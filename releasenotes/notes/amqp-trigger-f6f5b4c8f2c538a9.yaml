@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    A new AMQP driver enable triggering pipeline on new messages.
+    The trigger supports address and body filter.

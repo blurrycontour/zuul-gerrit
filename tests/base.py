@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import configparser
 from contextlib import contextmanager
 import datetime
@@ -56,6 +57,10 @@ import testtools.content_type
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
+from proton import Endpoint
+from proton.handlers import MessagingHandler
+from proton.reactor import Container
+
 
 import tests.fakegithub
 import zuul.driver.gerrit.gerritsource as gerritsource
@@ -2129,6 +2134,142 @@ class ChrootedKazooFixture(fixtures.Fixture):
         _tmp_client.delete(self.zookeeper_chroot, recursive=True)
         _tmp_client.stop()
         _tmp_client.close()
+
+
+class AMQPQueue(object):
+    """A basic AMQP Queue implementation used by the broker fixture."""
+    def __init__(self, dynamic=False):
+        self.dynamic = dynamic
+        self.queue = collections.deque()
+        self.consumers = []
+
+    def subscribe(self, consumer):
+        self.consumers.append(consumer)
+
+    def unsubscribe(self, consumer):
+        if consumer in self.consumers:
+            self.consumers.remove(consumer)
+        return len(self.consumers) == 0 and (
+            self.dynamic or self.queue.count == 0)
+
+    def publish(self, message):
+        self.queue.append(message)
+        self.dispatch()
+
+    def dispatch(self, consumer=None):
+        if consumer:
+            c = [consumer]
+        else:
+            c = self.consumers
+        while self._deliver_to(c):
+            pass
+
+    def _deliver_to(self, consumers):
+        try:
+            result = False
+            for c in consumers:
+                if c.credit:
+                    c.send(self.queue.popleft())
+                    result = True
+            return result
+        except IndexError:  # no more messages
+            return False
+
+
+class AMQPBroker(MessagingHandler):
+    """A basic AMQP broker to enable message passing to consumer."""
+    def __init__(self, url):
+        super().__init__()
+        self.url = url
+        self.queues = {}
+        self.acceptor = None
+
+    def on_start(self, event):
+        self.acceptor = event.container.listen(self.url)
+
+    def _queue(self, address):
+        queue = None
+        for addr in self.queues:
+            if address.startswith(addr.rstrip('>')):
+                queue = self.queues[addr]
+        if not queue:
+            queue = self.queues.setdefault(address, AMQPQueue())
+        return queue
+
+    def on_link_opening(self, event):
+        if event.link.is_sender:
+            if event.link.remote_source.dynamic:
+                address = str(uuid.uuid4())
+                event.link.source.address = address
+                q = AMQPQueue(True)
+                self.queues[address] = q
+                q.subscribe(event.link)
+            elif event.link.remote_source.address:
+                event.link.source.address = event.link.remote_source.address
+                self._queue(event.link.source.address).subscribe(event.link)
+        elif event.link.remote_target.address:
+            event.link.target.address = event.link.remote_target.address
+
+    def _unsubscribe(self, link):
+        if link.source.address in self.queues and \
+           self.queues[link.source.address].unsubscribe(link):
+            del self.queues[link.source.address]
+
+    def on_link_closing(self, event):
+        if event.link.is_sender:
+            self._unsubscribe(event.link)
+
+    def on_connection_closing(self, event):
+        self.remove_stale_consumers(event.connection)
+
+    def on_disconnected(self, event):
+        self.remove_stale_consumers(event.connection)
+
+    def remove_stale_consumers(self, connection):
+        l = connection.link_head(Endpoint.REMOTE_ACTIVE)
+        while l:
+            if l.is_sender:
+                self._unsubscribe(l)
+            l = l.next(Endpoint.REMOTE_ACTIVE)
+
+    def on_sendable(self, event):
+        self._queue(event.link.source.address).dispatch(event.link)
+
+    def on_message(self, event):
+        address = event.link.target.address
+        if address is None:
+            address = event.message.address
+        self._queue(address).publish(event.message)
+
+
+class AMQPBrokerFixture(fixtures.Fixture):
+    log = logging.getLogger("zuul.AMQPBrokerFixture")
+
+    def _setUp(self):
+        self.broker = None
+        self.thread = threading.Thread(name='AMQPBroker',
+                                       target=self.run)
+        self.thread.daemon = True
+        self.thread.start()
+        self.addCleanup(self._cleanUp)
+        for count in iterate_timeout(10, "AMQP broker started"):
+            if self.broker and self.broker.acceptor:
+                break
+
+    def _cleanUp(self):
+        self.thread.join()
+
+    def run(self):
+        self.log.debug("Starting AMQP broker")
+        self.broker = AMQPBroker("localhost:5672")
+        Container(self.broker).run()
+
+    def stop(self):
+        self.log.debug("Stopping AMQP broker")
+        self.broker.acceptor.close()
+        for broker_queue in self.broker.queues.values():
+            for consumer in broker_queue.consumers:
+                consumer.close()
 
 
 class WebProxyFixture(fixtures.Fixture):

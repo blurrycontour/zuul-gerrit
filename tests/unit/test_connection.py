@@ -14,9 +14,11 @@
 
 import textwrap
 
+from proton import Message
+from proton.utils import BlockingConnection
 import sqlalchemy as sa
 
-from tests.base import ZuulTestCase, ZuulDBTestCase
+from tests.base import ZuulTestCase, ZuulDBTestCase, AMQPBrokerFixture
 
 
 def _get_reporter_from_connection_name(reporters, connection_name):
@@ -458,6 +460,60 @@ class TestConnectionsGitweb(ZuulTestCase):
         url_should_be = 'https://review.example.com/' \
                         'gitweb?p=foo/bar.git;a=commitdiff;h=1'
         self.assertEqual(url, url_should_be)
+
+
+class TestAMQPConnection(ZuulTestCase):
+    config_file = 'zuul-amqp-driver.conf'
+    tenant_config_file = 'config/amqp-driver/main.yaml'
+
+    def setUp(self):
+        self.amqp_broker = self.useFixture(AMQPBrokerFixture())
+        super().setUp()
+
+    def tearDown(self):
+        self.amqp_broker.stop()
+        super().tearDown()
+
+    def send_message(self, address, body):
+        conn = BlockingConnection("localhost:5672", sasl_enabled=False)
+        self.log.debug("Sending AMQP message to %s (%s)", address, body)
+        conn.create_sender(address).send(Message(
+            address=address, body=body))
+        conn.close()
+
+    def test_amqp_trigger(self):
+        "Test the AMQP trigger"
+        self.executor_server.hold_jobs_in_build = True
+
+        # Send messsages not matching amqp pipeline filters
+        # -> invalid address
+        self.send_message(
+            "/topic/VirtualTopic.qa.ci",
+            {"type": "release", "product": "os-base"})
+        # -> invalid body type
+        self.send_message(
+            "/topic/VirtualTopic.qe.ci",
+            {"type": "pre-release", "product": "os-base"})
+        # -> invalid body product
+        self.send_message(
+            "/topic/VirtualTopic.qe.ci",
+            {"type": "release", "product": "dev-base"})
+        self.waitUntilSettled()
+        self.assertBuilds([])
+
+        # Send a message matching amqp pipeline
+        self.send_message(
+            "/topic/VirtualTopic.qe.ci",
+            {"type": "release", "product": "os-base"})
+        self.waitUntilSettled()
+        self.assertBuilds([
+            dict(name='test',
+                 project='common-config',
+                 pipeline='amqp'),
+        ])
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
 
 
 class TestMQTTConnection(ZuulTestCase):
