@@ -65,6 +65,7 @@ Zuul includes the following drivers:
    drivers/gerrit
    drivers/github
    drivers/git
+   drivers/amqp
    drivers/mqtt
    drivers/smtp
    drivers/sql
