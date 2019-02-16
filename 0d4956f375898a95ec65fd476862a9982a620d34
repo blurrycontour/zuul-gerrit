@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_55e4d3df",
+        "filename": "zuul/ansible/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-16T08:36:11Z",
+      "side": 1,
+      "message": "Exactly this is already done three lines above or am I missing something?",
+      "range": {
+        "startLine": 237,
+        "startChar": 0,
+        "endLine": 240,
+        "endChar": 28
+      },
+      "revId": "0d4956f375898a95ec65fd476862a9982a620d34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
