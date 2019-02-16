@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_d5c20334",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1248,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-16T08:32:58Z",
+      "side": 1,
+      "message": "Do you know how does that cooperate with localhost (which is by intention not specified in the hosts)? Removing the ansible_python_interpreter from all_vars will remove it from local tasks. Will it work correctly if we leave it in all_vars and additionally add it to the host vars here?",
+      "revId": "c3188cb2999d6988d1f6f7b941e71ccef4de5e49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
