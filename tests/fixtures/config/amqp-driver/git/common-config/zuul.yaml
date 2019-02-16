@@ -1,0 +1,24 @@
+- pipeline:
+    name: amqp
+    manager: independent
+    trigger:
+      amqp:
+        - event: message-published
+          address: ^/topic/VirtualTopic.qe.ci.*$
+          body:
+            type: release
+            product: ^os-.*$
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: test
+    run: playbooks/test.yaml
+
+- project:
+    name: common-config
+    amqp:
+      jobs:
+        - test
