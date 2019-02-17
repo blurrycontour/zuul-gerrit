@@ -5185,3 +5185,20 @@ class TestJobPausePriority(AnsibleZuulTestCase):
 
         self.fake_nodepool.unpause()
         self.waitUntilSettled()
+
+
+class TestAnsibleVersion(AnsibleZuulTestCase):
+    tenant_config_file = 'config/ansible-versions/main.yaml'
+
+    def test_ansible_versions(self):
+        """
+        Tests that jobs run with the requested ansible version.
+        """
+        A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='ansible-default', result='SUCCESS', changes='1,1'),
+            dict(name='ansible-25', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
