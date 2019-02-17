@@ -161,6 +161,29 @@ class AnsibleManager:
             for future in concurrent.futures.as_completed(futures):
                 future.result()
 
+    def validate(self):
+        result = True
+        for version in self.supported_versions:
+            command = [
+                self.getAnsibleCommand(version, 'ansible'),
+                '--version',
+            ]
+            try:
+                result = subprocess.run(command,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE,
+                                        check=True)
+                self.log.info('Ansible version %s information: \n%s',
+                              version, result.stdout.decode())
+            except FileNotFoundError:
+                result = False
+                self.log.exception('Ansible version %s not found' % version)
+            except subprocess.CalledProcessError:
+                result = False
+                self.log.exception("Ansible version %s not working" % version)
+
+        return result
+
     def _getAnsible(self, version):
         return self.supported_versions.get(version, self.default_version)
 
