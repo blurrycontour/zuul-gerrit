@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    Zuul now supports multiple ansible versions in parallel. The ansible version
+    to use can now be specified by :attr:`job.ansible-version`.
+upgrade:
+  - |
+    In order to support several ansible versions in parallel zuul now handles
+    them itself in virtual environments. By default zuul installs the needed
+    ansible versions on startup so there is no further user action required.
+    However it is recommended to pre-install the ansible environments during
+    installation by invoking ``zuul-manage-ansible``.
