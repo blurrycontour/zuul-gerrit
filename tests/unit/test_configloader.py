@@ -73,6 +73,55 @@ class TestTenantSimple(TenantParserTestCase):
         self.assertEqual(job[1].variant_description, "stable")
 
 
+class TestTenantAnsibleVersion(TenantParserTestCase):
+    tenant_config_file = 'config/tenant-parser/ansible-version.yaml'
+
+    def test_tenant_ansible_version(self):
+        tenant_no_default = self.sched.abide.tenants.get('tenant-no-default')
+        tenant_2_5 = self.sched.abide.tenants.get('tenant-default-2-5')
+
+        # These tenants should have no loading errors
+        self.assertEqual(
+            0, len(tenant_no_default.layout.loading_errors.errors))
+        self.assertEqual(0, len(tenant_2_5.layout.loading_errors.errors))
+
+        tenants = [
+            (tenant_no_default, '2.5'),
+            (tenant_2_5, '2.5'),
+        ]
+
+        for tenant, version in tenants:
+            self.assertEqual(['common-config'],
+                             [x.name for x in tenant.config_projects])
+            self.assertEqual(['org/project1', 'org/project2'],
+                             [x.name for x in tenant.untrusted_projects])
+
+            project = tenant.config_projects[0]
+            tpc = tenant.project_configs[project.canonical_name]
+            self.assertEqual(self.CONFIG_SET, tpc.load_classes)
+            project = tenant.untrusted_projects[0]
+            tpc = tenant.project_configs[project.canonical_name]
+            self.assertEqual(self.UNTRUSTED_SET, tpc.load_classes)
+            project = tenant.untrusted_projects[1]
+            tpc = tenant.project_configs[project.canonical_name]
+            self.assertEqual(self.UNTRUSTED_SET, tpc.load_classes)
+            self.assertTrue('common-config-job' in tenant.layout.jobs)
+            self.assertTrue('project1-job' in tenant.layout.jobs)
+            self.assertTrue('project2-job' in tenant.layout.jobs)
+            project1_config = tenant.layout.project_configs.get(
+                'review.example.com/org/project1')
+            self.assertTrue('common-config-job' in
+                            project1_config[0].pipelines['check'].job_list.jobs)
+            self.assertTrue('project1-job' in
+                            project1_config[1].pipelines['check'].job_list.jobs)
+            project2_config = tenant.layout.project_configs.get(
+                'review.example.com/org/project2')
+            self.assertTrue('common-config-job' in
+                            project2_config[0].pipelines['check'].job_list.jobs)
+            self.assertTrue('project2-job' in
+                            project2_config[1].pipelines['check'].job_list.jobs)
+
+
 class TestTenantOverride(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/override.yaml'
 

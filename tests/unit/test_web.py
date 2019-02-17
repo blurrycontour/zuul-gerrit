@@ -284,6 +284,7 @@ class TestWeb(BaseTestWeb):
             {
                 'name': 'project-test1',
                 'abstract': False,
+                'ansible_version': None,
                 'attempts': 4,
                 'branches': [],
                 'dependencies': [],
@@ -319,6 +320,7 @@ class TestWeb(BaseTestWeb):
             }, {
                 'name': 'project-test1',
                 'abstract': False,
+                'ansible_version': None,
                 'attempts': 3,
                 'branches': ['stable'],
                 'dependencies': [],
@@ -357,6 +359,7 @@ class TestWeb(BaseTestWeb):
         self.assertEqual([
             {
                 'abstract': False,
+                'ansible_version': None,
                 'attempts': 3,
                 'branches': [],
                 'dependencies': [],
@@ -431,6 +434,7 @@ class TestWeb(BaseTestWeb):
             'api/tenant/tenant-one/project/org/project1').json()
 
         jobs = [[{'abstract': False,
+                  'ansible_version': None,
                   'attempts': 3,
                   'branches': [],
                   'dependencies': [],
@@ -458,6 +462,7 @@ class TestWeb(BaseTestWeb):
                   'variant_description': '',
                   'voting': True}],
                 [{'abstract': False,
+                  'ansible_version': None,
                   'attempts': 3,
                   'branches': [],
                   'dependencies': ['project-merge'],
@@ -485,6 +490,7 @@ class TestWeb(BaseTestWeb):
                   'variant_description': '',
                   'voting': True}],
                 [{'abstract': False,
+                  'ansible_version': None,
                   'attempts': 3,
                   'branches': [],
                   'dependencies': ['project-merge'],
@@ -512,6 +518,7 @@ class TestWeb(BaseTestWeb):
                   'variant_description': '',
                   'voting': True}],
                 [{'abstract': False,
+                  'ansible_version': None,
                   'attempts': 3,
                   'branches': [],
                   'dependencies': ['project-merge'],
