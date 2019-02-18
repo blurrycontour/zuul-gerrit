@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_54ea8c73",
+        "filename": "zuul/cmd/runner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-18T05:10:49Z",
+      "side": 1,
+      "message": "This looks like duplicated code. Is this elsewhere, and if so, can we put it in a lib?",
+      "range": {
+        "startLine": 293,
+        "startChar": 36,
+        "endLine": 293,
+        "endChar": 46
+      },
+      "revId": "a06d99b6c28270606dc8314170b3069e0c639c9b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
