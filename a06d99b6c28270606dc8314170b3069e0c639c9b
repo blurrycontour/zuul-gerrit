@@ -22,6 +22,30 @@
       "revId": "a06d99b6c28270606dc8314170b3069e0c639c9b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_bf9b9170",
+        "filename": "zuul/cmd/runner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-02-18T06:41:05Z",
+      "side": 1,
+      "message": "The code comes from the base manager, but the logic requires access to the full tenant configuration. As noted bellow, perhaps we should give the depends-on list to the freeze_job handler so that it can prepare the required \u0027projects\u0027 and \u0027items\u0027 list.",
+      "parentUuid": "9fdfeff1_54ea8c73",
+      "range": {
+        "startLine": 293,
+        "startChar": 36,
+        "endLine": 293,
+        "endChar": 46
+      },
+      "revId": "a06d99b6c28270606dc8314170b3069e0c639c9b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
