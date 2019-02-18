@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_9f932d4f",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-02-18T06:45:43Z",
+      "side": 1,
+      "message": "It\u0027s indeed not useful for the zuul-runner use case, but it is a valuable information. We can add it in a follow-up too.",
+      "parentUuid": "9fdfeff1_940a3487",
+      "range": {
+        "startLine": 363,
+        "startChar": 25,
+        "endLine": 363,
+        "endChar": 29
+      },
+      "revId": "06511a295add742840129248ae218fc6f22c05f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_54004c66",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 13
@@ -36,6 +60,30 @@
       "writtenOn": "2019-02-18T04:41:05Z",
       "side": 1,
       "message": "I don\u0027t think this is interesting for somebody who is asking \"what systems does this zuul instance connect to\". It should be up to the consumer what to do with ssl.",
+      "range": {
+        "startLine": 601,
+        "startChar": 13,
+        "endLine": 601,
+        "endChar": 23
+      },
+      "revId": "06511a295add742840129248ae218fc6f22c05f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_1f9f3d50",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 601,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-02-18T06:45:43Z",
+      "side": 1,
+      "message": "Well if the server is known to not be signed by a public CA, then consumer might use that information. It can be added back in a follow-up if needed.",
+      "parentUuid": "9fdfeff1_54004c66",
       "range": {
         "startLine": 601,
         "startChar": 13,
