@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_940a3487",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-18T04:41:05Z",
+      "side": 1,
+      "message": "I\u0027m not sure if we should expose this here. It\u0027s probably harmless, but it also probably isn\u0027t that useful to anybody who doesn\u0027t have the keys for that user.",
+      "range": {
+        "startLine": 363,
+        "startChar": 25,
+        "endLine": 363,
+        "endChar": 29
+      },
+      "revId": "06511a295add742840129248ae218fc6f22c05f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_54004c66",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 601,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-18T04:41:05Z",
+      "side": 1,
+      "message": "I don\u0027t think this is interesting for somebody who is asking \"what systems does this zuul instance connect to\". It should be up to the consumer what to do with ssl.",
+      "range": {
+        "startLine": 601,
+        "startChar": 13,
+        "endLine": 601,
+        "endChar": 23
+      },
+      "revId": "06511a295add742840129248ae218fc6f22c05f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
