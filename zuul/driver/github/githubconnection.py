@@ -29,6 +29,7 @@ import cherrypy
 import cachecontrol
 from cachecontrol.cache import DictCache
 from cachecontrol.heuristics import BaseHeuristic
+import cachetools
 import iso8601
 import jwt
 import requests
@@ -76,14 +77,15 @@ class GithubShaCache(object):
         self.projects = {}
 
     def update(self, project_name, pr):
-        project_cache = self.projects.setdefault(project_name, {})
+        project_cache = self.projects.setdefault(
+            project_name,
+            # Cache up to 2k PRs for each project
+            cachetools.LRUCache(2048)
+        )
         sha = pr['head']['sha']
         number = pr['number']
         cached_prs = project_cache.setdefault(sha, set())
-        if pr['state'] == 'open':
-            cached_prs.add(number)
-        else:
-            cached_prs.discard(number)
+        cached_prs.add(number)
 
     def get(self, project_name, sha):
         project_cache = self.projects.get(project_name, {})
