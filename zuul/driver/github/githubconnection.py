@@ -29,6 +29,7 @@ import cherrypy
 import cachecontrol
 from cachecontrol.cache import DictCache
 from cachecontrol.heuristics import BaseHeuristic
+import cachetools
 import iso8601
 import jwt
 import requests
@@ -47,6 +48,7 @@ from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
 
 GITHUB_BASE_URL = 'https://api.github.com'
 PREVIEW_JSON_ACCEPT = 'application/vnd.github.machine-man-preview+json'
+HOUR = 60 * 60
 
 
 def _sign_request(body, secret):
@@ -76,14 +78,16 @@ class GithubShaCache(object):
         self.projects = {}
 
     def update(self, project_name, pr):
-        project_cache = self.projects.setdefault(project_name, {})
+        project_cache = self.projects.setdefault(
+            project_name,
+            # Cache each project's sha to PR table entries
+            # for up to 3 hours.
+            cachetools.TTLCache(2048, 3 * HOUR)
+        )
         sha = pr['head']['sha']
         number = pr['number']
         cached_prs = project_cache.setdefault(sha, set())
-        if pr['state'] == 'open':
-            cached_prs.add(number)
-        else:
-            cached_prs.discard(number)
+        cached_prs.add(number)
 
     def get(self, project_name, sha):
         project_cache = self.projects.get(project_name, {})

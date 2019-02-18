@@ -1336,8 +1336,17 @@ class TestGithubShaCache(BaseTestCase):
         }
         cache.update('foo/bar', pr_dict)
         self.assertEqual(cache.get('foo/bar', '123456'), set({1}))
-        pr_dict['state'] = 'closed'
-        cache.update('foo/bar', pr_dict)
+
+        # Object will be expired at this point in time.
+        future_time = time.monotonic() + (3 * 60 * 60 + 100)
+        time_mock = mock.MagicMock(return_value=future_time)
+
+        # Ugly access of cache internals to ensure we've expired the
+        # above entry.
+        project_cache = cache.projects.get('foo/bar')
+        timer = project_cache._TTLCache__timer
+        timer._Timer__timer = time_mock
+
         self.assertEqual(cache.get('foo/bar', '123456'), set())
 
     def testMultiInsert(self):
@@ -1382,7 +1391,7 @@ class TestGithubShaCache(BaseTestCase):
         self.assertEqual(cache.get('bar/foo', '789'), set())
         self.assertEqual(cache.get('foo/bar', '789'), set())
 
-    def testNoUpdate(self):
+    def testClosedPRRemains(self):
         cache = GithubShaCache()
         pr_dict = {
             'head': {
@@ -1392,4 +1401,4 @@ class TestGithubShaCache(BaseTestCase):
             'state': 'closed',
         }
         cache.update('foo/bar', pr_dict)
-        self.assertEqual(cache.get('bar/foo', '123456'), set())
+        self.assertEqual(cache.get('foo/bar', '123456'), set({1}))
