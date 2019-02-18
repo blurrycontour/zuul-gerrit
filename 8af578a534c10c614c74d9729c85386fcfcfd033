@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_b41e58b8",
+        "filename": "zuul/cmd/runner.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-18T05:02:08Z",
+      "side": 1,
+      "message": "possibly should have this in the help note as it should be a require param and this default isn\u0027t useful.\n\nRather than separating nodes by a semi-colon, we could take this argument multiple times (once per node)",
+      "range": {
+        "startLine": 80,
+        "startChar": 12,
+        "endLine": 80,
+        "endChar": 19
+      },
+      "revId": "8af578a534c10c614c74d9729c85386fcfcfd033",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
