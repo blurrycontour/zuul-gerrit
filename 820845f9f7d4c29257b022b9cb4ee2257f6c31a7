@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_742c7001",
+        "filename": "zuul/cmd/runner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-18T04:45:30Z",
+      "side": 1,
+      "message": "This format only really works for gerrit connections. We should defer to a user supplied dict for overrides. However, this starts to look just like reading in a config, so I\u0027m not sure of the value of that.\n\nPerhaps we should consider zuul providing a \u0027readonly\u0027 set of creds. That\u0027d add additional deployment complexity though.\n\nWe should also look into possibly reworking the runner to not require an ssh connection to gerrit instead pulling over http.",
+      "revId": "820845f9f7d4c29257b022b9cb4ee2257f6c31a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
