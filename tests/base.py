@@ -2033,8 +2033,6 @@ class ChrootedKazooFixture(fixtures.Fixture):
         rand_test_path = '%s_%s_%s' % (random_bits, os.getpid(), self.test_id)
         self.zookeeper_chroot = "/nodepool_test/%s" % rand_test_path
 
-        self.addCleanup(self._cleanup)
-
         # Ensure the chroot path exists and clean up any pre-existing znodes.
         _tmp_client = kazoo.client.KazooClient(
             hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port))
@@ -2047,7 +2045,7 @@ class ChrootedKazooFixture(fixtures.Fixture):
         _tmp_client.stop()
         _tmp_client.close()
 
-    def _cleanup(self):
+    def _cleanUp(self):
         '''Remove the chroot path.'''
         # Need a non-chroot'ed client to remove the chroot path
         _tmp_client = kazoo.client.KazooClient(
@@ -2090,9 +2088,8 @@ class WebProxyFixture(fixtures.Fixture):
         self.port = self.httpd.socket.getsockname()[1]
         self.thread = threading.Thread(target=self.httpd.serve_forever)
         self.thread.start()
-        self.addCleanup(self._cleanup)
 
-    def _cleanup(self):
+    def _cleanUp(self):
         self.httpd.shutdown()
         self.thread.join()
 
