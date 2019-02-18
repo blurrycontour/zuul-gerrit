@@ -16,6 +16,24 @@
       "revId": "820845f9f7d4c29257b022b9cb4ee2257f6c31a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_bfd711ee",
+        "filename": "zuul/cmd/runner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-02-18T06:54:51Z",
+      "side": 1,
+      "message": "Agreed, not sure how far we can go with supporting zero-configuration, though it seems like a great use-case. Perhaps we should start by implementing a zuul-runner.yaml config format. Then when default value could work everywhere, (e.g. by using gerrit\u0027s anon http) we could look into supporting zero-conf.",
+      "parentUuid": "9fdfeff1_742c7001",
+      "revId": "820845f9f7d4c29257b022b9cb4ee2257f6c31a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
