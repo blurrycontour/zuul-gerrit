@@ -16,6 +16,24 @@
       "revId": "c3188cb2999d6988d1f6f7b941e71ccef4de5e49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_27222503",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1248,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-02-19T04:44:33Z",
+      "side": 1,
+      "message": "IIUC, ansible use sys.executable by default for localhost\u0027s python interpreter path.",
+      "parentUuid": "9fdfeff1_d5c20334",
+      "revId": "c3188cb2999d6988d1f6f7b941e71ccef4de5e49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
