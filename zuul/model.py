@@ -3686,6 +3686,7 @@ class Layout(object):
         job_list = ppc.job_list
         change = item.change
         pipeline = item.pipeline
+        item.debug("triggers: {}".format(item.pipeline.triggers))
         item.debug("Freezing job graph")
         for jobname in job_list.jobs:
             # This is the final job we are constructing
@@ -3745,7 +3746,9 @@ class Layout(object):
                 item.debug("No matching pipeline variants for {jobname}".
                            format(jobname=jobname), indent=2)
                 continue
-            if not frozen_job.changeMatchesFiles(change):
+            item.pipeline.triggers[0].name != 'timer'
+            if item.pipeline.triggers[0].name != 'timer' and \
+                    not frozen_job.changeMatchesFiles(change):
                 self.log.debug("Job %s did not match files in %s",
                                repr(frozen_job), change)
                 item.debug("Job {jobname} did not match files".

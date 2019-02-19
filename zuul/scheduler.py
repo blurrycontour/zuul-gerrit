@@ -1047,6 +1047,7 @@ class Scheduler(threading.Thread):
         self.log.debug("Fetching trigger event")
         event = self.trigger_event_queue.get()
         self.log.debug("Processing trigger event %s" % event)
+        self.log.debug("Processing trigger event type %s" % event.type)
         try:
             full_project_name = ('/'.join([event.project_hostname,
                                            event.project_name]))

@@ -38,6 +38,8 @@
         - name: static
           label: ubuntu-xenial
     run: playbooks/project-bitrot.yaml
+    files: 
+      - foo/bar.txt
 
 - project:
     name: org/project1
