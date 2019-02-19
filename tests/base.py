@@ -2185,7 +2185,14 @@ class AMQPBroker(MessagingHandler):
         self.acceptor = None
 
     def on_start(self, event):
-        self.acceptor = event.container.listen(self.url)
+        for count in iterate_timeout(30, "bind broker"):
+            try:
+                self.acceptor = event.container.listen(self.url)
+                break
+            except OSError:
+                # Address may already be in use
+                # Proton doesn't let us use the SO_REUSEADDR option
+                time.sleep(0.2)
 
     def _queue(self, address):
         queue = None

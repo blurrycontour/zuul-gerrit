@@ -12,11 +12,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os
 import textwrap
 
 from proton import Message
 from proton.utils import BlockingConnection
 import sqlalchemy as sa
+import yaml
 
 from tests.base import ZuulTestCase, ZuulDBTestCase, AMQPBrokerFixture
 
@@ -514,6 +516,33 @@ class TestAMQPConnection(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
+
+    def test_amqp_message(self):
+        "Test the AMQP zuul variable"
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.keep_jobdir = True
+
+        # Test message is reflected in the zuul.amqp job variable
+        amqp = {
+            "address": "/topic/VirtualTopic.qe.ci",
+            "body": {"type": "release", "product": "os-base"},
+        }
+        self.send_message(**amqp)
+        self.waitUntilSettled()
+        build = self.getJobFromHistory("test")
+        self.assertEqual(build.result, 'SUCCESS')
+        inventory = yaml.safe_load(open(os.path.join(
+            self.executor_server.jobdir_root,
+            build.uuid,
+            "ansible",
+            "inventory.yaml")))
+        self.assertEqual(amqp, inventory['all']['vars']['zuul']['amqp'])
+
+        # Test a new message result in a new build
+        amqp["body"]["product"] = "os-virt"
+        self.send_message(**amqp)
+        self.waitUntilSettled()
+        self.assertEquals(2, len(self.history))
 
 
 class TestMQTTConnection(ZuulTestCase):

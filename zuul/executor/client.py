@@ -181,6 +181,10 @@ class ExecutorClient(object):
             zuul_params['patchset'] = str(item.change.patchset)
         if hasattr(item.change, 'message'):
             zuul_params['message'] = item.change.message
+        if hasattr(item.event, 'address'):
+            zuul_params.setdefault('amqp', {})["address"] = item.event.address
+        if hasattr(item.event, 'body'):
+            zuul_params.setdefault('amqp', {})["body"] = item.event.body
         if (hasattr(item.change, 'oldrev') and item.change.oldrev
             and item.change.oldrev != '0' * 40):
             zuul_params['oldrev'] = item.change.oldrev
