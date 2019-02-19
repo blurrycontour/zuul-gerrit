@@ -15,6 +15,7 @@
 
 import json
 import logging
+import re
 import threading
 import traceback
 import types
@@ -22,6 +23,7 @@ import types
 import gear
 
 from zuul import model
+from zuul.driver.webtrigger import WebTriggerEvent
 from zuul.lib import encryption
 from zuul.lib.config import get_default
 
@@ -78,6 +80,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:pipeline_list")
         self.worker.registerFunction("zuul:key_get")
         self.worker.registerFunction("zuul:config_errors_list")
+        self.worker.registerFunction("zuul:web_trigger")
 
     def stop(self):
         self.log.debug("Stopping")
@@ -482,3 +485,24 @@ class RPCListener(object):
                 'source_context': err.key.context.toDict(),
                 'error': err.error})
         job.sendWorkComplete(json.dumps(output))
+
+    def handle_web_trigger(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        if not tenant:
+            job.sendWorkComplete(json.dumps(None))
+            return
+        _, project = tenant.getProject(args.get("project"))
+        if not project:
+            job.sendWorkComplete(json.dumps(None))
+            return
+        event = WebTriggerEvent()
+        event.project_hostname = project.canonical_hostname
+        event.project_name = project.name
+        event.ref = 'refs/heads/%s' % args.get('branch', 'master')
+        event.branch = args.get('branch', 'master')
+        event.job_filters = [re.compile(x)
+                             for x in args.get('job_filters', [])]
+        self.sched.addEvent(event)
+        job.sendWorkComplete(json.dumps({
+            'url': '/status/change/%s' % event.ref}))
