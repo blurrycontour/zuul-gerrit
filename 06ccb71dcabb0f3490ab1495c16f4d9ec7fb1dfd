@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_94e9abb8",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1201,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-19T17:42:22Z",
+      "side": 1,
+      "message": "nit: We could make this even less confusing if we call these vars owner, repository (in github3.py it\u0027s called repository too) as project is a strong wording in zuul.",
+      "revId": "06ccb71dcabb0f3490ab1495c16f4d9ec7fb1dfd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
