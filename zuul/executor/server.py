@@ -13,6 +13,7 @@
 # under the License.
 
 import collections
+from concurrent.futures import ThreadPoolExecutor
 import datetime
 import json
 import logging
@@ -834,13 +835,17 @@ class AnsibleJob(object):
             self.jobdir.src_root,
             self.executor_server.merge_root,
             self.log)
+
+        git_worker_count = 8 * multiprocessing.cpu_count()
         repos = {}
-        for project in args['projects']:
-            self.log.debug("Cloning %s/%s" % (project['connection'],
-                                              project['name'],))
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
-            repos[project['canonical_name']] = repo
+        with ThreadPoolExecutor(max_workers=git_worker_count) as pool:
+            def do_one_clone(project):
+                self.log.debug("Cloning %s/%s" % (project['connection'],
+                                                  project['name'],))
+                repo = merger.getRepo(project['connection'],
+                                      project['name'])
+                repos[project['canonical_name']] = repo
+            pool.map(do_one_clone, args['projects'])
 
         # The commit ID of the original item (before merging).  Used
         # later for line mapping.
@@ -859,35 +864,37 @@ class AnsibleJob(object):
         if state_items:
             merger.setRepoState(state_items, args['repo_state'])
 
-        for project in args['projects']:
-            repo = repos[project['canonical_name']]
-            # If this project is the Zuul project and this is a ref
-            # rather than a change, checkout the ref.
-            if (project['canonical_name'] ==
-                args['zuul']['project']['canonical_name'] and
-                (not args['zuul'].get('branch')) and
-                args['zuul'].get('ref')):
-                ref = args['zuul']['ref']
-            else:
-                ref = None
-            selected_ref, selected_desc = self.resolveBranch(
-                project['canonical_name'],
-                ref,
-                args['branch'],
-                args['override_branch'],
-                args['override_checkout'],
-                project['override_branch'],
-                project['override_checkout'],
-                project['default_branch'])
-            self.log.info("Checking out %s %s %s",
-                          project['canonical_name'], selected_desc,
-                          selected_ref)
-            repo.checkout(selected_ref)
+        with ThreadPoolExecutor(max_workers=git_worker_count) as pool:
+            def do_one_checkout(project):
+                repo = repos[project['canonical_name']]
+                # If this project is the Zuul project and this is a ref
+                # rather than a change, checkout the ref.
+                if (project['canonical_name'] ==
+                    args['zuul']['project']['canonical_name'] and
+                    (not args['zuul'].get('branch')) and
+                    args['zuul'].get('ref')):
+                    ref = args['zuul']['ref']
+                else:
+                    ref = None
+                selected_ref, selected_desc = self.resolveBranch(
+                    project['canonical_name'],
+                    ref,
+                    args['branch'],
+                    args['override_branch'],
+                    args['override_checkout'],
+                    project['override_branch'],
+                    project['override_checkout'],
+                    project['default_branch'])
+                self.log.info("Checking out %s %s %s",
+                              project['canonical_name'], selected_desc,
+                              selected_ref)
+                repo.checkout(selected_ref)
 
-            # Update the inventory variables to indicate the ref we
-            # checked out
-            p = args['zuul']['projects'][project['canonical_name']]
-            p['checkout'] = selected_ref
+                # Update the inventory variables to indicate the ref we
+                # checked out
+                p = args['zuul']['projects'][project['canonical_name']]
+                p['checkout'] = selected_ref
+            pool.map(do_one_checkout, args['projects'])
 
         # Set the URL of the origin remote for each repo to a bogus
         # value. Keeping the remote allows tools to use it to determine
