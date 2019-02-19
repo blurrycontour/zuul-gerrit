@@ -46,6 +46,30 @@
       "revId": "127d8536d92916488bc865ba0cb7ff1b42308f3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_6f0c72ec",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-19T18:10:21Z",
+      "side": 1,
+      "message": "Yes it is, I thought we have a configparser object here but you\u0027re right, we really have just a dict here.\n\nToo bad that _convert_to_boolean is private in configparser:\nhttps://github.com/python/cpython/blob/3.7/Lib/configparser.py#L1156",
+      "parentUuid": "9fdfeff1_6159f88c",
+      "range": {
+        "startLine": 320,
+        "startChar": 0,
+        "endLine": 321,
+        "endChar": 36
+      },
+      "revId": "127d8536d92916488bc865ba0cb7ff1b42308f3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
