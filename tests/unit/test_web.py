@@ -19,6 +19,7 @@ import urllib.parse
 import socket
 
 import requests
+import yaml
 
 import zuul.web
 
@@ -81,6 +82,11 @@ class BaseTestWeb(ZuulTestCase):
     def get_url(self, url, *args, **kwargs):
         return requests.get(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
+
+    def post_url(self, url, data={}, *args, **kwargs):
+        return requests.post(
+            urllib.parse.urljoin(self.base_url, url),
+            json=data, *args, **kwargs)
 
     def tearDown(self):
         self.executor_server.hold_jobs_in_build = False
@@ -597,6 +603,41 @@ class TestWeb(BaseTestWeb):
     def test_web_job_noop(self):
         job = self.get_url("api/tenant/tenant-one/job/noop").json()
         self.assertEqual("noop", job[0]["name"])
+
+    def test_web_trigger_404(self):
+        resp = self.post_url("api/tenant/tenant-42/trigger/org/project")
+        self.assertEqual(404, resp.status_code)
+        resp = self.post_url("api/tenant/tenant-one/trigger/org/project42")
+        self.assertEqual(404, resp.status_code)
+
+    def test_web_trigger_post(self):
+        self.executor_server.hold_jobs_in_build = False
+        result = self.post_url(
+            "api/tenant/tenant-one/trigger/org/project").json()
+        self.assertEqual({"url": "/status/change/refs/heads/master"}, result)
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+
+    def test_web_trigger_variables(self):
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.keep_jobdir = True
+        result = self.post_url(
+            "api/tenant/tenant-one/trigger/org/project",
+            {'test_var': 42, 'test_str': 'test string'}).json()
+        self.assertEqual({"url": "/status/change/refs/heads/master"}, result)
+        self.executor_server.release()
+        self.waitUntilSettled()
+        build = self.getJobFromHistory("project-test1")
+        self.assertEqual(build.result, 'SUCCESS')
+        inventory = yaml.safe_load(open(os.path.join(
+            self.executor_server.jobdir_root,
+            build.uuid,
+            "ansible",
+            "inventory.yaml")))
+        self.assertEqual(42, inventory['all']['vars']['test_var'])
+        self.assertEqual('test string', inventory['all']['vars']['test_str'])
 
 
 class TestInfo(BaseTestWeb):
