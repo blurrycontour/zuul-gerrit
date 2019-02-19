@@ -455,6 +455,25 @@ class ZuulWebAPI(object):
         resp.headers['Content-Type'] = 'text/plain'
         return job.data[0] + '\n'
 
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def trigger(self, tenant, project):
+        inputs = cherrypy.request.json
+        job = self.rpc.submitJob('zuul:web_trigger', {
+            'tenant': tenant,
+            'project': project,
+            'branch': inputs.get("branch", "master"),
+            'job_filters': list(inputs.get("job_filters", [])),
+            'variables': inputs.get("variables", {}),
+            'pipeline': inputs.get("pipeline"),
+        })
+        ret = json.loads(job.data[0])
+        if ret is None:
+            raise cherrypy.HTTPError(404, 'Tenant or project does not exist.')
+        return ret
+
     def buildToDict(self, build, buildset=None):
         start_time = build.start_time
         if build.start_time:
@@ -798,6 +817,9 @@ class ZuulWeb(object):
                           controller=api, action='buildset')
         route_map.connect('api', '/api/tenant/{tenant}/config-errors',
                           controller=api, action='config_errors')
+        route_map.connect(
+            'api', '/api/tenant/{tenant}/trigger/{project:.*}',
+            controller=api, action='trigger', conditions=dict(method=["POST"]))
 
         for connection in connections.connections.values():
             controller = connection.getWebController(self)
