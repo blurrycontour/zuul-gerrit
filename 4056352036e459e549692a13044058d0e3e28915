@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_34923f5a",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1356,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-19T17:38:15Z",
+      "side": 1,
+      "message": "nit: {1, 2} is already a set so casting it to a set is not necessary",
+      "revId": "4056352036e459e549692a13044058d0e3e28915",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
