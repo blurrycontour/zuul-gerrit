@@ -3239,6 +3239,7 @@ class TriggerEvent(object):
         self.newrev = None
         # List of job set by EventFilter
         self.job_filters = []
+        self.variables = None
         # For events that arrive with a destination pipeline (eg, from
         # an admin command, etc):
         self.forced_pipeline = None
@@ -3275,7 +3276,8 @@ class TriggerEvent(object):
                                  id(self), self._repr())
 
     def filterEquals(self, other):
-        if (self.job_filters == other.job_filters):
+        if (self.job_filters == other.job_filters and
+            self.variables == other.variables):
             return True
         return False
 
@@ -4167,6 +4169,10 @@ class Layout(object):
             if not frozen_job.run:
                 raise Exception("Job %s does not specify a run playbook" % (
                     frozen_job.name,))
+
+            if item.event and item.event.variables:
+                frozen_job.updateVariables(
+                    item.event.variables, None, None, None)
 
             job_graph.addJob(frozen_job)
 

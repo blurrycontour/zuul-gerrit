@@ -942,6 +942,40 @@ class TestWeb(BaseTestWeb):
         }
         self.assertIn(expected, resp.json())
 
+    def test_web_trigger_404(self):
+        resp = self.post_url(
+            "api/tenant/tenant-42/trigger/org/project", json={})
+        self.assertEqual(404, resp.status_code)
+        resp = self.post_url(
+            "api/tenant/tenant-one/trigger/org/project42", json={})
+        self.assertEqual(404, resp.status_code)
+
+    def test_web_trigger_post(self):
+        self.executor_server.hold_jobs_in_build = False
+        result = self.post_url(
+            "api/tenant/tenant-one/trigger/org/project", json={}).json()
+        self.assertEqual({"url": "/status/change/refs/heads/master"}, result)
+        self.executor_server.release()
+        self.waitUntilSettled()
+        ref = "refs/heads/master"
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', ref=ref),
+            dict(name='project-test2', result='SUCCESS', ref=ref),
+        ])
+
+    def test_web_trigger_filters(self):
+        self.executor_server.hold_jobs_in_build = False
+        result = self.post_url(
+            "api/tenant/tenant-one/trigger/org/project",
+            json={"job_filters": ["project-test1"]}).json()
+        self.assertEqual({"url": "/status/change/refs/heads/master"}, result)
+        self.executor_server.release()
+        self.waitUntilSettled()
+        ref = "refs/heads/master"
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', ref=ref),
+        ])
+
 
 class TestWebMultiTenant(BaseTestWeb):
     tenant_config_file = 'config/multi-tenant/main.yaml'

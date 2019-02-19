@@ -15,10 +15,12 @@
 
 import json
 import logging
+import re
 import time
 
 from zuul import model
 from zuul.connection import BaseConnection
+from zuul.driver.webtrigger import WebTriggerEvent
 from zuul.lib import encryption
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
@@ -57,6 +59,7 @@ class RPCListener(object):
             'config_errors_list',
             'connection_list',
             'authorize_user',
+            'web_trigger',
         ]
         for func in functions:
             f = getattr(self, 'handle_%s' % func)
@@ -533,6 +536,29 @@ class RPCListener(object):
         else:
             job.sendWorkComplete("")
             return
+
+    def handle_web_trigger(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        if not tenant:
+            job.sendWorkComplete(json.dumps(None))
+            return
+        _, project = tenant.getProject(args.get("project"))
+        if not project:
+            job.sendWorkComplete(json.dumps(None))
+            return
+        event = WebTriggerEvent()
+        event.project_hostname = project.canonical_hostname
+        event.project_name = project.name
+        event.ref = 'refs/heads/%s' % args.get('branch', 'master')
+        event.branch = args.get('branch', 'master')
+        event.forced_pipeline = args.get('pipeline')
+        event.job_filters = [re.compile(x)
+                             for x in args.get('job_filters', [])]
+        event.variables = args.get('variables', {})
+        self.sched.addEvent(event)
+        job.sendWorkComplete(json.dumps({
+            'url': '/status/change/%s' % event.ref}))
 
     def handle_config_errors_list(self, job):
         args = json.loads(job.arguments)
