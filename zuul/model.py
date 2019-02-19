@@ -2704,6 +2704,7 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        self.amqp = None
 
     def _id(self):
         return self.newrev
@@ -2731,7 +2732,8 @@ class Ref(object):
     def equals(self, other):
         if (self.project == other.project
             and self.ref == other.ref
-            and self.newrev == other.newrev):
+            and self.newrev == other.newrev
+            and self.amqp == other.amqp):
             return True
         return False
 

@@ -64,4 +64,10 @@ class AMQPFilter(EventFilter):
         if self.body and not matches_body:
             return False
 
+        # Add message information to the change to be passed as
+        # zuul.amqp job variable
+        change.amqp = {
+            "address": event.address,
+            "body": event.body,
+        }
         return True
