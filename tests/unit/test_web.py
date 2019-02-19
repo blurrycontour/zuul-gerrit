@@ -403,10 +403,11 @@ class TestWeb(BaseTestWeb):
         # can we fetch the list of pipelines
         data = self.get_url('api/tenant/tenant-one/pipelines').json()
 
+        gerrit_trigger = {'connection': 'gerrit', 'name': 'gerrit'}
         expected_list = [
-            {'name': 'check'},
-            {'name': 'gate'},
-            {'name': 'post'},
+            {'name': 'check', 'triggers': [gerrit_trigger]},
+            {'name': 'gate', 'triggers': [gerrit_trigger]},
+            {'name': 'post', 'triggers': [gerrit_trigger]},
         ]
         self.assertEqual(expected_list, data)
 

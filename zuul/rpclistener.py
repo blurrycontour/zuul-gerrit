@@ -428,8 +428,14 @@ class RPCListener(object):
             job.sendWorkComplete(json.dumps(None))
             return
         output = []
-        for pipeline in tenant.layout.pipelines.keys():
-            output.append({"name": pipeline})
+        for pipeline, pipeline_config in tenant.layout.pipelines.items():
+            triggers = []
+            for trigger in pipeline_config.triggers:
+                triggers.append({
+                    "name": trigger.name,
+                    "connection": trigger.connection.connection_name,
+                })
+            output.append({"name": pipeline, "triggers": triggers})
         job.sendWorkComplete(json.dumps(output))
 
     def handle_key_get(self, job):
