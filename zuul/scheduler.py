@@ -49,6 +49,7 @@ class ManagementEvent(object):
         self._wait_event = threading.Event()
         self._exc_info = None
         self.job_filters = None
+        self.variables = None
         self.zuul_event_id = None
 
     def exception(self, exc_info):
