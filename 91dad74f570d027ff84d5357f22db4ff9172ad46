@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_dc597e8e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 839,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-20T20:23:20Z",
+      "side": 1,
+      "message": "I think we should think more about wether we can come up with a reasonable default value here. E.g. we have multiprocessing.cpu_count() \u003d\u003d 16 which would result in 128 threads which is excessive. Also if you think about having 10 jobs starting at the same time that would result in more than 1000 threads which is pretty much at the limit that python can handle. We might also want to have one threadpool per executor and not one per job.",
+      "range": {
+        "startLine": 839,
+        "startChar": 8,
+        "endLine": 839,
+        "endChar": 58
+      },
+      "revId": "91dad74f570d027ff84d5357f22db4ff9172ad46",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
