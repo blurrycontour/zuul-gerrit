@@ -725,6 +725,36 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
 
         buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
         self.assertEqual(2, len(buildsets))
+        project_bs = [x for x in buildsets if x["project"] == "org/project"][0]
+
+        buildset = self.get_url(
+            "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
+        print("X" * 120)
+        print(buildset)
+        print("Y" * 120)
+        self.assertEqual(3, len(buildset["builds"]))
+
+        test1_build = [x for x in buildset["builds"]
+                       if x["job_name"] == "project-test1"][0]
+        arts = test1_build['artifacts']
+        arts.sort(key=lambda x: x['name'])
+        self.assertEqual([
+            {'url': 'http://example.com/docs',
+             'name': 'docs'},
+            {'url': 'http://logs.example.com/build/relative/docs',
+             'name': 'relative',
+             'metadata': {'foo': 'bar'}},
+            {'url': 'http://example.com/tarball',
+             'name': 'tarball'},
+        ], test1_build['artifacts'])
+
+        project_test2_build = [x for x in buildset["builds"]
+                               if x["job_name"] == "project-test2"][0]
+        self.assertEqual('SUCCESS', project_test2_build['result'])
+
+        project_merge_build = [x for x in buildset["builds"]
+                               if x["job_name"] == "project-merge"][0]
+        self.assertEqual('SUCCESS', project_merge_build['result'])
 
 
 class TestArtifacts(ZuulDBTestCase, BaseTestWeb, AnsibleZuulTestCase):
