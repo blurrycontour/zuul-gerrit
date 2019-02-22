@@ -70,6 +70,30 @@
       "revId": "a06d99b6c28270606dc8314170b3069e0c639c9b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_78ee3e8c",
+        "filename": "zuul/cmd/runner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-02-22T04:19:37Z",
+      "side": 1,
+      "message": "Sure, so how about we use the PUT verb with a list of depends-on string as the json body? Server side, if the verb is GET, then we assume no depends-on, and if the verb is PUT, then we load the depends-on list, pass it to gearman and let the scheduler prepare the appropriate \u0027projects\u0027 and \u0027items\u0027 properties of the job_params.\n\nI can look into that implementing that next week.",
+      "parentUuid": "9fdfeff1_a561e3aa",
+      "range": {
+        "startLine": 293,
+        "startChar": 36,
+        "endLine": 293,
+        "endChar": 46
+      },
+      "revId": "a06d99b6c28270606dc8314170b3069e0c639c9b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
