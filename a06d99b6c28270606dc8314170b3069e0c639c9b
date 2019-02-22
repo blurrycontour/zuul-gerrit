@@ -46,6 +46,30 @@
       "revId": "a06d99b6c28270606dc8314170b3069e0c639c9b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_a561e3aa",
+        "filename": "zuul/cmd/runner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-22T02:22:03Z",
+      "side": 1,
+      "message": "That actually makes a lot more sense to me if you\u0027re happy with that direction?",
+      "parentUuid": "9fdfeff1_bf9b9170",
+      "range": {
+        "startLine": 293,
+        "startChar": 36,
+        "endLine": 293,
+        "endChar": 46
+      },
+      "revId": "a06d99b6c28270606dc8314170b3069e0c639c9b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
