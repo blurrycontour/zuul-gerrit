@@ -34,6 +34,24 @@
       "revId": "820845f9f7d4c29257b022b9cb4ee2257f6c31a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_85037fbe",
+        "filename": "zuul/cmd/runner.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-22T02:23:52Z",
+      "side": 1,
+      "message": "Right, I feel like this is something we can improve down the track. For now, some sort of simple config or overrides would be a good start. My comment was though that it starts to look like a zuul.conf which is already kinda supported here.",
+      "parentUuid": "9fdfeff1_bfd711ee",
+      "revId": "820845f9f7d4c29257b022b9cb4ee2257f6c31a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
