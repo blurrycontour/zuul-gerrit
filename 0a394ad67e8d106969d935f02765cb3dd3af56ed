@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_0f078fcb",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-02-24T04:51:46Z",
+      "side": 1,
+      "message": "We may want to point out that disabling it will reduce I/O load on the executor.",
+      "revId": "0a394ad67e8d106969d935f02765cb3dd3af56ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
