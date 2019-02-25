@@ -95,6 +95,10 @@ class BaseTestWeb(ZuulTestCase):
         return requests.post(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
 
+    def put_url(self, url, *args, **kwargs):
+        return requests.put(
+            urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
+
     def delete_url(self, url, *args, **kwargs):
         return requests.delete(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
@@ -1081,6 +1085,39 @@ class TestWeb(BaseTestWeb):
         }
 
         self.assertEqual(job_params, resp.json())
+
+    def test_freeze_job_with_depends_on(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        data = self.put_url(
+            "api/tenant/tenant-one/pipeline/check"
+            "/project/org/project1/branch/master/freeze-job/"
+            "project-test1", json=["http://review.example.com/1"]).json()
+        self.assertEquals([{
+            'branch': 'master',
+            'change': '1',
+            'change_url': 'https://review.example.com/1',
+            'patchset': '1',
+            'project': {
+                'canonical_hostname': 'review.example.com',
+                'canonical_name': 'review.example.com/org/project',
+                'name': 'org/project',
+                'short_name': 'project',
+                'src_dir': 'src/review.example.com/org/project',
+            }
+        }], data["zuul"]["items"])
+        self.assertEquals(
+            ["review.example.com/org/project"],
+            list(data["zuul"]["projects"].keys()))
+        self.assertEquals({
+            'canonical_hostname': 'review.example.com',
+            'canonical_name': 'review.example.com/org/project',
+            'name': 'org/project',
+            'required': False,
+            'short_name': 'project',
+            'src_dir': 'src/review.example.com/org/project',
+        }, data["zuul"]["projects"]["review.example.com/org/project"])
 
 
 class TestWebMultiTenant(BaseTestWeb):
