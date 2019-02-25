@@ -1,0 +1,11 @@
+- hosts: all
+  tasks:
+    # Indicate test post-run started
+    - file:
+        path: "{{postpath}}"
+        state: touch
+
+    # Do not finish until test creates the flag file
+    - wait_for:
+        state: present
+        path: "{{waitpath}}"

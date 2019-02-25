@@ -375,6 +375,8 @@ class JobDir(object):
         self.control_path = os.path.join(self.ansible_cache_root, 'cp')
         self.job_unreachable_file = os.path.join(self.ansible_cache_root,
                                                  'nodes.unreachable')
+        self.job_release_nodeset_file = os.path.join(self.ansible_cache_root,
+                                                     'nodes.released')
         os.makedirs(self.control_path)
         localhost_facts = os.path.join(self.fact_cache, 'localhost')
         # NOTE(pabelanger): We do not want to leak zuul-executor facts to other
@@ -718,6 +720,20 @@ class AnsibleJob(object):
         data = {'paused': self.paused, 'data': self.getResultData()}
         self.job.sendWorkData(json.dumps(data))
         self._resume_event.wait()
+
+    def release_nodeset(self):
+        self.log.info(
+            "Releaing nodeset of job %s for ref %s (change %s)" % (
+                self.arguments['zuul']['job'],
+                self.arguments['zuul']['ref'],
+                self.arguments['zuul']['change_url']))
+        with open(self.jobdir.job_output_file, 'a') as job_output:
+            job_output.write(
+                "{now} |\n"
+                "{now} | Nodeset released\n".format(
+                    now=datetime.datetime.now()))
+        data = {'release_nodeset': True}
+        self.job.sendWorkData(json.dumps(data))
 
     def resume(self):
         if not self.paused:
@@ -1985,6 +2001,8 @@ class AnsibleJob(object):
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
                         line=line.decode('utf-8').rstrip()))
+        if os.path.exists(self.jobdir.job_release_nodeset_file):
+            self.release_nodeset()
 
         return (self.RESULT_NORMAL, ret)
 

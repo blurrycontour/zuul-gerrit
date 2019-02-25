@@ -185,6 +185,15 @@ class BuildPausedEvent(ResultEvent):
         self.build = build
 
 
+class BuildReleaseNodeset(ResultEvent):
+    """A build released its nodes.
+
+    :arg Build build: The build which has released its nodes."""
+
+    def __init__(self, build):
+        self.build = build
+
+
 class BuildCompletedEvent(ResultEvent):
     """A build has completed
 
@@ -431,6 +440,11 @@ class Scheduler(threading.Thread):
     def onBuildPaused(self, build, result_data):
         build.result_data = result_data
         event = BuildPausedEvent(build)
+        self.result_event_queue.put(event)
+        self.wake_event.set()
+
+    def onBuildReleaseNodeset(self, build):
+        event = BuildReleaseNodeset(build)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
@@ -1136,6 +1150,8 @@ class Scheduler(threading.Thread):
                 self._doBuildStartedEvent(event)
             elif isinstance(event, BuildPausedEvent):
                 self._doBuildPausedEvent(event)
+            elif isinstance(event, BuildReleaseNodeset):
+                self._doBuildReleaseNodesetEvent(event)
             elif isinstance(event, BuildCompletedEvent):
                 self._doBuildCompletedEvent(event)
             elif isinstance(event, MergeCompletedEvent):
@@ -1255,6 +1271,13 @@ class Scheduler(threading.Thread):
         if autohold_key is not None:
             self.nodepool.holdNodeSet(build.nodeset, autohold_key)
 
+    def _doBuildReleaseNodesetEvent(self, event):
+        build = event.build
+        try:
+            self.nodepool.returnNodeSet(build.nodeset, build)
+        except Exception:
+            self.log.exception("Unable to return nodeset %s" % build.nodeset)
+
     def _doBuildCompletedEvent(self, event):
         build = event.build
 
@@ -1266,7 +1289,8 @@ class Scheduler(threading.Thread):
         except Exception:
             self.log.exception("Unable to process autohold for %s" % build)
         try:
-            self.nodepool.returnNodeSet(build.nodeset, build)
+            if not build.nodeset_released:
+                self.nodepool.returnNodeSet(build.nodeset, build)
         except Exception:
             self.log.exception("Unable to return nodeset %s" % build.nodeset)
 

@@ -34,6 +34,7 @@ import zuul.rpcclient
 import zuul.model
 
 from tests.base import (
+    AnsibleZuulTestCase,
     SSLZuulTestCase,
     ZuulTestCase,
     repack_repo,
@@ -6844,3 +6845,35 @@ class TestSchedulerBranchMatcher(ZuulTestCase):
                          "A should report start and success")
         self.assertIn('gate', A.messages[1],
                       "A should transit gate")
+
+
+class TestSchedulerNodesetRelease(AnsibleZuulTestCase):
+    tenant_config_file = 'config/data-return/main.yaml'
+
+    def test_zuul_release_nodeset(self):
+        A = self.fake_gerrit.addFakeChange('org/project5', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        # We don't have any real synchronization for the ansible jobs, so
+        # just wait until we get our running build.
+        for x in iterate_timeout(30, "builds"):
+            if len(self.builds):
+                break
+        build = self.builds[0]
+        self.assertEqual(build.name, 'nodeset-release')
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        flag_file = os.path.join(build_dir, 'test_wait')
+        post_file = os.path.join(build_dir, 'test_post')
+
+        # Wait for postpath to be created
+        for x in iterate_timeout(30, "post_file"):
+            if os.path.exists(post_file):
+                break
+
+        # Check node is released
+        node = self.fake_nodepool.getNodes()[0]
+        self.assertEquals("used", node['state'])
+
+        # Allow the job to complete
+        open(flag_file, 'w').close()
+        self.waitUntilSettled()
