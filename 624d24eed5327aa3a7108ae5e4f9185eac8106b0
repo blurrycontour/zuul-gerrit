@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_eb222ca3",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 980,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-25T16:28:18Z",
+      "side": 1,
+      "message": "-1: This parameter doesn\u0027t seem to be used.",
+      "revId": "624d24eed5327aa3a7108ae5e4f9185eac8106b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_8b3b60cf",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 700,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-25T16:28:18Z",
+      "side": 1,
+      "message": "We should use \u0027-\u0027 instead of \u0027_\u0027, like the others.",
+      "revId": "624d24eed5327aa3a7108ae5e4f9185eac8106b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
