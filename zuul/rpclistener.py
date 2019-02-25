@@ -15,6 +15,7 @@
 
 import json
 import logging
+import urllib
 import time
 from abc import ABCMeta
 from typing import List
@@ -531,9 +532,20 @@ class RPCListener(RPCListenerBase):
             gear_job.sendWorkComplete(json.dumps(None))
             return
 
+        dependent_changes = []
+        for change in args.get('depends-on', []):
+            url = urllib.parse.urlparse(change)
+            source = self.sched.connections.getSourceByHostname(url.hostname)
+            dependent_changes.append(source.getChangeByURL(change, None))
+
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
         queue = model.ChangeQueue(pipeline)
+
+        merger_items = []
+        for dependent_change in dependent_changes:
+            merger_items.append(queue.enqueueChange(dependent_change, None))
+
         item = model.QueueItem(queue, change, None)
         item.layout = tenant.layout
         item.freezeJobGraph(skip_file_matcher=True)
@@ -548,7 +560,9 @@ class RPCListener(RPCListenerBase):
         uuid = '0' * 32
         params = zuul.executor.common.construct_gearman_params(
             uuid, self.sched, nodeset,
-            job, item, pipeline)
+            job, item, pipeline,
+            [c.toDict() for c in dependent_changes],
+            [i.makeMergerItem() for i in merger_items])
         gear_job.sendWorkComplete(json.dumps(params, cls=ZuulJSONEncoder))
 
     def handle_allowed_labels_get(self, job):

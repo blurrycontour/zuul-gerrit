@@ -1123,10 +1123,16 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
+    @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def project_freeze_job(self, tenant, pipeline, project, branch, job):
-        # TODO(jhesketh): Allow a canonical change/item to be passed in which
-        # would return the job with any in-change modifications.
+        dependson = []
+        try:
+            if cherrypy.request.method == "PUT" and cherrypy.request.body:
+                dependson = list(cherrypy.request.json)
+        except json.decoder.JSONDecodeError:
+            self.log.warning(
+                "Couldn't decode request body %s", cherrypy.request.body)
 
         job = self.rpc.submitJob(
             'zuul:project_freeze_job',
@@ -1135,7 +1141,8 @@ class ZuulWebAPI(object):
                 'project': project,
                 'pipeline': pipeline,
                 'branch': branch,
-                'job': job
+                'job': job,
+                'depends-on': dependson,
             }
         )
         ret = json.loads(job.data[0])
