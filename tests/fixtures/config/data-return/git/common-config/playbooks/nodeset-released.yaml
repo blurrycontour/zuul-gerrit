@@ -1,0 +1,16 @@
+- hosts: all
+  tasks:
+    - shell: exit "{{ job_exit_status }}"
+      when: "job_exit_status is defined"
+
+    - block:
+        # Indicate test post-run started
+        - file:
+            path: "{{postpath}}"
+            state: touch
+
+        # Do not finish until test creates the flag file
+        - wait_for:
+            state: present
+            path: "{{waitpath}}"
+      when: "job_exit_status is not defined"

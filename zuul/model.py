@@ -1707,6 +1707,7 @@ class Build(object):
         self.node_labels = []
         self.node_name = None
         self.nodeset = None
+        self.nodeset_released = False
 
     def __repr__(self):
         return ('<Build %s of %s voting:%s on %s>' %

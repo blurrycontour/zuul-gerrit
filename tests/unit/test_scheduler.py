@@ -34,6 +34,7 @@ import zuul.rpcclient
 import zuul.model
 
 from tests.base import (
+    AnsibleZuulTestCase,
     SSLZuulTestCase,
     ZuulTestCase,
     repack_repo,
@@ -6844,3 +6845,125 @@ class TestSchedulerBranchMatcher(ZuulTestCase):
                          "A should report start and success")
         self.assertIn('gate', A.messages[1],
                       "A should transit gate")
+
+
+class TestSchedulerNodesetRelease(AnsibleZuulTestCase):
+    tenant_config_file = 'config/data-return/main.yaml'
+
+    def test_zuul_release_nodeset(self):
+        A = self.fake_gerrit.addFakeChange('org/project5', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        # We don't have any real synchronization for the ansible jobs, so
+        # just wait until we get our running build.
+        for x in iterate_timeout(30, "builds"):
+            if len(self.builds):
+                break
+        build = self.builds[0]
+        self.assertEqual(build.name, 'nodeset-release')
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        flag_file = os.path.join(build_dir, 'test_wait')
+        post_file = os.path.join(build_dir, 'test_post')
+
+        # Wait for postpath to be created
+        for x in iterate_timeout(30, "post_file"):
+            if os.path.exists(post_file):
+                break
+
+        # Check node is released
+        node = self.fake_nodepool.getNodes()[0]
+        self.assertEquals("used", node['state'])
+
+        # Allow the job to complete
+        open(flag_file, 'w').close()
+        self.waitUntilSettled()
+
+    def test_zuul_release_nodeset_autohold(self):
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.autohold('tenant-one', 'org/project5', 'nodeset-release',
+                            "", "", "reason text", 1)
+        self.assertTrue(r)
+
+        # First check that successful jobs do not autohold
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - nodeset-release:
+                        vars:
+                          job_exit_status: 0
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project5', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(self.history[0].result, 'SUCCESS')
+
+        # Check nodepool for a held node
+        held_node = None
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_node = node
+                break
+        self.assertIsNone(held_node)
+
+        # Now test that failed jobs are autoheld
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - nodeset-release:
+                        vars:
+                          job_exit_status: 1
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project5', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(B.data['status'], 'NEW')
+        self.assertEqual(B.reported, 1)
+        self.assertEqual(self.history[1].result, 'POST_FAILURE')
+
+        # Check nodepool for a held node
+        held_node = None
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_node = node
+                break
+        self.assertIsNotNone(held_node)
+
+        # Validate node has recorded the failed job
+        self.assertEqual(
+            held_node['hold_job'],
+            " ".join(['tenant-one',
+                      'review.example.com/org/project5',
+                      'nodeset-release', '.*'])
+        )
+        self.assertEqual(held_node['comment'], "reason text")
+
+        # Another failed change should not hold any more nodes
+        C = self.fake_gerrit.addFakeChange('org/project5', 'master', 'C',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(C.data['status'], 'NEW')
+        self.assertEqual(C.reported, 1)
+        self.assertEqual(self.history[2].result, 'POST_FAILURE')
+
+        held_nodes = 0
+        for node in self.fake_nodepool.getNodes():
+            if node['state'] == zuul.model.STATE_HOLD:
+                held_nodes += 1
+        self.assertEqual(held_nodes, 1)

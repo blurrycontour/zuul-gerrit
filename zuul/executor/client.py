@@ -467,6 +467,11 @@ class ExecutorClient(object):
             # Update information about worker
             build.worker.updateFromData(data)
 
+            if 'release_nodeset' in data and not build.nodeset_released:
+                build.release_result = data['release_nodeset']
+                self.sched.onBuildReleaseNodeset(build)
+                build.nodeset_released = True
+
             if 'paused' in data and build.paused != data['paused']:
                 build.paused = data['paused']
                 if build.paused:

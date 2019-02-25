@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+    - zuul_release_nodeset:
+        zuul_success: "{{ job_exit_status|default(True) }}"

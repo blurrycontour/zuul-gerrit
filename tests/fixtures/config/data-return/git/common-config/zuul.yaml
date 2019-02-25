@@ -58,6 +58,18 @@
     parent: several-zuul-return-parent
     run: playbooks/several-zuul-return-child.yaml
 
+- job:
+    name: nodeset-release
+    run: playbooks/nodeset-release.yaml
+    post-run: playbooks/nodeset-released.yaml
+    vars:
+      postpath: '{{zuul._test.test_root}}/{{zuul.build}}/test_post'
+      waitpath: '{{zuul._test.test_root}}/{{zuul.build}}/test_wait'
+    nodeset:
+      nodes:
+        - name: node
+          label: test
+
 - project:
     name: org/project
     check:
@@ -110,3 +122,9 @@
         - data-return:
             dependencies:
               - several-zuul-return-child
+
+- project:
+    name: org/project5
+    check:
+      jobs:
+        - nodeset-release
