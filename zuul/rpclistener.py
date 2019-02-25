@@ -18,6 +18,7 @@ import logging
 import threading
 import traceback
 import types
+import urllib
 
 import gear
 
@@ -464,9 +465,20 @@ class RPCListener(object):
             gear_job.sendWorkComplete(json.dumps(None))
             return
 
+        dependent_changes = []
+        for change in args.get('depends-on', []):
+            url = urllib.parse.urlparse(change)
+            source = self.sched.connections.getSourceByHostname(url.hostname)
+            dependent_changes.append(source.getChangeByURL(change))
+
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
         queue = model.ChangeQueue(pipeline)
+
+        merger_items = []
+        for dependent_change in dependent_changes:
+            merger_items.append(queue.enqueueChange(dependent_change))
+
         item = model.QueueItem(queue, change)
         item.layout = tenant.layout
         item.freezeJobGraph(skip_matcher=True)
@@ -483,7 +495,9 @@ class RPCListener(object):
         uuid = '0' * 32
         params = zuul.executor.common.construct_gearman_params(
             uuid, self.sched, nodeset,
-            job, item, pipeline)
+            job, item, pipeline,
+            [c.toDict() for c in dependent_changes],
+            [i.makeMergerItem() for i in merger_items])
 
         gear_job.sendWorkComplete(json.dumps(params, cls=MappingProxyEncoder))
 
