@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_5add3212",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-02-26T06:32:48Z",
+      "side": 1,
+      "message": "Indeed, this is a rebase left-over. This chunk isn\u0027t needed.",
+      "parentUuid": "9fdfeff1_fb259a0b",
+      "revId": "32aa4affa9dc43644df3f619294e33f29c277207",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_0e793e2e",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 7
@@ -30,6 +48,30 @@
       "writtenOn": "2019-02-04T20:05:40Z",
       "side": 1,
       "message": "We already have \u0027console-stream\u0027 and \u0027config-errors\u0027 so I\u0027d prefer \u0027freeze-jobs\u0027 for consistency.",
+      "range": {
+        "startLine": 662,
+        "startChar": 34,
+        "endLine": 662,
+        "endChar": 45
+      },
+      "revId": "32aa4affa9dc43644df3f619294e33f29c277207",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_7abd96b5",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 662,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-02-26T06:32:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fdfeff1_0e793e2e",
       "range": {
         "startLine": 662,
         "startChar": 34,
