@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_8a4b3f85",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-26T17:25:03Z",
+      "side": 1,
+      "message": "This is really just debugging information, it\u0027s not a documented or supported API at this point.  I guess it\u0027s okay to leave it in the test, though I\u0027d prefer we drop it.",
+      "revId": "e212c92d4cf11e07f991ce91c0302aa11df07b37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_ea78cbc1",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 981,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-02-26T17:25:03Z",
+      "side": 1,
+      "message": "This scares the bejesus out of me.",
+      "revId": "e212c92d4cf11e07f991ce91c0302aa11df07b37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
