@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_c7de1d69",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-02-26T20:18:25Z",
+      "side": 1,
+      "message": "This is fine, but I worry that as we add to the API, updating this will be a chore. I wonder if we could just assert the pieces that matter for this task?",
+      "revId": "9a013b22b71d2cb27f355927fb1a23c6c3136aca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
