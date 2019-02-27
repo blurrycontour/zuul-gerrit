@@ -1,0 +1,24 @@
+- rule:
+    name: venkman_rule
+    actions:
+      autohold:
+        AnyOf:
+          - venkman
+      dequeue:
+        AnyOf:
+          - venkman
+      enqueue:
+        AnyOf:
+          - venkman
+- rule:
+    name: stantz_rule
+    actions:
+      autohold:
+        AnyOf:
+          - sub=stantz
+      dequeue:
+        AnyOf:
+          - sub=stantz
+      enqueue:
+        AnyOf:
+          - sub=stantz
