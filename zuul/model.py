@@ -495,6 +495,7 @@ class Project(object):
         # when deciding whether to enqueue their changes
         # TODOv3 (jeblair): re-add support for foreign projects if needed
         self.foreign = foreign
+        self.authorization_rules = {}
 
     def __str__(self):
         return self.name
@@ -2993,6 +2994,8 @@ class TenantProjectConfig(object):
         self.exclude_unprotected_branches = None
         self.parsed_branch_config = {}  # branch -> ParsedConfig
 
+        self.authorization_rules = []
+
 
 class ProjectPipelineConfig(ConfigObject):
     # Represents a project cofiguration in the context of a pipeline
@@ -3224,6 +3227,7 @@ class UnparsedConfig(object):
         self.nodesets = []
         self.secrets = []
         self.semaphores = []
+        self.authorization_rules = []
 
     def copy(self, trusted=None):
         # If trusted is not None, update the source context of each
@@ -3233,7 +3237,8 @@ class UnparsedConfig(object):
         # project-branch-path so that we can share them across objects
         source_contexts = {}
         for attr in ['pragmas', 'pipelines', 'jobs', 'project_templates',
-                     'projects', 'nodesets', 'secrets', 'semaphores']:
+                     'projects', 'nodesets', 'secrets', 'semaphores',
+                     'authorization_rules']:
             # Make a deep copy of each of our attributes
             old_objlist = getattr(self, attr)
             new_objlist = copy.deepcopy(old_objlist)
@@ -3263,6 +3268,7 @@ class UnparsedConfig(object):
             self.nodesets.extend(conf.nodesets)
             self.secrets.extend(conf.secrets)
             self.semaphores.extend(conf.semaphores)
+            self.authorization_rules.extend(conf.authorization_rules)
             return
 
         if not isinstance(conf, list):
@@ -3290,6 +3296,8 @@ class UnparsedConfig(object):
                 self.semaphores.append(value)
             elif key == 'pragma':
                 self.pragmas.append(value)
+            elif key == 'authorization-rule':
+                self.authorization_rules.append(value)
             else:
                 raise ConfigItemUnknownError()
 
@@ -3307,6 +3315,7 @@ class ParsedConfig(object):
         self.nodesets = []
         self.secrets = []
         self.semaphores = []
+        self.authorization_rules = []
 
     def copy(self):
         r = ParsedConfig()
@@ -3319,6 +3328,7 @@ class ParsedConfig(object):
         r.nodesets = self.nodesets[:]
         r.secrets = self.secrets[:]
         r.semaphores = self.semaphores[:]
+        r.authorization_rules = self.authorization_rules[:]
         return r
 
     def extend(self, conf):
@@ -3331,6 +3341,7 @@ class ParsedConfig(object):
             self.nodesets.extend(conf.nodesets)
             self.secrets.extend(conf.secrets)
             self.semaphores.extend(conf.semaphores)
+            self.authorization_rules.extend(conf.authorization_rules)
             for regex, projects in conf.projects_by_regex.items():
                 self.projects_by_regex.setdefault(regex, []).extend(projects)
             return
@@ -3936,6 +3947,8 @@ class Tenant(object):
         self.projects = {}
         self.canonical_hostnames = set()
 
+        self.authorization_rules = {}
+
     def _addProject(self, tpc):
         """Add a project to the project index
 
@@ -4255,3 +4268,134 @@ class WebInfo(object):
         if self.tenant:
             d['tenant'] = self.tenant
         return d
+
+
+# AuthZ models
+
+class AuthZRule(object):
+    """The base class for authorization rules"""
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class NoAuthZRule(AuthZRule):
+    """This rule denies authorization."""
+    def __call__(self, claims):
+        return False
+
+    def __eq__(self, other):
+        return isinstance(other, NoAuthZRule)
+
+    def __repr__(self):
+        return '<AuthZRule False>'
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class StringClaimRule(AuthZRule):
+    """This rule checks the value of a string claim."""
+    def __init__(self, claim=None, value=None):
+        super(StringClaimRule, self).__init__()
+        self.claim = claim or 'sub'
+        self.value = value
+
+    def __call__(self, claims):
+        return claims.get(self.claim, None) == self.value
+
+    def __eq__(self, other):
+        if not isinstance(other, StringClaimRule):
+            return False
+        return (self.claim == other.claim and self.value == other.value)
+
+    def __repr__(self):
+        return '<ClaimRule "%s" == "%s">' % (self.claim, self.value)
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class ListClaimRule(StringClaimRule):
+
+    def __call__(self, claims):
+        return self.value in claims.get(self.claim, [])
+
+    def __eq__(self, other):
+        if not isinstance(other, ListClaimRule):
+            return False
+        return (self.claim == other.claim and self.value == other.value)
+
+    def __repr__(self):
+        return '<ClaimRule "%s" in "%s">' % (self.value, self.claim)
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class AnyOfRule(AuthZRule):
+
+    def __init__(self, subrules):
+        super(AnyOfRule, self).__init__()
+        self.rules = set(subrules)
+
+    def __call__(self, claims):
+        return any(rule(claims) for rule in self.rules)
+
+    def __eq__(self, other):
+        if not isinstance(other, AnyOfRule):
+            return False
+        return self.rules == other.rules
+
+    def __repr__(self):
+        return '<AnyOfRule %s>' % (' OR '.join(repr(r) for r in self.rules))
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class AllOfRule(AuthZRule):
+
+    def __init__(self, subrules):
+        super(AllOfRule, self).__init__()
+        self.rules = set(subrules)
+
+    def __call__(self, claims):
+        return all(rule(claims) for rule in self.rules)
+
+    def __eq__(self, other):
+        if not isinstance(other, AllOfRule):
+            return False
+        return self.rules == other.rules
+
+    def __repr__(self):
+        return '<AllOfRule %s>' % (' AND '.join(repr(r) for r in self.rules))
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class AuthZRuleTree(object):
+
+    def __init__(self, name):
+        self.name = name
+        # initialize actions as unauthorized
+        self.actions = {
+            'autohold': AuthZRule(),
+            'dequeue': AuthZRule(),
+            'enqueue': AuthZRule(),
+        }
+
+    def __eq__(self, other):
+        if not isinstance(other, AuthZRuleTree):
+            return False
+        return (self.name == other.name and
+                self.actions['autohold'] == other.actions['autohold'] and
+                self.actions['dequeue'] == other.actions['enqueue'] and
+                self.actions['enqueue'] == other.actions['enqueue'])
+
+    def __repr__(self):
+        r = '<AuthZRuleTree -autohold: %r -dequeue: %r -enqueue: %r'
+        return r % (self.actions['autohold'],
+                    self.actions['dequeue'],
+                    self.actions['enqueue'])
