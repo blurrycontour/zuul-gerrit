@@ -16,6 +16,8 @@ import fixtures
 import logging
 import textwrap
 
+from zuul.configloader import AuthorizationRuleParser
+
 from tests.base import ZuulTestCase
 
 
@@ -416,3 +418,85 @@ class TestConfigConflict(ZuulTestCase):
             ['base', 'noop', 'trusted-zuul.yaml-job',
              'untrusted-zuul.yaml-job'],
             jobs)
+
+
+class TestAuthorizationRuleParser(ZuulTestCase):
+    tenant_config_file = 'config/tenant-parser/authorizations.yaml'
+
+    def test_parse_simplest_rule_from_yaml(self):
+        rule_d = {'name': 'my-rule',
+                  'conditions': {'sub': 'user1'}
+                 }
+        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        self.assertEqual('my-rule', rule.name)
+        claims = {'iss': 'my-idp',
+                  'sub': 'user1',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertTrue(rule(claims))
+        claims = {'iss': 'my-2nd-idp',
+                  'sub': 'user2',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertFalse(rule(claims))
+
+    def test_parse_AND_rule_from_yaml(self):
+        rule_d = {'name': 'my-rule',
+                  'conditions': {'sub': 'user1',
+                                 'iss': 'my-idp'}
+                 }
+        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        self.assertEqual('my-rule', rule.name)
+        claims = {'iss': 'my-idp',
+                  'sub': 'user1',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertTrue(rule(claims))
+        claims = {'iss': 'my-2nd-idp',
+                  'sub': 'user1',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertFalse(rule(claims))
+
+    def test_parse_OR_rule_from_yaml(self):
+        rule_d = {'name': 'my-rule',
+                  'conditions': [{'sub': 'user1',
+                                  'iss': 'my-idp'},
+                                 {'sub': 'user2',
+                                  'iss': 'my-2nd-idp'}
+                                ]
+                 }
+        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        self.assertEqual('my-rule', rule.name)
+        claims = {'iss': 'my-idp',
+                  'sub': 'user1',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertTrue(rule(claims))
+        claims = {'iss': 'my-2nd-idp',
+                  'sub': 'user1',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertFalse(rule(claims))
+        claims = {'iss': 'my-2nd-idp',
+                  'sub': 'user2',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertTrue(rule(claims))
+
+    def test_parse_rule_with_claim_type_from_yaml(self):
+        rule_d = {'name': 'my-rule',
+                  'conditions': [{'groups': 'ghostbusters',
+                                  'iss': 'my-idp'},
+                                 {'sub': 'user2',
+                                  'iss': 'my-2nd-idp'}
+                                ],
+                  'claim_types': {'groups': 'list'}
+                 }
+        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        self.assertEqual('my-rule', rule.name)
+        claims = {'iss': 'my-idp',
+                  'sub': 'user1',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertTrue(rule(claims))
+        claims = {'iss': 'my-idp',
+                  'sub': 'user1',
+                  'groups': ['admin', 'ghostbeaters']}
+        self.assertFalse(rule(claims))
+        claims = {'iss': 'my-2nd-idp',
+                  'sub': 'user2',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertTrue(rule(claims))
