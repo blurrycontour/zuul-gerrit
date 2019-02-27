@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_c09827c1",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 3705,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-27T21:18:31Z",
+      "side": 1,
+      "message": "nit: maybe a comment explaining that arg would be nice (or rename it to skip_file_matcher). It isn\u0027t really clear to me when reading this that this means \u0027skip file matcher\u0027 as there are also other types of matchers like the branch matcher.",
+      "range": {
+        "startLine": 3705,
+        "startChar": 52,
+        "endLine": 3705,
+        "endChar": 64
+      },
+      "revId": "ea0db65dafaab85008009b64b2ee2dec498da336",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
