@@ -25,6 +25,7 @@ import requests
 import zuul.web
 import zuul.rpcclient
 
+from unittest import skip
 from tests.base import ZuulTestCase, ZuulDBTestCase, AnsibleZuulTestCase
 from tests.base import ZuulWebFixture, FIXTURE_DIR
 
@@ -44,6 +45,13 @@ class FakeConfig(object):
 class BaseTestWeb(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
     config_ini_data = {}
+    authorization_rules_config_file = None
+
+    def setup_config(self):
+        super(BaseTestWeb, self).setup_config()
+        if getattr(self, 'authorization_rules_config_file') is not None:
+            value = getattr(self, 'authorization_rules_config_file')
+            self.config.set('web', 'authorizations_config', value)
 
     def setUp(self):
         super(BaseTestWeb, self).setUp()
@@ -1121,3 +1129,23 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(200, req.status_code, req.text)
         data = req.json()
         self.assertEqual(True, data)
+
+
+class TestTenantScopedWebApiWithAuthRulesOverrideAllowed(
+    TestTenantScopedWebApi):
+    config_file = 'zuul-admin-web.conf'
+    authorization_rules_config_file = 'config/authorization/rules/rules.yaml'
+    tenant_config_file = 'config/authorization/single-tenant/main.yaml'
+
+    test_valid_JWT_bad_tenants = skip('N/A')(
+        TestTenantScopedWebApi.test_valid_JWT_bad_tenants.__func__)
+    test_expired_JWT_token = skip('N/A')(
+        TestTenantScopedWebApi.test_expired_JWT_token.__func__)
+    test_bad_key_JWT_token = skip('N/A')(
+        TestTenantScopedWebApi.test_bad_key_JWT_token.__func__)
+
+    def test_authorization_registry_is_loaded(self):
+        self.assertEqual(2, len(self.authorizations.ruleset),
+                         self.authorizations)
+        self.assertTrue('venkman_rule' in self.authorizations.ruleset)
+        self.assertTrue('stantz_rule' in self.authorizations.ruleset)

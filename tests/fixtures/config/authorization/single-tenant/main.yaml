@@ -1,0 +1,14 @@
+- tenant:
+    name: tenant-one
+    authorizations:
+      - venkman_rule
+    source:
+      gerrit:
+        config-projects:
+          - common-config
+        untrusted-projects:
+          - org/project
+          - org/project1:
+            authorizations:
+              - stantz_rule
+          - org/project2
