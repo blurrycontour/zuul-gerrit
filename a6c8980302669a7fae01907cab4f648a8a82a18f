@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_a622e050",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-02-27T19:18:46Z",
+      "side": 1,
+      "message": "Unlike encrypt_secret.py, this script imports zuul modules and so only works with Python 3.x. Any objection to updating the shebang here to python3 instead of python, so that people can run it directly on systems where Zuul is present in the module search path but the default python is not python3?",
+      "revId": "a6c8980302669a7fae01907cab4f648a8a82a18f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
