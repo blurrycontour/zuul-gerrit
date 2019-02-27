@@ -1269,6 +1269,63 @@ class SemaphoreParser(object):
         return semaphore
 
 
+class AuthorizationRuleParser(object):
+    def __init__(self):
+        self.log = logging.getLogger("zuul.AuthorizationRuleParser")
+        self.schema = self.getSchema()
+
+    def getSchema(self):
+
+        authRule = {vs.Required('name'): str,
+                    vs.Required('conditions'): to_list(dict),
+                    'claim_types': to_list(dict)
+                   }
+
+        return vs.Schema(authRule)
+
+    def fromYaml(self, conf):
+        self.schema(conf)
+        a = model.AuthZRuleTree(conf['name'])
+
+        claim_types_mapper = {}
+        if 'claim_types' in conf:
+            ct = conf['claim_types']
+            if isinstance(ct, dict):
+                ct = [ct, ]
+            if isinstance(ct, list):
+                for t in ct:
+                    for claim, _type in t.items():
+                        if claim in claim_types_mapper:
+                            raise Exception(
+                                'duplicate claim_type "%s"' % claim)
+                        claim_types_mapper[claim] = _type
+            else:
+                raise Exception('invalid "claim_types": %r' % ct)
+
+        def parse_tree(node):
+            if isinstance(node, list):
+                return model.OrRule(parse_tree(x) for x in node)
+            if isinstance(node, dict):
+                subrules = []
+                for claim, value in node.items():
+                    if claim in claim_types_mapper:
+                        # todo support more types?
+                        if claim_types_mapper[claim].lower() != 'list':
+                            raise Exception(
+                                'Unsupported claim type "%s"'
+                                % claim_types_mapper[claim]
+                            )
+                        subrules.append(model.ListClaimRule(claim, value))
+                    else:
+                        subrules.append(model.StringClaimRule(claim, value))
+                return model.AndRule(subrules)
+            else:
+                raise Exception('Invalid claim declaration %r' % node)
+
+        a.ruletree = parse_tree(conf['conditions'])
+        return a
+
+
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
@@ -1370,6 +1427,7 @@ class TenantParser(object):
                   'allowed-labels': to_list(str),
                   'default-parent': str,
                   'default-ansible-version': vs.Any(str, float),
+                  'admin_rules': to_list(str),
                   }
         return vs.Schema(tenant)
 
