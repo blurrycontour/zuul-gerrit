@@ -16,6 +16,8 @@ import fixtures
 import logging
 import textwrap
 
+from zuul.configloader import AuthorizationRuleParser
+
 from tests.base import ZuulTestCase
 
 
@@ -32,7 +34,7 @@ class TenantParserTestCase(ZuulTestCase):
 
 
 class TestTenantSimple(TenantParserTestCase):
-    tenant_config_file = 'config/tenant-parser/simple.yaml'
+    tenant_config_file = 'config/tenant-parser/authorizations.yaml'
 
     def test_tenant_simple(self):
         tenant = self.sched.abide.tenants.get('tenant-one')
@@ -400,3 +402,30 @@ class TestConfigConflict(ZuulTestCase):
             ['base', 'noop', 'trusted-zuul.yaml-job',
              'untrusted-zuul.yaml-job'],
             jobs)
+
+
+class TestAuthorizationRuleParser(ZuulTestCase):
+    tenant_config_file = 'config/tenant-parser/simple.yaml'
+
+    def test_from_yaml(self):
+        rule_d = {'name': 'my-rule',
+                  'actions': {'autohold': {'AnyOf': ['sub=user1']},
+                              'dequeue': {'AllOf': ['"admin" in groups',
+                                                    'iss=my-idp']},
+                              'enqueue': {'AllOf': [{'AnyOf': ['sub=user2',
+                                                               'sub=user3']},
+                                                    'iss=my-2nd-idp']}
+                              }
+                 }
+        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        self.assertEqual('my-rule', rule.name)
+        claims = {'iss': 'my-idp',
+                  'sub': 'user1',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertTrue(rule.actions['autohold'](claims))
+        self.assertTrue(rule.actions['dequeue'](claims))
+        self.assertFalse(rule.actions['enqueue'](claims))
+        claims = {'iss': 'my-2nd-idp',
+                  'sub': 'user2',
+                  'groups': ['admin', 'ghostbusters']}
+        self.assertTrue(rule.actions['enqueue'](claims))
