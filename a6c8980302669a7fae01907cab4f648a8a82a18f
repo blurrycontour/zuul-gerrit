@@ -16,6 +16,24 @@
       "revId": "a6c8980302669a7fae01907cab4f648a8a82a18f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_c03ca7c9",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-27T21:09:46Z",
+      "side": 1,
+      "message": "As it imports zuul modules we may want to install it as a regular script just like all the other zuul-* scripts. With this method the shebang would be automatically correct as well as the module imports.",
+      "parentUuid": "9fdfeff1_a622e050",
+      "revId": "a6c8980302669a7fae01907cab4f648a8a82a18f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
