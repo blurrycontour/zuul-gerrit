@@ -14,11 +14,67 @@
 # under the License.
 
 import logging
+import os.path
 import re
 import jwt
 
 from zuul import exceptions
+from zuul.lib.yamlutil import safe_load as yaml_safe_load
 import zuul.driver.auth.jwt as auth_jwt
+from zuul.configloader import AuthorizationRuleParser
+
+
+"""AuthN/AuthZ related library, used by zuul-web."""
+
+
+class AuthorizationRegistry(object):
+    """Registry of authorization rules"""
+
+    log = logging.getLogger("Zuul.AuthorizationRegistry")
+
+    def __init__(self):
+        self.ruleset = {}
+
+    # TODO a lot of this and expandConfigPath duplicate code in configloader.py
+    def reconfigure(self, config):
+        # TODO should the [web] section be mandatory?
+        if 'web' not in config.sections():
+            return
+        web_config = dict(config.items('web'))
+        config_path = web_config.get('authorizations_config', None)
+        if config_path is None:
+            # no rules to parse
+            return
+        cpath = self.expandConfigPath(config_path)
+        with open(cpath) as f:
+            rules = yaml_safe_load(f)
+        if not isinstance(rules, list):
+            raise Exception('Authorizations file must be a list of rules')
+        new_ruleset = {}
+        ruleparser = AuthorizationRuleParser()
+        for rule in rules:
+            if not isinstance(rule, dict):
+                raise Exception('Invalid rule format for rule "%r"' % rule)
+            if len(rule.keys()) > 1:
+                raise Exception('Rules must consist of "rule" element only')
+            if 'rule' in rule:
+                rule_tree = ruleparser.fromYaml(rule['rule'])
+                if rule_tree.name in new_ruleset:
+                    raise Exception(
+                        'Rule "%s" is defined at least twice' % rule_tree.name)
+                else:
+                    new_ruleset[rule_tree.name] = rule_tree
+            else:
+                raise Exception('Unknown element "%s"' % rule.keys()[0])
+        self.ruleset = new_ruleset
+
+    def expandConfigPath(self, config_path):
+        if config_path:
+            config_path = os.path.expanduser(config_path)
+        if not os.path.exists(config_path):
+            raise Exception("Unable to read authorization config file at %s" %
+                            config_path)
+        return config_path
 
 
 class AuthenticatorRegistry(object):
