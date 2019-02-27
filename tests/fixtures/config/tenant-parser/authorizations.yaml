@@ -1,0 +1,40 @@
+- authorization:
+    name: auth-rule-one
+    actions:
+      autohold:
+        AnyOf:
+          - sub=zuul
+      dequeue:
+        AnyOf:
+          - sub=gozer
+      enqueue:
+        AnyOf:
+          - sub=vinz clortho
+
+- authorization:
+    name: auth-rule-two
+    actions:
+      autohold:
+        AnyOf:
+          - sub=venkman
+          - sub=stanz
+      dequeue:
+        AnyOf:
+          - sub=venkman
+      enqueue:
+        AnyOf:
+          - sub=stanz
+
+- tenant:
+    name: tenant-one
+    authorizations:
+      - auth-rule-one
+    source:
+      gerrit:
+        config-projects:
+          - common-config
+        untrusted-projects:
+          - org/project1
+          - org/project2:
+              authorizations:
+                - auth-rule-two
