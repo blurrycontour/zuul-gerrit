@@ -27,6 +27,8 @@ import textwrap
 import types
 import itertools
 
+import jsonpath_rw
+
 from zuul import change_matcher
 from zuul.lib.config import get_default
 from zuul.lib.artifacts import get_artifacts_from_result_data
@@ -4061,6 +4063,8 @@ class Tenant(object):
         # The per tenant default ansible version
         self.default_ansible_version = None
 
+        self.authorization_rules = []
+
     def _addProject(self, tpc):
         """Add a project to the project index
 
@@ -4380,3 +4384,130 @@ class WebInfo(object):
         if self.tenant:
             d['tenant'] = self.tenant
         return d
+
+
+# AuthZ models
+
+class AuthZRule(object):
+    """The base class for authorization rules"""
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+
+class StringClaimRule(AuthZRule):
+    """This rule checks the value of a string claim."""
+    def __init__(self, claim=None, value=None):
+        super(StringClaimRule, self).__init__()
+        self.claim = claim or 'sub'
+        self.value = value
+
+    def __call__(self, claims):
+        matches = [match.value
+                   for match in jsonpath_rw.parse(self.claim).find(claims)]
+        if len(matches) == 1:
+            return matches[0] == self.value
+        else:
+            # TODO we should differentiate no match and 2+ matches
+            return False
+
+    def __eq__(self, other):
+        if not isinstance(other, StringClaimRule):
+            return False
+        return (self.claim == other.claim and self.value == other.value)
+
+    def __repr__(self):
+        return '<ClaimRule "%s" == "%s">' % (self.claim, self.value)
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class ListClaimRule(StringClaimRule):
+
+    def __call__(self, claims):
+        matches = [match.value
+                   for match in jsonpath_rw.parse(self.claim).find(claims)]
+        if len(matches) == 1:
+            match = matches[0]
+            # we fail if the claim is not of the expected type.
+            if isinstance(match, list):
+                return self.value in match
+            else:
+                return False
+        else:
+            # TODO we should differentiate no match and 2+ matches
+            return False
+
+    def __eq__(self, other):
+        if not isinstance(other, ListClaimRule):
+            return False
+        return (self.claim == other.claim and self.value == other.value)
+
+    def __repr__(self):
+        return '<ClaimRule "%s" in "%s">' % (self.value, self.claim)
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class OrRule(AuthZRule):
+
+    def __init__(self, subrules):
+        super(OrRule, self).__init__()
+        self.rules = set(subrules)
+
+    def __call__(self, claims):
+        return any(rule(claims) for rule in self.rules)
+
+    def __eq__(self, other):
+        if not isinstance(other, OrRule):
+            return False
+        return self.rules == other.rules
+
+    def __repr__(self):
+        return '<OrRule %s>' % ('  || '.join(repr(r) for r in self.rules))
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class AndRule(AuthZRule):
+
+    def __init__(self, subrules):
+        super(AndRule, self).__init__()
+        self.rules = set(subrules)
+
+    def __call__(self, claims):
+        return all(rule(claims) for rule in self.rules)
+
+    def __eq__(self, other):
+        if not isinstance(other, AndRule):
+            return False
+        return self.rules == other.rules
+
+    def __repr__(self):
+        return '<AndRule %s>' % (' && '.join(repr(r) for r in self.rules))
+
+    def __hash__(self):
+        return hash(repr(self))
+
+
+class AuthZRuleTree(object):
+
+    def __init__(self, name):
+        self.name = name
+        # initialize actions as unauthorized
+        self.ruletree = None
+
+    def __call__(self, claims):
+        return self.ruletree(claims)
+
+    def __eq__(self, other):
+        if not isinstance(other, AuthZRuleTree):
+            return False
+        return (self.name == other.name and
+                self.ruletree == other.ruletree)
+
+    def __repr__(self):
+        return '<AuthZRuleTree [ %s ]>' % self.ruletree
