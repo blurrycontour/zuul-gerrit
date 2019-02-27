@@ -1247,6 +1247,73 @@ class SemaphoreParser(object):
         return semaphore
 
 
+class AuthorizationRuleParser(object):
+    def __init__(self):
+        self.log = logging.getLogger("zuul.AuthorizationRuleParser")
+        self.schema = self.getSchema()
+
+    def getSchema(self):
+        def _any_of(value):
+            return any_of(value)
+
+        def _all_of(value):
+            return all_of(value)
+
+        any_of = vs.Schema({'AnyOf': vs.Any([str, _any_of, _all_of])})
+        all_of = vs.Schema({'AllOf': vs.Any([str, _any_of, _all_of])})
+
+        actions_dict = vs.Schema({
+            'autohold': vs.Any(any_of, all_of),
+            'dequeue': vs.Any(any_of, all_of),
+            'enqueue': vs.Any(any_of, all_of),
+        })
+
+        authRule = {vs.Required('name'): str,
+                    vs.Required('actions'): actions_dict,
+                   }
+
+        return vs.Schema(authRule)
+
+    def fromYaml(self, conf):
+        self.schema(conf)
+        a = model.AuthZRuleTree(conf['name'])
+
+        def parse_tree(node):
+            if node is None:
+                return model.NoAuthZRule()
+            if isinstance(node, dict):
+                if 'AnyOf' in node:
+                    return model.AnyOfRule(parse_tree(x)
+                                           for x in node['AnyOf'])
+                if 'AllOf' in node:
+                    return model.AllOfRule(parse_tree(x)
+                                           for x in node['AllOf'])
+            if isinstance(node, str):
+                claim_format =\
+                    r'^"?(?P<A>[^="]+)"?\s*(?P<op>=|in)\s*(?P<B>.+)$'
+                matcher = re2.compile(claim_format)
+                m = matcher.fullmatch(node)
+                if m:
+                    d = m.groupdict()
+                    if d['op'] == 'in':
+                        claim = d['B']
+                        value = d['A']
+                        return model.ListClaimRule(claim, value)
+                    else:
+                        claim = d['A']
+                        value = d['B']
+                        return model.StringClaimRule(claim, value)
+                else:
+                    claim = 'sub'
+                    value = node
+                    return model.StringClaimRule(claim, value)
+
+        for x in ['autohold', 'dequeue', 'enqueue']:
+            a.actions[x] = parse_tree(conf['actions'].get(x, None))
+
+        return a
+
+
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
@@ -1306,6 +1373,7 @@ class TenantParser(object):
         'exclude': to_list(classes),
         'shadow': to_list(str),
         'exclude-unprotected-branches': bool,
+        'authorizations': to_list(str),
     }}
 
     project = vs.Any(str, project_dict)
@@ -1346,6 +1414,7 @@ class TenantParser(object):
                   'allowed-reporters': to_list(str),
                   'allowed-labels': to_list(str),
                   'default-parent': str,
+                  'authorizations': to_list(str),
                   }
         return vs.Schema(tenant)
 
