@@ -57,7 +57,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
 
         params['connections'] = self.connections
-        params['auths'] = self.auths
+        params['authenticators'] = self.authenticators
+        params['authorizations'] = self.authorizations
         # Validate config here before we spin up the ZuulWeb object
         for conn_name, connection in self.connections.connections.items():
             try:
@@ -90,9 +91,18 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.web.stop()
         self.log.info("Zuul Web Server stopped")
 
-    def configure_auth(self):
-        self.auths = zuul.lib.auth.AuthenticatorRegistry()
-        self.auths.configure(self.config)
+    def configure_authenticators(self):
+        self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
+        self.authenticators.configure(self.config)
+
+    def configure_authorizations(self):
+        config_path = get_default(self.config, 'web',
+                                  'authorizations_config', None)
+        if config_path:
+            self.authorizations = zuul.lib.auth.AuthorizationsRegistry()
+            self.authorizations.configure(config_path)
+        else:
+            self.authorizations = None
 
     def run(self):
         self.setup_logging('web', 'log_config')
@@ -102,7 +112,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
             self.configure_connections(
                 include_drivers=[zuul.driver.sql.SQLDriver,
                                  zuul.driver.github.GithubDriver])
-            self.configure_auth()
+            self.configure_authenticators()
+            self.configure_authorizations()
             self._run()
         except Exception:
             self.log.exception("Exception from WebServer:")
