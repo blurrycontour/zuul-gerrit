@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_e01d2b0f",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-27T21:32:06Z",
+      "side": 1,
+      "message": "What\u0027s the reasoning for removing this variable? It\u0027s useful debugging information.",
+      "range": {
+        "startLine": 152,
+        "startChar": 7,
+        "endLine": 152,
+        "endChar": 51
+      },
+      "revId": "3ea0d5b808c07c1d64efd5b183d3a49f4afb851f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_60c05b51",
+        "filename": "zuul/model.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 976,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-27T21:32:06Z",
+      "side": 1,
+      "message": "Maybe that\u0027s paranoid, but what do you think about changing the default here to True so we redact by default and only don\u0027t redact when sending this to the executor?",
+      "range": {
+        "startLine": 976,
+        "startChar": 21,
+        "endLine": 976,
+        "endChar": 41
+      },
+      "revId": "3ea0d5b808c07c1d64efd5b183d3a49f4afb851f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_c07ee717",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 486,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-02-27T21:32:06Z",
+      "side": 1,
+      "message": "Is it on purpose that you fake an uuid instead of just generating one?",
+      "range": {
+        "startLine": 486,
+        "startChar": 8,
+        "endLine": 486,
+        "endChar": 23
+      },
+      "revId": "3ea0d5b808c07c1d64efd5b183d3a49f4afb851f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
