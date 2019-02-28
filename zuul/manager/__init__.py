@@ -136,10 +136,11 @@ class PipelineManager(object):
                  i.live]
         return items.index(item)
 
-    def isChangeAlreadyInPipeline(self, change):
+    def isChangeAlreadyInPipeline(self, change, event):
         # Checks live items in the pipeline
         for item in self.pipeline.getAllItems():
-            if item.live and change.equals(item.change):
+            if item.live and change.equals(item.change) and \
+               event.filterEquals(item.event):
                 return True
         return False
 
@@ -281,7 +282,7 @@ class PipelineManager(object):
         # If we are adding a live change, check if it's a live item
         # anywhere in the pipeline.  Otherwise, we will perform the
         # duplicate check below on the specific change_queue.
-        if live and self.isChangeAlreadyInPipeline(change):
+        if live and self.isChangeAlreadyInPipeline(change, event):
             log.debug("Change %s is already in pipeline, ignoring" % change)
             return True
 
@@ -1026,6 +1027,8 @@ class PipelineManager(object):
             self.pipeline._consecutive_failures += 1
         if project_in_pipeline and self.pipeline._disabled:
             actions = self.pipeline.disabled_actions
+        if item.event.job_filters:
+            actions = self.pipeline.neutral_actions
         # Check here if we should disable so that we only use the disabled
         # reporters /after/ the last disable_at failure is still reported as
         # normal.
