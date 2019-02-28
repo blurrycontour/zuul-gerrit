@@ -155,7 +155,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
     def __init__(self, trigger, types=[], branches=[], refs=[],
                  event_approvals={}, comments=[], emails=[], usernames=[],
                  required_approvals=[], reject_approvals=[],
-                 ignore_deletes=True):
+                 job_filter_comments=[], ignore_deletes=True):
 
         EventFilter.__init__(self, trigger)
 
@@ -169,6 +169,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
         self._comments = comments
         self._emails = emails
         self._usernames = usernames
+        self._job_filter_comments = job_filter_comments
         self.types = [re.compile(x) for x in types]
         self.branches = [re.compile(x) for x in branches]
         self.refs = [re.compile(x) for x in refs]
@@ -177,6 +178,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
         self.usernames = [re.compile(x) for x in usernames]
         self.event_approvals = event_approvals
         self.ignore_deletes = ignore_deletes
+        self.job_filter_comments = [re.compile(x) for x in job_filter_comments]
 
     def __repr__(self):
         ret = '<GerritEventFilter'
@@ -204,6 +206,9 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
             ret += ' emails: %s' % ', '.join(self._emails)
         if self._usernames:
             ret += ' usernames: %s' % ', '.join(self._usernames)
+        if self.job_filter_comments:
+            ret += ' job_filter_comments: %s' % ', '.join(
+                self._job_filter_comments)
         ret += '>'
 
         return ret
@@ -283,6 +288,13 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
         # required approvals are ANDed (reject approvals are ORed)
         if not self.matchesApprovals(change):
             return False
+
+        # job filter comments are added to the event
+        for job_filter_comment_re in self.job_filter_comments:
+            if job_filter_comment_re is not None:
+                match = job_filter_comment_re.search(event.comment)
+                if match:
+                    event.job_filters.append(re.compile(match.groups()[0]))
 
         return True
 

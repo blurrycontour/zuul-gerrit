@@ -588,6 +588,7 @@ class JobParser(object):
                       'provides': to_list(str),
                       'failure-message': str,
                       'success-message': str,
+                      'neutral-message': str,
                       'failure-url': str,
                       'success-url': str,
                       'hold-following-changes': bool,
@@ -1124,6 +1125,7 @@ class PipelineParser(object):
         'failure': 'failure_actions',
         'merge-failure': 'merge_failure_actions',
         'disabled': 'disabled_actions',
+        'neutral': 'neutral_actions',
     }
 
     def __init__(self, pcontext):
@@ -1167,6 +1169,7 @@ class PipelineParser(object):
                     'supercedes': to_list(str),
                     'description': str,
                     'success-message': str,
+                    'neutral-message': str,
                     'failure-message': str,
                     'start-message': str,
                     'merge-failure-message': str,
@@ -1189,7 +1192,7 @@ class PipelineParser(object):
         pipeline['reject'] = self.getDriverSchema('reject')
         pipeline['trigger'] = vs.Required(self.getDriverSchema('trigger'))
         for action in ['start', 'success', 'failure', 'merge-failure',
-                       'disabled']:
+                       'disabled', 'neutral']:
             pipeline[action] = self.getDriverSchema('reporter')
         return vs.Schema(pipeline)
 
@@ -1212,6 +1215,8 @@ class PipelineParser(object):
             "repository. Please rebase the change and upload a new "
             "patchset.")
         pipeline.success_message = conf.get('success-message',
+                                            "Build succeeded.")
+        pipeline.neutral_message = conf.get('neutral-message',
                                             "Build succeeded.")
         pipeline.footer_message = conf.get('footer-message', "")
         pipeline.start_message = conf.get('start-message',
