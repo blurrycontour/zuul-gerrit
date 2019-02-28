@@ -3065,6 +3065,8 @@ class TriggerEvent(object):
         # ref-updated
         self.oldrev = None
         self.newrev = None
+        # List of job set by EventFilter
+        self.job_filters = []
         # For events that arrive with a destination pipeline (eg, from
         # an admin command, etc):
         self.forced_pipeline = None
@@ -3099,6 +3101,10 @@ class TriggerEvent(object):
         return '<%s 0x%x %s>' % (self.__class__.__name__,
                                  id(self), self._repr())
 
+    def filterEquals(self, other):
+        if (self.job_filters == other.job_filters):
+            return True
+        return False
 
 class FalseWithReason(object):
     """Event filter result"""
@@ -3867,6 +3873,12 @@ class Layout(object):
         item.debug("Freezing job graph")
         for jobname in job_list.jobs:
             # This is the final job we are constructing
+            if item.event.job_filters and \
+               not [True for job_filter in item.event.job_filters
+                    if job_filter.match(jobname)]:
+                self.log.debug("Job %s doesn't match change job filter %s",
+                               jobname, item.event.job_filters)
+                continue
             frozen_job = None
             log.debug("Collecting jobs %s for %s", jobname, change)
             item.debug("Freezing job {jobname}".format(
