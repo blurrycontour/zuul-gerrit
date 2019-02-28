@@ -56,6 +56,7 @@ class GerritTrigger(BaseTrigger):
                 reject_approvals=to_list(
                     trigger.get('reject-approval')
                 ),
+                job_filter_comments=to_list(trigger.get('job-filter-comment')),
                 ignore_deletes=ignore_deletes
             )
             efilters.append(f)
@@ -87,6 +88,7 @@ def getSchema():
         'email': scalar_or_list(str),
         'username_filter': scalar_or_list(str),
         'username': scalar_or_list(str),
+        'job-filter-comment': scalar_or_list(str),
         'branch': scalar_or_list(str),
         'ref': scalar_or_list(str),
         'ignore-deletes': bool,

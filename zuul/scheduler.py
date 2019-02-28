@@ -48,6 +48,7 @@ class ManagementEvent(object):
     def __init__(self):
         self._wait_event = threading.Event()
         self._exc_info = None
+        self.job_filters = None
         self.zuul_event_id = None
 
     def exception(self, exc_info):
@@ -64,6 +65,10 @@ class ManagementEvent(object):
             type_, exception_instance, traceback = self._exc_info
             raise exception_instance.with_traceback(traceback)
         return self._wait_event.is_set()
+
+    def filterEquals(self, other):
+        # ManagementEvent doesn't have filter
+        return True
 
 
 class ReconfigureEvent(ManagementEvent):
