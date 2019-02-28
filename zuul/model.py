@@ -2727,6 +2727,7 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        self.job_filters = []
 
     def _id(self):
         return self.newrev
@@ -2754,7 +2755,8 @@ class Ref(object):
     def equals(self, other):
         if (self.project == other.project
             and self.ref == other.ref
-            and self.newrev == other.newrev):
+            and self.newrev == other.newrev
+            and self.job_filters == other.job_filters):
             return True
         return False
 
@@ -3719,6 +3721,12 @@ class Layout(object):
         item.debug("Freezing job graph")
         for jobname in job_list.jobs:
             # This is the final job we are constructing
+            if change.job_filters and \
+               not [True for job_filter in change.job_filters
+                    if job_filter.match(jobname)]:
+                self.log.debug("Job %s doesn't match change job filter %s",
+                               jobname, change.job_filters)
+                continue
             frozen_job = None
             self.log.debug("Collecting jobs %s for %s", jobname, change)
             item.debug("Freezing job {jobname}".format(
