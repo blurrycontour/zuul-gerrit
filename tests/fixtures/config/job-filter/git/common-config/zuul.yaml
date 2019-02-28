@@ -1,0 +1,43 @@
+- pipeline:
+    name: manual
+    manager: independent
+    trigger:
+      gerrit:
+        - event: comment-added
+          job-filter-comment: ^recheck-filter (.*)$
+    neutral:
+      gerrit: {}
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: test-base
+    run: playbooks/project-test.yaml
+
+- job:
+    name: test-matrix1
+    parent: test-base
+
+- job:
+    name: test-matrix2
+    parent: test-base
+
+- job:
+    name: test-matrix3
+    parent: test-base
+
+- project:
+    name: org/project
+    manual:
+      jobs:
+        - test-matrix1
+        - test-matrix2
+        - test-matrix3

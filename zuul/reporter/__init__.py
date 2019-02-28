@@ -103,7 +103,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             'success': self._formatItemReportSuccess,
             'failure': self._formatItemReportFailure,
             'merge-failure': self._formatItemReportMergeFailure,
-            'disabled': self._formatItemReportDisabled
+            'disabled': self._formatItemReportDisabled,
+            'neutral': self._formatItemReportNeutral,
         }
         return format_methods[self._action]
 
@@ -133,6 +134,12 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
     def _formatItemReportSuccess(self, item, with_jobs=True):
         msg = item.pipeline.success_message
+        if with_jobs:
+            msg += '\n\n' + self._formatItemReportJobs(item)
+        return msg
+
+    def _formatItemReportNeutral(self, item, with_jobs=True):
+        msg = item.pipeline.neutral_message
         if with_jobs:
             msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
