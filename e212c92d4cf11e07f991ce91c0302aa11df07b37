@@ -51,6 +51,24 @@
       "revId": "e212c92d4cf11e07f991ce91c0302aa11df07b37",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_25b6ddfa",
+        "filename": "zuul/model.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 981,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-28T04:16:50Z",
+      "side": 1,
+      "message": "Me too if I\u0027m being honest. The followup for making redacted the default might be a good idea. Thoughts?",
+      "parentUuid": "9fdfeff1_ea78cbc1",
+      "revId": "e212c92d4cf11e07f991ce91c0302aa11df07b37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
