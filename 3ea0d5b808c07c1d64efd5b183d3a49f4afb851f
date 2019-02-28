@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_45bd21d6",
+        "filename": "zuul/model.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 976,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-02-28T04:16:50Z",
+      "side": 1,
+      "message": "I\u0027m not opposed to setting it to True, and in general think it\u0027s an improvement. However, this is consistent with the previous state, so it can be done as a followup.",
+      "parentUuid": "9fdfeff1_afa4eca3",
+      "range": {
+        "startLine": 976,
+        "startChar": 21,
+        "endLine": 976,
+        "endChar": 41
+      },
+      "revId": "3ea0d5b808c07c1d64efd5b183d3a49f4afb851f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_c07ee717",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 17
