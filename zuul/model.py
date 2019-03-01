@@ -1271,12 +1271,16 @@ class Job(ConfigObject):
         if changed:
             self.roles = tuple(newroles)
 
-    def setBranchMatcher(self, branches):
+    def setBranchMatcher(self, branches, implied=False):
         # Set the branch matcher to match any of the supplied branches
         self._branches = branches
         matchers = []
+        if implied:
+            matcher_class = change_matcher.ImpliedBranchMatcher
+        else:
+            matcher_class = change_matcher.BranchMatcher
         for branch in branches:
-            matchers.append(change_matcher.BranchMatcher(branch))
+            matchers.append(matcher_class(branch))
         self.branch_matcher = change_matcher.MatchAny(matchers)
 
     def setFileMatcher(self, files):
