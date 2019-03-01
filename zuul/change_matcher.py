@@ -59,12 +59,20 @@ class ProjectMatcher(AbstractChangeMatcher):
 
 class BranchMatcher(AbstractChangeMatcher):
 
+    def __init__(self, regex, fullmatch=False):
+        super().__init__(regex)
+        self._fullmatch = fullmatch
+
     def matches(self, change):
+        if self._fullmatch:
+            matcher = self.regex.fullmatch
+        else:
+            matcher = self.regex.match
         if hasattr(change, 'branch'):
-            if self.regex.match(change.branch):
+            if matcher(change.branch):
                 return True
             return False
-        if self.regex.match(change.ref):
+        if matcher(change.ref):
             return True
         return False
 

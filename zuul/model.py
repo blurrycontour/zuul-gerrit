@@ -1333,12 +1333,13 @@ class Job(ConfigObject):
         # Return the raw branch list that match this job
         return self._branches
 
-    def setBranchMatcher(self, branches):
+    def setBranchMatcher(self, branches, fullmatch=False):
         # Set the branch matcher to match any of the supplied branches
         self._branches = branches
         matchers = []
         for branch in branches:
-            matchers.append(change_matcher.BranchMatcher(branch))
+            matchers.append(change_matcher.BranchMatcher(
+                branch, fullmatch=fullmatch))
         self.branch_matcher = change_matcher.MatchAny(matchers)
 
     def setFileMatcher(self, files):
