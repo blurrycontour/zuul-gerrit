@@ -3288,12 +3288,14 @@ class ZuulTestCase(BaseTestCase):
                 self.assertNotEqual(job.name, name,
                                     'Job %s found in history' % name)
 
-    def getJobFromHistory(self, name, project=None, result=None):
+    def getJobFromHistory(self, name, project=None, result=None, branch=None):
         for job in self.history:
             if (job.name == name and
                 (project is None or
                  job.parameters['zuul']['project']['name'] == project) and
-                (result is None or job.result == result)):
+                (result is None or job.result == result) and
+                (branch is None or
+                 job.parameters['zuul']['branch'] == branch)):
                 return job
         raise Exception("Unable to find job %s in history" % name)
 
