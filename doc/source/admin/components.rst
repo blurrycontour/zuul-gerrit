@@ -590,6 +590,26 @@ The following sections of ``zuul.conf`` are used by the executor:
       add any site-wide variables.  See the :ref:`User's Guide
       <user_jobs_sitewide_variables>` for more information.
 
+   .. attr:: manage_ansible
+      :default: true
+
+      Specifies wether the zuul-executor should install the supported ansible
+      versions during startup or not. If this is ``True`` the zuul-executor
+      will install the ansible versions into :attr:`executor.ansible_root`.
+
+   .. attr:: ansible_root
+      :default: <state_dir>/ansible-bin
+
+      Specifies where the zuul-executor should look for its supported ansible
+      installations. By default it looks in the following directories and uses
+      the first which it can find.
+
+      * ``<zuul_install_dir>/lib/zuul/ansible``
+      * ``<ansible_root>``
+
+      The ``ansible_root`` setting allows you to override the second location
+      which is also used for installation if ``manage_ansible`` is ``True``.
+
    .. attr:: ansible_setup_timeout
       :default: 60
 
