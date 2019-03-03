@@ -311,11 +311,11 @@ class CallbackModule(default.CallbackModule):
             # items have their own events
             pass
         elif (result_dict.get('msg') == 'MODULE FAILURE'):
-            if 'module_stdout' in result_dict:
+            if 'module_stdout' in result_dict and result_dict['module_stdout']:
                 self._log_message(
                     result, status='MODULE FAILURE',
                     msg=result_dict['module_stdout'])
-            elif 'exception' in result_dict:
+            elif 'exception' in result_dict  and result_dict['exception']:
                 self._log_message(
                     result, status='MODULE FAILURE',
                     msg=result_dict['exception'])
@@ -388,11 +388,11 @@ class CallbackModule(default.CallbackModule):
             pass
 
         elif (result_dict.get('msg') == 'MODULE FAILURE'):
-            if 'module_stdout' in result_dict:
+            if 'module_stdout' in result_dict and result_dict['module_stdout']:
                 self._log_message(
                     result, status='MODULE FAILURE',
                     msg=result_dict['module_stdout'])
-            elif 'exception' in result_dict:
+            elif 'exception' in result_dict and result_dict['exception']:
                 self._log_message(
                     result, status='MODULE FAILURE',
                     msg=result_dict['exception'])
