@@ -53,6 +53,10 @@
 
     - name: Validate output - shell task with exception
       shell: |
+       cat job-output.txt
+
+    - name: Validate output - shell task with exception
+      shell: |
         egrep "^.+\| node1 \| OSError.+\/shelltask\/" job-output.txt
         egrep "^.+\| node2 \| OSError.+\/shelltask\/" job-output.txt
 
