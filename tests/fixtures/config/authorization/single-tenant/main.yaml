@@ -2,6 +2,9 @@
     name: tenant-one
     admin_rules:
       - venkman_rule
+      - car_rule
+      - gb_rule
+      - columbia_rule
     source:
       gerrit:
         config-projects:
