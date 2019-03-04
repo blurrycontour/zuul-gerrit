@@ -1315,6 +1315,8 @@ class AuthorizationRuleParser(object):
             elif isinstance(node, dict):
                 subrules = []
                 for claim, value in node.items():
+                    if claim == 'zuul_uid':
+                        claim = '__zuul_uid_claim'
                     subrules.append(model.ClaimRule(claim, value))
                 return model.AndRule(subrules)
             else:
@@ -1439,6 +1441,8 @@ class TenantParser(object):
         if conf.get('exclude-unprotected-branches') is not None:
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
+        if conf.get('admin-rules') is not None:
+            tenant.authorization_rules = conf['admin-rules']
         tenant.allowed_triggers = conf.get('allowed-triggers')
         tenant.allowed_reporters = conf.get('allowed-reporters')
         tenant.allowed_labels = conf.get('allowed-labels')
