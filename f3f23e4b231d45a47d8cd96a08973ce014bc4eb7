@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_34323af4",
+        "filename": "zuul/ansible/actiongeneral/zuul_release_nodeset.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-04T18:30:25Z",
+      "side": 1,
+      "message": "Why use a new module instead of zuul_return?",
+      "revId": "f3f23e4b231d45a47d8cd96a08973ce014bc4eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_943526de",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-04T18:30:25Z",
+      "side": 1,
+      "message": "This appears to be tri-state: present means release, and the value is the result.  That\u0027s not what I would get from reading the variable/key names (where I would assume \"release_nodeset: False\" means don\u0027t release the nodeset, rather than, release the nodeset and call the job a failure.\n\nThat at least warrants some comments, but it might be better to split this into two keys: release_nodeset, and preliminary_result.",
+      "revId": "f3f23e4b231d45a47d8cd96a08973ce014bc4eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_542fbe87",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2012,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-04T18:30:25Z",
+      "side": 1,
+      "message": "Why are we getting the result from this file, when we already know the result in the calling function? In fact, we have more current information than the release_nodeset task had.",
+      "revId": "f3f23e4b231d45a47d8cd96a08973ce014bc4eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
