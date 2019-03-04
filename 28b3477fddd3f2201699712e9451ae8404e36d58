@@ -16,6 +16,24 @@
       "revId": "28b3477fddd3f2201699712e9451ae8404e36d58",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_9fca1f44",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1535,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-04T19:46:43Z",
+      "side": 1,
+      "message": "That\u0027s because in this test case also the setup playbook has no path. This probably wasn\u0027t hit so far because I think this is one of the first occurrences that hold the executor with real ansible builds.",
+      "parentUuid": "9fdfeff1_91c53840",
+      "revId": "28b3477fddd3f2201699712e9451ae8404e36d58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
