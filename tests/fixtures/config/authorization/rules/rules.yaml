@@ -22,3 +22,21 @@
       enqueue:
         AnyOf:
           - sub=stantz
+- rule:
+    name: ghostbusters_rule
+    actions:
+      autohold:
+        AnyOf:
+          - ghostbusters in groups
+      dequeue:
+        AnyOf:
+          - ghostbusters in groups
+      enqueue:
+        AnyOf:
+          - ghostbusters in groups
+- rule:
+    name: car_rule
+    actions:
+      enqueue:
+        AnyOf:
+          - car=ecto-1
