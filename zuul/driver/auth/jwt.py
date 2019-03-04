@@ -89,8 +89,9 @@ class JWTAuthenticator(AuthenticatorInterface):
 
     def authenticate(self, rawToken):
         decoded = self.decodeToken(rawToken)
-        return (decoded[self.uid_claim],
-                decoded.get('zuul.actions', {}))
+        # inject the special authenticator-specific uid
+        decoded['__zuul_uid_claim'] = decoded[self.uid_claim]
+        return decoded
 
 
 class HS256Authenticator(JWTAuthenticator):
