@@ -7,8 +7,12 @@
         config-projects:
           - common-config
         untrusted-projects:
-          - org/project
+          - org/project:
+              authorizations:
+                - car_rule
           - org/project1:
               authorizations:
                 - stantz_rule
-          - org/project2
+          - org/project2:
+              authorizations:
+                - ghostbusters_rule
