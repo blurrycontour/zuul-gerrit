@@ -58,7 +58,6 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
         params['connections'] = self.connections
         params['authenticators'] = self.authenticators
-        params['authorizations'] = self.authorizations
         # Validate config here before we spin up the ZuulWeb object
         for conn_name, connection in self.connections.connections.items():
             try:
@@ -97,9 +96,6 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(self.config)
 
-    def configure_authorizations(self):
-        self.authorizations = zuul.lib.auth.AuthorizationRegistry()
-
     def run(self):
         self.setup_logging('web', 'log_config')
         self.log = logging.getLogger("zuul.WebServer")
@@ -109,7 +105,6 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                 include_drivers=[zuul.driver.sql.SQLDriver,
                                  zuul.driver.github.GithubDriver])
             self.configure_authenticators()
-            self.configure_authorizations()
             self._run()
         except Exception:
             self.log.exception("Exception from WebServer:")
