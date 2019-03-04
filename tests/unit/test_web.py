@@ -1155,3 +1155,30 @@ class TestTenantScopedWebApiWithAuthRulesOverrideAllowed(
                          self.web.authorizations)
         self.assertTrue('venkman_rule' in self.web.authorizations.ruleset)
         self.assertTrue('stantz_rule' in self.web.authorizations.ruleset)
+
+
+class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
+    config_file = 'zuul-admin-web-no-override.conf'
+    authorization_rules_config_file = 'config/authorization/rules/rules.yaml'
+    tenant_config_file = 'config/authorization/single-tenant/main.yaml'
+
+    def test_override_not_allowed(self):
+        """Test that authz cannot be overriden if config does not allow it"""
+        args = {"reason": "some reason",
+                "count": 1,
+                'job': 'project-test2',
+                'change': None,
+                'ref': None,
+                'node_hold_expiration': None}
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul.actions': {'autohold': {'tenant-one': '*'}, },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        req = self.post_url(
+            'api/tenant/tenant-one/project/org/project/autohold',
+            headers={'Authorization': 'Bearer %s' % token},
+            json=args)
+        self.assertEqual(401, req.status_code, req.text)
