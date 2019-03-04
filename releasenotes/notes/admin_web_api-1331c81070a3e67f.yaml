@@ -10,6 +10,10 @@ features:
   - Add a "dequeue" protected endpoint to zuul-web's REST API.
   - Add an "enqueue" protected endpoint to zuul-web's REST API.
   - |
+    Add an "authorizations" protected endpoint to zuul-web's REST API. Users
+    (and front-end applications) can query this endpoint with a valid JWT to
+    find out which tenants they can perform protected actions on.
+  - |
     Allow an operator to configure multiple authenticators in Zuul Web Server's
     configuration. Authenticators define ways to validate JWTs issued by a given
     Identity Provider, and sometimes to generate tokens as well if the signing
@@ -27,6 +31,12 @@ features:
     Tenant-scoped, protected actions can be performed with the Zuul Client
     by calling Zuul's REST API. The user needs to provide a valid JWT as
     authentication/authorization.
+  - |
+    Add the "admin-rule" object in the tenant configuration file, and the
+    "admin-rules" attribute for tenants. Admin rules let administrator define
+    access rules to tenant-scoped protected actions such as `autohold` and
+    `dequeue` in the REST API, provided the user presents a valid token matching
+    these rules.
 upgrade:
   - |
     The "autohold", "dequeue" and "enqueue" endpoints are deactivated by default.
