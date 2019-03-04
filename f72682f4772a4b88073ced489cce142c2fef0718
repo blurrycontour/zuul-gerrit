@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fdfeff1_654ece39",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-04T21:04:25Z",
+      "side": 1,
+      "message": "This playbook needs to be mounted into the container. Otherwise the ansible-playbook run will just fail. It won\u0027t harm but it won\u0027t fix the issue as well.\n\n - \"./playbooks/:/var/playbooks/:z\"",
+      "revId": "f72682f4772a4b88073ced489cce142c2fef0718",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
