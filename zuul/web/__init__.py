@@ -38,23 +38,6 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
 
 
-def is_authorized(uid, action, tenant, project, authN=None):
-    """Simple authorization checker. For now, relies on the passed authN
-    dictionary to figure out whether 'uid' is allowed 'action' on
-    'tenant/project'."""
-    if authN is None:
-        authN = {}
-    if action in authN:
-        if authN[action] == '*':
-            return True
-        if tenant in authN[action]:
-            if authN[action][tenant] == "*":
-                return True
-            if project in authN[action][tenant]:
-                return True
-    return False
-
-
 class SaveParamsTool(cherrypy.Tool):
     """
     Save the URL parameters to allow them to take precedence over query
@@ -271,6 +254,34 @@ class ZuulWebAPI(object):
                 self.static_cache_expiry
         resp.last_modified = self.zuulweb.start_time
         return ret
+
+    def is_authorized(self, claims, action, tenant, project):
+        # First, check for zuul.actions override
+        override = claims.get('zuul.actions', {})
+        if action in override:
+            if override[action] == '*':
+                return True
+            if tenant in override[action]:
+                if override[action][tenant] == "*":
+                    return True
+                if project in override[action][tenant]:
+                    return True
+        # Next, get the rules for tenant/project
+        data = {'tenant': tenant,
+                'project': project}
+        # TODO: it is probably worth caching
+        job = self.rpc.submitJob('zuul:authorization_rules', data)
+        rules = json.loads(job.data[0])
+        for rule in rules:
+            if rule not in self.zuulweb.authorizations.ruleset:
+                self.log.error('Unknown rule "%s"' % rule)
+            else:
+                v = self.zuulweb.authorizations.ruleset[rule].actions[action]
+                if v(claims):
+                    msg = 'user "%s" authorized by rule "%s"'
+                    self.log.debug(msg % (claims['__zuul_uid_claim'], rule))
+                    return True
+        return False
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -564,7 +575,7 @@ class ZuulWebAPI(object):
         # AuthN/AuthZ
         rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
         try:
-            uid, authz = self.zuulweb.authenticators.authenticate(rawToken)
+            claims = self.zuulweb.authenticators.authenticate(rawToken)
         except exceptions.AuthTokenException as e:
             for header, contents in e.getAdditionalHeaders().items():
                 cherrypy.response.headers[header] = contents
@@ -572,11 +583,12 @@ class ZuulWebAPI(object):
             return '<h1>%s</h1>' % e.error_description
         # TODO plug an actual authorization mechanism, for now rely on token
         # content
-        if not is_authorized(uid, 'dequeue', tenant, project, authz):
+        if not self.is_authorized(claims, 'dequeue', tenant, project):
             raise cherrypy.HTTPError(403)
+        msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
-            'User "%s" requesting "%s" on %s/%s' % (uid, 'dequeue',
-                                                    tenant, project))
+            msg % (claims['__zuul_uid_claim'], 'dequeue',
+                   tenant, project))
 
         body = cherrypy.request.json
         if 'pipeline' in body and (
@@ -606,19 +618,18 @@ class ZuulWebAPI(object):
         # AuthN/AuthZ
         rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
         try:
-            uid, authz = self.zuulweb.authenticators.authenticate(rawToken)
+            claims = self.zuulweb.authenticators.authenticate(rawToken)
         except exceptions.AuthTokenException as e:
             for header, contents in e.getAdditionalHeaders().items():
                 cherrypy.response.headers[header] = contents
             cherrypy.response.status = e.HTTPError
             return '<h1>%s</h1>' % e.error_description
-        # TODO plug an actual authorization mechanism, for now rely on token
-        # content
-        if not is_authorized(uid, 'enqueue', tenant, project, authz):
+        if not self.is_authorized(claims, 'enqueue', tenant, project):
             raise cherrypy.HTTPError(403)
+        msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
-            'User "%s" requesting "%s" on %s/%s' % (uid, 'enqueue',
-                                                    tenant, project))
+            msg % (claims['__zuul_uid_claim'], 'enqueue',
+                   tenant, project))
 
         body = cherrypy.request.json
         if all(p in body for p in ['trigger', 'change', 'pipeline']):
@@ -681,19 +692,18 @@ class ZuulWebAPI(object):
             rawToken = \
                 cherrypy.request.headers['Authorization'][len('Bearer '):]
             try:
-                uid, authz = self.zuulweb.authenticators.authenticate(rawToken)
+                claims = self.zuulweb.authenticators.authenticate(rawToken)
             except exceptions.AuthTokenException as e:
                 for header, contents in e.getAdditionalHeaders().items():
                     cherrypy.response.headers[header] = contents
                 cherrypy.response.status = e.HTTPError
                 return '<h1>%s</h1>' % e.error_description
-            # TODO plug an actual authorization mechanism, for now rely on
-            # token content
-            if not is_authorized(uid, 'autohold', tenant, project, authz):
+            if not self.is_authorized(claims, 'autohold', tenant, project):
                 raise cherrypy.HTTPError(403)
+            msg = 'User "%s" requesting "%s" on %s/%s'
             self.log.info(
-                'User "%s" requesting "%s" on %s/%s' % (uid, 'autohold',
-                                                        tenant, project))
+                msg % (claims['__zuul_uid_claim'], 'autohold',
+                       tenant, project))
 
             length = int(cherrypy.request.headers['Content-Length'])
             body = cherrypy.request.body.read(length)
