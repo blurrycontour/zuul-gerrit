@@ -2182,7 +2182,6 @@ class ZuulWebFixture(fixtures.Fixture):
                              zuul.driver.github.GithubDriver])
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(config)
-        self.authorizations = zuul.lib.auth.AuthorizationRegistry()
         if info is None:
             self.info = zuul.model.WebInfo()
         else:
@@ -2197,8 +2196,7 @@ class ZuulWebFixture(fixtures.Fixture):
             info=self.info,
             connections=self.connections,
             zk_hosts=self.zk_hosts,
-            authenticators=self.authenticators,
-            authorizations=self.authorizations)
+            authenticators=self.authenticators)
         self.web.start()
         self.addCleanup(self.stop)
 
