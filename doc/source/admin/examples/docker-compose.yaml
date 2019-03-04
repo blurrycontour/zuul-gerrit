@@ -42,7 +42,7 @@ services:
       - mysql
     environment:
       no_proxy: "${no_proxy},gerrit"
-    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-scheduler -d'"
+    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml && zuul-scheduler -d'"
     image: zuul/zuul-scheduler
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
@@ -50,7 +50,7 @@ services:
       - "sshkey:/var/ssh:z"
       - /var/lib/zuul
   web:
-    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-web -d'"
+    command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml && zuul-web -d'"
     depends_on:
       - scheduler
       - mysql
@@ -59,6 +59,7 @@ services:
     image: zuul/zuul-web
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
+      - "./playbooks/:/var/playbooks/:z"
   executor:
     privileged: true
     environment:
