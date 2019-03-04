@@ -15,3 +15,7 @@
       - groups: ghostbusters
     claim_types:
       - groups: list
+- rule:
+    name: car_rule
+    conditions:
+      - car: ecto-1

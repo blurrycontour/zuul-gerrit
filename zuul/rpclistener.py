@@ -69,6 +69,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:get_running_jobs")
         self.worker.registerFunction("zuul:get_job_log_stream_address")
         self.worker.registerFunction("zuul:tenant_list")
+        self.worker.registerFunction("zuul:authorization_rules")
         self.worker.registerFunction("zuul:tenant_sql_connection")
         self.worker.registerFunction("zuul:status_get")
         self.worker.registerFunction("zuul:job_get")
@@ -318,6 +319,15 @@ class RPCListener(object):
             job_log_stream_address['server'] = build.worker.hostname
             job_log_stream_address['port'] = build.worker.log_port
         job.sendWorkComplete(json.dumps(job_log_stream_address))
+
+    def handle_authorization_rules(self, job):
+        args = json.loads(job.arguments)
+        tenant_name = args['tenant']
+        tenant = self.sched.abide.tenants.get(tenant_name)
+        output = []
+        if tenant:
+            output += tenant.authorization_rules
+        job.sendWorkComplete(json.dumps(output))
 
     def handle_tenant_list(self, job):
         output = []
