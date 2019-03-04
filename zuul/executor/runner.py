@@ -20,12 +20,60 @@ import threading
 import uuid
 
 import requests
+import voluptuous as vs
+import yaml
 
 import zuul.merger.merger
 import zuul.lib.connections
 
 from zuul.executor.common import JobDir, AnsibleJobBase, DeduplicateQueue
 from zuul.executor.common import UpdateTask
+
+
+class RunnerConfiguration(object):
+    log = logging.getLogger("zuul.RunnerConfiguration")
+    runner = {
+        "job-dir": str,
+        "git-dir": str,
+    }
+
+    schema = {
+        'runner': runner,
+        'api': str,
+        'tenant': str,
+        'project': str,
+        'pipeline': str,
+        'branch': str,
+        'job': str,
+    }
+
+    def readConfig(self, config_path):
+        config_path = os.path.expanduser(config_path)
+        if os.path.exists(config_path):
+            with open(config_path) as config_file:
+                return yaml.safe_load(config_file)
+        else:
+            return {}
+
+    def loadConfig(self, config, args=None):
+        # Override from args
+        if args:
+            for key in self.schema:
+                if getattr(args, key):
+                    config[key] = args.key
+        # Validate schema
+        vs.Schema(self.schema)(config)
+        # Set default value
+        self.api = config["api"]
+        self.tenant = config.get("tenant")
+        self.pipeline = config.get("pipeline")
+        self.project = config.get("project")
+        self.branch = config.get("branch", "master")
+        self.job = config.get("job")
+        self.job_dir = config.get("runner", {}).get("job-dir")
+        self.git_dir = config.get(
+            "runner", {}).get("git-dir", "~/.cache/zuul/git")
+        return config
 
 
 class Runner(object):
@@ -96,21 +144,21 @@ class Runner(object):
             speed_limit, speed_time, cache_root, logger)
 
     def _grab_frozen_job(self):
-        url = self.config["api"]
-        if self.config.get("tenant"):
-            url = os.path.join(url, "tenant", self.config["tenant"])
-        if self.config.get("project"):
+        url = self.config.api
+        if self.config.tenant:
+            url = os.path.join(url, "tenant", self.config.tenant)
+        if self.config.project:
             url = os.path.join(
                 url,
                 "pipeline",
-                self.config["pipeline"],
+                self.config.pipeline,
                 "project",
-                self.config["project"],
+                self.config.project,
                 "branch",
-                self.config["branch"],
+                self.config.branch,
                 "freeze-job")
-        if self.config.get("job"):
-            url = os.path.join(url, self.config["job"])
+        if self.config.job:
+            url = os.path.join(url, self.config.job)
         return requests.get(url).json()
 
     def prep_workspace(self):
@@ -122,8 +170,8 @@ class Runner(object):
         self.lookup_dir = ""
         self.action_dir_general = ""
         self.merger_lock = threading.Lock()
-        if self.config["runner"]["job-dir"]:
-            root = self.config["runner"]["job-dir"]
+        if self.config.job_dir:
+            root = self.config.job_dir
             if root.endswith('/'):
                 root = root[:-1]
             job_unique = root.split('/')[-1]
@@ -133,7 +181,7 @@ class Runner(object):
             root = tempfile.mkdtemp()
             job_unique = str(uuid.uuid4().hex)
         job = AnsibleJobBase(self, job_params, job_unique)
-        self.merge_root = os.path.expanduser(self.config["runner"]["git-dir"])
+        self.merge_root = os.path.expanduser(self.config.git_dir)
         self.merger = self._getMerger(self.merge_root)
         self.start_update_thread()
         # TODO(jhesketh):

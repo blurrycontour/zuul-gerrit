@@ -29,17 +29,20 @@ class Runner(zuul.cmd.ZuulApp):
         parser = super(Runner, self).createParser()
         parser.add_argument('-v', dest='verbose', action='store_true',
                             help='verbose output')
+        parser.add_argument('-r', '--runner-config',
+                            default='~/.config/zuul/runner.yaml',
+                            help='zuul-runner.yaml configuration file path')
         parser.add_argument('-a', '--api', required=True,
                             help='the zuul server api to query against')
         parser.add_argument('-t', '--tenant',
                             help='the zuul tenant name')
         parser.add_argument('-j', '--job',
                             help='the zuul job name')
-        parser.add_argument('-P', '--pipeline', default='master',
+        parser.add_argument('-P', '--pipeline',
                             help='the zuul pipeline name')
         parser.add_argument('-p', '--project',
                             help='the zuul project name')
-        parser.add_argument('-b', '--branch', default='master',
+        parser.add_argument('-b', '--branch',
                             help='the zuul project\'s branch name')
         parser.add_argument('-g', '--git-dir', default='~/.cache/zuul/git',
                             help='the git merger dir')
@@ -96,6 +99,9 @@ class Runner(zuul.cmd.ZuulApp):
 
     def main(self):
         self.parseArguments()
+        config = zuul.executor.runner.RunnerConfiguration()
+        runner_config = config.readConfig(self.args.runner_config)
+        config.loadConfig(runner_config, self.args)
         # TODO: use common logging
         # self.setup_logging()
         # in the meantime, enable debug
@@ -103,18 +109,6 @@ class Runner(zuul.cmd.ZuulApp):
             format='%(asctime)s %(levelname)-5.5s %(name)s - %(message)s',
             level=logging.DEBUG)
 
-        config = {
-            "runner": {
-                "job-dir": self.args.dir,
-                "git-dir": self.args.git_dir,
-            },
-            "api": self.args.api,
-            "tenant": self.args.tenant,
-            "project": self.args.project,
-            "pipeline": self.args.pipeline,
-            "branch": self.args.branch,
-            "job": self.args.job,
-        }
         connections = self._constructConnections()
         self.runner = zuul.executor.runner.Runner(config, connections)
 
