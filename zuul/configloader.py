@@ -1273,7 +1273,7 @@ class AuthorizationRuleParser(object):
                                            for x in node['AllOf'])
             if isinstance(node, str):
                 claim_format =\
-                    r'^"?(?P<A>[^="]+)"?\s*(?P<op>=|in)\s*(?P<B>.+)$'
+                    r'^"?(?P<A>[^="]+[^="\s])"?\s*(?P<op>=|in)\s*(?P<B>.+)$'
                 matcher = re2.compile(claim_format)
                 m = matcher.fullmatch(node)
                 if m:
@@ -1411,6 +1411,8 @@ class TenantParser(object):
         if conf.get('exclude-unprotected-branches') is not None:
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
+        if conf.get('authorizations') is not None:
+            tenant.authorization_rules = conf['authorizations']
         tenant.allowed_triggers = conf.get('allowed-triggers')
         tenant.allowed_reporters = conf.get('allowed-reporters')
         tenant.allowed_labels = conf.get('allowed-labels')
@@ -1540,10 +1542,12 @@ class TenantParser(object):
             project_include = current_include
             shadow_projects = []
             project_exclude_unprotected_branches = None
+            authz_rules = []
         else:
             project_name = list(conf.keys())[0]
             project = source.getProject(project_name)
             shadow_projects = as_list(conf[project_name].get('shadow', []))
+            authz_rules = as_list(conf[project_name].get('authorizations', []))
 
             # We check for None since the user may set include to an empty list
             if conf[project_name].get("include") is None:
@@ -1563,6 +1567,7 @@ class TenantParser(object):
         tenant_project_config.shadow_projects = shadow_projects
         tenant_project_config.exclude_unprotected_branches = \
             project_exclude_unprotected_branches
+        tenant_project_config.authorization_rules = authz_rules
 
         return tenant_project_config
 
