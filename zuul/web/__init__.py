@@ -38,16 +38,6 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
 
 
-def is_authorized(uid, tenant, authN=None):
-    """Simple authorization checker. For now, relies on the passed authN
-    dictionary to figure out whether 'uid' is allowed 'action' on
-    'tenant/project'.
-    This is just a stub that will be expanded in subsequent patches."""
-    if authN is None:
-        authN = []
-    return (tenant in authN)
-
-
 class SaveParamsTool(cherrypy.Tool):
     """
     Save the URL parameters to allow them to take precedence over query
@@ -482,6 +472,28 @@ class ZuulWebAPI(object):
                 self.static_cache_expiry
         resp.last_modified = self.zuulweb.start_time
         return ret
+
+    def is_authorized(self, claims, tenant):
+        # First, check for zuul.actions override
+        override = claims.get('zuul', {}).get('admin', [])
+        if (override == '*' or
+            (isinstance(override, list) and tenant in override)):
+            return True
+        # Next, get the rules for tenant
+        data = {'tenant': tenant}
+        # TODO: it is probably worth caching
+        job = self.rpc.submitJob('zuul:authorization_rules', data)
+        rules = json.loads(job.data[0])
+        for rule in rules:
+            if rule not in self.zuulweb.authorizations.ruleset:
+                self.log.error('Unknown rule "%s"' % rule)
+            else:
+                v = self.zuulweb.authorizations.ruleset[rule]
+                if v(claims):
+                    msg = 'user "%s" authorized by rule "%s"'
+                    self.log.debug(msg % (claims['__zuul_uid_claim'], rule))
+                    return True
+        return False
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
