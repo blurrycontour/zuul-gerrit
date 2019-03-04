@@ -27,6 +27,12 @@ features:
     Tenant-scoped, protected actions can be performed with the Zuul Client
     by calling Zuul's REST API. The user needs to provide a valid JWT as
     authentication/authorization.
+  - |
+    Add the "admin-rule" object in the tenant configuration file, and the
+    "admin-rules" attribute for tenants. Admin rules let administrator define
+    access rules to tenant-scoped protected actions such as `autohold` and
+    `dequeue` in the REST API, provided the user presents a valid token matching
+    these rules.
 upgrade:
   - |
     The "autohold", "dequeue" and "enqueue" endpoints are deactivated by default.
