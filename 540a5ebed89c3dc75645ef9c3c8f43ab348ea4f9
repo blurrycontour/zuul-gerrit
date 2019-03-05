@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_67758e98",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-05T22:04:35Z",
+      "side": 1,
+      "message": "Some Identity Providers might use complex claims schemes like so:\n\n(... more claims ...)\n\"resources_access\": {\n  \"account\": {\n    \"roles\": [\n      \"dev\",\n      \"ops\",\n      \"QA\"],\n(...)\n\nan operator must have a way to drill into claims, ie ``\"dev\" in resources_access.account.roles``",
+      "range": {
+        "startLine": 207,
+        "startChar": 41,
+        "endLine": 207,
+        "endChar": 52
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
