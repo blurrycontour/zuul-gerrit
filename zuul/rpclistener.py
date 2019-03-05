@@ -65,6 +65,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:get_job_log_stream_address")
         self.worker.registerFunction("zuul:tenant_list")
         self.worker.registerFunction("zuul:authorize_user")
+        self.worker.registerFunction("zuul:get_admin_tenants")
         self.worker.registerFunction("zuul:tenant_sql_connection")
         self.worker.registerFunction("zuul:status_get")
         self.worker.registerFunction("zuul:job_get")
@@ -315,11 +316,7 @@ class RPCListener(object):
             job_log_stream_address['port'] = build.worker.log_port
         job.sendWorkComplete(json.dumps(job_log_stream_address))
 
-    def handle_authorize_user(self, job):
-        args = json.loads(job.arguments)
-        tenant_name = args['tenant']
-        claims = args['claims']
-        tenant = self.sched.abide.tenants.get(tenant_name)
+    def _is_authorized(self, tenant, claims, debug=False):
         authorized = False
         if tenant:
             rules = tenant.authorization_rules
@@ -327,16 +324,36 @@ class RPCListener(object):
                 if rule not in self.sched.abide.admin_rules.keys():
                     self.log.error('Undefined rule "%s"' % rule)
                     continue
-                debug_msg = 'Applying rule "%s" from tenant "%s" to claims %s'
-                self.log.debug(
-                    debug_msg % (rule, tenant, json.dumps(claims)))
+                if debug:
+                    debug_msg = ('Applying rule "%s" from tenant '
+                                 '"%s" to claims %s')
+                    self.log.debug(
+                        debug_msg % (rule, tenant, json.dumps(claims)))
                 authorized = self.sched.abide.admin_rules[rule](claims)
                 if authorized:
-                    debug_msg = '%s authorized on tenant "%s" by rule "%s"'
-                    self.log.debug(
-                        debug_msg % (json.dumps(claims), tenant, rule))
+                    if debug:
+                        debug_msg = '%s authorized on tenant "%s" by rule "%s"'
+                        self.log.debug(
+                            debug_msg % (json.dumps(claims), tenant, rule))
                     break
+        return authorized
+
+    def handle_authorize_user(self, job):
+        args = json.loads(job.arguments)
+        tenant_name = args['tenant']
+        claims = args['claims']
+        tenant = self.sched.abide.tenants.get(tenant_name)
+        authorized = self._is_authorized(tenant, claims, debug=True)
         job.sendWorkComplete(json.dumps(authorized))
+
+    def handle_get_admin_tenants(self, job):
+        args = json.loads(job.arguments)
+        claims = args['claims']
+        admin_tenants = []
+        for tenant_name, tenant in self.sched.abide.tenants.items():
+            if self._is_authorized(tenant, claims):
+                admin_tenants.append(tenant_name)
+        job.sendWorkComplete(json.dumps(admin_tenants))
 
     def handle_tenant_list(self, job):
         output = []
