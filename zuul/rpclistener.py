@@ -70,6 +70,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:get_job_log_stream_address")
         self.worker.registerFunction("zuul:tenant_list")
         self.worker.registerFunction("zuul:authorization_rules")
+        self.worker.registerFunction("zuul:rules_tree")
         self.worker.registerFunction("zuul:tenant_sql_connection")
         self.worker.registerFunction("zuul:status_get")
         self.worker.registerFunction("zuul:job_get")
@@ -328,6 +329,17 @@ class RPCListener(object):
                 project_config = tenant.project_configs[project.canonical_name]
                 output += project_config.authorization_rules
         job.sendWorkComplete(json.dumps(output))
+
+    def handle_rules_tree(self, job):
+        rules_tree = {}
+        for t_name, t in self.sched.abide.tenants.items():
+            rules_tree[t_name] = {'base_rules': t.authorization_rules,
+                                  'project_rules': {}}
+            for project in t.config_projects + t.untrusted_projects:
+                p_conf = t.project_configs[project.canonical_name]
+                p_rules = p_conf.authorization_rules
+                rules_tree[t_name]['project_rules'][project.name] = p_rules
+        job.sendWorkComplete(json.dumps(rules_tree))
 
     def handle_tenant_list(self, job):
         output = []
