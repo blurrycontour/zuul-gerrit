@@ -18,4 +18,4 @@
 - rule:
     name: car_rule
     conditions:
-      - car: ecto-1
+      - vehicle.car: ecto-1

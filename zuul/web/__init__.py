@@ -253,6 +253,11 @@ class ZuulWebAPI(object):
             'buildsets': '/api/tenant/{tenant}/buildsets',
             'buildset': '/api/tenant/{tenant}/buildset/{uuid}',
             'config_errors': '/api/tenant/{tenant}/config-errors',
+            'authorizations': '/api/user/authorizations',
+            'autohold': '/api/tenant/{tenant}/project/{project:.*}/autohold',
+            'autohold_list': '/api/tenant/{tenant}/autohold',
+            'enqueue': '/api/tenant/{tenant}/project/{project:.*}/enqueue',
+            'dequeue': '/api/tenant/{tenant}/project/{project:.*}/dequeue',
         }
 
     @cherrypy.expose
@@ -299,6 +304,29 @@ class ZuulWebAPI(object):
                     self.log.debug(msg % (claims['__zuul_uid_claim'], rule))
                     return True
         return False
+
+    # TODO good candidate for caching
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def user_authorizations(self):
+        rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
+        try:
+            claims = self.zuulweb.authenticators.authenticate(rawToken)
+        except exceptions.AuthTokenException as e:
+            for header, contents in e.getAdditionalHeaders().items():
+                cherrypy.response.headers[header] = contents
+            cherrypy.response.status = e.HTTPError
+            return '<h1>%s</h1>' % e.error_description
+        if 'zuul' in claims and 'admin' in claims.get('zuul', {}):
+            return {'zuul': {'admin': claims['zuul']['admin']}, }
+        admin_tenants = []
+        job = self.rpc.submitJob('zuul:rules_tree', {})
+        rules_tree = json.loads(job.data[0])
+        ruleset = self.zuulweb.authorizations.ruleset
+        for t, t_rules in rules_tree.items():
+            if any(ruleset[rule](claims) for rule in t_rules):
+                admin_tenants.append(t)
+        return {'zuul': {'admin': admin_tenants}, }
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -998,6 +1026,8 @@ class ZuulWeb(object):
         if self.authenticators.authenticators:
             # route order is important, put project actions before the more
             # generic tenant/{tenant}/project/{project} route
+            route_map.connect('api', '/api/user/authorizations',
+                              controller=api, action='user_authorizations')
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/autohold',
