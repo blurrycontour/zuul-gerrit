@@ -1370,6 +1370,26 @@ class TestTenantScopedWebApiWithAuthRulesOverrideAllowed(
         self.assertTrue('gb_rule' in self.web.authorizations.ruleset)
         self.assertTrue('car_rule' in self.web.authorizations.ruleset)
 
+    def test_user_authorizations_with_override(self):
+        """Test that user with 'zuul.admin' claim gets it back"""
+        admin_tenants = ['tenant-ten', 'tenant-umpteen']
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {'admin': admin_tenants},
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        req = self.get_url('/api/user/authorizations',
+                           headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(200, req.status_code, req.text)
+        # The JSON returned is the same as the client's output
+        data = req.json()
+        self.assertTrue('zuul' in data, data)
+        self.assertTrue('admin' in data['zuul'], data)
+        for t in admin_tenants:
+            self.assertTrue(t in data['zuul']['admin'], data)
+
 
 class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
     config_file = 'zuul-admin-web-no-override.conf'
@@ -1472,8 +1492,8 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
         self.assertEqual(200, req.status_code, req.text)
         self.waitUntilSettled()
 
-    def test_arbitrary_claim_rule(self):
-        """Test a rule based on a specific claim"""
+    def test_depth_claim_rule(self):
+        """Test a rule based on a complex claim"""
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         A.addApproval('Approved', 1)
@@ -1481,7 +1501,8 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
         authz = {'iss': 'zuul_operator',
                  'aud': 'zuul.example.com',
                  'sub': 'zeddemore',
-                 'car': 'ecto-1',
+                 'vehicle': {
+                     'car': 'ecto-1'},
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
@@ -1496,3 +1517,66 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                             json=change)
         self.assertEqual(200, req.status_code, req.text)
         self.waitUntilSettled()
+
+    def test_user_actions_action_override(self):
+        """Test that user with 'zuul.admin' claim does NOT get it back"""
+        admin_tenants = ['tenant-zero', ]
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {'admin': admin_tenants},
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        req = self.get_url('/api/user/authorizations',
+                           headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(401, req.status_code, req.text)
+
+    def test_user_actions(self):
+        """Test that users get the right 'zuul.actions' trees"""
+        users = [
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'vigo'},
+             'zuul.admin': []},
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'venkman'},
+             'zuul.admin': ['tenant-one', ]},
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'stantz'},
+             'zuul.admin': []},
+            {'authz': {'iss': 'columbia.edu',
+                       'aud': 'zuul.example.com',
+                       'sub': 'stantz'},
+             'zuul.admin': ['tenant-one', ]},
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'zeddemore',
+                       'vehicle': {
+                           'car': 'ecto-1'
+                       }},
+             'zuul.admin': ['tenant-one', ]},
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'melnitz',
+                       'groups': ['secretary', 'ghostbusters']},
+             'zuul.admin': ['tenant-one', ]},
+        ]
+        for test_user in users:
+            authz = test_user['authz']
+            authz['exp'] = time.time() + 3600
+            token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                               algorithm='HS256').decode('utf-8')
+            req = self.get_url('/api/user/authorizations',
+                               headers={'Authorization': 'Bearer %s' % token})
+            self.assertEqual(200, req.status_code, req.text)
+            data = req.json()
+            self.assertTrue('zuul' in data,
+                            "%s got %s" % (authz['sub'], data))
+            self.assertTrue('admin' in data['zuul'],
+                            "%s got %s" % (authz['sub'], data))
+            self.assertEqual(test_user['zuul.admin'],
+                             data['zuul']['admin'],
+                             "%s got %s" % (authz['sub'], data))
