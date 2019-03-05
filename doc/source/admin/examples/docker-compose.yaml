@@ -59,6 +59,7 @@ services:
     image: zuul/zuul-web
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
+      - "./playbooks/:/var/playbooks/:z"
   executor:
     privileged: true
     environment:
