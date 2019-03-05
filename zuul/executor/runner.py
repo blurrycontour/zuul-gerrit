@@ -20,6 +20,8 @@ import threading
 import uuid
 
 import requests
+import voluptuous as vs
+import yaml
 
 import zuul
 import zuul.merger.merger
@@ -30,6 +32,59 @@ from zuul.executor.common import JobDir, AnsibleJobBase, DeduplicateQueue
 from zuul.executor.common import UpdateTask
 
 
+class RunnerConfiguration(object):
+    log = logging.getLogger("zuul.RunnerConfiguration")
+    runner = {
+        "ansible-dir": str,
+        "job-dir": str,
+        "git-dir": str,
+    }
+
+    schema = {
+        'runner': runner,
+        'api': str,
+        'tenant': str,
+        'project': str,
+        'pipeline': str,
+        'branch': str,
+        'job': str,
+    }
+
+    def readConfig(self, config_path):
+        config_path = os.path.expanduser(config_path)
+        if os.path.exists(config_path):
+            with open(config_path) as config_file:
+                return yaml.safe_load(config_file)
+        else:
+            return {}
+
+    def loadConfig(self, config, args=None):
+        config.setdefault("runner", {})
+        # Override from args
+        if args:
+            for key in self.schema:
+                if getattr(args, key):
+                    config[key] = args.key
+            if args.directory:
+                config["runner"]["job-dir"] = args.directory
+            if args.git_dir:
+                config["runner"]["git-dir"] = args.git_dir
+        # Validate schema
+        vs.Schema(self.schema)(config)
+        # Set default value
+        self.api = config["api"]
+        self.tenant = config.get("tenant")
+        self.pipeline = config.get("pipeline")
+        self.project = config.get("project")
+        self.branch = config.get("branch", "master")
+        self.job = config.get("job")
+        self.job_dir = config["runner"].get("job-dir")
+        self.ansible_dir = config["runner"].get(
+            "ansible-dir", "~/.cache/zuul/ansible")
+        self.git_dir = config["runner"].get("git-dir", "~/.cache/zuul/git")
+        return config
+
+
 class Runner(object):
     log = logging.getLogger("zuul.Runner")
 
@@ -37,7 +92,7 @@ class Runner(object):
         self.runner_config = runner_config
         self.connections = connections
         self.ansible_manager = zuul.lib.ansible.AnsibleManager(
-            runner_config["runner"]["ansible-dir"])
+            runner_config.ansible_dir)
 
     def _updateLoop(self):
         while True:
@@ -100,29 +155,29 @@ class Runner(object):
             speed_limit, speed_time, cache_root, logger)
 
     def _grab_frozen_job(self):
-        url = self.runner_config["api"]
-        if self.runner_config.get("tenant"):
-            url = os.path.join(url, "tenant", self.runner_config["tenant"])
-        if self.runner_config.get("project"):
+        url = self.runner_config.api
+        if self.runner_config.tenant:
+            url = os.path.join(url, "tenant", self.runner_config.tenant)
+        if self.runner_config.project:
             url = os.path.join(
                 url,
                 "pipeline",
-                self.runner_config["pipeline"],
+                self.runner_config.pipeline,
                 "project",
-                self.runner_config["project"],
+                self.runner_config.project,
                 "branch",
-                self.runner_config["branch"],
+                self.runner_config.branch,
                 "freeze-job")
-        if self.runner_config.get("job"):
-            url = os.path.join(url, self.runner_config["job"])
+        if self.runner_config.job:
+            url = os.path.join(url, self.runner_config.job)
         return requests.get(url).json()
 
     def prep_workspace(self):
         self.ansible_manager.copyAnsibleFiles()
         job_params = self._grab_frozen_job()
         self.merger_lock = threading.Lock()
-        if self.runner_config["runner"]["job-dir"]:
-            root = self.runner_config["runner"]["job-dir"]
+        if self.runner_config.job_dir:
+            root = self.runner_config.job_dir
             if root.endswith('/'):
                 root = root[:-1]
             job_unique = root.split('/')[-1]
@@ -138,8 +193,7 @@ class Runner(object):
         job.action_dir = ""
         job.lookup_dir = ""
         job.action_dir_general = ""
-        self.merge_root = os.path.expanduser(
-            self.runner_config["runner"]["git-dir"])
+        self.merge_root = os.path.expanduser(self.runner_config.git_dir)
         self.merger = self._getMerger(self.merge_root)
         self.start_update_thread()
         # TODO(jhesketh):
