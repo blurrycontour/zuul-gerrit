@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_377a37ba",
+        "filename": "zuul/ansible/actiongeneral/zuul_release_nodeset.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-05T02:18:03Z",
+      "side": 1,
+      "message": "I was looking for being able to release the node mid-playbook, but we are missing signaling between the ansible-playbook and the executor process. We can use zuul_return instead indeed.",
+      "parentUuid": "9fdfeff1_34323af4",
+      "revId": "f3f23e4b231d45a47d8cd96a08973ce014bc4eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_943526de",
         "filename": "zuul/executor/client.py",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9fdfeff1_0abcaa04",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-05T02:18:03Z",
+      "side": 1,
+      "message": "agreed, next PS will split this into 2 keys.",
+      "parentUuid": "9fdfeff1_943526de",
+      "revId": "f3f23e4b231d45a47d8cd96a08973ce014bc4eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_542fbe87",
         "filename": "zuul/executor/server.py",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2019-03-04T18:30:25Z",
       "side": 1,
       "message": "Why are we getting the result from this file, when we already know the result in the calling function? In fact, we have more current information than the release_nodeset task had.",
+      "revId": "f3f23e4b231d45a47d8cd96a08973ce014bc4eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fdfeff1_6d6d5098",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2012,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-05T02:18:03Z",
+      "side": 1,
+      "message": "I was thinking this could be used to release specifics node, but that\u0027s probably an oversight.",
+      "parentUuid": "9fdfeff1_542fbe87",
       "revId": "f3f23e4b231d45a47d8cd96a08973ce014bc4eb7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
