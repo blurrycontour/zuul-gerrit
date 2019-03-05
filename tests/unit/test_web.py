@@ -1261,6 +1261,25 @@ class TestTenantScopedWebApiWithAuthRulesOverrideAllowed(
             'ghostbusters_rule' in self.web.authorizations.ruleset)
         self.assertTrue('car_rule' in self.web.authorizations.ruleset)
 
+    def test_user_actions_action_override(self):
+        """Test that user with 'zuul.actions' claim gets it back"""
+        zuul_actions = {'enqueue': {'tenant-one': ['org/project', ]}, }
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {'actions': zuul_actions},
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        req = self.get_url('/api/user/actions',
+                           headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(200, req.status_code, req.text)
+        # The JSON returned is the same as the client's output
+        data = req.json()
+        self.assertTrue('zuul' in data, data)
+        self.assertTrue('actions' in data['zuul'], data)
+        self.assertEqual(zuul_actions, data['zuul']['actions'], data)
+
 
 class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
     config_file = 'zuul-admin-web-no-override.conf'
@@ -1412,3 +1431,70 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                             json=change)
         self.assertEqual(200, req.status_code, req.text)
         self.waitUntilSettled()
+
+    def test_user_actions_action_override(self):
+        """Test that user with 'zuul.actions' claim does NOT get it back"""
+        zuul_actions = {'enqueue': {'tenant-one': ['org/project', ]}, }
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {'actions': zuul_actions},
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        req = self.get_url('/api/user/actions',
+                           headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(401, req.status_code, req.text)
+
+    def test_user_actions(self):
+        """Test that users get the right 'zuul.actions' trees"""
+        users = [
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'vigo'},
+             'zuul.actions': {'autohold': {'tenant-one': []},
+                              'enqueue': {'tenant-one': []},
+                              'dequeue': {'tenant-one': []}}, },
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'venkman'},
+             'zuul.actions': {'autohold': {'tenant-one': '*'},
+                              'enqueue': {'tenant-one': '*'},
+                              'dequeue': {'tenant-one': '*'}}, },
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'stantz'},
+             'zuul.actions': {'autohold': {'tenant-one': ['org/project1', ]},
+                              'enqueue': {'tenant-one': ['org/project1', ]},
+                              'dequeue': {'tenant-one': ['org/project1', ]}}},
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'zeddemore',
+                       'car': 'ecto-1'},
+             'zuul.actions': {'autohold': {'tenant-one': []},
+                              'enqueue': {'tenant-one': ['org/project', ]},
+                              'dequeue': {'tenant-one': []}}, },
+            {'authz': {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'melnitz',
+                       'groups': ['secretary', 'ghostbusters']},
+             'zuul.actions': {'autohold': {'tenant-one': ['org/project2', ]},
+                              'enqueue': {'tenant-one': ['org/project2', ]},
+                              'dequeue': {'tenant-one': ['org/project2', ]}}},
+        ]
+        for test_user in users:
+            authz = test_user['authz']
+            authz['exp'] = time.time() + 3600
+            token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                               algorithm='HS256').decode('utf-8')
+            req = self.get_url('/api/user/actions',
+                               headers={'Authorization': 'Bearer %s' % token})
+            self.assertEqual(200, req.status_code, req.text)
+            data = req.json()
+            self.assertTrue('zuul' in data,
+                            "%s got %s" % (authz['sub'], data))
+            self.assertTrue('actions' in data['zuul'],
+                            "%s got %s" % (authz['sub'], data))
+            self.assertEqual(test_user['zuul.actions'],
+                             data['zuul']['actions'],
+                             "%s got %s" % (authz['sub'], data))

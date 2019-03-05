@@ -275,6 +275,38 @@ class ZuulWebAPI(object):
                     return True
         return False
 
+    # TODO good candidate for caching
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def user_actions(self):
+        rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
+        try:
+            claims = self.zuulweb.authenticators.authenticate(rawToken)
+        except exceptions.AuthTokenException as e:
+            for header, contents in e.getAdditionalHeaders().items():
+                cherrypy.response.headers[header] = contents
+            cherrypy.response.status = e.HTTPError
+            return '<h1>%s</h1>' % e.error_description
+        if 'zuul' in claims and 'actions' in claims.get('zuul', {}):
+            return {'zuul': {'actions': claims['zuul']['actions']}, }
+        zuul_actions = {'enqueue': {},
+                        'dequeue': {},
+                        'autohold': {}, }
+        job = self.rpc.submitJob('zuul:rules_tree', {})
+        rules_tree = json.loads(job.data[0])
+        ruleset = self.zuulweb.authorizations.ruleset
+        for t, t_rules in rules_tree.items():
+            base_rules = t_rules['base_rules']
+            for a in ['autohold', 'enqueue', 'dequeue']:
+                if any(ruleset[r].actions[a](claims) for r in base_rules):
+                    zuul_actions[a][t] = '*'
+                else:
+                    zuul_actions[a][t] = []
+                    for p, p_rules in t_rules['project_rules'].items():
+                        if any(ruleset[r].actions[a](claims) for r in p_rules):
+                            zuul_actions[a][t].append(p)
+        return {'zuul': {'actions': zuul_actions}, }
+
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def tenants(self):
@@ -923,6 +955,8 @@ class ZuulWeb(object):
         if self.authenticators.authenticators:
             # route order is important, put project actions before the more
             # generic tenant/{tenant}/project/{project} route
+            route_map.connect('api', '/api/user/actions',
+                              controller=api, action='user_actions')
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/autohold',
