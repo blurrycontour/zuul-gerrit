@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_0e45acb3",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T18:33:46Z",
+      "side": 1,
+      "message": "I would still add the optional maximum validity time.",
+      "revId": "d52e4136fc86dcf40748ea892fa0dee7e73b848e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
