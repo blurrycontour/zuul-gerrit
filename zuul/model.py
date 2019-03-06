@@ -1649,12 +1649,21 @@ class JobList(ConfigObject):
                     joblist.append(job)
 
 
+class JobDependency(ConfigObject):
+    """ A reference to another job in the project-pipeline-config. """
+    def __init__(self, name, soft=False):
+        super(JobDependency, self).__init__()
+        self.name = name
+        self.soft = soft
+
+
 class JobGraph(object):
     """ A JobGraph represents the dependency graph between Job."""
 
     def __init__(self):
         self.jobs = OrderedDict()  # job_name -> Job
-        self._dependencies = {}  # dependent_job_name -> set(parent_job_names)
+        # dependent_job_name -> dict(parent_job_name -> soft)
+        self._dependencies = {}
 
     def __repr__(self):
         return '<JobGraph %s>' % (self.jobs)
@@ -1666,17 +1675,18 @@ class JobGraph(object):
             raise Exception("Job %s already added" % (job.name,))
         self.jobs[job.name] = job
         # Append the dependency information
-        self._dependencies.setdefault(job.name, set())
+        self._dependencies.setdefault(job.name, {})
         try:
             for dependency in job.dependencies:
                 # Make sure a circular dependency is never created
                 ancestor_jobs = self._getParentJobNamesRecursively(
-                    dependency, soft=True)
-                ancestor_jobs.add(dependency)
+                    dependency.name, soft=True)
+                ancestor_jobs.add(dependency.name)
                 if any((job.name == anc_job) for anc_job in ancestor_jobs):
                     raise Exception("Dependency cycle detected in job %s" %
                                     (job.name,))
-                self._dependencies[job.name].add(dependency)
+                self._dependencies[job.name][dependency.name] = \
+                    dependency.soft
         except Exception:
             del self.jobs[job.name]
             del self._dependencies[job.name]
@@ -1709,19 +1719,21 @@ class JobGraph(object):
 
     def _getParentJobNamesRecursively(self, dependent_job, soft=False):
         all_parent_jobs = set()
-        jobs_to_iterate = set([dependent_job])
+        jobs_to_iterate = set([(dependent_job, False)])
         while len(jobs_to_iterate) > 0:
-            current_job = jobs_to_iterate.pop()
+            (current_job, current_soft) = jobs_to_iterate.pop()
             current_parent_jobs = self._dependencies.get(current_job)
             if current_parent_jobs is None:
-                if soft:
-                    current_parent_jobs = set()
+                if soft or current_soft:
+                    current_parent_jobs = {}
                 else:
                     raise Exception("Job %s depends on %s which was not run." %
                                     (dependent_job, current_job))
-            new_parent_jobs = current_parent_jobs - all_parent_jobs
-            jobs_to_iterate |= new_parent_jobs
-            all_parent_jobs |= new_parent_jobs
+            elif dependent_job != current_job:
+                all_parent_jobs.add(current_job)
+            new_parent_jobs = set(current_parent_jobs.keys()) - all_parent_jobs
+            for j in new_parent_jobs:
+                jobs_to_iterate.add((j, current_parent_jobs[j]))
         return all_parent_jobs
 
 
