@@ -2271,8 +2271,7 @@ class QueueItem(object):
                     found = True
                     break
             if found:
-                if not item.providesRequirements(requirements, data):
-                    return False
+                return item.providesRequirements(requirements, data)
             else:
                 # Look for this item in the SQL DB.
                 data += self._getRequirementsResultFromSQL(requirements)
@@ -2307,6 +2306,7 @@ class QueueItem(object):
         try:
             data = []
             ret = self.item_ahead.providesRequirements(job.requires, data)
+            data.reverse()
             job.updateArtifactData(data)
         except RequirementsError as e:
             self.warning(str(e))
