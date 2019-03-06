@@ -2,6 +2,75 @@
   "comments": [
     {
       "key": {
+        "uuid": "5fc1f717_f63ff1b2",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Just to be sure I\u0027m clear, this would be the groups communicated down from the JWT source (standard/public claims) not something internal to Zuul.",
+      "range": {
+        "startLine": 189,
+        "startChar": 14,
+        "endLine": 189,
+        "endChar": 38
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_b6496961",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Not sure what this is intended to convey, usernames? It just ins\u0027t purely clear from the example, and it is not consistent with `\"ghostbusters\" in groups`",
+      "range": {
+        "startLine": 193,
+        "startChar": 14,
+        "endLine": 194,
+        "endChar": 20
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_160f1d2f",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Can these be stacked?\n\n    any_of:\n      - all_of:\n          - \"ghostbusters\" in groups\n          - iss\u003dcolumbia_university\n      - \"gatekeeper\" in groups\n      - \"keymaster\" in groups\n\nIs this intended to be a DSL? What mechanism are you using to determined \"XXX\" in \"Y\"/tokenize. I worry when a new DSL is being created.",
+      "range": {
+        "startLine": 204,
+        "startChar": 0,
+        "endLine": 205,
+        "endChar": 75
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_67758e98",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 10
@@ -18,6 +87,236 @@
         "startChar": 41,
         "endLine": 207,
         "endChar": 52
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_56a925dd",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "I highly recommend avoiding this. Don\u0027t leak privileged information in HTTP request logs. Request logs may not be viewed by the same person as the operator who could perform the actions anyway.",
+      "range": {
+        "startLine": 289,
+        "startChar": 25,
+        "endLine": 289,
+        "endChar": 84
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d6b43538",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Question:\n\nIs this already the standard? Is this because all actions are a creation of an action (resource) that zuul processes?",
+      "range": {
+        "startLine": 291,
+        "startChar": 74,
+        "endLine": 291,
+        "endChar": 77
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_16d95d82",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "You may also need to add a 422 response (UNPROCESSABLE ENTITY) in the case that the JSON is well formed, is the correct content-type, but the value is incorrect (e.g. incomplete dataset, missing a trigger, etc).\n\n400 with clear response should be ok in most cases.",
+      "range": {
+        "startLine": 293,
+        "startChar": 12,
+        "endLine": 293,
+        "endChar": 55
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_16c2bd86",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Suggest: Add a \"GET\" for any enpoint that emits a schema of the expected POST body/entity. [Can be a followup] (unprotected/not requiring a JWT)",
+      "range": {
+        "startLine": 302,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 51
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d950e6d7",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "See comment below about \"reason\"",
+      "range": {
+        "startLine": 313,
+        "startChar": 0,
+        "endLine": 315,
+        "endChar": 28
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_793692b7",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Suggest adding \"Reason\" (optional) as well, that is logged.",
+      "range": {
+        "startLine": 339,
+        "startChar": 0,
+        "endLine": 340,
+        "endChar": 28
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_19474e20",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Same \"Reason\" comment here.",
+      "range": {
+        "startLine": 347,
+        "startChar": 0,
+        "endLine": 348,
+        "endChar": 28
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_592cf646",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "It might be worth also adding \"--endpoint\" or \"--url\" to the CLI allowing it to be used without a config file (might be useful for some folks) -- This is outside the scope of this spec.",
+      "range": {
+        "startLine": 442,
+        "startChar": 0,
+        "endLine": 449,
+        "endChar": 64
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_998ede2c",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Is this intended to be a magic string for the \"zuul_operator\" issuer? I would do this as a boolean instead of a magic string.",
+      "range": {
+        "startLine": 507,
+        "startChar": 0,
+        "endLine": 507,
+        "endChar": 27
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_7905327a",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 2903
+      },
+      "writtenOn": "2019-03-06T01:11:17Z",
+      "side": 1,
+      "message": "Suggest an optional maximum validity time, avoids potential typos that could make a token valid for 1800000 seconds. Since revocations (short of secret rotation, which invalidates all active tokens) is not part of the spec (revocations should not be part of the spec).",
+      "range": {
+        "startLine": 502,
+        "startChar": 4,
+        "endLine": 512,
+        "endChar": 17
       },
       "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
