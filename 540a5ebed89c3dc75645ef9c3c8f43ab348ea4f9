@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_db73f64c",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "Yes, these rules all refer to claims found in the JWT. Since Zuul has no user backend these rules could be used as ad hoc group definitions, using \"any_of\".",
+      "parentUuid": "5fc1f717_f63ff1b2",
+      "range": {
+        "startLine": 189,
+        "startChar": 14,
+        "endLine": 189,
+        "endChar": 38
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_b6496961",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 10
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_5b04e67b",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "it is mentioned in line 288: if no claim is explicitly mentioned, the check applies to the default uid claim (authenticators can define a claim to use as uid rather then sub, see below)\n\nThis is meant to simplify things on the operator\u0027s end but could be removed for consistency.",
+      "parentUuid": "5fc1f717_b6496961",
+      "range": {
+        "startLine": 193,
+        "startChar": 14,
+        "endLine": 194,
+        "endChar": 20
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_160f1d2f",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 10
@@ -59,6 +107,30 @@
       "writtenOn": "2019-03-06T01:11:17Z",
       "side": 1,
       "message": "Can these be stacked?\n\n    any_of:\n      - all_of:\n          - \"ghostbusters\" in groups\n          - iss\u003dcolumbia_university\n      - \"gatekeeper\" in groups\n      - \"keymaster\" in groups\n\nIs this intended to be a DSL? What mechanism are you using to determined \"XXX\" in \"Y\"/tokenize. I worry when a new DSL is being created.",
+      "range": {
+        "startLine": 204,
+        "startChar": 0,
+        "endLine": 205,
+        "endChar": 75
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_bbfcea3e",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "yes, in my PoC they are stackable: https://review.openstack.org/#/c/639855/9/zuul/configloader.py\n\nIt\u0027s not intended to be something complex because as you point out, maintaining DSLs is hard, but at least support for boolean operands AND and OR should be there.",
+      "parentUuid": "5fc1f717_160f1d2f",
       "range": {
         "startLine": 204,
         "startChar": 0,
@@ -117,6 +189,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_fb7592cd",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "OK, I\u0027ve seen it done in some implementations so that\u0027s why I mentioned it. Not having to deal with that case simplifies things so I\u0027ll remove that",
+      "parentUuid": "5fc1f717_56a925dd",
+      "range": {
+        "startLine": 289,
+        "startChar": 25,
+        "endLine": 289,
+        "endChar": 84
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_d6b43538",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 10
@@ -128,6 +224,30 @@
       "writtenOn": "2019-03-06T01:11:17Z",
       "side": 1,
       "message": "Question:\n\nIs this already the standard? Is this because all actions are a creation of an action (resource) that zuul processes?",
+      "range": {
+        "startLine": 291,
+        "startChar": 74,
+        "endLine": 291,
+        "endChar": 77
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_9b2a4de5",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "Other endpoints return either 200 or 404. These new endpoints \"create\" an action, I thought 201 would be more appropriate.",
+      "parentUuid": "5fc1f717_d6b43538",
       "range": {
         "startLine": 291,
         "startChar": 74,
@@ -186,6 +306,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_5bd065ca",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "Good idea, but since the call accepts two types of body (enqueue or enqueue-ref), how would we convey that? I\u0027d rather not split the endpoint per body type for convenience.",
+      "parentUuid": "5fc1f717_16c2bd86",
+      "range": {
+        "startLine": 302,
+        "startChar": 0,
+        "endLine": 302,
+        "endChar": 51
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_d950e6d7",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 10
@@ -197,6 +341,30 @@
       "writtenOn": "2019-03-06T01:11:17Z",
       "side": 1,
       "message": "See comment below about \"reason\"",
+      "range": {
+        "startLine": 313,
+        "startChar": 0,
+        "endLine": 315,
+        "endChar": 28
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_9b948dea",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "That\u0027s a missing feature at the RPC level, that could be a followup. RPC autohold has it, there\u0027s no reason it shouldn\u0027t be there for enqueue and dequeue as well",
+      "parentUuid": "5fc1f717_d950e6d7",
       "range": {
         "startLine": 313,
         "startChar": 0,
@@ -278,6 +446,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_3b7319ea",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "The CLI also requires the full Zuul library to be installed, a nice followup would be to split zuul into zuul-lib, zuul-cli and zuul-server",
+      "parentUuid": "5fc1f717_592cf646",
+      "range": {
+        "startLine": 442,
+        "startChar": 0,
+        "endLine": 449,
+        "endChar": 64
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_998ede2c",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 10
@@ -301,6 +493,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_fb2a718e",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "maybe an option like \"generate_token_from_cli\u003dTrue\" ?",
+      "parentUuid": "5fc1f717_998ede2c",
+      "range": {
+        "startLine": 507,
+        "startChar": 0,
+        "endLine": 507,
+        "endChar": 27
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_7905327a",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 10
@@ -312,6 +528,30 @@
       "writtenOn": "2019-03-06T01:11:17Z",
       "side": 1,
       "message": "Suggest an optional maximum validity time, avoids potential typos that could make a token valid for 1800000 seconds. Since revocations (short of secret rotation, which invalidates all active tokens) is not part of the spec (revocations should not be part of the spec).",
+      "range": {
+        "startLine": 502,
+        "startChar": 4,
+        "endLine": 512,
+        "endChar": 17
+      },
+      "revId": "540a5ebed89c3dc75645ef9c3c8f43ab348ea4f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_3e0f872f",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-06T08:40:00Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "5fc1f717_7905327a",
       "range": {
         "startLine": 502,
         "startChar": 4,
