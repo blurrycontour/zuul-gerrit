@@ -45,6 +45,23 @@
       "revId": "6d5d794a516728b7db3652eaf25881e3a46ff0e0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_c11e7b0b",
+        "filename": "tests/fixtures/layouts/soft-dependencies.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-07T19:20:52Z",
+      "side": 1,
+      "message": "Yep.  I think that may be a good idea.",
+      "revId": "6d5d794a516728b7db3652eaf25881e3a46ff0e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
