@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_4e515d36",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-07T15:52:34Z",
+      "side": 1,
+      "message": "If we change the ; to \u0026\u0026 we would catch the error in testing.",
+      "revId": "0769746f3a4fb01414fd1914b0e7dae4bb549de1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
