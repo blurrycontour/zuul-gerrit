@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_8e4505b6",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 787,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-07T15:44:06Z",
+      "side": 1,
+      "message": "Leftover debugging :)",
+      "revId": "48959d6e5388c0628905703c8cd8d250cdd722a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
