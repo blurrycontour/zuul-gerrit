@@ -1,0 +1,7 @@
+- hosts: all
+  tasks:
+    - name: Install jemalloc
+      become: true
+      package:
+        name: libjemalloc1
+        state: present

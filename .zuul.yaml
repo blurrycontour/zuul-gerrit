@@ -187,20 +187,30 @@
         - tox-docs
         - tox-pep8
         - tox-py35:
-            pre-run: playbooks/sar/pre.yaml
+            pre-run:
+              - playbooks/sar/pre.yaml
+              - playbooks/jemalloc/pre.yaml
             post-run: playbooks/sar/post.yaml
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
             timeout: 2700  # 45 minutes
+            vars:
+              tox_environment:
+                LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so.1
         - tox-py36:
-            pre-run: playbooks/sar/pre.yaml
+            pre-run:
+              - playbooks/sar/pre.yaml
+              - playbooks/jemalloc/pre.yaml
             post-run: playbooks/sar/post.yaml
             nodeset: ubuntu-bionic
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
             timeout: 2700  # 45 minutes
+            vars:
+              tox_environment:
+                LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so.1
         - zuul-build-dashboard
         - zuul-build-dashboard-multi-tenant
         - nodejs-npm-run-lint:
