@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_d2f2cb06",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1655,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-07T21:34:31Z",
+      "side": 1,
+      "message": "nit: This can be simplified to:\n\n super().__init__()",
+      "range": {
+        "startLine": 1655,
+        "startChar": 8,
+        "endLine": 1655,
+        "endChar": 45
+      },
+      "revId": "db3388688a5c0893b5b480579a8dd8905e6835b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
