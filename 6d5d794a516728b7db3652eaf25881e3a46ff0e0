@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_ebb596ef",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1089,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-07T18:13:27Z",
+      "side": 1,
+      "message": "nit: contains?",
+      "range": {
+        "startLine": 1089,
+        "startChar": 21,
+        "endLine": 1089,
+        "endChar": 30
+      },
+      "revId": "6d5d794a516728b7db3652eaf25881e3a46ff0e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_6b768609",
+        "filename": "tests/fixtures/layouts/soft-dependencies.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-07T18:13:27Z",
+      "side": 1,
+      "message": "I guess this is intended to be \u0027build\u0027. Also that job doesn\u0027t seem to exist at all in the config.\n\nThat takes me to the following question: Should referencing a non-existing job (as opposed to an existing one that just doesn\u0027t run) still raise an error?",
+      "range": {
+        "startLine": 33,
+        "startChar": 22,
+        "endLine": 33,
+        "endChar": 35
+      },
+      "revId": "6d5d794a516728b7db3652eaf25881e3a46ff0e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
