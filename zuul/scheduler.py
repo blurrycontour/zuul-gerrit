@@ -346,6 +346,9 @@ class Scheduler(threading.Thread):
         self.rpc.join()
         self._command_running = False
         self.command_socket.stop()
+        # We join here to avoid whitelisting the thread -- if it takes more
+        # than 5s to stop in tests, there's a problem.
+        self.command_thread.join(timeout=5)
 
     def runCommand(self):
         while self._command_running:
