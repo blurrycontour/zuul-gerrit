@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_17284584",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-07T20:40:31Z",
+      "side": 1,
+      "message": "pep8 error:\n\n ./zuul/driver/sql/sqlconnection.py:213:60: F821 undefined name \u0027connection_name\u0027\n                \"SQL connection %s will be unavailable.\" % connection_name)",
+      "revId": "3f0146cf90eb93f61952e143069e0d5c6e89f473",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
