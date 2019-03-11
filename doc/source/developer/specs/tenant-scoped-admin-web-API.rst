@@ -500,7 +500,9 @@ Here is an example defining the three supported types of authenticators:
     # Auth realm, used in 401 error messages
     realm=openstack
     # (optional) Ensure a Token cannot be valid for longer than this amount of time, in seconds
-    max_validity_time = 1800000
+    max_token_age = 1800000
+    # (optional) Account for skew between clocks, in seconds
+    skew = 3
 
     # asymmetrical encryption
     [auth "my_oidc_idp"]
@@ -516,7 +518,7 @@ Here is an example defining the three supported types of authenticators:
     # Auth realm, used in 401 error messages
     realm=openstack
     # (optional) Ensure a Token cannot be valid for longer than this amount of time, in seconds
-    max_validity_time = 1800000
+    max_token_age = 1800000
 
     # asymmetrical encryption using JWKS for validation
     # The signing secret being known to the Identity Provider only, this

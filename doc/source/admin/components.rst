@@ -985,11 +985,18 @@ protected endpoints and configure JWT validation:
       a token. This is "sub" by default, as it is usually the purpose of this
       claim in a JWT. This identifier is used in audit logs.
 
-   .. attr:: max_validity_time
+   .. attr:: max_token_age
 
       Optional value to ensure a JWT cannot be valid for more than this amount
       of time in seconds. This is useful if the Zuul operator has no control
       over the service issueing JWTs, and the tokens are too long-lived.
+
+      .. attr:: skew
+      :default: 0
+
+      Optional integer value to compensate for skew between Zuul's and the
+      JWT emitter's respective clocks. Use a negative value if Zuul's clock
+      is running behind.
 
 This section can be repeated as needed with different authenticators, allowing
 access to privileged API actions from several JWT issuers.
