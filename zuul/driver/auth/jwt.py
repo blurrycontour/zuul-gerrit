@@ -14,6 +14,7 @@
 # under the License.
 
 import logging
+import math
 import time
 import jwt
 import requests
@@ -41,6 +42,7 @@ class JWTAuthenticator(AuthenticatorInterface):
                 self.allow_authz_override = True
             else:
                 self.allow_authz_override = False
+        self.token_expiry = conf.get('token_expiry', math.inf)
 
     def _decode(self, rawToken):
         raise NotImplementedError
@@ -68,13 +70,31 @@ class JWTAuthenticator(AuthenticatorInterface):
             raise exceptions.AuthTokenUnauthorizedException(
                 realm=self.realm,
                 msg=e)
+        # Missing claim tests
         if not all(x in decoded for x in ['aud', 'iss', 'exp', 'sub']):
             raise exceptions.MissingClaimError(realm=self.realm)
+        if self.token_expiry < math.inf and 'iat' not in decoded:
+            raise exceptions.MissingClaimError(
+                msg='Missing "iat" claim',
+                realm=self.realm)
         if self.uid_claim not in decoded:
             raise exceptions.MissingUIDClaimError(realm=self.realm)
+        # Time related tests
         expires = decoded.get('exp', 0)
-        if expires < time.time():
+        issued_at = decoded.get('iat', 0)
+        now = time.time()
+        if issued_at > now:
+            raise exceptions.AuthTokenUnauthorizedException(
+                msg='"iat" claim set in the future',
+                realm=self.realm
+            )
+        if now - issued_at > self.token_expiry:
+            raise exceptions.TokenExpiredError(
+                msg='Token was issued too long ago',
+                realm=self.realm)
+        if expires < now:
             raise exceptions.TokenExpiredError(realm=self.realm)
+        # Zuul-specific claims tests
         zuul_claims = decoded.get('zuul', {})
         actions = zuul_claims.get('actions', {})
         if not isinstance(actions, dict):
@@ -91,6 +111,7 @@ class JWTAuthenticator(AuthenticatorInterface):
                    'authorization granted')
             logger.info(msg % (decoded['iss'], decoded[self.uid_claim]))
             logger.debug('%r' % actions)
+
         return decoded
 
     def authenticate(self, rawToken):
