@@ -47,6 +47,7 @@ realm=zuul.example.com
 client_id=zuul.example.com
 issuer_id=zuul_operator
 secret=NoDanaOnlyZuul
+token_expiry=36000
 
 [connection gerrit]
 driver=gerrit
