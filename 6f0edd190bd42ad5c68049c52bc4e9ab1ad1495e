@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_809ef151",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-11T21:44:51Z",
+      "side": 1,
+      "message": "Why have a timeout at all?  We have other joins here with no timeout.  And I worry about assuming that 5 seconds is enough time to stop when running tests in parallel -- we\u0027ve seen some really long context switches.",
+      "revId": "6f0edd190bd42ad5c68049c52bc4e9ab1ad1495e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
