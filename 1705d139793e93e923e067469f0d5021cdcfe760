@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_43b49335",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 602,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-11T22:25:04Z",
+      "side": 1,
+      "message": "It might be better to say why someone might want to change it (otherwise we only say why it should be \"true\", not why it should be \"false\"), and if so, what they need to do.  In particular, we should at least tell them they need to run \"zuul-manage-ansible\".",
+      "revId": "1705d139793e93e923e067469f0d5021cdcfe760",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
