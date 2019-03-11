@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_0309abdb",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-11T22:34:28Z",
+      "side": 1,
+      "message": "If you respin, capitalize Zuul :)",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_a30f77df",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 911,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-11T22:34:28Z",
+      "side": 1,
+      "message": "We should make sure to get this in the web ui at some point.",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_63f98fc6",
+        "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-11T22:34:28Z",
+      "side": 1,
+      "message": "\"in parallel\" is confusing.  Perhaps just drop those two words, or \"jobs may now specify which ansible version is used to run them\"?",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_83f4bbd0",
+        "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-11T22:34:28Z",
+      "side": 1,
+      "message": "Here it makes more sense to be specific, but parallel is still confusing.  I would suggest \"several ansible versions installed simultaneously\".",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_c312c309",
+        "filename": "zuul/cmd/manage_ansible.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-11T22:34:28Z",
+      "side": 1,
+      "message": "I would find \"-l\" for \"list supported versions\" slightly more inuitive.\n\nUsually I think of \"-s\" for \"set\".",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
