@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_63d0af20",
+        "filename": ".zuul.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-11T22:38:39Z",
+      "side": 1,
+      "message": "Is this because installing 3 versions of ansible in the unit tests takes longer?",
+      "revId": "3123bdea3e20e1a3cb62ffbd055c981ec4e4822d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
