@@ -1508,7 +1508,7 @@ class FakeBuild(object):
         return repos
 
 
-class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
+class RecordingAnsibleJob(zuul.executor.server.AnsibleJobGearman):
     def doMergeChanges(self, merger, items, repo_state):
         # Get a merger in order to update the repos involved in this job.
         commit = super(RecordingAnsibleJob, self).doMergeChanges(
