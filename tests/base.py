@@ -3001,7 +3001,7 @@ class FakeSqlConnection(sqlconnection.SQLConnection):
         return FakeZuulDatabaseSession(self)
 
 
-class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
+class RecordingAnsibleJob(zuul.executor.server.AnsibleJobGearman):
     result = None
 
     def doMergeChanges(self, merger, items, repo_state):

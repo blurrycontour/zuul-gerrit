@@ -438,8 +438,8 @@ class TestAnsibleJob(ZuulTestCase):
         ansible_version = AnsibleManager().default_version
         args = '{"ansible_version": "%s"}' % ansible_version
         job = gear.TextJob('executor:execute', args, unique='test')
-        self.test_job = zuul.executor.server.AnsibleJob(self.executor_server,
-                                                        job)
+        self.test_job = zuul.executor.server.AnsibleJobGearman(
+            self.executor_server, job)
 
     def test_getHostList_host_keys(self):
         # Test without connection_port set
