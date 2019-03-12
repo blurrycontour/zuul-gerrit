@@ -20,7 +20,7 @@ import time
 import os
 
 from zuul.driver import bubblewrap
-from zuul.executor.server import SshAgent
+from zuul.executor.common import SshAgent
 from tests.base import iterate_timeout
 from unittest import skipIf
 

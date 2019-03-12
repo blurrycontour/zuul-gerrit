@@ -6795,7 +6795,7 @@ class TestContainerJobs(AnsibleZuulTestCase):
     tenant_config_file = "config/container-build-resources/main.yaml"
 
     def test_container_jobs(self):
-        self.patch(zuul.executor.server.KubeFwd,
+        self.patch(zuul.executor.common.KubeFwd,
                    'kubectl_command',
                    os.path.join(FIXTURE_DIR, 'fake_kubectl.sh'))
 

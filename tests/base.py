@@ -3085,7 +3085,7 @@ class FakeBuild(object):
         return repos
 
 
-class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
+class RecordingAnsibleJob(zuul.executor.server.AnsibleJobZK):
     result = None
 
     def _execute(self):

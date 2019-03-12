@@ -34,7 +34,7 @@ from tests.base import (
 
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
-from zuul.executor.server import AnsibleJob, JobDir, squash_variables
+from zuul.executor.server import AnsibleJobZK, JobDir, squash_variables
 from zuul.lib.ansible import AnsibleManager
 from zuul.model import BuildRequest, NodeSet, Group
 
@@ -459,7 +459,8 @@ class TestAnsibleJob(ZuulTestCase):
             event_id='1',
         )
 
-        self.test_job = AnsibleJob(self.executor_server, build_request, params)
+        self.test_job = AnsibleJobZK(
+            self.executor_server, build_request, params)
         self.test_job.jobdir = JobDir(self.executor_server.jobdir_root,
                                       self.executor_server.keep_jobdir,
                                       str(build_request.uuid))
