@@ -2863,7 +2863,7 @@ class FakeBuild(object):
         return repos
 
 
-class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
+class RecordingAnsibleJob(zuul.executor.server.AnsibleJobGearman):
     result = None
 
     def doMergeChanges(self, merger, items, repo_state):

@@ -11,6 +11,7 @@ Zuul, though advanced users may find it interesting.
    :maxdepth: 1
 
    datamodel
+   jobmodel
    drivers
    triggers
    testing
