@@ -16,6 +16,24 @@
       "revId": "3123bdea3e20e1a3cb62ffbd055c981ec4e4822d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_2bda684b",
+        "filename": ".zuul.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T19:13:20Z",
+      "side": 1,
+      "message": "Partly, we\u0027re already near the current limit when we run on a slower node. Part of the longer time comes from installing ansible three times. However the more significant reason is that we run some ansible test cases (mainly test_ansible and test_plugins which are probably the two most expensive test cases in zuul) for each ansible version.\n\nIf that\u0027s too large, maybe we could shard the test cases like run one job with test_scheduler and test_v3 and one job with all the other tests.",
+      "parentUuid": "5fc1f717_63d0af20",
+      "revId": "3123bdea3e20e1a3cb62ffbd055c981ec4e4822d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
