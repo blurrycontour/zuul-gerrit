@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Zuul now allows the keys subdirectory in the
+    :attr:`scheduler.state_dir` directory to have both 0o700 and 0o750
+    directory permissions.

@@ -65,6 +65,35 @@ class TestSchedulerSSL(SSLZuulTestCase):
                          'label1')
 
 
+class TestSchedulerProjectKeysGroupRead(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+    create_project_keys = True
+
+    def setup_config(self):
+        key_root = os.path.join(self.state_root, 'keys')
+        os.mkdir(key_root, 0o750)
+        super(TestSchedulerProjectKeysGroupRead, self).setup_config()
+
+    def test_jobs_executed(self):
+        "Test that jobs are executed and a change is merged"
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-merge').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('project-test1').node,
+                         'label1')
+        self.assertEqual(self.getJobFromHistory('project-test2').node,
+                         'label1')
+
+
 class TestSchedulerZone(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 

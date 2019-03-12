@@ -583,9 +583,13 @@ class Scheduler(threading.Thread):
             os.mkdir(key_dir, 0o700)
         st = os.stat(key_dir)
         mode = st.st_mode & 0o777
-        if mode != 0o700:
-            raise Exception("Project key directory %s must be mode 0700; "
-                            "current mode is %o" % (key_dir, mode))
+        insecure = True
+        if mode == 0o700 or mode == 0o750:
+            insecure = False
+        if insecure:
+            raise Exception(
+                "Project key directory %s must be mode 0700 or 0750; "
+                "current mode is %o" % (key_dir, mode))
         return key_dir
 
     def _save_queue(self):
