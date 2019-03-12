@@ -14,7 +14,7 @@ import os
 import subprocess
 
 from tests.base import ZuulTestCase
-from zuul.executor.server import SshAgent
+from zuul.executor.common import SshAgent
 
 
 class TestSshAgent(ZuulTestCase):
