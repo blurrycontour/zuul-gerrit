@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_0ba8cbd8",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T20:27:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_eb02206f",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_a30f77df",
         "filename": "doc/source/user/config.rst",
         "patchSetId": 15
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "good idea",
       "parentUuid": "5fc1f717_a30f77df",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_eb7bff77",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 911,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T20:27:09Z",
+      "side": 1,
+      "message": "Are you ok doing this with follow-ups?",
+      "parentUuid": "5fc1f717_abf8987a",
       "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -107,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_8b4fdb32",
+        "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T20:27:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_2b326860",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_83f4bbd0",
         "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
         "patchSetId": 15
@@ -142,6 +196,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_2b6267af",
+        "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T20:27:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_4bf1f494",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_c312c309",
         "filename": "zuul/cmd/manage_ansible.py",
         "patchSetId": 15
@@ -171,6 +243,24 @@
       "side": 1,
       "message": "Actually now you say that I have no clue why I chose -s...",
       "parentUuid": "5fc1f717_c312c309",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_2b07c7cc",
+        "filename": "zuul/cmd/manage_ansible.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T20:27:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_cb0ba47a",
       "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
