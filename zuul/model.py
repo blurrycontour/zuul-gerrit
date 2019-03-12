@@ -1387,10 +1387,11 @@ class Job(ConfigObject):
             self.group_variables = Job._deepUpdate(
                 self.group_variables, other_group_vars)
 
-    def updateParentData(self, other_vars):
+    def updateParentData(self, other_build):
         # Update variables, but give the current values priority (used
         # for job return data which is lower precedence than defined
         # job vars).
+        other_vars = other_build.result_data
         v = self.parent_data or {}
         v = Job._deepUpdate(v, other_vars)
         # To avoid running afoul of checks that jobs don't set zuul
@@ -1399,6 +1400,23 @@ class Job(ConfigObject):
             del v['zuul']
         self.parent_data = v
         self.variables = Job._deepUpdate(self.parent_data, self.variables)
+
+        artifact_data = self.artifact_data or []
+        artifacts = other_vars.get('zuul', {}).get('artifacts', [])
+        for a in artifacts:
+            change = other_build.build_set.item.change
+            artifact = {'name': a.get('name'),
+                        'url': a.get('url'),
+                        'project': change.project.name,
+                        'change': str(change.number),
+                        'patchset': change.patchset,
+                        'job': other_build.job.name}
+            if a.get('meta'):
+                artifact['metadata'] = json.loads(a.get('meta'))
+            if artifact not in artifact_data:
+                artifact_data.append(artifact)
+        if artifact_data:
+            self.updateArtifactData(artifact_data)
 
     def updateArtifactData(self, artifact_data):
         self.artifact_data = artifact_data
@@ -2392,7 +2410,7 @@ class QueueItem(object):
                         parent_build = parent_builds_with_data.get(
                             parent_job.name)
                         if parent_build:
-                            job.updateParentData(parent_build.result_data)
+                            job.updateParentData(parent_build)
 
                 nodeset = self.current_build_set.getJobNodeSet(job.name)
                 if nodeset is None:
