@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_eb02206f",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T19:16:31Z",
+      "side": 1,
+      "message": "sure :)",
+      "parentUuid": "5fc1f717_0309abdb",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_a30f77df",
         "filename": "doc/source/user/config.rst",
         "patchSetId": 15
@@ -30,6 +48,24 @@
       "writtenOn": "2019-03-11T22:34:28Z",
       "side": 1,
       "message": "We should make sure to get this in the web ui at some point.",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_abf8987a",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 911,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T19:16:31Z",
+      "side": 1,
+      "message": "good idea",
+      "parentUuid": "5fc1f717_a30f77df",
       "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_2b326860",
+        "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T19:16:31Z",
+      "side": 1,
+      "message": "will change",
+      "parentUuid": "5fc1f717_63f98fc6",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_83f4bbd0",
         "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
         "patchSetId": 15
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_4bf1f494",
+        "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T19:16:31Z",
+      "side": 1,
+      "message": "thanks, will change",
+      "parentUuid": "5fc1f717_83f4bbd0",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_c312c309",
         "filename": "zuul/cmd/manage_ansible.py",
         "patchSetId": 15
@@ -81,6 +153,24 @@
       "writtenOn": "2019-03-11T22:34:28Z",
       "side": 1,
       "message": "I would find \"-l\" for \"list supported versions\" slightly more inuitive.\n\nUsually I think of \"-s\" for \"set\".",
+      "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_cb0ba47a",
+        "filename": "zuul/cmd/manage_ansible.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-12T19:16:31Z",
+      "side": 1,
+      "message": "Actually now you say that I have no clue why I chose -s...",
+      "parentUuid": "5fc1f717_c312c309",
       "revId": "331204a7aa588bf7821b5f4d0626b995af7aa9be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
