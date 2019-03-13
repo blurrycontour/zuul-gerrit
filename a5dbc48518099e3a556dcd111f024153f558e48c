@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_7eeee2ed",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-13T12:08:42Z",
+      "side": 1,
+      "message": "the \"aud\" claim may be a list, should we account for multiple values there?\n\nNote that this can also be covered in rules:\n\nAllOf:\n  - aud1 in aud\n  - aud2 in aud",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_7ec7c265",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-03-13T12:08:42Z",
+      "side": 1,
+      "message": "This implies that tokens without the \"iat\" claim should be rejected if this setting is present.",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
