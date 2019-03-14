@@ -14,6 +14,7 @@
 
 import abc
 from collections import OrderedDict
+import contextlib
 import copy
 import json
 import logging
@@ -180,7 +181,17 @@ class Attributes(object):
     """A class to hold attributes for string formatting."""
 
     def __init__(self, **kw):
-        setattr(self, '__dict__', kw)
+        self._attrs = kw
+
+    def __getattribute__(self, name):
+        with contextlib.suppress(KeyError):
+            attrs = super().__getattribute__("_attrs")
+            return attrs[name]
+        with contextlib.suppress(AttributeError):
+            return super().__getattribute__(name)
+
+    def update(self, **kwargs):
+        self._attrs.update(**kwargs)
 
 
 class Freezable(object):
@@ -3102,12 +3113,26 @@ class Branch(Ref):
         d['branch'] = self.branch
         return d
 
+    def getSafeAttributes(self):
+        attrs = super().getSafeAttributes()
+        attrs.update(
+            branch=self.branch
+        )
+        return attrs
+
 
 class Tag(Ref):
     """An existing tag state for a Project."""
     def __init__(self, project):
         super(Tag, self).__init__(project)
         self.tag = None
+
+    def getSafeAttributes(self):
+        attrs = super().getSafeAttributes()
+        attrs.update(
+            tag=self.tag
+        )
+        return attrs
 
 
 class Change(Branch):
@@ -3195,9 +3220,12 @@ class Change(Branch):
         return related
 
     def getSafeAttributes(self):
-        return Attributes(project=self.project,
-                          number=self.number,
-                          patchset=self.patchset)
+        attrs = super().getSafeAttributes()
+        attrs.update(
+            number=self.number,
+            patchset=self.patchset
+        )
+        return attrs
 
     def toDict(self):
         # Render to a dict to use in passing json to the executor

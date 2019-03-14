@@ -15,6 +15,9 @@
 import abc
 import logging
 from zuul.lib.config import get_default
+from zuul.model import Attributes
+
+import voluptuous as vs
 
 
 class BaseReporter(object, metaclass=abc.ABCMeta):
@@ -236,3 +239,32 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         for job_fields in jobs_fields:
             ret += '- %s%s : %s%s%s%s\n' % job_fields
         return ret
+
+    def safeFormatTemplate(self, template, item):
+        """Format a user supplied string template."""
+        try:
+            return template.format(
+                change=item.change.getSafeAttributes(),
+                tenant=item.pipeline.tenant.getSafeAttributes(),
+                pipeline=item.pipeline.getSafeAttributes()
+            )
+        except Exception:
+            self.log.exception("Error while formatting template '%s'",
+                               template)
+
+
+def safe_template_value(value):
+    if not isinstance(value, str):
+        raise vs.Invalid("topic is not a string")
+    try:
+        value.format(
+            tenant=Attributes(name="test"),
+            pipeline=Attributes(name="test"),
+            change=Attributes(name="test", project="test", number=12345,
+                              pathset=1)
+        )
+    except Exception as exc:
+        raise vs.Invalid(
+            "Template '{}' is invalid: {}".format(value, exc)
+        )
+    return value

@@ -513,5 +513,5 @@ class TestMQTTConnection(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.assertIn("topic component 'bad' is invalid", A.messages[0],
+        self.assertIn("is invalid: 'bad'", A.messages[0],
                       "A should report a syntax error")
