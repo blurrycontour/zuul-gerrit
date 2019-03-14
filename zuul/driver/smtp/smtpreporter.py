@@ -15,7 +15,7 @@
 import logging
 import voluptuous as v
 
-from zuul.reporter import BaseReporter
+from zuul.reporter import BaseReporter, safe_template_value
 
 
 class SMTPReporter(BaseReporter):
@@ -37,18 +37,18 @@ class SMTPReporter(BaseReporter):
             if 'to' in self.config else None
 
         if 'subject' in self.config:
-            subject = self.config['subject'].format(
-                change=item.change)
+            subject = self.safeFormatTemplate(self.config['subject'], item)
         else:
             subject = "Report for change %s" % item.change
 
-        self.connection.sendMail(subject, message, from_email, to_email)
+        if subject is not None:
+            self.connection.sendMail(subject, message, from_email, to_email)
 
 
 def getSchema():
     smtp_reporter = v.Schema({
         'to': str,
         'from': str,
-        'subject': str,
+        'subject': safe_template_value,
     })
     return smtp_reporter

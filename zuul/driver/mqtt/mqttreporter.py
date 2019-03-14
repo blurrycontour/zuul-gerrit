@@ -16,7 +16,7 @@ import logging
 import time
 import voluptuous as v
 
-from zuul.reporter import BaseReporter
+from zuul.reporter import BaseReporter, safe_template_value
 
 
 class MQTTReporter(BaseReporter):
@@ -66,39 +66,11 @@ class MQTTReporter(BaseReporter):
                     'result': result,
                 })
             message['buildset']['builds'].append(job_informations)
-        topic = None
-        try:
-            topic = self.config['topic'].format(
-                tenant=item.pipeline.tenant.name,
-                pipeline=item.pipeline.name,
-                project=item.change.project.name,
-                branch=getattr(item.change, 'branch', None),
-                change=getattr(item.change, 'number', None),
-                patchset=getattr(item.change, 'patchset', None),
-                ref=getattr(item.change, 'ref', None))
-        except Exception:
-            self.log.exception("Error while formatting MQTT topic %s:"
-                               % self.config['topic'])
+
+        topic = self.safeFormatTemplate(self.config['topic'], item)
         if topic is not None:
             self.connection.publish(
                 topic, message, qos=self.config.get('qos', 0))
-
-
-def topicValue(value):
-    if not isinstance(value, str):
-        raise v.Invalid("topic is not a string")
-    try:
-        value.format(
-            tenant='test',
-            pipeline='test',
-            project='test',
-            branch='test',
-            change='test',
-            patchset='test',
-            ref='test')
-    except KeyError as e:
-        raise v.Invalid("topic component %s is invalid" % str(e))
-    return value
 
 
 def qosValue(value):
@@ -110,4 +82,5 @@ def qosValue(value):
 
 
 def getSchema():
-    return v.Schema({v.Required('topic'): topicValue, 'qos': qosValue})
+    return v.Schema({v.Required('topic'): safe_template_value,
+                     'qos': qosValue})

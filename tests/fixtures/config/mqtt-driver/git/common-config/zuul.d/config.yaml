@@ -6,17 +6,17 @@
         - event: patchset-created
     start:
       mqtt:
-        topic: "{tenant}/zuul_start/{pipeline}/{project}/{branch}"
+        topic: "{tenant.name}/zuul_start/{pipeline.name}/{change.project}/{change.branch}"
     success:
       gerrit:
         Verified: 1
       mqtt:
-        topic: "{tenant}/zuul_buildset/{pipeline}/{project}/{branch}"
+        topic: "{tenant.name}/zuul_buildset/{pipeline.name}/{change.project}/{change.branch}"
     failure:
       gerrit:
         Verified: -1
       mqtt:
-        topic: "{tenant}/zuul_buildset/{pipeline}/{project}/{branch}"
+        topic: "{tenant.name}/zuul_buildset/{pipeline.name}/{change.project}/{change.branch}"
 
 - job:
     name: base
