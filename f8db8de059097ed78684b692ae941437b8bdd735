@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_f14509b5",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-14T14:52:55Z",
+      "side": 1,
+      "message": "I bet we can drop this now.",
+      "revId": "f8db8de059097ed78684b692ae941437b8bdd735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
