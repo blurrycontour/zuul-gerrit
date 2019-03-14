@@ -36,13 +36,26 @@ class SMTPReporter(BaseReporter):
         to_email = self.config['to'] \
             if 'to' in self.config else None
 
+        subject = None
         if 'subject' in self.config:
-            subject = self.config['subject'].format(
-                change=item.change)
+            try:
+                subject = self.config['subject'].format(
+                    change=item.change,
+                    tenant=item.pipeline.tenant.name,
+                    pipeline=item.pipeline.name,
+                    project=item.change.project.name,
+                    branch=getattr(item.change, 'branch', None),
+                    patchset=getattr(item.change, 'patchset', None),
+                    ref=getattr(item.change, 'ref', None)
+                )
+            except Exception:
+                self.log.exception("Error while formatting email subject '%s'",
+                                   self.config['topic'])
         else:
             subject = "Report for change %s" % item.change
 
-        self.connection.sendMail(subject, message, from_email, to_email)
+        if subject is not None:
+            self.connection.sendMail(subject, message, from_email, to_email)
 
 
 def getSchema():
