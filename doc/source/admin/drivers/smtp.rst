@@ -100,4 +100,6 @@ providing alternatives as arguments to the reporter. For example:
 
       The Subject of the report email.
 
-      .. TODO: document subject string formatting.
+      The subject can be a format string that can use the following parameters:
+      ``change``, ``tenant``, ``pipeline``, ``project``, ``branch``,
+      ``patchset`` and ``ref``.
