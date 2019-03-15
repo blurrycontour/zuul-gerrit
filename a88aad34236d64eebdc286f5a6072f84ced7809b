@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_2caa3d18",
+        "filename": "web/src/containers/jobs/Jobs.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-15T14:55:13Z",
+      "side": 1,
+      "message": "That probably would be better.",
+      "revId": "a88aad34236d64eebdc286f5a6072f84ced7809b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_def7ac8a",
         "filename": "web/src/containers/status/Pipeline.jsx",
         "patchSetId": 3
