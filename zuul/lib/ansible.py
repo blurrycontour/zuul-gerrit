@@ -92,7 +92,7 @@ class ManagedAnsible:
 
         # We don't use directly the venv module here because its behavior is
         # broken if we're already in a virtual environment.
-        cmd = [os.path.join(sys.exec_prefix, 'bin', 'virtualenv'),
+        cmd = [os.path.join(sys.base_prefix, 'bin', 'virtualenv'),
                '-p', python_executable, venv_path]
         p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
