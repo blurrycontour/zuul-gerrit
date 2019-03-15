@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_aa805bf6",
+        "filename": "doc/source/admin/examples/playbooks/wait-to-start-gearman.sh",
+        "patchSetId": 47
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-15T01:20:34Z",
+      "side": 1,
+      "message": "Could zuul service do that by default instead?",
+      "revId": "80d284622772bdccab0f9111e4898ff16dc8910c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_8aa6bfaa",
+        "filename": "zuul/lib/ansible-config.conf",
+        "patchSetId": 47
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-15T01:20:34Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we add openstacksdk, openshift and jmespath by default too?",
+      "revId": "80d284622772bdccab0f9111e4898ff16dc8910c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
