@@ -36,6 +36,7 @@ import { fetchConfigErrorsAction } from './actions/configErrors'
 import { setTenantAction } from './actions/tenant'
 import { clearError } from './actions/errors'
 
+import Keycloak from 'keycloak-js'
 
 class App extends React.Component {
   static propTypes = {
@@ -50,7 +51,19 @@ class App extends React.Component {
 
   state = {
     menuCollapsed: true,
-    showErrors: false
+    showErrors: false,
+    keycloak: null,
+  }
+
+  componentDidMount = () => {
+    const keycloak = Keycloak("/keycloak.json");
+
+    keycloak.init({ onLoad: 'login-required' }).success(authenticated => {
+      this.setState({ keycloak: keycloak, authenticated: authenticated });
+      console.log(keycloak.token);
+    }).error(err => {
+      alert(err);
+  });
   }
 
   onNavToggleClick = () => {
@@ -291,6 +304,6 @@ export default withRouter(connect(
     errors: state.errors,
     configErrors: state.configErrors,
     info: state.info,
-    tenant: state.tenant
+    tenant: state.tenant,
   })
 )(App))

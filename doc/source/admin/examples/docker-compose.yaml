@@ -1,12 +1,23 @@
 # Version 2 is the latest that is supported by docker-compose in
 # Ubuntu Xenial.
-version: '2'
+version: '3.4'
 
 services:
+  keycloak:
+    image: jboss/keycloak
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=h2
+      # - KEYCLOAK_IMPORT=/var/keycloak_import/test-realm.json
+    volumes:
+      - "./keycloak/:/var/keycloak_import/:z"
+    ports:
+      - "8180:8080"
   gerrit:
     image: gerritcodereview/gerrit
     ports:
-      - "8080:8080"
+      - "8081:8080"
       - "29418:29418"
     command: |
       /bin/sh -c '\
@@ -43,7 +54,10 @@ services:
     environment:
       no_proxy: "${no_proxy},gerrit"
     command: "sh -c 'ansible-playbook /var/playbooks/wait-to-start.yaml; zuul-scheduler -d'"
-    image: zuul/zuul-scheduler
+    build:
+      context: ../../../../
+      dockerfile: Dockerfile
+      target: zuul-scheduler
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
@@ -56,7 +70,10 @@ services:
       - mysql
     ports:
       - "9000:9000"
-    image: zuul/zuul-web
+    build:
+      context: ../../../../
+      dockerfile: Dockerfile
+      target: zuul-web
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
   executor:
@@ -66,7 +83,10 @@ services:
     command: "zuul-executor -d"
     depends_on:
       - scheduler
-    image: zuul/zuul-executor
+    build:
+      context: ../../../../
+      dockerfile: Dockerfile
+      target: zuul-executor
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
