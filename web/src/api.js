@@ -154,6 +154,13 @@ function fetchNodes (apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
 
+function fetchUserAuthZ (token) {
+    Axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    let res = Axios.get(apiUrl + 'user/actions')
+    Axios.defaults.headers.common['Authorization'] = ''
+    return res
+}
+
 export {
   getHomepageUrl,
   getStreamUrl,
@@ -170,5 +177,6 @@ export {
   fetchLabels,
   fetchNodes,
   fetchTenants,
-  fetchInfo
+  fetchInfo,
+  fetchUserAuthZ
 }
