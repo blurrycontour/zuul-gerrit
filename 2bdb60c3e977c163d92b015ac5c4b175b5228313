@@ -39,6 +39,30 @@
       "revId": "2bdb60c3e977c163d92b015ac5c4b175b5228313",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_57f63f65",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-15T08:18:59Z",
+      "side": 1,
+      "message": "It\u0027s by design a str because then we also can have \u00272.7.7\u0027 or some local addition like \u00272.7-with-experimental-fix\u0027. Which makes us more flexible.",
+      "parentUuid": "5fc1f717_7e58f854",
+      "range": {
+        "startLine": 573,
+        "startChar": 48,
+        "endLine": 573,
+        "endChar": 51
+      },
+      "revId": "2bdb60c3e977c163d92b015ac5c4b175b5228313",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
