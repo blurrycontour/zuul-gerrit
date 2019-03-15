@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_1e48d484",
+        "filename": "releasenotes/notes/multi-ansible-d027be61ad8593d4.yaml",
+        "patchSetId": 17
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-15T03:41:34Z",
+      "side": 1,
+      "message": "it seems like this note should be in https://review.openstack.org/640644",
+      "revId": "2bdb60c3e977c163d92b015ac5c4b175b5228313",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_7e58f854",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 573,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-15T03:41:34Z",
+      "side": 1,
+      "message": "shouldn\u0027t ansible-version schema be float only?",
+      "range": {
+        "startLine": 573,
+        "startChar": 48,
+        "endLine": 573,
+        "endChar": 51
+      },
+      "revId": "2bdb60c3e977c163d92b015ac5c4b175b5228313",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
