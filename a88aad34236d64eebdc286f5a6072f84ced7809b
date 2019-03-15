@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_befc2070",
+        "filename": "web/src/containers/jobs/Jobs.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-03-15T02:56:07Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be better to replace any continuous whitespace. eg: /\\s+/ ?",
+      "range": {
+        "startLine": 105,
+        "startChar": 36,
+        "endLine": 105,
+        "endChar": 37
+      },
+      "revId": "a88aad34236d64eebdc286f5a6072f84ced7809b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_def7ac8a",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-03-15T02:56:07Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 93,
+        "startChar": 34,
+        "endLine": 93,
+        "endChar": 36
+      },
+      "revId": "a88aad34236d64eebdc286f5a6072f84ced7809b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
