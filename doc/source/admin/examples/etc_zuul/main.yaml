@@ -1,5 +1,8 @@
 - tenant:
     name: example-tenant
+    admin_rules:
+      - gozer_rule
+      - venkman_rule
     source:
       gerrit:
         config-projects:

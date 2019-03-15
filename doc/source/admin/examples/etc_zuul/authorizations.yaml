@@ -1,0 +1,10 @@
+- rule:
+    name: gozer_rule
+    conditions:
+      - groups: gozerian
+    claim_types:
+      - groups: list
+- rule:
+    name: venkman_rule
+    conditions:
+      - preferred_username: venkman
