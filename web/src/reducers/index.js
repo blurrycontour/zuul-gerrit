@@ -28,6 +28,7 @@ import projects from './projects'
 import status from './status'
 import tenant from './tenant'
 import tenants from './tenants'
+import user from './user'
 
 const reducers = {
   change,
@@ -44,6 +45,7 @@ const reducers = {
   status,
   tenant,
   tenants,
+  user,
 }
 
 export default combineReducers(reducers)

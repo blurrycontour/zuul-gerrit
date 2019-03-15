@@ -20,6 +20,7 @@ import PropTypes from 'prop-types'
 import { matchPath, withRouter } from 'react-router'
 import { Link, Redirect, Route, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
+import UserLogin from './containers/user'
 import {
   Icon,
   Masthead,
@@ -37,6 +38,7 @@ import { setTenantAction } from './actions/tenant'
 import { clearError } from './actions/errors'
 
 
+
 class App extends React.Component {
   static propTypes = {
     errors: PropTypes.array,
@@ -50,7 +52,8 @@ class App extends React.Component {
 
   state = {
     menuCollapsed: true,
-    showErrors: false
+    showErrors: false,
+    keycloak: null,
   }
 
   onNavToggleClick = () => {
@@ -267,6 +270,9 @@ class App extends React.Component {
                   </Link>
                 </li>
               )}
+              <li>
+                <UserLogin />
+              </li>
             </ul>
             {showErrors && this.renderConfigErrors(configErrors)}
           </div>
@@ -291,6 +297,6 @@ export default withRouter(connect(
     errors: state.errors,
     configErrors: state.configErrors,
     info: state.info,
-    tenant: state.tenant
+    tenant: state.tenant,
   })
 )(App))

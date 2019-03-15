@@ -31,6 +31,8 @@ import App from './App'
 
 const store = createZuulStore()
 
+const unsubscribe = store.subscribe(() => console.log(store.getState()))
+
 // Load info endpoint
 store.dispatch(fetchInfoIfNeeded())
 
