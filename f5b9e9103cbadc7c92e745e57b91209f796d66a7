@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_2c66b8c2",
+        "filename": "zuul/cmd/manage_ansible.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-15T18:11:51Z",
+      "side": 1,
+      "message": "It might be nice to add a CLI arg to take a list of files.",
+      "revId": "f5b9e9103cbadc7c92e745e57b91209f796d66a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
