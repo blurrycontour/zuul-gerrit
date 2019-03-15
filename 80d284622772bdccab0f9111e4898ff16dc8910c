@@ -33,6 +33,24 @@
       "revId": "80d284622772bdccab0f9111e4898ff16dc8910c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_975d8716",
+        "filename": "zuul/lib/ansible-config.conf",
+        "patchSetId": 47
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-15T07:38:11Z",
+      "side": 1,
+      "message": "I agree that we should at least include all dependencies that are needed for core functionality and all things in zuul-jobs.\n\nThat at least includes openstacksdk and openshift.\n\nWhat are you using jmespath for?\n\nAre you ok adding those as a followup?",
+      "parentUuid": "5fc1f717_8aa6bfaa",
+      "revId": "80d284622772bdccab0f9111e4898ff16dc8910c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
