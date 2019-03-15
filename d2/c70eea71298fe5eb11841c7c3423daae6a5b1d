@@ -1,0 +1,11 @@
+Code-Review+1: Benedikt Löffler <benedikt.loeffler@bmw.de>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+1: Andriy Shevchenko <huang.zhiping@99cloud.net>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: Tobias Henkel <tobias.henkel@bmw.de>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 15 Mar 2019 05:47:35 +0000
+Reviewed-on: https://review.openstack.org/643069
+Project: openstack-infra/zuul
+Branch: refs/heads/master
