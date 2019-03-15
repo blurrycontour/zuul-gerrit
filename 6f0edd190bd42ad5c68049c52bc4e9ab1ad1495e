@@ -16,6 +16,24 @@
       "revId": "6f0edd190bd42ad5c68049c52bc4e9ab1ad1495e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_74e339a5",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-15T07:03:03Z",
+      "side": 1,
+      "message": "I just copied that from another place in zuul. But I agree that we shouldn\u0027t have a timeout here. Maybe we should remove the other timeouts as well.",
+      "parentUuid": "5fc1f717_809ef151",
+      "revId": "6f0edd190bd42ad5c68049c52bc4e9ab1ad1495e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
