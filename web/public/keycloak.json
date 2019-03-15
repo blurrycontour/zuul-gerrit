@@ -1,0 +1,8 @@
+{
+  "realm": "zuul",
+  "auth-server-url": "http://localhost:8282/auth",
+  "ssl-required": "external",
+  "resource": "zuul-web",
+  "public-client": true,
+  "confidential-port": 0
+}

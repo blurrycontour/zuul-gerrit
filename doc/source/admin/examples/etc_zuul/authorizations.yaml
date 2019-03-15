@@ -1,0 +1,36 @@
+- rule:
+    name: gozer_rule
+    actions:
+      autohold:
+        AnyOf:
+          - gozer
+      dequeue:
+        AnyOf:
+          - gozer
+      enqueue:
+        AnyOf:
+          - gozer
+- rule:
+    name: venkman_rule
+    actions:
+      autohold:
+        AnyOf:
+          - venkman
+      dequeue:
+        AnyOf:
+          - venkman
+      enqueue:
+        AnyOf:
+          - venkman
+- rule:
+    name: group_rule
+    actions:
+      autohold:
+        AnyOf:
+          - gozer
+      dequeue:
+        AnyOf:
+          - gozer
+      enqueue:
+        AnyOf:
+          - gozer
