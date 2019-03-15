@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_7e7558f9",
+        "filename": "releasenotes/notes/group-read-permissions-keys-directory-1d1d550ce4f7bee6.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-03-15T03:05:27Z",
+      "side": 1,
+      "message": "(nit) \"either 0o700 or 0o750\"",
+      "range": {
+        "startLine": 5,
+        "startChar": 50,
+        "endLine": 5,
+        "endChar": 54
+      },
+      "revId": "4438af6b5c7abb3d7a2441baef2e39bda9841cc2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
