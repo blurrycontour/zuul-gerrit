@@ -92,13 +92,8 @@ class ManagedAnsible:
 
         # We don't use directly the venv module here because its behavior is
         # broken if we're already in a virtual environment.
-        path = os.path.join(sys.base_prefix, 'bin', 'virtualenv')
-        if not os.path.exists(path):
-            # If we're not installed into a venv and not into a standard path
-            # e.g. /usr/local we can only try to run it directly if it's in the
-            # PATH.
-            path = 'virtualenv'
-        cmd = [path, '-p', python_executable, venv_path]
+        p = os.path.join(sys.base_prefix, 'bin', 'python')
+        cmd = [p, '-m', 'virtualenv', '-p', python_executable, venv_path]
         p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         if p.returncode != 0:
