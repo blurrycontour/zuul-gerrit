@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_175e7775",
+        "filename": "doc/source/admin/examples/playbooks/wait-to-start-gearman.sh",
+        "patchSetId": 47
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-15T08:17:27Z",
+      "side": 1,
+      "message": "It should and probably does but this seemed to stabilize the many quick start failures. I think we should look into that again after landing this.",
+      "parentUuid": "5fc1f717_aa805bf6",
+      "revId": "80d284622772bdccab0f9111e4898ff16dc8910c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_8aa6bfaa",
         "filename": "zuul/lib/ansible-config.conf",
         "patchSetId": 47
