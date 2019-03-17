@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_1f7af7b8",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2096,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-17T07:50:26Z",
+      "side": 1,
+      "message": "oops",
+      "parentUuid": "5fc1f717_7fdbfb4d",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_9fdee73b",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_9f47c777",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2099,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-17T07:50:26Z",
+      "side": 1,
+      "message": "There is already test_crd_dynamic_config_branch which tests A_project1 -\u003e B_project2 but if you want I can also add this test case.",
+      "parentUuid": "5fc1f717_9fdee73b",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_5f1f1f07",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 1
@@ -47,6 +83,30 @@
       "writtenOn": "2019-03-17T02:16:26Z",
       "side": 1,
       "message": "Should be \"B_conflict should report\"",
+      "range": {
+        "startLine": 2210,
+        "startChar": 50,
+        "endLine": 2210,
+        "endChar": 60
+      },
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_3f62530b",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2210,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-17T07:50:26Z",
+      "side": 1,
+      "message": "oops",
+      "parentUuid": "5fc1f717_5f1f1f07",
       "range": {
         "startLine": 2210,
         "startChar": 50,
@@ -144,6 +204,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_9f3ca7e1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 728,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-17T07:50:26Z",
+      "side": 1,
+      "message": "Yeah, maybe it makes sense to try to refactor and simplify this method as it became a little hard to read. But yes, that should be kept separate from this.",
+      "parentUuid": "5fc1f717_7fa9bb8d",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_3fd25329",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 1
@@ -155,6 +233,24 @@
       "writtenOn": "2019-03-17T02:16:26Z",
       "side": 1,
       "message": "Related to my comment about adding a test scenario we only get a singular resulting commit sha back from the merger, however the merger does merge each item individually and appends the requested files to the read_files attribute of the merge. So as long as we only care about the file contents of intermediate merges in other repos I think this is ok (we should still test that behavior explicitly though).\n\nAlso if we really need them we can probably sort out how to get them from the merger via the \"recent\" value in the merger return. That doesn\u0027t make it over the gearman wire from what I can tell right now though.",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_3f27b3cc",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-17T07:50:26Z",
+      "side": 1,
+      "message": "Ack, will look for a test case to explicitly validate this behavior in the merger.",
+      "parentUuid": "5fc1f717_3fd25329",
       "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
