@@ -1,0 +1,163 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_7fdbfb4d",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2096,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "Small nit the test actually seems to be this chain:\n\n  A -\u003e B -\u003e B_conflict -\u003e C_conflict",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_9fdee73b",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2099,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "Do we also want a fourth scenario like:\n\n  A_project1 -\u003e B_project2 -\u003e C_project1\n\nTo ensure that we properly merge multiple projects in a dependency change with non live items (think check queue with depends on across more than one project).",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_5f1f1f07",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2210,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "Should be \"B_conflict should report\"",
+      "range": {
+        "startLine": 2210,
+        "startChar": 50,
+        "endLine": 2210,
+        "endChar": 60
+      },
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_ff192b21",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2224,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "Do we want to annotate this as change A.",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_1f1517e5",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2226,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "Then change B",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_bfd5e31d",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2232,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "Change C",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_dfd8ef53",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2234,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "Change B_after_invalid.",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_7fa9bb8d",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 728,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "It might make this code slightly more readable if we put it under the block just above so then the block above become:\n\n  if actionable and live:\n    check if ready\n    if ready and actions and report:\n      reportStart(item)\n    if unable to merge:\n      record failure state\n    if config errors\n      record failure state\n    if ready and executeJobs:\n      record change\n\nMostly thinking we only execute jobs if ready and we are only ready if actionable and live so it makes that relationship a but more clear. Then below here we can do the additional error checking and reporting.\n\nNote I don\u0027t think we need to make that a part of this change. Just something I noticed when trying to make sense of the code removals above.",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_3fd25329",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 851,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 1,
+      "message": "Related to my comment about adding a test scenario we only get a singular resulting commit sha back from the merger, however the merger does merge each item individually and appends the requested files to the read_files attribute of the merge. So as long as we only care about the file contents of intermediate merges in other repos I think this is ok (we should still test that behavior explicitly though).\n\nAlso if we really need them we can probably sort out how to get them from the merger via the \"recent\" value in the merger return. That doesn\u0027t make it over the gearman wire from what I can tell right now though.",
+      "revId": "b8c76739c611bb7e8983d7b700a5ebcc58f03b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

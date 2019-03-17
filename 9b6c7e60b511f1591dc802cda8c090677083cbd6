@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_bfa3a3b1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-03-17T02:16:26Z",
+      "side": 0,
+      "message": "Is the idea behind these code removals that the live version of the change will handle the dequeueing and we shouldn\u0027t worry about that on the non live processing?",
+      "revId": "9b6c7e60b511f1591dc802cda8c090677083cbd6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
