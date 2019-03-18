@@ -4833,7 +4833,11 @@ class TestProvidesRequires(ZuulDBTestCase):
             'image-builder', A,
             {'zuul':
              {'artifacts': [
-                 {'name': 'image', 'url': 'http://example.com/image'},
+                 {'name': 'image',
+                  'url': 'http://example.com/image',
+                  'metadata': {
+                      'type': 'container_image'
+                  }},
              ]}}
         )
         A.addApproval('Code-Review', 2)
@@ -4870,7 +4874,8 @@ class TestProvidesRequires(ZuulDBTestCase):
             'image-builder', A,
             {'zuul':
              {'artifacts': [
-                 {'name': 'image', 'url': 'http://example.com/image'},
+                 {'name': 'image', 'url': 'http://example.com/image',
+                  'metadata': {'type': 'container_image'}},
              ]}}
         )
         A.addApproval('Code-Review', 2)
@@ -4912,6 +4917,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'image-builder',
                 'url': 'http://example.com/image',
                 'name': 'image',
+                'metadata': {
+                    'type': 'container_image',
+                }
             }])
 
     @simple_layout('layouts/provides-requires-unshared.yaml')
@@ -4922,7 +4930,8 @@ class TestProvidesRequires(ZuulDBTestCase):
             'image-builder', A,
             {'zuul':
              {'artifacts': [
-                 {'name': 'image', 'url': 'http://example.com/image'},
+                 {'name': 'image', 'url': 'http://example.com/image',
+                  'metadata': {'type': 'container_image'}},
              ]}}
         )
         A.addApproval('Code-Review', 2)
@@ -4967,14 +4976,16 @@ class TestProvidesRequires(ZuulDBTestCase):
             'image-builder', A,
             {'zuul':
              {'artifacts': [
-                 {'name': 'image', 'url': 'http://example.com/image'},
+                 {'name': 'image', 'url': 'http://example.com/image',
+                  'metadata': {'type': 'container_image'}},
              ]}}
         )
         self.executor_server.returnData(
             'library-builder', A,
             {'zuul':
              {'artifacts': [
-                 {'name': 'library', 'url': 'http://example.com/library'},
+                 {'name': 'library', 'url': 'http://example.com/library',
+                  'metadata': {'type': 'library_object'}},
              ]}}
         )
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -4989,14 +5000,16 @@ class TestProvidesRequires(ZuulDBTestCase):
             'image-builder', B,
             {'zuul':
              {'artifacts': [
-                 {'name': 'image2', 'url': 'http://example.com/image2'},
+                 {'name': 'image2', 'url': 'http://example.com/image2',
+                  'metadata': {'type': 'container_image'}},
              ]}}
         )
         self.executor_server.returnData(
             'library-builder', B,
             {'zuul':
              {'artifacts': [
-                 {'name': 'library2', 'url': 'http://example.com/library2'},
+                 {'name': 'library2', 'url': 'http://example.com/library2',
+                  'metadata': {'type': 'library_object'}},
              ]}}
         )
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
@@ -5041,6 +5054,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'image-builder',
                 'url': 'http://example.com/image',
                 'name': 'image',
+                'metadata': {
+                    'type': 'container_image',
+                }
             }, {
                 'project': 'org/project1',
                 'change': '2',
@@ -5048,6 +5064,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'image-builder',
                 'url': 'http://example.com/image2',
                 'name': 'image2',
+                'metadata': {
+                    'type': 'container_image',
+                }
             }])
         library_user = self.getJobFromHistory('library-user')
         self.assertEqual(
@@ -5059,6 +5078,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'library-builder',
                 'url': 'http://example.com/library',
                 'name': 'library',
+                'metadata': {
+                    'type': 'library_object',
+                }
             }, {
                 'project': 'org/project1',
                 'change': '2',
@@ -5066,6 +5088,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'library-builder',
                 'url': 'http://example.com/library2',
                 'name': 'library2',
+                'metadata': {
+                    'type': 'library_object',
+                }
             }])
 
     @simple_layout('layouts/provides-requires.yaml')
@@ -5075,14 +5100,16 @@ class TestProvidesRequires(ZuulDBTestCase):
             'image-builder', A,
             {'zuul':
              {'artifacts': [
-                 {'name': 'image', 'url': 'http://example.com/image'},
+                 {'name': 'image', 'url': 'http://example.com/image',
+                  'metadata': {'type': 'container_image'}},
              ]}}
         )
         self.executor_server.returnData(
             'library-builder', A,
             {'zuul':
              {'artifacts': [
-                 {'name': 'library', 'url': 'http://example.com/library'},
+                 {'name': 'library', 'url': 'http://example.com/library',
+                  'metadata': {'type': 'library_object'}},
              ]}}
         )
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -5100,14 +5127,16 @@ class TestProvidesRequires(ZuulDBTestCase):
             'image-builder', B,
             {'zuul':
              {'artifacts': [
-                 {'name': 'image2', 'url': 'http://example.com/image2'},
+                 {'name': 'image2', 'url': 'http://example.com/image2',
+                 'metadata': {'type': 'container_image'}},
              ]}}
         )
         self.executor_server.returnData(
             'library-builder', B,
             {'zuul':
              {'artifacts': [
-                 {'name': 'library2', 'url': 'http://example.com/library2'},
+                 {'name': 'library2', 'url': 'http://example.com/library2',
+                  'metadata': {'type': 'library_object'}},
              ]}}
         )
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
@@ -5149,6 +5178,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'image-builder',
                 'url': 'http://example.com/image',
                 'name': 'image',
+                'metadata': {
+                    'type': 'container_image',
+                }
             }, {
                 'project': 'org/project1',
                 'change': '2',
@@ -5156,6 +5188,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'image-builder',
                 'url': 'http://example.com/image2',
                 'name': 'image2',
+                'metadata': {
+                    'type': 'container_image',
+                }
             }])
         library_user = self.getJobFromHistory('library-user')
         self.assertEqual(
@@ -5167,6 +5202,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'library-builder',
                 'url': 'http://example.com/library',
                 'name': 'library',
+                'metadata': {
+                    'type': 'library_object',
+                }
             }, {
                 'project': 'org/project1',
                 'change': '2',
@@ -5174,6 +5212,9 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'job': 'library-builder',
                 'url': 'http://example.com/library2',
                 'name': 'library2',
+                'metadata': {
+                    'type': 'library_object',
+                }
             }])
 
     @simple_layout('layouts/provides-requires.yaml')
