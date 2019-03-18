@@ -16,6 +16,23 @@
       "revId": "3d8e48afab3405795a811f3393bec4303c3bcd73",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_c45c891a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 587,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-03-18T19:33:12Z",
+      "side": 1,
+      "message": "Like James mentioned in his comment on the commit message, probably better to just use a bitmask for the comparison. The stat module provides a number of such masks already including one which matches on any permissions for \"other\" so you could instead just do something along the lines of...\n\n    if st.st_mode \u0026 stat.S_IRWXO:\n        raise Exception(\n            \"Project key directory %s must not be world readable, writeable or traversable; current mode is %o\" % (key_dir, st.st_mode))",
+      "revId": "3d8e48afab3405795a811f3393bec4303c3bcd73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
