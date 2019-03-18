@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_49b752f6",
+        "filename": "releasenotes/notes/group-read-permissions-keys-directory-1d1d550ce4f7bee6.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-18T19:06:44Z",
+      "side": 1,
+      "message": "This should say \"or\" not \"and\".\n\nAre these the only permissions that are okay?  Are we sure that 0770 isn\u0027t okay?\nMaybe we should just check that \"perm \u0026 0o7 \u003d\u003d 0\"?",
+      "revId": "3d8e48afab3405795a811f3393bec4303c3bcd73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
