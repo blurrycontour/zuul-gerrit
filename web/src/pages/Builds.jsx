@@ -19,10 +19,10 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 
 import { fetchBuilds } from '../api'
-import TableFilters from '../containers/TableFilters'
+import withTableFilters from '../containers/TableFilters'
 
 
-class BuildsPage extends TableFilters {
+class BuildsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object
   }
@@ -160,4 +160,6 @@ class BuildsPage extends TableFilters {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(BuildsPage)
+export default connect(state => ({
+  tenant: state.tenant
+}))(withTableFilters(BuildsPage))

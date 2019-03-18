@@ -19,10 +19,10 @@ import { connect } from 'react-redux'
 
 import { fetchChangeIfNeeded } from '../actions/change'
 import ChangePanel from '../containers/status/ChangePanel'
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 
 
-class ChangeStatusPage extends Refreshable {
+class ChangeStatusPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     tenant: PropTypes.object,
@@ -76,4 +76,4 @@ class ChangeStatusPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.change
-}))(ChangeStatusPage)
+}))(withRefresh(ChangeStatusPage))

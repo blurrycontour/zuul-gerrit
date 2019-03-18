@@ -19,10 +19,10 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 
 import { fetchProjectsIfNeeded } from '../actions/projects'
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 
 
-class ProjectsPage extends Refreshable {
+class ProjectsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -108,4 +108,4 @@ class ProjectsPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.projects,
-}))(ProjectsPage)
+}))(withRefresh(ProjectsPage))

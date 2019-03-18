@@ -18,11 +18,11 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 import { fetchTenantsIfNeeded } from '../actions/tenants'
 
 
-class TenantsPage extends Refreshable {
+class TenantsPage extends React.Component {
   static propTypes = {
     remoteData: PropTypes.object,
     dispatch: PropTypes.func
@@ -37,7 +37,7 @@ class TenantsPage extends Refreshable {
     this.updateData()
   }
 
-  // TODO: fix Refreshable class to work with tenant less page.
+  // TODO: fix React.Component class to work with tenant less page.
   componentDidUpdate () { }
 
   render () {
@@ -98,4 +98,6 @@ class TenantsPage extends Refreshable {
   }
 }
 
-export default connect(state => ({remoteData: state.tenants}))(TenantsPage)
+export default connect(state => ({
+  remoteData: state.tenants
+}))(withRefresh(TenantsPage))

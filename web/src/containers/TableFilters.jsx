@@ -20,218 +20,220 @@ import PropTypes from 'prop-types'
 import { Button, Filter, FormControl, Toolbar } from 'patternfly-react'
 
 
-class TableFilters extends React.Component {
-  static propTypes = {
-    location: PropTypes.object
-  }
+function withTableFilters(WrappedComponent) {
+  return class extends WrappedComponent {
+    static propTypes = {
+      location: PropTypes.object
+    }
 
-  getFilterFromUrl = () => {
-    const urlParams = new URLSearchParams(this.props.location.search)
-    let activeFilters = []
-    this.filterTypes.forEach(item => {
-      urlParams.getAll(item.id).forEach(param => {
-        activeFilters.push({
-          label: item.title + ': ' + param,
-          key: item.id,
-          value: param})
+    getFilterFromUrl = () => {
+      const urlParams = new URLSearchParams(this.props.location.search)
+      let activeFilters = []
+      this.filterTypes.forEach(item => {
+        urlParams.getAll(item.id).forEach(param => {
+          activeFilters.push({
+            label: item.title + ': ' + param,
+            key: item.id,
+            value: param})
+        })
       })
-    })
-    this.setState({activeFilters: activeFilters})
-    return activeFilters
-  }
-
-  updateUrl (activeFilters) {
-    let path = window.location.pathname
-    if (activeFilters.length > 0) {
-      path += '?'
-      activeFilters.forEach((item, idx) => {
-        if (idx > 0) {
-          path += '&'
-        }
-        path += (
-          encodeURIComponent(item.key)
-          + '=' +
-          encodeURIComponent(item.value)
-        )
-      })
-    }
-    window.history.pushState({path: path}, '', path)
-  }
-
-  filterAdded = (field, value) => {
-    let filterText = ''
-    if (field.title) {
-      filterText = field.title
-    } else {
-      filterText = field
-    }
-    filterText += ': '
-
-    if (value.filterCategory) {
-      filterText +=
-        (value.filterCategory.title || value.filterCategory) +
-        '-' +
-        (value.filterValue.title || value.filterValue)
-    } else if (value.title) {
-      filterText += value.title
-    } else {
-      filterText += value
+      this.setState({activeFilters: activeFilters})
+      return activeFilters
     }
 
-    let activeFilters = [...this.state.activeFilters, {
-      label: filterText,
-      key: field.id,
-      value: value
-    }]
-    this.setState({ activeFilters: activeFilters })
-    this.updateData(activeFilters)
-    this.updateUrl(activeFilters)
-  }
-
-  selectFilterType = filterType => {
-    const { currentFilterType } = this.state
-    if (currentFilterType !== filterType) {
-      this.setState(prevState => {
-        return {
-          currentValue: '',
-          currentFilterType: filterType,
-          filterCategory:
-            filterType.filterType === 'complex-select'
-              ? undefined
-              : prevState.filterCategory,
-          categoryValue:
-            filterType.filterType === 'complex-select'
-              ? ''
-              : prevState.categoryValue
-        }
-      })
+    updateUrl (activeFilters) {
+      let path = window.location.pathname
+      if (activeFilters.length > 0) {
+        path += '?'
+        activeFilters.forEach((item, idx) => {
+          if (idx > 0) {
+            path += '&'
+          }
+          path += (
+            encodeURIComponent(item.key)
+            + '=' +
+            encodeURIComponent(item.value)
+          )
+        })
+      }
+      window.history.pushState({path: path}, '', path)
     }
-  }
 
-  filterValueSelected = filterValue => {
-    const { currentFilterType, currentValue } = this.state
+    filterAdded = (field, value) => {
+      let filterText = ''
+      if (field.title) {
+        filterText = field.title
+      } else {
+        filterText = field
+      }
+      filterText += ': '
 
-    if (filterValue !== currentValue) {
-      this.setState({ currentValue: filterValue })
-      if (filterValue) {
-        this.filterAdded(currentFilterType, filterValue)
+      if (value.filterCategory) {
+        filterText +=
+          (value.filterCategory.title || value.filterCategory) +
+          '-' +
+          (value.filterValue.title || value.filterValue)
+      } else if (value.title) {
+        filterText += value.title
+      } else {
+        filterText += value
+      }
+
+      let activeFilters = [...this.state.activeFilters, {
+        label: filterText,
+        key: field.id,
+        value: value
+      }]
+      this.setState({ activeFilters: activeFilters })
+      this.updateData(activeFilters)
+      this.updateUrl(activeFilters)
+    }
+
+    selectFilterType = filterType => {
+      const { currentFilterType } = this.state
+      if (currentFilterType !== filterType) {
+        this.setState(prevState => {
+          return {
+            currentValue: '',
+            currentFilterType: filterType,
+            filterCategory:
+              filterType.filterType === 'complex-select'
+                ? undefined
+                : prevState.filterCategory,
+            categoryValue:
+              filterType.filterType === 'complex-select'
+                ? ''
+                : prevState.categoryValue
+          }
+        })
       }
     }
-  }
 
-  filterCategorySelected = category => {
-    const { filterCategory } = this.state
-    if (filterCategory !== category) {
-      this.setState({ filterCategory: category, currentValue: '' })
-    }
-  }
+    filterValueSelected = filterValue => {
+      const { currentFilterType, currentValue } = this.state
 
-  categoryValueSelected = value => {
-    const { currentValue, currentFilterType, filterCategory } = this.state
-
-    if (filterCategory && currentValue !== value) {
-      this.setState({ currentValue: value })
-      if (value) {
-        let filterValue = {
-          filterCategory: filterCategory,
-          filterValue: value
+      if (filterValue !== currentValue) {
+        this.setState({ currentValue: filterValue })
+        if (filterValue) {
+          this.filterAdded(currentFilterType, filterValue)
         }
-        this.filterAdded(currentFilterType, filterValue)
       }
     }
-  }
 
-  updateCurrentValue = event => {
-    this.setState({ currentValue: event.target.value })
-  }
-
-  onValueKeyPress = keyEvent => {
-    const { currentValue, currentFilterType } = this.state
-
-    if (keyEvent.key === 'Enter' && currentValue && currentValue.length > 0) {
-      this.setState({ currentValue: '' })
-      this.filterAdded(currentFilterType, currentValue)
-      keyEvent.stopPropagation()
-      keyEvent.preventDefault()
+    filterCategorySelected = category => {
+      const { filterCategory } = this.state
+      if (filterCategory !== category) {
+        this.setState({ filterCategory: category, currentValue: '' })
+      }
     }
-  }
 
-  removeFilter = filter => {
-    const { activeFilters } = this.state
+    categoryValueSelected = value => {
+      const { currentValue, currentFilterType, filterCategory } = this.state
 
-    let index = activeFilters.indexOf(filter)
-    if (index > -1) {
-      let updated = [
-        ...activeFilters.slice(0, index),
-        ...activeFilters.slice(index + 1)
-      ]
-      this.setState({ activeFilters: updated })
-      this.updateData(updated)
-      this.updateUrl(updated)
+      if (filterCategory && currentValue !== value) {
+        this.setState({ currentValue: value })
+        if (value) {
+          let filterValue = {
+            filterCategory: filterCategory,
+            filterValue: value
+          }
+          this.filterAdded(currentFilterType, filterValue)
+        }
+      }
     }
-  }
 
-  clearFilters = () => {
-    this.setState({ activeFilters: [] })
-    this.updateData()
-    this.updateUrl([])
-  }
-
-  renderFilterInput() {
-    const { currentFilterType, currentValue } = this.state
-    if (!currentFilterType) {
-      return null
+    updateCurrentValue = event => {
+      this.setState({ currentValue: event.target.value })
     }
-    return (
-      <FormControl
-        type={currentFilterType.filterType}
-        value={currentValue}
-        placeholder={currentFilterType.placeholder}
-        onChange={e => this.updateCurrentValue(e)}
-        onKeyPress={e => this.onValueKeyPress(e)}
-        />
-    )
-  }
 
-  renderFilter = () => {
-    const { currentFilterType, activeFilters } = this.state
-    return (
-      <React.Fragment>
-        <div style={{ width: 300 }}>
-          <Filter>
-            <Filter.TypeSelector
-              filterTypes={this.filterTypes}
-              currentFilterType={currentFilterType}
-              onFilterTypeSelected={this.selectFilterType}
-              />
-            {this.renderFilterInput()}
-          </Filter>
-        </div>
-        {activeFilters && activeFilters.length > 0 && (
-          <Toolbar.Results>
-            <Filter.ActiveLabel>{'Active Filters:'}</Filter.ActiveLabel>
-            <Filter.List>
-              {activeFilters.map((item, index) => {
-                return (
-                  <Filter.Item
-                    key={index}
-                    onRemove={this.removeFilter}
-                    filterData={item}
-                    >
-                    {item.label}
-                  </Filter.Item>
-                )
-              })}
-          </Filter.List>
-            <Button onClick={e => {
-              e.preventDefault()
-              this.clearFilters()
-            }}>Clear All Filters</Button>
-            </Toolbar.Results>
-        )}
-      </React.Fragment>
-    )
+    onValueKeyPress = keyEvent => {
+      const { currentValue, currentFilterType } = this.state
+
+      if (keyEvent.key === 'Enter' && currentValue && currentValue.length > 0) {
+        this.setState({ currentValue: '' })
+        this.filterAdded(currentFilterType, currentValue)
+        keyEvent.stopPropagation()
+        keyEvent.preventDefault()
+      }
+    }
+
+    removeFilter = filter => {
+      const { activeFilters } = this.state
+
+      let index = activeFilters.indexOf(filter)
+      if (index > -1) {
+        let updated = [
+          ...activeFilters.slice(0, index),
+          ...activeFilters.slice(index + 1)
+        ]
+        this.setState({ activeFilters: updated })
+        this.updateData(updated)
+        this.updateUrl(updated)
+      }
+    }
+
+    clearFilters = () => {
+      this.setState({ activeFilters: [] })
+      this.updateData()
+      this.updateUrl([])
+    }
+
+    renderFilterInput() {
+      const { currentFilterType, currentValue } = this.state
+      if (!currentFilterType) {
+        return null
+      }
+      return (
+        <FormControl
+          type={currentFilterType.filterType}
+          value={currentValue}
+          placeholder={currentFilterType.placeholder}
+          onChange={e => this.updateCurrentValue(e)}
+          onKeyPress={e => this.onValueKeyPress(e)}
+          />
+      )
+    }
+
+    renderFilter() {
+      const { currentFilterType, activeFilters } = this.state
+      return (
+        <React.Fragment>
+          <div style={{ width: 300 }}>
+            <Filter>
+              <Filter.TypeSelector
+                filterTypes={this.filterTypes}
+                currentFilterType={currentFilterType}
+                onFilterTypeSelected={this.selectFilterType}
+                />
+              {this.renderFilterInput()}
+            </Filter>
+          </div>
+          {activeFilters && activeFilters.length > 0 && (
+            <Toolbar.Results>
+              <Filter.ActiveLabel>{'Active Filters:'}</Filter.ActiveLabel>
+              <Filter.List>
+                {activeFilters.map((item, index) => {
+                  return (
+                    <Filter.Item
+                      key={index}
+                      onRemove={this.removeFilter}
+                      filterData={item}
+                      >
+                      {item.label}
+                    </Filter.Item>
+                  )
+                })}
+            </Filter.List>
+              <Button onClick={e => {
+                e.preventDefault()
+                this.clearFilters()
+              }}>Clear All Filters</Button>
+              </Toolbar.Results>
+          )}
+        </React.Fragment>
+      )
+    }
   }
 }
 
-export default TableFilters
+export default withTableFilters

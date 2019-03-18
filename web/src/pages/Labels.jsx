@@ -18,10 +18,10 @@ import { connect } from 'react-redux'
 import { Table } from 'patternfly-react'
 
 import { fetchLabelsIfNeeded } from '../actions/labels'
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 
 
-class LabelsPage extends Refreshable {
+class LabelsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -82,4 +82,4 @@ class LabelsPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.labels,
-}))(LabelsPage)
+}))(withRefresh(LabelsPage))

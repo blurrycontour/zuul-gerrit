@@ -26,10 +26,10 @@ import {
 
 import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 
 
-class StatusPage extends Refreshable {
+class StatusPage extends React.Component {
   static propTypes = {
     location: PropTypes.object,
     tenant: PropTypes.object,
@@ -98,7 +98,6 @@ class StatusPage extends Refreshable {
   componentDidMount () {
     document.title = 'Zuul Status'
     this.loadState()
-    super.componentDidMount()
   }
 
   componentWillUnmount () {
@@ -259,4 +258,4 @@ class StatusPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.status,
-}))(StatusPage)
+}))(withRefresh(StatusPage))

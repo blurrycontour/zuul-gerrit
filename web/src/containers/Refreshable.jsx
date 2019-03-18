@@ -22,34 +22,38 @@ import {
 } from 'patternfly-react'
 
 
-class Refreshable extends React.Component {
-  static propTypes = {
-    tenant: PropTypes.object,
-    remoteData: PropTypes.object,
-  }
-
-  componentDidMount () {
-    if (this.props.tenant.name) {
-      this.updateData()
+function withRefresh(WrappedComponent) {
+  return class extends WrappedComponent {
+    static propTypes = {
+      tenant: PropTypes.object,
+      remoteData: PropTypes.object,
     }
-  }
 
-  componentDidUpdate (prevProps) {
-    if (this.props.tenant.name !== prevProps.tenant.name) {
-      this.updateData()
+    componentDidMount () {
+      if (this.props.tenant && this.props.tenant.name) {
+        this.updateData()
+      }
+      super.componentDidMount()
     }
-  }
 
-  renderSpinner () {
-    const { remoteData } = this.props
-    return (
-      <Spinner loading={ remoteData.isFetching }>
-        <a className="refresh" onClick={() => {this.updateData(true)}}>
-          <Icon type="fa" name="refresh" /> refresh&nbsp;&nbsp;
-        </a>
-      </Spinner>
-    )
+    componentDidUpdate (prevProps) {
+      if (this.props.tenant &&
+          this.props.tenant.name !== prevProps.tenant.name) {
+        this.updateData()
+      }
+    }
+
+    renderSpinner () {
+      const { remoteData } = this.props
+      return (
+        <Spinner loading={ remoteData.isFetching }>
+          <a className="refresh" onClick={() => {this.updateData(true)}}>
+            <Icon type="fa" name="refresh" /> refresh&nbsp;&nbsp;
+          </a>
+        </Spinner>
+      )
+    }
   }
 }
 
-export default Refreshable
+export default withRefresh
