@@ -17,11 +17,11 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import { fetchJobsIfNeeded } from '../actions/jobs'
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 import Jobs from '../containers/jobs/Jobs'
 
 
-class JobsPage extends Refreshable {
+class JobsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -56,4 +56,4 @@ class JobsPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.jobs,
-}))(JobsPage)
+}))(withRefresh(JobsPage))

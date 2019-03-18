@@ -17,15 +17,16 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
 import { fetchBuildIfNeeded } from '../actions/build'
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 import Build from '../containers/build/Build'
 
 
-class BuildPage extends Refreshable {
+class BuildPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    dispatch: PropTypes.function
   }
 
   updateData = (force) => {
@@ -55,4 +56,4 @@ class BuildPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.build,
-}))(BuildPage)
+}))(withRefresh(BuildPage))

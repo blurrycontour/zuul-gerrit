@@ -18,10 +18,10 @@ import PropTypes from 'prop-types'
 
 import Project from '../containers/project/Project'
 import { fetchProjectIfNeeded } from '../actions/project'
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 
 
-class ProjectPage extends Refreshable {
+class ProjectPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     tenant: PropTypes.object,
@@ -58,4 +58,4 @@ class ProjectPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.project,
-}))(ProjectPage)
+}))(withRefresh(ProjectPage))

@@ -18,10 +18,10 @@ import { connect } from 'react-redux'
 import { Table } from 'patternfly-react'
 
 import { fetchBuildsets } from '../api'
-import TableFilters from '../containers/TableFilters'
+import withTableFilters from '../containers/TableFilters'
 
 
-class BuildsetsPage extends TableFilters {
+class BuildsetsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object
   }
@@ -147,4 +147,6 @@ class BuildsetsPage extends TableFilters {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(BuildsetsPage)
+export default connect(state => ({
+  tenant: state.tenant
+}))(withTableFilters(BuildsetsPage))

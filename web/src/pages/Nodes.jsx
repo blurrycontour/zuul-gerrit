@@ -19,10 +19,10 @@ import { Table } from 'patternfly-react'
 import * as moment from 'moment'
 
 import { fetchNodesIfNeeded } from '../actions/nodes'
-import Refreshable from '../containers/Refreshable'
+import withRefresh from '../containers/Refreshable'
 
 
-class NodesPage extends Refreshable {
+class NodesPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -103,4 +103,4 @@ class NodesPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.nodes,
-}))(NodesPage)
+}))(withRefresh(NodesPage))
