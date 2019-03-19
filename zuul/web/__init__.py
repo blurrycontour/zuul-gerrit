@@ -415,6 +415,7 @@ class ZuulWebAPI(object):
             'tenant': tenant,
             'project': project,
             'job_filters': list(cherrypy.request.json.get("job_filters", [])),
+            'variables': list(cherrypy.request.json.get("variables", {})),
         })
         ret = json.loads(job.data[0])
         if ret is None:

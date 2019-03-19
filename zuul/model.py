@@ -2795,6 +2795,7 @@ class Ref(object):
         self.newrev = None
         self.files = []
         self.job_filters = []
+        self.variables = None
 
     def _id(self):
         return self.newrev
@@ -2823,7 +2824,8 @@ class Ref(object):
         if (self.project == other.project
             and self.ref == other.ref
             and self.newrev == other.newrev
-            and self.job_filters == other.job_filters):
+            and self.job_filters == other.job_filters
+            and self.variables == other.variables):
             return True
         return False
 
@@ -3886,6 +3888,9 @@ class Layout(object):
             if not frozen_job.ansible_version:
                 frozen_job.ansible_version = \
                     item.layout.tenant.default_ansible_version
+
+            if change.variables:
+                frozen_job.updateProjectVariables(change.variables)
 
             job_graph.addJob(frozen_job)
 

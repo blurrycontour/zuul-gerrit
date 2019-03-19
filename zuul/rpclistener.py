@@ -506,6 +506,7 @@ class RPCListener(object):
         event.branch = args.get('branch', 'master')
         event.job_filters = [re.compile(x)
                              for x in args.get('job_filters', [])]
+        event.variables = args.get('variables', {})
         self.sched.addEvent(event)
         job.sendWorkComplete(json.dumps({
             'url': '/status/change/%s' % event.ref}))

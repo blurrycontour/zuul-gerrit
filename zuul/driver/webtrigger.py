@@ -33,6 +33,7 @@ class WebTriggerFilter(EventFilter):
     def matches(self, event, change):
         if event.type == 'web':
             change.job_filters = event.job_filters
+            change.variables = event.variables
             return True
         return False
 
@@ -49,3 +50,4 @@ class WebTriggerEvent(TriggerEvent):
         super().__init__()
         self.type = 'web'
         self.job_filters = []
+        self.job_variables = {}
