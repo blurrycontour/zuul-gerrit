@@ -14,6 +14,7 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
+import { withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
@@ -26,16 +27,31 @@ import {
   TreeView
 } from 'patternfly-react'
 
+import TableFilters from '../TableFilters'
 
-class JobsList extends React.Component {
+
+class JobsList extends TableFilters {
   static propTypes = {
     tenant: PropTypes.object,
     jobs: PropTypes.array,
+    location: PropTypes.object
   }
 
-  state = {
-    filter: null,
-    flatten: false,
+  constructor() {
+    super()
+    this.filterTypes = [{
+      id: 'tag',
+      title: 'tag',
+      placeHolder: 'Filter by tag',
+      filterType: 'select',
+    }]
+    this.state = {
+      filter: null,
+      flatten: false,
+      activeFilters: [],
+      currentValue: '',
+      currentFilterType: this.filterTypes[0]
+    }
   }
 
   handleKeyPress = (e) => {
@@ -46,14 +62,23 @@ class JobsList extends React.Component {
     }
   }
 
+  componentDidMount() {
+    this.getFilterFromUrl()
+  }
+
+  // Jobs list data is updated on render
+  updateData () {}
+
   render () {
     const { jobs } = this.props
-    const { filter, flatten } = this.state
+    const { filter, flatten, activeFilters } = this.state
 
     const linkPrefix = this.props.tenant.linkPrefix + '/job/'
 
     // job index map
     const jobMap = {}
+    // tag list
+    const tagList = []
     // nodes contains the tree data
     const nodes = []
     // visited contains individual node
@@ -101,25 +126,52 @@ class JobsList extends React.Component {
       }
       return visited[job.name]
     }
+
     // index job list
     for (let job of jobs) {
       jobMap[job.name] = job
-    }
-    // filter job
-    let filtered = false
-    if (filter) {
-      filtered = true
-      let filters = filter.replace(/ +/, ',').split(',')
-      for (let job of jobs) {
-        filters.forEach(jobFilter => {
-         if (jobFilter && (
-              (job.name.indexOf(jobFilter) !== -1) ||
-              (job.description && job.description.indexOf(jobFilter) !== -1))) {
-            getNode(job, !filtered)
-         }
-        })
+      if (job.tags) {
+        for (let tag of job.tags) {
+          if (tagList.indexOf(tag) === -1) {
+            tagList.push(tag)
+          }
+        }
       }
     }
+
+    const tagFilter = function (tagName) {
+      for (let filter of activeFilters) {
+        if (filter.value === tagName) {
+          return true
+        }
+      }
+      return false
+    }
+
+    // filter job
+    let filtered = false
+    if (filter || activeFilters.length > 0) {
+      filtered = true
+      let filters
+      if (filter) {
+        filters = filter.replace(/ +/, ',').split(',')
+      }
+      for (let job of jobs) {
+        if (filters) {
+          filters.forEach(jobFilter => {
+            if (jobFilter && (
+              (job.name.indexOf(jobFilter) !== -1) ||
+              (job.description && job.description.indexOf(jobFilter) !== -1))) {
+              getNode(job, !filtered)
+            }
+          })
+        }
+        if (job.tags && job.tags.filter(tagFilter).length > 0) {
+          getNode(job, !filtered)
+        }
+      }
+    }
+
     // process job list
     for (let job of jobs) {
       const jobNode = getNode(job, filtered)
@@ -170,6 +222,9 @@ class JobsList extends React.Component {
               </FormControl.Feedback>
             )}
           </FormGroup>
+          <FormGroup controlId='jobs-tag'>
+            {this.renderFilterInput(tagList)}
+          </FormGroup>
           <FormGroup controlId='jobs-flatten'>
             &nbsp; Flatten list &nbsp;
             <Checkbox
@@ -177,12 +232,13 @@ class JobsList extends React.Component {
               onChange={(e) => this.setState({flatten: e.target.checked})} />
           </FormGroup>
         </Form>
+        {this.renderActiveFilters()}
         <TreeView nodes={nodes} />
       </div>
     )
   }
 }
 
-export default connect(state => ({
+export default withRouter(connect(state => ({
   tenant: state.tenant,
-}))(JobsList)
+}))(JobsList))

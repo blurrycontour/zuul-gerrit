@@ -177,36 +177,40 @@ class TableFilters extends React.Component {
     this.updateUrl([])
   }
 
-  renderFilterInput() {
+  renderFilterInput(filterValues) {
     const { currentFilterType, currentValue } = this.state
     if (!currentFilterType) {
       return null
     }
-    return (
-      <FormControl
-        type={currentFilterType.filterType}
-        value={currentValue}
-        placeholder={currentFilterType.placeholder}
-        onChange={e => this.updateCurrentValue(e)}
-        onKeyPress={e => this.onValueKeyPress(e)}
+    if (currentFilterType.filterType === 'select') {
+      if (!filterValues) {
+        filterValues = currentFilterType.filterValues
+      }
+      return (
+        <Filter.ValueSelector
+          filterValues={filterValues}
+          placeholder={currentFilterType.placeholder}
+          currentValue={currentValue}
+          onFilterValueSelected={this.filterValueSelected}
         />
-    )
+      )
+    } else {
+      return (
+        <FormControl
+          type={currentFilterType.filterType}
+          value={currentValue}
+          placeholder={currentFilterType.placeholder}
+          onChange={e => this.updateCurrentValue(e)}
+          onKeyPress={e => this.onValueKeyPress(e)}
+        />
+      )
+    }
   }
 
-  renderFilter = () => {
-    const { currentFilterType, activeFilters } = this.state
+  renderActiveFilters() {
+    const { activeFilters } = this.state
     return (
       <React.Fragment>
-        <div style={{ width: 300 }}>
-          <Filter>
-            <Filter.TypeSelector
-              filterTypes={this.filterTypes}
-              currentFilterType={currentFilterType}
-              onFilterTypeSelected={this.selectFilterType}
-              />
-            {this.renderFilterInput()}
-          </Filter>
-        </div>
         {activeFilters && activeFilters.length > 0 && (
           <Toolbar.Results>
             <Filter.ActiveLabel>{'Active Filters:'}</Filter.ActiveLabel>
@@ -229,6 +233,25 @@ class TableFilters extends React.Component {
             }}>Clear All Filters</Button>
             </Toolbar.Results>
         )}
+      </React.Fragment>
+    )
+  }
+
+  renderFilter = () => {
+    const { currentFilterType } = this.state
+    return (
+      <React.Fragment>
+        <div style={{ width: 300 }}>
+          <Filter>
+            <Filter.TypeSelector
+              filterTypes={this.filterTypes}
+              currentFilterType={currentFilterType}
+              onFilterTypeSelected={this.selectFilterType}
+              />
+            {this.renderFilterInput()}
+          </Filter>
+        </div>
+        {this.renderActiveFilters()}
       </React.Fragment>
     )
   }
