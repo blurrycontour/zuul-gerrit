@@ -38,3 +38,8 @@ then
     popd
 fi
 pip install $*
+
+# Check if we're installing zuul. If so install the managed ansible as well.
+if echo "$*" | grep -v requirements.txt > /dev/null; then
+    zuul-manage-ansible -v
+fi
