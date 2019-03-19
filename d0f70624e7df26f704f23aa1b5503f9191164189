@@ -22,6 +22,30 @@
       "revId": "d0f70624e7df26f704f23aa1b5503f9191164189",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_47873211",
+        "filename": "tools/pip.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-19T09:10:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_61933e02",
+      "range": {
+        "startLine": 43,
+        "startChar": 39,
+        "endLine": 43,
+        "endChar": 51
+      },
+      "revId": "d0f70624e7df26f704f23aa1b5503f9191164189",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
