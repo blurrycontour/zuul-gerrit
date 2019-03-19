@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_f029289b",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1594,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-19T20:18:34Z",
+      "side": 1,
+      "message": "You could use this technique ^\n\n    _ansible_maneger_class \u003d FakeAnsibleManager\n\nThen you wouldn\u0027t need the conditionals, and it would be more clear what\u0027s happening and hopefully more robust.",
+      "revId": "6de7ab277027a65a78c91aa5ac081cef82a0ee3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
