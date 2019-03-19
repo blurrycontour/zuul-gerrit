@@ -19,7 +19,7 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Button } from 'patternfly-react'
 
-import * as API from '../../api'
+import BuildModal from '../build/BuildModal'
 
 
 class ProjectVariant extends React.Component {
@@ -29,13 +29,6 @@ class ProjectVariant extends React.Component {
     pipelines: PropTypes.array,
     variant: PropTypes.object.isRequired,
     history: PropTypes.object.isRequired,
-  }
-
-  triggerJob = (jobName) => {
-    const { projectName, tenant } = this.props
-    API.triggerJobs(tenant.apiPrefix, projectName, [jobName])
-      .then(() => this.props.history.push(tenant.linkPrefix + '/status'))
-      .catch(error => console.error('oops', error))
   }
 
   render () {
@@ -63,6 +56,7 @@ class ProjectVariant extends React.Component {
       })
     })
 
+    const modalRefs = {}
     variant.pipelines.forEach(pipeline => {
       // TODO: either adds job link anchor to load the right variant
       // and/or show the job variant config in a modal?
@@ -74,13 +68,21 @@ class ProjectVariant extends React.Component {
             {pipeline.jobs.map((item, idx) => (
               <li className='list-group-item' key={idx}>
                 {pipelineWebTrigger.indexOf(pipeline.name) !== -1 && (
-                  <Button
-                    onClick={() => this.triggerJob(item[0].name)}
-                    bsStyle='primary'
-                    style={{marginRight: '5px'}}
-                    title='Trigger this job'>
-                    Build
-                  </Button>
+                  <React.Fragment>
+                    <BuildModal
+                      onRef={e => (modalRefs[pipeline.name + item[0].name] = e)}
+                      projectName={this.props.projectName}
+                      jobName={item[0].name} />&nbsp;
+                    <Button
+                      onClick={() => (
+                        modalRefs[pipeline.name+item[0].name].show()
+                      )}
+                      bsStyle='primary'
+                      style={{marginRight: '5px'}}
+                      title='Trigger this job'>
+                      Build
+                    </Button>
+                  </React.Fragment>
                 )}
                 <Link to={tenant.linkPrefix + '/job/' + item[0].name}>
                   {item[0].name}

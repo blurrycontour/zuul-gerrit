@@ -156,10 +156,10 @@ function fetchLabels (apiPrefix) {
 function fetchNodes (apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
-function triggerJobs (apiPrefix, projectName, filters) {
+function triggerJobs (apiPrefix, projectName, filters, variables) {
   return Axios.post(
     apiUrl + apiPrefix + 'trigger/' + projectName,
-    {job_filters: filters})
+    {job_filters: filters, variables: variables})
 }
 
 export {
