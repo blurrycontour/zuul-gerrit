@@ -426,6 +426,7 @@ class ZuulWebAPI(object):
             'project': project,
             'branch': inputs.get("branch", "master"),
             'job_filters': list(inputs.get("job_filters", [])),
+            'variables': inputs.get("variables", {}),
         })
         ret = json.loads(job.data[0])
         if ret is None:
