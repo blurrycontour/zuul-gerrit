@@ -2291,8 +2291,9 @@ class ExecutorServer(object):
             self.config, 'executor', 'ansible_root', None)
         if not ansible_install_root:
             ansible_install_root = os.path.join(state_dir, 'ansible-bin')
-        self.ansible_manager = AnsibleManager(
-            ansible_dir, runtime_install_path=ansible_install_root)
+        if not getattr(self, 'ansible_manager', None):
+            self.ansible_manager = AnsibleManager(
+                ansible_dir, runtime_install_path=ansible_install_root)
         if not self.ansible_manager.validate():
             if not manage_ansible:
                 raise Exception('Error while validating ansible '
