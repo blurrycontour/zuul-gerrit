@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_6fe0f7fb",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-19T17:42:00Z",
+      "side": 1,
+      "message": "nit: maybe rename this to ansible_var_name as this validates an Ansible variable name and not a full declaration?",
+      "range": {
+        "startLine": 403,
+        "startChar": 4,
+        "endLine": 403,
+        "endChar": 15
+      },
+      "revId": "4033e28e6870b84aba57734a6b78e411218d56e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_cfe48b3f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-19T17:42:00Z",
+      "side": 1,
+      "message": "I think this would be much easier to understand:\n\n if not re.fullmatch(r\"[a-zA-Z][a-zA-Z0-9_]*\", value):\n     raise vs.Invalid(...)",
+      "revId": "4033e28e6870b84aba57734a6b78e411218d56e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
