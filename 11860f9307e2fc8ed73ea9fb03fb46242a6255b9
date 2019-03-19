@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_3a26aa18",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-19T22:54:57Z",
+      "side": 1,
+      "message": "For the purpose of searching, maybe you should include tags from all variants?  So make this a set that is the union of all tags?  Otherwise it might be confusing why a tag which appears only on a variant doesn\u0027t cause a job to show up in a search.",
+      "revId": "11860f9307e2fc8ed73ea9fb03fb46242a6255b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
