@@ -961,7 +961,7 @@ class PipelineManager(object):
             self.pipeline._consecutive_failures += 1
         if project_in_pipeline and self.pipeline._disabled:
             actions = self.pipeline.disabled_actions
-        if item.change.job_filters:
+        if item.change.job_filters or item.change.variables:
             actions = self.pipeline.neutral_actions
         # Check here if we should disable so that we only use the disabled
         # reporters /after/ the last disable_at failure is still reported as
