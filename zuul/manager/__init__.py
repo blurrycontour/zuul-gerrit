@@ -387,6 +387,7 @@ class PipelineManager(object):
         build_set = item.current_build_set
         for job in jobs:
             self.log.debug("Found job %s for change %s" % (job, item.change))
+            self.log.debug("AAA_1 %s" % job.variables)
             try:
                 nodeset = item.current_build_set.getJobNodeSet(job.name)
                 self.sched.nodepool.useNodeSet(nodeset)
