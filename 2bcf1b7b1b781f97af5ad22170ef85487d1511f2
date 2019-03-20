@@ -22,6 +22,30 @@
       "revId": "2bcf1b7b1b781f97af5ad22170ef85487d1511f2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_3031dded",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1413,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-20T14:11:05Z",
+      "side": 1,
+      "message": "Even if that might be unused, the artifact data structure is like that so we should keep that consistent.",
+      "parentUuid": "5fc1f717_c998fe1c",
+      "range": {
+        "startLine": 1413,
+        "startChar": 12,
+        "endLine": 1413,
+        "endChar": 18
+      },
+      "revId": "2bcf1b7b1b781f97af5ad22170ef85487d1511f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
