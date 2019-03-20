@@ -81,6 +81,7 @@ from zuul.driver.pagure import PagureDriver
 from zuul.driver.gitlab import GitlabDriver
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.github.githubconnection import GithubClientManager
+from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.lib.connections import ConnectionRegistry
 from psutil import Popen
 
@@ -92,6 +93,7 @@ import zuul.driver.github.githubconnection as githubconnection
 import zuul.driver.pagure.pagureconnection as pagureconnection
 import zuul.driver.gitlab.gitlabconnection as gitlabconnection
 import zuul.driver.github
+import zuul.driver.elasticsearch.connection as elconnection
 import zuul.driver.sql
 import zuul.scheduler
 import zuul.executor.server
@@ -335,6 +337,7 @@ class TestConnectionRegistry(ConnectionRegistry):
             self, changes, upstream_root, additional_event_queues, rpcclient))
         self.registerDriver(GitlabDriverMock(
             self, changes, upstream_root, additional_event_queues, rpcclient))
+        self.registerDriver(ElasticsearchDriver())
 
 
 class FakeAnsibleManager(zuul.lib.ansible.AnsibleManager):
@@ -1068,6 +1071,19 @@ class FakeGerritRefWatcher(gitwatcher.GitWatcher):
         # after they changed something.
         self.connection._ref_watcher_event.set()
         return r
+
+
+class FakeElasticsearchConnection(elconnection.ElasticsearchConnection):
+
+    log = logging.getLogger("zuul.test.FakeElasticsearchConnection")
+
+    def __init__(self, driver, connection_name, connection_config):
+        self.driver = driver
+        self.source_it = None
+
+    def add_docs(self, source_it, index):
+        self.source_it = source_it
+        self.index = index
 
 
 class FakeGerritConnection(gerritconnection.GerritConnection):
@@ -4130,6 +4146,7 @@ class ZuulTestCase(BaseTestCase):
         self.poller_events = {}
         self._configureSmtp()
         self._configureMqtt()
+        self._configureElasticsearch()
 
         executor_connections = TestConnectionRegistry(
             self.changes, self.config, self.additional_event_queues,
@@ -4196,6 +4213,17 @@ class ZuulTestCase(BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'zuul.driver.mqtt.mqttconnection.MQTTConnection.publish',
             fakeMQTTPublish))
+
+    def _configureElasticsearch(self):
+        # Set up Elasticsearch related fakes
+        def getElasticsearchConnection(driver, name, config):
+            con = FakeElasticsearchConnection(
+                driver, name, config)
+            return con
+
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.driver.elasticsearch.ElasticsearchDriver.getConnection',
+            getElasticsearchConnection))
 
     def setup_config(self, config_file: str):
         # This creates the per-test configuration object.  It can be
