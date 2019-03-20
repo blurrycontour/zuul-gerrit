@@ -93,6 +93,19 @@
 
 - job:
     name: project-test2
+    description: |
+      This is a test job description.
+
+      Those are example of parameters description:
+
+      .. zuul:jobvar:: param1
+
+         The desription of param1
+
+      .. zuul:jobvar:: param2
+         :default: default-value
+
+         The description of param2
     nodeset:
       nodes:
         - name: controller
