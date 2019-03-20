@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_ff58fdfa",
+        "filename": "zuul/driver/elasticsearch/reporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-20T17:32:38Z",
+      "side": 1,
+      "message": "maybe I\u0027m misreading the code here but is/should there be a conneciton between builds and their buildset? i.e.: each build_doc dict should have buildset_uuid set as well?",
+      "range": {
+        "startLine": 84,
+        "startChar": 15,
+        "endLine": 84,
+        "endChar": 29
+      },
+      "revId": "56904154b02d2c1c43866e064e0ca4527916f422",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
