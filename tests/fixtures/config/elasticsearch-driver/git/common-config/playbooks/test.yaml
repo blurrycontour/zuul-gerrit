@@ -1,0 +1,8 @@
+- hosts: all
+  tasks:
+    - zuul_return:
+        data:
+          vars_override:
+            ir_foo: 'bar'
+            not: match
+            ir_var3: tonkatsu
