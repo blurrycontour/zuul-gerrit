@@ -72,6 +72,10 @@ class Runner(zuul.cmd.ZuulApp):
             help='the directory to prepare inside of. defaults to a temp dir')
         cmd_execute.set_defaults(func=self.execute)
 
+        cmd_list_params = subparsers.add_parser(
+            'list-parameters', help='List a job parameters')
+        cmd_list_params.set_defaults(func=self.list_params)
+
         # TODO(jhesketh):
         #  - Enable command line argument override from environ
         #  - Allow supplying the job via either raw input or zuul endpoint
@@ -126,6 +130,9 @@ class Runner(zuul.cmd.ZuulApp):
 
     def execute(self):
         print(self.runner.execute())
+
+    def list_params(self):
+        print(self.runner.jobParameters())
 
     def main(self):
         self.parseArguments()
