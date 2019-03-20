@@ -241,6 +241,60 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             root, self.connections, None, email, username,
             speed_limit, speed_time, cache_root, logger)
 
+    def decodeParameters(self, description):
+        parameters = []
+        if not description:
+            return parameters
+        parameter = None
+        for line in description.split('\n') + ['EOD']:
+            if line.startswith('.. zuul:jobvar:: '):
+                if parameter:
+                    parameters.append(parameter)
+                parameter = {'name': line.split()[-1], 'description': ''}
+            elif parameter:
+                if line.startswith('   :default: '):
+                    parameter['defaults'] = line.replace('   :default: ', '')
+                elif line.startswith('   '):
+                    parameter['description'] += line.lstrip()
+                elif line.strip():
+                    parameters.append(parameter)
+                    parameter = None
+        return parameters
+
+    def _grabJob(self, job):
+        url = self.runner_config.api
+        if self.runner_config.tenant:
+            url = os.path.join(url, "tenant", self.runner_config.tenant)
+        url = os.path.join(url, "job", job)
+        return requests.get(url).json()
+
+    def jobParameters(self, job=None):
+        parameters = []
+        history = set()
+        if job is None:
+            job = self.runner_config.job
+        stack = [job]
+        while stack:
+            current_job = stack.pop()
+            try:
+                job = self._grabJob(current_job)[0]
+            except Exception:
+                self.log.exception("Couldn't grab %s job:", current_job)
+                continue
+            if job.get('parent') and job['parent'] not in history:
+                stack.append(job['parent'])
+                history.add(job['parent'])
+            job_parameters = self.decodeParameters(job.get('description'))
+            for job_param in job_parameters:
+                found = False
+                for param in parameters:
+                    if param["name"] == job_param["name"]:
+                        found = True
+                        break
+                if not found:
+                    parameters.append(job_param)
+        return parameters
+
     def grabFrozenJob(self):
         url = self.runner_config.api
         if self.runner_config.tenant:

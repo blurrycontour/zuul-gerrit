@@ -2680,3 +2680,28 @@ class TestRunner(BaseTestWeb):
             "job": "project-test1",
         })
         self.assertEquals("SUCCESS", runner.execute())
+
+    def test_runner_parameters(self):
+        """Test runner can list parameters"""
+        runner = self.setup_runner({
+            "nodes": [{
+                "label": "label1",
+                "hostname": "localhost",
+                "connection": "local"
+            }],
+            "api": urllib.parse.urljoin(self.base_url, "api"),
+            "tenant": "tenant-one",
+            "project": "org/project",
+            "pipeline": "check",
+            "branch": "master",
+            "job": "project-test2",
+        })
+        params = runner.jobParameters()
+        self.assertEquals([{
+            'name': 'param1',
+            'description': 'The desription of param1',
+        }, {
+            'name': 'param2',
+            'defaults': 'default-value',
+            'description': 'The description of param2',
+        }], params)
