@@ -1,0 +1,36 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+      elasticsearch:
+        index: zuul-index
+        index-vars: true
+        index-returned-vars: true
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: test
+    run: playbooks/test.yaml
+    vars:
+      bar: foo
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - test:
+            vars:
+              bar2: foo2
+
+- project:
+    name: common-config
+    check:
+      jobs: []
