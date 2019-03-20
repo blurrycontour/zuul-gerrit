@@ -57,7 +57,14 @@ class RunnerConfiguration(object):
         else:
             return {}
 
-    def loadConfig(self, config):
+    def loadConfig(self, config, args=None):
+        # Override from args
+        if args:
+            for key in self.schema:
+                key = str(key)
+                args_key = key.replace('-', '_')
+                if getattr(args, args_key, None):
+                    config[key] = getattr(args, args_key)
         # Validate schema
         vs.Schema(self.schema)(config)
         # Set default value
@@ -203,6 +210,10 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         if self.runner_config.tenant:
             url = os.path.join(url, "tenant", self.runner_config.tenant)
         if self.runner_config.project:
+            if not self.runner_config.pipeline:
+                raise RuntimeError("You must specify a pipeline")
+            if not self.runner_config.branch:
+                raise RuntimeError("You must specify a branch")
             url = os.path.join(
                 url,
                 "pipeline",
