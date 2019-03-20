@@ -29,6 +29,7 @@ import zuul.driver.nullwrap
 import zuul.driver.mqtt
 import zuul.driver.pagure
 import zuul.driver.gitlab
+import zuul.driver.elasticsearch
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 
@@ -58,6 +59,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.mqtt.MQTTDriver())
         self.registerDriver(zuul.driver.pagure.PagureDriver())
         self.registerDriver(zuul.driver.gitlab.GitlabDriver())
+        self.registerDriver(zuul.driver.elasticsearch.ElasticsearchDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:
