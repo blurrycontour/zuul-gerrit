@@ -76,6 +76,7 @@ import zuul.driver.github.githubconnection as githubconnection
 import zuul.driver.pagure.pagureconnection as pagureconnection
 import zuul.driver.gitlab.gitlabconnection as gitlabconnection
 import zuul.driver.github
+import zuul.driver.elasticsearch.connection as elconnection
 import zuul.driver.sql
 import zuul.scheduler
 import zuul.executor.server
@@ -896,6 +897,19 @@ class FakeGerritRefWatcher(gitwatcher.GitWatcher):
         # after they changed something.
         self.connection._ref_watcher_event.set()
         return r
+
+
+class FakeElasticsearchConnection(elconnection.ElasticsearchConnection):
+
+    log = logging.getLogger("zuul.test.FakeElasticsearchConnection")
+
+    def __init__(self, driver, connection_name, connection_config):
+        self.driver = driver
+        self.source_it = None
+
+    def add_docs(self, source_it, index):
+        self.source_it = source_it
+        self.index = index
 
 
 class FakeGerritConnection(gerritconnection.GerritConnection):
@@ -4058,6 +4072,15 @@ class ZuulTestCase(BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'zuul.driver.mqtt.mqttconnection.MQTTConnection.publish',
             fakeMQTTPublish))
+
+        def getElasticsearchConnection(driver, name, config):
+            con = FakeElasticsearchConnection(
+                driver, name, config)
+            return con
+
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.driver.elasticsearch.ElasticsearchDriver.getConnection',
+            getElasticsearchConnection))
 
         # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
