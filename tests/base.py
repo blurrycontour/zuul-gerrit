@@ -63,6 +63,7 @@ import zuul.driver.gerrit.gerritconnection as gerritconnection
 import zuul.driver.github.githubconnection as githubconnection
 import zuul.driver.pagure.pagureconnection as pagureconnection
 import zuul.driver.github
+import zuul.driver.elasticsearch.connection as elconnection
 import zuul.driver.sql
 import zuul.scheduler
 import zuul.executor.server
@@ -586,6 +587,19 @@ class GerritWebServer(object):
     def stop(self):
         self.httpd.shutdown()
         self.thread.join()
+
+
+class FakeElasticsearchConnection(elconnection.ElasticsearchConnection):
+
+    log = logging.getLogger("zuul.test.FakeElasticsearchConnection")
+
+    def __init__(self, driver, connection_name, connection_config):
+        self.driver = driver
+        self.source_it = None
+
+    def add_docs(self, source_it, index):
+        self.source_it = source_it
+        self.index = index
 
 
 class FakeGerritConnection(gerritconnection.GerritConnection):
@@ -3060,6 +3074,15 @@ class ZuulTestCase(BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'zuul.driver.mqtt.mqttconnection.MQTTConnection.publish',
             fakeMQTTPublish))
+
+        def getElasticsearchConnection(driver, name, config):
+            con = FakeElasticsearchConnection(
+                driver, name, config)
+            return con
+
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.driver.elasticsearch.ElasticsearchDriver.getConnection',
+            getElasticsearchConnection))
 
         # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
