@@ -517,3 +517,52 @@ class TestMQTTConnection(ZuulTestCase):
 
         self.assertIn("topic component 'bad' is invalid", A.messages[0],
                       "A should report a syntax error")
+
+
+class TestElasticsearchConnection(ZuulTestCase):
+    config_file = 'zuul-elastic-driver.conf'
+    tenant_config_file = 'config/elasticsearch-driver/main.yaml'
+
+    def test_elastic_reporter(self):
+        "Test the Elasticsearch reporter"
+        # Add a success result
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        #TODO(fbo): compare to build history uuid
+        indexed_docs = self.connections.connections['elasticsearch'].source_it
+        self.assertEqual(len(indexed_docs), 2)
+        buildset_doc = [doc for doc in indexed_docs if
+                        doc['build_type'] == 'buildset'][0]
+        self.assertEqual(buildset_doc['tenant'], 'tenant-one')
+        self.assertEqual(buildset_doc['pipeline'], 'check')
+        self.assertEqual(buildset_doc['result'], 'SUCCESS')
+        build_doc = [doc for doc in indexed_docs if
+                     doc['build_type'] == 'build'][0]
+        self.assertEqual(build_doc['buildset_uuid'], buildset_doc['uuid'])
+        self.assertEqual(build_doc['result'], 'SUCCESS')
+        self.assertEqual(build_doc['job_name'], 'test')
+        # Variable indexation not activated
+        self.assertNotIn(build_doc, "job_param.ir_var0")
+
+    def test_elastic_reporter_with_vars_indexation(self):
+        "Test the Elasticsearch reporter with vars indexation"
+        # Add a success result
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        indexed_docs = self.connections.connections['elasticsearch'].source_it
+        self.assertEqual(len(indexed_docs), 2)
+        build_doc = [doc for doc in indexed_docs if
+                     doc['build_type'] == 'build'][0]
+        self.assertEqual(build_doc['result'], 'SUCCESS')
+        self.assertEqual(build_doc['job_name'], 'test')
+
+        # Check job variables are there
+        self.assertEqual(build_doc['job_param.ir_var0'], 'Dear')
+        self.assertEqual(build_doc['job_param.ir_var1'], 'Hello')
+        self.assertEqual(build_doc['job_param.ir_var2'], 'Zuul')
+        # Did not match the regexp
+        self.assertNotIn(build_doc, "job_param.var3")
