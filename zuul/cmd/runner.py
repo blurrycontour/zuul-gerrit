@@ -62,6 +62,11 @@ class Runner(zuul.cmd.ZuulApp):
             help='the directory to prepare inside of. Defaults to a temp dir')
 
         parser.add_argument(
+            '--list-parameters',
+            action='store_true',
+            help='print the list of parameter')
+
+        parser.add_argument(
             '--list-playbooks',
             action='store_true',
             help='print the list of playbooks')
@@ -130,6 +135,9 @@ class Runner(zuul.cmd.ZuulApp):
             connections.connections[config['name']] = connections.drivers[
                 config['driver']].getConnection(config['name'], config)
         return connections
+
+    def list_params(self):
+        print(self.runner.jobParameters())
 
     def list_playbooks(self):
         self.runner.prepareWorkspace()
@@ -246,6 +254,9 @@ class Runner(zuul.cmd.ZuulApp):
             config, connections)
 
         try:
+            if self.args.list_parameters:
+                return self.list_params()
+
             self.runner.job_params = Runner.filter_playbooks(
                 self.args, self.runner.grabFrozenJob())
             if self.args.list_playbooks:
