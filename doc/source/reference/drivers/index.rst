@@ -24,6 +24,7 @@ Zuul includes the following drivers:
    gitlab
    git
    mqtt
+   elasticsearch
    smtp
    sql
    timer
