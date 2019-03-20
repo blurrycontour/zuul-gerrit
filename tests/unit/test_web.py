@@ -2655,7 +2655,8 @@ class TestRunner(BaseTestWeb):
             "branch": "master",
             "job": "project-test1",
         })
-        runner.prepareWorkspace()
+        job_params = runner.grabFrozenJob()
+        runner.prepareWorkspace(job_params)
         job = runner.ansible_job
         self.assertEquals(0, len(job.jobdir.pre_playbooks))
         self.assertEquals(1, len(job.jobdir.playbooks))

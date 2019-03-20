@@ -57,7 +57,14 @@ class RunnerConfiguration(object):
         else:
             return {}
 
-    def loadConfig(self, config):
+    def loadConfig(self, config, args=None):
+        # Override from args
+        if args:
+            for key in self.schema:
+                key = str(key)
+                args_key = key.replace('-', '_')
+                if getattr(args, args_key, None):
+                    config[key] = getattr(args, args_key)
         # Validate schema
         vs.Schema(self.schema)(config)
         # Set default value
@@ -198,11 +205,15 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             root, self.connections, None, email, username,
             speed_limit, speed_time, cache_root, logger)
 
-    def _grabFrozenJob(self):
+    def grabFrozenJob(self):
         url = self.runner_config.api
         if self.runner_config.tenant:
             url = os.path.join(url, "tenant", self.runner_config.tenant)
         if self.runner_config.project:
+            if not self.runner_config.pipeline:
+                raise RuntimeError("You must specify a pipeline")
+            if not self.runner_config.branch:
+                raise RuntimeError("You must specify a branch")
             url = os.path.join(
                 url,
                 "pipeline",
@@ -216,9 +227,8 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             url = os.path.join(url, self.runner_config.job)
         return requests.get(url).json()
 
-    def prepareWorkspace(self):
+    def prepareWorkspace(self, job_params):
         self.ansible_manager.copyAnsibleFiles()
-        job_params = self._grabFrozenJob()
 
         self.merger = self.getMerger(self.merge_root)
         self.start_update_thread()
