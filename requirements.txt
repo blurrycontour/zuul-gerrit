@@ -29,3 +29,4 @@ cherrypy
 ws4py
 routes
 jsonpath-rw
+elasticsearch
