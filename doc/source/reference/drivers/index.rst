@@ -23,6 +23,7 @@ Zuul includes the following drivers:
    pagure
    git
    mqtt
+   elasticsearch
    smtp
    sql
    timer
