@@ -50,6 +50,7 @@ class RunnerConfiguration(object):
     log = logging.getLogger("zuul.RunnerConfiguration")
     runner = {
         "ansible-dir": str,
+        "ansible-bin": str,
         "job-dir": str,
         "git-dir": str,
         "ssh-key": str,
@@ -64,11 +65,18 @@ class RunnerConfiguration(object):
         'cwd': str,
     }
 
+    connection = {
+        'name': str,
+        'user': str,
+        'keyfile': str,
+    }
+
     schema = {
         'runner': runner,
         'nodes': [node],
+        'connections': [connection],
         'secrets': dict,
-        'api': str,
+        vs.Required('api'): str,
         'tenant': str,
         'project': str,
         'pipeline': str,
@@ -89,8 +97,9 @@ class RunnerConfiguration(object):
         # Override from args
         if args:
             for key in self.schema:
-                if getattr(args, key):
-                    config[key] = args.key
+                key = str(key)
+                if getattr(args, key, None):
+                    config[key] = getattr(args, key)
             if args.directory:
                 config["runner"]["job-dir"] = args.directory
             if args.git_dir:
@@ -101,6 +110,7 @@ class RunnerConfiguration(object):
         vs.Schema(self.schema)(config)
         # Set default value
         self.api = config["api"]
+        self.connections = config.get("connections", [])
         self.tenant = config.get("tenant")
         self.pipeline = config.get("pipeline")
         self.project = config.get("project")
@@ -109,6 +119,10 @@ class RunnerConfiguration(object):
         self.job_dir = config["runner"].get("job-dir")
         self.ansible_dir = config["runner"].get(
             "ansible-dir", "~/.cache/zuul/ansible")
+        self.ansible_install_root = config["runner"].get("ansible-bin")
+        if self.ansible_install_root:
+            self.ansible_install_root = os.path.expanduser(
+                self.ansible_install_root)
         self.git_dir = config["runner"].get("git-dir", "~/.cache/zuul/git")
         self.ssh_key = config["runner"].get("ssh-key", "~/.ssh/id_rsa")
         self.nodes = config.get("nodes", [])
@@ -123,7 +137,8 @@ class Runner(object):
         self.runner_config = runner_config
         self.connections = connections
         self.ansible_manager = zuul.lib.ansible.AnsibleManager(
-            runner_config.ansible_dir)
+            os.path.expanduser(runner_config.ansible_dir),
+            runtime_install_path=runner_config.ansible_install_root)
         self.merge_root = os.path.expanduser(self.runner_config.git_dir)
         self.job_params = None
 
@@ -189,9 +204,17 @@ class Runner(object):
 
     def _grabFrozenJob(self):
         url = self.runner_config.api
+        if not url.endswith('/'):
+            url += '/'
+        if "/api/" not in url:
+            url = os.path.join(url, "api")
         if self.runner_config.tenant:
             url = os.path.join(url, "tenant", self.runner_config.tenant)
         if self.runner_config.project:
+            if not self.runner_config.pipeline:
+                raise RuntimeError("You mush specify a pipeline")
+            if not self.runner_config.branch:
+                raise RuntimeError("You mush specify a branch")
             url = os.path.join(
                 url,
                 "pipeline",
@@ -203,7 +226,18 @@ class Runner(object):
                 "freeze-job")
         if self.runner_config.job:
             url = os.path.join(url, self.runner_config.job)
-        self.job_params = requests.get(url).json()
+
+        # Check user input
+        if "freeze-job" not in url:
+            raise RuntimeError("You must specify a project")
+        elif url.endswith("freeze-job"):
+            raise RuntimeError("You must a job name")
+
+        resp = requests.get(url)
+
+        if resp.status_code == 404:
+            raise RuntimeError("%s: returned 404.")
+        self.job_params = resp.json()
 
         # Substitute nodeset with provided node
         local_nodes = self.runner_config.nodes
@@ -248,7 +282,7 @@ class Runner(object):
                             "path": os.path.join(node["cwd"], secret),
                             "ssh_username": node["username"],
                             "ssh_private_key": open(os.path.expanduser(
-                                self.config.key)).read(),
+                                self.runner_config.ssh_key)).read(),
                         }
                         if node["connection_type"] == "ssh":
                             self.runner_config.secrets[secret][
