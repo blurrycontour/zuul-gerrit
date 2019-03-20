@@ -70,3 +70,4 @@ Zuul includes the following drivers:
    drivers/sql
    drivers/timer
    drivers/zuul
+   drivers/elasticsearch
