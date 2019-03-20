@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_c998fe1c",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1413,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-03-20T06:05:55Z",
+      "side": 1,
+      "message": "Why do the artifacts needs to include the change info? Won\u0027t parent artifacts only ever be for the same change as the child?",
+      "range": {
+        "startLine": 1413,
+        "startChar": 12,
+        "endLine": 1413,
+        "endChar": 18
+      },
+      "revId": "2bcf1b7b1b781f97af5ad22170ef85487d1511f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
