@@ -1057,3 +1057,28 @@ class TestRunner(BaseTestWeb):
         self.assertEquals("project-test1.yaml", os.path.basename(pb.path))
         self.assertTrue(os.path.exists(pb.path))
         self.assertEquals("SUCCESS", runner.execute(job))
+
+    def test_runner_parameters(self):
+        """Test runner can list parameters"""
+        runner = self.setup_runner({
+            "nodes": [{
+                "label": "label1",
+                "hostname": "localhost",
+                "connection": "local"
+            }],
+            "api": urllib.parse.urljoin(self.base_url, "api"),
+            "tenant": "tenant-one",
+            "project": "org/project",
+            "pipeline": "check",
+            "branch": "master",
+            "job": "project-test2",
+        })
+        params = runner.job_parameters()
+        self.assertEquals([{
+            'name': 'param1',
+            'description': 'The desription of param1',
+        }, {
+            'name': 'param2',
+            'defaults': 'default-value',
+            'description': 'The description of param2',
+        }], params)
