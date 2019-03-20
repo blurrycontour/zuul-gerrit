@@ -1,0 +1,55 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+      elasticsearch:
+
+- pipeline:
+    name: check2
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+      elasticsearch:
+        job_vars:
+          - "ir_.*"
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: test
+    run: playbooks/test.yaml
+    vars:
+      ir_var0: Dear
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - test
+
+- project:
+    name: org/project2
+    check2:
+      jobs:
+        - test:
+            vars:
+              ir_var1: Hello
+              ir_var2: Zuul
+              var3: Gating
+              ir_foo: rab
+
+- project:
+    name: common-config
+    check:
+      jobs: []
