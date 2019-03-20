@@ -34,6 +34,23 @@
       "revId": "c3188cb2999d6988d1f6f7b941e71ccef4de5e49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_ffd6be27",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1248,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-20T16:59:25Z",
+      "side": 1,
+      "message": "If a user specifies ansible_python_interpreter using Zuul host_vars (e.g., https://opendev.org/openstack-infra/system-config/src/branch/master/.zuul.yaml#L397 ), this will overwrite it.  We should be careful not to do that.",
+      "revId": "c3188cb2999d6988d1f6f7b941e71ccef4de5e49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
