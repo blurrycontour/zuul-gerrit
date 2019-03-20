@@ -16,7 +16,7 @@ import textwrap
 
 import sqlalchemy as sa
 
-from tests.base import ZuulTestCase, ZuulDBTestCase
+from tests.base import ZuulTestCase, ZuulDBTestCase, AnsibleZuulTestCase
 
 
 def _get_reporter_from_connection_name(reporters, connection_name):
@@ -517,3 +517,44 @@ class TestMQTTConnection(ZuulTestCase):
 
         self.assertIn("topic component 'bad' is invalid", A.messages[0],
                       "A should report a syntax error")
+
+
+class TestElasticsearchConnection(AnsibleZuulTestCase):
+    config_file = 'zuul-elastic-driver.conf'
+    tenant_config_file = 'config/elasticsearch-driver/main.yaml'
+
+    def test_elastic_reporter(self):
+        "Test the Elasticsearch reporter"
+        # Add a success result
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        indexed_docs = self.connections.connections['elasticsearch'].source_it
+        index = self.connections.connections['elasticsearch'].index
+
+        self.assertEqual(len(indexed_docs), 2)
+        self.assertEqual(index, 'zuul-index.tenant-one')
+
+        buildset_doc = [doc for doc in indexed_docs if
+                        doc['build_type'] == 'buildset'][0]
+        self.assertEqual(buildset_doc['tenant'], 'tenant-one')
+        self.assertEqual(buildset_doc['pipeline'], 'check')
+        self.assertEqual(buildset_doc['result'], 'SUCCESS')
+        build_doc = [doc for doc in indexed_docs if
+                     doc['build_type'] == 'build'][0]
+        self.assertEqual(build_doc['buildset_uuid'], buildset_doc['uuid'])
+        self.assertEqual(build_doc['result'], 'SUCCESS')
+        self.assertEqual(build_doc['job_name'], 'test')
+        self.assertEqual(build_doc['tenant'], 'tenant-one')
+        self.assertEqual(build_doc['pipeline'], 'check')
+
+        self.assertIn('job_vars', build_doc)
+        self.assertDictEqual(
+            build_doc['job_vars'], {'bar': 'foo', 'bar2': 'foo2'})
+
+        self.assertIn('job_returned_vars', build_doc)
+        self.assertDictEqual(
+            build_doc['job_returned_vars'], {'foo': 'bar'})
+
+        self.assertEqual(self.history[0].uuid, build_doc['uuid'])
