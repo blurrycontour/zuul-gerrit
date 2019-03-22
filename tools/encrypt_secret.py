@@ -109,12 +109,11 @@ def main():
     pubkey = urlopen(req, context=ssl_ctx)
 
     if args.infile:
-        with open(args.infile) as f:
+        with open(args.infile, 'rb') as f:
             plaintext = f.read()
     else:
-        plaintext = sys.stdin.read()
+        plaintext = sys.stdin.read().encode("utf-8")
 
-    plaintext = plaintext.encode("utf-8")
     if args.strip:
         plaintext = plaintext.strip()
 
