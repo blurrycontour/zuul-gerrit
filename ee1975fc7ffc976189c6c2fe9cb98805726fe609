@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_bcdedfd7",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 875,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-22T01:02:02Z",
+      "side": 1,
+      "message": "Perhaps the path could be set to \u0027Zuul tenants configuration\u0027, or default to \u0027/etc/zuul/main.yaml\u0027?",
+      "range": {
+        "startLine": 875,
+        "startChar": 20,
+        "endLine": 875,
+        "endChar": 24
+      },
+      "revId": "ee1975fc7ffc976189c6c2fe9cb98805726fe609",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
