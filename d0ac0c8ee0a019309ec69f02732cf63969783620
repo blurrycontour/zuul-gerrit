@@ -34,6 +34,24 @@
       "revId": "d0ac0c8ee0a019309ec69f02732cf63969783620",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_4c4ffb91",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-22T15:56:19Z",
+      "side": 1,
+      "message": "my 2 cents, as will all flattening please be careful, the ir_* variables that we\u0027d like to index under zuul index sometimes are... while still being a string... quite complex by what characters they use, example:\n\n    ir_tripleo_overcloud_deploy_override_options: |-\n        --config-heat ComputeExtraConfig.nova::compute::consecutive_build_service_disable_threshold\u003d0 \\\n        --config-heat OpenDaylightUsername\u003dodladmin \\\n        --config-heat OpenDaylightPassword\u003dredhat \\\n        --extra-deploy-params\u003d\u0027-e /home/stack/virt/log_levels/netvirt_genius_debug.yaml\u0027",
+      "parentUuid": "5fc1f717_8971550f",
+      "revId": "d0ac0c8ee0a019309ec69f02732cf63969783620",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
