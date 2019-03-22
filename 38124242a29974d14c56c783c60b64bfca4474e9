@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_529eb163",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-03-22T19:22:48Z",
+      "side": 1,
+      "message": "I should add a short snip into this section about the flow of log streaming.",
+      "revId": "38124242a29974d14c56c783c60b64bfca4474e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
