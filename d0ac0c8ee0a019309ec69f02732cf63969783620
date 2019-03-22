@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_213abbe6",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-22T14:46:21Z",
+      "side": 1,
+      "message": "Why not store them all?  If it\u0027s a matter of wanting a limited set of indexes, is there a way to usefully store all the variables in one indexed field?",
+      "revId": "d0ac0c8ee0a019309ec69f02732cf63969783620",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
