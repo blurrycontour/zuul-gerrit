@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_594b4d86",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-22T00:06:28Z",
+      "side": 1,
+      "message": "you need to include this file in doc/source/admin/connections.rst",
+      "revId": "e02f3cb41f665202804ebb0c8752fbaad76f2103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_3948c185",
+        "filename": "zuul/driver/elasticsearch/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-22T00:06:28Z",
+      "side": 1,
+      "message": "wouldn\u0027t that return prevent the report to be added to multiple actions?",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 22
+      },
+      "revId": "e02f3cb41f665202804ebb0c8752fbaad76f2103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
