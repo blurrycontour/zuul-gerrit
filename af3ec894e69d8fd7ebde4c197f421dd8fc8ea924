@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_fcca2744",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-22T00:53:48Z",
+      "side": 1,
+      "message": "could we detect legacy format and convert them automatically, e.g. look for {tenant}, {pipeline} so that this change is backward compatible? Otherwise the migration is going to cause service interruption.",
+      "revId": "af3ec894e69d8fd7ebde4c197f421dd8fc8ea924",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
