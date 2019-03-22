@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_7505e579",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-22T11:22:30Z",
+      "side": 1,
+      "message": "does not exist in Elastic",
+      "range": {
+        "startLine": 8,
+        "startChar": 6,
+        "endLine": 8,
+        "endChar": 21
+      },
+      "revId": "f8e3fc29d3a2c346d716c88735eb76d29111c5ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_95089191",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-22T11:22:30Z",
+      "side": 1,
+      "message": "create",
+      "range": {
+        "startLine": 8,
+        "startChar": 42,
+        "endLine": 8,
+        "endChar": 45
+      },
+      "revId": "f8e3fc29d3a2c346d716c88735eb76d29111c5ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_75dc0518",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-22T11:22:30Z",
+      "side": 1,
+      "message": "remove",
+      "range": {
+        "startLine": 10,
+        "startChar": 6,
+        "endLine": 10,
+        "endChar": 7
+      },
+      "revId": "f8e3fc29d3a2c346d716c88735eb76d29111c5ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_752ac5e7",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-22T11:22:30Z",
+      "side": 1,
+      "message": "maybe an example of a URI would be good? ... I don\u0027t know what usually a good practice in such docs",
+      "revId": "f8e3fc29d3a2c346d716c88735eb76d29111c5ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d51b79c7",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-22T11:22:30Z",
+      "side": 1,
+      "message": "build results",
+      "range": {
+        "startLine": 41,
+        "startChar": 31,
+        "endLine": 41,
+        "endChar": 38
+      },
+      "revId": "f8e3fc29d3a2c346d716c88735eb76d29111c5ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_f5547556",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-22T11:22:30Z",
+      "side": 1,
+      "message": "maybe better as \u0027job_vars_regexp\u0027 ?",
+      "range": {
+        "startLine": 51,
+        "startChar": 13,
+        "endLine": 51,
+        "endChar": 27
+      },
+      "revId": "f8e3fc29d3a2c346d716c88735eb76d29111c5ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
