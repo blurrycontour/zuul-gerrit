@@ -16,6 +16,24 @@
       "revId": "d0ac0c8ee0a019309ec69f02732cf63969783620",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_8971550f",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-03-22T15:15:23Z",
+      "side": 1,
+      "message": "Yes all variables could be added to the indexed build doc but the usecase that motivate me to write the reporter is not interested by all variables (their base job has around 50 vars). Also an Elasticsearch index is limited (by default) to 1000 fields so I feel safer to allow a selection of fields. We can also set the default to [.*].\n\nRegarding to store all of them in one field by flattening them, that a good point and that possible (using the text type to let Elasticsearch tokenize the field) but after I\u0027m not sure if that will be handy at query time. Or we can do both ? Feedback from Kibana/Elasticsearch experts will be welcome :)",
+      "parentUuid": "5fc1f717_213abbe6",
+      "revId": "d0ac0c8ee0a019309ec69f02732cf63969783620",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
