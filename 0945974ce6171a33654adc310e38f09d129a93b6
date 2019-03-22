@@ -16,6 +16,24 @@
       "revId": "0945974ce6171a33654adc310e38f09d129a93b6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_9cebde10",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-03-22T07:25:42Z",
+      "side": 1,
+      "message": "Ansible itself doesn\u0027t allow defining vars like:\n\n    foo-bar: invalid\n\nbut\n\n    foobar:\n      is-valid: barfoo\n\nis actually valid. You loose the possibility to use attribute like access (e.g. {{ foobar.is-valid }}) but you can use dict-like access:\n\n    {{ foobar[\u0027is-valid\u0027] }}",
+      "parentUuid": "5fc1f717_5ca01ba6",
+      "revId": "0945974ce6171a33654adc310e38f09d129a93b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
