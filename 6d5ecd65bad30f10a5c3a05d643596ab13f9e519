@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_1ccb73a5",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1415,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-22T00:31:44Z",
+      "side": 1,
+      "message": "That str conversion doesn\u0027t seem necessary.",
+      "range": {
+        "startLine": 1415,
+        "startChar": 32,
+        "endLine": 1415,
+        "endChar": 35
+      },
+      "revId": "6d5ecd65bad30f10a5c3a05d643596ab13f9e519",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
