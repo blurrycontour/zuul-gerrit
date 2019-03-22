@@ -25,7 +25,9 @@ which is described below.
       Executor -- Statsd
       Web -- Gearman
       Web -- Zookeeper
+      Web -- Executor
       Finger -- Gearman
+      Finger -- Executor
 
       Gearman -- Scheduler;
       Scheduler -- Gerrit;
