@@ -2971,13 +2971,14 @@ class ZuulTestCase(BaseTestCase):
         repo = git.Repo(path)
         fn = os.path.join(path, commit_filename)
 
-        branch_head = repo.create_head(branch)
-        repo.head.reference = branch_head
+        # Detach head, create a commit and create a branch from this commit
+        repo.head.reference = repo.head.commit
         f = open(fn, 'a')
         f.write("test %s\n" % branch)
         f.close()
         repo.index.add([fn])
         repo.index.commit('%s commit' % branch)
+        repo.create_head(branch)
 
         repo.head.reference = repo.heads['master']
         zuul.merger.merger.reset_repo_to_head(repo)
