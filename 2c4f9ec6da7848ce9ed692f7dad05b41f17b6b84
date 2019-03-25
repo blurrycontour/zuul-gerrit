@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_f0c2fa52",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-25T20:18:00Z",
+      "side": 0,
+      "message": "If the build is restarted for some reason, this would be necessary.  We probably should have left a comment about it if it is.  And I don\u0027t expect this test to do that.  So it\u0027s probably okay to remove.  Maybe it was copy-pastad.",
+      "revId": "2c4f9ec6da7848ce9ed692f7dad05b41f17b6b84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
