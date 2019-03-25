@@ -49,6 +49,23 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_aa1f1f6a",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-25T19:01:02Z",
+      "side": 1,
+      "message": "The earlier patchset had a test which asserted that this variable and all its contents were in the resulting frozen dictionary.  Mostly I wanted to avoid any suggestion that we will continue to include this.  The long term plan is to replace this with an actual data structure.  It\u0027s just that no one has gotten around to it yet.\n\nI\u0027m okay with either putting it back, or going ahead and replacing it with a real data structure.  We can do either of those now or later.  But I think Tristan has hit on the best compromise here -- keep it in the inventory but don\u0027t put it in the API (so people don\u0027t write apps which depend on it).  Then we\u0027ll just make the new data structure and add it to both.",
+      "revId": "3ea0d5b808c07c1d64efd5b183d3a49f4afb851f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fdfeff1_60c05b51",
         "filename": "zuul/model.py",
         "patchSetId": 17
