@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_d069fe8b",
+        "filename": "zuul/executor/runner.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-25T20:12:15Z",
+      "side": 1,
+      "message": "Can you use camelcase to remain consistent with the rest of the code?",
+      "revId": "8d1f627678e5172c0c55541efc03030adfff4925",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_f0667abb",
+        "filename": "zuul/executor/runner.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-25T20:12:15Z",
+      "side": 1,
+      "message": "And here.",
+      "revId": "8d1f627678e5172c0c55541efc03030adfff4925",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
