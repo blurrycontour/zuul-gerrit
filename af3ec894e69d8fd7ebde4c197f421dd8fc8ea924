@@ -16,6 +16,24 @@
       "revId": "af3ec894e69d8fd7ebde4c197f421dd8fc8ea924",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_6aef001e",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-03-25T14:35:43Z",
+      "side": 1,
+      "message": "We could do a\n\n    self.config[\"topic]\".replace(\"{tenant}\", \"{tenant.name}\")\n\nbut this falls short for \"{change}\" which used to be the change number but now holds the safe attrs of a change/ref/branch/...",
+      "parentUuid": "5fc1f717_fcca2744",
+      "revId": "af3ec894e69d8fd7ebde4c197f421dd8fc8ea924",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
