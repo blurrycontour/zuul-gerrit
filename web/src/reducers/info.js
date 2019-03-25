@@ -21,6 +21,7 @@ import {
 export default (state = {
   isFetching: false,
   tenant: null,
+  capabilities: {},
 }, action) => {
   switch (action.type) {
     case INFO_FETCH_REQUEST:
@@ -28,11 +29,13 @@ export default (state = {
       return {
         isFetching: true,
         tenant: null,
+        capabilities: {},
       }
     case INFO_FETCH_SUCCESS:
       return {
         isFetching: false,
         tenant: action.tenant,
+        capabilities: action.capabilities,
         ready: true
       }
     default:

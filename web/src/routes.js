@@ -60,11 +60,13 @@ const routes = () => [
   {
     title: 'Builds',
     to: '/builds',
+    capability: 'job_history',
     component: BuildsPage
   },
   {
     title: 'Buildsets',
     to: '/buildsets',
+    capability: 'job_history',
     component: BuildsetsPage
   },
   {

@@ -71,13 +71,17 @@ class App extends React.Component {
   }
 
   renderMenu() {
-    const { location } = this.props
+    const { info, location } = this.props
     const activeItem = this.menu.find(
       item => location.pathname === item.to
     )
     return (
       <ul className='nav navbar-nav navbar-primary'>
-        {this.menu.filter(item => item.title).map(item => (
+        {this.menu
+         .filter(item =>
+                 (item.capability && info.capabilities[item.capability]) ||
+                 !item.capability)
+         .filter(item => item.title).map(item => (
           <li key={item.to} className={item === activeItem ? 'active' : ''}>
             <Link
               to={this.props.tenant.linkPrefix + item.to}
@@ -101,6 +105,10 @@ class App extends React.Component {
       // Do not include '/tenants' route in white-label setup
       .filter(item =>
               (tenant.whiteLabel && !item.globalRoute) || !tenant.whiteLabel)
+      // Do not include route missing capabilities
+      .filter(item =>
+              (item.capability && info.capabilities[item.capability]) ||
+              !item.capability)
       .forEach((item, index) => {
         allRoutes.push(
           <Route
