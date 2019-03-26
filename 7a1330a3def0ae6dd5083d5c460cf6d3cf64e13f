@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_950a7a76",
+        "filename": "doc/requirements.txt",
+        "patchSetId": 10
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-26T11:58:20Z",
+      "side": 1,
+      "message": "\\o/ So the 3.0 support [1] works! Success\n\n[1] https://github.com/sphinx-contrib/openapi/pull/22",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 28
+      },
+      "revId": "7a1330a3def0ae6dd5083d5c460cf6d3cf64e13f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_55dbb2eb",
+        "filename": "doc/source/user/web.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-26T11:58:20Z",
+      "side": 1,
+      "message": "You might want to add the \u0027:examples:\u0027 argument. IMO, it makes these things far more useful",
+      "revId": "7a1330a3def0ae6dd5083d5c460cf6d3cf64e13f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_95583a8a",
+        "filename": "tox.ini",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-26T11:58:20Z",
+      "side": 1,
+      "message": "Why can\u0027t we use \u0027openapi-spec-validator\u0027 [1]?\n\n[1] https://github.com/p1c2u/openapi-spec-validator/blob/7fef38ab2962ab4866ffa27e2e9fd92f6a3ff67f/setup.py#L67",
+      "range": {
+        "startLine": 59,
+        "startChar": 2,
+        "endLine": 59,
+        "endChar": 134
+      },
+      "revId": "7a1330a3def0ae6dd5083d5c460cf6d3cf64e13f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_35edc6b6",
+        "filename": "web/public/swagger.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-26T11:58:20Z",
+      "side": 1,
+      "message": "Totally unrelated (and possibly bikeshedding), but I thought version 3.0.0 of this was referred to exclusively as OpenAPI - not Swagger (that\u0027s 2.0 and maybe a trademark)",
+      "revId": "7a1330a3def0ae6dd5083d5c460cf6d3cf64e13f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
