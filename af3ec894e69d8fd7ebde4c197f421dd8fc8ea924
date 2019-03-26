@@ -52,6 +52,24 @@
       "revId": "af3ec894e69d8fd7ebde4c197f421dd8fc8ea924",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d94122a8",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-03-26T07:27:51Z",
+      "side": 1,
+      "message": "Probably not, since `repr(change)` would be used for that.",
+      "parentUuid": "5fc1f717_63287d85",
+      "revId": "af3ec894e69d8fd7ebde4c197f421dd8fc8ea924",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
