@@ -177,14 +177,6 @@ class AnsibleJob(AnsibleJobBase):
             executor_extra_paths=extra_paths)
         self.executor_server = executor_server
         self.job = job
-        self.proc = None
-        self.proc_lock = threading.Lock()
-        self.running = False
-        self.started = False  # Whether playbooks have started running
-        self.time_starting_build = None
-        self.paused = False
-        self.aborted = False
-        self.aborted_reason = None
         self._resume_event = threading.Event()
         self.thread = None
         self.private_key_file = get_default(self.executor_server.config,
@@ -205,11 +197,6 @@ class AnsibleJob(AnsibleJobBase):
             'executor',
             'winrm_read_timeout_sec')
         self.ssh_agent = SshAgent()
-
-        self.executor_variables_file = None
-
-        self.cpu_times = {'user': 0, 'system': 0,
-                          'children_user': 0, 'children_system': 0}
 
         if self.executor_server.config.has_option('executor', 'variables'):
             self.executor_variables_file = self.executor_server.config.get(
