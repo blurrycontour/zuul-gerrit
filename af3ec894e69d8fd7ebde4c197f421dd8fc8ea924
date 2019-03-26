@@ -34,6 +34,24 @@
       "revId": "af3ec894e69d8fd7ebde4c197f421dd8fc8ea924",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_63287d85",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-26T02:16:49Z",
+      "side": 1,
+      "message": "Would \"{change}\" be usable as a MQTT topic with the new attrs format?",
+      "parentUuid": "5fc1f717_6aef001e",
+      "revId": "af3ec894e69d8fd7ebde4c197f421dd8fc8ea924",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
