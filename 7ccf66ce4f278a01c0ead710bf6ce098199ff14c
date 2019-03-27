@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_179c2e68",
+        "filename": "doc/source/admin/drivers/amqp.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 14287
+      },
+      "writtenOn": "2019-03-27T15:20:09Z",
+      "side": 1,
+      "message": "why address and not \u0027topic\u0027 ?",
+      "range": {
+        "startLine": 28,
+        "startChar": 13,
+        "endLine": 28,
+        "endChar": 20
+      },
+      "revId": "7ccf66ce4f278a01c0ead710bf6ce098199ff14c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
