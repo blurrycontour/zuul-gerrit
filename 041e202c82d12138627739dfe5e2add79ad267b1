@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_e3abe9d2",
+        "filename": ".gitignore",
+        "patchSetId": 13
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-27T12:04:39Z",
+      "side": 1,
+      "message": "Haven\u0027t grokked what\u0027s creating this yet but shouldn\u0027t this be \u0027yaml\u0027 now?\n\nLater: I see it\u0027s the use of js-yaml later on",
+      "range": {
+        "startLine": 22,
+        "startChar": 19,
+        "endLine": 22,
+        "endChar": 23
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_a38ac160",
+        "filename": "web/package.json",
+        "patchSetId": 13
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-27T12:04:39Z",
+      "side": 1,
+      "message": "Maybe this is unnecessary, but a comment explaining why this conversion is necessary might be helpful?",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 86
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_03f15501",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-27T12:04:39Z",
+      "side": 1,
+      "message": "++ This is *so* much more readable that JSON",
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_43a3ddb2",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-27T12:04:39Z",
+      "side": 1,
+      "message": "nit: I think camelCase is more typical for these things, likely coming from a JavaScript\u0027y world",
+      "range": {
+        "startLine": 55,
+        "startChar": 4,
+        "endLine": 55,
+        "endChar": 16
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_83e4653d",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-27T12:04:39Z",
+      "side": 1,
+      "message": "nit: This stuff feels like it should be at the top",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 210,
+        "endChar": 14
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_a3df2164",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-27T12:04:39Z",
+      "side": 1,
+      "message": "and this feels like it should be above components (it\u0027s more important)",
+      "range": {
+        "startLine": 211,
+        "startChar": 0,
+        "endLine": 211,
+        "endChar": 6
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_23425110",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-27T12:04:39Z",
+      "side": 1,
+      "message": "Is this correct?",
+      "range": {
+        "startLine": 437,
+        "startChar": 0,
+        "endLine": 438,
+        "endChar": 14
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
