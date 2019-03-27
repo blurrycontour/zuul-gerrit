@@ -444,6 +444,17 @@ class Repo(object):
             self._git_fetch(repo, 'origin')
         self._git_fetch(repo, 'origin', tags=True)
 
+    def isUpdateNeeded(self, repo_state):
+        repo = self.createRepoObject()
+        for rev in repo_state.values():
+            try:
+                repo.commit(rev)
+            except Exception:
+                # GitPython throws an error if a revision does not
+                # exist
+                return True
+        return False
+
     def getFiles(self, files, dirs=[], branch=None, commit=None):
         ret = {}
         repo = self.createRepoObject()
@@ -573,12 +584,18 @@ class Merger(object):
                             (connection_name, project_name,))
         return self._addProject(hostname, project_name, url, sshkey)
 
-    def updateRepo(self, connection_name, project_name):
+    def updateRepo(self, connection_name, project_name, repo_state=None):
         repo = self.getRepo(connection_name, project_name)
         try:
-            self.log.info("Updating local repository %s/%s",
-                          connection_name, project_name)
-            repo.reset()
+
+            # Check if we need an update if we got a repo_state
+            if repo_state and not repo.isUpdateNeeded(repo_state):
+                self.log.info("Skipping updating local repository %s/%s",
+                              connection_name, project_name)
+            else:
+                self.log.info("Updating local repository %s/%s",
+                              connection_name, project_name)
+                repo.reset()
         except Exception:
             self.log.exception("Unable to update %s/%s",
                                connection_name, project_name)

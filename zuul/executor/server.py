@@ -511,9 +511,10 @@ class JobDir(object):
 
 
 class UpdateTask(object):
-    def __init__(self, connection_name, project_name):
+    def __init__(self, connection_name, project_name, repo_state=None):
         self.connection_name = connection_name
         self.project_name = project_name
+        self.repo_state = repo_state
         self.canonical_name = None
         self.branches = None
         self.refs = None
@@ -522,7 +523,8 @@ class UpdateTask(object):
 
     def __eq__(self, other):
         if (other and other.connection_name == self.connection_name and
-            other.project_name == self.project_name):
+            other.project_name == self.project_name and
+            other.repo_state == self.repo_state):
             return True
         return False
 
@@ -817,12 +819,13 @@ class AnsibleJob(object):
         self.log.debug("Job root: %s" % (self.jobdir.root,))
         tasks = []
         projects = set()
+        repo_state = args['repo_state']
 
         # Make sure all projects used by the job are updated...
         for project in args['projects']:
             self.log.debug("Updating project %s" % (project,))
             tasks.append(self.executor_server.update(
-                project['connection'], project['name']))
+                project['connection'], project['name'], repo_state=repo_state))
             projects.add((project['connection'], project['name']))
 
         # ...as well as all playbook and role projects.
@@ -837,7 +840,8 @@ class AnsibleJob(object):
             self.log.debug("Updating playbook or role %s" % (repo['project'],))
             key = (repo['connection'], repo['project'])
             if key not in projects:
-                tasks.append(self.executor_server.update(*key))
+                tasks.append(self.executor_server.update(
+                    *key, repo_state=repo_state))
                 projects.add(key)
 
         for task in tasks:
@@ -871,8 +875,7 @@ class AnsibleJob(object):
 
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
-            item_commit = self.doMergeChanges(merger, merge_items,
-                                              args['repo_state'])
+            item_commit = self.doMergeChanges(merger, merge_items, repo_state)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -880,7 +883,7 @@ class AnsibleJob(object):
 
         state_items = [i for i in args['items'] if not i.get('number')]
         if state_items:
-            merger.setRepoState(state_items, args['repo_state'])
+            merger.setRepoState(state_items, repo_state)
 
         for project in args['projects']:
             repo = repos[project['canonical_name']]
@@ -2516,7 +2519,8 @@ class ExecutorServer(object):
             with lock:
                 self.log.info("Updating repo %s/%s",
                               task.connection_name, task.project_name)
-                self.merger.updateRepo(task.connection_name, task.project_name)
+                self.merger.updateRepo(task.connection_name, task.project_name,
+                                       repo_state=task.repo_state)
                 repo = self.merger.getRepo(
                     task.connection_name, task.project_name)
                 source = self.connections.getSource(task.connection_name)
@@ -2533,9 +2537,14 @@ class ExecutorServer(object):
         finally:
             task.setComplete()
 
-    def update(self, connection_name, project_name):
+    def update(self, connection_name, project_name, repo_state=None):
         # Update a repository in the main merger
-        task = UpdateTask(connection_name, project_name)
+
+        state = None
+        if repo_state:
+            state = repo_state.get(connection_name, {}).get(project_name)
+
+        task = UpdateTask(connection_name, project_name, repo_state=state)
         task = self.update_queue.put(task)
         return task
 
