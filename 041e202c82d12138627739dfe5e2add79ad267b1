@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_8647921d",
+        "filename": ".gitignore",
+        "patchSetId": 13
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-27T13:32:46Z",
+      "side": 1,
+      "message": "The json file is generated and it should be ignored from the git index.",
+      "parentUuid": "5fc1f717_e3abe9d2",
+      "range": {
+        "startLine": 22,
+        "startChar": 19,
+        "endLine": 22,
+        "endChar": 23
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_a38ac160",
         "filename": "web/package.json",
         "patchSetId": 13
@@ -36,6 +60,30 @@
       "writtenOn": "2019-03-27T12:04:39Z",
       "side": 1,
       "message": "Maybe this is unnecessary, but a comment explaining why this conversion is necessary might be helpful?",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 86
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_0665e2b4",
+        "filename": "web/package.json",
+        "patchSetId": 13
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-27T13:32:46Z",
+      "side": 1,
+      "message": "It\u0027s because the webui doesn\u0027t parse yaml and it\u0027s easier to load a json file.",
+      "parentUuid": "5fc1f717_a38ac160",
       "range": {
         "startLine": 41,
         "startChar": 0,
@@ -88,6 +136,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_6675c663",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-27T13:32:46Z",
+      "side": 1,
+      "message": "good point.",
+      "parentUuid": "5fc1f717_43a3ddb2",
+      "range": {
+        "startLine": 55,
+        "startChar": 4,
+        "endLine": 55,
+        "endChar": 16
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_83e4653d",
         "filename": "web/public/openapi.yaml",
         "patchSetId": 13
@@ -99,6 +171,30 @@
       "writtenOn": "2019-03-27T12:04:39Z",
       "side": 1,
       "message": "nit: This stuff feels like it should be at the top",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 210,
+        "endChar": 14
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_46668abd",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-27T13:32:46Z",
+      "side": 1,
+      "message": "yes",
+      "parentUuid": "5fc1f717_83e4653d",
       "range": {
         "startLine": 207,
         "startChar": 0,
@@ -134,6 +230,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_e60696ce",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-27T13:32:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_a3df2164",
+      "range": {
+        "startLine": 211,
+        "startChar": 0,
+        "endLine": 211,
+        "endChar": 6
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_23425110",
         "filename": "web/public/openapi.yaml",
         "patchSetId": 13
@@ -145,6 +265,30 @@
       "writtenOn": "2019-03-27T12:04:39Z",
       "side": 1,
       "message": "Is this correct?",
+      "range": {
+        "startLine": 437,
+        "startChar": 0,
+        "endLine": 438,
+        "endChar": 14
+      },
+      "revId": "041e202c82d12138627739dfe5e2add79ad267b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_0633a2ac",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-27T13:32:46Z",
+      "side": 1,
+      "message": "i think, isn\u0027t this the tag list used in the apis?",
+      "parentUuid": "5fc1f717_23425110",
       "range": {
         "startLine": 437,
         "startChar": 0,
