@@ -99,6 +99,7 @@ import zuul.driver.github
 import zuul.driver.elasticsearch.connection as elconnection
 import zuul.driver.sql
 import zuul.scheduler
+import zuul.executor.runner
 import zuul.executor.server
 import zuul.executor.client
 import zuul.lib.ansible
@@ -4421,6 +4422,15 @@ class ZuulTestCase(BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'zuul.driver.elasticsearch.ElasticsearchDriver.getConnection',
             getElasticsearchConnection))
+
+    def setup_runner(self, config):
+        config.update({
+            "ansible-dir": os.path.join(self.test_root, "ansible-runner"),
+            "job-dir": os.path.join(self.test_root, "job-runner"),
+            "git-dir": self.executor_src_root,
+        })
+        return zuul.executor.runner.LocalRunnerContextManager(
+            config, self.scheds.first.connections)
 
     def setup_config(self, config_file: str):
         # This creates the per-test configuration object.  It can be

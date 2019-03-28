@@ -2642,3 +2642,24 @@ class TestCLIViaWebApi(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+
+
+class TestRunner(BaseTestWeb):
+    def test_runner_prepare_workspace(self):
+        """Test runner can prepare workspace from the freeze_job api"""
+        runner = self.setup_runner({
+            "api": urllib.parse.urljoin(self.base_url, "api"),
+            "tenant": "tenant-one",
+            "project": "org/project",
+            "pipeline": "check",
+            "branch": "master",
+            "job": "project-test1",
+        })
+        runner.prepareWorkspace()
+        job = runner.ansible_job
+        self.assertEquals(0, len(job.jobdir.pre_playbooks))
+        self.assertEquals(1, len(job.jobdir.playbooks))
+        self.assertEquals(0, len(job.jobdir.post_playbooks))
+        pb = job.jobdir.playbooks[0]
+        self.assertEquals("project-test1.yaml", os.path.basename(pb.path))
+        self.assertTrue(os.path.exists(pb.path))
