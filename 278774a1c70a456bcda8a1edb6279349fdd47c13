@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_2d48e9b0",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-03-28T09:46:50Z",
+      "side": 1,
+      "message": "FWIW, this *is* the recommended filename for these [1]\n\n[1] https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#document-structure",
+      "revId": "278774a1c70a456bcda8a1edb6279349fdd47c13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
