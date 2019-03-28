@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_7bc8dd20",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-28T21:05:59Z",
+      "side": 1,
+      "message": "setdefault is (now) atomic, so this should be safe.  :)\n\nhttps://bugs.python.org/issue13521",
+      "revId": "78d470f1dc3bcb3165b05fddf335f531e8469136",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
