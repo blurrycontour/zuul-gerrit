@@ -15,10 +15,12 @@
 
 import logging
 import os
+import socket
 import tempfile
 import threading
 import uuid
 
+import paramiko.transport
 import requests
 import voluptuous as vs
 import yaml
@@ -33,6 +35,19 @@ from zuul.executor.common import AnsibleJobContextManager
 from zuul.executor.common import DeduplicateQueue
 from zuul.executor.common import JobDir
 from zuul.executor.common import UpdateTask
+from zuul.executor.common import SshAgent
+
+
+def get_host_key(node):
+    addrinfo = socket.getaddrinfo(
+        node["interface_ip"], node["connection_port"])[0]
+    sock = socket.socket(addrinfo[0], socket.SOCK_STREAM)
+    sock.settimeout(10)
+    sock.connect(addrinfo[4])
+    t = paramiko.transport.Transport(sock)
+    t.start_client(timeout=10)
+    key = t.get_remote_server_key()
+    return "%s %s %s" % (node["hostname"], key.get_name(), key.get_base64())
 
 
 class RunnerConfiguration(object):
@@ -41,10 +56,22 @@ class RunnerConfiguration(object):
         "ansible-dir": str,
         "job-dir": str,
         "git-dir": str,
+        "ssh-key": str,
+    }
+
+    node = {
+        'label': str,
+        'connection': str,
+        'connection_port': int,
+        'username': str,
+        'hostname': str,
+        'cwd': str,
     }
 
     schema = {
         'runner': runner,
+        'nodes': [node],
+        'secrets': dict,
         'api': str,
         'tenant': str,
         'project': str,
@@ -72,6 +99,8 @@ class RunnerConfiguration(object):
                 config["runner"]["job-dir"] = args.directory
             if args.git_dir:
                 config["runner"]["git-dir"] = args.git_dir
+            if args.key:
+                config["runner"]["ssh-key"] = args.key
         # Validate schema
         vs.Schema(self.schema)(config)
         # Set default value
@@ -85,6 +114,9 @@ class RunnerConfiguration(object):
         self.ansible_dir = config["runner"].get(
             "ansible-dir", "~/.cache/zuul/ansible")
         self.git_dir = config["runner"].get("git-dir", "~/.cache/zuul/git")
+        self.ssh_key = config["runner"].get("ssh-key", "~/.ssh/id_rsa")
+        self.nodes = config.get("nodes", [])
+        self.secrets = config.get("secrets", {})
         return config
 
 
@@ -126,12 +158,15 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             ansible_manager=self.ansible_manager,
             execution_wrapper=self.connections.drivers["bubblewrap"],
             logger=self.log,
+            # TODO(jhesketh): Fix getting ansible-version from job-params
+            ansible_plugin_dir=self.ansible_manager.getAnsiblePluginDir('2.7'),
         )
 
         # TODO(jhesketh):
         #  - Give options to clean up working dir
         jobdir = JobDir(root, keep=False, build_uuid=self.unique)
         self.ansible_job.setJobDir(jobdir)
+        self.job_params = {}
 
     def run(self):
         raise Exception("run is not implemented yet")
@@ -223,15 +258,83 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
                 "freeze-job")
         if self.runner_config.job:
             url = os.path.join(url, self.runner_config.job)
-        return requests.get(url).json()
+        job_params = requests.get(url).json()
+
+        # Substitute nodeset with provided node
+        local_nodes = self.runner_config.nodes
+        if job_params["nodes"]:
+            if len(local_nodes) != len(job_params["nodes"]):
+                raise Exception("Not enough nodes provided to run %s" %
+                                job_params["nodes"])
+
+            for node in job_params["nodes"]:
+                reserved_node = None
+                for local_node in local_nodes:
+                    if local_node.get("reserved"):
+                        continue
+                    if local_node.get("label") != node["label"]:
+                        continue
+                    reserved_node = local_node
+                    local_node["reserved"] = True
+                if reserved_node is None:
+                    raise Exception("Couldn't find a local node for %s" %
+                                    node)
+                node["hostname"] = reserved_node["hostname"]
+                node["interface_ip"] = socket.gethostbyname(node["hostname"])
+                node["connection_type"] = reserved_node.get(
+                    "connection", "ssh")
+                node["connection_port"] = reserved_node.get(
+                    "connection_port", 22)
+                node["username"] = reserved_node.get("username", "zuul")
+                node["cwd"] = reserved_node.get("cwd", "/home/zuul")
+
+        # Substitute secrets
+        for playbook in (job_params["pre_playbooks"] +
+                         job_params["playbooks"] +
+                         job_params["post_playbooks"]):
+            for secret in playbook["secrets"]:
+                if secret not in self.runner_config.secrets:
+                    self.log.warning("Secrets %s is unknown", secret)
+                    # We can fake 'site_' secret with the provided node...
+                    if secret.startswith("site_"):
+                        node = job_params["nodes"][0]
+                        self.runner_config.secrets[secret] = {
+                            "fqdn": node["hostname"],
+                            "path": os.path.join(node["cwd"], secret),
+                            "ssh_username": node["username"],
+                            "ssh_private_key": open(os.path.expanduser(
+                                self.config.key)).read(),
+                        }
+                        if node["connection_type"] == "ssh":
+                            self.runner_config.secrets[secret][
+                                "ssh_known_hosts"] = get_host_key(node)
+                playbook["secrets"][secret] = self.runner_config.secrets.get(
+                    secret, "unknown")
+
+        return job_params
 
     def prepareWorkspace(self):
         self.ansible_manager.copyAnsibleFiles()
-        job_params = self._grabFrozenJob()
+        self.job_params = self._grabFrozenJob()
         self.merger = self.getMerger(self.merge_root)
         self.start_update_thread()
 
-        self.ansible_job.prepareRepositories(self.update, job_params)
-        self.ansible_job.preparePlaybooks(job_params)
+        self.ansible_job.prepareRepositories(self.update, self.job_params)
+        self.ansible_job.preparePlaybooks(self.job_params)
+        self.ansible_job.prepareAnsibleFiles(self.job_params)
+        self.ansible_job.writeLoggingConfig()
         self.update_queue.put(None)
         self.update_thread.join()
+
+    def execute(self):
+        self.ssh_agent = SshAgent()
+        result = None
+        try:
+            self.ssh_agent.start()
+            # TODO: enable custom key
+            self.ssh_agent.add(os.path.expanduser(self.runner_config.ssh_key))
+            self.ansible_job.setExtraEnvVars(self.ssh_agent.env)
+            result = self.ansible_job.runPlaybooks(self.job_params)
+        finally:
+            self.ssh_agent.stop()
+        return result

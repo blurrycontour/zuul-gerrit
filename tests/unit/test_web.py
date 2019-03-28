@@ -1057,9 +1057,15 @@ class TestArtifacts(ZuulDBTestCase, BaseTestWeb, AnsibleZuulTestCase):
 
 
 class TestRunner(BaseTestWeb):
-    def test_runner_prepare_workspace(self):
-        """Test runner can prepare workspace from the freeze_job api"""
+    def test_runner_execute(self):
+        """Test runner can prepare a workspace and execute
+        from the freeze_job api"""
         runner = self.setup_runner({
+            "nodes": [{
+                "label": "label1",
+                "hostname": "localhost",
+                "connection": "local"
+            }],
             "api": urllib.parse.urljoin(self.base_url, "api"),
             "tenant": "tenant-one",
             "project": "org/project",
@@ -1075,3 +1081,4 @@ class TestRunner(BaseTestWeb):
         pb = job.jobdir.playbooks[0]
         self.assertEquals("project-test1.yaml", os.path.basename(pb.path))
         self.assertTrue(os.path.exists(pb.path))
+        self.assertEquals("SUCCESS", runner.execute())
