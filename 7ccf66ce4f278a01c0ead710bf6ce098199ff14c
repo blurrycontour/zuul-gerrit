@@ -22,6 +22,30 @@
       "revId": "7ccf66ce4f278a01c0ead710bf6ce098199ff14c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_96e33705",
+        "filename": "doc/source/admin/drivers/amqp.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-03-28T00:23:08Z",
+      "side": 1,
+      "message": "Because that\u0027s what the client needs. The configuration would looks like:\n\n  address: ^/topic/VirtualTopic.qe.ci.*$",
+      "parentUuid": "5fc1f717_179c2e68",
+      "range": {
+        "startLine": 28,
+        "startChar": 13,
+        "endLine": 28,
+        "endChar": 20
+      },
+      "revId": "7ccf66ce4f278a01c0ead710bf6ce098199ff14c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
