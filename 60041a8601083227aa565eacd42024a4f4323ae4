@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_6249fc8c",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-29T18:14:11Z",
+      "side": 1,
+      "message": "The vars_overwrite doesn\u0027t seem consistent with typical Zuul behavior.  I think if a reporter wants to record either the variables or the return data for a build, that\u0027s okay.  But I don\u0027t think we should have a specific return value that is used to cause the reporter to report incorrect information about the build.  Just have it record returned variables as well (but, report them separately so they don\u0027t overlap).",
+      "revId": "60041a8601083227aa565eacd42024a4f4323ae4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
