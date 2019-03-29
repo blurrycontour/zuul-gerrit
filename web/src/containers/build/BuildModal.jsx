@@ -67,7 +67,12 @@ class BuildModal extends React.Component {
     const variables = {}
     if (this.jobVariables) {
       for (let variable of this.jobVariables) {
-        const value = this.inputs[variable.name].value
+        let value
+        if (variable['type'] === 'bool') {
+          value = this.inputs[variable.name].checked
+        } else {
+          value = this.inputs[variable.name].value
+        }
         if (value) {
           variables[variable.name] = value
         }
@@ -93,6 +98,13 @@ class BuildModal extends React.Component {
       }
       if (v && !v['defaults'] && new RegExp('^ {3}:default: ').test(line)) {
         v['defaults'] = line.split(':default: ')[1]
+      }
+      if (v && !v['type'] && new RegExp('^ {3}:type: ').test(line)) {
+        v['type'] = line.split(':type: ')[1]
+      }
+      if (v && v['type'] && v['type'] === 'choice' && !v['value'] && new RegExp('^ {3}:value: ').test(line)) {
+        let val = line.split(':value: ')[1]
+        v['value'] = val.substr(1, val.length - 2).split(',').map(String.prototype.trim)
       }
       if (v && !v['description'] && new RegExp('^ {3}[a-zA-Z]').test(line)) {
         v['description'] = line.trim()
@@ -128,22 +140,48 @@ class BuildModal extends React.Component {
         </Modal.Header>
         <Modal.Body>
           <Form horizontal>
-            {this.jobVariables.map(item => (
-              <FormGroup controlId={item.name} key={item.name}>
-                <Col sm={3}>
-                  {item.name}
-                </Col>
-                <Col sm={9}>
+            {this.jobVariables.map(item => {
+              let formControl
+              if (item['type'] === 'bool') {
+                formControl = (
+                  <FormControl
+                    type='checkbox'
+                    inputRef={(ref) => {this.inputs[item.name]= ref}} />
+                )
+              } else if (item['type'] === 'choice') {
+                formControl = (
+                  <FormControl
+                    componentClass='select'
+                    inputRef={(ref) => {this.inputs[item.name]= ref}}>
+                    <React.Fragment>
+                      {item['value'].map(itemValue => (
+                        <option value={itemValue} key={itemValue}>{itemValue}</option>
+                      ))}
+                    </React.Fragment>
+                  </FormControl>
+                )
+              } else {
+                formControl = (
                   <FormControl
                     type='text'
                     inputRef={(ref) => {this.inputs[item.name]= ref}} />
-                  <HelpBlock>
-                    {item.description}
-                    {item.defaults && ' (' + item.defaults + ')'}
-                  </HelpBlock>
-                </Col>
-              </FormGroup>
-            ))}
+                )
+              }
+              return (
+                <FormGroup controlId={item.name} key={item.name}>
+                  <Col sm={3}>
+                    {item.name}
+                  </Col>
+                  <Col sm={9}>
+                    {formControl}
+                    <HelpBlock>
+                      {item.description}
+                      {item.defaults && ' (' + item.defaults + ')'}
+                    </HelpBlock>
+                  </Col>
+                </FormGroup>
+              )
+            })}
             <Row style={{paddingTop: '10px',paddingBottom: '10px'}}>
               <Col smOffset={3} sm={9}>
                 <span>
