@@ -13,11 +13,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import abc
 import base64
 import collections
 import copy
 import datetime
-import git
 import json
 import logging
 import os
@@ -35,7 +35,6 @@ from urllib.parse import urlsplit
 import zuul.ansible.logconfig
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.yamlutil import yaml
-from zuul.lib import filecomments
 
 
 BUFFER_LINES_FOR_SYNTAX = 200
@@ -67,6 +66,16 @@ class RoleNotFoundError(ExecutorError):
 
 
 class PluginFoundError(ExecutorError):
+    pass
+
+
+class MergerFetchFailure(Exception):
+    """ Raised when failing to fetch all the required refs """
+    pass
+
+
+class MergerMergeFailure(Exception):
+    """ A ref failed to merge """
     pass
 
 
@@ -678,7 +687,71 @@ def make_inventory_dict(nodes, args, all_vars):
     return inventory
 
 
+class AnsibleJobContextManager(object, metaclass=abc.ABCMeta):
+    """An AnsibleJobContextManager is an object that handles running an
+    AnsibleJob within a given context.
+
+    For example, an extension of this may handle placing AnsibleJob into a
+    thread or forked process. It may also handle communicating with gearman
+    or some other external trigger.
+
+    """
+
+    def __init__(self):
+        self.running = False
+        self.paused = False
+        self.aborted = False
+        self.aborted_reason = None
+        self.cleanup_started = False
+        self.started = False
+
+    def isPaused(self):
+        return self.paused
+
+    def isAborted(self):
+        return self.aborted
+
+    def setStarted(self, s):
+        self.started = s
+
+    @abc.abstractmethod
+    def run(self):
+        """Run the job"""
+        self.running = True
+
+    @abc.abstractmethod
+    def pause(self):
+        """Pause the job execution
+        This may be called from AnsibleJob when a playbook gives zuul the
+        directive to pause. This allows the parent process (eg a scheduler)
+        to do other events and resume the job when it is ready."""
+        pass
+
+    @abc.abstractmethod
+    def resume(self):
+        """Resume the job execution"""
+        pass
+
+    @abc.abstractmethod
+    def stop(self):
+        """Stop (and abort) the job execution"""
+        pass
+
+    @abc.abstractmethod
+    def send_aborted(self):
+        """Signal job is aborted"""
+        pass
+
+
 class AnsibleJob(object):
+    """An object to manage job execution.
+
+    The AnsibleJob is responsible for preparing the workspace and
+    executing a single job as a series of playbooks.
+
+    The caller must invoke the prepare procedures before using the
+    runPlaybooks procedure to execute a job.
+    """
     RESULT_NORMAL = 1
     RESULT_TIMED_OUT = 2
     RESULT_UNREACHABLE = 3
@@ -693,28 +766,34 @@ class AnsibleJob(object):
         RESULT_DISK_FULL: 'RESULT_DISK_FULL',
     }
 
-    def __init__(self, arguments, job_unique,
+    def __init__(self,
+                 job_unique,
+                 zuul_event_id,
+                 context_manager,
                  getMerger,
                  process_worker,
                  merge_root,
                  connections,
                  ansible_manager,
                  execution_wrapper,
+                 logger,
                  verbose=False,
                  setup_timeout=60,
                  default_username="zuul",
                  executor_hostname="localhost",
                  executor_extra_paths={},
+                 ansible_plugin_dir='',
+                 ansible_ara_callbacks=None,
+                 ansible_callbacks=None,
+                 executor_variables_file=None,
                  statsd=None,
                  log_console_port=DEFAULT_STREAM_PORT):
-        logger = logging.getLogger("zuul.AnsibleJob")
-        self.arguments = arguments
+        self.job_unique = job_unique
+        self.zuul_event_id = zuul_event_id
+        self.context_manager = context_manager
+        self.log = logger
         self.process_worker = process_worker
-        self.zuul_event_id = self.arguments.get('zuul_event_id')
-        self.log = get_annotated_logger(
-            logger, self.zuul_event_id, build=job_unique)
         self.connections = connections
-        self.ansible_version = self.arguments.get('ansible_version')
         self.ansible_manager = ansible_manager
         self.merge_root = merge_root
         self.getMerger = getMerger
@@ -727,11 +806,52 @@ class AnsibleJob(object):
         self.executor_hostname = executor_hostname
         self.statsd = statsd
         self.log_console_port = log_console_port
-        self.arguments = arguments
         self.jobdir = None
         self.project_info = {}
         self.execution_wrapper = execution_wrapper
         self.executor_extra_paths = executor_extra_paths
+
+        self.ara_callbacks = ansible_ara_callbacks
+        self.ansible_callbacks = ansible_callbacks
+        self.library_dir = os.path.join(ansible_plugin_dir, 'library')
+        self.action_dir = os.path.join(ansible_plugin_dir, 'action')
+        self.action_dir_general = os.path.join(
+            ansible_plugin_dir, 'actiongeneral')
+        self.action_dir_trusted = os.path.join(
+            ansible_plugin_dir, 'actiontrusted')
+        self.callback_dir = os.path.join(ansible_plugin_dir, 'callback')
+        self.lookup_dir = os.path.join(ansible_plugin_dir, 'lookup')
+        self.filter_dir = os.path.join(ansible_plugin_dir, 'filter')
+
+        self.executor_variables_file = executor_variables_file
+
+        self.cpu_times = {'user': 0, 'system': 0,
+                          'children_user': 0, 'children_system': 0}
+
+        self.proc = None
+        self.proc_lock = threading.Lock()
+        self.extra_env_vars = {}
+
+        self.winrm_key_file = '~/.winrm/winrm_client_cert.key'
+        self.winrm_pem_file = '~/.winrm/winrm_client_cert.pem'
+        self.winrm_operation_timeout = 'winrm_operation_timeout_sec'
+        self.winrm_read_timeout = 'winrm_read_timeout_sec'
+
+    def setWinrmOptions(self, key_file=None, pem_file=None,
+                        operation_timeout=None, read_timeout=None):
+        if key_file:
+            self.winrm_key_file = key_file
+        if pem_file:
+            self.winrm_pem_file = pem_file
+        if operation_timeout:
+            self.winrm_operation_timeout = operation_timeout
+        if read_timeout:
+            self.winrm_read_timeout = read_timeout
+
+    def setJobDir(self, jobdir):
+        # The jobdir is managed outside of AnsibleJob along with the cleanup
+        # responsibilities. jobdir contents may be modified by other objects.
+        self.jobdir = jobdir
 
     def getResultData(self):
         data = {}
@@ -744,95 +864,19 @@ class AnsibleJob(object):
             self.log.exception("Unable to load result data:")
         return data
 
-    def mapLines(self, merger, args, data, commit, warnings):
-        # The data and warnings arguments are mutated in this method.
-
-        # If we received file comments, map the line numbers before
-        # we send the result.
-        fc = data.get('zuul', {}).get('file_comments')
-        if not fc:
-            return
-        disable = data.get('zuul', {}).get('disable_file_comment_line_mapping')
-        if disable:
-            return
-
-        try:
-            filecomments.validate(fc)
-        except Exception as e:
-            warnings.append("Job %s: validation error in file comments: %s" %
-                            (args['zuul']['job'], str(e)))
-            del data['zuul']['file_comments']
-            return
-
-        repo = None
-        for project in args['projects']:
-            if (project['canonical_name'] !=
-                args['zuul']['project']['canonical_name']):
-                continue
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
-        # If the repo doesn't exist, abort
-        if not repo:
-            return
-
-        # Check out the selected ref again in case the job altered the
-        # repo state.
-        p = args['zuul']['projects'][project['canonical_name']]
-        selected_ref = p['checkout']
-
-        self.log.info("Checking out %s %s for line mapping",
-                      project['canonical_name'], selected_ref)
-        try:
-            repo.checkout(selected_ref)
-        except Exception:
-            # If checkout fails, abort
-            self.log.exception("Error checking out repo for line mapping")
-            warnings.append("Job %s: unable to check out repo "
-                            "for file comments" % (args['zuul']['job']))
-            return
-
-        lines = filecomments.extractLines(fc)
-
-        new_lines = {}
-        for (filename, lineno) in lines:
-            try:
-                new_lineno = repo.mapLine(commit, filename, lineno)
-            except Exception as e:
-                # Log at debug level since it's likely a job issue
-                self.log.debug("Error mapping line:", exc_info=True)
-                if isinstance(e, git.GitCommandError):
-                    msg = e.stderr
-                else:
-                    msg = str(e)
-                warnings.append("Job %s: unable to map line "
-                                "for file comments: %s" %
-                                (args['zuul']['job'], msg))
-                new_lineno = None
-            if new_lineno is not None:
-                new_lines[(filename, lineno)] = new_lineno
-
-        filecomments.updateLines(fc, new_lines)
-
     def doMergeChanges(self, merger, items, repo_state):
         try:
             ret = merger.mergeChanges(
                 items, repo_state=repo_state,
                 process_worker=self.process_worker)
         except ValueError:
-            # Return ABORTED so that we'll try again. At this point all of
-            # the refs we're trying to merge should be valid refs. If we
-            # can't fetch them, it should resolve itself.
             self.log.exception("Could not fetch refs to merge from remote")
-            result = dict(result='ABORTED')
-            self.job.sendWorkComplete(json.dumps(result))
-            return None
+            raise MergerFetchFailure()
         if not ret:  # merge conflict
-            result = dict(result='MERGER_FAILURE')
             if self.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
                 self.statsd.incr(base_key + ".FAILURE")
-            self.job.sendWorkComplete(json.dumps(result))
-            return None
+            raise MergerMergeFailure()
 
         if self.statsd:
             base_key = "zuul.executor.{hostname}.merger"
@@ -899,8 +943,9 @@ class AnsibleJob(object):
             timeout = timeout - elapsed
         return timeout
 
-    def runPlaybooks(self, args):
+    def runPlaybooks(self, args, time_starting_build=None):
         result = None
+        self.ansible_version = args['ansible_version']
 
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write("{now} | Running Ansible setup...\n".format(
@@ -919,12 +964,12 @@ class AnsibleJob(object):
 
         pre_failed = False
         success = False
-        if self.statsd:
+        if self.statsd and time_starting_build:
             key = "zuul.executor.{hostname}.starting_builds"
             self.statsd.timing(
-                key, (time.monotonic() - self.time_starting_build) * 1000)
+                key, (time.monotonic() - time_starting_build) * 1000)
 
-        self.started = True
+        self.context_manager.setStarted(True)
         time_started = time.time()
         # timeout value is "total" job timeout which accounts for
         # pre-run and run playbooks. post-run is different because
@@ -981,8 +1026,8 @@ class AnsibleJob(object):
         result_data = self.getResultData()
         pause = result_data.get('zuul', {}).get('pause')
         if success and pause:
-            self.pause()
-        if self.aborted:
+            self.context_manager.pause()
+        if self.context_manager.isAborted():
             return 'ABORTED'
 
         post_timeout = args['post_timeout']
@@ -1017,6 +1062,9 @@ class AnsibleJob(object):
             return None
 
         return result
+
+    def setExtraEnvVars(self, env):
+        self.extra_env_vars = env
 
     def runCleanupPlaybooks(self, success):
         if not self.jobdir.cleanup_playbooks:
@@ -1530,7 +1578,7 @@ class AnsibleJob(object):
                     all_vars['zuul']['resources'][
                         node['name'][0]]['pod'] = data['pod']
                     fwd = KubeFwd(zuul_event_id=self.zuul_event_id,
-                                  build=self.job.unique,
+                                  build=self.job_unique,
                                   kubeconfig=self.jobdir.kubeconfig,
                                   context=data['context_name'],
                                   namespace=data['namespace'],
@@ -1685,7 +1733,7 @@ class AnsibleJob(object):
 
     def abortRunningProc(self):
         with self.proc_lock:
-            if self.proc and not self.cleanup_started:
+            if self.proc and not self.context_manager.cleanup_started:
                 self.log.debug("Abort: sending kill signal to job "
                                "process group")
                 try:
@@ -1705,7 +1753,7 @@ class AnsibleJob(object):
         env_copy = {key: value
                     for key, value in os.environ.copy().items()
                     if not key.startswith("ZUUL_")}
-        env_copy.update(self.ssh_agent.env)
+        env_copy.update(self.extra_env_vars)
         if self.ara_callbacks:
             env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
@@ -1765,7 +1813,7 @@ class AnsibleJob(object):
         env_copy['HOME'] = self.jobdir.work_root
 
         with self.proc_lock:
-            if self.aborted and not cleanup:
+            if self.context_manager.isAborted() and not cleanup:
                 return (self.RESULT_ABORTED, None)
             self.log.debug("Ansible command: ANSIBLE_CONFIG=%s ZUUL_JOBDIR=%s "
                            "ZUUL_JOB_LOG_CONFIG=%s PYTHONPATH=%s TMP=%s %s",
@@ -1794,7 +1842,7 @@ class AnsibleJob(object):
         try:
             ansible_log = get_annotated_logger(
                 logging.getLogger("zuul.AnsibleJob.output"),
-                self.zuul_event_id, build=self.job.unique)
+                self.zuul_event_id, build=self.job_unique)
 
             # Use manual idx instead of enumerate so that RESULT lines
             # don't count towards BUFFER_LINES_FOR_SYNTAX
@@ -1915,7 +1963,7 @@ class AnsibleJob(object):
                         now=datetime.datetime.now(),
                         line=line.decode('utf-8').rstrip()))
 
-        if self.aborted:
+        if self.context_manager.isAborted():
             return (self.RESULT_ABORTED, None)
 
         return (self.RESULT_NORMAL, ret)
@@ -1939,8 +1987,7 @@ class AnsibleJob(object):
             self.statsd.incr(base_key + ".%s" % self.RESULT_MAP[result])
         return result, code
 
-    def prepareRepositories(self, update_manager):
-        args = self.arguments
+    def prepareRepositories(self, update_manager, args):
         tasks = []
         projects = set()
         repo_state = args['repo_state']
@@ -1952,7 +1999,7 @@ class AnsibleJob(object):
                 project['connection'], project['name'],
                 repo_state=repo_state,
                 zuul_event_id=self.zuul_event_id,
-                build=self.job.unique))
+                build=self.job_unique))
             projects.add((project['connection'], project['name']))
 
         # ...as well as all playbook and role projects.
@@ -1971,7 +2018,7 @@ class AnsibleJob(object):
                 tasks.append(update_manager(
                     *key, repo_state=repo_state,
                     zuul_event_id=self.zuul_event_id,
-                    build=self.job.unique))
+                    build=self.job_unique))
                 projects.add(key)
 
         for task in tasks:
@@ -1987,8 +2034,8 @@ class AnsibleJob(object):
             }
 
         # Early abort if abort requested
-        if self.aborted:
-            self._send_aborted()
+        if self.context_manager.isAborted():
+            self.context_manager.send_aborted()
             return False, None
 
         self.log.debug("Git updates complete")
@@ -2013,13 +2060,13 @@ class AnsibleJob(object):
             item_commit = self.doMergeChanges(
                 merger, merge_items, repo_state)
             if item_commit is None:
-                # There was a merge conflict and we have already sent
-                # a work complete result, don't run any jobs
+                # Merge failures are raised, so if we get here something else
+                # has gone wrong
                 return False, merger
 
         # Early abort if abort requested
-        if self.aborted:
-            self._send_aborted()
+        if self.context_manager.isAborted():
+            self.context_manager.send_aborted()
             return False, merger
 
         state_items = [i for i in args['items'] if not i.get('number')]
@@ -2029,8 +2076,8 @@ class AnsibleJob(object):
                 process_worker=self.process_worker)
 
         # Early abort if abort requested
-        if self.aborted:
-            self._send_aborted()
+        if self.context_manager.isAborted():
+            self.context_manager.send_aborted()
             return False, merger
 
         for project in args['projects']:
