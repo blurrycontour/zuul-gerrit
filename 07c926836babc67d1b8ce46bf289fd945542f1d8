@@ -1,0 +1,221 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_53cffcb2",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1295,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "We should rename this to project_name to not confuse it with the project object which already lead to some confusion in the past.",
+      "range": {
+        "startLine": 1295,
+        "startChar": 29,
+        "endLine": 1295,
+        "endChar": 36
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_f6d61654",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1450,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "We should also test with a team that has admin permissions.",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_7686a668",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1490,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "Maybe we should add a negative test for this one.",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d638bad5",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1501,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "This looks like this can create a race so we should probably add a self.waitUntilSettled after this event.",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_36cedeb4",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1531,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "waitUntilSettled?",
+      "range": {
+        "startLine": 1527,
+        "startChar": 0,
+        "endLine": 1531,
+        "endChar": 46
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d6c2fa86",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1545,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "waitUntilSettled?",
+      "range": {
+        "startLine": 1541,
+        "startChar": 0,
+        "endLine": 1545,
+        "endChar": 46
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_c1fc72b7",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1592,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "Add following test cases:\n\nPR containing main.rs and test.yaml and expect:\n- team1 AND team2 approval\n\nPR containing main.rs and test.yaml and expect:\n-  team3",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_565daaea",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1611,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "All tests use self.assert* so this should be the case here too.",
+      "range": {
+        "startLine": 1611,
+        "startChar": 8,
+        "endLine": 1611,
+        "endChar": 14
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_01d7da51",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "The patten \u0027/\u0027  will result in None as regex. We need to check for this case and ignore it. Also this edge case should be tested.",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_41df223a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "Maybe add an explanation of the algorithm here.",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_bc162d49",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-03-29T16:05:01Z",
+      "side": 1,
+      "message": "That could be simplified to\n\n if action in (\u0027edited\u0027, \u0027added_to_repository\u0027, \u0027removed_from_repository\u0027):\n   ...",
+      "range": {
+        "startLine": 577,
+        "startChar": 0,
+        "endLine": 578,
+        "endChar": 53
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
