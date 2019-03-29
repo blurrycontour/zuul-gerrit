@@ -438,7 +438,7 @@ class TestAnsibleJob(ZuulTestCase):
         ansible_version = AnsibleManager().default_version
         args = '{"ansible_version": "%s"}' % ansible_version
         job = gear.TextJob('executor:execute', args, unique='test')
-        self.test_job = zuul.executor.server.AnsibleJobGearman(
+        self.test_job = zuul.executor.server.GearmanAnsibleContextManager(
             self.executor_server, job)
 
     def test_getHostList_host_keys(self):
@@ -446,29 +446,32 @@ class TestAnsibleJob(ZuulTestCase):
         node = {'name': 'fake-host',
                 'host_keys': ['fake-host-key'],
                 'interface_ip': 'localhost'}
-        keys = self.test_job.getHostList({'nodes': [node],
-                                          'host_vars': {},
-                                          'vars': {},
-                                          'groups': [],
-                                          })[0]['host_keys']
+        keys = self.test_job.ansible_job.getHostList(
+            {'nodes': [node],
+             'host_vars': {},
+             'vars': {},
+             'groups': [],
+             })[0]['host_keys']
         self.assertEqual(keys[0], 'localhost fake-host-key')
 
         # Test with custom connection_port set
         node['connection_port'] = 22022
-        keys = self.test_job.getHostList({'nodes': [node],
-                                          'host_vars': {},
-                                          'vars': {},
-                                          'groups': [],
-                                          })[0]['host_keys']
+        keys = self.test_job.ansible_job.getHostList(
+            {'nodes': [node],
+             'host_vars': {},
+             'vars': {},
+             'groups': [],
+             })[0]['host_keys']
         self.assertEqual(keys[0], '[localhost]:22022 fake-host-key')
 
         # Test with no host keys
         node['host_keys'] = []
-        host = self.test_job.getHostList({'nodes': [node],
-                                          'host_vars': {},
-                                          'vars': {},
-                                          'groups': [],
-                                          })[0]
+        host = self.test_job.ansible_job.getHostList(
+            {'nodes': [node],
+             'host_vars': {},
+             'vars': {},
+             'groups': [],
+             })[0]
         self.assertEqual(host['host_keys'], [])
         self.assertEqual(
             host['host_vars']['ansible_ssh_common_args'],
