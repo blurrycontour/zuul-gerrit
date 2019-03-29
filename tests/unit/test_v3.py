@@ -5672,7 +5672,7 @@ class TestJobPause(AnsibleZuulTestCase):
 
         # Stop the job worker of compile1 to simulate an executor restart
         for job_worker in self.executor_server.job_workers.values():
-            if job_worker.job.unique == compile1.unique:
+            if job_worker.unique == compile1.unique:
                 job_worker.stop()
         self.waitUntilSettled("Stop job")
 
