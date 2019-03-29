@@ -1508,7 +1508,7 @@ class FakeBuild(object):
         return repos
 
 
-class RecordingAnsibleJob(zuul.executor.server.AnsibleJobGearman):
+class RecordingAnsibleJob(zuul.executor.common.AnsibleJob):
     def doMergeChanges(self, merger, items, repo_state):
         # Get a merger in order to update the repos involved in this job.
         commit = super(RecordingAnsibleJob, self).doMergeChanges(
@@ -1518,9 +1518,9 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJobGearman):
         return commit
 
     def recordResult(self, result):
-        build = self.executor_server.job_builds[self.job.unique]
-        self.executor_server.lock.acquire()
-        self.executor_server.build_history.append(
+        build = self.context_manager.executor_server.job_builds[self.unique]
+        self.context_manager.executor_server.lock.acquire()
+        self.context_manager.executor_server.build_history.append(
             BuildHistory(name=build.name, result=result, changes=build.changes,
                          node=build.node, uuid=build.unique,
                          ref=build.parameters['zuul']['ref'],
@@ -1528,23 +1528,24 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJobGearman):
                          parameters=build.parameters, jobdir=build.jobdir,
                          pipeline=build.parameters['zuul']['pipeline'])
         )
-        self.executor_server.running_builds.remove(build)
-        del self.executor_server.job_builds[self.job.unique]
-        self.executor_server.lock.release()
+        self.context_manager.executor_server.running_builds.remove(build)
+        del self.context_manager.executor_server.job_builds[self.unique]
+        self.context_manager.executor_server.lock.release()
 
-    def runPlaybooks(self, args):
-        build = self.executor_server.job_builds[self.job.unique]
+    def runPlaybooks(self, args, time_starting_build=None):
+        build = self.context_manager.executor_server.job_builds[self.unique]
         build.jobdir = self.jobdir
 
-        result = super(RecordingAnsibleJob, self).runPlaybooks(args)
+        result = super(RecordingAnsibleJob, self).runPlaybooks(
+            args, time_starting_build)
         self.recordResult(result)
         return result
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
                    wrapped=True):
-        build = self.executor_server.job_builds[self.job.unique]
+        build = self.context_manager.executor_server.job_builds[self.unique]
 
-        if self.executor_server._run_ansible:
+        if self.context_manager.executor_server._run_ansible:
             # Call run on the fake build omitting the result so we also can
             # hold real ansible jobs.
             if playbook.path:
@@ -1574,15 +1575,21 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJobGearman):
         return hosts
 
     def pause(self):
-        build = self.executor_server.job_builds[self.job.unique]
+        build = self.context_manager.executor_server.job_builds[self.unique]
         build.paused = True
         super().pause()
 
     def resume(self):
-        build = self.executor_server.job_builds.get(self.job.unique)
+        build = self.context_manager.executor_server.job_builds.get(
+            self.unique)
         if build:
             build.paused = False
         super().resume()
+
+
+class RecordingGearmanAnsibleContextManager(
+    zuul.executor.server.GearmanAnsibleContextManager):
+    _job_class = RecordingAnsibleJob
 
 
 class RecordingMergeClient(zuul.merger.client.MergeClient):
@@ -1610,7 +1617,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
     """
 
-    _job_class = RecordingAnsibleJob
+    _job_context_class = RecordingGearmanAnsibleContextManager
 
     def __init__(self, *args, **kw):
         self._run_ansible = kw.pop('_run_ansible', False)
