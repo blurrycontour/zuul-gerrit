@@ -13,6 +13,7 @@
 # under the License.
 
 import datetime
+import git
 import json
 import logging
 import multiprocessing
@@ -39,11 +40,14 @@ import zuul.lib.repl
 import zuul.merger.merger
 import zuul.ansible.logconfig
 from zuul.executor.common import AnsibleJob
+from zuul.executor.common import AnsibleJobContextManager
 from zuul.executor.common import DeduplicateQueue
 from zuul.executor.common import DEFAULT_FINGER_PORT
 from zuul.executor.common import DEFAULT_STREAM_PORT
 from zuul.executor.common import ExecutorError
 from zuul.executor.common import JobDir
+from zuul.executor.common import MergerFetchFailure
+from zuul.executor.common import MergerMergeFailure
 from zuul.executor.common import SshAgent
 from zuul.executor.common import UpdateTask
 from zuul.executor.sensors.cpu import CPUSensor
@@ -52,6 +56,7 @@ from zuul.executor.sensors.pause import PauseSensor
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
+from zuul.lib import filecomments
 from zuul.merger.server import BaseMergeServer, RepoLocks
 
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -156,23 +161,22 @@ class DiskAccountant(object):
         return self._running
 
 
-class AnsibleJobGearman(AnsibleJob):
-    """An object to manage threaded job used by the executor service.
-    The AnsibleJobGearman is responsible for creating and managing
-    an AnsibleJob thread as well as sending the result data back to the
+class GearmanAnsibleContextManager(AnsibleJobContextManager):
+    """An object to manage the threaded gearman ansible job used by the
+    executor service.
+
+    The GearmanAnsibleContextManager is responsible for creating and managing
+    an AnsibleJob in a thread as well as sending the result data back to the
     gearman. The constructor is also responsible for interfacing the
     executor service configurations with the base AnsibleJob requirements.
 
     The caller must invoke the run procedure to execute a job.
-
-    NOTE(jhesketh): To reduce review complexity, at the moment this class still
-                    inherits from AnsibleJob. This change should mostly be a
-                    copy out of the class that was here into the common
-                    library. In subsuqent changes we will rework this to
-                    consume AnsibleJob rather than extend it.
     """
+    _job_class = AnsibleJob
 
-    def __init__(self, executor_server, job):
+    def __init__(self, executor_server, gearman_job):
+        super(GearmanAnsibleContextManager, self).__init__()
+
         extra_paths = {}
         for context in ("trusted", "untrusted"):
             extra_paths[context] = {}
@@ -183,83 +187,83 @@ class AnsibleJobGearman(AnsibleJob):
                     '%s_%s_paths' % (context, type_path))
                 extra_paths[
                     context][type_path] = conf.split(":") if conf else []
-        super().__init__(
-            json.loads(job.arguments), str(job.unique),
+
+        self.executor_server = executor_server
+        self.gearman_job = gearman_job
+        self.gearman_arguments = json.loads(self.gearman_job.arguments)
+        self.unique = self.gearman_job.unique
+
+        # Logger name left for backwards compatability and its shortness
+        logger = logging.getLogger("zuul.AnsibleJob")
+        self.zuul_event_id = self.gearman_arguments.get('zuul_event_id')
+        self.log = get_annotated_logger(
+            logger, self.zuul_event_id, build=self.unique)
+
+        self.time_starting_build = None
+        self._resume_event = threading.Event()
+        self.thread = None
+        self.private_key_file = get_default(self.executor_server.config,
+                                            'executor', 'private_key_file',
+                                            '~/.ssh/id_rsa')
+
+        self.ssh_agent = SshAgent(zuul_event_id=self.zuul_event_id,
+                                  build=self.unique)
+        self.port_forwards = []
+
+        executor_variables_file = None
+        if self.executor_server.config.has_option('executor', 'variables'):
+            executor_variables_file = self.executor_server.config.get(
+                'executor', 'variables')
+
+        ara_callbacks = \
+            self.executor_server.ansible_manager.getAraCallbackPlugin(
+                self.gearman_arguments.get('ansible_version'))
+        ansible_callbacks = self.executor_server.ansible_callbacks
+        plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
+            self.gearman_arguments.get('ansible_version'))
+
+        self.ansible_job = self._job_class(
+            self.unique,
+            self.zuul_event_id,
+            context_manager=self,
             getMerger=executor_server._getMerger,
             process_worker=executor_server.process_worker,
             merge_root=executor_server.merge_root,
             connections=executor_server.connections,
             ansible_manager=executor_server.ansible_manager,
             execution_wrapper=executor_server.execution_wrapper,
+            logger=self.log,
             verbose=executor_server.verbose,
             setup_timeout=executor_server.setup_timeout,
             executor_hostname=executor_server.hostname,
             default_username=executor_server.default_username,
             statsd=executor_server.statsd,
-            executor_extra_paths=extra_paths,
-            log_console_port=executor_server.log_console_port)
+            ansible_plugin_dir=plugin_dir,
+            ansible_ara_callbacks=ara_callbacks,
+            ansible_callbacks=ansible_callbacks,
+            executor_variables_file=executor_variables_file,
+            executor_extra_paths=extra_paths
+        )
 
-        # Record ansible version being used for the cleanup phase
-        self.executor_server = executor_server
-        self.job = job
-        self.proc = None
-        self.proc_lock = threading.Lock()
-        self.running = False
-        self.started = False  # Whether playbooks have started running
-        self.time_starting_build = None
-        self.paused = False
-        self.aborted = False
-        self.aborted_reason = None
-        self.cleanup_started = False
-        self._resume_event = threading.Event()
-        self.thread = None
-        self.private_key_file = get_default(self.executor_server.config,
-                                            'executor', 'private_key_file',
-                                            '~/.ssh/id_rsa')
-        self.winrm_key_file = get_default(self.executor_server.config,
-                                          'executor', 'winrm_cert_key_file',
-                                          '~/.winrm/winrm_client_cert.key')
-        self.winrm_pem_file = get_default(self.executor_server.config,
-                                          'executor', 'winrm_cert_pem_file',
-                                          '~/.winrm/winrm_client_cert.pem')
-        self.winrm_operation_timeout = get_default(
-            self.executor_server.config,
-            'executor',
-            'winrm_operation_timeout_sec')
-        self.winrm_read_timeout = get_default(
-            self.executor_server.config,
-            'executor',
-            'winrm_read_timeout_sec')
-        self.ssh_agent = SshAgent(zuul_event_id=self.zuul_event_id,
-                                  build=self.job.unique)
-        self.port_forwards = []
-        self.executor_variables_file = None
-
-        self.cpu_times = {'user': 0, 'system': 0,
-                          'children_user': 0, 'children_system': 0}
-
-        if self.executor_server.config.has_option('executor', 'variables'):
-            self.executor_variables_file = self.executor_server.config.get(
-                'executor', 'variables')
-
-        plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
-            self.arguments.get('ansible_version'))
-        self.ara_callbacks = \
-            self.executor_server.ansible_manager.getAraCallbackPlugin(
-                self.arguments.get('ansible_version'))
-        self.library_dir = os.path.join(plugin_dir, 'library')
-        self.action_dir = os.path.join(plugin_dir, 'action')
-        self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
-        self.action_dir_trusted = os.path.join(plugin_dir, 'actiontrusted')
-        self.callback_dir = os.path.join(plugin_dir, 'callback')
-        self.lookup_dir = os.path.join(plugin_dir, 'lookup')
-        self.filter_dir = os.path.join(plugin_dir, 'filter')
-        self.ansible_callbacks = self.executor_server.ansible_callbacks
+        self.ansible_job.setWinrmOptions(
+            key_file=get_default(self.executor_server.config,
+                                 'executor', 'winrm_cert_key_file',
+                                 '~/.winrm/winrm_client_cert.key'),
+            pem_file=get_default(self.executor_server.config,
+                                 'executor', 'winrm_cert_pem_file',
+                                 '~/.winrm/winrm_client_cert.pem'),
+            operation_timeout=get_default(self.executor_server.config,
+                                          'executor',
+                                          'winrm_operation_timeout_sec'),
+            read_timeout=get_default(self.executor_server.config,
+                                     'executor',
+                                     'winrm_read_timeout_sec')
+        )
 
     def run(self):
         self.running = True
-        self.thread = threading.Thread(target=self.execute,
-                                       name='build-%s' % self.job.unique)
+        self.thread = threading.Thread(
+            target=self.execute, name='build-%s' % self.gearman_job.unique)
         self.thread.start()
 
     def stop(self, reason=None):
@@ -268,23 +272,27 @@ class AnsibleJobGearman(AnsibleJob):
 
         # if paused we need to resume the job so it can be stopped
         self.resume()
-        self.abortRunningProc()
+        self.ansible_job.abortRunningProc()
 
     def pause(self):
         self.log.info(
             "Pausing job %s for ref %s (change %s)" % (
-                self.arguments['zuul']['job'],
-                self.arguments['zuul']['ref'],
-                self.arguments['zuul']['change_url']))
+                self.gearman_arguments['zuul']['job'],
+                self.gearman_arguments['zuul']['ref'],
+                self.gearman_arguments['zuul']['change_url']))
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write(
                 "{now} |\n"
                 "{now} | Job paused\n".format(now=datetime.datetime.now()))
 
         self.paused = True
+        self.ansible_job.pause()
 
-        data = {'paused': self.paused, 'data': self.getResultData()}
-        self.job.sendWorkData(json.dumps(data))
+        data = {
+            'paused': self.paused,
+            'data': self.ansible_job.getResultData(),
+        }
+        self.gearman_job.sendWorkData(json.dumps(data))
         self._resume_event.wait()
 
     def resume(self):
@@ -293,15 +301,16 @@ class AnsibleJobGearman(AnsibleJob):
 
         self.log.info(
             "Resuming job %s for ref %s (change %s)" % (
-                self.arguments['zuul']['job'],
-                self.arguments['zuul']['ref'],
-                self.arguments['zuul']['change_url']))
+                self.gearman_arguments['zuul']['job'],
+                self.gearman_arguments['zuul']['ref'],
+                self.gearman_arguments['zuul']['change_url']))
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write(
                 "{now} | Job resumed\n"
                 "{now} |\n".format(now=datetime.datetime.now()))
 
         self.paused = False
+        self.ansible_job.resume()
         self._resume_event.set()
 
     def wait(self):
@@ -309,34 +318,37 @@ class AnsibleJobGearman(AnsibleJob):
             self.thread.join()
 
     def execute(self):
+        self.jobdir = None
         try:
             self.time_starting_build = time.monotonic()
 
             # report that job has been taken
-            self.job.sendWorkData(json.dumps(self._base_job_data()))
+            self.gearman_job.sendWorkData(json.dumps(self._base_job_data()))
 
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
-            for key in self.arguments.get('ssh_keys', []):
+            for key in self.gearman_arguments.get('ssh_keys', []):
                 self.ssh_agent.addData(key['name'], key['key'])
             self.jobdir = JobDir(self.executor_server.jobdir_root,
                                  self.executor_server.keep_jobdir,
-                                 str(self.job.unique))
+                                 str(self.gearman_job.unique))
+            self.ansible_job.setJobDir(self.jobdir)
+            self.ansible_job.setExtraEnvVars(self.ssh_agent.env)
             self._execute()
         except BrokenProcessPool:
             # The process pool got broken, re-initialize it and send
             # ABORTED so we re-try the job.
             self.log.exception('Process pool got broken')
             self.executor_server.resetProcessPool()
-            self._send_aborted()
+            self.send_aborted()
         except ExecutorError as e:
             result_data = json.dumps(dict(result='ERROR',
                                           error_detail=e.args[0]))
             self.log.debug("Sending result: %s" % (result_data,))
-            self.job.sendWorkComplete(result_data)
+            self.gearman_job.sendWorkComplete(result_data)
         except Exception:
             self.log.exception("Exception while executing job")
-            self.job.sendWorkException(traceback.format_exc())
+            self.gearman_job.sendWorkException(traceback.format_exc())
         finally:
             self.running = False
             if self.jobdir:
@@ -355,7 +367,7 @@ class AnsibleJobGearman(AnsibleJob):
                 except Exception:
                     self.log.exception("Error stopping port forward:")
             try:
-                self.executor_server.finishJob(self.job.unique)
+                self.executor_server.finishJob(self.gearman_job.unique)
             except Exception:
                 self.log.exception("Error finalizing job thread:")
             self.log.info("Job execution took: %.3f seconds" % (
@@ -373,12 +385,12 @@ class AnsibleJobGearman(AnsibleJob):
             'worker_log_port': self.executor_server.log_streaming_port,
         }
 
-    def _send_aborted(self):
+    def send_aborted(self):
         result = dict(result='ABORTED')
-        self.job.sendWorkComplete(json.dumps(result))
+        self.gearman_job.sendWorkComplete(json.dumps(result))
 
     def _execute(self):
-        args = self.arguments
+        args = self.gearman_arguments
         self.log.info(
             "Beginning job %s for ref %s (change %s)" % (
                 args['zuul']['job'],
@@ -386,9 +398,21 @@ class AnsibleJobGearman(AnsibleJob):
                 args['zuul']['change_url']))
         self.log.debug("Job root: %s" % (self.jobdir.root,))
 
-        item_commit, merger = self.prepareRepositories(
-            self.executor_server.update)
-
+        try:
+            item_commit, merger = self.ansible_job.prepareRepositories(
+                self.executor_server.update, args)
+        except MergerFetchFailure:
+            # Return ABORTED so that we'll try again. At this point all of
+            # the refs we're trying to merge should be valid refs. If we
+            # can't fetch them, it should resolve itself.
+            result = dict(result='ABORTED')
+            self.gearman_job.sendWorkComplete(json.dumps(result))
+            return
+        except MergerMergeFailure:
+            # Merge conflict
+            result = dict(result='MERGER_FAILURE')
+            self.gearman_job.sendWorkComplete(json.dumps(result))
+            return
         if item_commit is False:
             # There was a merge conflict and we have already sent
             # a work complete result, don't run any jobs
@@ -396,18 +420,18 @@ class AnsibleJobGearman(AnsibleJob):
 
         # Early abort if abort requested
         if self.aborted:
-            self._send_aborted()
+            self.send_aborted()
             return
 
         # This prepares each playbook and the roles needed for each.
-        self.preparePlaybooks(args)
+        self.ansible_job.preparePlaybooks(args)
 
-        self.prepareAnsibleFiles(args)
-        self.writeLoggingConfig()
+        self.ansible_job.prepareAnsibleFiles(args)
+        self.ansible_job.writeLoggingConfig()
 
         # Early abort if abort requested
         if self.aborted:
-            self._send_aborted()
+            self.send_aborted()
             return
 
         data = self._base_job_data()
@@ -415,27 +439,27 @@ class AnsibleJobGearman(AnsibleJob):
             data['url'] = "finger://{hostname}:{port}/{uuid}".format(
                 hostname=self.executor_server.hostname,
                 port=self.executor_server.log_streaming_port,
-                uuid=self.job.unique)
+                uuid=self.gearman_job.unique)
         else:
             data['url'] = 'finger://{hostname}/{uuid}'.format(
                 hostname=self.executor_server.hostname,
-                uuid=self.job.unique)
+                uuid=self.gearman_job.unique)
 
-        self.job.sendWorkData(json.dumps(data))
-        self.job.sendWorkStatus(0, 100)
+        self.gearman_job.sendWorkData(json.dumps(data))
+        self.gearman_job.sendWorkStatus(0, 100)
 
-        result = self.runPlaybooks(args)
+        result = self.ansible_job.runPlaybooks(args, self.time_starting_build)
         success = result == 'SUCCESS'
 
-        self.runCleanupPlaybooks(success)
+        self.ansible_job.runCleanupPlaybooks(success)
 
         # Stop the persistent SSH connections.
-        setup_status, setup_code = self.runAnsibleCleanup(
+        setup_status, setup_code = self.ansible_job.runAnsibleCleanup(
             self.jobdir.setup_playbook)
 
-        if self.aborted_reason == self.RESULT_DISK_FULL:
+        if self.aborted_reason == AnsibleJob.RESULT_DISK_FULL:
             result = 'DISK_FULL'
-        data = self.getResultData()
+        data = self.ansible_job.getResultData()
         warnings = []
         self.mapLines(merger, args, data, item_commit, warnings)
         warnings.extend(get_warnings_from_result_data(data, logger=self.log))
@@ -443,7 +467,76 @@ class AnsibleJobGearman(AnsibleJob):
                                       warnings=warnings,
                                       data=data))
         self.log.debug("Sending result: %s" % (result_data,))
-        self.job.sendWorkComplete(result_data)
+        self.gearman_job.sendWorkComplete(result_data)
+
+    def mapLines(self, merger, args, data, commit, warnings):
+        # The data and warnings arguments are mutated in this method.
+
+        # If we received file comments, map the line numbers before
+        # we send the result.
+        fc = data.get('zuul', {}).get('file_comments')
+        if not fc:
+            return
+        disable = data.get('zuul', {}).get('disable_file_comment_line_mapping')
+        if disable:
+            return
+
+        try:
+            filecomments.validate(fc)
+        except Exception as e:
+            warnings.append("Job %s: validation error in file comments: %s" %
+                            (args['zuul']['job'], str(e)))
+            del data['zuul']['file_comments']
+            return
+
+        repo = None
+        for project in args['projects']:
+            if (project['canonical_name'] !=
+                args['zuul']['project']['canonical_name']):
+                continue
+            repo = merger.getRepo(project['connection'],
+                                  project['name'])
+        # If the repo doesn't exist, abort
+        if not repo:
+            return
+
+        # Check out the selected ref again in case the job altered the
+        # repo state.
+        p = args['zuul']['projects'][project['canonical_name']]
+        selected_ref = p['checkout']
+
+        self.log.info("Checking out %s %s for line mapping",
+                      project['canonical_name'], selected_ref)
+        try:
+            repo.checkout(selected_ref)
+        except Exception:
+            # If checkout fails, abort
+            self.log.exception("Error checking out repo for line mapping")
+            warnings.append("Job %s: unable to check out repo "
+                            "for file comments" % (args['zuul']['job']))
+            return
+
+        lines = filecomments.extractLines(fc)
+
+        new_lines = {}
+        for (filename, lineno) in lines:
+            try:
+                new_lineno = repo.mapLine(commit, filename, lineno)
+            except Exception as e:
+                # Log at debug level since it's likely a job issue
+                self.log.debug("Error mapping line:", exc_info=True)
+                if isinstance(e, git.GitCommandError):
+                    msg = e.stderr
+                else:
+                    msg = str(e)
+                warnings.append("Job %s: unable to map line "
+                                "for file comments: %s" %
+                                (args['zuul']['job'], msg))
+                new_lineno = None
+            if new_lineno is not None:
+                new_lines[(filename, lineno)] = new_lineno
+
+        filecomments.updateLines(fc, new_lines)
 
 
 class ExecutorMergeWorker(gear.TextWorker):
@@ -477,7 +570,7 @@ class ExecutorExecuteWorker(gear.TextWorker):
 class ExecutorServer(BaseMergeServer):
     log = logging.getLogger("zuul.ExecutorServer")
     _ansible_manager_class = AnsibleManager
-    _job_class = AnsibleJobGearman
+    _job_context_class = GearmanAnsibleContextManager
     _repo_locks_class = RepoLocks
 
     def __init__(
@@ -948,7 +1041,7 @@ class ExecutorServer(BaseMergeServer):
         if self.statsd:
             base_key = 'zuul.executor.{hostname}'
             self.statsd.incr(base_key + '.builds')
-        self.job_workers[job.unique] = self._job_class(self, job)
+        self.job_workers[job.unique] = self._job_context_class(self, job)
         # Run manageLoad before starting the thread mostly for the
         # benefit of the unit tests to make the calculation of the
         # number of starting jobs more deterministic.
@@ -1002,7 +1095,8 @@ class ExecutorServer(BaseMergeServer):
 
     def stopJobDiskFull(self, jobdir):
         unique = os.path.basename(jobdir)
-        self.stopJobByUnique(unique, reason=AnsibleJob.RESULT_DISK_FULL)
+        self.stopJobByUnique(
+            unique, reason=self._job_context_class._job_class.RESULT_DISK_FULL)
 
     def resumeJob(self, job):
         try:
