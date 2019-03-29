@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "5fc1f717_a74cd6c8",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-29T17:14:12Z",
+      "side": 1,
+      "message": "nit: s/entice/entail/  but the meaning is clear",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_c749e2b7",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-29T17:14:12Z",
+      "side": 1,
+      "message": "See comment below about complexity.",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_67c4ae0f",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-29T17:14:12Z",
+      "side": 1,
+      "message": "I grant that this is very flexible and would likely allow us to support any number of unforseen scenarios in the future.  However, this is far more complicated than we originally discussed.  And with complexity comes cost and risk for maintainers and users.\n\nThe problem statement at the top of this spec, which I agree with, states that the intent is to provide access to privileged tenant administrative actions without granting full Zuul system admin access.  It is imperative that we keep in mind that all of these actions are *admin* actions.  They are not end-user actions.  They all represent exceptions to the normal workflow in a system.\n\nBecause of that, we don\u0027t need to have fine-grained access control.  It is enough to state that \"these users are adminsitrators in this tenant and therefore have access to the privileged commands\".  We don\u0027t need to specify the command or project.\n\nTo create such complex rules makes the system difficult for new users to set up correctly.",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_87c99a26",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-03-29T17:14:12Z",
+      "side": 1,
+      "message": "I would much rather we revert to something more like the earlier drafts, but with the improved understanding of tokens.  So perhaps:\nadministrators:\n  - iss: issuer1\n    sub: user1\n  - iss: issuer2\n    role: role1\nThat still gives us the flexibility to accomodate different issuers or role constructs, but doesn\u0027t require users to learn a new authorization language.",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_7eeee2ed",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 12
