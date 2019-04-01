@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_f3736d15",
+        "filename": "TESTING.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-04-01T14:13:25Z",
+      "side": 1,
+      "message": "I\u0027d really like to eliminate the need for this suffix but I fear doing so will bork zuul, which presumably doesn\u0027t have any kind of configuration for this stuff",
+      "range": {
+        "startLine": 21,
+        "startChar": 65,
+        "endLine": 22,
+        "endChar": 29
+      },
+      "revId": "c1c955a7aabe0b8b46d16a2c68eb251b293052e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
