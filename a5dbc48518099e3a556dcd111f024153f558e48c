@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_a41041aa",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-01T10:27:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_a74cd6c8",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_c749e2b7",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 12
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_04a91523",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-01T10:27:06Z",
+      "side": 1,
+      "message": "I agree the proposed implementation is not the most straightforward, I considered the following reasons:\n\n- I tried to account for any future, unforeseen expansion in privileged actions or user data to transmit to Zuul, as something too simple might end up difficult to extend\n- fine-grained rules reduce significantly the surface of attack in case a token is leaked; revoking JWTs is not trivial outside of the identity provider and thus the only way to mitigate risks is left with the token\u0027s validity period.\n\nObviously I\u0027m fine with going for a simpler approach, granted we\u0027re all fine with the loss in flexibility and security.",
+      "parentUuid": "5fc1f717_67c4ae0f",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_87c99a26",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 12
@@ -64,6 +100,24 @@
       "writtenOn": "2019-03-29T17:14:12Z",
       "side": 1,
       "message": "I would much rather we revert to something more like the earlier drafts, but with the improved understanding of tokens.  So perhaps:\nadministrators:\n  - iss: issuer1\n    sub: user1\n  - iss: issuer2\n    role: role1\nThat still gives us the flexibility to accomodate different issuers or role constructs, but doesn\u0027t require users to learn a new authorization language.",
+      "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_071a776e",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-01T10:27:06Z",
+      "side": 1,
+      "message": "I\u0027d suggest something in between, let\u0027s keep a way to define rules separately for reusability, but let\u0027s have them as simple as a list of \"claim:value\"s to match.\n\nThere should also still be a way for an operator to specify if a claim\u0027s expected content is a list or a string to avoid being too permissive in the checks; and since JWTs issued by third parties may have complex structures ( \"resources_access.account.roles\" is a real claim in tokens issued by keycloak) support for XPath-like claim definition should be kept as well.",
+      "parentUuid": "5fc1f717_87c99a26",
       "revId": "a5dbc48518099e3a556dcd111f024153f558e48c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
