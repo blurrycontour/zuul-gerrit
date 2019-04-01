@@ -22,6 +22,30 @@
       "revId": "d20b39fc2b353183d13dc1b7684e5501407419a2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_10dab478",
+        "filename": "doc/source/developer/javascript.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-04-01T08:42:02Z",
+      "side": 1,
+      "message": "cool, even easier :)",
+      "parentUuid": "5fc1f717_5596ee40",
+      "range": {
+        "startLine": 177,
+        "startChar": 2,
+        "endLine": 177,
+        "endChar": 15
+      },
+      "revId": "d20b39fc2b353183d13dc1b7684e5501407419a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
