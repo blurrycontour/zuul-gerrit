@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_2a22dd02",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-01T05:48:46Z",
+      "side": 1,
+      "message": "Instead of the job name, how about \"build history\" ?",
+      "range": {
+        "startLine": 104,
+        "startChar": 12,
+        "endLine": 104,
+        "endChar": 26
+      },
+      "revId": "4e5b11454d2ec958ba8971a3d2128a212b607e95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
