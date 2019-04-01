@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_0a53616e",
+        "filename": "web/src/pages/Stream.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-01T06:05:48Z",
+      "side": 1,
+      "message": "This is still hard to see when there are lots of text. I had better result using rgb(252, 252, 252) without alpha and with this css (borrowed from https://github.com/xtermjs/xterm.js/issues/692):\n\n  .xterm-selection-layer {\n    mix-blend-mode: exclusion;\n  }",
+      "revId": "49647a3927109fdd736f69db56c860eec9d8777c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
