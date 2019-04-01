@@ -22,6 +22,23 @@
       "revId": "4e5b11454d2ec958ba8971a3d2128a212b607e95",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_143a9e97",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-01T16:16:07Z",
+      "side": 1,
+      "message": "+1",
+      "revId": "4e5b11454d2ec958ba8971a3d2128a212b607e95",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
