@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_5596ee40",
+        "filename": "doc/source/developer/javascript.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-01T07:58:34Z",
+      "side": 1,
+      "message": "actually \u0027yarn lint\u0027 works too",
+      "range": {
+        "startLine": 177,
+        "startChar": 2,
+        "endLine": 177,
+        "endChar": 15
+      },
+      "revId": "d20b39fc2b353183d13dc1b7684e5501407419a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
