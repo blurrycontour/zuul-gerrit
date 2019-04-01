@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_fa5102db",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-01T17:44:50Z",
+      "side": 1,
+      "message": "We should keep support for the \u0027*\u0027 wildcard, allowing operators to perform admin actions from the web UI as well. WDYT?",
+      "range": {
+        "startLine": 133,
+        "startChar": 7,
+        "endLine": 133,
+        "endChar": 38
+      },
+      "revId": "da5659326aa8d23cc722644f866c9cb7d3fe9bd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_da0766c9",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-01T17:44:50Z",
+      "side": 1,
+      "message": "to clarify: the rule is matched if *any* condition in the list matches the Authentication Token\u0027s claims",
+      "range": {
+        "startLine": 196,
+        "startChar": 17,
+        "endLine": 197,
+        "endChar": 20
+      },
+      "revId": "da5659326aa8d23cc722644f866c9cb7d3fe9bd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
