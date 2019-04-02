@@ -162,26 +162,38 @@
             # If zuul.tag is defined: [ '3', '3.19', '3.19.0' ].  Only works for 3-component tags.
             # Otherwise: ['latest']
             &imagetag "{{ zuul.tag is defined | ternary([zuul.get('tag', '').split('.')[0], '.'.join(zuul.get('tag', '').split('.')[:2]), zuul.get('tag', '')], ['latest']) }}"
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn | default("") }}
         - context: .
           repository: zuul/zuul-executor
           target: zuul-executor
           tags: *imagetag
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-fingergw
           target: zuul-fingergw
           tags: *imagetag
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-merger
           target: zuul-merger
           tags: *imagetag
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-scheduler
           target: zuul-scheduler
           tags: *imagetag
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-web
           target: zuul-web
           tags: *imagetag
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
 
 - job:
     name: zuul-upload-image

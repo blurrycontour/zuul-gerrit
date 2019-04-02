@@ -24,6 +24,14 @@ ARG REACT_APP_ENABLE_SERVICE_WORKER
 ARG OPENSHIFT_URL=https://github.com/openshift/origin/releases/download/v3.11.0/openshift-origin-client-tools-v3.11.0-0cbc58b-linux-64bit.tar.gz
 ARG OPENSHIFT_SHA=4b0f07428ba854174c58d2e38287e5402964c9a9355f6c359d1242efd0990da3
 
+# Optional location of packages
+ARG PACKAGE_MIRROR
+
+RUN [ -n "${PACKAGE_MIRROR}" ] || exit 0 \
+  && echo "deb [ trusted=yes ] http://${PACKAGE_MIRROR}/debian buster main" > /etc/apt/sources.list \
+  && echo "deb [ trusted=yes ] http://${PACKAGE_MIRROR}/debian buster-updates main" >> /etc/apt/sources.list \
+  && echo "deb [ trusted=yes ] http://${PACKAGE_MIRROR}/debian buster-backports main" >> /etc/apt/sources.list
+
 COPY . /tmp/src
 RUN /tmp/src/tools/install-js-tools.sh
 # Explicitly run the Javascript build
@@ -51,9 +59,21 @@ FROM docker.io/opendevorg/python-base:3.7 as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
-RUN /output/install-from-bindep \
+RUN if [ -n "${PACKAGE_MIRROR}" ]; then \
+      mv /etc/apt/sources.list /etc/apt/sources.list.bak \
+      && echo "deb [ trusted=yes ] http://${PACKAGE_MIRROR}/debian buster main" > /etc/apt/sources.list \
+      && echo "deb [ trusted=yes ] http://${PACKAGE_MIRROR}/debian buster-updates main" >> /etc/apt/sources.list \
+      && echo "deb [ trusted=yes ] http://${PACKAGE_MIRROR}/debian buster-backports main" >> /etc/apt/sources.list; \
+  fi \
+  && apt-get update \
+  && output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
-  && rm -rf /output
+  && rm -rf /output \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* \
+  && if [ -n "${PACKAGE_MIRROR}" ]; then \
+    mv /etc/apt/sources.list.bak /etc/apt/sources.list; \
+  fi
 RUN useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul
 
 VOLUME /var/lib/zuul
