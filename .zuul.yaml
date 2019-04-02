@@ -133,21 +133,33 @@
         - context: .
           repository: zuul/zuul
           target: zuul
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-executor
           target: zuul-executor
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-fingergw
           target: zuul-fingergw
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-merger
           target: zuul-merger
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-scheduler
           target: zuul-scheduler
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
         - context: .
           repository: zuul/zuul-web
           target: zuul-web
+          build_args:
+            - PACKAGE_MIRROR={{ zuul_site_mirror_fqdn }}
 
 - job:
     name: zuul-upload-image
