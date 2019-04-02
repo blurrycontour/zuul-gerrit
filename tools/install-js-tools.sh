@@ -21,6 +21,10 @@ if type apt-get; then
     # Install https transport - otherwise apt-get HANGS on https urls
     # Install curl so the curl commands work
     # Install gnupg2 so that the apt-key add works
+
+    echo "/etc/apt/apt.conf.d/99unauthenticated:"
+    cat /etc/apt/apt.conf.d/99unauthenticated
+
     $SUDO apt-get update
     $SUDO apt-get install -y apt-transport-https curl gnupg2
     # Install recent NodeJS repo
