@@ -25,6 +25,40 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_6d1c56c1",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-02T21:21:48Z",
+      "side": 1,
+      "message": "Sounds a little risky (people might be tempted to issue them out of convenience), but I\u0027m not opposed.",
+      "revId": "da5659326aa8d23cc722644f866c9cb7d3fe9bd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_0d77d20a",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-02T21:21:48Z",
+      "side": 1,
+      "message": "If we\u0027re going to keep the authorizations config, how about we just combine it with the main tenant config.  So main.yaml would look like:\n\n- admin-rule:\n  name: foo\n\n- admin-rule:\n  name: bar\n\n- tenant:\n  name: foo\n  admin-rules:\n    - foo\n\n(And regardless, I suggest the change from \"rule\" to \"admin-rule\" just to make the link between the different data structures more obvious).",
+      "revId": "da5659326aa8d23cc722644f866c9cb7d3fe9bd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_da0766c9",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 13
@@ -42,6 +76,23 @@
         "endLine": 197,
         "endChar": 20
       },
+      "revId": "da5659326aa8d23cc722644f866c9cb7d3fe9bd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_2d7c0eea",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-02T21:21:48Z",
+      "side": 1,
+      "message": "Are you sure we can\u0027t infer this?  Given the examples, testing for equality if the claim is a string and membership if it\u0027s a list would work... (I see a comment from you below on this -- maybe I just need to see an example of where it would be too permissive if we didn\u0027t know the type.)",
       "revId": "da5659326aa8d23cc722644f866c9cb7d3fe9bd2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
