@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_2d872e64",
+        "filename": "zuul/executor/common.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 582,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-02T20:59:03Z",
+      "side": 1,
+      "message": "Honestly, everything in this class just seems like something that should be (and is!) on the AnsibleJob classs.  The extra layer is more typing and more confusion when trying to follow the code.",
+      "revId": "e55e0cd96e54e292a39f0d49023ae5c41d7a1299",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
