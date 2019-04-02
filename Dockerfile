@@ -20,6 +20,15 @@ ARG REACT_APP_ZUUL_API
 # Optional flag to enable React Service Worker. (set to true to enable)
 ARG REACT_APP_ENABLE_SERVICE_WORKER
 
+# Optional location of packages
+ARG PACKAGE_MIRROR
+
+RUN [ -n "${PACKAGE_MIRROR}" ] || exit 0 \
+  && echo "deb http://${PACKAGE_MIRROR}/debian stretch main" > /etc/apt/sources.list \
+  && echo "deb http://${PACKAGE_MIRROR}/debian stretch-updates main" >> /etc/apt/sources.list \
+  && echo "deb http://${PACKAGE_MIRROR}/debian stretch-backports main" >> /etc/apt/sources.list \
+  && echo 'APT::Get::AllowUnauthenticated "true";' > /etc/apt/apt.conf.d/99unauthenticated
+
 COPY . /tmp/src
 RUN /tmp/src/tools/install-js-tools.sh
 RUN assemble
@@ -31,12 +40,26 @@ RUN /output/install-from-bindep && zuul-manage-ansible
 
 FROM opendevorg/python-base as zuul
 
+COPY sources.list /etc/apt/sources.list
+COPY 99unauthenticated /etc/apt/apt.conf.d/99unauthenticated
+
 COPY --from=builder /output/ /output
 RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list \
+  && if [ -n "${PACKAGE_MIRROR}" ]; then \
+      mv /etc/apt/sources.list /etc/apt/sources.list.bak \
+      && echo "deb http://${PACKAGE_MIRROR}/debian stretch main" > /etc/apt/sources.list \
+      && echo "deb http://${PACKAGE_MIRROR}/debian stretch-updates main" >> /etc/apt/sources.list \
+      && echo "deb http://${PACKAGE_MIRROR}/debian stretch-backports main" >> /etc/apt/sources.list \
+      && echo 'APT::Get::AllowUnauthenticated "true";' > /etc/apt/apt.conf.d/99unauthenticated; \
+  fi \
   && apt-get update \
   && apt-get install -t stretch-backports -y bubblewrap \
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && if [ -n "${PACKAGE_MIRROR}" ]; then \
+    rm  /etc/apt/apt.conf.d/99unauthenticated \
+    && mv /etc/apt/sources.list.bak /etc/apt/sources.list; \
+  fi
 RUN /output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
   && rm -rf /output

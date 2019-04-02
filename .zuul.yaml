@@ -86,30 +86,48 @@
         - context: ../zuul
           repository: zuul/zuul
           target: zuul
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
         - context: ../zuul
           repository: zuul/zuul-executor
           target: zuul-executor
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
         - context: ../zuul
           repository: zuul/zuul-fingergw
           target: zuul-fingergw
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
         - context: ../zuul
           repository: zuul/zuul-merger
           target: zuul-merger
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
         - context: ../zuul
           repository: zuul/zuul-scheduler
           target: zuul-scheduler
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
         - context: ../zuul
           repository: zuul/zuul-web
           target: zuul-web
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
         - context: ../nodepool
           repository: zuul/nodepool
           target: nodepool
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
         - context: ../nodepool
           repository: zuul/nodepool-launcher
           target: nodepool-launcher
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
         - context: ../nodepool
           repository: zuul/nodepool-builder
           target: nodepool-builder
+          build_args:
+            - PACKAGE_MIRROR: "{{ package_mirror }}"
     required-projects:
       - openstack-infra/nodepool
       - openstack-infra/zuul
