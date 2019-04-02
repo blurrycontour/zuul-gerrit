@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_8ba65253",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-02T16:37:01Z",
+      "side": 1,
+      "message": "That port is different for postgres.  I suggest omitting that detail; leave that for the database documentation.",
+      "revId": "dbf17417144dca0e392b59798dee8999054b2889",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
