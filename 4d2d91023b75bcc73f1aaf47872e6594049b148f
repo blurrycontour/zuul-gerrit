@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_ada9dedd",
+        "filename": "doc/source/user/runner.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-02T20:58:35Z",
+      "side": 1,
+      "message": "From a usability point of view, I believe that the need to configure the things in this file (regardless of whether we have a file or use command line arguments, etc.) is a very large hurdle for users.  Especially the idea that they would need to figure out and set up something like site log storage.  That is, essentially, the only thing that makes the idea of \"just run a Zuul\" an impractical solution to the problem this stack is attempting to solve; so I think this needs to solve it.\n\nI thought our earlier discussions of this included the idea of omitting post-run playbooks so that we wouldn\u0027t have to deal with this?\n\nIf we focus on that, most users won\u0027t have to add secrets to this.\n\nIt would also be great to figure out a way to drop connections, and to simplify nodes.\n\nI think we need to focus on the use case of someone trying to iterate locally on a complex job.  They don\u0027t want to set up a Zuul environment, they just want to run the job\u0027s main playbooks.",
+      "revId": "4d2d91023b75bcc73f1aaf47872e6594049b148f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_4db63a41",
+        "filename": "doc/source/user/runner.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-02T20:58:35Z",
+      "side": 1,
+      "message": "Perhaps we should seriously start looking into setting up a Zuul docker-compose configuration as an alternative.  \"Just run Zuul\" is a lot easier than it used to be.",
+      "revId": "4d2d91023b75bcc73f1aaf47872e6594049b148f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
