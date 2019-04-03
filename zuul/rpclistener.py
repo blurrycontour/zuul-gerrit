@@ -73,6 +73,7 @@ class RPCListener(object):
         self.worker.registerFunction("zuul:status_get")
         self.worker.registerFunction("zuul:job_get")
         self.worker.registerFunction("zuul:job_list")
+        self.worker.registerFunction("zuul:role_list")
         self.worker.registerFunction("zuul:project_get")
         self.worker.registerFunction("zuul:project_list")
         self.worker.registerFunction("zuul:project_freeze_jobs")
@@ -405,6 +406,26 @@ class RPCListener(object):
                     job_output["tags"] = list(tags)
                 output.append(job_output)
         job.sendWorkComplete(json.dumps(output, cls=MappingProxyEncoder))
+
+    def handle_role_list(self, job):
+        args = json.loads(job.arguments)
+        tenant = self.sched.abide.tenants.get(args.get("tenant"))
+        if not tenant:
+            job.sendWorkComplete(json.dumps(None))
+        # Iterate over the tenant's repositories and set up a merger job
+        # to retrieve the roles from each repo
+        output = []
+        for project in tenant.config_projects + tenant.untrusted_projects:
+            roles_job = self.sched.merger.getRoles(
+                project.connection_name, project.name, "master"
+            )
+            roles_job.wait()
+            for role_name, role_data in roles_job.files.items():
+                # "Normalize" the data to go in hand with the output of other
+                # list api endpoints
+                role_data["name"] = role_name
+                output.append(role_data)
+        job.sendWorkComplete(json.dumps(output))
 
     def handle_project_get(self, gear_job):
         args = json.loads(gear_job.arguments)
