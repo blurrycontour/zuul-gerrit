@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_53632fde",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2050,
+      "author": {
+        "id": 30156
+      },
+      "writtenOn": "2019-04-03T14:39:18Z",
+      "side": 1,
+      "message": "What\u0027s the meaning of this var?",
+      "range": {
+        "startLine": 2050,
+        "startChar": 12,
+        "endLine": 2050,
+        "endChar": 30
+      },
+      "revId": "390f0715633abecd37a4cc97c8a1d1388f6c3bd5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
