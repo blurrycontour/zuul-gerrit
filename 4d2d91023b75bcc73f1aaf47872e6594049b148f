@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_8b608937",
+        "filename": "doc/source/user/runner.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-03T01:18:09Z",
+      "side": 1,
+      "message": "Note that site log storage default to the first test node and most users don\u0027t have to add secrets.\n\nConnections may be dropped if/when Source driver support anonymous access.\n\nIf configuration is deemed a very large hurdle for users, how do you envision the zuul-runner interface?",
+      "parentUuid": "5fc1f717_ada9dedd",
+      "revId": "4d2d91023b75bcc73f1aaf47872e6594049b148f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_4db63a41",
         "filename": "doc/source/user/runner.rst",
         "patchSetId": 9
@@ -30,6 +48,24 @@
       "writtenOn": "2019-04-02T20:58:35Z",
       "side": 1,
       "message": "Perhaps we should seriously start looking into setting up a Zuul docker-compose configuration as an alternative.  \"Just run Zuul\" is a lot easier than it used to be.",
+      "revId": "4d2d91023b75bcc73f1aaf47872e6594049b148f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_cbf1b197",
+        "filename": "doc/source/user/runner.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-03T01:18:09Z",
+      "side": 1,
+      "message": "Wouldn\u0027t using Zuul docker compose to reproduce a job needs more configuration?",
+      "parentUuid": "5fc1f717_4db63a41",
       "revId": "4d2d91023b75bcc73f1aaf47872e6594049b148f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
