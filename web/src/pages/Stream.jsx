@@ -99,8 +99,6 @@ class StreamPage extends React.Component {
     term.setOption('disableStdin', true)
     term.setOption('convertEol', true)
 
-    term.attachCustomKeyEventHandler(function () {return false})
-
     term.open(this.terminal)
 
     this.ws = new Sockette(getStreamUrl(this.props.tenant.apiPrefix), {
