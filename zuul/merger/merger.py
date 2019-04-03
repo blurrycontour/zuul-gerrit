@@ -792,7 +792,7 @@ class Merger(object):
         for file_path in sorted(files.keys()):
             _, role_name, rel_path = file_path.split("/", 2)
             # Create the role entry if it doesn't exist
-            role = roles.setdefault(role_name, {})
+            role = roles.setdefault(role_name, {"project": project_name})
 
             # Add necessary file contents if they match a certain criteria
             if "readme" in rel_path.lower():

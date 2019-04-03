@@ -1,0 +1,3 @@
+- name: Doing not much
+  debug:
+    msg: I'm not doing much
