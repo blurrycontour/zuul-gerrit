@@ -848,6 +848,41 @@ class TestWeb(BaseTestWeb):
         self.assertIn(expected, resp.json())
 
 
+class TestRoles(BaseTestWeb):
+
+    tenant_config_file = "config/roles-api/main.yaml"
+
+    def test_roles_list(self):
+        roles = self.get_url("api/tenant/tenant-one/roles").json()
+        self.assertEqual(len(roles), 3)
+
+        for role in roles:
+            self.assertIn(
+                role["name"],
+                ["ensure-python", "foo", "undocumented-role"]
+            )
+
+        ensure_python = [r for r in roles if r["name"] == "ensure-python"][0]
+        foo = [r for r in roles if r["name"] == "foo"][0]
+        undocumented_role = [
+            r for r in roles if r["name"] == "undocumented-role"
+        ][0]
+
+        self.assertEquals(
+            ["project", "changelog", "readme", "name"],
+            list(ensure_python.keys())
+        )
+        self.assertEquals(
+            ["project", "readme", "name"], list(foo.keys())
+        )
+        self.assertEquals(
+            ["project", "name"], list(undocumented_role.keys())
+        )
+
+        resp = self.get_url("api/tenant/non-tenant/jobs")
+        self.assertEqual(404, resp.status_code)
+
+
 class TestWebSecrets(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
 
