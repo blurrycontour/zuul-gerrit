@@ -95,6 +95,23 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_6dbd1fd6",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-03T20:10:20Z",
+      "side": 1,
+      "message": "I suspect that in the long run, with scale-out schedulers, we would have the entire tenant config, including the authorizations, in ZK, and the scheduler(s) will be responsible for putting it there, and zuul-web can read it out of there.  Given that, I would like to avoid introducing a new config file which will probably be removed; this will make things easier on users.\n\nThe connection of the rules to the tenant are already in the tenant config anyway, so I don\u0027t think it will be much more complex.  As for the rules themselves, we can probably have the scheduler supply them to zuul-web over RPC (along with the tenant list).",
+      "revId": "da5659326aa8d23cc722644f866c9cb7d3fe9bd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_da0766c9",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 13
