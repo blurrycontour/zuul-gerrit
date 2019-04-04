@@ -5519,6 +5519,7 @@ class TestProvidesRequires(ZuulDBTestCase):
             dict(name='image-user', result='SUCCESS', changes='1,1 2,1 3,1'),
             dict(name='library-user', result='SUCCESS',
                  changes='1,1 2,1 3,1'),
+            dict(name='both-user', result='SUCCESS', changes='1,1 2,1 3,1'),
             dict(name='hold', result='SUCCESS', changes='1,1 2,1 3,1'),
         ], ordered=False)
         image_user = self.getJobFromHistory('image-user')
@@ -5557,6 +5558,50 @@ class TestProvidesRequires(ZuulDBTestCase):
                 'name': 'library',
                 'metadata': {
                     'type': 'library_object',
+                }
+            }, {
+                'project': 'org/project1',
+                'change': '2',
+                'patchset': '1',
+                'job': 'library-builder',
+                'url': 'http://example.com/library2',
+                'name': 'library2',
+                'metadata': {
+                    'type': 'library_object',
+                }
+            }])
+        both_user = self.getJobFromHistory('both-user')
+        self.assertEqual(
+            both_user.parameters['zuul']['artifacts'],
+            [{
+                'project': 'org/project1',
+                'change': '1',
+                'patchset': '1',
+                'job': 'image-builder',
+                'url': 'http://example.com/image',
+                'name': 'image',
+                'metadata': {
+                    'type': 'container_image',
+                }
+            }, {
+                'project': 'org/project1',
+                'change': '1',
+                'patchset': '1',
+                'job': 'library-builder',
+                'url': 'http://example.com/library',
+                'name': 'library',
+                'metadata': {
+                    'type': 'library_object',
+                }
+            }, {
+                'project': 'org/project1',
+                'change': '2',
+                'patchset': '1',
+                'job': 'image-builder',
+                'url': 'http://example.com/image2',
+                'name': 'image2',
+                'metadata': {
+                    'type': 'container_image',
                 }
             }, {
                 'project': 'org/project1',
