@@ -751,6 +751,9 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         elif query.startswith('message:'):
             # Query the content of a commit message
             msg = query[len('message:'):].strip()
+            # Remove quoting if it is there
+            if msg.startswith('{') and msg.endswith('}'):
+                msg = msg[1:-1]
             l = [change.query() for change in self.changes.values()
                  if msg in change.data['commitMessage']]
         else:
