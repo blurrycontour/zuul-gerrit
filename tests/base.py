@@ -386,7 +386,8 @@ class FakeGerritChange(object):
         }
         return event
 
-    def addApproval(self, category, value, username='reviewer_john',
+    def addApproval(self, category, value, old_value=0,
+                    username='reviewer_john',
                     granted_on=None, message=''):
         if not granted_on:
             granted_on = time.time()
@@ -394,6 +395,7 @@ class FakeGerritChange(object):
             'description': self.categories[category][0],
             'type': category,
             'value': str(value),
+            'oldValue': str(old_value),
             'by': {
                 'username': username,
                 'email': username + '@example.com',
@@ -616,6 +618,10 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.changes = changes_db
         self.queries = []
         self.upstream_root = upstream_root
+
+    @property
+    def gerrit_version(self):
+        return (2, 17)
 
     def addFakeChange(self, project, branch, subject, status='NEW',
                       files=None, parent=None):
