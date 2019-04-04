@@ -235,3 +235,53 @@ class TestFileComments(AnsibleZuulTestCase):
                       "A should have a validation error reported")
         self.assertIn('invalid file missingfile.txt', A.messages[0],
                       "A should have file error reported")
+
+class TestGerritCommentAdded(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_old_behavior(self):
+        # Ensure that on old Gerrit versions, the lack of an oldValue field in
+        # comment-added events does not prevent changes from being enqeueued
+
+        self.fake_gerrit.setGerritVersion((2, 12))
+
+        change = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        change.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(change.addApproval('Approved', 1,
+                                                     old_value=None))
+        self.waitUntilSettled()
+
+        self.assertEqual(change.data['status'], 'MERGED')
+
+    def test_new_behavior(self):
+        # Ensure that on new Gerrit versions, changes are not re-triggered by
+        # comment-added events that do not contain the oldValue field
+
+        change = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        change.addApproval('Code-Review', 2)
+        approval_event = change.addApproval('Approved', 1, old_value=0)
+        self.fake_gerrit.addEvent(approval_event)
+        self.executor_server.failJob('project-test1', change)
+
+        self.waitUntilSettled()
+
+        # (Job failed, should not be merged)
+        self.assertEqual(change.data['status'], 'NEW')
+
+        jobs_run = len(self.history)
+
+        # Now someone comments again on the change. Assume it was the same
+        # person so gerrit reports the approvals field again (this time without
+        # the oldValue subfield)
+        [approval] = approval_event["approvals"]
+        del approval["oldValue"]
+        comment_event = change.getChangeCommentEvent(1)
+        comment_event["approvals"].append(approval)
+        self.fake_gerrit.addEvent(comment_event)
+
+        self.waitUntilSettled()
+
+        # (Job failed, should not be merged)
+        self.assertEqual(change.data['status'], 'NEW')
+        # Should not have run any new jobs
+        self.assertEqual(len(self.history), jobs_run)
