@@ -46,7 +46,11 @@ class GerritTriggerEvent(TriggerEvent):
             ret += " %s,%s" % (self.change_number, self.patch_number)
         if self.approvals:
             ret += ' ' + ', '.join(
-                ['%s:%s' % (a['type'], a['value']) for a in self.approvals])
+                ['%s:%s%s' % (
+                    a['type'],
+                    '%s->' % a['oldValue'] if 'oldValue' in a else '',
+                    a['value'])
+                 for a in self.approvals])
         ret += '>'
 
         return ret
@@ -274,6 +278,14 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
         for category, value in self.event_approvals.items():
             matches_approval = False
             for eapp in event.approvals:
+                # Gerrit 2.13 started reporting the existing approvals in every
+                # comment - using the extra 'oldValue' field to distinguish if
+                # the command actually created an approval transition.
+                version = self.trigger.connection.gerrit_version
+                if version >= (2, 13):
+                    if 'oldValue' not in eapp:
+                        continue
+
                 if (eapp['description'] == category and
                         int(eapp['value']) == int(value)):
                     matches_approval = True
