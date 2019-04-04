@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_172a527d",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-04T17:47:42Z",
+      "side": 1,
+      "message": "^ here\u0027s the invocation for provides",
+      "revId": "83d2e5a5992ac513fc39e377b27c0eba6468ebef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
