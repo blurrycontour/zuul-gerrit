@@ -353,6 +353,27 @@ class GerritConnection(BaseConnection):
             self.auth = authclass(
                 self.user, self.password)
 
+        self._gerrit_version_queried = False
+        self._gerrit_version = None
+
+    @property
+    def gerrit_version(self):
+        if not self._gerrit_version_queried:
+            out, err = self._ssh('gerrit version')
+            match = re.match(r'gerrit version ([0-9\.]+)', out)
+            if not match:
+                # Gerrit might have been built from a custom SHA, or the format
+                # of the command output has changed
+                self.log.error(
+                    'Cannot parse Gerrit version from "%s" (err: "%s")' %
+                    (out, err))
+            else:
+                self._gerrit_version = tuple(
+                    int(i) for i in match.group(1).split('.'))
+            self._gerrit_version_queried = True
+
+        return self._gerrit_version
+
     def toDict(self):
         d = super().toDict()
         d.update({
