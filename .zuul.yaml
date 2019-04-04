@@ -181,6 +181,10 @@
       nodes: []
     vars: *zuul_image_vars
 
+- job:
+    name: break-stuff
+    run: playbooks/break-stuff
+
 - project:
     check:
       jobs:
@@ -251,6 +255,7 @@
         - zuul-tox-remote
         - zuul-quick-start
         - zuul-upload-image
+        - break-stuff
     post:
       jobs:
         - publish-zuul-docs
