@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_92adf9eb",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 769,
+      "author": {
+        "id": 29485
+      },
+      "writtenOn": "2019-04-04T12:15:14Z",
+      "side": 1,
+      "message": "Ah, this is failing nondeterministically when the query is in such an order that the component that matches an existing commit message is at the end. This is an off-by-one.",
+      "revId": "2cd701a227140454dfa42565cfba22d6f7c50ea2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
