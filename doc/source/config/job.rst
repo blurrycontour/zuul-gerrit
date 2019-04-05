@@ -641,6 +641,21 @@ Here is an example of two job definitions:
            - name: playbooks/job-playbook.yaml
              semaphores: playbook-semaphore
 
+   .. attr:: ansible-split-streams
+      :default: False
+
+      Keep stdout/stderr of command and shell tasks separate (the Ansible
+      default behavior) instead of merging stdout and stderr.
+
+      Since version 3, Zuul has combined the stdout and stderr streams
+      in Ansible command tasks, but will soon switch to using the
+      normal Ansible behavior.  In an upcoming release of Zuul, this
+      default will change to `True`, and in a later release, this
+      option will be removed altogether.
+
+      This option may be used in the interim to verify playbook
+      compatibility and facilitate upgrading to the new behavior.
+
    .. attr:: ansible-version
 
       The ansible version to use for all playbooks of the job. This can be
