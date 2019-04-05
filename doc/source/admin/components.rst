@@ -634,6 +634,12 @@ The following sections of ``zuul.conf`` are used by the executor:
       Timeout of the ansible setup playbook in seconds that runs before
       the first playbook of the job.
 
+   .. attr:: ansible_split_streams
+      :default: False
+
+      Keep stdout/stderr of command and shell tasks separate (the Ansible
+      default behavior) instead of merging stdout and stderr.
+
    .. attr:: disk_limit_per_job
       :default: 250
 

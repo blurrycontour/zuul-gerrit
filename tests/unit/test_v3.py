@@ -4766,13 +4766,15 @@ class TestJobOutput(AnsibleZuulTestCase):
         with open(p) as f:
             return f.read()
 
-    def test_job_output(self):
+    def test_job_output_split_streams(self):
         # Verify that command standard output appears in the job output,
         # and that failures in the final playbook get logged.
 
         # This currently only verifies we receive output from
         # localhost.  Notably, it does not verify we receive output
         # via zuul_console streaming.
+        self.executor_server.config.set("executor", "ansible_split_streams",
+                                        "True")
         self.executor_server.keep_jobdir = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -4781,18 +4783,57 @@ class TestJobOutput(AnsibleZuulTestCase):
             dict(name='job-output', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
-        token = 'Standard output test %s' % (self.history[0].jobdir.src_root)
+        token_stdout = "Standard output test {}".format(
+            self.history[0].jobdir.src_root)
+        token_stderr = "Standard error test {}".format(
+            self.history[0].jobdir.src_root)
+
         j = json.loads(self._get_file(self.history[0],
                                       'work/logs/job-output.json'))
-        self.assertEqual(token,
-                         j[0]['plays'][0]['tasks'][0]
-                         ['hosts']['localhost']['stdout'])
+        result = j[0]['plays'][0]['tasks'][0]['hosts']['localhost']
+        self.assertEqual(token_stdout, result['stdout'])
+        self.assertEqual(token_stderr, result['stderr'])
 
-        self.log.info(self._get_file(self.history[0],
-                                     'work/logs/job-output.txt'))
-        self.assertIn(token,
-                      self._get_file(self.history[0],
-                                     'work/logs/job-output.txt'))
+        job_output = self._get_file(self.history[0],
+                                    'work/logs/job-output.txt')
+        self.log.info(job_output)
+        self.assertIn(token_stdout, job_output)
+        self.assertIn(token_stderr, job_output)
+
+    def test_job_output(self):
+        # Verify that command standard output appears in the job output,
+        # and that failures in the final playbook get logged.
+
+        # This currently only verifies we receive output from
+        # localhost.  Notably, it does not verify we receive output
+        # via zuul_console streaming.
+        self.executor_server.config.set("executor", "ansible_split_streams",
+                                        "False")
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='job-output', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        token_stdout = "Standard output test {}".format(
+            self.history[0].jobdir.src_root)
+        token_stderr = "Standard error test {}".format(
+            self.history[0].jobdir.src_root)
+
+        j = json.loads(self._get_file(self.history[0],
+                                      'work/logs/job-output.json'))
+        result = j[0]['plays'][0]['tasks'][0]['hosts']['localhost']
+        self.assertEqual("\n".join((token_stdout, token_stderr)),
+                         result['stdout'])
+        self.assertEqual("", result['stderr'])
+
+        job_output = self._get_file(self.history[0],
+                                    'work/logs/job-output.txt')
+        self.log.info(job_output)
+        self.assertIn(token_stdout, job_output)
+        self.assertIn(token_stderr, job_output)
 
     def test_job_output_missing_role(self):
         # Verify that ansible errors such as missing roles are part of the
@@ -4815,7 +4856,9 @@ class TestJobOutput(AnsibleZuulTestCase):
             self.assertIn('the role \'not_existing\' was not found',
                           job_output)
 
-    def test_job_output_failure_log(self):
+    def test_job_output_failure_log_split_streams(self):
+        self.executor_server.config.set("executor", "ansible_split_streams",
+                                        "True")
         logger = logging.getLogger('zuul.AnsibleJob')
         output = io.StringIO()
         logger.addHandler(logging.StreamHandler(output))
@@ -4831,22 +4874,72 @@ class TestJobOutput(AnsibleZuulTestCase):
                  result='POST_FAILURE', changes='1,1'),
         ], ordered=False)
 
-        token = 'Standard output test %s' % (self.history[0].jobdir.src_root)
-        j = json.loads(self._get_file(self.history[0],
-                                      'work/logs/job-output.json'))
-        self.assertEqual(token,
-                         j[0]['plays'][0]['tasks'][0]
-                         ['hosts']['localhost']['stdout'])
+        token_stdout = "Standard output test {}".format(
+            self.history[0].jobdir.src_root)
+        token_stderr = "Standard error test {}".format(
+            self.history[0].jobdir.src_root)
 
-        self.log.info(self._get_file(self.history[0],
-                                     'work/logs/job-output.json'))
-        self.assertIn(token,
-                      self._get_file(self.history[0],
-                                     'work/logs/job-output.txt'))
+        json_output = self._get_file(self.history[0],
+                                     'work/logs/job-output.json')
+        self.log.info(json_output)
+        j = json.loads(json_output)
+        result = j[0]['plays'][0]['tasks'][0]['hosts']['localhost']
+        self.assertEqual(token_stdout, result['stdout'])
+        self.assertEqual(token_stderr, result['stderr'])
+
+        job_output = self._get_file(self.history[0],
+                                    'work/logs/job-output.txt')
+        self.log.info(job_output)
+        self.assertIn(token_stdout, job_output)
+        self.assertIn(token_stderr, job_output)
 
         log_output = output.getvalue()
         self.assertIn('Final playbook failed', log_output)
-        self.assertIn('Failure test', log_output)
+        self.assertIn('Failure stdout test', log_output)
+        self.assertIn('Failure stderr test', log_output)
+
+    def test_job_output_failure_log(self):
+        self.executor_server.config.set("executor", "ansible_split_streams",
+                                        "False")
+        logger = logging.getLogger('zuul.AnsibleJob')
+        output = io.StringIO()
+        logger.addHandler(logging.StreamHandler(output))
+
+        # Verify that a failure in the last post playbook emits the contents
+        # of the json output to the log
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='job-output-failure',
+                 result='POST_FAILURE', changes='1,1'),
+        ], ordered=False)
+
+        token_stdout = "Standard output test {}".format(
+            self.history[0].jobdir.src_root)
+        token_stderr = "Standard error test {}".format(
+            self.history[0].jobdir.src_root)
+
+        json_output = self._get_file(self.history[0],
+                                     'work/logs/job-output.json')
+        self.log.info(json_output)
+        j = json.loads(json_output)
+        result = j[0]['plays'][0]['tasks'][0]['hosts']['localhost']
+        self.assertEqual("\n".join((token_stdout, token_stderr)),
+                         result['stdout'])
+        self.assertEqual("", result['stderr'])
+
+        job_output = self._get_file(self.history[0],
+                                    'work/logs/job-output.txt')
+        self.log.info(job_output)
+        self.assertIn(token_stdout, job_output)
+        self.assertIn(token_stderr, job_output)
+
+        log_output = output.getvalue()
+        self.assertIn('Final playbook failed', log_output)
+        self.assertIn('Failure stdout test', log_output)
+        self.assertIn('Failure stderr test', log_output)
 
 
 class TestPlugins(AnsibleZuulTestCase):
