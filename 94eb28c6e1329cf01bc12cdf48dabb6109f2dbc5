@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_f278def8",
+        "filename": "zuul/manager/supercedent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-04-05T20:56:17Z",
+      "side": 1,
+      "message": "This comment is slightly less accurate now.",
+      "range": {
+        "startLine": 29,
+        "startChar": 41,
+        "endLine": 29,
+        "endChar": 48
+      },
+      "revId": "94eb28c6e1329cf01bc12cdf48dabb6109f2dbc5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d25cc27e",
+        "filename": "zuul/manager/supercedent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-04-05T20:56:17Z",
+      "side": 1,
+      "message": "Need to check that this change has the branch attribute too right?",
+      "range": {
+        "startLine": 33,
+        "startChar": 18,
+        "endLine": 33,
+        "endChar": 47
+      },
+      "revId": "94eb28c6e1329cf01bc12cdf48dabb6109f2dbc5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
