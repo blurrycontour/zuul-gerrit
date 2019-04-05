@@ -2548,11 +2548,11 @@ class TestInRepoJoin(ZuulTestCase):
         self.assertHistory([])
 
 
-class TestAnsible25(AnsibleZuulTestCase):
+class TestAnsible28(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
     tenant_config_file = 'config/ansible/main.yaml'
-    ansible_version = '2.5'
+    ansible_version = '2.8'
 
     def test_playbook(self):
         # This test runs a bit long and needs extra time.
@@ -2723,16 +2723,12 @@ class TestAnsible25(AnsibleZuulTestCase):
         # getting the exception we expect.
 
 
-class TestAnsible26(TestAnsible25):
+class TestAnsible26(TestAnsible28):
     ansible_version = '2.6'
 
 
-class TestAnsible27(TestAnsible25):
+class TestAnsible27(TestAnsible28):
     ansible_version = '2.7'
-
-
-class TestAnsible28(TestAnsible25):
-    ansible_version = '2.8'
 
 
 class TestPrePlaybooks(AnsibleZuulTestCase):
@@ -5768,7 +5764,6 @@ class TestAnsibleVersion(AnsibleZuulTestCase):
 
         self.assertHistory([
             dict(name='ansible-default', result='SUCCESS', changes='1,1'),
-            dict(name='ansible-25', result='SUCCESS', changes='1,1'),
             dict(name='ansible-26', result='SUCCESS', changes='1,1'),
             dict(name='ansible-27', result='SUCCESS', changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
@@ -5790,7 +5785,6 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='ansible-default-zuul-conf', result='SUCCESS',
                  changes='1,1'),
-            dict(name='ansible-25', result='SUCCESS', changes='1,1'),
             dict(name='ansible-26', result='SUCCESS', changes='1,1'),
             dict(name='ansible-27', result='SUCCESS', changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),

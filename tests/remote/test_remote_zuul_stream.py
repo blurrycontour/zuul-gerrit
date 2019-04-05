@@ -19,9 +19,9 @@ import textwrap
 from tests.base import AnsibleZuulTestCase
 
 
-class TestZuulStream25(AnsibleZuulTestCase):
+class TestZuulStream28(AnsibleZuulTestCase):
     tenant_config_file = 'config/remote-zuul-stream/main.yaml'
-    ansible_version = '2.5'
+    ansible_version = '2.8'
 
     def setUp(self):
         super().setUp()
@@ -186,13 +186,10 @@ class TestZuulStream25(AnsibleZuulTestCase):
             self.assertLogLine(regex, text)
 
 
-class TestZuulStream26(TestZuulStream25):
+class TestZuulStream26(TestZuulStream28):
     ansible_version = '2.6'
 
 
-class TestZuulStream27(TestZuulStream25):
+class TestZuulStream27(TestZuulStream28):
     ansible_version = '2.7'
 
-
-class TestZuulStream28(TestZuulStream25):
-    ansible_version = '2.8'
