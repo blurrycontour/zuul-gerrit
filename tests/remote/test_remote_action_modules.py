@@ -22,9 +22,9 @@ ERROR_SYNC_TO_OUTSIDE = "Syncing files to outside the working dir"
 ERROR_SYNC_FROM_OUTSIDE = "Syncing files from outside the working dir"
 
 
-class TestActionModules25(AnsibleZuulTestCase):
+class TestActionModules28(AnsibleZuulTestCase):
     tenant_config_file = 'config/remote-action-modules/main.yaml'
-    ansible_version = '2.5'
+    ansible_version = '2.8'
 
     def setUp(self):
         super().setUp()
@@ -213,13 +213,9 @@ class TestActionModules25(AnsibleZuulTestCase):
         self._run_job('known-hosts-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
 
 
-class TestActionModules26(TestActionModules25):
+class TestActionModules26(TestActionModules28):
     ansible_version = '2.6'
 
 
-class TestActionModules27(TestActionModules25):
+class TestActionModules27(TestActionModules28):
     ansible_version = '2.7'
-
-
-class TestActionModules28(TestActionModules25):
-    ansible_version = '2.8'
