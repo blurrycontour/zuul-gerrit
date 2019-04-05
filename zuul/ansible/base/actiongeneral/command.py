@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 
 from zuul.ansible import paths
 command = paths._import_ansible_action_plugin("command")
@@ -25,5 +26,7 @@ class ActionModule(command.ActionModule):
         host = paths._sanitize_filename(task_vars.get('inventory_hostname'))
         if self._task.action in ('command', 'shell'):
             self._task.args['zuul_log_id'] = "%s-%s" % (self._task._uuid, host)
+            self._task.args["zuul_ansible_split_streams"] = (
+                os.environ["ZUUL_ANSIBLE_SPLIT_STREAMS"] == "True")
 
         return super(ActionModule, self).run(tmp, task_vars)
