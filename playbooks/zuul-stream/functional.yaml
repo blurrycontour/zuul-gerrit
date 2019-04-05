@@ -12,6 +12,7 @@
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
+        ZUUL_ANSIBLE_SPLIT_STREAMS: False
         ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         PYTHONPATH: "{{ python_path }}"
 
@@ -24,6 +25,7 @@
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
+        ZUUL_ANSIBLE_SPLIT_STREAMS: False
         ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         PYTHONPATH: "{{ python_path }}"
 
