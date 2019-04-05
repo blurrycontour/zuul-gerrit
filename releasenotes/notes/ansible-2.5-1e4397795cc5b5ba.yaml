@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    Zuul no longer supports ansible 2.5 for running jobs.
