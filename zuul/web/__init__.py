@@ -1689,6 +1689,7 @@ class ZuulWebAPI(object):
         params['override_branch'] = job.override_branch
         params['override_checkout'] = job.override_checkout
         params['ansible_version'] = job.ansible_version
+        params['ansible_split_streams'] = job.ansible_split_streams
         params['workspace_scheme'] = job.workspace_scheme
         if job.name != 'noop':
             params['playbooks'] = job.run

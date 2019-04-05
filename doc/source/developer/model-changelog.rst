@@ -125,3 +125,9 @@ Version 14
 :Prior Zuul version: 8.2.0
 :Description: Adds the pre_fail attribute to builds.
               Affects schedulers.
+
+Version 15
+----------
+:Prior Zuul version: 9.0.0
+:Description: Adds ansible_split_streams to FrozenJob.
+              Affects schedulers and executors.
