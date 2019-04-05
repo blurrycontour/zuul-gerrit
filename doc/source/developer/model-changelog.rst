@@ -119,3 +119,9 @@ Version 13
 :Description: Stores only the necessary event info as part of a queue item
               instead of the full trigger event.
               Affects schedulers.
+
+Version 14
+----------
+:Prior Zuul version: 8.3.1
+:Description: Adds ansible_split_streams to FrozenJob.
+              Affects schedulers and executors.
