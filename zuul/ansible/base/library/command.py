@@ -127,6 +127,7 @@ import datetime
 import glob
 import os
 import shlex
+import select
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -150,8 +151,9 @@ from ansible.module_utils._text import to_native, to_bytes, to_text
 
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
-# List to save stdout log lines in as we collect them
+# Lists to save stdout/stderr log lines in as we collect them
 _log_lines = []
+_stderr_log_lines = []
 
 
 class Console(object):
@@ -180,18 +182,27 @@ class Console(object):
         self.logfile.write(outln)
 
 
-def follow(fd, log_uuid):
+def follow(stdout, stderr, log_uuid):
     newline_warning = False
     with Console(log_uuid) as console:
+        rselect = [stdout, stderr]
         while True:
-            line = fd.readline()
-            if not line:
+            if not rselect:
                 break
-            _log_lines.append(line)
-            if not line.endswith(b'\n'):
-                line += b'\n'
-                newline_warning = True
-            console.addLine(line)
+            rready, _, __ = select.select(rselect, [], [])
+            for fd in rready:
+                line = fd.readline()
+                if not line:
+                    rselect.remove(fd)
+                    continue
+                if fd == stdout:
+                    _log_lines.append(line)
+                else:
+                    _stderr_log_lines.append(line)
+                if not line[-1] != b'\n':
+                    line += b'\n'
+                    newline_warning = True
+                console.addLine(line)
         if newline_warning:
             console.addLine('[Zuul] No trailing newline\n')
 
@@ -362,7 +373,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         close_fds=close_fds,
         stdin=st_in,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        stderr=subprocess.PIPE,
     )
 
     # store the pwd
@@ -395,7 +406,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         if self.no_log:
             t = None
         else:
-            t = threading.Thread(target=follow, args=(cmd.stdout, zuul_log_id))
+            t = threading.Thread(target=follow, args=(cmd.stdout, cmd.stderr, zuul_log_id))
             t.daemon = True
             t.start()
 
@@ -468,9 +479,10 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
             # ZUUL: stdout and stderr are in the console log file
             # ZUUL: return the saved log lines so we can ship them back
             stdout = b('').join(_log_lines)
+            stderr = b('').join(_stderr_log_lines)
         else:
             stdout = b('')
-        stderr = b('')
+            stderr = b('')
 
     except (OSError, IOError) as e:
         self.log("Error Executing CMD:%s Exception:%s" % (clean_args, to_native(e)))
