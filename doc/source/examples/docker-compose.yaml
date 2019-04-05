@@ -27,6 +27,7 @@ services:
       - "sshkey:/var/ssh:z"
       - "nodessh:/var/node:z"
       - "./playbooks/:/var/playbooks/:z"
+      - "zuul:/var/lib/zuul:z"
     # NOTE(pabelanger): Be sure to update this line each time we change the
     # default version of ansible for Zuul.
     command: "/usr/local/lib/zuul/ansible/2.8/bin/ansible-playbook /var/playbooks/setup.yaml"
@@ -59,6 +60,7 @@ services:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
+      - "zuul:/var/lib/zuul:z"
   web:
     command: "sh -c '/var/playbooks/wait-to-start-gearman.sh && zuul-web -d'"
     depends_on:
@@ -72,6 +74,7 @@ services:
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
+      - "zuul:/var/lib/zuul:z"
   executor:
     privileged: true
     environment:
@@ -88,6 +91,7 @@ services:
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
+      - "zuul:/var/lib/zuul:z"
   node:
     build:
       dockerfile: node-Dockerfile
@@ -124,3 +128,4 @@ volumes:
   sshkey:
   nodessh:
   logs:
+  zuul:
