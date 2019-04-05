@@ -40,22 +40,38 @@ RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/s
 RUN /output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
   && rm -rf /output
+
+### Containers should NOT run as root as a good practice
+RUN chmod g=u /etc/passwd
+ENV APP_ROOT=/var/lib/zuul
+ENV HOME=${APP_ROOT}
+ENV USER_NAME=zuul
+# USER config is set after so that zuul-executor can install in /usr
+
+### user name recognition at runtime w/ an arbitrary uid - for OpenShift deployments
+COPY tools/uid_entrypoint.sh /uid_entrypoint
+ENTRYPOINT ["/uid_entrypoint"]
 VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
 
 FROM zuul as zuul-executor
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 
+USER 10001
 CMD ["/usr/local/bin/zuul-executor"]
 
 FROM zuul as zuul-fingergw
+USER 10001
 CMD ["/usr/local/bin/zuul-fingergw"]
 
 FROM zuul as zuul-merger
+USER 10001
 CMD ["/usr/local/bin/zuul-merger"]
 
 FROM zuul as zuul-scheduler
+USER 10001
 CMD ["/usr/local/bin/zuul-scheduler"]
 
 FROM zuul as zuul-web
+USER 10001
 CMD ["/usr/local/bin/zuul-web"]
