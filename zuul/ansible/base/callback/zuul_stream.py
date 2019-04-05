@@ -39,10 +39,10 @@ LOG_STREAM_PORT = int(os.environ.get("ZUUL_CONSOLE_PORT", 19885))
 def zuul_filter_result(result):
     """Remove keys from shell/command output.
 
-    Zuul streams stdout into the log above, so including stdout and stderr
-    in the result dict that ansible displays in the logs is duplicate
-    noise. We keep stdout in the result dict so that other callback plugins
-    like ARA could also have access to it. But drop them here.
+    Zuul streams stdout/stderr into the log above, so including stdout and
+    stderr in the result dict that ansible displays in the logs is duplicate
+    noise. We keep stdout/stderr in the result dict so that other callback
+    plugins like ARA could also have access to it. But drop them here.
 
     Remove changed so that we don't show a bunch of "changed" titles
     on successful shell tasks, since that doesn't make sense from a Zuul
@@ -60,10 +60,16 @@ def zuul_filter_result(result):
     if not stdout_lines and stdout:
         stdout_lines = stdout.split('\n')
 
-    for key in ('changed', 'cmd', 'zuul_log_id', 'invocation',
-                'stderr', 'stderr_lines'):
+    stderr = result.pop('stderr', '')
+    stderr_lines = result.pop('stderr_lines', [])
+    if not stderr_lines and stderr:
+        stderr_lines = stderr.split('\n')
+
+    for key in ('changed', 'cmd', 'zuul_log_id', 'invocation'):
         result.pop(key, None)
-    return stdout_lines
+
+    # Combine stdout / stderr
+    return stdout_lines + stderr_lines
 
 
 class CallbackModule(default.CallbackModule):
