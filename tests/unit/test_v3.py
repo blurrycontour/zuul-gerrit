@@ -4715,18 +4715,22 @@ class TestJobOutput(AnsibleZuulTestCase):
             dict(name='job-output', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
-        token = 'Standard output test %s' % (self.history[0].jobdir.src_root)
+        token_stdout = "Standard output test {}".format(
+            self.history[0].jobdir.src_root)
+        token_stderr = "Standard error test {}".format(
+            self.history[0].jobdir.src_root)
+
         j = json.loads(self._get_file(self.history[0],
                                       'work/logs/job-output.json'))
-        self.assertEqual(token,
-                         j[0]['plays'][0]['tasks'][0]
-                         ['hosts']['localhost']['stdout'])
+        result = j[0]['plays'][0]['tasks'][0]['hosts']['localhost']
+        self.assertEqual(token_stdout, result['stdout'])
+        self.assertEqual(token_stderr, result['stderr'])
 
-        self.log.info(self._get_file(self.history[0],
-                                     'work/logs/job-output.txt'))
-        self.assertIn(token,
-                      self._get_file(self.history[0],
-                                     'work/logs/job-output.txt'))
+        job_output = self._get_file(self.history[0],
+                                    'work/logs/job-output.txt')
+        self.log.info(job_output)
+        self.assertIn(token_stdout, job_output)
+        self.assertIn(token_stderr, job_output)
 
     def test_job_output_missing_role(self):
         # Verify that ansible errors such as missing roles are part of the
@@ -4765,22 +4769,29 @@ class TestJobOutput(AnsibleZuulTestCase):
                  result='POST_FAILURE', changes='1,1'),
         ], ordered=False)
 
-        token = 'Standard output test %s' % (self.history[0].jobdir.src_root)
-        j = json.loads(self._get_file(self.history[0],
-                                      'work/logs/job-output.json'))
-        self.assertEqual(token,
-                         j[0]['plays'][0]['tasks'][0]
-                         ['hosts']['localhost']['stdout'])
+        token_stdout = "Standard output test {}".format(
+            self.history[0].jobdir.src_root)
+        token_stderr = "Standard error test {}".format(
+            self.history[0].jobdir.src_root)
 
-        self.log.info(self._get_file(self.history[0],
-                                     'work/logs/job-output.json'))
-        self.assertIn(token,
-                      self._get_file(self.history[0],
-                                     'work/logs/job-output.txt'))
+        json_output = self._get_file(self.history[0],
+                                     'work/logs/job-output.json')
+        self.log.info(json_output)
+        j = json.loads(json_output)
+        result = j[0]['plays'][0]['tasks'][0]['hosts']['localhost']
+        self.assertEqual(token_stdout, result['stdout'])
+        self.assertEqual(token_stderr, result['stderr'])
+
+        job_output = self._get_file(self.history[0],
+                                    'work/logs/job-output.txt')
+        self.log.info(job_output)
+        self.assertIn(token_stdout, job_output)
+        self.assertIn(token_stderr, job_output)
 
         log_output = output.getvalue()
         self.assertIn('Final playbook failed', log_output)
-        self.assertIn('Failure test', log_output)
+        self.assertIn('Failure stdout test', log_output)
+        self.assertIn('Failure stderr test', log_output)
 
 
 class TestPlugins(AnsibleZuulTestCase):
