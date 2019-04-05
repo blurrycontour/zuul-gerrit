@@ -40,22 +40,32 @@ RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/s
 RUN /output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
   && rm -rf /output
+# Create unpriv user and give it access to volumes
+# See https://github.com/docker/compose/issues/3270
+RUN useradd -u 1000 -d /var/lib/zuul zuul \
+  && mkdir -p /var/lib/zuul /etc/zuul /var/ssh /var/playbooks /srv/static/logs \
+  && chown zuul /var/lib/zuul /etc/zuul /var/ssh /var/playbooks /srv/static/logs
+
 VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
 
 FROM zuul as zuul-executor
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
-
+USER 1000
 CMD ["/usr/local/bin/zuul-executor"]
 
 FROM zuul as zuul-fingergw
+USER 1000
 CMD ["/usr/local/bin/zuul-fingergw"]
 
 FROM zuul as zuul-merger
+USER 1000
 CMD ["/usr/local/bin/zuul-merger"]
 
 FROM zuul as zuul-scheduler
+USER 1000
 CMD ["/usr/local/bin/zuul-scheduler"]
 
 FROM zuul as zuul-web
+USER 1000
 CMD ["/usr/local/bin/zuul-web"]
