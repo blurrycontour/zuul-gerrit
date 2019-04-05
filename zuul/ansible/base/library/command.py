@@ -233,6 +233,7 @@ import datetime
 import glob
 import os
 import shlex
+import select
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_native, to_bytes, to_text
@@ -257,8 +258,9 @@ from ansible.module_utils.six.moves import shlex_quote
 
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
-# List to save stdout log lines in as we collect them
+# Lists to save stdout/stderr log lines in as we collect them
 _log_lines = []
+_stderr_log_lines = []
 
 
 class Console(object):
@@ -297,25 +299,34 @@ class Console(object):
         self.logfile.write(outln)
 
 
-def follow(fd, log_uuid):
+def follow(stdout, stderr, log_uuid):
     newline_warning = False
     with Console(log_uuid) as console:
+        rselect = list(s for s in (stdout, stderr) if s is not None)
         while True:
-            line = fd.readline()
-            if not line:
+            if not rselect:
                 break
-            _log_lines.append(line)
-            if not line.endswith(b'\n'):
-                line += b'\n'
-                newline_warning = True
-            console.addLine(line)
+            rready, _, __ = select.select(rselect, [], [])
+            for fd in rready:
+                line = fd.readline()
+                if not line:
+                    rselect.remove(fd)
+                    continue
+                if fd == stdout:
+                    _log_lines.append(line)
+                else:
+                    _stderr_log_lines.append(line)
+                if not line[-1] != b'\n':
+                    line += b'\n'
+                    newline_warning = True
+                console.addLine(line)
         if newline_warning:
             console.addLine('[Zuul] No trailing newline\n')
 
 
 # Taken from ansible/module_utils/basic.py ... forking the method for now
 # so that we can dive in and figure out how to make appropriate hook points
-def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None,
+def zuul_run_command(self, args, zuul_log_id, zuul_ansible_split_streams, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None,
                 use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict',
                 expand_user_and_vars=True, pass_fds=None, before_communicate_callback=None, ignore_invalid_cwd=True):
     '''
@@ -467,14 +478,15 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         if umask:
             os.umask(umask)
 
-    # ZUUL: changed stderr to follow stdout
+    # ZUUL: merge stdout/stderr depending on config
+    stderr = subprocess.PIPE if zuul_ansible_split_streams else subprocess.STDOUT
     kwargs = dict(
         executable=executable,
         shell=shell,
         close_fds=close_fds,
         stdin=st_in,
         stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
+        stderr=stderr,
         preexec_fn=preexec,
         env=env,
     )
@@ -508,7 +520,7 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         if self.no_log:
             t = None
         else:
-            t = threading.Thread(target=follow, args=(cmd.stdout, zuul_log_id))
+            t = threading.Thread(target=follow, args=(cmd.stdout, cmd.stderr, zuul_log_id))
             t.daemon = True
             t.start()
 
@@ -543,9 +555,10 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
             # ZUUL: stdout and stderr are in the console log file
             # ZUUL: return the saved log lines so we can ship them back
             stdout = b('').join(_log_lines)
+            stderr = b('').join(_stderr_log_lines)
         else:
             stdout = b('')
-        stderr = b('')
+            stderr = b('')
 
     except (OSError, IOError) as e:
         self.log("Error Executing CMD:%s Exception:%s" % (self._clean_args(args), to_native(e)))
@@ -637,6 +650,7 @@ def main():
             stdin_add_newline=dict(type='bool', default=True),
             strip_empty_ends=dict(type='bool', default=True),
             zuul_log_id=dict(type='str'),
+            zuul_ansible_split_streams=dict(type='bool'),
         ),
         supports_check_mode=True,
     )
@@ -652,6 +666,7 @@ def main():
     stdin_add_newline = module.params['stdin_add_newline']
     strip = module.params['strip_empty_ends']
     zuul_log_id = module.params['zuul_log_id']
+    zuul_ansible_split_streams = module.params["zuul_ansible_split_streams"]
 
     # we promissed these in 'always' ( _lines get autoaded on action plugin)
     r = {'changed': False, 'stdout': '', 'stderr': '', 'rc': None, 'cmd': None, 'start': None, 'end': None, 'delta': None, 'msg': ''}
@@ -722,7 +737,7 @@ def main():
     # actually executes command (or not ...)
     if not module.check_mode:
         r['start'] = datetime.datetime.now()
-        r['rc'], r['stdout'], r['stderr'] = zuul_run_command(module, args, zuul_log_id, executable=executable, use_unsafe_shell=shell, encoding=None,
+        r['rc'], r['stdout'], r['stderr'] = zuul_run_command(module, args, zuul_log_id, zuul_ansible_split_streams, executable=executable, use_unsafe_shell=shell, encoding=None,
                                                                data=stdin, binary_data=(not stdin_add_newline))
         r['end'] = datetime.datetime.now()
     else:

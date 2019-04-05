@@ -818,6 +818,7 @@ class JobParser(object):
                       'post-run': playbook_def,
                       'run': playbook_def,
                       'cleanup-run': playbook_def,
+                      'ansible-split-streams': bool,
                       'ansible-version': vs.Any(str, float, int),
                       '_source_context': model.SourceContext,
                       '_start_mark': model.ZuulMark,
@@ -956,6 +957,8 @@ class JobParser(object):
             else:
                 raise Exception("Once set, the post-review attribute "
                                 "may not be unset")
+
+        job.ansible_split_streams = conf.get('ansible-split-streams')
 
         # Configure and validate ansible version
         if 'ansible-version' in conf:

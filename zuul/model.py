@@ -2292,6 +2292,7 @@ class FrozenJob(zkobject.ZKObject):
     MAX_DATA_LEN = 10 * 1024
 
     attributes = ('ansible_version',
+                  'ansible_split_streams',
                   'dependencies',
                   'inheritance_path',
                   'name',
@@ -2402,7 +2403,7 @@ class FrozenJob(zkobject.ZKObject):
     def serialize(self, context):
         # Ensure that any special handling in this method is matched
         # in Job.freezeJob so that FrozenJobs are identical regardless
-        # of whether they have been desiraliazed.
+        # of whether they have been deserialized.
         data = {}
         for k in self.attributes:
             # TODO: Backwards compat handling, remove after 5.0
@@ -2455,6 +2456,10 @@ class FrozenJob(zkobject.ZKObject):
             data['nodeset_alternatives'] = [data['nodeset']]
             data['nodeset_index'] = 0
             del data['nodeset']
+
+        # MODEL_API < 14
+        if 'ansible_split_streams' not in data:
+            data['ansible_split_streams'] = None
 
         if hasattr(self, 'nodeset_alternatives'):
             alts = self.nodeset_alternatives
@@ -2752,6 +2757,7 @@ class Job(ConfigObject):
             d['nodeset'] = alts[0].toDict()
         elif len(alts) > 1:
             d['nodeset_alternatives'] = [x.toDict() for x in alts]
+        d['ansible_split_streams'] = self.ansible_split_streams
         if self.ansible_version:
             d['ansible_version'] = self.ansible_version
         else:
@@ -2804,6 +2810,7 @@ class Job(ConfigObject):
             post_run=(),
             cleanup_run=(),
             run=(),
+            ansible_split_streams=None,
             ansible_version=None,
             semaphores=(),
             attempts=3,
