@@ -697,6 +697,10 @@ class AnsibleJob(object):
             self.executor_server.config,
             'executor',
             'winrm_read_timeout_sec')
+        self.ansible_split_streams = get_default(
+            self.executor_server.config,
+            "executor",
+            "ansible_split_streams", False)
         self.ssh_agent = SshAgent()
 
         self.executor_variables_file = None
@@ -1846,6 +1850,8 @@ class AnsibleJob(object):
             env_copy['ZUUL_CONSOLE_PORT'] = str(
                 self.executor_server.log_console_port)
         env_copy['TMP'] = self.jobdir.local_tmp
+        env_copy['ZUUL_ANSIBLE_SPLIT_STREAMS'] = str(
+            self.ansible_split_streams)
         pythonpath = env_copy.get('PYTHONPATH')
         if pythonpath:
             pythonpath = [pythonpath]
