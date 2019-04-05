@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 from zuul.ansible import paths
 
 from ansible.module_utils.parsing.convert_bool import boolean
@@ -51,4 +53,6 @@ class ActionModule(command.ActionModule):
                 count = paths.ZUUL_LOG_ID_MAP.get(key, 0)
                 self._task.args['zuul_log_id'] = "%s-%s-%s" % (
                     self._task._uuid, count, log_host)
+            self._task.args["zuul_ansible_split_streams"] = (
+                os.environ["ZUUL_ANSIBLE_SPLIT_STREAMS"] == "True")
         return super(ActionModule, self).run(tmp, task_vars)

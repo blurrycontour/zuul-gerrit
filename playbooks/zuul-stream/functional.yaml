@@ -59,6 +59,7 @@
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
+        ZUUL_ANSIBLE_SPLIT_STREAMS: False
         PYTHONPATH: "{{ python_path }}"
       register: _success_output
 
@@ -101,6 +102,7 @@
         ZUUL_CONSOLE_PORT: 19887
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
+        ZUUL_ANSIBLE_SPLIT_STREAMS: False
         PYTHONPATH: "{{ python_path }}"
 
     - name: Save output
