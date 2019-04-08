@@ -37,6 +37,7 @@ import { setTenantAction } from './actions/tenant'
 import { clearError } from './actions/errors'
 
 
+
 class App extends React.Component {
   static propTypes = {
     errors: PropTypes.array,
@@ -50,7 +51,8 @@ class App extends React.Component {
 
   state = {
     menuCollapsed: true,
-    showErrors: false
+    showErrors: false,
+    keycloak: null,
   }
 
   onNavToggleClick = () => {
@@ -291,6 +293,6 @@ export default withRouter(connect(
     errors: state.errors,
     configErrors: state.configErrors,
     info: state.info,
-    tenant: state.tenant
+    tenant: state.tenant,
   })
 )(App))
