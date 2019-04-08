@@ -15,7 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Table } from 'patternfly-react'
+import { Table, Button } from 'patternfly-react'
 
 import { fetchBuildsets } from '../api'
 import TableFilters from '../containers/TableFilters'
@@ -23,7 +23,9 @@ import TableFilters from '../containers/TableFilters'
 
 class BuildsetsPage extends TableFilters {
   static propTypes = {
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    token: PropTypes.string,
+    admin_tenants: PropTypes.array,
   }
 
   constructor () {
@@ -76,6 +78,16 @@ class BuildsetsPage extends TableFilters {
         </a>
       </Table.Cell>
     )
+    const enqueueIfAdmin = (value, rowdata) => (
+        <Table.Cell>
+            <div>{value}</div>
+            { this.props.admin_tenants.indexOf(this.props.tenant.name) > -1 ?
+            <div>
+                <Button onClick={e => alert('re-enqueue!')}>re-enqueue</Button>
+            </div> : <div></div>
+            }
+        </Table.Cell>
+    )
     this.columns = []
     this.filterTypes = []
     const myColumns = [
@@ -89,6 +101,9 @@ class BuildsetsPage extends TableFilters {
       let formatter = cellFormat
       if (column === 'change') {
         formatter = linkChangeFormat
+      }
+      if (column === 'result') {
+          formatter = enqueueIfAdmin
       }
       const label = column.charAt(0).toUpperCase() + column.slice(1)
       this.columns.push({
@@ -147,4 +162,7 @@ class BuildsetsPage extends TableFilters {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(BuildsetsPage)
+export default connect(state => ({
+    tenant: state.tenant,
+    token: state.auth.token,
+    admin_tenants: state.auth.tenants}))(BuildsetsPage)
