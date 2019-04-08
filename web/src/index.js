@@ -26,13 +26,38 @@ import './index.css'
 import { getHomepageUrl } from './api'
 import registerServiceWorker from './registerServiceWorker'
 import { fetchInfoIfNeeded } from './actions/info'
+import { loginRequest, loginSuccess, login, loginFail } from './actions/auth'
 import createZuulStore from './store'
 import App from './App'
 
+import Keycloak from 'keycloak-js'
+
 const store = createZuulStore()
+
+const unsubscribe = store.subscribe(() => console.log(store.getState()))
+
+// Login by default
+
+store.dispatch(loginRequest())
+const keycloak = Keycloak("/keycloak.json")
+keycloak.init({ onLoad: 'login-required' })
+    .success(authenticated => {
+        console.log('success!')
+        console.log(keycloak.token)
+        store.dispatch(loginSuccess(keycloak.token))
+        store.dispatch(login(keycloak.token))
+    })
+       .error(err => {
+           console.log('error!')
+           store.dispatch(loginFail(err))
+           alert(err)
+           })
 
 // Load info endpoint
 store.dispatch(fetchInfoIfNeeded())
+
+
+
 
 ReactDOM.render(
   <Provider store={store}>
