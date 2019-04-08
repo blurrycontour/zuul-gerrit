@@ -16,6 +16,8 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { dequeue } from '../../api'
+import { Icon } from 'patternfly-react'
 
 
 class ChangePanel extends React.Component {
@@ -161,6 +163,16 @@ class ChangePanel extends React.Component {
     )
   }
 
+  dequeue(change) {
+      let projectName = change.project
+      let trigger = 'gerrit'
+      let pipeline = 'check'
+      let changeId = change.id
+      dequeue(this.props.token, this.props.tenant.apiPrefix, projectName, trigger, changeId, pipeline).then(response => {
+          alert('change "' + changeId + '" dequeued.')
+      })
+  }
+
   renderTimer (change) {
     let remainingTime
     if (change.remaining_time === null) {
@@ -176,7 +188,8 @@ class ChangePanel extends React.Component {
         <br />
         <small title='Elapsed Time' className='time'>
           {this.enqueueTime(change.enqueue_time)}
-        </small>
+      </small><br />
+  <Icon type='fa' title='Dequeue this buildset' name='bolt' onClick={e => this.dequeue(change)} />
       </React.Fragment>
     )
   }
@@ -330,4 +343,7 @@ class ChangePanel extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ChangePanel)
+export default connect(state => ({
+    tenant: state.tenant,
+    token: state.auth.token,
+    admin_tenants: state.auth.tenants}))(ChangePanel)

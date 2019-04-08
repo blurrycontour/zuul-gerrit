@@ -1,5 +1,15 @@
+- admin-rule:
+    name: gozer_rule
+    conditions:
+      - groups: gozerian
+- admin-rule:
+    name: venkman_rule
+    conditions:
+      - preferred_username: venkman
 - tenant:
     name: example-tenant
+    admin-rules:
+      - gozer_rule
     source:
       gerrit:
         config-projects:
@@ -10,5 +20,21 @@
       opendev.org:
         untrusted-projects:
           - zuul/zuul-jobs:
+              include:
+                - job
+- tenant:
+    name: example-tenant-2
+    admin-rules:
+      - venkman_rule
+    source:
+      gerrit:
+        config-projects:
+          - zuul-config
+        untrusted-projects:
+          - test3
+          - test4
+      zuul-ci.org:
+        untrusted-projects:
+          - zuul-jobs:
               include:
                 - job
