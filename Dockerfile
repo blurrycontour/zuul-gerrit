@@ -38,7 +38,7 @@ RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/s
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 RUN /output/install-from-bindep \
-  && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
+  && pip install --no-cache-dir -r /output/zuul_base/requirements.txt \
   && rm -rf /output
 VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
@@ -46,7 +46,7 @@ CMD ["/usr/local/bin/zuul"]
 FROM zuul as zuul-executor
 COPY --from=builder /output/ /output
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
-RUN pip install --cache-dir=/output/wheels -r /output/zuul_executor/requirements.txt \
+RUN pip install --no-cache-dir -r /output/zuul_executor/requirements.txt \
   && rm -rf /output
 
 CMD ["/usr/local/bin/zuul-executor"]
