@@ -865,6 +865,25 @@ zuul.child_jobs is empty, all jobs will be marked as SKIPPED. Invalid child jobs
 are stripped and ignored, if only invalid jobs are listed it is the same as
 providing an empty list to zuul.child_jobs.
 
+Leaving warnings
+~~~~~~~~~~~~~~~~
+
+A job can leave warnings that will be appended to the comment zuul leaves on
+the change. Use *zuul_return* to add a list of warnings. For example:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        data:
+          zuul:
+            warnings:
+              - This warning will be posted on the change.
+
+If *zuul_return* is invoked multiple times (e.g., via multiple
+playbooks), then the elements of **zuul.warnings** from each
+invocation will be appended.
+
 Leaving file comments
 ~~~~~~~~~~~~~~~~~~~~~
 

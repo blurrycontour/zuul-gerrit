@@ -37,6 +37,7 @@ from urllib.parse import urlsplit
 
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.gearworker import ZuulGearWorker
+from zuul.lib.result_data import get_warnings_from_result_data
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
@@ -1175,6 +1176,7 @@ class AnsibleJob(object):
         data = self.getResultData()
         warnings = []
         self.mapLines(merger, args, data, item_commit, warnings)
+        warnings.extend(get_warnings_from_result_data(data, logger=self.log))
         result_data = json.dumps(dict(result=result,
                                       warnings=warnings,
                                       data=data))

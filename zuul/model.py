@@ -31,7 +31,7 @@ import jsonpath_rw
 
 from zuul import change_matcher
 from zuul.lib.config import get_default
-from zuul.lib.artifacts import get_artifacts_from_result_data
+from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
 

@@ -6622,3 +6622,24 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
             dict(name='ansible-29', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+
+class TestReturnWarnings(AnsibleZuulTestCase):
+    tenant_config_file = 'config/return-warnings/main.yaml'
+
+    def test_return_warnings(self):
+        """
+        Tests that jobs can emit custom warnings that get reported.
+        """
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='emit-warnings', result='SUCCESS', changes='1,1'),
+        ])
+
+        self.assertTrue(A.reported)
+        self.assertIn('This is the first warning', A.messages[0])
+        self.assertIn('This is the second warning', A.messages[0])
