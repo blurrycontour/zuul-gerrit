@@ -70,6 +70,30 @@
       "revId": "6a4f34674415990653f4a4e3e3afbbdaabbc3ed6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_92802cf9",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-10T09:44:34Z",
+      "side": 1,
+      "message": "This change is not really meant for merging, just for letting people test around the auth feature (which we wouldn\u0027t want so closely tied to keycloak anyway). They\u0027re supposed to build the image locally, hence the relative context.",
+      "parentUuid": "5fc1f717_b76f5ac2",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 28
+      },
+      "revId": "6a4f34674415990653f4a4e3e3afbbdaabbc3ed6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
