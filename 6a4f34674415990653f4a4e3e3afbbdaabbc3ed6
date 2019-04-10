@@ -46,6 +46,30 @@
       "revId": "6a4f34674415990653f4a4e3e3afbbdaabbc3ed6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_b76f5ac2",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-10T08:33:08Z",
+      "side": 1,
+      "message": "that should already be the case in opendev ci, the quick-start job test image speculatively, not the one from the docker registry.",
+      "parentUuid": "5fc1f717_cc8299c7",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 28
+      },
+      "revId": "6a4f34674415990653f4a4e3e3afbbdaabbc3ed6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
