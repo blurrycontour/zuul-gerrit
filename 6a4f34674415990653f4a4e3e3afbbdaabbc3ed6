@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_c9b12be2",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-10T06:57:24Z",
+      "side": 1,
+      "message": "Aren\u0027t those left-over dev change?",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 28
+      },
+      "revId": "6a4f34674415990653f4a4e3e3afbbdaabbc3ed6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
