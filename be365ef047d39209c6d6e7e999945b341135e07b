@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_71a3359f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-04-10T17:28:21Z",
+      "side": 1,
+      "message": "Nit, where the PR may not exist yet.",
+      "range": {
+        "startLine": 10,
+        "startChar": 24,
+        "endLine": 10,
+        "endChar": 31
+      },
+      "revId": "be365ef047d39209c6d6e7e999945b341135e07b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_91c7c145",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1154,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-04-10T17:28:21Z",
+      "side": 1,
+      "message": "Can we log the owner/proj as we do on line 1151 above too?",
+      "range": {
+        "startLine": 1154,
+        "startChar": 61,
+        "endLine": 1154,
+        "endChar": 64
+      },
+      "revId": "be365ef047d39209c6d6e7e999945b341135e07b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
