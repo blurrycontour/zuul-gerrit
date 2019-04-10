@@ -22,6 +22,30 @@
       "revId": "6a4f34674415990653f4a4e3e3afbbdaabbc3ed6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_cc8299c7",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-10T08:08:50Z",
+      "side": 1,
+      "message": "It\u0027s still WIP alpha early access code, I\u0027ll set the workflow -1 flag for clarity. I\u0027m just uploading/updating it when the patch chain changes or to make sure I save progress.\n\nAlthough in that specific case this is intentional, in order to build the container based on this branch rather than master (or use the official container in the docker registry).",
+      "parentUuid": "5fc1f717_c9b12be2",
+      "range": {
+        "startLine": 59,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 28
+      },
+      "revId": "6a4f34674415990653f4a4e3e3afbbdaabbc3ed6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
