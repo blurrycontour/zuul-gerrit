@@ -1011,6 +1011,7 @@ class AnsibleJob(object):
         data = self.getResultData()
         warnings = []
         self.mapLines(merger, args, data, item_commit, warnings)
+        warnings.extend(data.get('zuul', {}).get('warnings', []))
         result_data = json.dumps(dict(result=result,
                                       warnings=warnings,
                                       data=data))
