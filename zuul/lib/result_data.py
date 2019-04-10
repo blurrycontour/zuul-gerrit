@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from copy import deepcopy
 
 import voluptuous as v
 import urllib.parse
@@ -24,18 +25,23 @@ artifact = {
 zuul_data = {
     'zuul': {
         'log_url': str,
-        'artifacts': [artifact],
         v.Extra: object,
     },
     v.Extra: object,
 }
 
-artifact_schema = v.Schema(zuul_data)
+artifact_data = deepcopy(zuul_data)
+artifact_data['zuul']['artifacts'] = [artifact]
+artifact_schema = v.Schema(artifact_data)
+
+warning_data = deepcopy(zuul_data)
+warning_data['zuul']['warnings'] = [str]
+warning_schema = v.Schema(warning_data)
 
 
-def validate_artifact_schema(data):
+def validate_schema(data, schema):
     try:
-        artifact_schema(data)
+        schema(data)
     except Exception:
         return False
     return True
@@ -43,7 +49,7 @@ def validate_artifact_schema(data):
 
 def get_artifacts_from_result_data(result_data, logger=None):
     ret = []
-    if validate_artifact_schema(result_data):
+    if validate_schema(result_data, artifact_schema):
         artifacts = result_data.get('zuul', {}).get(
             'artifacts', [])
         default_url = result_data.get('zuul', {}).get(
@@ -71,3 +77,12 @@ def get_artifacts_from_result_data(result_data, logger=None):
             logger.debug("Result data did not pass artifact schema "
                          "validation: %s", result_data)
     return ret
+
+
+def get_warnings_from_result_data(result_data, logger=None):
+    if validate_schema(result_data, warning_schema):
+        return result_data.get('zuul', {}).get('warnings', [])
+    else:
+        if logger:
+            logger.debug("Result data did not pass warnings schema "
+                         "validation: %s", result_data)
