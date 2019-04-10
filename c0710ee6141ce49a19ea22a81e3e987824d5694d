@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_78ad5f2f",
+        "filename": "tools/uid_entrypoint.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-04-10T12:01:35Z",
+      "side": 1,
+      "message": "The python-base image has an entrypoint of /usr/bin/dumb-init, which provides signal handling. Replacing that with this means this should be:\n\n  exec dumb-init \"$@\"",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 9
+      },
+      "revId": "c0710ee6141ce49a19ea22a81e3e987824d5694d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
