@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fce034c_69d24237",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-11T08:54:36Z",
+      "side": 1,
+      "message": "Any plans for the Nodepool REST API? GUI? Integration with Zuul?",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 29,
+        "endChar": 29
+      },
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_e920724c",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-04-11T08:54:36Z",
+      "side": 1,
+      "message": "I still think granularity at project level, and even at action level, is desirable. Looking at the amount of projects on the openstack tenant on z.o.o, it\u0027d be good for example to have one or two maintainers per project simply allowed to dequeue a buildset if it is a resource hog, without having to query a Zuul operator.\nI get that it is a drastic increase in complexity, but that should be considered at some point in the future.",
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
