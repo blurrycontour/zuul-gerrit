@@ -7252,3 +7252,41 @@ class TestSchedulerFailFast(ZuulTestCase):
             dict(name='project-test5', result='SUCCESS', changes='1,1'),
             dict(name='project-test6', result='FAILURE', changes='1,1'),
         ], ordered=False)
+
+
+class TestSchedulerSmartReconfiguration(ZuulTestCase):
+    tenant_config_file = 'config/multi-tenant/main.yaml'
+
+    def test_smart_reconfiguration(self):
+        "Test that live reconfiguration via command socket works"
+
+        # record previous tenant reconfiguration time, which may not be set
+        old_one = self.sched.tenant_last_reconfigured.get('tenant-one', 0)
+        old_two = self.sched.tenant_last_reconfigured.get('tenant-two', 0)
+        time.sleep(1)
+        self.waitUntilSettled()
+
+        self.newTenantConfig('config/multi-tenant/main-reconfig.yaml')
+
+        command_socket = self.config.get('scheduler', 'command_socket')
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(command_socket)
+            s.sendall('smart-reconfigure\n'.encode('utf8'))
+
+        # Wait for smart reconfiguration. Only tenant-two should be
+        # reconfigured. Note that waitUntilSettled is not
+        # reliable here because the reconfigure event may arrive in the
+        # event queue after waitUntilSettled.
+        start = time.time()
+        while True:
+            if time.time() - start > 15:
+                raise Exception("Timeout waiting for smart reconfiguration")
+            new_two = self.sched.tenant_last_reconfigured.get('tenant-two', 0)
+            if old_two < new_two:
+                break
+            else:
+                time.sleep(0)
+
+        self.waitUntilSettled()
+        new_one = self.sched.tenant_last_reconfigured.get('tenant-one', 0)
+        self.assertEqual(old_one, new_one)

@@ -40,7 +40,7 @@ from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 from zuul.model import Build
 
-COMMANDS = ['full-reconfigure', 'stop']
+COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop']
 
 
 class ManagementEvent(object):
@@ -72,9 +72,10 @@ class ReconfigureEvent(ManagementEvent):
 
     :arg ConfigParser config: the new configuration
     """
-    def __init__(self, config):
+    def __init__(self, config, smart=False):
         super(ReconfigureEvent, self).__init__()
         self.config = config
+        self.smart = smart
 
 
 class TenantReconfigureEvent(ManagementEvent):
@@ -277,6 +278,7 @@ class Scheduler(threading.Thread):
         self.command_map = {
             'stop': self.stop,
             'full-reconfigure': self.fullReconfigureCommandHandler,
+            'smart-reconfigure': self.smartReconfigureCommandHandler,
         }
         self._pause = False
         self._exit = False
@@ -519,9 +521,12 @@ class Scheduler(threading.Thread):
     def fullReconfigureCommandHandler(self):
         self._zuul_app.fullReconfigure()
 
-    def reconfigure(self, config):
+    def smartReconfigureCommandHandler(self):
+        self._zuul_app.smartReconfigure()
+
+    def reconfigure(self, config, smart=False):
         self.log.debug("Submitting reconfiguration event")
-        event = ReconfigureEvent(config)
+        event = ReconfigureEvent(config, smart)
         self.management_event_queue.put(event)
         self.wake_event.set()
         self.log.debug("Waiting for reconfiguration")
@@ -671,7 +676,10 @@ class Scheduler(threading.Thread):
         self.layout_lock.acquire()
         self.config = event.config
         try:
-            self.log.info("Full reconfiguration beginning")
+            if event.smart:
+                self.log.info("Smart reconfiguration beginning")
+            else:
+                self.log.info("Full reconfiguration beginning")
 
             # Reload the ansible manager in case the default ansible version
             # changed.
@@ -680,19 +688,31 @@ class Scheduler(threading.Thread):
             self.ansible_manager = AnsibleManager(
                 default_version=default_ansible_version)
 
-            for connection in self.connections.connections.values():
-                self.log.debug("Clear branch cache for: %s" % connection)
-                connection.clearBranchCache()
+            # Clear branch cache only on full reconfigure
+            if not event.smart:
+                for connection in self.connections.connections.values():
+                    self.log.debug("Clear branch cache for: %s" % connection)
+                    connection.clearBranchCache()
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
                 self._get_key_dir())
             tenant_config, script = self._checkTenantSourceConf(self.config)
+            old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
             abide = loader.loadConfig(
                 self.unparsed_abide, self.ansible_manager)
             for tenant in abide.tenants.values():
+                # If we're doing a smart reconfig only reconfig tenants that
+                # changed their config.
+                if event.smart:
+                    old_tenant = [x for x in old_unparsed_abide.tenants
+                                  if x['name'] == tenant.name]
+                    new_tenant = [x for x in self.unparsed_abide.tenants
+                                  if x['name'] == tenant.name]
+                    if old_tenant == new_tenant:
+                        continue
                 self._reconfigureTenant(tenant)
             self.abide = abide
         finally:

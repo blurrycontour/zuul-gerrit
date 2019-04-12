@@ -2623,6 +2623,12 @@ class ZuulTestCase(BaseTestCase):
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
+    def smartReconfigure(self):
+        try:
+            self.sched.reconfigure(self.config, smart=True)
+        except Exception:
+            self.log.exception("Reconfiguration failed:")
+
     def configure_connections(self, source_only=False):
         # Set up gerrit related fakes
         # Set a changes database so multiple FakeGerrit's can report back to
