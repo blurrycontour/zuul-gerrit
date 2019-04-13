@@ -182,7 +182,7 @@ _log_lines = []
 
 def log_line(line):
     if isinstance(line, bytes):
-        line = line.decode('utf-8')
+        line = line.decode('utf-8', 'backslashreplace')
     zuulLogger = logging.getLogger('zuul.executor.ansible')
     zuulLogger.info(
         line.rstrip(),
