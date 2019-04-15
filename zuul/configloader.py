@@ -865,6 +865,7 @@ class ProjectTemplateParser(object):
         pipeline_contents = {
             'queue': str,
             'debug': bool,
+            'fail-fast': bool,
             'jobs': job_list
         }
 
@@ -894,6 +895,8 @@ class ProjectTemplateParser(object):
             project_template.pipelines[pipeline_name] = project_pipeline
             project_pipeline.queue_name = conf_pipeline.get('queue')
             project_pipeline.debug = conf_pipeline.get('debug')
+            project_pipeline.fail_fast = conf_pipeline.get(
+                'fail-fast')
             self.parseJobList(
                 conf_pipeline.get('jobs', []),
                 source_context, start_mark, project_pipeline.job_list)
@@ -946,6 +949,7 @@ class ProjectParser(object):
         pipeline_contents = {
             'queue': str,
             'debug': bool,
+            'fail-fast': bool,
             'jobs': job_list
         }
 
