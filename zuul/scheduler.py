@@ -37,6 +37,7 @@ from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
+from zuul.model import Build
 
 COMMANDS = ['full-reconfigure', 'stop']
 
@@ -1417,11 +1418,11 @@ class Scheduler(threading.Thread):
                         other_change.refresh_deps = True
         change.refresh_deps = True
 
-    def cancelJob(self, buildset, job, build=None):
+    def cancelJob(self, buildset, job, build=None, final=False):
         item = buildset.item
         try:
             # Cancel node request if needed
-            req = buildset.node_requests.get(job)
+            req = buildset.node_requests.get(job.name)
             if req:
                 self.nodepool.cancelRequest(req)
                 buildset.removeJobNodeRequest(job.name)
@@ -1457,6 +1458,13 @@ class Scheduler(threading.Thread):
                 nodeset = buildset.getJobNodeSet(job.name)
                 if nodeset:
                     self.nodepool.returnNodeSet(nodeset)
+
+                if final:
+                    # If final is set make sure that the job is not resurrected
+                    # later by re-requesting nodes.
+                    fakebuild = Build(job, None)
+                    fakebuild.result = 'CANCELED'
+                    buildset.addBuild(fakebuild)
         finally:
             # Release the semaphore in any case
             tenant = buildset.item.pipeline.tenant
