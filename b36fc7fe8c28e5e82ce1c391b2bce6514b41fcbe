@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fce034c_90b989ea",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1391,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-15T19:58:18Z",
+      "side": 1,
+      "message": "If you\u0027re going to editorialize, please include this counter-argument:\n\nat the cost of potentially requiring multiple attempts if more than one problem is present.",
+      "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_30d0d51f",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-15T19:58:18Z",
+      "side": 1,
+      "message": "and build.job.voting is not None and build.job.voting",
+      "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_50cb2171",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3063,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-15T19:58:18Z",
+      "side": 1,
+      "message": "\u003d None (see below)",
+      "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_f0c9ed77",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3076,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-15T19:58:18Z",
+      "side": 1,
+      "message": "Check whether this is None here so that there is only one setting for the project, and admins can force the setting.  This should behave like queue_name.",
+      "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
