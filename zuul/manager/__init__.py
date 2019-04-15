@@ -794,6 +794,13 @@ class PipelineManager(object):
                 self.sched.executor.resumeBuild(build)
                 build.paused = False
 
+    def _cancelRunningBuilds(self, build_set):
+        item = build_set.item
+        for job in item.getJobs():
+            build = build_set.getBuild(job.name)
+            if not build or not build.result:
+                self.sched.cancelJob(build_set, job)
+
     def onBuildCompleted(self, build):
         item = build.build_set.item
 
@@ -808,6 +815,13 @@ class PipelineManager(object):
             build.build_set.removeJobNodeSet(build.job.name)
 
         self._resumeBuilds(build.build_set)
+
+        if (item.project_pipeline_config.fail_fast and
+            build.failed and build.job.voting and build.job.voting):
+            # If fail-fast is set and the build is not successful
+            # cancel all remaining jobs.
+            self._cancelRunningBuilds(build.build_set)
+
         return True
 
     def onFilesChangesCompleted(self, event):
