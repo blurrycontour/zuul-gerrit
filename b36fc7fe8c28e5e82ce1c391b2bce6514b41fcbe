@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fce034c_854866cc",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 1391,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-04-16T09:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fce034c_90b989ea",
+      "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fce034c_30d0d51f",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2019-04-15T19:58:18Z",
       "side": 1,
       "message": "and build.job.voting is not None and build.job.voting",
+      "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_a54322af",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-04-16T09:14:49Z",
+      "side": 1,
+      "message": "actually the check for none should not be necessary at all, so I just removed the second build.job.voting",
+      "parentUuid": "3fce034c_30d0d51f",
       "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3fce034c_4514bea0",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3063,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-04-16T09:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fce034c_50cb2171",
+      "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fce034c_f0c9ed77",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2019-04-15T19:58:18Z",
       "side": 1,
       "message": "Check whether this is None here so that there is only one setting for the project, and admins can force the setting.  This should behave like queue_name.",
+      "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_65177aa5",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3076,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-04-16T09:14:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fce034c_f0c9ed77",
       "revId": "b36fc7fe8c28e5e82ce1c391b2bce6514b41fcbe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
