@@ -16,6 +16,24 @@
       "revId": "eb7f1fc0f1167dc2441000160781bef6c1b464e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_36b203e8",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 29485
+      },
+      "writtenOn": "2019-04-16T10:25:20Z",
+      "side": 1,
+      "message": "Ah I see - OK will update",
+      "parentUuid": "3fce034c_9663b7b1",
+      "revId": "eb7f1fc0f1167dc2441000160781bef6c1b464e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
