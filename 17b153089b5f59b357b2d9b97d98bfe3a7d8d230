@@ -34,6 +34,24 @@
       "revId": "17b153089b5f59b357b2d9b97d98bfe3a7d8d230",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_93666929",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 29485
+      },
+      "writtenOn": "2019-04-16T09:49:51Z",
+      "side": 1,
+      "message": "OK fixed - this time I manually tested against a local staging setup (real Gerrit)",
+      "parentUuid": "3fce034c_f327ad11",
+      "revId": "17b153089b5f59b357b2d9b97d98bfe3a7d8d230",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
