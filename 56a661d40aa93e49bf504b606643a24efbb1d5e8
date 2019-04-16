@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fce034c_7dff0e01",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-16T07:59:50Z",
+      "side": 1,
+      "message": "Perhaps we can remove that variable and set the _gerrit_version to (0, 0) on parse error.",
+      "range": {
+        "startLine": 356,
+        "startChar": 8,
+        "endLine": 356,
+        "endChar": 44
+      },
+      "revId": "56a661d40aa93e49bf504b606643a24efbb1d5e8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
