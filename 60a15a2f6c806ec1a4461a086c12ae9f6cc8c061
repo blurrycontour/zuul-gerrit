@@ -16,6 +16,24 @@
       "revId": "60a15a2f6c806ec1a4461a086c12ae9f6cc8c061",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fce034c_866da505",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-04-17T18:33:59Z",
+      "side": 1,
+      "message": "This depends if we decide to always use ara or not (with upstream zuul, every ansible venv has ara).",
+      "parentUuid": "3fce034c_26f9514c",
+      "revId": "60a15a2f6c806ec1a4461a086c12ae9f6cc8c061",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
