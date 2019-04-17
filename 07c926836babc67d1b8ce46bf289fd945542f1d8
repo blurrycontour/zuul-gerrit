@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_93a69253",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1295,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_53cffcb2",
+      "range": {
+        "startLine": 1295,
+        "startChar": 29,
+        "endLine": 1295,
+        "endChar": 36
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_f6d61654",
         "filename": "tests/unit/test_github_driver.py",
         "patchSetId": 5
@@ -36,6 +60,24 @@
       "writtenOn": "2019-03-29T16:05:01Z",
       "side": 1,
       "message": "We should also test with a team that has admin permissions.",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_ee11295f",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1450,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_f6d61654",
       "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_2e189182",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1490,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_7686a668",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_d638bad5",
         "filename": "tests/unit/test_github_driver.py",
         "patchSetId": 5
@@ -70,6 +130,24 @@
       "writtenOn": "2019-03-29T16:05:01Z",
       "side": 1,
       "message": "This looks like this can create a race so we should probably add a self.waitUntilSettled after this event.",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_e28d35d4",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1501,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_d638bad5",
       "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -99,6 +177,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_d51eb45d",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1531,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_36cedeb4",
+      "range": {
+        "startLine": 1527,
+        "startChar": 0,
+        "endLine": 1531,
+        "endChar": 46
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_d6c2fa86",
         "filename": "tests/unit/test_github_driver.py",
         "patchSetId": 5
@@ -110,6 +212,30 @@
       "writtenOn": "2019-03-29T16:05:01Z",
       "side": 1,
       "message": "waitUntilSettled?",
+      "range": {
+        "startLine": 1541,
+        "startChar": 0,
+        "endLine": 1545,
+        "endChar": 46
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d5531415",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1545,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_d6c2fa86",
       "range": {
         "startLine": 1541,
         "startChar": 0,
@@ -162,6 +288,30 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_b5468820",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1611,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_565daaea",
+      "range": {
+        "startLine": 1611,
+        "startChar": 8,
+        "endLine": 1611,
+        "endChar": 14
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_877bc779",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 5
@@ -173,6 +323,24 @@
       "writtenOn": "2019-04-01T10:33:44Z",
       "side": 1,
       "message": "TextIOBase? Double check",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_b5ad2832",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_877bc779",
       "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -231,6 +399,24 @@
     },
     {
       "key": {
+        "uuid": "5fc1f717_1885515a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_41df223a",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_bc162d49",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 5
@@ -242,6 +428,30 @@
       "writtenOn": "2019-03-29T16:05:01Z",
       "side": 1,
       "message": "That could be simplified to\n\n if action in (\u0027edited\u0027, \u0027added_to_repository\u0027, \u0027removed_from_repository\u0027):\n   ...",
+      "range": {
+        "startLine": 577,
+        "startChar": 0,
+        "endLine": 578,
+        "endChar": 53
+      },
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5fc1f717_d8c829a9",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-04-17T09:56:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_bc162d49",
       "range": {
         "startLine": 577,
         "startChar": 0,
