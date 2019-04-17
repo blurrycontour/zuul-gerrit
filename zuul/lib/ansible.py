@@ -229,6 +229,23 @@ class AnsibleManager:
             raise Exception('Requested ansible version %s not found' % version)
         return ansible
 
+    def getAraCallbackPlugin(self, version):
+        result = None
+        try:
+            _python = self.getAnsibleCommand(version, 'python')
+            result = subprocess.run(
+                [_python, '-m', 'ara.setup.callback_plugins'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=True)
+            self.log.info(
+                'Ansible version %s ARA callback plugin: \n%s', version,
+                result.stdout.decode())
+        except Exception:
+            self.log.exception(
+                'Ansible version %s ARA not installed' % version)
+        return result
+
     def getAnsibleCommand(self, version, command='ansible-playbook'):
         ansible = self._getAnsible(version)
         venv_path = ansible.venv_path
