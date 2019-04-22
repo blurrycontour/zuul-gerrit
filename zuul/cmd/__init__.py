@@ -209,10 +209,16 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
                 self.run()
 
     def send_command(self, cmd):
+        sockfile = '/var/lib/zuul/%s.socket' % self.app_name
         command_socket = get_default(
-            self.config, self.app_name, 'command_socket',
-            '/var/lib/zuul/%s.socket' % self.app_name)
+            self.config, self.app_name, 'command_socket', sockfile)
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        s.connect(command_socket)
+        try:
+            s.connect(command_socket)
+        except FileNotFoundError:
+            log.error(
+                "RPC command '{cmd}' requested but socket {sockfile} not "
+                "found; is the service running?".format(
+                    cmd=cmd, sockfile=sockfile))
         cmd = '%s\n' % cmd
         s.sendall(cmd.encode('utf8'))
