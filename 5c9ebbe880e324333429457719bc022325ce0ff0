@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_1652b968",
+        "filename": "doc/source/admin/drivers/pagure.rst",
+        "patchSetId": 29
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-22T08:12:55Z",
+      "side": 1,
+      "message": "Isn\u0027t the review added?",
+      "range": {
+        "startLine": 122,
+        "startChar": 38,
+        "endLine": 122,
+        "endChar": 45
+      },
+      "revId": "5c9ebbe880e324333429457719bc022325ce0ff0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
