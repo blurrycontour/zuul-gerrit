@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_75cf567f",
+        "filename": "doc/source/admin/examples/etc_zuul/zuul.conf",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-23T05:09:25Z",
+      "side": 1,
+      "message": "connection name\u003d attribute doesn\u0027t seem to be used. Perhaps we should drop it, or name it \"opendev.org\", because simply opendev is confusing.",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 24,
+        "endChar": 12
+      },
+      "revId": "f3e2a2038b1af7ae6ab9bbbe0e26f0cec03dca11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_35c9de77",
+        "filename": "doc/source/admin/github_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-23T05:09:25Z",
+      "side": 1,
+      "message": "This should be opendev.org",
+      "range": {
+        "startLine": 109,
+        "startChar": 9,
+        "endLine": 109,
+        "endChar": 17
+      },
+      "revId": "f3e2a2038b1af7ae6ab9bbbe0e26f0cec03dca11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_75943645",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-23T05:09:25Z",
+      "side": 1,
+      "message": "this is likely not working, perhaps zuul-jobs should be dropped from this example?",
+      "range": {
+        "startLine": 48,
+        "startChar": 15,
+        "endLine": 48,
+        "endChar": 29
+      },
+      "revId": "f3e2a2038b1af7ae6ab9bbbe0e26f0cec03dca11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_359ebe63",
+        "filename": "doc/source/admin/zuul-from-scratch.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-23T05:09:25Z",
+      "side": 1,
+      "message": "Would be nice to use the same connection name as in the quickstart.",
+      "range": {
+        "startLine": 107,
+        "startChar": 15,
+        "endLine": 107,
+        "endChar": 26
+      },
+      "revId": "f3e2a2038b1af7ae6ab9bbbe0e26f0cec03dca11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
