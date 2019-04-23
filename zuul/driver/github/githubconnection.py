@@ -1243,8 +1243,18 @@ class GithubConnection(BaseConnection):
     def getPullReviews(self, pr_obj, project, number):
         # make a list out of the reviews so that we complete our
         # API transaction
-        revs = [review.as_dict() for review in pr_obj.reviews()]
-        self.log.debug('Got reviews for PR %s#%s', project, number)
+        for retry in range(5):
+            try:
+                revs = [review.as_dict() for review in pr_obj.reviews()]
+                self.log.debug('Got reviews for PR %s#%s', project, number)
+                break
+            except github3.exceptions.GitHubException:
+                self.log.warning(
+                    "Failed to get reviews for PR %s#%s; retrying" %
+                    (project, number))
+            time.sleep(1)
+        else:
+            raise Exception('Pull reviews not found')
 
         permissions = {}
         reviews = {}
