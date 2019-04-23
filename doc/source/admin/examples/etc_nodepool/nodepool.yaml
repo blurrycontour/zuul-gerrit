@@ -10,7 +10,19 @@ providers:
     pools:
       - name: main
         nodes:
-          - name: node
+          - name: examples_node_1
+            labels: ubuntu-bionic
+            host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjDZ9C89nUVGQ1qZzG/X0onkmcju4kWJ2uTLBdIXsy1"
+            username: root
+          - name: examples_node_2
+            labels: ubuntu-bionic
+            host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjDZ9C89nUVGQ1qZzG/X0onkmcju4kWJ2uTLBdIXsy1"
+            username: root
+          - name: examples_node_3
+            labels: ubuntu-bionic
+            host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjDZ9C89nUVGQ1qZzG/X0onkmcju4kWJ2uTLBdIXsy1"
+            username: root
+          - name: examples_node_4
             labels: ubuntu-bionic
             host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjDZ9C89nUVGQ1qZzG/X0onkmcju4kWJ2uTLBdIXsy1"
             username: root

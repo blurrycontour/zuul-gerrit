@@ -1,6 +1,6 @@
 # Version 2 is the latest that is supported by docker-compose in
 # Ubuntu Xenial.
-version: '2'
+version: '2.2'
 
 services:
   gerrit:
@@ -89,6 +89,7 @@ services:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
+    scale: 4
     volumes:
       - "nodessh:/root/.ssh:z"
   launcher:
