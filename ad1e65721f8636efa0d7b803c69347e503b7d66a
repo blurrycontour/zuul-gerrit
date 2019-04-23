@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_55d7b2ee",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-23T05:20:26Z",
+      "side": 1,
+      "message": "Log object is undefined. Perhaps using print is good enough?\nAlso, this should probably be raised back to the caller to avoid an exception on the s.sendall call below.",
+      "range": {
+        "startLine": 219,
+        "startChar": 12,
+        "endLine": 219,
+        "endChar": 22
+      },
+      "revId": "ad1e65721f8636efa0d7b803c69347e503b7d66a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
