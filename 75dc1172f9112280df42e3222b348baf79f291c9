@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_a30d863f",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 22720
+      },
+      "writtenOn": "2019-04-23T16:37:18Z",
+      "side": 1,
+      "message": "Maybe also expose data about type?\n\n`https://github.com/[apps/]user (bot/user/org)`",
+      "revId": "75dc1172f9112280df42e3222b348baf79f291c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
