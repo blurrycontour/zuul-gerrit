@@ -16,6 +16,24 @@
       "revId": "278774a1c70a456bcda8a1edb6279349fdd47c13",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_4535a7d9",
+        "filename": "web/public/openapi.yaml",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-24T02:38:51Z",
+      "side": 1,
+      "message": "next PS drop the json conversion and load the yaml directly for swagger-ui",
+      "parentUuid": "5fc1f717_2d48e9b0",
+      "revId": "278774a1c70a456bcda8a1edb6279349fdd47c13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
