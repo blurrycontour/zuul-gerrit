@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_249c07bf",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2019-04-25T22:11:40Z",
+      "side": 1,
+      "message": "Job tox-py35-1 not defined",
+      "range": {
+        "startLine": 200,
+        "startChar": 2,
+        "endLine": 262,
+        "endChar": 0
+      },
+      "revId": "2478eddab77e38c8d0b68e33e0d55a3ea450fb40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
