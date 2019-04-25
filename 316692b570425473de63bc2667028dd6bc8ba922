@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_878aab18",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-25T00:05:31Z",
+      "side": 1,
+      "message": "it seems like this whole case block can be removed as the default is similar.",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 148,
+        "endChar": 21
+      },
+      "revId": "316692b570425473de63bc2667028dd6bc8ba922",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
