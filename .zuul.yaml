@@ -154,44 +154,62 @@
       nodes: []
     vars: *zuul_image_vars
 
+- job:
+    name: zuul-tox-py35
+    parent: tox-py35
+    nodeset: ubuntu-xenial
+    timeout: 3600  # 60 minutes
+
+- job:
+    name: zuul-tox-py35-1
+    parent: zuul-tox-py35
+- job:
+    name: zuul-tox-py35-2
+    parent: zuul-tox-py35
+- job:
+    name: zuul-tox-py35-3
+    parent: zuul-tox-py35
+- job:
+    name: zuul-tox-py35-4
+    parent: zuul-tox-py35
+- job:
+    name: zuul-tox-py35-5
+    parent: zuul-tox-py35
+
+- job:
+    name: zuul-tox-py36
+    parent: tox-py36
+    timeout: 3600  # 60 minutes
+
+- job:
+    name: zuul-tox-py36-1
+    parent: zuul-tox-py36
+- job:
+    name: zuul-tox-py36-2
+    parent: zuul-tox-py36
+- job:
+    name: zuul-tox-py36-3
+    parent: zuul-tox-py36
+- job:
+    name: zuul-tox-py36-4
+    parent: zuul-tox-py36
+- job:
+    name: zuul-tox-py36-5
+    parent: zuul-tox-py36
+
 - project:
     check:
       jobs:
-        - zuul-build-image
-        - tox-docs
-        - tox-pep8
-        - tox-py35:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
-            timeout: 2700  # 45 minutes
-        - tox-py36:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            timeout: 2700  # 45 minutes
-        - zuul-build-dashboard
-        - zuul-build-dashboard-multi-tenant
-        - nodejs-npm-run-lint:
-            vars:
-              node_version: 10
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-npm-run-test:
-            vars:
-              node_version: 10
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.5
-        - zuul-stream-functional-2.6
-        - zuul-stream-functional-2.7
-        - zuul-tox-remote
-        - zuul-quick-start:
-            dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
+        - zuul-tox-py35-1
+        - zuul-tox-py35-2
+        - zuul-tox-py35-3
+        - zuul-tox-py35-4
+        - zuul-tox-py35-5
+        - zuul-tox-py36-1
+        - zuul-tox-py36-2
+        - zuul-tox-py36-3
+        - zuul-tox-py36-4
+        - zuul-tox-py36-5
     gate:
       jobs:
         - zuul-upload-image
