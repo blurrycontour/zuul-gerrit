@@ -2466,7 +2466,7 @@ class QueueItem(object):
             build = build_set.getBuild(job.name)
             if build and (build.result == 'SUCCESS' or build.paused):
                 successful_job_names.add(job.name)
-            elif build and build.result == 'SKIPPED':
+            elif build and build.result in ('SKIPPED', 'FAILURE'):
                 pass
             else:
                 nodeset = build_set.getJobNodeSet(job.name)
