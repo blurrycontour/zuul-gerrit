@@ -2285,10 +2285,11 @@ class ExecutorServer(object):
         # in case we were uncleanly shut down.
         if not self.keep_jobdir:
             for fn in os.listdir(self.jobdir_root):
-                if not os.path.isdir(fn):
+                path = os.path.join(self.jobdir_root, fn)
+                if not os.path.isdir(path):
                     continue
-                self.log.info("Deleting stale jobdir %s", fn)
-                shutil.rmtree(os.path.join(self.jobdir_root, fn))
+                self.log.info("Deleting stale jobdir %s", path)
+                shutil.rmtree(path)
 
         self.job_workers = {}
         self.disk_accountant = DiskAccountant(self.jobdir_root,
