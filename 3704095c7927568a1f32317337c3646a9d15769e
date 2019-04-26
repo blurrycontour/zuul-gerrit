@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_37e2ed30",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1401,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-26T17:47:13Z",
+      "side": 1,
+      "message": "This should be job_name.  Otherwise, this will return nothing and we\u0027ll keep old node requests around with old buildsets.  They link to old layouts, etc, and can cause memory explosion.",
+      "revId": "3704095c7927568a1f32317337c3646a9d15769e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_d7d2715c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-26T17:47:13Z",
+      "side": 1,
+      "message": "In the old code, this only happened on reconfigurations, but now it also happens when new buildsets are created (eg gate resets).  At the moment, I don\u0027t see how that could be harmful.",
+      "revId": "3704095c7927568a1f32317337c3646a9d15769e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_f7d53544",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1422,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-26T17:47:13Z",
+      "side": 1,
+      "message": "In the old code, this only happened on reconfigurations, but now it also happens when new buildsets are created (eg gate resets).  At the moment, I don\u0027t see how that could be harmful.",
+      "revId": "3704095c7927568a1f32317337c3646a9d15769e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_97ccf9bc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1431,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-04-26T17:47:13Z",
+      "side": 1,
+      "message": "The nodeset return wasn\u0027t included in the reconfiguration case before, however that seems like an oversight and could have lead to leaked nodes, so this seems like an improvement.",
+      "revId": "3704095c7927568a1f32317337c3646a9d15769e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
