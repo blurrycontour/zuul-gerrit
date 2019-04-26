@@ -17,6 +17,10 @@ sudo service mysql start
 sudo service postgresql start
 sudo service zookeeper start
 
+# Give zookeeper a higher priority.
+ZK_PID=$(pgrep -f zookeeper)
+sudo renice -20 ${ZK_PID}
+
 # The root password for the MySQL database; pass it in via
 # MYSQL_ROOT_PW.
 DB_ROOT_PW=${MYSQL_ROOT_PW:-insecure_slave}
