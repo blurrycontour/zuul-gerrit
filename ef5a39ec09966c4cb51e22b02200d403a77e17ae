@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_84fa77ba",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1422,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-04-27T20:24:03Z",
+      "side": 1,
+      "message": "Is there a way this can be disabled on a per-project bases?  In my case, because we pay each time we launch a VM, projects enabling this will actually cost us more in testing.  So, as a zuul admin, I\u0027d like to selectively enable it for specific projects, or block it for all projects by default.",
+      "revId": "ef5a39ec09966c4cb51e22b02200d403a77e17ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
