@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_a1876db5",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-04-27T18:39:48Z",
+      "side": 1,
+      "message": "I think you also need to add paused here",
+      "revId": "41fc881e0bbd50112768cf54d384c3df564d2847",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
