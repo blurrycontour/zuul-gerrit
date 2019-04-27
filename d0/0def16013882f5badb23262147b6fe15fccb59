@@ -1,0 +1,11 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: David Shrewsbury <dshrewsb@redhat.com>
+Workflow+1: David Shrewsbury <dshrewsb@redhat.com>
+Code-Review+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+1: Andreas Jaeger <jaegerandi@gmail.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Sat, 27 Apr 2019 07:08:46 +0000
+Reviewed-on: https://review.opendev.org/654483
+Project: zuul/zuul
+Branch: refs/heads/master
