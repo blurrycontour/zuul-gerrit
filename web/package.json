@@ -35,7 +35,7 @@
   },
   "scripts": {
     "start:openstack": "REACT_APP_ZUUL_API='https://zuul.openstack.org/api/' react-scripts start",
-    "start:multi": "REACT_APP_ZUUL_API='https://softwarefactory-project.io/zuul/api/' react-scripts start",
+    "start:multi": "REACT_APP_ZUUL_API='https://zuul.opendev.org/api/' react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",

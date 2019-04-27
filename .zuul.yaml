@@ -72,7 +72,7 @@
     name: zuul-build-dashboard-multi-tenant
     parent: zuul-build-dashboard
     vars:
-      zuul_api_url: https://softwarefactory-project.io/zuul
+      zuul_api_url: https://zuul.opendev.org
 
 # This job is run on changes to both Zuul and Nodepool; any changes to
 # the other project will be picked up via image builds which appear in
