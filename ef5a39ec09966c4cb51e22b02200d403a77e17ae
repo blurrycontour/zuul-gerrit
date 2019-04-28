@@ -16,6 +16,24 @@
       "revId": "ef5a39ec09966c4cb51e22b02200d403a77e17ae",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_7adcbee3",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 1422,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-04-28T06:29:04Z",
+      "side": 1,
+      "message": "You should be able to force this to false in a config project. See first comment by corvus which I addressed in PS5.",
+      "parentUuid": "ffb9cba7_84fa77ba",
+      "revId": "ef5a39ec09966c4cb51e22b02200d403a77e17ae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
