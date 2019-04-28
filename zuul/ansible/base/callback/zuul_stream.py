@@ -241,9 +241,6 @@ class CallbackModule(default.CallbackModule):
                 if ip in ('localhost', '127.0.0.1'):
                     # Don't try to stream from localhost
                     continue
-                if task.loop:
-                    # Don't try to stream from loops
-                    continue
                 if play_vars[host].get('ansible_connection') in ('kubectl', ):
                     # Don't try to stream from kubectl connection
                     continue
