@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffb9cba7_4e3ed58c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1253,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-28T23:51:01Z",
+      "side": 1,
+      "message": "logger automatically format the string when needed, the \u0027% (...)\u0027 could be replaced by a \u0027,\u0027.",
+      "range": {
+        "startLine": 1253,
+        "startChar": 67,
+        "endLine": 1253,
+        "endChar": 68
+      },
+      "revId": "ec0a42a2a88ea42846cf34721883c94e302b672e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffb9cba7_8eba8d07",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1256,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-04-28T23:51:01Z",
+      "side": 1,
+      "message": "Shouldn\u0027t an exception be raised when retry \u003d\u003d 4?",
+      "revId": "ec0a42a2a88ea42846cf34721883c94e302b672e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
