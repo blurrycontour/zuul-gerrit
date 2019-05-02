@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Zuul needs to be able to connect to the remote systems in order to
 # start.
@@ -10,7 +10,7 @@ wait_for_gearman() {
         sleep 1
     done
 
-    echo "Timeout waiting for mysql"
+    echo "Timeout waiting for gearman"
     exit 1
 }
 
