@@ -122,6 +122,9 @@ class BuildModal extends React.Component {
       if (v && !v['defaults'] && new RegExp('^ {3}:default: ').test(line)) {
         v['defaults'] = line.split(':default: ')[1]
       }
+      if (v && !v['doc'] && new RegExp('^ {3}:doc-link: ').test(line)) {
+        v['doc'] = line.split(':doc-link: ')[1]
+      }
       if (v && !v['type'] && new RegExp('^ {3}:type: ').test(line)) {
         v['type'] = line.split(':type: ')[1]
       }
@@ -218,6 +221,16 @@ class BuildModal extends React.Component {
                     <HelpBlock>
                       {item.description}
                       {item.defaults && ' (' + item.defaults + ')'}
+                      {item.doc && (
+                        <React.Fragment>
+                          {item.description && <br />}
+                          <a href={item.doc}
+                             rel='noopener noreferrer'
+                             target='_blank'>
+                            Documentation
+                          </a>
+                        </React.Fragment>
+                      )}
                     </HelpBlock>
                   </Col>
                 </FormGroup>
