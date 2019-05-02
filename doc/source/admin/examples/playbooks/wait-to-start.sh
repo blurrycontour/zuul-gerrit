@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Zuul needs to be able to connect to the remote systems in order to
 # start.
