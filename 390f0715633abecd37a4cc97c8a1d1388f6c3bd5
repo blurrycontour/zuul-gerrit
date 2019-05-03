@@ -22,6 +22,30 @@
       "revId": "390f0715633abecd37a4cc97c8a1d1388f6c3bd5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_c08e8d26",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2050,
+      "author": {
+        "id": 15334
+      },
+      "writtenOn": "2019-05-03T21:55:45Z",
+      "side": 1,
+      "message": "This is automatically set by the tox-docker plugin. I\u0027ll add a comment to this effect",
+      "parentUuid": "5fc1f717_53632fde",
+      "range": {
+        "startLine": 2050,
+        "startChar": 12,
+        "endLine": 2050,
+        "endChar": 30
+      },
+      "revId": "390f0715633abecd37a4cc97c8a1d1388f6c3bd5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
