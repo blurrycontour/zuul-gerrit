@@ -28,8 +28,13 @@ services:
     environment:
       - ZOO_AUTOPURGE_PURGEINTERVAL=1
       - ZOO_LOG4J_PROP=WARN
+      - JVMFLAGS=-Djava.security.auth.login.config=/etc/zookeeper/auth.conf
+      - JAVA_OPTS=-Djava.security.auth.login.config=/etc/zookeeper/auth.conf
     ports:
       - "2181:2181"
     tmpfs:
       - /data
       - /datalog
+    volumes:
+      - ./zoo.cfg:/conf/zoo.cfg:z
+      - ./auth.conf:/etc/zookeeper/auth.conf:z
