@@ -2702,8 +2702,10 @@ class ZuulTestCase(BaseTestCase):
             "job-dir": os.path.join(self.test_root, "job-runner"),
             "git-dir": self.executor_src_root,
         })
+        runner_config = zuul.executor.runner.RunnerConfiguration()
+        runner_config.loadConfig(config)
         return zuul.executor.runner.LocalRunnerContextManager(
-            config, self.connections)
+            runner_config, self.connections)
 
     def setup_config(self):
         # This creates the per-test configuration object.  It can be
