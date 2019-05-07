@@ -66,6 +66,16 @@ class Runner(zuul.cmd.ZuulApp):
             action='store_true',
             help='print the list of playbooks')
 
+        parser.add_argument(
+            '--nodes',
+            action='append',
+            help='A node to use, semi-colon separated tuple '
+                 'of connection:label:hostname:username:cwd')
+        parser.add_argument(
+            '--skip-ansible-install',
+            action='store_true',
+            help='Skip ansible install and validation')
+
         # TODO(jhesketh):
         #  - Enable command line argument override from environ
         #  - Allow supplying the job via either raw input or zuul endpoint
@@ -75,6 +85,23 @@ class Runner(zuul.cmd.ZuulApp):
 
     def parseArguments(self, args=None):
         super(Runner, self).parseArguments()
+        # Parse node command line argument
+        nodes = []
+        if getattr(self.args, "nodes", None) is not None:
+            for node in self.args.nodes:
+                try:
+                    conn, label, hostname, user, cwd = node.split(':')
+                except Exception as e:
+                    print("Couldn't decode %s: %s" % (node, str(e)))
+                    sys.exit(1)
+                nodes.append(dict(
+                    connection=conn,
+                    label=label,
+                    username=user,
+                    hostname=hostname,
+                    cwd=cwd,
+                ))
+        self.args.nodes = nodes
 
     def _constructConnections(self, config):
         connections = zuul.lib.connections.ConnectionRegistry()
@@ -105,6 +132,9 @@ class Runner(zuul.cmd.ZuulApp):
         print("== Post phase ==")
         for playbook in job.jobdir.post_playbooks:
             print_play(playbook.path)
+
+    def execute(self):
+        print(self.runner.execute(self.args.skip_ansible_install))
 
     def main(self):
         self.parseArguments()
@@ -137,6 +167,8 @@ class Runner(zuul.cmd.ZuulApp):
         try:
             if self.args.list_playbooks:
                 self.list_playbooks()
+            else:
+                self.execute()
             return 0
         except Exception as e:
             if self.args.verbose:
