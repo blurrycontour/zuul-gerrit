@@ -37,7 +37,6 @@ class BuildModal extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     projectName: PropTypes.string,
-    jobName: PropTypes.string,
     job: PropTypes.object,
     onRef: PropTypes.func,
     dispatch: PropTypes.func,
@@ -46,13 +45,14 @@ class BuildModal extends React.Component {
 
   state = {
     show: false,
+    jobsNames: [],
   }
 
-  show = () => {
-    this.props.dispatch(
-      fetchJobIfNeeded(this.props.tenant, this.props.jobName)
-    )
-    this.setState({show: true})
+  show = (jobs) => {
+    for (let job of jobs) {
+      this.props.dispatch(fetchJobIfNeeded(this.props.tenant, job))
+    }
+    this.setState({show: true, jobsNames: jobs})
   }
 
   componentDidMount() {
@@ -82,10 +82,11 @@ class BuildModal extends React.Component {
   }
 
   submit = () => {
-    const { tenant, projectName, jobName } = this.props
+    const { jobsNames } = this.state
+    const { tenant, projectName } = this.props
     const variables = {}
-    if (this.jobVariables) {
-      for (let variable of this.jobVariables) {
+    if (this.jobsVariables) {
+      for (let variable of this.jobsVariables) {
         let value
         if (variable['type'] === 'bool') {
           value = this.inputs[variable.name].checked
@@ -102,7 +103,7 @@ class BuildModal extends React.Component {
       branch = this.branchRef.value
     }
     API.triggerJobs(
-      tenant.apiPrefix, projectName, branch, [jobName], variables)
+      tenant.apiPrefix, projectName, branch, jobsNames, variables)
       .then(() => this.props.history.push(tenant.linkPrefix + '/status'))
       .catch(error => console.error('oops', error))
   }
@@ -118,7 +119,7 @@ class BuildModal extends React.Component {
         if (v) {
           variables.push(v)
         }
-        v = {name: line.split(':: ')[1]}
+        v = {name: line.split(':: ')[1], jobs: [job]}
       }
       if (v && !v['defaults'] && new RegExp('^ {3}:default: ').test(line)) {
         v['defaults'] = line.split(':default: ')[1]
@@ -145,10 +146,35 @@ class BuildModal extends React.Component {
     return variables
   }
 
+  getJobsVariables(jobs, jobsNames) {
+    const variables = []
+    const getVariable = function (variableName) {
+      for (let variable of variables) {
+        if (variable.name === variableName) {
+          return variable
+        }
+      }
+    }
+    for (let job of jobsNames) {
+      const jobVariables = this.getVariables(jobs, job)
+
+      for (let jobVariable of jobVariables) {
+        let variable = getVariable(jobVariable.name)
+        if (!variable) {
+          variables.push(jobVariable)
+        } else {
+          variable.jobs.push(job)
+        }
+      }
+    }
+    return variables
+  }
+
   render () {
-    const { projectName, job, jobName } = this.props
-    this.jobVariables = this.getVariables(
-      job.jobs[this.props.tenant.name], jobName)
+    const { jobsNames } = this.state
+    const { projectName, job } = this.props
+    this.jobsVariables = this.getJobsVariables(
+      job.jobs[this.props.tenant.name], jobsNames)
     this.inputs = {}
     this.branchRef = null
     return (
@@ -165,7 +191,7 @@ class BuildModal extends React.Component {
             <Icon type='pf' name='close' />
           </button>
           <Modal.Title>
-            Run {jobName} for project {projectName}
+            Run {jobsNames.join(' ')} for project {projectName}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -184,7 +210,7 @@ class BuildModal extends React.Component {
                 </HelpBlock>
               </Col>
             </FormGroup>
-            {this.jobVariables.map(item => {
+            {this.jobsVariables.map(item => {
               let formControl
               if (item['type'] === 'bool') {
                 formControl = (
@@ -221,9 +247,15 @@ class BuildModal extends React.Component {
                     <HelpBlock>
                       {item.description}
                       {item.defaults && ' (' + item.defaults + ')'}
-                      {item.doc && (
+                      {item.jobs.length !== jobsNames.length && (
                         <React.Fragment>
                           {item.description && <br />}
+                          <strong>Affects:</strong> {item.jobs.join(',')}
+                        </React.Fragment>
+                      )}
+                      {item.doc && (
+                        <React.Fragment>
+                          {(item.description || item.jobs.length !== jobsNames.length) && <br />}
                           <a href={item.doc}
                              rel='noopener noreferrer'
                              target='_blank'>
@@ -236,22 +268,16 @@ class BuildModal extends React.Component {
                 </FormGroup>
               )
             })}
-            <Row style={{paddingTop: '10px',paddingBottom: '10px'}}>
-              <Col smOffset={3} sm={9}>
-                <span>
-                  <Button bsStyle='primary' onClick={this.submit}>
-                    Execute
-                  </Button>
-                </span>&nbsp;
-                <span>
-                  <Button onClick={() => {this.setState({show: false})}}>
-                    Cancel
-                  </Button>
-                </span>
-              </Col>
-            </Row>
           </Form>
         </Modal.Body>
+        <Modal.Footer>
+          <Button bsStyle='primary' onClick={this.submit}>
+            Execute
+          </Button>
+          <Button onClick={() => {this.setState({show: false})}}>
+            Cancel
+          </Button>
+        </Modal.Footer>
       </Modal>
     )
   }
