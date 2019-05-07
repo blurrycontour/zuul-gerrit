@@ -21,6 +21,8 @@ import uuid
 from concurrent.futures.process import ProcessPoolExecutor
 
 import requests
+import voluptuous as vs
+import yaml
 
 import zuul
 import zuul.merger.merger
@@ -32,6 +34,45 @@ from zuul.executor.common import AnsibleJobContextManager
 from zuul.executor.common import DeduplicateQueue
 from zuul.executor.common import JobDir
 from zuul.executor.common import UpdateTask
+
+
+class RunnerConfiguration(object):
+    log = logging.getLogger("zuul.RunnerConfiguration")
+
+    schema = {
+        "ansible-dir": str,
+        "job-dir": str,
+        "git-dir": str,
+        'api': str,
+        'tenant': str,
+        'project': str,
+        'pipeline': str,
+        'branch': str,
+        'job': str,
+    }
+
+    def readConfig(self, config_path):
+        config_path = os.path.expanduser(config_path)
+        if os.path.exists(config_path):
+            with open(config_path) as config_file:
+                return yaml.safe_load(config_file)
+        else:
+            return {}
+
+    def loadConfig(self, config):
+        # Validate schema
+        vs.Schema(self.schema)(config)
+        # Set default value
+        self.api = config["api"]
+        self.tenant = config.get("tenant")
+        self.pipeline = config.get("pipeline", "check")
+        self.project = config.get("project")
+        self.branch = config.get("branch", "master")
+        self.job = config.get("job")
+        self.job_dir = config.get("job-dir")
+        self.ansible_dir = config.get("ansible-dir", "~/.cache/zuul/ansible")
+        self.git_dir = config.get("git-dir", "~/.cache/zuul/git")
+        return config
 
 
 class LocalRunnerContextManager(AnsibleJobContextManager):
@@ -48,12 +89,12 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         self.runner_config = runner_config
         self.connections = connections
         self.ansible_manager = zuul.lib.ansible.AnsibleManager(
-            runner_config["ansible-dir"])
-        self.merge_root = os.path.expanduser(runner_config["git-dir"])
+            runner_config.ansible_dir)
+        self.merge_root = os.path.expanduser(runner_config.git_dir)
         self.merger_lock = threading.Lock()
 
-        if self.runner_config["job-dir"]:
-            root = self.runner_config["job-dir"]
+        if self.runner_config.job_dir:
+            root = self.runner_config.job_dir
             if root.endswith('/'):
                 root = root[:-1]
             self.unique = root.split('/')[-1]
@@ -160,27 +201,26 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             speed_limit, speed_time, cache_root, logger)
 
     def _grabFrozenJob(self):
-        url = self.runner_config["api"]
-        if self.runner_config.get("tenant"):
-            url = os.path.join(url, "tenant", self.runner_config["tenant"])
-        if self.runner_config.get("project"):
+        url = self.runner_config.api
+        if self.runner_config.tenant:
+            url = os.path.join(url, "tenant", self.runner_config.tenant)
+        if self.runner_config.project:
             url = os.path.join(
                 url,
                 "pipeline",
-                self.runner_config["pipeline"],
+                self.runner_config.pipeline,
                 "project",
-                self.runner_config["project"],
+                self.runner_config.project,
                 "branch",
-                self.runner_config["branch"],
+                self.runner_config.branch,
                 "freeze-job")
-        if self.runner_config.get("job"):
-            url = os.path.join(url, self.runner_config["job"])
+        if self.runner_config.job:
+            url = os.path.join(url, self.runner_config.job)
         return requests.get(url).json()
 
     def prepareWorkspace(self):
         self.ansible_manager.copyAnsibleFiles()
         job_params = self._grabFrozenJob()
-
         self.merger = self.getMerger(self.merge_root)
         self.start_update_thread()
 
