@@ -37,6 +37,9 @@ class Runner(zuul.cmd.ZuulApp):
             action='store_true',
             help='verbose output')
         parser.add_argument(
+            '--user',
+            help='the connection user for cloning projects')
+        parser.add_argument(
             '--api',
             help='the zuul server api to query against')
         parser.add_argument(
@@ -66,6 +69,16 @@ class Runner(zuul.cmd.ZuulApp):
             action='store_true',
             help='print the list of playbooks')
 
+        parser.add_argument(
+            '--nodes',
+            action='append',
+            help='A node to use, semi-colon separated tuple '
+                 'of connection:label:hostname:username:cwd')
+        parser.add_argument(
+            '--skip-ansible-install',
+            action='store_true',
+            help='Skip ansible install and validation')
+
         # TODO(jhesketh):
         #  - Enable command line argument override from environ
         #  - Allow supplying the job via either raw input or zuul endpoint
@@ -75,12 +88,29 @@ class Runner(zuul.cmd.ZuulApp):
 
     def parseArguments(self, args=None):
         super(Runner, self).parseArguments()
+        # Parse node command line argument
+        nodes = []
+        if getattr(self.args, "nodes", None) is not None:
+            for node in self.args.nodes:
+                try:
+                    conn, label, hostname, user, cwd = node.split(':')
+                except Exception as e:
+                    print("Couldn't decode %s: %s" % (node, str(e)))
+                    sys.exit(1)
+                nodes.append(dict(
+                    connection=conn,
+                    label=label,
+                    username=user,
+                    hostname=hostname,
+                    cwd=cwd,
+                ))
+        self.args.nodes = nodes
 
     def _constructConnections(self, config):
         connections = zuul.lib.connections.ConnectionRegistry()
         url = os.path.join(config.api, "connections")
         for config in requests.get(url).json():
-            config['user'] = os.environ.get("USER", "zuul")
+            config['user'] = os.environ.get("USER", self.args.user or "zuul")
             connections.connections[config['name']] = connections.drivers[
                 config['driver']].getConnection(config['name'], config)
         return connections
@@ -106,7 +136,7 @@ class Runner(zuul.cmd.ZuulApp):
         # in the meantime, enable debug
         logging.basicConfig(
             format='%(asctime)s %(levelname)-5.5s %(name)s - %(message)s',
-            level=logging.DEBUG if self.args.verbose else logging.WARNING)
+            level=logging.DEBUG)
 
         config = zuul.executor.runner.RunnerConfiguration()
         runner_config = {}
@@ -128,10 +158,14 @@ class Runner(zuul.cmd.ZuulApp):
             config, connections)
 
         try:
+            rc = 0
             job_params = self.runner.grabFrozenJob()
             if self.args.list_playbooks:
                 self.list_playbooks(job_params)
-            return 0
+            else:
+                rc = self.runner.execute(
+                    job_params, self.args.skip_ansible_install)
+            return rc
         except Exception as e:
             if self.args.verbose:
                 raise
