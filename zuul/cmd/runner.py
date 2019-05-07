@@ -61,6 +61,20 @@ class Runner(zuul.cmd.ZuulApp):
             help='the directory to prepare inside of. Defaults to a temp dir')
         cmd_prep_workspace.set_defaults(func=self.prep_workspace)
 
+        cmd_execute = subparsers.add_parser(
+            'execute', help='prepare and execute a zuul jobs')
+        cmd_execute.add_argument(
+            '-n', '--nodes', action='append',
+            help='A node to use, semi-colon separated tuple '
+                 'of connection:label:hostname:username:cwd')
+        cmd_execute.add_argument(
+            '--skip-ansible-install', action='store_true',
+            help='Skip ansible install and validation')
+        cmd_execute.add_argument(
+            '-d', '--job-dir', default=None,
+            help='the directory to prepare inside of. defaults to a temp dir')
+        cmd_execute.set_defaults(func=self.execute)
+
         # TODO(jhesketh):
         #  - Enable command line argument override from environ
         #  - Allow supplying the job via either raw input or zuul endpoint
@@ -73,6 +87,23 @@ class Runner(zuul.cmd.ZuulApp):
         if not getattr(self.args, 'func', None):
             parser.print_help()
             sys.exit(1)
+        # Parse node command line argument
+        nodes = []
+        if getattr(self.args, "nodes", None) is not None:
+            for node in self.args.nodes:
+                try:
+                    conn, label, hostname, user, cwd = node.split(':')
+                except Exception as e:
+                    print("Couldn't decode %s: %s" % (node, str(e)))
+                    sys.exit(1)
+                nodes.append(dict(
+                    connection=conn,
+                    label=label,
+                    username=user,
+                    hostname=hostname,
+                    cwd=cwd,
+                ))
+        self.args.nodes = nodes
 
     def _constructConnections(self, config):
         connections = zuul.lib.connections.ConnectionRegistry()
@@ -95,6 +126,9 @@ class Runner(zuul.cmd.ZuulApp):
         print("== Post phase ==")
         for index, playbook in enumerate(job.jobdir.post_playbooks):
             print(playbook.path)
+
+    def execute(self):
+        print(self.runner.execute(self.args.skip_ansible_install))
 
     def main(self):
         self.parseArguments()

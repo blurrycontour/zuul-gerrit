@@ -43,3 +43,28 @@ For example, to prepare the tempest job workspace of the Nova project:
    /tmp/tmp4b58gpfz/untrusted/project_2/opendev.org/openstack/devstack/playbooks/post.yaml
    /tmp/tmp4b58gpfz/trusted/project_0/opendev.org/opendev/base-jobs/playbooks/base/post.yaml
    /tmp/tmp4b58gpfz/trusted/project_0/opendev.org/opendev/base-jobs/playbooks/base/post-logs.yaml
+
+
+Execute
+-------
+
+.. program-output:: zuul-runner execute --help
+
+For example, to execute the tempest job of the Nova project:
+
+.. code-block:: shell
+
+   $ zuul-runner --api https://zuul.openstack.org --project openstack/nova \
+       --job tempest-full-py3 execute --nodes ssh:ubuntu-bionic:instance-ip:tdecacqu:/home/tdecacqu
+   [...]
+   2019-05-07 06:08:01,040 DEBUG zuul.Runner - Ansible output: b'PLAY RECAP *********************************************************************'
+   2019-05-07 06:08:01,040 DEBUG zuul.Runner - Ansible output: b'instance-ip                : ok=9    changed=5    unreachable=0    failed=0'
+   2019-05-07 06:08:01,040 DEBUG zuul.Runner - Ansible output: b'localhost                  : ok=12   changed=9    unreachable=0    failed=0'
+   2019-05-07 06:08:01,040 DEBUG zuul.Runner - Ansible output: b''
+   2019-05-07 06:08:01,218 DEBUG zuul.Runner - Ansible output terminated
+   2019-05-07 06:08:01,219 DEBUG zuul.Runner - Ansible cpu times: user=0.00, system=0.00, children_user=0.00, children_system=0.00
+   2019-05-07 06:08:01,219 DEBUG zuul.Runner - Ansible exit code: 0
+   2019-05-07 06:08:01,219 DEBUG zuul.Runner - Stopped disk job killer
+   2019-05-07 06:08:01,220 DEBUG zuul.Runner - Ansible complete, result RESULT_NORMAL code 0
+   2019-05-07 06:08:01,220 DEBUG zuul.ExecutorServer - Sent SIGTERM to SSH Agent, {'SSH_AUTH_SOCK': '/tmp/ssh-SYKgxg36XMBa/agent.18274', 'SSH_AGENT_PID': '18275'}
+   SUCCESS
