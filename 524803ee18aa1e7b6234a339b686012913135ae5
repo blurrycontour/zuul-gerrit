@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_f471d8df",
+        "filename": "zuul/driver/bitbucket/bitbucketsource.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:40:02Z",
+      "side": 1,
+      "message": "This regex will work fantastically well with re2, which is up to 40x faster than re, and already in zuul\u0027s requirements.\n\n  Python 3.6.7 (default, Oct 22 2018, 11:32:17) \n  [GCC 8.2.0] on linux\n  Type \"help\", \"copyright\", \"credits\" or \"license\" for more information.\n  \u003e\u003e\u003e import re2\n  \u003e\u003e\u003e re2.compile(\".*/projects/(.*?)/repos/(.*?)/pull-requests/(\\d+)[\\w]*\")\n  \u003c_re2.RE2_Regexp object at 0x7f49a1595750\u003e\n  \u003e\u003e\u003e x \u003d re2.compile(\".*/projects/(.*?)/repos/(.*?)/pull-requests/(\\d+)[\\w]*\")\n  \u003e\u003e\u003e y \u003d x.match(\"/anything/projects/moar/repos/bah/pull-requests/99999\")\n  \u003e\u003e\u003e y\n  \u003c_re2.RE2_Match object at 0x7f49a15dfde0\u003e\n  \u003e\u003e\u003e dir(y)\n  [\u0027__class__\u0027, \u0027__delattr__\u0027, \u0027__dir__\u0027, \u0027__doc__\u0027, \u0027__eq__\u0027, \u0027__format__\u0027, \u0027__ge__\u0027, \u0027__getattribute__\u0027, \u0027__gt__\u0027, \u0027__hash__\u0027, \u0027__init__\u0027, \u0027__init_subclass__\u0027, \u0027__le__\u0027, \u0027__lt__\u0027, \u0027__ne__\u0027, \u0027__new__\u0027, \u0027__reduce__\u0027, \u0027__reduce_ex__\u0027, \u0027__repr__\u0027, \u0027__setattr__\u0027, \u0027__sizeof__\u0027, \u0027__str__\u0027, \u0027__subclasshook__\u0027, \u0027end\u0027, \u0027group\u0027, \u0027groupdict\u0027, \u0027groups\u0027, \u0027span\u0027, \u0027start\u0027]\n  \u003e\u003e\u003e y.groups\n  \u003cbuilt-in method groups of _re2.RE2_Match object at 0x7f49a15dfde0\u003e\n  \u003e\u003e\u003e list(y.groups)\n  Traceback (most recent call last):\n    File \"\u003cstdin\u003e\", line 1, in \u003cmodule\u003e\n  TypeError: \u0027builtin_function_or_method\u0027 object is not iterable\n  \u003e\u003e\u003e y.groups()\n  (\u0027moar\u0027, \u0027bah\u0027, \u002799999\u0027)\n  \u003e\u003e\u003e",
+      "revId": "524803ee18aa1e7b6234a339b686012913135ae5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
