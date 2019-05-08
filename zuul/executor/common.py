@@ -199,20 +199,20 @@ class JobDirPlaybook(object):
         self.ansible_config = os.path.join(self.root, 'ansible.cfg')
         self.project_link = os.path.join(self.root, 'project')
         self.secrets_root = os.path.join(self.root, 'secrets')
-        os.makedirs(self.secrets_root)
+        os.makedirs(self.secrets_root, exist_ok=True)
         self.secrets = os.path.join(self.secrets_root, 'secrets.yaml')
         self.secrets_content = None
 
-    def addRole(self):
+    def addRole(self, exist_ok=False):
         count = len(self.roles)
         root = os.path.join(self.root, 'role_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, exist_ok=exist_ok)
         self.roles.append(root)
         return root
 
 
 class JobDir(object):
-    def __init__(self, root, keep, build_uuid):
+    def __init__(self, root, keep, build_uuid, exist_ok=False):
         '''
         :param str root: Root directory for the individual job directories.
             Can be None to use the default system temp root directory.
@@ -257,35 +257,35 @@ class JobDir(object):
         else:
             tmpdir = tempfile.gettempdir()
         self.root = os.path.join(tmpdir, build_uuid)
-        os.mkdir(self.root, 0o700)
+        os.makedirs(self.root, 0o700, exist_ok=exist_ok)
         self.work_root = os.path.join(self.root, 'work')
-        os.makedirs(self.work_root)
+        os.makedirs(self.work_root, exist_ok=exist_ok)
         self.src_root = os.path.join(self.work_root, 'src')
-        os.makedirs(self.src_root)
+        os.makedirs(self.src_root, exist_ok=exist_ok)
         self.log_root = os.path.join(self.work_root, 'logs')
-        os.makedirs(self.log_root)
+        os.makedirs(self.log_root, exist_ok=exist_ok)
         # Create local tmp directory
         # NOTE(tobiash): This must live within the work root as it can be used
         # by ansible for temporary files which are path checked in untrusted
         # jobs.
         self.local_tmp = os.path.join(self.work_root, 'tmp')
-        os.makedirs(self.local_tmp)
+        os.makedirs(self.local_tmp, exist_ok=exist_ok)
         self.ansible_root = os.path.join(self.root, 'ansible')
-        os.makedirs(self.ansible_root)
+        os.makedirs(self.ansible_root, exist_ok=exist_ok)
         self.trusted_root = os.path.join(self.root, 'trusted')
-        os.makedirs(self.trusted_root)
+        os.makedirs(self.trusted_root, exist_ok=exist_ok)
         self.untrusted_root = os.path.join(self.root, 'untrusted')
-        os.makedirs(self.untrusted_root)
+        os.makedirs(self.untrusted_root, exist_ok=exist_ok)
         ssh_dir = os.path.join(self.work_root, '.ssh')
-        os.mkdir(ssh_dir, 0o700)
+        os.makedirs(ssh_dir, 0o700, exist_ok=exist_ok)
         # Create ansible cache directory
         self.ansible_cache_root = os.path.join(self.root, '.ansible')
         self.fact_cache = os.path.join(self.ansible_cache_root, 'fact-cache')
-        os.makedirs(self.fact_cache)
+        os.makedirs(self.fact_cache, exist_ok=exist_ok)
         self.control_path = os.path.join(self.ansible_cache_root, 'cp')
         self.job_unreachable_file = os.path.join(self.ansible_cache_root,
                                                  'nodes.unreachable')
-        os.makedirs(self.control_path)
+        os.makedirs(self.control_path, exist_ok=exist_ok)
         localhost_facts = os.path.join(self.fact_cache, 'localhost')
         # NOTE(pabelanger): We do not want to leak zuul-executor facts to other
         # playbooks now that smart fact gathering is enabled by default.  We
@@ -326,17 +326,17 @@ class JobDir(object):
         # methods to write an ansible.cfg as the rest of the Ansible
         # runs.
         setup_root = os.path.join(self.ansible_root, 'setup_playbook')
-        os.makedirs(setup_root)
+        os.makedirs(setup_root, exist_ok=exist_ok)
         self.setup_playbook = JobDirPlaybook(setup_root)
         self.setup_playbook.trusted = True
 
-    def addTrustedProject(self, canonical_name, branch):
+    def addTrustedProject(self, canonical_name, branch, exist_ok=False):
         # Trusted projects are placed in their own directories so that
         # we can support using different branches of the same project
         # in different playbooks.
         count = len(self.trusted_projects)
         root = os.path.join(self.trusted_root, 'project_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, exist_ok=exist_ok)
         self.trusted_projects.append(root)
         self.trusted_project_index[(canonical_name, branch)] = root
         return root
@@ -344,7 +344,7 @@ class JobDir(object):
     def getTrustedProject(self, canonical_name, branch):
         return self.trusted_project_index.get((canonical_name, branch))
 
-    def addUntrustedProject(self, canonical_name, branch):
+    def addUntrustedProject(self, canonical_name, branch, exist_ok=False):
         # Similar to trusted projects, but these hold checkouts of
         # projects which are allowed to have speculative changes
         # applied.  They might, however, be different branches than
@@ -353,7 +353,7 @@ class JobDir(object):
         # the contents of the working dir.
         count = len(self.untrusted_projects)
         root = os.path.join(self.untrusted_root, 'project_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, exist_ok=exist_ok)
         self.untrusted_projects.append(root)
         self.untrusted_project_index[(canonical_name, branch)] = root
         return root
@@ -361,26 +361,26 @@ class JobDir(object):
     def getUntrustedProject(self, canonical_name, branch):
         return self.untrusted_project_index.get((canonical_name, branch))
 
-    def addPrePlaybook(self):
+    def addPrePlaybook(self, exist_ok=False):
         count = len(self.pre_playbooks)
         root = os.path.join(self.ansible_root, 'pre_playbook_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, exist_ok=exist_ok)
         playbook = JobDirPlaybook(root)
         self.pre_playbooks.append(playbook)
         return playbook
 
-    def addPostPlaybook(self):
+    def addPostPlaybook(self, exist_ok=False):
         count = len(self.post_playbooks)
         root = os.path.join(self.ansible_root, 'post_playbook_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, exist_ok=exist_ok)
         playbook = JobDirPlaybook(root)
         self.post_playbooks.append(playbook)
         return playbook
 
-    def addPlaybook(self):
+    def addPlaybook(self, exist_ok=False):
         count = len(self.playbooks)
         root = os.path.join(self.ansible_root, 'playbook_%i' % (count,))
-        os.makedirs(root)
+        os.makedirs(root, exist_ok=exist_ok)
         playbook = JobDirPlaybook(root)
         self.playbooks.append(playbook)
         return playbook
@@ -1028,17 +1028,17 @@ class AnsibleJob(object):
             return path
         raise ExecutorError("Unable to find playbook %s" % path)
 
-    def preparePlaybooks(self, args):
-        self.writeAnsibleConfig(self.jobdir.setup_playbook)
+    def preparePlaybooks(self, args, exist_ok=False):
+        self.writeAnsibleConfig(self.jobdir.setup_playbook, exist_ok)
 
         for playbook in args['pre_playbooks']:
-            jobdir_playbook = self.jobdir.addPrePlaybook()
-            self.preparePlaybook(jobdir_playbook, playbook, args)
+            jobdir_playbook = self.jobdir.addPrePlaybook(exist_ok)
+            self.preparePlaybook(jobdir_playbook, playbook, args, exist_ok)
 
         job_playbook = None
         for playbook in args['playbooks']:
-            jobdir_playbook = self.jobdir.addPlaybook()
-            self.preparePlaybook(jobdir_playbook, playbook, args)
+            jobdir_playbook = self.jobdir.addPlaybook(exist_ok)
+            self.preparePlaybook(jobdir_playbook, playbook, args, exist_ok)
             if jobdir_playbook.path is not None:
                 if job_playbook is None:
                     job_playbook = jobdir_playbook
@@ -1047,10 +1047,10 @@ class AnsibleJob(object):
             raise ExecutorError("No playbook specified")
 
         for playbook in args['post_playbooks']:
-            jobdir_playbook = self.jobdir.addPostPlaybook()
-            self.preparePlaybook(jobdir_playbook, playbook, args)
+            jobdir_playbook = self.jobdir.addPostPlaybook(exist_ok)
+            self.preparePlaybook(jobdir_playbook, playbook, args, exist_ok)
 
-    def preparePlaybook(self, jobdir_playbook, playbook, args):
+    def preparePlaybook(self, jobdir_playbook, playbook, args, exist_ok=False):
         # Check out the playbook repo if needed and set the path to
         # the playbook that should be run.
         self.log.debug("Prepare playbook repo for %s: %s@%s" %
@@ -1067,9 +1067,10 @@ class AnsibleJob(object):
         path = None
 
         if not jobdir_playbook.trusted:
-            path = self.checkoutUntrustedProject(project, branch, args)
+            path = self.checkoutUntrustedProject(
+                project, branch, args, exist_ok)
         else:
-            path = self.checkoutTrustedProject(project, branch)
+            path = self.checkoutTrustedProject(project, branch, exist_ok)
         path = os.path.join(path, playbook['path'])
 
         jobdir_playbook.path = self.findPlaybook(
@@ -1082,7 +1083,7 @@ class AnsibleJob(object):
             return
 
         for role in playbook['roles']:
-            self.prepareRole(jobdir_playbook, role, args)
+            self.prepareRole(jobdir_playbook, role, args, exist_ok)
 
         secrets = playbook['secrets']
         if secrets:
@@ -1092,17 +1093,22 @@ class AnsibleJob(object):
 
         self.writeAnsibleConfig(jobdir_playbook)
 
-    def checkoutTrustedProject(self, project, branch):
+    def checkoutTrustedProject(self, project, branch, exist_ok=False):
         root = self.jobdir.getTrustedProject(project.canonical_name,
                                              branch)
         if not root:
             root = self.jobdir.addTrustedProject(project.canonical_name,
-                                                 branch)
-            self.log.debug("Cloning %s@%s into new trusted space %s",
-                           project, branch, root)
-            merger = self.getMerger(root, self.merge_root, self.log)
-            merger.checkoutBranch(project.connection_name, project.name,
-                                  branch)
+                                                 branch, exist_ok)
+            if exist_ok and os.path.exists(os.path.join(
+                    root, project.canonical_name, ".git")):
+                self.log.debug("Using existing project %s", os.path.join(
+                    root, project.canonical_name))
+            else:
+                self.log.debug("Cloning %s@%s into new trusted space %s",
+                               project, branch, root)
+                merger = self.getMerger(root, self.merge_root, self.log)
+                merger.checkoutBranch(project.connection_name, project.name,
+                                      branch)
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
                            project, branch, root)
@@ -1112,34 +1118,40 @@ class AnsibleJob(object):
                             project.name)
         return path
 
-    def checkoutUntrustedProject(self, project, branch, args):
+    def checkoutUntrustedProject(self, project, branch, args, exist_ok=False):
         root = self.jobdir.getUntrustedProject(project.canonical_name,
                                                branch)
         if not root:
             root = self.jobdir.addUntrustedProject(project.canonical_name,
-                                                   branch)
-            # If the project is in the dependency chain, clone from
-            # there so we pick up any speculative changes, otherwise,
-            # clone from the cache.
-            merger = None
-            for p in args['projects']:
-                if (p['connection'] == project.connection_name and
-                    p['name'] == project.name):
-                    # We already have this repo prepared
-                    self.log.debug("Found workdir repo for untrusted project")
-                    merger = self.getMerger(
-                        root,
-                        self.jobdir.src_root,
-                        self.log)
-                    break
+                                                   branch, exist_ok)
+            if exist_ok and os.path.exists(os.path.join(
+                    root, project.canonical_name, ".git")):
+                self.log.debug("Using existing project %s", os.path.join(
+                    root, project.canonical_name))
+            else:
+                # If the project is in the dependency chain, clone from
+                # there so we pick up any speculative changes, otherwise,
+                # clone from the cache.
+                merger = None
+                for p in args['projects']:
+                    if (p['connection'] == project.connection_name and
+                        p['name'] == project.name):
+                        # We already have this repo prepared
+                        self.log.debug(
+                            "Found workdir repo for untrusted project")
+                        merger = self.getMerger(
+                            root,
+                            self.jobdir.src_root,
+                            self.log)
+                        break
 
-            if merger is None:
-                merger = self.getMerger(root, self.merge_root, self.log)
+                if merger is None:
+                    merger = self.getMerger(root, self.merge_root, self.log)
 
-            self.log.debug("Cloning %s@%s into new untrusted space %s",
-                           project, branch, root)
-            merger.checkoutBranch(project.connection_name, project.name,
-                                  branch)
+                self.log.debug("Cloning %s@%s into new untrusted space %s",
+                               project, branch, root)
+                merger.checkoutBranch(project.connection_name, project.name,
+                                      branch)
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
                            project, branch, root)
@@ -1149,10 +1161,10 @@ class AnsibleJob(object):
                             project.name)
         return path
 
-    def prepareRole(self, jobdir_playbook, role, args):
+    def prepareRole(self, jobdir_playbook, role, args, exist_ok=False):
         if role['type'] == 'zuul':
-            root = jobdir_playbook.addRole()
-            self.prepareZuulRole(jobdir_playbook, role, args, root)
+            root = jobdir_playbook.addRole(exist_ok)
+            self.prepareZuulRole(jobdir_playbook, role, args, root, exist_ok)
 
     def findRole(self, path, trusted=False):
         d = os.path.join(path, 'tasks')
@@ -1175,7 +1187,8 @@ class AnsibleJob(object):
         # It is neither a bare role, nor a collection of roles
         raise RoleNotFoundError("Unable to find role in %s" % (path,))
 
-    def prepareZuulRole(self, jobdir_playbook, role, args, root):
+    def prepareZuulRole(
+            self, jobdir_playbook, role, args, root, exist_ok=False):
         self.log.debug("Prepare zuul role for %s" % (role,))
         # Check out the role repo if needed
         source = self.connections.getSource(role['connection'])
@@ -1212,18 +1225,20 @@ class AnsibleJob(object):
             self.log.debug("Role using %s %s", selected_desc, branch)
 
         if not jobdir_playbook.trusted:
-            path = self.checkoutUntrustedProject(project, branch, args)
+            path = self.checkoutUntrustedProject(
+                project, branch, args, exist_ok)
         else:
-            path = self.checkoutTrustedProject(project, branch)
+            path = self.checkoutTrustedProject(project, branch, exist_ok)
 
         # The name of the symlink is the requested name of the role
         # (which may be the repo name or may be something else; this
         # can come into play if this is a bare role).
         link = os.path.join(root, name)
         link = os.path.realpath(link)
-        if not link.startswith(os.path.realpath(root)):
-            raise ExecutorError("Invalid role name %s" % name)
-        os.symlink(path, link)
+        if not exist_ok and not os.path.exists(link):
+            if not link.startswith(os.path.realpath(root)):
+                raise ExecutorError("Invalid role name %s" % name)
+            os.symlink(path, link)
 
         try:
             role_path = self.findRole(link, trusted=jobdir_playbook.trusted)
@@ -1364,7 +1379,7 @@ class AnsibleJob(object):
             job_output_file=self.jobdir.job_output_file)
         logging_config.writeJson(self.jobdir.logging_json)
 
-    def writeAnsibleConfig(self, jobdir_playbook):
+    def writeAnsibleConfig(self, jobdir_playbook, exist_ok=False):
         trusted = jobdir_playbook.trusted
 
         # TODO(mordred) This should likely be extracted into a more generalized
@@ -1376,6 +1391,8 @@ class AnsibleJob(object):
                 os.path.dirname(self.ara_callbacks))
         else:
             callback_path = self.callback_dir
+        if exist_ok and os.path.exists(jobdir_playbook.ansible_config):
+            return
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
             config.write('inventory = %s\n' % self.jobdir.inventory)
@@ -1779,7 +1796,7 @@ class AnsibleJob(object):
         self.emitPlaybookBanner(playbook, 'END', phase, result=result)
         return result, code
 
-    def prepareRepositories(self, update_manager, args):
+    def prepareRepositories(self, update_manager, args, exist_ok=False):
         tasks = []
         projects = set()
 
@@ -1787,7 +1804,7 @@ class AnsibleJob(object):
         for project in args['projects']:
             self.log.debug("Updating project %s" % (project,))
             tasks.append(update_manager(
-                project['connection'], project['name']))
+                project['connection'], project['name'], exist_ok))
             projects.add((project['connection'], project['name']))
 
         # ...as well as all playbook and role projects.
@@ -1799,10 +1816,12 @@ class AnsibleJob(object):
             repos += playbook['roles']
 
         for repo in repos:
-            self.log.debug("Updating playbook or role %s" % (repo['project'],))
+            if not exist_ok:
+                # Reduce logs when re-using a workspace
+                self.log.debug("Updating playbook or role %s", repo['project'])
             key = (repo['connection'], repo['project'])
             if key not in projects:
-                tasks.append(update_manager(*key))
+                tasks.append(update_manager(*key, exist_ok))
                 projects.add(key)
 
         for task in tasks:
@@ -1865,21 +1884,23 @@ class AnsibleJob(object):
                 project['override_branch'],
                 project['override_checkout'],
                 project['default_branch'])
-            self.log.info("Checking out %s %s %s",
-                          project['canonical_name'], selected_desc,
-                          selected_ref)
-            repo.checkout(selected_ref)
+            if not exist_ok:
+                self.log.info("Checking out %s %s %s",
+                              project['canonical_name'], selected_desc,
+                              selected_ref)
+                repo.checkout(selected_ref)
 
             # Update the inventory variables to indicate the ref we
             # checked out
             p = args['zuul']['projects'][project['canonical_name']]
             p['checkout'] = selected_ref
 
-        # Set the URL of the origin remote for each repo to a bogus
-        # value. Keeping the remote allows tools to use it to determine
-        # which commits are part of the current change.
-        for repo in repos.values():
-            repo.setRemoteUrl('file:///dev/null')
+        if not exist_ok:
+            # Set the URL of the origin remote for each repo to a bogus
+            # value. Keeping the remote allows tools to use it to determine
+            # which commits are part of the current change.
+            for repo in repos.values():
+                repo.setRemoteUrl('file:///dev/null')
 
         return item_commit, merger
 

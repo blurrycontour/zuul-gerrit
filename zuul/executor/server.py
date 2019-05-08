@@ -856,7 +856,7 @@ class ExecutorServer(object):
         finally:
             task.setComplete()
 
-    def update(self, connection_name, project_name):
+    def update(self, connection_name, project_name, exist_ok=False):
         # Update a repository in the main merger
         task = UpdateTask(connection_name, project_name)
         task = self.update_queue.put(task)

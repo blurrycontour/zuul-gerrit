@@ -158,7 +158,9 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
 
         # TODO(jhesketh):
         #  - Give options to clean up working dir
-        jobdir = JobDir(root, keep=False, build_uuid=self.unique)
+        jobdir = JobDir(
+            root, keep=False, build_uuid=self.unique,
+            exist_ok=self.runner_config.job_dir is not None)
         self.ansible_job.setJobDir(jobdir)
         self.job_params = {}
 
@@ -192,9 +194,18 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             return True
         try:
             with self.merger_lock:
-                self.log.info("Updating repo %s/%s" % (
-                    task.connection_name, task.project_name))
-                self.merger.updateRepo(task.connection_name, task.project_name)
+                if task.exist_ok and os.path.exists(os.path.join(
+                        self.merger.working_root, task.connection_name,
+                        task.project_name, ".git")):
+                    self.log.info("Re-using existing repo %s/%s",
+                                  task.connection_name, task.project_name)
+                    updated_repo = False
+                else:
+                    self.log.info("Updating repo %s/%s" % (
+                        task.connection_name, task.project_name))
+                    self.merger.updateRepo(
+                        task.connection_name, task.project_name)
+                    updated_repo = True
                 repo = self.merger.getRepo(
                     task.connection_name, task.project_name)
                 source = self.connections.getSource(task.connection_name)
@@ -202,8 +213,9 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
                 task.canonical_name = project.canonical_name
                 task.branches = repo.getBranches()
                 task.refs = [r.name for r in repo.getRefs()]
-                self.log.debug("Finished updating repo %s/%s" %
-                               (task.connection_name, task.project_name))
+                if updated_repo:
+                    self.log.debug("Finished updating repo %s/%s" %
+                                   (task.connection_name, task.project_name))
                 task.success = True
         except Exception:
             self.log.exception('Got exception while updating repo %s/%s',
@@ -211,9 +223,10 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         finally:
             task.setComplete()
 
-    def update(self, connection_name, project_name):
+    def update(self, connection_name, project_name, exist_ok=False):
         # Update a repository in the main merger
         task = UpdateTask(connection_name, project_name)
+        task.exist_ok = exist_ok
         task = self.update_queue.put(task)
         return task
 
@@ -258,15 +271,16 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             url = os.path.join(url, self.runner_config.job)
         self.job_params = requests.get(url).json()
 
-    def prepareWorkspace(self):
+    def prepareWorkspace(self, exist_ok=False):
         self.ansible_manager.copyAnsibleFiles()
         if not self.job_params:
             self._grabFrozenJob()
         self.merger = self.getMerger(self.merge_root)
         self.start_update_thread()
 
-        self.ansible_job.prepareRepositories(self.update, self.job_params)
-        self.ansible_job.preparePlaybooks(self.job_params)
+        self.ansible_job.prepareRepositories(
+            self.update, self.job_params, exist_ok)
+        self.ansible_job.preparePlaybooks(self.job_params, exist_ok)
         self.update_queue.put(None)
         self.update_thread.join()
 
@@ -331,7 +345,11 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         self._setNodesAndSecrets()
         if not skip_ansible_install and not self.ansible_manager.validate():
             self.ansible_manager.install()
-        self.prepareWorkspace()
+        exist_ok = False
+        if self.runner_config.job_dir and os.path.exists(
+                self.runner_config.job_dir):
+            exist_ok = True
+        self.prepareWorkspace(exist_ok)
         self.ansible_job.prepareAnsibleFiles(self.job_params)
         self.ansible_job.writeLoggingConfig()
         self.ssh_agent = SshAgent()
