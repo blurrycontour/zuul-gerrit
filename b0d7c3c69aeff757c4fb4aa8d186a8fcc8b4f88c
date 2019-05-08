@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_335f8a73",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1426,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T14:09:03Z",
+      "side": 1,
+      "message": "I think this deserves a clarification. \"... and abort all running builds in the buildset.\" Otherwise one might get the false impression that it will cancel all builds in the pipeline.",
+      "revId": "b0d7c3c69aeff757c4fb4aa8d186a8fcc8b4f88c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_d355ce51",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1429,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T14:09:03Z",
+      "side": 1,
+      "message": "I think a note that non-voting jobs are not affected by this behavior would help with clarity.",
+      "revId": "b0d7c3c69aeff757c4fb4aa8d186a8fcc8b4f88c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_f3501261",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 1433,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T14:09:03Z",
+      "side": 1,
+      "message": "I think \"afterwards\" may actually confuse one to think it might never be able to be overridden. I think if you just drop the word, it\u0027s more clear.",
+      "revId": "b0d7c3c69aeff757c4fb4aa8d186a8fcc8b4f88c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
