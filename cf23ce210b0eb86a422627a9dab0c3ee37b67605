@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_b4728048",
+        "filename": "tests/bitbucket/mocks.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "IMO this file is full of stubs, not mocks. A minor point, but it may be confusing for some who expect sophisticated mocking to happen here. (And for the record, I prefer the stub approach you\u0027ve taken to mocking.",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_548f8422",
+        "filename": "tests/bitbucket/mocks.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "I\u0027m sure you\u0027ll get a pep8 fail that tells you this, but just to be clear, we use spaces. You may want to configure your editor to do that on all python, as it\u0027s almost entirely unheard of to use tabs in python.",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_7492c84d",
+        "filename": "tests/bitbucket/mocks.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "Using semi-real domain names can cause problems. I suggest using .test as your tld here. There\u0027s a whole RFC for this: https://tools.ietf.org/html/rfc2606#section-2",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_14990c6d",
+        "filename": "tests/bitbucket/mocks.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_349c505c",
+        "filename": "tests/bitbucket/mocks.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "Same with all the email addresses, don\u0027t use real tlds",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_d4a2949a",
+        "filename": "tests/bitbucket/mocks.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "*DO* continue to talk nerdy to us.",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_f49d5857",
+        "filename": "tests/bitbucket/testbitbucketconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "We have a BaseTestCase which we want every test suite to use. Peek at the other tests to see it. There are others which add some helpful functionality you may need.",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_94ac1c8d",
+        "filename": "tests/bitbucket/testbitbucketconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "smaato.net is your company, yes? This URL needs to be an environment variable too. Also it\u0027s weird that the client takes a port number when you can specify that in the URL.",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_b4a7e0a7",
+        "filename": "tests/bitbucket/testbitbucketconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_54b8e4c6",
+        "filename": "tests/bitbucket/testbitbucketconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "@patch should pass the mocked client as a second arg here, so you shouldn\u0027t need to call the private _getBitbucketClient method to get it.",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_74bba8c3",
+        "filename": "tests/bitbucket/testbitbucketdriver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-08T16:22:53Z",
+      "side": 1,
+      "message": "Oops, forgot the newline",
+      "revId": "cf23ce210b0eb86a422627a9dab0c3ee37b67605",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
