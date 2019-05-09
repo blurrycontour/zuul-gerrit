@@ -89,6 +89,9 @@ class TestZuulStream25(AnsibleZuulTestCase):
             self.assertEqual(build.result, 'SUCCESS')
 
             text = self._get_job_output(build)
+            print("X" * 120)
+            print(text)
+            print("Y" * 120)
             self.assertLogLine(
                 r'RUN START: \[untrusted : review.example.com/org/project/'
                 r'playbooks/command.yaml@master\]', text)
