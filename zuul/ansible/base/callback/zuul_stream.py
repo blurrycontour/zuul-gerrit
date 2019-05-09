@@ -25,7 +25,6 @@ import logging.config
 import json
 import os
 import socket
-import threading
 import time
 
 from ansible.plugins.callback import default
@@ -55,6 +54,7 @@ def zuul_filter_result(result):
     of cmd it'll echo what the command was for folks.
     """
 
+    print("YYY zuul_filter_result", result)
     stdout = result.pop('stdout', '')
     stdout_lines = result.pop('stdout_lines', [])
     if not stdout_lines and stdout:
@@ -142,6 +142,7 @@ class CallbackModule(default.CallbackModule):
                           executor=True, debug=True)
                 time.sleep(0.1)
                 continue
+            print("ZZZ: connected to", host, "for log_id", log_id)
             msg = "%s\n" % log_id
             s.send(msg.encode("utf-8"))
             buff = s.recv(4096)
@@ -262,6 +263,7 @@ class CallbackModule(default.CallbackModule):
 
     def _stop_streamers(self):
         self._streamers_stop = True
+        print("XXX stopping streamers now:", self._streamers)
         while True:
             if not self._streamers:
                 break
@@ -357,6 +359,11 @@ class CallbackModule(default.CallbackModule):
                 and self._last_task_banner != result._task._uuid):
             self._print_task_banner(result._task)
 
+        try:
+            print("WWW: v2_runner_on_ok for log_id", result["zuul_log_id"])
+        except Exception:
+            pass
+
         result_dict = dict(result._result)
 
         self._clean_results(result_dict, result._task.action)
@@ -432,6 +439,8 @@ class CallbackModule(default.CallbackModule):
         elif result_dict.get('msg') == 'All items completed':
             self._log_message(result, result_dict['msg'])
         else:
+            # Test sleep
+            time.sleep(1)
             self._log_message(
                 result,
                 "Runtime: {delta}".format(
