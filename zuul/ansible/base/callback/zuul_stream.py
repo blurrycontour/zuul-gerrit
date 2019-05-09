@@ -89,6 +89,7 @@ class CallbackModule(default.CallbackModule):
         self._items_done = False
         self._deferred_result = None
         self._playbook_name = None
+        self.log_lock = threading.Lock()
 
     def configure_logger(self):
         # ansible appends timestamp, user and pid to the log lines emitted
@@ -106,14 +107,18 @@ class CallbackModule(default.CallbackModule):
 
     def _log(self, msg, ts=None, job=True, executor=False, debug=False):
         msg = msg.rstrip()
-        if job:
-            now = ts or datetime.datetime.now()
-            self._logger.info("{now} | {msg}".format(now=now, msg=msg))
-        if executor:
-            if debug:
-                self._display.vvv(msg)
-            else:
-                self._display.display(msg)
+        self.log_lock.acquire()
+        try:
+            if job:
+                now = ts or datetime.datetime.now()
+                self._logger.info("{now} | {msg}".format(now=now, msg=msg))
+            if executor:
+                if debug:
+                    self._display.vvv(msg)
+                else:
+                    self._display.display(msg)
+        finally:
+            self.log_lock.release()
 
     def _read_log(self, host, ip, log_id, task_name, hosts):
         self._log("[%s] Starting to log %s for task %s"
