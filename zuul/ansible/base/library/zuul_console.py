@@ -23,6 +23,7 @@ import socket
 import subprocess
 import threading
 import time
+import traceback
 
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 LOG_STREAM_PORT = 19885
@@ -94,7 +95,9 @@ class Server(object):
     def chunkConsole(self, conn, log_uuid):
         try:
             console = Console(self.path.format(log_uuid=log_uuid))
-        except Exception:
+        except Exception as e:
+            conn.send("XXX | Exception: %s\n" %
+                      traceback.format_exc().replace('\n', '|'))
             return
         while True:
             chunk = console.file.read(4096)
