@@ -62,6 +62,30 @@
         ZUUL_REMOTE_KEEP: "true"
 
 - job:
+    name: zuul-tox-remote-2
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-3
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-3
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-4
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-5
+    parent: zuul-tox-remote
+
+- job:
+    name: zuul-tox-remote-6
+    parent: zuul-tox-remote
+
+- job:
     name: zuul-build-dashboard
     parent: build-javascript-content
     success-url: 'npm/html/'
@@ -163,42 +187,12 @@
 - project:
     check:
       jobs:
-        - zuul-build-image
-        - tox-docs
-        - tox-pep8
-        - tox-py35:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
-            timeout: 3600  # 60 minutes
-        - tox-py36:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            timeout: 3600  # 60 minutes
-        - zuul-build-dashboard
-        - zuul-build-dashboard-multi-tenant
-        - nodejs-npm-run-lint:
-            vars:
-              node_version: 10
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-npm-run-test:
-            vars:
-              node_version: 10
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.5
-        - zuul-stream-functional-2.6
-        - zuul-stream-functional-2.7
-        - zuul-stream-functional-2.8
         - zuul-tox-remote
-        - zuul-quick-start:
-            dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
+        - zuul-tox-remote-2
+        - zuul-tox-remote-3
+        - zuul-tox-remote-4
+        - zuul-tox-remote-5
+        - zuul-tox-remote-6
     gate:
       jobs:
         - zuul-upload-image
