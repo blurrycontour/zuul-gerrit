@@ -119,6 +119,7 @@ class CallbackModule(default.CallbackModule):
         self._log("[%s] Starting to log %s for task %s"
                   % (host, log_id, task_name), job=False, executor=True)
         while True:
+            print("XXX: connecting to", ip, LOG_STREAM_PORT)
             try:
                 s = socket.create_connection((ip, LOG_STREAM_PORT), 5)
                 # Disable the socket timeout after we have successfully
@@ -142,6 +143,7 @@ class CallbackModule(default.CallbackModule):
                           executor=True, debug=True)
                 time.sleep(0.1)
                 continue
+            print("XXX: connected to", host, "for log_id", log_id)
             msg = "%s\n" % log_id
             s.send(msg.encode("utf-8"))
             buff = s.recv(4096)
@@ -157,8 +159,10 @@ class CallbackModule(default.CallbackModule):
                     done = self._log_streamline(
                         host, line.decode("utf-8", "backslashreplace"))
                     if done:
+                        print("XXX: Streaming over", host, "for log_id", log_id)
                         return
                 else:
+                    print("XXX: receiving", host, "for log_id", log_id)
                     more = s.recv(4096)
                     if not more:
                         buffering = False
@@ -169,7 +173,9 @@ class CallbackModule(default.CallbackModule):
                     host, buff.decode("utf-8", "backslashreplace"))
 
     def _log_streamline(self, host, line):
+        print("XXX: log_streamline:", host, line)
         if "[Zuul] Task exit code" in line:
+            print("XXX: task exit code:", line)
             return True
         elif self._streamers_stop and "[Zuul] Log not found" in line:
             # When we got here it indicates that the task is already finished
@@ -180,8 +186,10 @@ class CallbackModule(default.CallbackModule):
             if time.monotonic() < (self._streamers_stop_ts + 10):
                 # don't output this line
                 return False
+            print('XXX: streamers stop and log not found', host, line)
             return True
         elif "[Zuul] Log not found" in line:
+            print('XXX: log not foundlog not found', host, line)
             # don't output this line
             return False
         else:
@@ -271,6 +279,7 @@ class CallbackModule(default.CallbackModule):
     def _stop_streamers(self):
         self._streamers_stop_ts = time.monotonic()
         self._streamers_stop = True
+        print("XXX: stopping streamers now:", self._streamers)
         while True:
             if not self._streamers:
                 break
