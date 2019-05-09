@@ -24,6 +24,7 @@ import logging
 import logging.config
 import json
 import os
+import re
 import socket
 import threading
 import time
@@ -34,6 +35,8 @@ from zuul.ansible import paths
 from zuul.ansible import logconfig
 
 LOG_STREAM_PORT = 19885
+TASK_END_REGEXP = re.compile(
+    r'[0-9-]+ [0-9:.]+ \| \[Zuul\] Task exit code: [0-9-]+')
 
 
 def zuul_filter_result(result):
@@ -55,6 +58,7 @@ def zuul_filter_result(result):
     of cmd it'll echo what the command was for folks.
     """
 
+    print("XXX: zuul_filter_result", result)
     stdout = result.pop('stdout', '')
     stdout_lines = result.pop('stdout_lines', [])
     if not stdout_lines and stdout:
@@ -119,6 +123,7 @@ class CallbackModule(default.CallbackModule):
         self._log("[%s] Starting to log %s for task %s"
                   % (host, log_id, task_name), job=False, executor=True)
         while True:
+            print("XXX: connecting to", ip, LOG_STREAM_PORT)
             try:
                 s = socket.create_connection((ip, LOG_STREAM_PORT), 5)
                 # Disable the socket timeout after we have successfully
@@ -142,6 +147,7 @@ class CallbackModule(default.CallbackModule):
                           executor=True, debug=True)
                 time.sleep(0.1)
                 continue
+            print("XXX: connected to", host, "for log_id", log_id)
             msg = "%s\n" % log_id
             s.send(msg.encode("utf-8"))
             buff = s.recv(4096)
@@ -159,6 +165,7 @@ class CallbackModule(default.CallbackModule):
                     if done:
                         return
                 else:
+                    print("XXX: receiving", host, "for log_id", log_id)
                     more = s.recv(4096)
                     if not more:
                         buffering = False
@@ -167,13 +174,20 @@ class CallbackModule(default.CallbackModule):
             if buff:
                 self._log_streamline(
                     host, buff.decode("utf-8", "backslashreplace"))
+        print("XXX: Streaming over", host, "for log_id", log_id)
 
     def _log_streamline(self, host, line):
-        if "[Zuul] Task exit code" in line:
+        print("XXX: log_streamline", host, line)
+        end = TASK_END_REGEXP.search(line)
+        if end:
+            rest = line.replace(end.group(), '')
+            if rest:
+                print("XXX: Logging the rest", rest)
+                self._log_streamline(host, rest)
             return True
-        elif self._streamers_stop and "[Zuul] Log not found" in line:
+        elif self._streamers_stop and line == "[Zuul] Log not found":
             return True
-        elif "[Zuul] Log not found" in line:
+        elif line == "[Zuul] Log not found":
             # don't output this line
             return False
         else:
@@ -262,6 +276,7 @@ class CallbackModule(default.CallbackModule):
 
     def _stop_streamers(self):
         self._streamers_stop = True
+        print("XXX: stopping streamers now:", self._streamers)
         while True:
             if not self._streamers:
                 break
@@ -357,6 +372,11 @@ class CallbackModule(default.CallbackModule):
                 and self._last_task_banner != result._task._uuid):
             self._print_task_banner(result._task)
 
+        try:
+            print("XXX: v2_runner_on_ok for log_id", result["zuul_log_id"])
+        except Exception:
+            pass
+
         result_dict = dict(result._result)
 
         self._clean_results(result_dict, result._task.action)
@@ -426,12 +446,14 @@ class CallbackModule(default.CallbackModule):
                     status=status)
         elif 'results' in result_dict:
             for res in result_dict['results']:
+                print("ZZZ: adding result runtime", result)
                 self._log_message(
                     result,
                     "Runtime: {delta}".format(**res))
         elif result_dict.get('msg') == 'All items completed':
             self._log_message(result, result_dict['msg'])
         else:
+            print("ZZZ: adding result runtime", result)
             self._log_message(
                 result,
                 "Runtime: {delta}".format(
@@ -465,6 +487,7 @@ class CallbackModule(default.CallbackModule):
                 hostname = self._get_hostname(result)
                 self._log("%s | %s " % (hostname, line))
 
+            print("ZZZ: adding result runtime", result)
             if isinstance(result_dict['item'], str):
                 self._log_message(
                     result,
