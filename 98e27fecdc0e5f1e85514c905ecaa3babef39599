@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_2a2cd200",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-09T17:04:52Z",
+      "side": 1,
+      "message": "Is that something that we can change easily, or are they somehow fundamentally different from one another? It might be good to call out the TODO\u0027s to make it happen so somebody else can pick it up.",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_4a2fc6f5",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-09T17:04:52Z",
+      "side": 1,
+      "message": "Does it actually use the raw git protocol? That thing is actually pretty insecure. I\u0027d hope it could do everything over https or ssh.",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_ea355a47",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-09T17:04:52Z",
+      "side": 1,
+      "message": "s/REAST/REST/",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_0a39ce3f",
+        "filename": "tests/unit/bitbucket/mocks.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-09T17:04:52Z",
+      "side": 1,
+      "message": "59 and 43? Is there some reason you chopped numbers off the defaults?",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_aa3f6223",
+        "filename": "tests/unit/bitbucket/mocks.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-09T17:04:52Z",
+      "side": 1,
+      "message": "Isn\u0027t this a SHA? seems like it should be left at full length. You could set a variable to it before building this, and then make this a reference to that, if you\u0027re worried about it being unreadable.",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_ca3ad632",
+        "filename": "tests/unit/bitbucket/mocks.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-09T17:04:52Z",
+      "side": 1,
+      "message": "Another trick you can do is\n\n  os.path.join(\n    \u0027rest\u0027,\n    \u0027api\u0027,\n    \u00271.0\u0027,\n    \u0027projects\u0027,\n    \u0027sys-ic\u0027,\n    \u0027repos\u0027,\n    \u0027foobar\u0027,\n    \u0027pull-requests\u0027,\n    \u0027101\u0027\n  )\n\nBut I kinda like the full path all in one.",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_6a496ace",
+        "filename": "tests/unit/bitbucket/mocks.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-09T17:04:52Z",
+      "side": 1,
+      "message": "You can also span multiple lines with (). As long as there\u0027s no comma, it will just resolve to the value in the parens, and that allows splitting strings across lines:\n\n  elif path \u003d\u003d (\u0027/rest/api/1.0/projects/sys-ic/repos/foobar/pull-requests/\u0027\n                \u0027101/merge\u0027):",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
