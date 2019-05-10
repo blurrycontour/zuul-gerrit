@@ -264,6 +264,36 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         else:
             self.job_params = requests.get(url).json()
 
+        # Because we don't have an item by default, we ensure the requested
+        # project is registered
+        proj = self.job_params["zuul"]["project"]
+        if not (any(filter(lambda x: x["project"]["name"] == proj["name"],
+                           self.job_params["zuul"]["items"])) or
+                any(filter(lambda x: x["name"] == proj["name"],
+                           self.job_params["projects"]))):
+            url = self.runner_config.api
+            if self.runner_config.tenant:
+                url = os.path.join(url, "tenant", self.runner_config.tenant)
+            url = os.path.join(url, "project", proj["name"])
+            conn = requests.get(url).json()["connection_name"]
+            self.job_params["projects"].append({
+                "connection": conn,
+                "name": proj["name"],
+                "canonical_name": proj["canonical_name"],
+                "override_branch": None,
+                "override_checkout": None,
+                "default_branch": self.runner_config.branch,
+            })
+            self.job_params["zuul"]["projects"][proj["canonical_name"]] = {
+                "canonical_hostname": conn,
+                "canonical_name": proj["canonical_name"],
+                "checkout": self.runner_config.branch,
+                "required": False,
+                "short_name": os.path.basename(proj["name"]),
+                "name": proj["name"],
+                "src_dir": os.path.join("src", proj["canonical_name"]),
+            }
+
     def prepareWorkspace(self):
         self.ansible_manager.copyAnsibleFiles()
         if not self.job_params:
