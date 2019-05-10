@@ -70,6 +70,7 @@ class RunnerConfiguration(object):
         "job-dir": str,
         "git-dir": str,
         'api': str,
+        'job-params': str,
         'depends-on': [str],
         'tenant': str,
         'project': str,
@@ -99,6 +100,7 @@ class RunnerConfiguration(object):
         vs.Schema(self.schema)(config)
         # Set default value
         self.api = config["api"]
+        self.job_params = config.get("job-params")
         self.tenant = config.get("tenant")
         self.pipeline = config.get("pipeline", "check")
         self.project = config.get("project")
@@ -184,6 +186,11 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             self.ansible_job.jobdir.ready = True
             pickle.dump(self.ansible_job.jobdir, of)
 
+    def saveJobParams(self):
+        if not self.runner_config.job_params:
+            yaml.safe_dump(self.job_params, open(os.path.join(
+                self.ansible_job.jobdir.root, ".jobparams.yaml"), "w"))
+
     def run(self):
         raise Exception("run is not implemented yet")
 
@@ -259,6 +266,10 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             speed_limit, speed_time, cache_root, logger)
 
     def _grabFrozenJob(self):
+        if self.runner_config.job_params:
+            self.job_params = yaml.safe_load(
+                open(self.runner_config.job_params))
+            return
         url = self.runner_config.api
         if self.runner_config.tenant:
             url = os.path.join(url, "tenant", self.runner_config.tenant)
@@ -326,11 +337,13 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         self.update_queue.put(None)
         self.update_thread.join()
         self.saveJobDir()
+        self.saveJobParams()
 
     def _setNodesAndSecrets(self):
         # Substitute nodeset with provided node
         local_nodes = self.runner_config.nodes
         job_params = self.job_params
+        print(job_params)
         if job_params["nodes"]:
             if len(local_nodes) != len(job_params["nodes"]):
                 raise Exception("Not enough nodes provided to run %s" %
