@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dfbec78f_47f9f34a",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-05-10T08:40:31Z",
+      "side": 1,
+      "message": "I didn\u0027t look into it. In general Bitbucket Cloud is quite more modern.",
+      "parentUuid": "dfbec78f_2a2cd200",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_4a2fc6f5",
         "filename": "doc/source/admin/drivers/bitbucket.rst",
         "patchSetId": 13
@@ -30,6 +48,24 @@
       "writtenOn": "2019-05-09T17:04:52Z",
       "side": 1,
       "message": "Does it actually use the raw git protocol? That thing is actually pretty insecure. I\u0027d hope it could do everything over https or ssh.",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_e79587e5",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-05-10T08:40:31Z",
+      "side": 1,
+      "message": "No, I usually just enter an ssh:// url into this variable.",
+      "parentUuid": "dfbec78f_4a2fc6f5",
       "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "dfbec78f_0799bb1d",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-05-10T08:40:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfbec78f_ea355a47",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_0a39ce3f",
         "filename": "tests/unit/bitbucket/mocks.py",
         "patchSetId": 13
@@ -64,6 +118,24 @@
       "writtenOn": "2019-05-09T17:04:52Z",
       "side": 1,
       "message": "59 and 43? Is there some reason you chopped numbers off the defaults?",
+      "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_478ed3d0",
+        "filename": "tests/unit/bitbucket/mocks.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-05-10T08:40:31Z",
+      "side": 1,
+      "message": "This is intentional for testing purposes. I wanted to check that these values actually get moved into the config of the adapter. So I had to change them from the defaults. But I don\u0027t see where I check this...",
+      "parentUuid": "dfbec78f_0a39ce3f",
       "revId": "98e27fecdc0e5f1e85514c905ecaa3babef39599",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
