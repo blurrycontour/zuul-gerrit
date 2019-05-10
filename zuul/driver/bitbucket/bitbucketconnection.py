@@ -33,6 +33,18 @@ class BitbucketClient():
 
         return r.json()
 
+    def post(self, path, payload):
+        url = '{}:{}{}'.format(self.server, self.port, path)
+        r = requests.post(url, auth=HTTPBasicAuth(self.user, self.pw),
+                          data = payload)
+
+        if r.status_code != 200:
+            raise BitbucketConnectionError(
+                "Connection to server returned status {} path {}"
+                .format(r.status_code, url))
+
+        return r.json()
+
 
 class BitbucketConnection(BaseConnection):
     driver_name = 'bitbucketserver'
@@ -132,3 +144,9 @@ class BitbucketConnection(BaseConnection):
         pr = self.getPR(bb_proj, repo, change.id)
 
         return pr.get('state') == 'MERGED'
+
+    def reportBuild(self, commitHash, status):
+        client = self._getBitbucketClient()
+
+        client.post('/rest/build-status/1.0/commits/{}'.format(commitHash),
+                    status)
