@@ -15,6 +15,7 @@
 
 import logging
 import os
+import pickle
 import socket
 import tempfile
 import threading
@@ -161,11 +162,31 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             executor_variables_file=self.runner_config.extra_vars,
         )
 
+        if self.runner_config.job_dir:
+            self.jobdir_file = os.path.join(
+                self.runner_config.job_dir, ".jobdir")
+        else:
+            self.jobdir_file = os.path.join(root, self.unique, ".jobdir")
+
         # TODO(jhesketh):
         #  - Give options to clean up working dir
-        jobdir = JobDir(root, keep=False, build_uuid=self.unique)
+        jobdir = self.loadJobDir()
+        if not jobdir:
+            jobdir = JobDir(root, keep=False, build_uuid=self.unique)
+            jobdir.ready = False
         self.ansible_job.setJobDir(jobdir)
         self.job_params = {}
+
+    def loadJobDir(self):
+        if self.runner_config.job_dir and os.path.exists(self.jobdir_file):
+            # TODO: replace pickle by clean fromDict() procedures
+            return pickle.load(open(self.jobdir_file, "rb"))
+
+    def saveJobDir(self):
+        # TODO: replace pickle by clean toDict() procedures
+        with open(self.jobdir_file, "wb") as of:
+            self.ansible_job.jobdir.ready = True
+            pickle.dump(self.ansible_job.jobdir, of)
 
     def run(self):
         raise Exception("run is not implemented yet")
@@ -308,6 +329,7 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         self.ansible_job.preparePlaybooks(self.job_params)
         self.update_queue.put(None)
         self.update_thread.join()
+        self.saveJobDir()
 
     def _setNodesAndSecrets(self):
         # Substitute nodeset with provided node
@@ -370,9 +392,10 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
         self._setNodesAndSecrets()
         if not skip_ansible_install and not self.ansible_manager.validate():
             self.ansible_manager.install()
-        self.prepareWorkspace()
-        self.ansible_job.prepareAnsibleFiles(self.job_params)
-        self.ansible_job.writeLoggingConfig()
+        if not self.ansible_job.jobdir.ready:
+            self.prepareWorkspace()
+            self.ansible_job.prepareAnsibleFiles(self.job_params)
+            self.ansible_job.writeLoggingConfig()
         self.ssh_agent = SshAgent()
         result = None
         try:
