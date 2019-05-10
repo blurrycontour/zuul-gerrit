@@ -36,6 +36,8 @@ class Runner(zuul.cmd.ZuulApp):
                             help='verbose output')
         parser.add_argument('-e', '--extra-vars', metavar='FILE',
                             help='global extra vars file')
+        parser.add_argument('-J', '--job-params',
+                            help='the raw job parameters')
         parser.add_argument('-a', '--api',
                             help='the zuul server api to query against')
         parser.add_argument('-t', '--tenant',
@@ -81,7 +83,6 @@ class Runner(zuul.cmd.ZuulApp):
 
         # TODO(jhesketh):
         #  - Enable command line argument override from environ
-        #  - Allow supplying the job via either raw input or zuul endpoint
         #  - Overwrite, warn, or exit on conflicting workspace entries
 
         return parser
@@ -152,10 +153,11 @@ class Runner(zuul.cmd.ZuulApp):
             sys.exit(1)
 
         # Help user setting the correct API url
-        if not config.api.endswith('/'):
-            config.api += '/'
-        if "/api/" not in config.api:
-            config.api = os.path.join(config.api, "api")
+        if config.api:
+            if not config.api.endswith('/'):
+                config.api += '/'
+            if "/api/" not in config.api:
+                config.api = os.path.join(config.api, "api")
 
         connections = self._constructConnections(config)
 
