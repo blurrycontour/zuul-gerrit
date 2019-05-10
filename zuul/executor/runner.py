@@ -75,6 +75,7 @@ class RunnerConfiguration(object):
         'pipeline': str,
         'branch': str,
         'job': str,
+        'extra-vars': str,
     }
 
     def readConfig(self, config_path):
@@ -111,6 +112,7 @@ class RunnerConfiguration(object):
         self.nodes = config.get("nodes", [])
         self.secrets = config.get("secrets", {})
         self.depends_on = config.get("depends-on", [])
+        self.extra_vars = config.get('extra-vars')
         return config
 
 
@@ -156,6 +158,7 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             logger=self.log,
             # TODO(jhesketh): Fix getting ansible-version from job-params
             ansible_plugin_dir=self.ansible_manager.getAnsiblePluginDir('2.7'),
+            executor_variables_file=self.runner_config.extra_vars,
         )
 
         # TODO(jhesketh):

@@ -34,6 +34,8 @@ class Runner(zuul.cmd.ZuulApp):
         parser = super(Runner, self).createParser()
         parser.add_argument('-v', '--verbose', action='store_true',
                             help='verbose output')
+        parser.add_argument('-e', '--extra-vars', metavar='FILE',
+                            help='global extra vars file')
         parser.add_argument('-a', '--api',
                             help='the zuul server api to query against')
         parser.add_argument('-t', '--tenant',
