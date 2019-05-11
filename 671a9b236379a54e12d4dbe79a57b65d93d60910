@@ -1,0 +1,129 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_acad1eea",
+        "filename": "doc/source/admin/drivers/pagure.rst",
+        "patchSetId": 31
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T16:31:20Z",
+      "side": 1,
+      "message": "For on prem or test installations of pagure it might make sense to later add an option to disable ssl validation.",
+      "revId": "671a9b236379a54e12d4dbe79a57b65d93d60910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_cc7bb278",
+        "filename": "tests/fixtures/layouts/merging-pagure.yaml",
+        "patchSetId": 31
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T16:31:20Z",
+      "side": 1,
+      "message": "Trailing whitespace",
+      "revId": "671a9b236379a54e12d4dbe79a57b65d93d60910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_8c993ac5",
+        "filename": "tests/fixtures/layouts/requirements-pagure.yaml",
+        "patchSetId": 31
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T16:31:20Z",
+      "side": 1,
+      "message": "Trailing whitespace",
+      "revId": "671a9b236379a54e12d4dbe79a57b65d93d60910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_ccf09200",
+        "filename": "tests/unit/test_pagure_driver.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 494,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T16:31:20Z",
+      "side": 1,
+      "message": "We also have test cases for cross-source dependencies (Gerrit change -\u003e github PR) in test_cross_crd.py. I think we should extend this to cover pagure as well.",
+      "revId": "671a9b236379a54e12d4dbe79a57b65d93d60910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_acc43e92",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T16:31:20Z",
+      "side": 1,
+      "message": "Good idea to document some reference pipelines.\nWe often see questions popping up about how to define certain pipelines.\nI think it would make sense to add a page to the docs (as a followup) containing a set of reference pipelines (check, gate, post) for each driver.",
+      "revId": "671a9b236379a54e12d4dbe79a57b65d93d60910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_8c4cda42",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T16:31:20Z",
+      "side": 1,
+      "message": "Don\u0027t we need to clear project_branch_cache here?",
+      "revId": "671a9b236379a54e12d4dbe79a57b65d93d60910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_2c67eebf",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 740,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T16:31:20Z",
+      "side": 1,
+      "message": "This is a very expensive operation and you don\u0027t want to do this here because getChange is called in the critical path of the event loop. In a more busy system this will become a severe scaling issue.\n\nThe Github driver has a similar problem for PRs containing more than 300 files. There we deal with it by setting the files explicitly to None and delay getting the files to the pipeline processing stage where this can be done asynchronously. You can see in [1] how the github driver uses this mechanism. For reference you can see the complete implementation of this mechanism in [2].\n\n[1] https://opendev.org/zuul/zuul/src/branch/master/zuul/driver/github/githubconnection.py#L994\n[2] https://review.opendev.org/625584",
+      "range": {
+        "startLine": 738,
+        "startChar": 0,
+        "endLine": 740,
+        "endChar": 78
+      },
+      "revId": "671a9b236379a54e12d4dbe79a57b65d93d60910",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
