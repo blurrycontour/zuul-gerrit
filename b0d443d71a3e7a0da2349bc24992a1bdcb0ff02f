@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_0cd54a1c",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 22
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T17:10:51Z",
+      "side": 1,
+      "message": "I think we should default to safe defaults, so ssl and verification enabled.",
+      "range": {
+        "startLine": 42,
+        "startChar": 16,
+        "endLine": 42,
+        "endChar": 21
+      },
+      "revId": "b0d443d71a3e7a0da2349bc24992a1bdcb0ff02f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_ecdf9637",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 22
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T17:10:51Z",
+      "side": 1,
+      "message": "I think it would be cleaner to postfix the tenant name instead of prefixing. This way you have all zuul indexes together when looking at a sorted index list in elasticsearch.",
+      "range": {
+        "startLine": 90,
+        "startChar": 47,
+        "endLine": 90,
+        "endChar": 73
+      },
+      "revId": "b0d443d71a3e7a0da2349bc24992a1bdcb0ff02f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_0c8c6a34",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T17:10:51Z",
+      "side": 1,
+      "message": "This looks unused.",
+      "range": {
+        "startLine": 73,
+        "startChar": 11,
+        "endLine": 73,
+        "endChar": 18
+      },
+      "revId": "b0d443d71a3e7a0da2349bc24992a1bdcb0ff02f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_8c961a4c",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T17:10:51Z",
+      "side": 1,
+      "message": "This looks unused.",
+      "range": {
+        "startLine": 79,
+        "startChar": 11,
+        "endLine": 79,
+        "endChar": 23
+      },
+      "revId": "b0d443d71a3e7a0da2349bc24992a1bdcb0ff02f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_4c758231",
+        "filename": "zuul/driver/elasticsearch/reporter.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T17:10:51Z",
+      "side": 1,
+      "message": "I think you found technical debt here. Zuul has native multi-node support so a single node_name doesn\u0027t make sense. Looking at the code build.node_name looks unused to me. If you want to add node information you probably want to use build.nodeset which also contains more information about the nodes.",
+      "range": {
+        "startLine": 89,
+        "startChar": 16,
+        "endLine": 89,
+        "endChar": 45
+      },
+      "revId": "b0d443d71a3e7a0da2349bc24992a1bdcb0ff02f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
