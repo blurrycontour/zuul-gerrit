@@ -1,0 +1,193 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_51fbdf45",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "The other drivers just use \u0027port\u0027 for this setting.",
+      "range": {
+        "startLine": 41,
+        "startChar": 12,
+        "endLine": 41,
+        "endChar": 27
+      },
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_71f86348",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "What do you think about setting a baseurl like the other drivers instead of defining the port of the rest api. That would encode also the protocol in it.",
+      "range": {
+        "startLine": 45,
+        "startChar": 12,
+        "endLine": 45,
+        "endChar": 28
+      },
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_d1e7cfab",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "All the other drivers just use the terms \u0027user\u0027 and \u0027password\u0027. For consistency reasons we should stick to this terminology.",
+      "range": {
+        "startLine": 49,
+        "startChar": 12,
+        "endLine": 49,
+        "endChar": 23
+      },
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_1197a7ee",
+        "filename": "tests/unit/bitbucket/mocks.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "Copyright header is missing",
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_51a99f21",
+        "filename": "tests/unit/bitbucket/mocks.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "This is probably good for the source only driver but won\u0027t scale for tests as soon as gating is involved.\n\nThis will probably need a fake bitbucket data structure which will be used for generating the responses. The gerrit and github driver do something similar. But I think that can be improved iteratively when it\u0027s needed.",
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_71a62356",
+        "filename": "tests/unit/bitbucket/testbitbucketconnection.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "Copyright header is missing",
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_d1110f5f",
+        "filename": "tests/unit/bitbucket/testbitbucketconnection.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "I have to second Clint that when using urls the port should be part of the url and not specified separetely.",
+      "range": {
+        "startLine": 15,
+        "startChar": 30,
+        "endLine": 15,
+        "endChar": 61
+      },
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_1165671e",
+        "filename": "tests/unit/bitbucket/testbitbucketconnection.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "What are the skips for?",
+      "range": {
+        "startLine": 24,
+        "startChar": 4,
+        "endLine": 24,
+        "endChar": 18
+      },
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_b1757bcd",
+        "filename": "zuul/driver/bitbucket/bitbucketsource.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-11T15:08:08Z",
+      "side": 1,
+      "message": "This class variable looks a little bit odd between the functions and should be moved above the function definitions.",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 78
+      },
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
