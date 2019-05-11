@@ -41,6 +41,7 @@ import gear
 from zuul.connection import BaseConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.config import get_default
+from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
@@ -139,26 +140,26 @@ class GithubGearmanWorker(object):
         body = args.get("body")
 
         delivery = headers.get('x-github-delivery')
-        self.log.debug("Github Webhook Received: {delivery}".format(
-            delivery=delivery))
+        log = get_annotated_logger(self.log, delivery)
+        log.debug("Github Webhook Received")
 
         # TODO(jlk): Validate project in the request is a project we know
 
         try:
-            self.__dispatch_event(body, headers)
+            self.__dispatch_event(body, headers, log)
             output = {'return_code': 200}
         except Exception:
             output = {'return_code': 503}
-            self.log.exception("Exception handling Github event:")
+            log.exception("Exception handling Github event:")
 
         return output
 
-    def __dispatch_event(self, body, headers):
+    def __dispatch_event(self, body, headers, log):
         try:
             event = headers['x-github-event']
-            self.log.debug("X-Github-Event: " + event)
+            log.debug("X-Github-Event: " + event)
         except KeyError:
-            self.log.debug("Request headers missing the X-Github-Event.")
+            log.debug("Request headers missing the X-Github-Event.")
             raise Exception('Please specify a X-Github-Event header.')
 
         delivery = headers.get('x-github-delivery')
@@ -166,7 +167,7 @@ class GithubGearmanWorker(object):
             self.connection.addEvent(body, event, delivery)
         except Exception:
             message = 'Exception deserializing JSON body'
-            self.log.exception(message)
+            log.exception(message)
             # TODO(jlk): Raise this as something different?
             raise Exception(message)
 
@@ -196,20 +197,13 @@ class GithubGearmanWorker(object):
         self.gearman.shutdown()
 
 
-class GithubEventLogAdapter(logging.LoggerAdapter):
-    def process(self, msg, kwargs):
-        msg, kwargs = super(GithubEventLogAdapter, self).process(msg, kwargs)
-        msg = '[delivery: %s] %s' % (kwargs['extra']['delivery'], msg)
-        return msg, kwargs
-
-
 class GithubEventProcessor(object):
     def __init__(self, connector, event_tuple):
         self.connector = connector
         self.connection = connector.connection
         self.ts, self.body, self.event_type, self.delivery = event_tuple
         logger = logging.getLogger("zuul.GithubEventConnector")
-        self.log = GithubEventLogAdapter(logger, {'delivery': self.delivery})
+        self.log = get_annotated_logger(logger, self.delivery)
 
     def run(self):
         self.log.debug("Starting event processing, queue length %s",
@@ -257,12 +251,14 @@ class GithubEventProcessor(object):
 
         if event:
             event.delivery = self.delivery
+            event.zuul_event_id = self.delivery
             project = self.connection.source.getProject(event.project_name)
             if event.change_number:
                 self.connection._getChange(project,
                                            event.change_number,
                                            event.patch_number,
-                                           refresh=True)
+                                           refresh=True,
+                                           zuul_event_id=event.zuul_event_id)
                 self.log.debug("Refreshed change %s,%s",
                                event.change_number, event.patch_number)
 
@@ -858,7 +854,8 @@ class GithubConnection(BaseConnection):
         project = self.source.getProject(event.project_name)
         if event.change_number:
             change = self._getChange(project, event.change_number,
-                                     event.patch_number, refresh=refresh)
+                                     event.patch_number, refresh=refresh,
+                                     zuul_event_id=event.zuul_event_id)
             if hasattr(event, 'change_url') and event.change_url:
                 change.url = event.change_url
             else:
@@ -889,7 +886,8 @@ class GithubConnection(BaseConnection):
                 change.files = self.getPushedFileNames(event)
         return change
 
-    def _getChange(self, project, number, patchset=None, refresh=False):
+    def _getChange(self, project, number, patchset=None, refresh=False,
+                   zuul_event_id=None):
         key = (project.name, number, patchset)
         change = self._change_cache.get(key)
         if change and not refresh:
@@ -901,7 +899,7 @@ class GithubConnection(BaseConnection):
             change.patchset = patchset
         self._change_cache[key] = change
         try:
-            self._updateChange(change)
+            self._updateChange(change, zuul_event_id=zuul_event_id)
         except Exception:
             if key in self._change_cache:
                 del self._change_cache[key]
@@ -977,9 +975,11 @@ class GithubConnection(BaseConnection):
 
         return changes
 
-    def _updateChange(self, change):
-        self.log.info("Updating %s" % (change,))
-        change.pr, pr_obj = self.getPull(change.project.name, change.number)
+    def _updateChange(self, change, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.info("Updating %s" % (change,))
+        change.pr, pr_obj = self.getPull(
+            change.project.name, change.number, log=log)
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
 
@@ -992,9 +992,9 @@ class GithubConnection(BaseConnection):
         # the first 300 changed files of a PR in alphabetical order.
         # https://developer.github.com/v3/pulls/#list-pull-requests-files
         if len(change.files) < change.pr.get('changed_files', 0):
-            self.log.warning("Got only %s files but PR has %s files.",
-                             len(change.files),
-                             change.pr.get('changed_files', 0))
+            log.warning("Got only %s files but PR has %s files.",
+                        len(change.files),
+                        change.pr.get('changed_files', 0))
             # In this case explicitly set change.files to None to signalize
             # that we need to ask the mergers later in pipeline processing.
             # We cannot query the files here using the mergers because this
@@ -1003,10 +1003,10 @@ class GithubConnection(BaseConnection):
         change.title = change.pr.get('title')
         change.open = change.pr.get('state') == 'open'
         change.is_merged = change.pr.get('merged')
-        change.status = self._get_statuses(change.project,
-                                           change.patchset)
-        change.reviews = self.getPullReviews(pr_obj, change.project,
-                                             change.number)
+        change.status = self._get_statuses(
+            change.project, change.patchset, log=log)
+        change.reviews = self.getPullReviews(
+            pr_obj, change.project, change.number, log=log)
         change.labels = change.pr.get('labels')
         # ensure message is at least an empty string
         message = change.pr.get("body") or ""
@@ -1032,7 +1032,7 @@ class GithubConnection(BaseConnection):
         ]
 
         if self.sched:
-            self.sched.onChangeUpdated(change)
+            self.sched.onChangeUpdated(change, zuul_event_id=zuul_event_id)
 
         return change
 
@@ -1241,11 +1241,12 @@ class GithubConnection(BaseConnection):
             return None
         return pulls.pop()
 
-    def getPullReviews(self, pr_obj, project, number):
+    def getPullReviews(self, pr_obj, project, number, log=None):
         # make a list out of the reviews so that we complete our
         # API transaction
+        log = log or self.log
         revs = [review.as_dict() for review in pr_obj.reviews()]
-        self.log.debug('Got reviews for PR %s#%s', project, number)
+        log.debug('Got reviews for PR %s#%s', project, number)
 
         permissions = {}
         reviews = {}
@@ -1291,9 +1292,9 @@ class GithubConnection(BaseConnection):
                 if review['grantedOn'] > reviews[user]['grantedOn']:
                     if (review['type'] == 'commented' and reviews[user]['type']
                             in ('approved', 'changes_requested')):
-                        self.log.debug("Discarding comment review %s due to "
-                                       "an existing vote %s" % (review,
-                                                                reviews[user]))
+                        log.debug("Discarding comment review %s due to "
+                                  "an existing vote %s" % (review,
+                                                           reviews[user]))
                         pass
                     else:
                         reviews[user] = review
@@ -1418,7 +1419,8 @@ class GithubConnection(BaseConnection):
             time.sleep(1)
             return self._getCommit(repository, sha, retries - 1)
 
-    def getCommitStatuses(self, project, sha):
+    def getCommitStatuses(self, project, sha, log=None):
+        log = log or self.log
         github = self.getGithubClient(project)
         owner, proj = project.split('/')
         repository = github.repository(owner, proj)
@@ -1429,8 +1431,8 @@ class GithubConnection(BaseConnection):
         # API transaction
         statuses = [status.as_dict() for status in commit.statuses()]
 
-        self.log.debug("Got commit statuses for sha %s on %s", sha, project)
-        self.log_rate_limit(self.log, github)
+        log.debug("Got commit statuses for sha %s on %s", sha, project)
+        self.log_rate_limit(log, github)
         return statuses
 
     def setCommitStatus(self, project, sha, state, url='', description='',
@@ -1469,7 +1471,7 @@ class GithubConnection(BaseConnection):
     def _ghTimestampToDate(self, timestamp):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
-    def _get_statuses(self, project, sha):
+    def _get_statuses(self, project, sha, log=None):
         # A ref can have more than one status from each context,
         # however the API returns them in order, newest first.
         # So we can keep track of which contexts we've already seen
@@ -1479,7 +1481,7 @@ class GithubConnection(BaseConnection):
         # by user, so that we can require/trigger by user too.
         seen = []
         statuses = []
-        for status in self.getCommitStatuses(project.name, sha):
+        for status in self.getCommitStatuses(project.name, sha, log=log):
             stuple = _status_as_tuple(status)
             if "%s:%s" % (stuple[0], stuple[1]) not in seen:
                 statuses.append("%s:%s:%s" % stuple)

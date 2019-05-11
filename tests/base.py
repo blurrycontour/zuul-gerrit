@@ -1592,10 +1592,11 @@ class RecordingMergeClient(zuul.merger.client.MergeClient):
         self.history = {}
 
     def submitJob(self, name, data, build_set,
-                  precedence=zuul.model.PRECEDENCE_NORMAL):
+                  precedence=zuul.model.PRECEDENCE_NORMAL, event=None):
         self.history.setdefault(name, [])
         self.history[name].append((data, build_set))
-        return super().submitJob(name, data, build_set, precedence)
+        return super().submitJob(
+            name, data, build_set, precedence, event=event)
 
 
 class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
@@ -2355,7 +2356,7 @@ class BaseTestCase(testtools.TestCase):
         # from libraries that zuul depends on such as gear.
         log_defaults_from_env = os.environ.get(
             'OS_LOG_DEFAULTS',
-            'git.cmd=INFO,kazoo.client=WARNING,gear=INFO')
+            'git.cmd=INFO,kazoo.client=WARNING,gear=WARNING')
 
         if log_defaults_from_env:
             for default in log_defaults_from_env.split(','):

@@ -27,6 +27,8 @@ import paramiko
 
 import zuul.model
 
+from zuul.lib.logutil import get_annotated_logger
+
 NULL_REF = '0000000000000000000000000000000000000000'
 
 
@@ -647,11 +649,12 @@ class Merger(object):
         orig_commit = repo.revParse('FETCH_HEAD')
         return orig_commit, commit
 
-    def _mergeItem(self, item, recent, repo_state):
-        self.log.debug("Processing ref %s for project %s/%s / %s uuid %s" %
-                       (item['ref'], item['connection'],
-                        item['project'], item['branch'],
-                        item['buildset_uuid']))
+    def _mergeItem(self, item, recent, repo_state, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("Processing ref %s for project %s/%s / %s uuid %s" %
+                  (item['ref'], item['connection'],
+                   item['project'], item['branch'],
+                   item['buildset_uuid']))
         repo = self.getRepo(item['connection'], item['project'])
         key = (item['connection'], item['project'], item['branch'])
 
@@ -661,11 +664,11 @@ class Merger(object):
         if not base:
             # There is none, so use the branch tip
             # we need to reset here in order to call getBranchHead
-            self.log.debug("No base commit found for %s" % (key,))
+            log.debug("No base commit found for %s" % (key,))
             try:
                 repo.reset()
             except Exception:
-                self.log.exception("Unable to reset repo %s" % repo)
+                log.exception("Unable to reset repo %s" % repo)
                 return None, None
             self._restoreRepoState(item['connection'], item['project'], repo,
                                    repo_state)
@@ -676,7 +679,7 @@ class Merger(object):
             self._saveRepoState(item['connection'], item['project'], repo,
                                 repo_state, recent)
         else:
-            self.log.debug("Found base commit %s for %s" % (base, key,))
+            log.debug("Found base commit %s for %s" % (base, key,))
 
         if self.execution_context:
             # Set origin branch to the rev of the current (speculative) base.
@@ -685,7 +688,8 @@ class Merger(object):
             repo.setRemoteRef(item['branch'], base)
 
         # Merge the change
-        orig_commit, commit = self._mergeChange(item, base)
+        orig_commit, commit = self._mergeChange(
+            item, base, zuul_event_id=zuul_event_id)
         if not commit:
             return None, None
         # Store this commit as the most recent for this project-branch
@@ -693,7 +697,8 @@ class Merger(object):
         return orig_commit, commit
 
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
-                     repo_locks=None):
+                     repo_locks=None, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         # connection+project+branch -> commit
         recent = {}
         commit = None
@@ -710,9 +715,10 @@ class Merger(object):
             else:
                 lock = nullcontext()
             with lock:
-                self.log.debug("Merging for change %s,%s" %
-                               (item["number"], item["patchset"]))
-                orig_commit, commit = self._mergeItem(item, recent, repo_state)
+                log.debug("Merging for change %s,%s" %
+                          (item["number"], item["patchset"]))
+                orig_commit, commit = self._mergeItem(
+                    item, recent, repo_state, zuul_event_id=zuul_event_id)
                 if not commit:
                     return None
                 if files or dirs:
