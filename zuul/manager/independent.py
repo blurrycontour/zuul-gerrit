@@ -33,7 +33,7 @@ class IndependentPipelineManager(PipelineManager):
         self.log.debug("Dynamically created queue %s", change_queue)
         return DynamicChangeQueueContextManager(change_queue)
 
-    def enqueueChangesAhead(self, change, quiet, ignore_requirements,
+    def enqueueChangesAhead(self, change, event, quiet, ignore_requirements,
                             change_queue, history=None):
         if history and change in history:
             # detected dependency cycle
