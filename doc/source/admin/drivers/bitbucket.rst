@@ -52,3 +52,14 @@ via a named user. The options for the ``zuul.conf`` connections are:
     :required:
 
     Password for the user to log in to the server.
+
+Connection configuration
+------------------------
+
+Zuul can report back build status to Bitbucket, it will do this on a
+per pipeline basis. This feature is based on the Bitbucket build
+status API. Build status can be used to set conditions in Bitbucket
+like all other build information can be used. Reporting includes
+the pipeline name and the string "Zuul".
+
+There are no configuration items right now.
