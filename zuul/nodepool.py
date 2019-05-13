@@ -157,8 +157,9 @@ class Nodepool(object):
             self.log.debug("Removing autohold for %s", autohold_key)
             del self.sched.autohold_requests[autohold_key]
 
-    def useNodeSet(self, nodeset):
-        self.log.info("Setting nodeset %s in use" % (nodeset,))
+    def useNodeSet(self, nodeset, event=None):
+        log = get_annotated_logger(self.log, event)
+        log.info("Setting nodeset %s in use", nodeset)
         for node in nodeset.getNodes():
             if node.lock is None:
                 raise Exception("Node %s is not locked" % (node,))

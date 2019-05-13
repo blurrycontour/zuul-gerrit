@@ -1812,7 +1812,7 @@ class Build(object):
     Job (related builds are grouped together in a BuildSet).
     """
 
-    def __init__(self, job, uuid):
+    def __init__(self, job, uuid, zuul_event_id=None):
         self.job = job
         self.uuid = uuid
         self.url = None
@@ -1832,6 +1832,7 @@ class Build(object):
         self.node_labels = []
         self.node_name = None
         self.nodeset = None
+        self.zuul_event_id = zuul_event_id
 
     def __repr__(self):
         return ('<Build %s of %s voting:%s on %s>' %
