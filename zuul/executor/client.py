@@ -24,6 +24,7 @@ import zuul.model
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.jsonutil import json_dumps
+from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Build
 
 
@@ -138,13 +139,14 @@ class ExecutorClient(object):
 
     def execute(self, job, item, pipeline, dependent_changes=[],
                 merger_items=[]):
+        log = get_annotated_logger(self.log, item.event)
         tenant = pipeline.tenant
         uuid = str(uuid4().hex)
         nodeset = item.current_build_set.getJobNodeSet(job.name)
-        self.log.info(
+        log.info(
             "Execute job %s (uuid: %s) on nodes %s for change %s "
-            "with dependent changes %s" % (
-                job, uuid, nodeset, item.change, dependent_changes))
+            "with dependent changes %s",
+            job, uuid, nodeset, item.change, dependent_changes)
 
         project = dict(
             name=item.change.project.name,
@@ -300,13 +302,13 @@ class ExecutorClient(object):
                 src_dir=os.path.join('src', p.canonical_name),
                 required=(p in required_projects),
             ))
-
-        build = Build(job, uuid)
+        params['zuul_event_id'] = item.event.zuul_event_id
+        build = Build(job, uuid, zuul_event_id=item.event.zuul_event_id)
         build.parameters = params
         build.nodeset = nodeset
 
-        self.log.debug("Adding build %s of job %s to item %s" %
-                       (build, job, item))
+        log.debug("Adding build %s of job %s to item %s",
+                  build, job, item)
         item.addBuild(build)
 
         if job.name == 'noop':
@@ -353,18 +355,17 @@ class ExecutorClient(object):
             self.gearman.submitJob(gearman_job, precedence=precedence,
                                    timeout=300)
         except Exception:
-            self.log.exception("Unable to submit job to Gearman")
+            log.exception("Unable to submit job to Gearman")
             self.onBuildCompleted(gearman_job, 'EXCEPTION')
             return build
 
         if not gearman_job.handle:
-            self.log.error("No job handle was received for %s after"
-                           " 300 seconds; marking as lost." %
-                           gearman_job)
+            log.error("No job handle was received for %s after"
+                      " 300 seconds; marking as lost.",
+                      gearman_job)
             self.onBuildCompleted(gearman_job, 'NO_HANDLE')
 
-        self.log.debug("Received handle %s for %s" % (gearman_job.handle,
-                                                      build))
+        log.debug("Received handle %s for %s", gearman_job.handle, build)
 
         return build
 

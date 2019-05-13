@@ -662,11 +662,11 @@ class AnsibleJob(object):
 
     def __init__(self, executor_server, job):
         logger = logging.getLogger("zuul.AnsibleJob")
-        # TODO(tobiash): Add zuul event id when it's plumbed through
-        self.log = get_annotated_logger(logger, None, build=job.unique)
+        self.arguments = json.loads(job.arguments)
+        self.log = get_annotated_logger(
+            logger, self.arguments.get('zuul_event_id'), build=job.unique)
         self.executor_server = executor_server
         self.job = job
-        self.arguments = json.loads(job.arguments)
         self.jobdir = None
         self.proc = None
         self.proc_lock = threading.Lock()
