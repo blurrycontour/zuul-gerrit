@@ -40,6 +40,8 @@ class GerritReporter(BaseReporter):
     def report(self, item):
         """Send a message to gerrit."""
 
+        return
+
         # If the source is no GerritSource we cannot report anything here.
         if not isinstance(item.change.project.source, GerritSource):
             return
