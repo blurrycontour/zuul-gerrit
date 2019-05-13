@@ -20,9 +20,45 @@ from zuul.driver.bitbucket.bitbucketsource import BitbucketSource
 
 import logging
 import requests
+import threading
+import time
 from requests.auth import HTTPBasicAuth
 from urllib.parse import urlparse
 
+class BitbucketWatcher(threading.Thread):
+    log = logging.getLogger("zuul.connection.bitbucket.watcher")
+
+    def __init__(self, bitbucket_con, poll_delay):
+        super(BitbucketWatcher, self).__init__(self)
+
+        self.daemon = True
+        self.bitbucket_con = bitbucket_con
+        self.poll_delay = poll_delay
+        self.stopped = False
+        self.branches = self.bitbucket_con.branches
+        self.event_count = 0
+
+    def _run(self):
+        self.log.debug("Check all branches for updates: {}"
+                       .format(self.bitbucket_con.connection_name))
+        try:
+            pass
+        except Exception as e:
+            self.log.debug("Unexpected issue in _run loop: {}"
+                           .format(str(e)))
+
+    # core event loop, no unittest
+    def run(self):
+        while not self.stopped:
+            if not self.bitbucket_con.pause_watcher:
+                self._run()
+            else:
+                self.log.debug("Watcher is paused")
+            time.sleep(self.poll_delay)
+    
+    # core event loop, no unittest
+    def stop(self):
+        self.stopped = True
 
 class BitbucketConnectionError(BaseException):
     def __init__(self, message):
@@ -82,6 +118,10 @@ class BitbucketConnection(BaseConnection):
 
         self.branches = {}
 
+        self.pause_watcher = False
+
+        self.poll_delay = 60
+
     def _getBitbucketClient(self):
         # authenticate, return client
         client = BitbucketClient(self.base_url)
@@ -93,7 +133,22 @@ class BitbucketConnection(BaseConnection):
         return project, repo
 
     def onLoad(self):
-        pass
+        self.log.debug("Starting Bitbucket watcher")
+        self._start_watcher_thread()
+
+    def onStop(self):
+        self.log.debug("Stopping Bitbucket watcher")
+        self._stop_watcher_thread()
+
+    def _start_watcher_thread(self):
+        self.watcher_thread = BitbucketWatcher(
+            self, self.poll_delay)
+        self.watcher_thread.start()
+
+    def _stop_watcher_thread(self):
+        if self.watcher_thread:
+            self.watcher_thread.stop()
+            self.watcher_thread.join()
 
     def clearBranchCache(self):
         self.projects = {}
