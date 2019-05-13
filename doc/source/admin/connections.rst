@@ -62,6 +62,7 @@ Zuul includes the following drivers:
 .. toctree::
    :maxdepth: 2
 
+   drivers/bitbucket
    drivers/gerrit
    drivers/github
    drivers/pagure
