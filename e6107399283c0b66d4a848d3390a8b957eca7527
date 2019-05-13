@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_15cf81b0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1308,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-05-13T14:14:45Z",
+      "side": 1,
+      "message": "we don\u0027t seem to test actually getting data from zookeeper. In this case, I think we should at least add something to FakeZookeeper (like we did for executor-zones), then assert the data is correct.\n\nI have a patch up to add some integration testing for quickstart, and hope to also look at tox-remote to see if there is a way to add some there too.",
+      "range": {
+        "startLine": 1308,
+        "startChar": 20,
+        "endLine": 1308,
+        "endChar": 28
+      },
+      "revId": "e6107399283c0b66d4a848d3390a8b957eca7527",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
