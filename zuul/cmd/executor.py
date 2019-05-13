@@ -76,6 +76,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.send_command(self.args.command)
             sys.exit(0)
 
+        sys.exit(0)
+
         self.configure_connections(source_only=True)
 
         if self.config.has_option('executor', 'job_dir'):
