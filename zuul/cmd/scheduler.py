@@ -129,6 +129,9 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('scheduler', 'log_config')
         self.log = logging.getLogger("zuul.Scheduler")
 
+        sys.exit(0)
+        self.log.warning("Stopping scheduler")
+
         self.sched = zuul.scheduler.Scheduler(self.config)
 
         gearman = zuul.executor.client.ExecutorClient(self.config, self.sched)
