@@ -17,6 +17,8 @@ from zuul.driver.bitbucket.bitbucketsource import BitbucketSource
 from zuul.driver.bitbucket.bitbucketconnection import BitbucketConnection
 from zuul.driver.bitbucket.bitbucketreporter import BitbucketReporter
 from tests.base import BaseTestCase
+from voluptuous import Schema
+from unittest.mock import MagicMock
 
 
 class TestBitbucketDriver(BaseTestCase):

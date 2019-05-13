@@ -14,6 +14,7 @@
 
 from zuul.driver import Driver, ConnectionInterface
 from zuul.driver import SourceInterface, ReporterInterface
+from zuul.driver import TriggerInterface
 from zuul.driver.bitbucket import bitbucketconnection
 from zuul.driver.bitbucket import bitbucketsource
 from zuul.driver.bitbucket import bitbucketreporter
@@ -42,4 +43,10 @@ class BitbucketDriver(Driver, ConnectionInterface, SourceInterface,
     def getReporterSchema(self):
         return bitbucketreporter.getSchema()
 
+    def getTrigger(self, connection, config=None):
+        # FIXME
+        pass
+
+    def getTriggerSchema(self):
+        # FIXME
         pass
