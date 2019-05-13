@@ -5,7 +5,8 @@
   roles:
     - name: install-docker
       use_upstream_docker: false
-    - use-buildset-registry
+    - name: use-buildset-registry
+      buildset_registry_docker_user: root
   tasks:
     - name: Install docker-compose and git-review
       package:
