@@ -704,7 +704,8 @@ class NodeSet(ConfigObject):
 class NodeRequest(object):
     """A request for a set of nodes."""
 
-    def __init__(self, requestor, build_set, job, nodeset, relative_priority):
+    def __init__(self, requestor, build_set, job, nodeset, relative_priority,
+                 event=None):
         self.requestor = requestor
         self.build_set = build_set
         self.job = job
@@ -719,6 +720,9 @@ class NodeRequest(object):
         self.provider = self._getPausedParentProvider()
         self.id = None
         self._zk_data = {}  # Data that we read back from ZK
+        self.meta = {}
+        if event is not None:
+            self.meta['zuul_event_id'] = event.zuul_event_id
         # Zuul internal flags (not stored in ZK so they are not
         # overwritten).
         self.failed = False
@@ -786,6 +790,7 @@ class NodeRequest(object):
         d['state'] = self.state
         d['state_time'] = self.state_time
         d['relative_priority'] = self.relative_priority
+        d['meta'] = self.meta
         return d
 
     def updateFromDict(self, data):
