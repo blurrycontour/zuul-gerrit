@@ -195,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "dfbec78f_da6836ba",
+        "filename": "tests/unit/bitbucket/mocks.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-05-13T13:17:13Z",
+      "side": 1,
+      "message": "I pretty much agree, for this patch set it\u0027s all I need.",
+      "parentUuid": "dfbec78f_51a99f21",
+      "revId": "d4ab7bf26f015a76e7edd10fd67302f7f85f6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_71a62356",
         "filename": "tests/unit/bitbucket/testbitbucketconnection.py",
         "patchSetId": 16
