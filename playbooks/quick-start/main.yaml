@@ -1,7 +1,7 @@
 - name: Run docker-compose up
   when: not local
   shell:
-    cmd: docker-compose up -d
+    cmd: docker-compose --verbose up -d
     chdir: src/opendev.org/zuul/zuul/doc/source/admin/examples
   become: true
 - name: Run docker-compose up
@@ -10,7 +10,7 @@
     cmd: docker-compose up -d
     chdir: ../../doc/source/admin/examples
 - name: Print list of images
-  command: docker image ls
+  command: docker image ls --all --digests --no-trunc
 - name: Wait for Gerrit to start
   wait_for:
     host: localhost
