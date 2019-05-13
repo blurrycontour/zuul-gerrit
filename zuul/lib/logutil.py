@@ -14,14 +14,12 @@
 
 import logging
 
-from zuul.model import TriggerEvent
-
 
 def get_annotated_logger(logger, event, build=None):
     extra = {}
 
     if event is not None:
-        if isinstance(event, TriggerEvent):
+        if hasattr(event, 'zuul_event_id'):
             extra['event_id'] = event.zuul_event_id
         else:
             extra['event_id'] = event
