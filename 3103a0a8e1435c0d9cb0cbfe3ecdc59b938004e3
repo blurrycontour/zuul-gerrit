@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_357ba47b",
+        "filename": "zuul/ansible/2.8/callback/zuul_stream.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-05-13T14:45:05Z",
+      "side": 1,
+      "message": "this is the added code, maybe we should do a version check here and just modify it when \u003e 2.7",
+      "range": {
+        "startLine": 524,
+        "startChar": 0,
+        "endLine": 525,
+        "endChar": 61
+      },
+      "revId": "3103a0a8e1435c0d9cb0cbfe3ecdc59b938004e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
