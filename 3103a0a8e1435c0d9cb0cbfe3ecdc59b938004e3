@@ -22,6 +22,30 @@
       "revId": "3103a0a8e1435c0d9cb0cbfe3ecdc59b938004e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_7eded911",
+        "filename": "zuul/ansible/2.8/callback/zuul_stream.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-05-13T17:21:21Z",
+      "side": 1,
+      "message": "IMO, that solution is preferable then a total copy-paste.",
+      "parentUuid": "dfbec78f_357ba47b",
+      "range": {
+        "startLine": 524,
+        "startChar": 0,
+        "endLine": 525,
+        "endChar": 61
+      },
+      "revId": "3103a0a8e1435c0d9cb0cbfe3ecdc59b938004e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
