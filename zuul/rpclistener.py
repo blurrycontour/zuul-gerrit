@@ -30,7 +30,11 @@ from zuul.lib.config import get_default
 class MappingProxyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, types.MappingProxyType):
-            return dict(obj)
+            d = dict(obj)
+            # Always remove SafeLoader left-over
+            d.pop('_source_context', None)
+            d.pop('_start_mark', None)
+            return d
         return json.JSONEncoder.default(self, obj)
 
 
