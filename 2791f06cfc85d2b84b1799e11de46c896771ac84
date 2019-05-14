@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_2c4fc934",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-14T13:06:22Z",
+      "side": 1,
+      "message": "For the future, it might be good to make this string a config option, that defaults to \"Zuul\".",
+      "revId": "2791f06cfc85d2b84b1799e11de46c896771ac84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
