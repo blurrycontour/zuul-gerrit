@@ -158,12 +158,6 @@
     check:
       jobs:
         - zuul-build-image
-        - tox-py35:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
-            timeout: 3600  # 60 minutes
         - zuul-quick-start:
             dependencies: zuul-build-image
     gate:
