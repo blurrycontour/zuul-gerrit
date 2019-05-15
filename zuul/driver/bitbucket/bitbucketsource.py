@@ -13,7 +13,6 @@
 # under the License.
 
 from zuul.source import BaseSource
-from zuul.driver.bitbucket.bitbucketmodel import PullRequest
 import re2
 import urllib
 
@@ -47,33 +46,10 @@ class BitbucketSource(BaseSource):
 
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
-        bb_proj, repo = self.connection._getProjectRepo(project.name)
-        prs = self.connection.getPRs(bb_proj, repo)
-
-        return [self.buildPR(bb_proj, repo, pr.get('id'))
-                for pr in prs.get('values')]
+        return self.connection.getProjectOpenChanges(project)
 
     def getChangesDependingOn(self, change, projects, tenant):
         return []
-
-    def buildPR(self, project, repo, id):
-        pr = self.connection.getPR(project, repo, id)
-
-        project = self.getProject('{}/{}'.format(project, repo))
-        pull = PullRequest(project.name)
-        pull.project = project
-        pull.id = id
-        pull.updatedDate = pr.get('updatedDate')
-        fromProj = '{}/{}'.format(pr.get('fromRef').get('repository')
-                                  .get('project').get('key'),
-                                  pr.get('fromRef').get('repository')
-                                  .get('slug'))
-        bslug = self.connection.getBranchSlug(fromProj, pr.get('fromRef')
-                                              .get('id'))
-        pull.patchset = self.connection.getBranchSha(fromProj, bslug)
-        pull.title = pr.get('title')
-
-        return pull
 
     def getChangeByURL(self, url):
         try:
@@ -89,12 +65,16 @@ class BitbucketSource(BaseSource):
             id = int(m.group(3))
         except ValueError:
             return None
-        change = self.buildPR(project, repo, int(id))
+        change = self.connection.buildPR(project, repo, int(id))
 
         return change
 
     def getChange(self, event):
-        raise NotImplementedError()
+        if event.type == 'bb-pr':
+            project_name, repo = self.connection._getProjectRepo(event.project_name)
+            return self.connection.buildPR(project_name, repo, event.change_id)
+
+        return None
 
     def canMerge(self, change, allow_needs):
         return self.connection.canMerge(change, allow_needs)
