@@ -1429,9 +1429,10 @@ class Job(ConfigObject):
         for a in artifacts:
             change = other_build.build_set.item.change
             a.update({'project': change.project.name,
-                      'change': str(change.number),
-                      'patchset': change.patchset,
                       'job': other_build.job.name})
+            if hasattr(change, 'number'):
+                a.update({'change': str(change.number),
+                          'patchset': change.patchset})
             if a not in artifact_data:
                 artifact_data.append(a)
         if artifact_data:
