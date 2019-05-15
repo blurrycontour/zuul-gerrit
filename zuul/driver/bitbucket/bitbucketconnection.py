@@ -14,6 +14,7 @@
 
 from zuul.connection import BaseConnection
 from zuul.model import Project
+from zuul.exceptions import MergeFailure
 
 from zuul.driver.bitbucket.bitbucketsource import BitbucketSource
 
@@ -39,6 +40,18 @@ class BitbucketClient():
     def get(self, path):
         url = '{}{}'.format(self.baseurl, path)
         r = requests.get(url, auth=HTTPBasicAuth(self.user, self.pw))
+
+        if r.status_code != 200:
+            raise BitbucketConnectionError(
+                "Connection to server returned status {} path {}"
+                .format(r.status_code, url))
+
+        return r.json()
+
+    def post(self, path, payload):
+        url = '{}:{}{}'.format(self.baseurl, path)
+        r = requests.post(url, auth=HTTPBasicAuth(self.user, self.pw),
+                          data=payload)
 
         if r.status_code != 200:
             raise BitbucketConnectionError(
@@ -142,3 +155,23 @@ class BitbucketConnection(BaseConnection):
         pr = self.getPR(bb_proj, repo, change.id)
 
         return pr.get('state') == 'MERGED'
+
+    def reportBuild(self, commitHash, status):
+        client = self._getBitbucketClient()
+
+        client.post('/rest/build-status/1.0/commits/{}'.format(commitHash),
+                    status)
+
+    def mergePull(self, projectName, prId):
+        client = self._getBitbucketClient()
+
+        project, repo = self._getProjectRepo(projectName)
+
+        re = client.post('/rest/api/1.0/projects/{}/repos/{}/pull'
+                         '-requests/{}/merge',
+                         project, repo, prId)
+
+        if re.get('state') != 'MERGED':
+            raise MergeFailure()
+
+        return True
