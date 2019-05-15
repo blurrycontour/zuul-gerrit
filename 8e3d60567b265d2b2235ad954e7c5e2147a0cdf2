@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5fc1f717_923f39b4",
+        "filename": "setup.cfg",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-05-15T09:40:49Z",
+      "side": 1,
+      "message": "You know - these can go too.",
+      "range": {
+        "startLine": 49,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 19
+      },
+      "revId": "8e3d60567b265d2b2235ad954e7c5e2147a0cdf2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
