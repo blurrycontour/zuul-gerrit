@@ -58,14 +58,16 @@ class BitbucketReporter(BaseReporter):
             state = 'SUCCESSFUL'
         status = {
             'state': state,
-            'key': '{}-{}'.format(self.reportid, self.context),
+            'key': '{}-{}'.format(self._report_id, self.context),
             'name': '{}: {}'.format(self._label, self.context),
-            'description': message
+            'description': message,
+            'url': 'http://zuul.test'
         }
-        self.connection.setBuildStatus(item.change.patchset, status)
+        self.connection.reportBuild(item.change.patchset, status)
 
 
 def getSchema():
     bitbucket_reporter = v.Schema({
+        'merge': bool,
     })
     return bitbucket_reporter

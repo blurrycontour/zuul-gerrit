@@ -17,11 +17,110 @@ from zuul.model import Project
 from zuul.exceptions import MergeFailure
 
 from zuul.driver.bitbucket.bitbucketsource import BitbucketSource
+from zuul.driver.bitbucket.bitbucketmodel import PullRequest
+from zuul.driver.bitbucket.bitbucketmodel import BitbucketTriggerEvent
 
+import traceback
 import logging
 import requests
+import threading
+import time
 from requests.auth import HTTPBasicAuth
 from urllib.parse import urlparse
+
+
+class BitbucketWatcher(threading.Thread):
+    log = logging.getLogger("zuul.connection.bitbucket.watcher")
+
+    def __init__(self, bitbucket_con, poll_delay):
+        threading.Thread.__init__(self)
+
+        self.daemon = True
+        self.bitbucket_con = bitbucket_con
+        self.poll_delay = poll_delay
+        self.stopped = False
+        self.branches = self.bitbucket_con.branches
+        self.event_count = 0
+
+    def isNew(self, change):
+        projectname = change.project.name
+        prid = change.id
+
+        return (self.bitbucket_con.cachedPR(projectname, prid)
+                is None)
+
+    def supersedes(self, change):
+        projectname = change.project.name
+        prid = change.id
+
+        oldpr = self.bitbucket_con.cachedPR(projectname, prid)
+        if oldpr and change.isUpdateOf(oldpr):
+            return oldpr
+
+        return None
+
+    def _handleBasePR(self, change):
+        event = BitbucketTriggerEvent()
+        event.type = 'bb-pr'
+        event.title = change.title
+        event.project_name = change.project.name
+        event.change_id = change.id
+        event.updateDate = change.updatedDate
+        event.branch = self.bitbucket_con\
+            .getBranchSlug(change.project.name, change.id)
+        event.ref = change.patchset
+        event.project_hostname = self.bitbucket_con.canonical_hostname
+
+        return event
+
+    def _handleNewPR(self, change):
+        event = self._handleBasePR(change)
+
+        event.action = 'opened'
+
+        self.log.debug('New event: {}'.format(event))
+
+        self.bitbucket_con.sched.addEvent(event)
+
+        return event
+
+    def _handleUpdatePR(self, change, oldchange):
+        pass
+
+    def _run(self):
+        self.log.debug("Check for updates: {}"
+                       .format(self.bitbucket_con.connection_name))
+        try:
+            for p in self.bitbucket_con.projects:
+                project = self.bitbucket_con.getProject(p)
+                for change in self.bitbucket_con\
+                        .getProjectOpenChanges(project, False):
+                    if self.isNew(change):
+                        self.log.debug("New change: {} in {}".format(change, change.project))
+                        self._handleNewPR(change)
+                        return
+                    oldpr = self.supersedes(change)
+                    if oldpr:
+                        self._handleUpdatePR(change, oldpr)
+                        return
+
+        except Exception as e:
+            self.log.debug("Unexpected issue in _run loop: {}"
+                           .format(str(e)))
+            self.log.debug(traceback.format_exception(Exception, e))
+
+    # core event loop, no unittest
+    def run(self):
+        while not self.stopped:
+            if not self.bitbucket_con.pause_watcher:
+                self._run()
+            else:
+                self.log.debug("Watcher is paused")
+            time.sleep(self.poll_delay)
+
+    # core event loop, no unittest
+    def stop(self):
+        self.stopped = True
 
 
 class BitbucketConnectionError(BaseException):
@@ -49,11 +148,11 @@ class BitbucketClient():
         return r.json()
 
     def post(self, path, payload):
-        url = '{}:{}{}'.format(self.baseurl, path)
+        url = '{}{}'.format(self.baseurl, path)
         r = requests.post(url, auth=HTTPBasicAuth(self.user, self.pw),
-                          data=payload)
+                          json=payload)
 
-        if r.status_code != 200:
+        if r.status_code not in [200, 204]:
             raise BitbucketConnectionError(
                 "Connection to server returned status {} path {}"
                 .format(r.status_code, url))
@@ -69,6 +168,7 @@ class BitbucketConnection(BaseConnection):
         super(BitbucketConnection, self).__init__(
             driver, connection_name, connection_config)
         self.projects = {}
+        self.prs = {}
 
         self.base_url = self.connection_config.get('baseurl').rstrip('/')
         self.cloneurl = self.connection_config.get('cloneurl').rstrip('/')
@@ -82,6 +182,14 @@ class BitbucketConnection(BaseConnection):
 
         self.branches = {}
 
+        self.pause_watcher = False
+
+        self.poll_delay = 60
+
+        self.canonical_hostname = 'FIXME'
+
+        self.watcher_thread = BitbucketWatcher(self, self.poll_delay)
+
     def _getBitbucketClient(self):
         # authenticate, return client
         client = BitbucketClient(self.base_url)
@@ -93,7 +201,22 @@ class BitbucketConnection(BaseConnection):
         return project, repo
 
     def onLoad(self):
-        pass
+        self.log.debug("Starting Bitbucket watcher")
+        self._start_watcher_thread()
+
+    def onStop(self):
+        self.log.debug("Stopping Bitbucket watcher")
+        self._stop_watcher_thread()
+
+    def _start_watcher_thread(self):
+        self.watcher_thread = BitbucketWatcher(
+            self, self.poll_delay)
+        self.watcher_thread.start()
+
+    def _stop_watcher_thread(self):
+        if self.watcher_thread:
+            self.watcher_thread.stop()
+            self.watcher_thread.join()
 
     def clearBranchCache(self):
         self.projects = {}
@@ -132,6 +255,37 @@ class BitbucketConnection(BaseConnection):
         return [item.get('displayId') for item in res.get('values')
                 if item.get('type') == 'BRANCH']
 
+    def buildPR(self, project, repo, id, cache=True):
+        pr = self.getPR(project, repo, id)
+
+        project = self.getProject('{}/{}'.format(project, repo))
+        pull = PullRequest(project.name)
+        pull.project = project
+        pull.id = id
+        pull.updatedDate = pr.get('updatedDate')
+        fromProj = '{}/{}'.format(pr.get('fromRef').get('repository')
+                                  .get('project').get('key'),
+                                  pr.get('fromRef').get('repository')
+                                  .get('slug'))
+        bslug = self.getBranchSlug(fromProj, pr.get('fromRef')
+                                   .get('id'))
+        pull.patchset = self.getBranchSha(fromProj, bslug)
+        pull.branch = pr.get('toRef').get('id')
+        pull.title = pr.get('title')
+        pull.message = pr.get('description')
+
+        if cache:
+            self.cachePR(pull)
+
+        return pull
+
+    def getProjectOpenChanges(self, project, cache=True):
+        bb_proj, repo = self._getProjectRepo(project.name)
+        prs = self.getPRs(bb_proj, repo)
+
+        return [self.buildPR(bb_proj, repo, pr.get('id'), cache)
+                for pr in prs.get('values')]
+
     def getPR(self, project, repo, id):
         return self._getBitbucketClient()\
             .get('/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}'
@@ -141,6 +295,17 @@ class BitbucketConnection(BaseConnection):
         return self._getBitbucketClient()\
             .get('/rest/api/1.0/projects/{}/repos/{}/pull-requests'
                  .format(project, repo))
+
+    def cachePR(self, pr):
+        projecthash = self.prs.get(pr.project.name, {})
+        projecthash[pr.id] = pr
+
+    def cachedPR(self, projectname, prid):
+        if projectname in self.prs:
+            if prid in self.prs[projectname]:
+                return self.prs[projectname][prid]
+
+        return None
 
     def canMerge(self, change, allow_needs):
         bb_proj, repo = self._getProjectRepo(change.project.name)
