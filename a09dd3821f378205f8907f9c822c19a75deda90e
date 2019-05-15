@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dfbec78f_6a47d3bd",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-05-15T09:12:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfbec78f_4769aaf6",
+      "revId": "a09dd3821f378205f8907f9c822c19a75deda90e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_e76bfeed",
         "filename": "doc/source/admin/drivers/bitbucket.rst",
         "patchSetId": 11
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "dfbec78f_8a4247aa",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-05-15T09:12:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfbec78f_e76bfeed",
+      "revId": "a09dd3821f378205f8907f9c822c19a75deda90e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_076f32fc",
         "filename": "zuul/driver/bitbucket/bitbucketreporter.py",
         "patchSetId": 11
@@ -47,6 +83,24 @@
       "writtenOn": "2019-05-15T08:36:22Z",
       "side": 1,
       "message": "This could be the buildset url, though I\u0027m not sure if we have a method to calculate it yet.",
+      "revId": "a09dd3821f378205f8907f9c822c19a75deda90e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_6a2033f8",
+        "filename": "zuul/driver/bitbucket/bitbucketreporter.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-05-15T09:12:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfbec78f_076f32fc",
       "revId": "a09dd3821f378205f8907f9c822c19a75deda90e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
