@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "dfbec78f_a758a687",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-05-15T08:34:45Z",
+      "side": 1,
+      "message": "Nothing currently, though I expect we\u0027ll see more tenant integration first.",
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fce034c_e920724c",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 14
@@ -36,6 +53,23 @@
       "writtenOn": "2019-04-11T08:54:36Z",
       "side": 1,
       "message": "I still think granularity at project level, and even at action level, is desirable. Looking at the amount of projects on the openstack tenant on z.o.o, it\u0027d be good for example to have one or two maintainers per project simply allowed to dequeue a buildset if it is a resource hog, without having to query a Zuul operator.\nI get that it is a drastic increase in complexity, but that should be considered at some point in the future.",
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_c7535a6a",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-05-15T08:34:45Z",
+      "side": 1,
+      "message": "Speaking with my OpenStack hat on -- that\u0027s mostly just history.  We plan on having more tenants in OpenDev, and when that process is finished, the folks responsible for the OpenStack project will be the appropriate token holders for all the projects.  In other words, I think that the tenant will still be the right scope for that.  And, hypothetically, if I were to create a public Zuul service, I would probably do the same thing -- every customer gets a tenant.  I\u0027m fairly confident that tenant is the right scope for now, and if I\u0027m wrong, we can expand it, which will be much easier than contracting it.",
       "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
