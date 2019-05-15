@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_de2a3cd9",
+        "filename": "zuul/web/static/.keep",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-15T17:45:04Z",
+      "side": 1,
+      "message": "This file deletion must be removed from the change.",
+      "revId": "51fced0e88f8d2b6f133ab82510d01dfa2d18248",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
