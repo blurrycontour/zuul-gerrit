@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_07165256",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 967,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-05-15T08:37:29Z",
+      "side": 1,
+      "message": "I think we need to validate these data before we use it.  See how we handle the artifact returns (we have a helper function to get the data and it uses voluptuous to verify the format and either return the real data or a null placeholder).  In this case I think our helper method should return either the real data or the empty list.\n\nThat will protect us if someone does:\nzuul_return:\n  data:\n    zuul:\n      warnings: [[1], [2]]",
+      "revId": "3c7b9bc7d8b5c6bf7d5039cee9a8b0d1200c3eb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
