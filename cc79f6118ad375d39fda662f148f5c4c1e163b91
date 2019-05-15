@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_07489284",
+        "filename": "zuul/driver/zuul/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-05-15T08:36:48Z",
+      "side": 1,
+      "message": "Theoretically, zuul events are caused by other events, so we *might* be able to chain them (ie, tie the zuul event to the gerrit event which caused it).  But that could be complex and might make it harder to follow the gerrit event, so this is probably the best thing to do for now.",
+      "revId": "cc79f6118ad375d39fda662f148f5c4c1e163b91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
