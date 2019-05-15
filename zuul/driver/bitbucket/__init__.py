@@ -14,13 +14,15 @@
 
 from zuul.driver import Driver, ConnectionInterface
 from zuul.driver import SourceInterface, ReporterInterface
+from zuul.driver import TriggerInterface
 from zuul.driver.bitbucket import bitbucketconnection
 from zuul.driver.bitbucket import bitbucketsource
 from zuul.driver.bitbucket import bitbucketreporter
+from zuul.driver.bitbucket import bitbuckettrigger
 
 
 class BitbucketDriver(Driver, ConnectionInterface, SourceInterface,
-                      ReporterInterface):
+                      ReporterInterface, TriggerInterface):
     name = 'bitbucket'
 
     def getConnection(self, name, config):
@@ -42,4 +44,8 @@ class BitbucketDriver(Driver, ConnectionInterface, SourceInterface,
     def getReporterSchema(self):
         return bitbucketreporter.getSchema()
 
-        pass
+    def getTrigger(self, connection, config=None):
+        return bitbuckettrigger.BitbucketTrigger(self, connection, config)
+
+    def getTriggerSchema(self):
+        return bitbuckettrigger.getSchema()
