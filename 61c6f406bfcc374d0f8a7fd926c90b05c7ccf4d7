@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfbec78f_7224a05e",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-16T00:27:01Z",
+      "side": 1,
+      "message": "CRD spec are provided as extra-var and they will override any group_vars/roles-default, thus we only need to reference dependencies apiVersion/kind as vars to enable override.\n\nHowever, supporting multiple dependency implementations may be too much work since the different operators may behave differently (e.g. the postgresql operator on operatorhub requires a \"primarysecretname\" object to create the zuul user while another one may need something else).\n\nThus I think we should pick one for RDMS and one for Zookeeper and stick with it. I had good success with: https://operatorhub.io/operator/alpha/postgres-operator.v3.5.0 and https://github.com/pravega/zookeeper-operator#install-the-operator )",
+      "range": {
+        "startLine": 75,
+        "startChar": 28,
+        "endLine": 75,
+        "endChar": 52
+      },
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_d2deac3c",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-16T00:27:01Z",
+      "side": 1,
+      "message": "If the user can provides part of the zuul.conf, shouldn\u0027t we be able to discover if we need to setup a Zookeeper or a RDMS?\n\nOn the other hand, extra files may be needed by zuul.conf entries (such as ssh key for gerrit connection or github app certificats). Thus it may be worthy to consider providing a:\n\n  apiVersion: zuul-ci.org/v1alpha1\n  kind: Source\n  spec:\n    zuul_conf_entry_configmapname: \"\"\n    secretname: \"\"\n\nAnd iterate over those when creating the final zuul.conf and mount all the secrets in /var/lib/zuul",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfbec78f_d2b78cf4",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-16T00:27:01Z",
+      "side": 1,
+      "message": "Deployment may not be able to detect config map change, thus we may need some extra CRD to manage the service lifecycle. For example, kind such as \"ZuulReload\" and \"ZuulBackup\" (to archive all the scheduler secrets, to be used by a companion \"ZuulRestore\")",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
