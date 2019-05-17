@@ -16,6 +16,23 @@
       "revId": "18bf0a464ffcd8901d4ce7b416ac51c2a69e1f31",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_34b1f5e2",
+        "filename": "playbooks/quick-start/run.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-05-17T14:10:58Z",
+      "side": 1,
+      "message": "Well, we were using sudo before when it was a system package so this is as similar and simple as I could make it. We could perhaps do --user instead but would likely need to update the executable path on all git-review invocations later. As for the pip module from ansible, will that still use Python 3? I copied the same pattern we\u0027re using to install zuul in playbooks/zuul-stream/pre.yaml but if you have a good example where we\u0027re using the pip module I\u0027m happy to adapt it.",
+      "revId": "18bf0a464ffcd8901d4ce7b416ac51c2a69e1f31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
