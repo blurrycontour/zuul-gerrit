@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_7750da33",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1257,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-05-17T00:32:26Z",
+      "side": 1,
+      "message": "Raising an exception here still doesn\u0027t help too much, as it is possible zuul won\u0027t enqueue PR properly.  I\u0027d have to see what harm there is if PullReviews is empty.",
+      "revId": "21eb38d0fa4c9b415144dbf4b6a6eadbdb0bed56",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
