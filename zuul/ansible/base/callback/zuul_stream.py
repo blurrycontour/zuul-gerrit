@@ -24,6 +24,7 @@ import logging
 import logging.config
 import json
 import os
+import re
 import socket
 import threading
 import time
@@ -34,6 +35,8 @@ from zuul.ansible import paths
 from zuul.ansible import logconfig
 
 LOG_STREAM_PORT = 19885
+TASK_END_REGEXP = re.compile(
+    r'[0-9-]+ [0-9:.]+ \| \[Zuul\] Task exit code: [0-9-]+')
 
 
 def zuul_filter_result(result):
@@ -169,11 +172,15 @@ class CallbackModule(default.CallbackModule):
                     host, buff.decode("utf-8", "backslashreplace"))
 
     def _log_streamline(self, host, line):
-        if "[Zuul] Task exit code" in line:
+        end = TASK_END_REGEXP.search(line)
+        if end:
+            rest = line.replace(end.group(), '')
+            if rest:
+                self._log_streamline(host, rest)
             return True
-        elif self._streamers_stop and "[Zuul] Log not found" in line:
+        elif self._streamers_stop and line == "[Zuul] Log not found":
             return True
-        elif "[Zuul] Log not found" in line:
+        elif line == "[Zuul] Log not found":
             # don't output this line
             return False
         else:
