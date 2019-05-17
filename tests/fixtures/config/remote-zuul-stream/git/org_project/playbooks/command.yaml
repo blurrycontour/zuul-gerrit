@@ -16,6 +16,13 @@
         mode: 0444
       run_once: True
 
+    - name: Kill any existing running zuul_console process
+      shell: |
+        for pid in $(ps aux | awk '/zuul_console/ { print $2 }'); do
+            kill -9 $pid || true
+        done
+      failed_when: false
+
     - name: Start zuul_console daemon
       zuul_console:
     - name: Create first file
