@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_c350de35",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-17T17:48:06Z",
+      "side": 1,
+      "message": "Catching the exception and silently returning no branches will lead to unreported errors (the removal of the errors in the test case show this).\n\nThere has been a change merged recently that makes zuul tolerate non-accessible projects [1] while keeping the information that something went wrong in the loading errors list of the tenant. Please check first if upstream master already fixes your issue.\n\n[1] https://review.opendev.org/579872",
+      "revId": "81aebacd5994501070c29d822d5ee8b86ecc6b9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
