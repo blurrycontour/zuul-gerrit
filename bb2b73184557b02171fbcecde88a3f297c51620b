@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bfb3d3c7_549ee207",
+        "filename": "tests/remote/test_remote_hostvars.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-05-17T20:41:38Z",
+      "side": 1,
+      "message": "Wouldn\u0027t it be a better test to assert a python3 value since ansible and zuul have both defaulted to python2 previously? Basically checking it is python2 here isn\u0027t checking that we\u0027ve changed anything.",
+      "revId": "bb2b73184557b02171fbcecde88a3f297c51620b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_0e3b7dd1",
         "filename": "zuul/executor/server.py",
         "patchSetId": 6
@@ -13,6 +30,30 @@
       "writtenOn": "2019-05-17T17:55:22Z",
       "side": 1,
       "message": "At some point in time we probably want to thing about switching the default to python3 :)",
+      "range": {
+        "startLine": 1307,
+        "startChar": 45,
+        "endLine": 1307,
+        "endChar": 61
+      },
+      "revId": "bb2b73184557b02171fbcecde88a3f297c51620b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_54e9027e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1307,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-05-17T20:41:38Z",
+      "side": 1,
+      "message": "Because we don\u0027t get the executor/localhost from nodepool and don\u0027t add it to the inventory I think that means we are stuck using whatever python ansible wants to use by default on localhost.\n\nIs this something we need to address? At least before it was hardcoded to python2 which is a known quantity.",
+      "parentUuid": "bfb3d3c7_0e3b7dd1",
       "range": {
         "startLine": 1307,
         "startChar": 45,
