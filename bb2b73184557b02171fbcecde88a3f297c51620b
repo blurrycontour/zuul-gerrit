@@ -129,6 +129,30 @@
       "revId": "bb2b73184557b02171fbcecde88a3f297c51620b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_448871c5",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1307,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-18T06:46:43Z",
+      "side": 1,
+      "message": "It seems like Ansible 2.8 introduced an \u0027auto\u0027 python interpreter that discover the path.",
+      "parentUuid": "bfb3d3c7_2f52fb68",
+      "range": {
+        "startLine": 1307,
+        "startChar": 45,
+        "endLine": 1307,
+        "endChar": 61
+      },
+      "revId": "bb2b73184557b02171fbcecde88a3f297c51620b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
