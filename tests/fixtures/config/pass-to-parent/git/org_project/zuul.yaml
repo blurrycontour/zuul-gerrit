@@ -43,9 +43,12 @@
     name: pass
     parent: parent-job
     secrets:
-      name: secret
-      secret: secret1
-      pass-to-parent: true
+      - name: secret1
+        secret: secret1
+        pass-to-parent: true
+      - name: secret2
+        secret: secret2
+        pass-to-parent: true
     files: pass.txt
 
 - job:

@@ -4281,15 +4281,18 @@ class TestSecretPassToParent(ZuulTestCase):
         self.assertEqual(
             self._getSecrets('pass', 'playbooks'),
             [{'parent_secret': {'password': 'password3'},
-              'secret': {'password': 'password1'}}])
+              'secret1': {'password': 'password1'},
+              'secret2': {'password': 'password2'}}])
         self.assertEqual(
             self._getSecrets('pass', 'pre_playbooks'),
             [{'parent_secret': {'password': 'password3'},
-              'secret': {'password': 'password1'}}])
+              'secret1': {'password': 'password1'},
+              'secret2': {'password': 'password2'}}])
         self.assertEqual(
             self._getSecrets('pass', 'post_playbooks'),
             [{'parent_secret': {'password': 'password3'},
-              'secret': {'password': 'password1'}}])
+              'secret1': {'password': 'password1'},
+              'secret2': {'password': 'password2'}}])
 
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
                                            files=file_dict)
