@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_abbc8e69",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4331,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-20T13:08:01Z",
+      "side": 1,
+      "message": "This need to be updated as well.",
+      "range": {
+        "startLine": 4320,
+        "startChar": 0,
+        "endLine": 4331,
+        "endChar": 52
+      },
+      "revId": "4dd40e3bcc1d62329f9c1210c213773d8ae97e0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
