@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_219bdd72",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-05-20T14:20:37Z",
+      "side": 1,
+      "message": "I don\u0027t see the need for a meta-level abstraction here. It\u0027s either part of the request or isn\u0027t. A top-level request attribute seems appropriate to me. But other than just requiring slightly more code, I don\u0027t have a problem with this technically.\n\nAlso, I prefer a non-zuul specific name. \u0027event_id\u0027 seems better.",
+      "range": {
+        "startLine": 723,
+        "startChar": 0,
+        "endLine": 725,
+        "endChar": 60
+      },
+      "revId": "1f4bb49825751d1497225bd2c304337a40f72663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
