@@ -16,6 +16,7 @@
 import React from 'react'
 import ReactTestUtils from 'react-dom/test-utils'
 import ReactDOM from 'react-dom'
+import { act } from 'react-dom/test-utils'
 import { Link, BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
@@ -101,5 +102,61 @@ it('renders single tenant', () => {
       application, StatusPage)).not.toEqual(null)
     // Fetch status has been called
     expect(api.fetchStatus).toBeCalled()
+  })
+})
+
+it('renders config errors', () => {
+  api.fetchInfo.mockImplementation(
+    () => Promise.resolve({data: {
+      info: {capabilities: {}, tenant: 'opendev'}
+    }})
+  )
+  api.fetchStatus.mockImplementation(
+    () => Promise.resolve({data: {pipelines: []}})
+  )
+  api.fetchConfigErrors.mockImplementation(
+    () => Promise.resolve({data: [{
+      error: 'Zuul encountered a syntax error',
+      source_context: {
+        project: 'config',
+        branch: 'master',
+        path: 'zuul.yaml'
+      }}, {
+      error: 'Zuul encountered another syntax error',
+      source_context: {
+        project: 'config',
+        branch: 'master',
+        path: 'zuul.yaml'
+      }}]})
+  )
+  const store = createZuulStore()
+  // Use ReactDOM.render to be able to simulate clicks, see:
+  // https://reactjs.org/docs/test-utils.html#act
+  const container = document.createElement('div')
+  document.body.appendChild(container)
+  act(() => {
+    ReactDOM.render(
+      <Provider store={store}><Router><App /></Router></Provider>, container);
+  });
+
+  store.dispatch(fetchInfoIfNeeded()).then(() => {
+    try {
+      const bell = container.querySelector('.fa-bell')
+      expect(bell).not.toEqual(null)
+      act(() => {
+        bell.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+      })
+      const drawer = container.querySelector('.drawer-pf-notifications')
+      expect(drawer).not.toEqual(null)
+      const items = container.querySelectorAll(
+        '.drawer-pf-notification-message')
+      expect(items[0].textContent).toEqual(
+        'Zuul encountered a syntax error')
+      expect(items[1].textContent).toEqual(
+        'Zuul encountered another syntax error')
+    } catch (error) {
+      // Ensure error result in test failing
+      expect(error).toEqual(undefined)
+    }
   })
 })
