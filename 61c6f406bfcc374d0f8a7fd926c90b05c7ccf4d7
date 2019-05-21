@@ -59,6 +59,24 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_b031350e",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-21T22:44:44Z",
+      "side": 1,
+      "message": "Looking at the operatorhub catalogue, FWIW there are only percona and vitess operators to setup mysql. Shouldn\u0027t we consider the rdms an implementation detail that the user doesn\u0027t need to know about?\n\nOtherwise I\u0027m fine with enabling the user to provide it\u0027s own dburi.",
+      "parentUuid": "bfb3d3c7_ca799f93",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_6a70b3a6",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -104,6 +122,24 @@
       "writtenOn": "2019-05-21T17:14:23Z",
       "side": 1,
       "message": "It would be nice if zuul did .d configuration, so we can just generate some in the Operator, and bind mount in others from secrets objects. I also submitted a patch a bazillion years ago (4 months?) that would allow environment variable interpolation in zuul.conf.. that would also help here.",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_102a818f",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-21T22:44:44Z",
+      "side": 1,
+      "message": "To keep things simple, we would also need to enable settings secrets content (e.g. ssh key) inline in the zuul conf (.d) so that the user can provide a single blob to describe a connection.\n\nBut since the operator is going to compose the configuration (at least to setup the zookeeper info), then it\u0027s not too much work to also append user provided sections.",
+      "parentUuid": "bfb3d3c7_8a73a7b1",
       "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
