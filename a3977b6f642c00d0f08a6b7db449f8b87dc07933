@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_1d762ea6",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-05-21T06:14:08Z",
+      "side": 1,
+      "message": "(nit) These validate methods could probably just be defined within the test_tenant_config_schema scope rather than as part of the test class as I\u0027m unsure of their reuse.",
+      "range": {
+        "startLine": 788,
+        "startChar": 8,
+        "endLine": 788,
+        "endChar": 30
+      },
+      "revId": "a3977b6f642c00d0f08a6b7db449f8b87dc07933",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
