@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bfb3d3c7_aa76aba3",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-21T17:14:23Z",
+      "side": 1,
+      "message": "s/operator/operate/",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_7224a05e",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -25,6 +42,40 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_ca799f93",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-21T17:14:23Z",
+      "side": 1,
+      "message": "Hard no on Postgres as \"the one\", and mostly no on MySQL being \"the one\". Given that every Zuul I\u0027ve set up is/was MySQL based, and OpenDev is as well. I don\u0027t think it would serve our community to tell other people to run what we don\u0027t, even if Postgres is a fine choice).\n\nThat said, I agree that they probably won\u0027t be entirely compatible, but I\u0027d hope they can have flags, and the database can simply be an optional plug-in and not a hard-dependency, so users can simply choose between 1 of 4 options: CRD\u0027d (mysql|postgres), or manually configured (mysql|postgres).\n\nSince we should not dither over this, what if we just start with \"plug in your database details here\" and just make clear that we don\u0027t help you set up the database?",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_6a70b3a6",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-21T17:14:23Z",
+      "side": 1,
+      "message": "See above. I disagree with this point, but if we had to pick one, we\u0027d have to pick the one that most current users are on, which I believe is MySQL. Also, a nit, it\u0027s either Postgres, or PostgreSQL.",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_d2deac3c",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -42,6 +93,23 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_8a73a7b1",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-21T17:14:23Z",
+      "side": 1,
+      "message": "It would be nice if zuul did .d configuration, so we can just generate some in the Operator, and bind mount in others from secrets objects. I also submitted a patch a bazillion years ago (4 months?) that would allow environment variable interpolation in zuul.conf.. that would also help here.",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_d2b78cf4",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -53,6 +121,23 @@
       "writtenOn": "2019-05-16T00:27:01Z",
       "side": 1,
       "message": "Deployment may not be able to detect config map change, thus we may need some extra CRD to manage the service lifecycle. For example, kind such as \"ZuulReload\" and \"ZuulBackup\" (to archive all the scheduler secrets, to be used by a companion \"ZuulRestore\")",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_2a6abbb2",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-21T17:14:23Z",
+      "side": 1,
+      "message": "Yes please. To me the ability to programattically encode operations in to the deployment is the main reason to do this as an operator and not just ansible/helm/etc.",
       "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
