@@ -1,0 +1,650 @@
+mappings:
+
+  # .. stat:: zuul.event.<driver>.event.<type>
+  #    :type: counter
+  #
+  #    Zuul will report counters for each type of event it receives from
+  #    each of its configured drivers.
+
+  # note: doc seems to be out of sync with implementation
+  #       current stat is: zuul.event.<driver>.<event>
+
+  - match: zuul.event.*.*
+    name: zuul_events
+    help: Zuul will report counters for each type of event it receives from each of its configured drivers.
+    labels:
+      driver: "$1"
+      event: "$2"
+
+  #
+  # .. stat:: zuul.tenant.<tenant>.pipeline
+  #
+  #    Holds metrics specific to jobs. This hierarchy includes:
+  #
+  #    .. stat:: <pipeline name>
+  #
+  #       A set of metrics for each pipeline named as defined in the Zuul
+  #       config.
+  #
+  #       .. stat:: all_jobs
+  #          :type: counter
+  #
+  #          Number of jobs triggered by the pipeline.
+
+  - match: zuul.tenant.*.pipeline.*.all_jobs
+    name: zuul_all_jobs
+    help: Number of jobs triggered by the pipeline.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+
+  #       .. stat:: current_changes
+  #          :type: gauge
+  #
+  #          The number of items currently being processed by this
+  #          pipeline.
+
+  - match: zuul.tenant.*.pipeline.*.current_changes
+    name: zuul_current_changes
+    help: The number of items currently being processed by this pipeline.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+
+  #       .. stat:: project
+  #
+  #          This hierarchy holds more specific metrics for each project
+  #          participating in the pipeline.
+  #
+  #          .. stat:: <canonical_hostname>
+  #
+  #             The canonical hostname for the triggering project.
+  #             Embedded ``.`` characters will be translated to ``_``.
+  #
+  #             .. stat:: <project>
+  #
+  #                The name of the triggering project.  Embedded ``/`` or
+  #                ``.`` characters will be translated to ``_``.
+  #
+  #                .. stat:: <branch>
+  #
+  #                   The name of the triggering branch.  Embedded ``/`` or
+  #                   ``.`` characters will be translated to ``_``.
+  #
+  #                   .. stat:: job
+  #
+  #                      Subtree detailing per-project job statistics:
+  #
+  #                      .. stat:: <jobname>
+  #
+  #                         The triggered job name.
+  #
+  #                         .. stat:: <result>
+  #                            :type: counter, timer
+  #
+  #                            A counter for each type of result (e.g., ``SUCCESS`` or
+  #                            ``FAILURE``, ``ERROR``, etc.) for the job.  If the
+  #                            result is ``SUCCESS`` or ``FAILURE``, Zuul will
+  #                            additionally report the duration of the build as a
+  #                            timer.
+
+  - match: zuul.tenant.*.pipeline.*.project.*.*.*.job.*.*
+    match_metric_type: counter
+    name: zuul_job_results
+    help: A counter for each type of result (e.g., SUCCESS or FAILURE, ERROR, etc.) for the job.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+      hostname: "$3"
+      project: "$4"
+      branch: "$5"
+      job: "$6"
+      result: "$7"
+
+  - match: zuul.tenant.*.pipeline.*.project.*.*.*.job.*.*
+    match_metric_type: timer
+    name: zuul_job_results_timer
+    help: Duration of a job
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+      hostname: "$3"
+      project: "$4"
+      branch: "$5"
+      job: "$6"
+      result: "$7"
+
+  #                   .. stat:: current_changes
+  #                      :type: gauge
+  #
+  #                      The number of items of this project currently being
+  #                      processed by this pipeline.
+
+  - match: zuul.tenant.*.pipeline.*.project.*.*.*.current_changes
+    name: zuul_project_current_changes
+    help: The number of items of this project currently being processed by this pipeline.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+      hostname: "$3"
+      project: "$4"
+      branch: "$5"
+
+  #                   .. stat:: resident_time
+  #                      :type: timer
+  #
+  #                      A timer metric reporting how long each item for this
+  #                      project has been in the pipeline.
+
+  - match: zuul.tenant.*.pipeline.*.project.*.*.*.resident_time
+    name: zuul_project_resident_time
+    help: A timer metric reporting how long each item for this project has been in the pipeline.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+      hostname: "$3"
+      project: "$4"
+      branch: "$5"
+
+  #                   .. stat:: total_changes
+  #                      :type: counter
+  #
+  #                      The number of changes for this project processed by the
+  #                      pipeline since Zuul started.
+
+  - match: zuul.tenant.*.pipeline.*.project.*.*.*.total_changes
+    name: zuul_project_total_changes
+    help: The number of changes for this project processed by the pipeline since Zuul started.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+      hostname: "$3"
+      project: "$4"
+      branch: "$5"
+
+  #       .. stat:: resident_time
+  #          :type: timer
+  #
+  #          A timer metric reporting how long each item has been in the
+  #          pipeline.
+
+  - match: zuul.tenant.*.pipeline.*.resident_time
+    name: zuul_resident_time
+    help: A timer metric reporting how long each item has been in the pipeline.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+
+  #       .. stat:: total_changes
+  #          :type: counter
+  #
+  #          The number of changes processed by the pipeline since Zuul
+  #          started.
+
+  - match: zuul.tenant.*.pipeline.*.total_changes
+    name: zuul_total_changes
+    help: The number of changes processed by the pipeline since Zuul started.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+
+  #       .. stat:: wait_time
+  #          :type: timer
+  #
+  #          How long each item spent in the pipeline before its first job
+  #          started.
+
+  - match: zuul.tenant.*.pipeline.*.wait_time
+    name: zuul_wait_time
+    help: How long each item spent in the pipeline before its first job started.
+    labels:
+      tenant: "$1"
+      pipeline: "$2"
+
+
+  #   .. stat:: merger.<result>
+  #      :type: counter
+  #
+  #      Incremented to represent the status of a Zuul executor's merger
+  #      operations. ``<result>`` can be either ``SUCCESS`` or ``FAILURE``.
+  #      A failed merge operation which would be accounted for as a ``FAILURE``
+  #      is what ends up being returned by Zuul as a ``MERGER_FAILURE``.
+
+  - match: zuul.executor.*.merger.*
+    name: zuul_executor_merger
+    help: Incremented each time the a merger operation is finished by the executor.
+    labels:
+      executor: "$1"
+      result: "$2"
+
+
+  # .. stat:: zuul.executor.<executor>
+  #
+  #    Holds metrics emitted by individual executors.  The ``<executor>``
+  #    component of the key will be replaced with the hostname of the
+  #    executor.
+  #
+  #    .. stat:: builds
+  #       :type: counter
+  #
+  #       Incremented each time the executor starts a build.
+
+  - match: zuul.executor.*.builds
+    name: zuul_executor_builds
+    help: Incremented each time the executor starts a build.
+    labels:
+      executor: "$1"
+
+  #    .. stat:: running_builds
+  #       :type: gauge
+  #
+  #       The number of builds currently running on this executor.
+
+  - match: zuul.executor.*.running_builds
+    name: zuul_executor_running_builds
+    help: The number of builds currently running on this executor.
+    labels:
+      executor: "$1"
+
+  #    .. stat:: starting_builds
+  #       :type: gauge
+  #
+  #       The number of builds currently starting on this executor.
+
+  - match: zuul.executor.*.starting_builds
+    match_metric_type: gauge
+    name: zuul_executor_starting_builds
+    help: The number of builds currently starting on this executor.
+    labels:
+      executor: "$1"
+
+  #    .. stat:: starting_builds
+  #       :type: timer
+  #
+  #       The number of builds currently starting on this executor.
+
+  - match: zuul.executor.*.starting_builds
+    match_metric_type: timer
+    timer_type: histogram
+    buckets: [20, 40, 60, 90, 120, 180, 240, 300, 360, 420, 480, 540, 600, 900, 1200]
+    name: zuul_executor_starting_builds_timer
+    help: Timer of starting builds on the executor
+    labels:
+      executor: "$1"
+
+  #    .. stat:: load_average
+  #       :type: gauge
+  #
+  #       The one-minute load average of this executor, multiplied by 100.
+
+  - match: zuul.executor.*.load_average
+    name: zuul_executor_load_average
+    help: The one-minute load average of this executor, multiplied by 100.
+    labels:
+      executor: "$1"
+
+  #   .. stat:: pct_used_ram
+  #      :type: gauge
+  #
+  #      The used RAM (excluding buffers and cache) on this executor, as
+  #      a percentage multiplied by 100.
+
+  - match: zuul.executor.*.pct_used_ram
+    name: zuul_executor_pct_used_ram
+    help: The used RAM (excluding buffers and cache) on this executor, as a percentage multiplied by 100.
+    labels:
+      executor: "$1"
+
+  #   .. stat:: pct_used_ram_cgroup
+  #      :type: gauge
+  #
+  #      The used RAM (excluding buffers and cache) on this executor allowed by
+  #      the cgroup, as a percentage multiplied by 100.
+
+  - match: zuul.executor.*.pct_used_ram_cgroup
+    name: zuul_executor_pct_used_ram_cgroup
+    help: The used RAM (excluding buffers and cache) on this executor allowed by the cgroup, as a percentage multiplied by 100.
+    labels:
+      executor: "$1"
+
+  #   .. stat:: pct_used_hdd
+  #      :type: gauge
+  #
+  #      The used disk on this executor, as
+  #      a percentage multiplied by 100.
+
+  - match: zuul.executor.*.pct_used_hdd
+    name: zuul_executor_pct_used_hdd
+    help: The used disk on this executor, as a percentage multiplied by 100.
+    labels:
+      executor: "$1"
+
+  #   .. stat:: pause
+  #      :type: gauge
+  #
+  #      1 if executor is paused else 0
+
+  - match: zuul.executor.*.pause
+    name: zuul_executor_pause
+    help: Indicates if the executor is paused.
+    labels:
+      executor: "$1"
+
+
+  #   .. stat:: paused_builds
+  #      :type: gauge
+  #
+  #      Number of currently paused builds
+
+  - match: zuul.executor.*.paused_builds
+    name: zuul_executor_paused_builds
+    help: Number of currently paused builds
+    labels:
+      executor: "$1"
+
+
+  #  .. stat:: phase
+  #
+  #     Subtree detailing per-phase execution statistics:
+  #
+  #     .. stat:: <phase>
+  #
+  #        ``<phase>`` represents a phase in the execution of a job.
+  #        This can be an *internal* phase (such as ``setup`` or ``cleanup``) as
+  #        well as *job* phases such as ``pre``, ``run`` or ``post``.
+  #
+  #        .. stat:: <result>
+  #           :type: counter
+
+  #           A counter for each type of result.
+  #           These results do not, by themselves, determine the status of a build
+  #           but are indicators of the exit status provided by Ansible for the
+  #           execution of a particular phase.
+
+  #           Example of possible counters for each phase are: ``RESULT_NORMAL``,
+  #           ``RESULT_TIMED_OUT``, ``RESULT_UNREACHABLE``, ``RESULT_ABORTED``.
+
+  - match: zuul.executor.*.phase.*.*
+    name: zuul_executor_phase
+    help: Counter of results of internal execution phases of the zuul-executor.
+    labels:
+      executor: "$1"
+      phase: "$2"
+      result: "$3"
+
+
+  #  .. stat:: zuul.nodepool.requests
+  #
+  #     Holds metrics related to Zuul requests and responses from Nodepool.
+  #
+  #     States are one of:
+  #
+  #        *requested*
+  #          Node request submitted by Zuul to Nodepool
+  #        *canceled*
+  #          Node request was canceled by Zuul
+  #        *failed*
+  #          Nodepool failed to fulfill a node request
+  #        *fulfilled*
+  #          Nodes were assigned by Nodepool
+
+
+  #    .. stat:: zuul.nodepool.requests.<state>.total
+  #       :type: counter
+  #
+  #       Incremented when nodes are assigned or removed as described in the states above.
+
+  - match: zuul.nodepool.requests.*.total
+    name: zuul_nodepool_requests_total
+    help: Incremented each time a node request is submitted to Nodepool.
+    labels:
+      state: "$1"
+
+
+  #       .. stat:: <state>.label.<label>
+  #          :type: counter, timer
+  #
+  #          Incremented each time a request for a specific label is
+  #          submitted to Nodepool.
+  #          Increments for the label of each request.  For example, requests
+  #          for `centos7` nodes could be tracked with
+  #          ``zuul.nodepool.requests.requested.centos7``.
+  #
+  #          The timer is implemented for ``fulfilled`` and ``failed``
+  #          requests.  For example, the timer
+  #          ``zuul.nodepool.requests.fulfilled.label.centos7.mean`` gives
+  #          the average time of ``centos7`` fulfilled requests within the
+  #          ``statsd`` flush interval.  A lower value for `fulfilled`
+  #          requests is better.  Ideally, there will be no `failed`
+  #          requests.
+  - match: zuul.nodepool.requests.*.label.*
+    name: zuul_nodepool_requests_label
+    match_metric_type: counter
+    help: Incremented each time a request for a specific label is submitted to Nodepool.
+    labels:
+      state: "$1"
+      label: "$2"
+  - match: zuul.nodepool.requests.*.label.*
+    name: zuul_nodepool_requests_label_timer
+    match_metric_type: timer
+    help: Incremented each time a request for a specific label is submitted to Nodepool.
+    labels:
+      state: "$1"
+      label: "$2"
+
+
+  #       .. stat:: <state>.size.<label>
+  #          :type: counter, timer
+  #
+  #          Increments for the node count of each request.  For example, a
+  #          request for 3 nodes would use the key
+  #          ``zuul.nodepool.requests.requested.size.3``; fulfillment of 3
+  #          node requests can be tracked with
+  #          ``zuul.nodepool.requests.fulfilled.size.3``.
+  #
+  #          The timer is implemented for ``fulfilled`` and ``failed``
+  #          requests.  For example, the timer
+  #          ``zuul.nodepool.requests.failed.size.3.mean`` gives the average
+  #          time of 3-node failed requests within the ``statsd`` flush
+  #          interval.  A lower value for `fulfilled` requests is better.
+  #          Ideally, there will be no `failed` requests.
+  - match: zuul.nodepool.requests.*.size.*
+    match_metric_type: counter
+    name: zuul_nodepool_requests_size
+    help: Incremented each time a request of a specific size is submitted to Nodepool.
+    labels:
+      state: "$1"
+      size: "$2"
+  - match: zuul.nodepool.requests.*.size.*
+    match_metric_type: timer
+    name: zuul_nodepool_requests_size_timer
+    help: Incremented each time a request of a specific size is submitted to Nodepool.
+    labels:
+      state: "$1"
+      size: "$2"
+
+  #    .. stat:: zuul.nodepool.requests.<state>
+  #       :type: timer
+  #
+  #       Records the elapsed time from request to completion for states
+  #       `failed` and `fulfilled`.  For example,
+  #       ``zuul.nodepool.request.fulfilled.mean`` will give the average
+  #       time for all fulfilled requests within each ``statsd`` flush
+  #       interval.
+  #
+  #       A lower value for `fulfilled` requests is better.  Ideally,
+  #       there will be no `failed` requests.
+
+  - match: zuul.nodepool.requests.*
+    name: zuul_nodepool_requests_timer
+    help: The timer records the elapsed time from request to the state by Zuul.
+    labels:
+      state: "$1"
+
+  #    .. stat:: current_requests
+  #       :type: gauge
+  #
+  #       The number of outstanding nodepool requests from Zuul.
+
+  - match: zuul.nodepool.current_requests
+    name: zuul_nodepool_current_requests
+    help: The number of outstanding nodepool requests from Zuul.
+
+  - match: zuul.nodepool.resources.tenant.*.*
+    match_metric_type: gauge
+    name: zuul_nodepool_resources_current_by_tenant
+    help: Current resource usage by tenant
+    labels:
+      tenant: "$1"
+      resource: "$2"
+
+  - match: zuul.nodepool.resources.project.*.*
+    match_metric_type: gauge
+    name: zuul_nodepool_resources_current_by_project
+    help: Current resource usage by project
+    labels:
+      project: "$1"
+      resource: "$2"
+
+  - match: zuul.nodepool.resources.tenant.*.*
+    match_metric_type: counter
+    name: zuul_nodepool_resources_count_by_tenant
+    help: Counter of resource usage by tenant
+    labels:
+      tenant: "$1"
+      resource: "$2"
+
+  - match: zuul.nodepool.resources.project.*.*
+    match_metric_type: counter
+    name: zuul_nodepool_resources_count_by_project
+    help: Counter of resource usage by project
+    labels:
+      project: "$1"
+      resource: "$2"
+
+  # .. stat:: zuul.mergers
+  #
+  #    Holds metrics related to Zuul mergers.
+  #
+  #    .. stat:: online
+  #       :type: gauge
+  #
+  #       The number of Zuul merger processes online.
+
+  - match: zuul.mergers.online
+    name: zuul_mergers_online
+    help: The number of Zuul merger processes online.
+
+  #    .. stat:: jobs_running
+  #       :type: gauge
+  #
+  #       The number of merge jobs running.
+
+  - match: zuul.mergers.jobs_running
+    name: zuul_mergers_jobs_running
+    help: The number of merge jobs running.
+
+  #    .. stat:: jobs_queued
+  #       :type: gauge
+  #
+  #       The number of merge jobs queued.
+
+  - match: zuul.mergers.jobs_queued
+    name: zuul_mergers_jobs_queued
+    help: The number of merge jobs queued.
+
+  # .. stat:: zuul.executors
+  #
+  #    Holds metrics related to Zuul executors.
+  #
+  #    .. stat:: online
+  #       :type: gauge
+  #
+  #       The number of Zuul executor processes online.
+
+  - match: zuul.executors.online
+    name: zuul_executors_online
+    help: The number of Zuul executor processes online.
+
+  #    .. stat:: accepting
+  #       :type: gauge
+  #
+  #       The number of Zuul executor processes accepting new jobs.
+
+  - match: zuul.executors.accepting
+    name: zuul_executors_accepting
+    help: The number of Zuul executor processes accepting new jobs.
+
+  #    .. stat:: jobs_running
+  #       :type: gauge
+  #
+  #       The number of executor jobs running.
+
+  - match: zuul.executors.jobs_running
+    name: zuul_executors_jobs_running
+    help: The number of executor jobs running.
+
+  #    .. stat:: jobs_queued
+  #       :type: gauge
+  #
+  #       The number of executor jobs queued.
+
+  - match: zuul.executors.jobs_queued
+    name: zuul_executors_jobs_queued
+    help: The number of executor jobs queued.
+
+  # -------------------------------------------------------------------------
+  # Zuul geard metrics (zuul.geard.*)
+  # -------------------------------------------------------------------------
+
+  # type: timer, counter
+  - match: zuul.geard.packet.*
+    name: zuul_geard_packet
+    match_metric_type: counter
+    help: Gearman packets.
+    labels:
+      type: "$1"
+
+  - match: zuul.geard.packet.*
+    name: zuul_geard_packet_timer
+    match_metric_type: timer
+    help: Gearman packets timer.
+    labels:
+      type: "$1"
+
+  # type: timer, counter
+  - match: zuul.geard.packet.*.count
+    name: zuul_geard_packet_count
+    match_metric_type: counter
+    help: Gearman packet count.
+    labels:
+      type: "$1"
+
+  - match: zuul.geard.packet.*.count
+    name: zuul_geard_packet_count_timer
+    match_metric_type: timer
+    help: Gearman packet count timer.
+    labels:
+      type: "$1"
+
+  # type: timer, counter
+  - match: zuul.geard.packet.*.sum
+    name: zuul_geard_packet_sum
+    match_metric_type: counter
+    help: Gearman packet sum.
+    labels:
+      type: "$1"
+
+  - match: zuul.geard.packet.*.sum
+    name: zuul_geard_packet_sum_timer
+    match_metric_type: timer
+    help: Gearman packet sum timer.
+    labels:
+      type: "$1"
+
+  # Drop all non-matching metrics to avoid spamming prometheus with
+  # eventually unmatched metrics.
+  - match: .
+    match_type: regex
+    action: drop
+    name: "dropped"
