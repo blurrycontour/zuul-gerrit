@@ -77,6 +77,24 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_f2579c01",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-22T20:40:02Z",
+      "side": 1,
+      "message": "FWIW, we\u0027re running our zuul with postgres. But we use an externally managed db.\n\nSo I\u0027d be fine with three options: CRD (mysql|postgres) and DBURI\n\nHowever if it\u0027s too much effort (I don\u0027t know how much it would be) I think we should standardize the CRD to one.",
+      "parentUuid": "bfb3d3c7_b031350e",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_6a70b3a6",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -146,6 +164,24 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_f25a3cf1",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-22T20:40:02Z",
+      "side": 1,
+      "message": "++ for .d configuration\n\nFTR, the environment interpolation change is here: https://review.opendev.org/612824",
+      "parentUuid": "bfb3d3c7_102a818f",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dfbec78f_d2b78cf4",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -174,6 +210,24 @@
       "writtenOn": "2019-05-21T17:14:23Z",
       "side": 1,
       "message": "Yes please. To me the ability to programattically encode operations in to the deployment is the main reason to do this as an operator and not just ansible/helm/etc.",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_d2e29801",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-22T20:40:02Z",
+      "side": 1,
+      "message": "Do we also want to specify some lifecycles (like upgrades) already or will this just be an implementation detail?",
+      "parentUuid": "bfb3d3c7_2a6abbb2",
       "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
