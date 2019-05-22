@@ -177,6 +177,23 @@
       "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_62a2054e",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-05-22T15:31:15Z",
+      "side": 1,
+      "message": "We\u0027re working on approaching a point where the default logging for Zuul is what we would expect people to use, so perhaps here we should support three things: 1) by default, perform no logging config and Zuul uses its default (info level).  2) have a Zuul crd option to set debug logging option in the app crd. 3) allow the user to specify the full logging config as a configmap.",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
