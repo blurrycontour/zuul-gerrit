@@ -265,6 +265,24 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_22aacdd1",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1592,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-05-22T15:08:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5fc1f717_c1fc72b7",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_565daaea",
         "filename": "tests/unit/test_github_driver.py",
         "patchSetId": 5
@@ -376,6 +394,24 @@
       "side": 1,
       "message": "The regex is only used if action is not None, otherwise this case is silently ignored. I will\n1. Check what GitHub does\n2. Make up a rule in case GitHub unexpectedly DOES consider the rule\n3. log the fact that a rule was ignored if regex or action is None",
       "parentUuid": "5fc1f717_01d7da51",
+      "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_d1f94480",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 27719
+      },
+      "writtenOn": "2019-05-22T15:08:43Z",
+      "side": 1,
+      "message": "GitHub does not consider that rule.",
+      "parentUuid": "5fc1f717_a7436313",
       "revId": "07c926836babc67d1b8ce46bf289fd945542f1d8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
