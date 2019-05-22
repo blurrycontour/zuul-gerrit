@@ -12,14 +12,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.source import BaseSource
-import re2
 import urllib
+
+import re2
+
+from zuul.source import BaseSource
 
 
 class BitbucketSource(BaseSource):
-
-    change_re =\
+    change_re = \
         re2.compile(r".*/projects/(.*?)/repos/(.*?)/pull-requests/(\d+)[\w]*")
 
     def __init__(self, driver, connection, config=None):
@@ -71,9 +72,10 @@ class BitbucketSource(BaseSource):
 
     def getChange(self, event):
         if event.type == 'bb-pr':
-            project_name, repo = \
-                self.connection._getProjectRepo(event.project_name)
-            return self.connection.buildPR(project_name, repo, event.change_id)
+            project_name, repo = self.connection._getProjectRepo(
+                event.project_name)
+            return self.connection.buildPR(
+                project_name, repo, event.change_id)
 
         return None
 
