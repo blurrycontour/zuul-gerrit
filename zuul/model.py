@@ -1639,7 +1639,10 @@ class Job(ConfigObject):
             return False
         return True
 
-    def changeMatchesFiles(self, change):
+    def changeMatchesFiles(self, change, event=None):
+        if event and not event.needsFileMatching():
+            return True
+
         if self.file_matcher and not self.file_matcher.matches(change):
             return False
 
@@ -3081,6 +3084,9 @@ class TriggerEvent(object):
     def isChangeAbandoned(self):
         return False
 
+    def needsFileMatching(self):
+        return True
+
     def _repr(self):
         flags = [str(self.type)]
         if self.project_name:
@@ -3924,7 +3930,7 @@ class Layout(object):
                            format(jobname=jobname), indent=2)
                 continue
             if not skip_file_matcher and \
-               not frozen_job.changeMatchesFiles(change):
+               not frozen_job.changeMatchesFiles(change, item.event):
                 log.debug("Job %s did not match files in %s",
                           repr(frozen_job), change)
                 item.debug("Job {jobname} did not match files".

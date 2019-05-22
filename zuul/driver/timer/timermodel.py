@@ -60,3 +60,6 @@ class TimerTriggerEvent(TriggerEvent):
     def __init__(self):
         super(TimerTriggerEvent, self).__init__()
         self.timespec = None
+
+    def needsFileMatching(self):
+        return False
