@@ -222,7 +222,7 @@ class ChangePanel extends React.Component {
       case 'skipped':
         className = 'label-info'
         break
-      // 'in progress' 'queued' 'lost' 'aborted' ...
+      // 'in progress' 'queued' 'lost' 'aborted' 'waiting' ...
       default:
         className = 'label-default'
     }
@@ -253,7 +253,9 @@ class ChangePanel extends React.Component {
     let resultBar
     let result = job.result ? job.result.toLowerCase() : null
     if (result === null) {
-      if (job.url === null) {
+      if (job.waiting_for_dependency === true) {
+        result = 'waiting'
+      } else if (job.url === null) {
         result = 'queued'
       } else if (job.paused !== null && job.paused) {
         result = 'paused'
