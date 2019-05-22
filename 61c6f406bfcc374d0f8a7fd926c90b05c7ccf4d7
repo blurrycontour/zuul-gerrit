@@ -95,6 +95,24 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_2074fe98",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-22T22:48:50Z",
+      "side": 1,
+      "message": "Supporting both mysql|postgres may complicate OLM dependencies declaration, not sure we can declare optional dependencies based on a CRD spec option...",
+      "parentUuid": "bfb3d3c7_f2579c01",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_6a70b3a6",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -228,6 +246,24 @@
       "side": 1,
       "message": "Do we also want to specify some lifecycles (like upgrades) already or will this just be an implementation detail?",
       "parentUuid": "bfb3d3c7_2a6abbb2",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_e0aa66d0",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-22T22:48:50Z",
+      "side": 1,
+      "message": "IIUC, upgrades are managed by the OLM itself (through the release of subsequent operator version). Otherwise, we could have a version field in the Zuul or Nodepool CRD to force using a specific image, but that shouldn\u0027t require an Upgrade CRD per se.",
+      "parentUuid": "bfb3d3c7_d2e29801",
       "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
