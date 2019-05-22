@@ -12,21 +12,21 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.connection import BaseConnection
-from zuul.model import Project
-from zuul.exceptions import MergeFailure
-
-from zuul.driver.bitbucket.bitbucketsource import BitbucketSource
-from zuul.driver.bitbucket.bitbucketmodel import PullRequest
-from zuul.driver.bitbucket.bitbucketmodel import BitbucketTriggerEvent
-
-import traceback
 import logging
-import requests
 import threading
 import time
-from requests.auth import HTTPBasicAuth
+import traceback
 from urllib.parse import urlparse
+
+import requests
+from requests.auth import HTTPBasicAuth
+
+from zuul.connection import BaseConnection
+from zuul.driver.bitbucket.bitbucketmodel import BitbucketTriggerEvent, \
+    PullRequest
+from zuul.driver.bitbucket.bitbucketsource import BitbucketSource
+from zuul.exceptions import MergeFailure
+from zuul.model import Project
 
 
 class BitbucketWatcher(threading.Thread):
@@ -98,10 +98,13 @@ class BitbucketWatcher(threading.Thread):
         try:
             for p in self.bitbucket_con.projects:
                 project = self.bitbucket_con.getProject(p)
-                for change in self.bitbucket_con\
-                        .getProjectOpenChanges(project, False):
+                for change in self.bitbucket_con.getProjectOpenChanges(
+                        project, False):
                     if self.isNew(change):
-                        self.log.debug("New change: {} in {}".format(change, change.project))
+                        self.log.debug(
+                            "New change: {} in {}".format(
+                                change, change.project)
+                        )
                         self._handleNewPR(change)
                         return
                     oldpr = self.supersedes(change)
@@ -111,7 +114,8 @@ class BitbucketWatcher(threading.Thread):
 
         except Exception as e:
             self.log.debug("Unexpected issue in _run loop: {}"
-                           .format(str(e)))
+                           .format(str(e))
+                           )
             self.log.debug(traceback.format_exception(Exception, e))
 
     # core event loop, no unittest
@@ -149,7 +153,8 @@ class BitbucketClient():
         if r.status_code != 200:
             raise BitbucketConnectionError(
                 "Connection to server returned status {} path {}"
-                .format(r.status_code, url))
+                .format(r.status_code, url)
+            )
 
         return r.json()
 
@@ -182,7 +187,8 @@ class BitbucketConnection(BaseConnection):
 
     def __init__(self, driver, connection_name, connection_config):
         super(BitbucketConnection, self).__init__(
-            driver, connection_name, connection_config)
+            driver, connection_name, connection_config
+        )
         self.projects = {}
         self.prs = {}
 
@@ -244,7 +250,6 @@ class BitbucketConnection(BaseConnection):
 
     def getBranchSlug(self, project, id):
         self.getProjectBranches(project, 'default')
-
         for branch in self.branches[project].keys():
             if self.branches[project][branch].get('id') == id:
                 return self.branches[project][branch].get('displayId')
@@ -258,7 +263,6 @@ class BitbucketConnection(BaseConnection):
 
     def getProjectBranches(self, project, tenant):
         client = self._getBitbucketClient()
-
         bb_project, repo = self._getProjectRepo(project)
         res = client.get('/rest/api/1.0/projects/{}/repos/{}/branches'
                          .format(bb_project, repo))
@@ -308,14 +312,16 @@ class BitbucketConnection(BaseConnection):
                 for pr in prs.get('values')]
 
     def getPR(self, project, repo, id):
-        return self._getBitbucketClient()\
-            .get('/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}'
-                 .format(project, repo, id))
+        return self._getBitbucketClient().get(
+            '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}'
+            .format(project, repo, id)
+        )
 
     def getPRs(self, project, repo):
-        return self._getBitbucketClient()\
-            .get('/rest/api/1.0/projects/{}/repos/{}/pull-requests'
-                 .format(project, repo))
+        return self._getBitbucketClient().get(
+            '/rest/api/1.0/projects/{}/repos/{}/pull-requests'
+            .format(project, repo)
+        )
 
     def cachePR(self, pr):
         projecthash = self.prs.get(pr.project.name, {})
@@ -331,9 +337,10 @@ class BitbucketConnection(BaseConnection):
 
     def canMerge(self, change, allow_needs):
         bb_proj, repo = self._getProjectRepo(change.project.name)
-        can_merge = self._getBitbucketClient()\
-            .get('/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/merge'
-                 .format(bb_proj, repo, change.id))
+        can_merge = self._getBitbucketClient().get(
+            '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/merge'
+            .format(bb_proj, repo, change.id)
+        )
 
         return can_merge.get('canMerge')
 
@@ -354,8 +361,10 @@ class BitbucketConnection(BaseConnection):
 
         project_name, repo = self._getProjectRepo(project)
 
-        client.post('/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/comments'
-            .format(project_name, repo, prid), {'text': message})
+        client.post(
+            '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/comments'
+            .format(project_name, repo, prid), {'text': message}
+        )
 
     def mergePull(self, projectName, prId):
         client = self._getBitbucketClient()

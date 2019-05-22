@@ -12,13 +12,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.driver import Driver, ConnectionInterface
-from zuul.driver import SourceInterface, ReporterInterface
-from zuul.driver import TriggerInterface
-from zuul.driver.bitbucket import bitbucketconnection
-from zuul.driver.bitbucket import bitbucketsource
-from zuul.driver.bitbucket import bitbucketreporter
-from zuul.driver.bitbucket import bitbuckettrigger
+from zuul.driver import (
+    ConnectionInterface, Driver, ReporterInterface,
+    SourceInterface, TriggerInterface
+)
+from zuul.driver.bitbucket import (
+    bitbucketconnection, bitbucketreporter,
+    bitbucketsource, bitbuckettrigger
+)
 
 
 class BitbucketDriver(Driver, ConnectionInterface, SourceInterface,
