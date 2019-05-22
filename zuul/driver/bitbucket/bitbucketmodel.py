@@ -14,7 +14,7 @@
 
 import re2
 
-from zuul.model import Change, TriggerEvent, EventFilter
+from zuul.model import Change, EventFilter, TriggerEvent
 
 
 class PullRequest(Change):
@@ -28,16 +28,20 @@ class PullRequest(Change):
         self.labels = []
 
     def __eq__(self, obj):
-        return isinstance(obj, PullRequest) and self.project == obj.project \
-            and self.id == obj.id and self.updatedDate == obj.updatedDate
+        return (isinstance(obj, PullRequest) and
+                self.project == obj.project and
+                self.id == obj.id and
+                self.updatedDate == obj.updatedDate)
 
     def isUpdateOf(self, other):
         if (self.project == other.project and
-                hasattr(other, 'id') and self.id == other.id and
-                hasattr(other, 'patchset') and
-                self.patchset != other.patchset and
-                hasattr(other, 'updatedDate') and
-                self.updatedDate > other.updatedDate):
+            hasattr(other, 'id') and
+            self.id == other.id and
+            hasattr(other, 'patchset') and
+            self.patchset != other.patchset and
+            hasattr(other, 'updatedDate') and
+            self.updatedDate > other.updatedDate
+        ):
             return True
         return False
 
@@ -72,6 +76,7 @@ class BitbucketEventFilter(EventFilter):
         for etype in self.types:
             if etype.match(event.type):
                 matches_type = True
+                break
         if self.types and not matches_type:
             return False
 
@@ -80,14 +85,15 @@ class BitbucketEventFilter(EventFilter):
             for ref in self.refs:
                 if ref.match(event.ref):
                     matches_ref = True
+                    break
         if self.refs and not matches_ref:
             return False
 
         matches_comment_re = False
         for comment_re in self.comments:
-            if (event.comment is not None and
-                    comment_re.search(event.comment)):
+            if event.comment is not None and comment_re.search(event.comment):
                 matches_comment_re = True
+                break
         if self.comments and not matches_comment_re:
             return False
 
@@ -95,6 +101,7 @@ class BitbucketEventFilter(EventFilter):
         for action in self.actions:
             if (event.action == action):
                 matches_action = True
+                break
         if self.actions and not matches_action:
             return False
 
@@ -102,6 +109,7 @@ class BitbucketEventFilter(EventFilter):
         for status in self.statuses:
             if event.status == status:
                 matches_status = True
+                break
         if self.statuses and not matches_status:
             return False
 

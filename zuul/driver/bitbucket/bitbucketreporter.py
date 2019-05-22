@@ -25,8 +25,8 @@ class BitbucketReporter(BaseReporter):
         if not isinstance(item.change.project.source, BitbucketSource):
             return
 
-        if item.change.project.source.connection.server != \
-                self.connection.server:
+        if (item.change.project.source.connection.server !=
+            self.connection.server):
             return
 
         if hasattr(item.change, 'id'):
@@ -44,11 +44,13 @@ class BitbucketReporter(BaseReporter):
             except MergeFailure:
                 self.log.exception(
                     'Merge attempt of change {} {}/4 failed.'
-                    .format(item.change, i))
+                    .format(item.change, i)
+                )
                 time.sleep(2)
         self.log.warning(
             'Merge of change {} failed after 4 attempts, giving up',
-            item.change)
+            item.change
+        )
 
     def commentPR(self, item):
         message = self._formatItemReport(item)
