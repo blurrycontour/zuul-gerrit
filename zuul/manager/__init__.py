@@ -686,7 +686,9 @@ class PipelineManager(object):
         if not item.job_graph:
             try:
                 log.debug("Freezing job graph for %s" % (item,))
-                item.freezeJobGraph()
+                item.freezeJobGraph(skip_file_matcher=any(filter(
+                    lambda trigger: trigger.name == "timer",
+                    self.pipeline.triggers)))
             except Exception as e:
                 # TODOv3(jeblair): nicify this exception as it will be reported
                 log.exception("Error freezing job graph for %s" % (item,))
