@@ -65,6 +65,9 @@ class ManagementEvent(object):
             raise exception_instance.with_traceback(traceback)
         return self._wait_event.is_set()
 
+    def isFileMatcher(self):
+        return True
+
 
 class ReconfigureEvent(ManagementEvent):
     """Reconfigure the scheduler.  The layout will be (re-)loaded from
