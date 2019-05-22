@@ -216,6 +216,7 @@ class ChangePanel extends React.Component {
         className = 'label-danger'
         break
       case 'unstable':
+      case 'waiting':
         className = 'label-warning'
         break
       case 'paused':
@@ -253,7 +254,9 @@ class ChangePanel extends React.Component {
     let resultBar
     let result = job.result ? job.result.toLowerCase() : null
     if (result === null) {
-      if (job.url === null) {
+      if (job.waiting_for_dependency === true) {
+        result = 'waiting'
+      } else if (job.url === null) {
         result = 'queued'
       } else if (job.paused !== null && job.paused) {
         result = 'paused'
