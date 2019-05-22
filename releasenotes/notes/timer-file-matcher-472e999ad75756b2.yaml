@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Changes triggered by timer event no longer evaluate file matcher and
+    execute job independently from the content of the branch tip.
