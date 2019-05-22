@@ -1188,6 +1188,7 @@ class Job(ConfigObject):
             _files=(),
             _irrelevant_files=(),
             secrets=(),  # secrets aren't inheritable
+            queued=False,
         )
 
         self.inheritable_attributes = {}
@@ -2513,6 +2514,7 @@ class QueueItem(object):
                     # If this job needs a semaphore, either acquire it or
                     # make sure that we have it before requesting the nodes.
                     toreq.append(job)
+                    job.other_attributes["queued"] = True
         return toreq
 
     def setResult(self, build):
@@ -2753,6 +2755,7 @@ class QueueItem(object):
                 'canceled': build.canceled if build else None,
                 'paused': build.paused if build else None,
                 'retry': build.retry if build else None,
+                'queued': job.other_attributes["queued"],
                 'node_labels': build.node_labels if build else [],
                 'node_name': build.node_name if build else None,
                 'worker': worker,
