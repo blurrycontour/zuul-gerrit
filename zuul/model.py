@@ -2734,9 +2734,20 @@ class QueueItem(object):
             if remaining and remaining > max_remaining:
                 max_remaining = remaining
 
+            # If we find a job dependency whose build is not finished yet
+            # (does not have a valid result), we assume that the job is
+            # still waiting for this dependency.
+            dependency_builds = [
+                self.current_build_set.getBuild(j.name)
+                for j in job.dependencies
+            ]
+            waiting_for_dependency = not all(
+                b.result for b in dependency_builds if b is not None)
+
             ret['jobs'].append({
                 'name': job.name,
                 'dependencies': [x.name for x in job.dependencies],
+                'waiting_for_dependency': waiting_for_dependency,
                 'elapsed_time': elapsed,
                 'remaining_time': remaining,
                 'url': build_url,
