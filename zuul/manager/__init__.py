@@ -875,14 +875,15 @@ class PipelineManager(object):
                 self.sched.cancelJob(build_set, job, final=True)
 
     def onBuildCompleted(self, build):
+        zuul_event_id = build.zuul_event_id
+        log = get_annotated_logger(self.log, zuul_event_id)
         item = build.build_set.item
 
-        self.log.debug("Build %s of %s completed" % (build, item.change))
+        log.debug("Build %s of %s completed" % (build, item.change))
 
         item.setResult(build)
         item.pipeline.tenant.semaphore_handler.release(item, build.job)
-        self.log.debug("Item %s status is now:\n %s" %
-                       (item, item.formatStatus()))
+        log.debug("Item %s status is now:\n %s", item, item.formatStatus())
 
         if build.retry:
             if build.build_set.getJobNodeSet(build.job.name):
@@ -897,8 +898,8 @@ class PipelineManager(object):
             build.failed and build.job.voting):
             # If fail-fast is set and the build is not successful
             # cancel all remaining jobs.
-            self.log.debug("Build %s failed and fail-fast enabled, canceling "
-                           "running builds", build)
+            log.debug("Build %s failed and fail-fast enabled, canceling "
+                      "running builds", build)
             self._cancelRunningBuilds(build.build_set)
 
         return True
