@@ -62,6 +62,10 @@ class RPCClient(object):
                 'node_hold_expiration': node_hold_expiration}
         return not self.submitJob('zuul:autohold', data).failure
 
+    def autohold_delete(self, request_id):
+        data = {'request_id': request_id}
+        return not self.submitJob('zuul:autohold_delete', data).failure
+
     def autohold_list(self):
         data = {}
         job = self.submitJob('zuul:autohold_list', data)
