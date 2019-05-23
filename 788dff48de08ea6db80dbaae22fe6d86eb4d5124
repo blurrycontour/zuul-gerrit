@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_b3ccb4bc",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-23T18:05:51Z",
+      "side": 1,
+      "message": "We should use the merge-mode [1] which is already existing to specify this and plumb it through to the reporter.",
+      "revId": "788dff48de08ea6db80dbaae22fe6d86eb4d5124",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
