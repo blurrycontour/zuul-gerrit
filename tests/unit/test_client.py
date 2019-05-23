@@ -61,3 +61,25 @@ class TestTenantValidationClient(BaseTestCase):
         self.assertIn(
             b"expected a dictionary for dictionary", out,
             "Expected error message not found")
+
+    def test_client_conf_d(self):
+
+        test_conf_d = os.path.join(self.test_root, 'conf.d')
+        os.mkdir(test_conf_d)
+
+        self.config.write(
+            open(os.path.join(test_conf_d, 'base.conf'), 'w'))
+
+        overlay_config = configparser.ConfigParser()
+        overlay_config.set(
+            'scheduler', 'tenant_config',
+            os.path.join(FIXTURE_DIR, 'config/tenant-parser/simple.yaml'))
+        overlay_config.write(
+            open(os.path.join(test_conf_d, 'overlay.conf'), 'w'))
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '-c', test_conf_d,
+             'tenant-conf-check'], stdout=subprocess.PIPE)
+        p.communicate()
+        self.assertEqual(p.returncode, 0, 'The command must exit 0')
