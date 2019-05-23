@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_8795b242",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-05-23T14:57:04Z",
+      "side": 1,
+      "message": "The current logic reads the first-found and then returns. I think the globbing will expand the config file list correctly, but then I think you\u0027ll need to $something to read the config in from multiple files. (something something merge)\n\nI\u0027ve been wanting for a while to change this to be yaml instead of ini for consistency. If we did that and made it yaml (or, really, ADDED support for yaml so that people could migrate) - then it might be easier to read all the files in conf.d and just do a dict-merge on the yaml dicts.\n\nWe should likely get some buy in from folks on such a thing before going too far down the rabbithole.",
+      "revId": "62114c7fc7084b56974185f955c93660abcc5045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
