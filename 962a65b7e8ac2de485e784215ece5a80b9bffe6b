@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_e6511e64",
+        "filename": "zuul/driver/amqp/amqpmodel.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-23T02:45:42Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be part of the matches procedure.",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 9
+      },
+      "revId": "962a65b7e8ac2de485e784215ece5a80b9bffe6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
