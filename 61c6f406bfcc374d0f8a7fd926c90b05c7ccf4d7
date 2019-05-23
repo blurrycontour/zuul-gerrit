@@ -270,6 +270,24 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_218720da",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-23T04:34:52Z",
+      "side": 1,
+      "message": "I mean the process of updating zuul itself. Like pausing executors before updating them or take a queue dump and re-enqueue on scheduler upgrade. These are the things that make an operator superior to helm/templates/..",
+      "parentUuid": "bfb3d3c7_e0aa66d0",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_62a2054e",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
