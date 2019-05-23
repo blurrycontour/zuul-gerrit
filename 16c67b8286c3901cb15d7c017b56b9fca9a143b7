@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_2604167b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-23T02:31:31Z",
+      "side": 1,
+      "message": "This should be `all(map` if we want that behavior to only happens for pipelines that only has timer trigger.",
+      "range": {
+        "startLine": 689,
+        "startChar": 54,
+        "endLine": 689,
+        "endChar": 64
+      },
+      "revId": "16c67b8286c3901cb15d7c017b56b9fca9a143b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
