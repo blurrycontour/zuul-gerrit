@@ -62,6 +62,7 @@ class RPCListener(object):
 
     def register(self):
         self.worker.registerFunction("zuul:autohold")
+        self.worker.registerFunction("zuul:autohold_delete")
         self.worker.registerFunction("zuul:autohold_list")
         self.worker.registerFunction("zuul:allowed_labels_get")
         self.worker.registerFunction("zuul:dequeue")
@@ -132,16 +133,19 @@ class RPCListener(object):
             return
         job.sendWorkComplete()
 
+    def handle_autohold_delete(self, job):
+        args = json.loads(job.arguments)
+        request_id = args['request_id']
+        try:
+            self.sched.autohold_delete(request_id)
+        except Exception as e:
+            job.sendWorkException(str(e).encode('utf8'))
+            return
+        job.sendWorkComplete()
+
     def handle_autohold_list(self, job):
-        req = {}
-
-        # The json.dumps() call cannot handle dict keys that are not strings
-        # so we convert our key to a CSV string that the caller can parse.
-        for key, value in self.sched.autohold_requests.items():
-            new_key = ','.join(key)
-            req[new_key] = value
-
-        job.sendWorkComplete(json.dumps(req))
+        data = self.sched.autohold_list()
+        job.sendWorkComplete(json.dumps(data))
 
     def handle_autohold(self, job):
         args = json.loads(job.arguments)
