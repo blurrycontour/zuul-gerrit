@@ -43,6 +43,7 @@ class ZooKeeper(object):
     REQUEST_ROOT = '/nodepool/requests'
     REQUEST_LOCK_ROOT = "/nodepool/requests-lock"
     NODE_ROOT = '/nodepool/nodes'
+    HOLD_REQUEST_ROOT = '/zuul/hold-requests/'
 
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
@@ -458,6 +459,61 @@ class ZooKeeper(object):
             node = self.getNode(node_id)
             if node:
                 yield node
+
+    def getHoldRequests(self):
+        '''
+        Get the current list of all hold requests.
+        '''
+        try:
+            return self.client.get_children(self.HOLD_REQUEST_ROOT)
+        except kze.NoNodeError:
+            return []
+
+    def getHoldRequest(self, hold_request_id):
+        path = self.HOLD_REQUEST_ROOT + hold_request_id
+        try:
+            data, stat = self.client.get(path)
+        except kze.NoNodeError:
+            return None
+        if not data:
+            return None
+
+        obj = zuul.model.HoldRequest.fromDict(self._strToDict(data))
+        obj.id = hold_request_id
+        return obj
+
+    def storeHoldRequest(self, hold_request):
+        '''
+        Create or update a hold request.
+
+        If this is a new request with no value for the `id` attribute of the
+        passed in request, then `id` will be set with the unique request
+        identifier after successful creation.
+
+        :param HoldRequest hold_request: Object representing the hold request.
+        '''
+        if hold_request.id is None:
+            path = self.client.create(
+                self.HOLD_REQUEST_ROOT,
+                value=hold_request.serialize(),
+                sequence=True,
+                makepath=True)
+            hold_request.id = path.split('/')[-1]
+        else:
+            path = self.HOLD_REQUEST_ROOT + hold_request.id
+            self.client.set(path, hold_request.serialize())
+
+    def deleteHoldRequest(self, hold_request):
+        '''
+        Delete a hold request.
+
+        :param HoldRequest hold_request: Object representing the hold request.
+        '''
+        path = self.HOLD_REQUEST_ROOT + hold_request.id
+        try:
+            self.client.delete(path)
+        except kze.NoNodeError:
+            pass
 
 
 class Launcher():

@@ -38,7 +38,7 @@ from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
-from zuul.model import Build
+from zuul.model import Build, HoldRequest
 
 COMMANDS = ['full-reconfigure', 'stop']
 
@@ -539,6 +539,40 @@ class Scheduler(threading.Thread):
         else:
             self.log.debug("Autohold requested for %s", key)
             self.autohold_requests[key] = (count, reason, node_hold_expiration)
+
+            request = HoldRequest()
+            request.tenant = tenant_name
+            request.project = project_name
+            request.job = job_name
+            request.ref_filter = ref_filter
+            request.reason = reason
+            request.count = count
+            request.node_expiration = node_hold_expiration
+            try:
+                self.zk.storeHoldRequest(request)
+            except Exception:
+                self.log.exception("Storing hold request %s failed:", request)
+
+    def autohold_release(self, hold_request_id):
+        try:
+            hold_request = self.zk.getHoldRequest(hold_request_id)
+        except Exception:
+            self.log.exception(
+                "Error retrieving autohold ID %s:", hold_request_id)
+
+        if not hold_request:
+            self.log.info("Ignored request to remove invalid autohold ID %s",
+                          hold_request_id)
+            return
+
+        # (TODO): Release any nodes held for this request here
+
+        self.log.debug("Removing autohold %s", hold_request)
+        try:
+            self.zk.deleteHoldRequest(hold_request)
+        except Exception:
+            self.log.exception(
+                "Error removing autohold request %s:", hold_request)
 
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)

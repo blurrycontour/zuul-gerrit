@@ -4443,3 +4443,57 @@ class WebInfo(object):
         if self.tenant:
             d['tenant'] = self.tenant
         return d
+
+
+class HoldRequest(object):
+    def __init__(self):
+        self.id = None
+        self.tenant = None
+        self.project = None
+        self.job = None
+        self.ref_filter = None
+        self.count = None
+        self.reason = None
+        self.node_expiration = None
+
+    def __str__(self):
+        return "<HoldRequest: tenant=%s project=%s job=%s ref_filter=%s>" % (
+            self.tenant, self.project, self.job, self.ref_filter)
+
+    @staticmethod
+    def fromDict(data):
+        '''
+        Return a new object from the given data dictionary.
+        '''
+        obj = HoldRequest()
+        obj.tenant = data.get('tenant')
+        obj.project = data.get('project')
+        obj.job = data.get('job')
+        obj.ref_filter = data.get('ref_filter')
+        obj.count = data.get('count')
+        obj.reason = data.get('reason')
+        obj.node_expiration = data.get('node_expiration')
+        return obj
+
+    def toDict(self):
+        '''
+        Return a dictionary representation of the object.
+        '''
+        d = dict()
+        d['id'] = self.id
+        d['tenant'] = self.tenant
+        d['project'] = self.project
+        d['job'] = self.job
+        d['ref_filter'] = self.ref_filter
+        d['count'] = self.count
+        d['reason'] = self.reason
+        d['node_expiration'] = self.node_expiration
+        return d
+
+    def serialize(self):
+        '''
+        Return a representation of the object as a string.
+
+        Used for storing the object data in ZooKeeper.
+        '''
+        return json.dumps(self.toDict()).encode('utf8')
