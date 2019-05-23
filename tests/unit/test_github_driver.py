@@ -1650,6 +1650,10 @@ class TestCodeownersParsing(ZuulTestCase):
         self._test_pipeline_with_codeowners(
             {'test.js': 'stuff'}, ['barf'], True)
 
+    def test_case_sensitivity(self):
+        self._test_pipeline_with_codeowners(
+            {'test.cpp': '#include <concepts>'}, ['goofy'], True)
+
     def test_codeowners_verification(self):
         github = self.fake_github
         review1 = [{
