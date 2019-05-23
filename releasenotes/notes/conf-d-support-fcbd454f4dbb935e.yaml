@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Added support for supplying ``zuul.conf`` config files in a conf.d
+    format to allow composing config from multiple sources.

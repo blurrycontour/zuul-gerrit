@@ -100,6 +100,14 @@ A minimal Zuul system may consist of a :ref:`scheduler` and
 should consider running multiple executors, each on a dedicated host,
 and running mergers on dedicated hosts as well.
 
+conf.d support
+--------------
+
+As an alternative to ``zuul.conf``, Zuul also supports reading the
+same data from a files in ``/etc/zuul/conf.d``. The contents of the
+files are read in sorted order, the contents are merged, and conflicting
+values in later files override values in earlier files.
+
 Common
 ------
 
