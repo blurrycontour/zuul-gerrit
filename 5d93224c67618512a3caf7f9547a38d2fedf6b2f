@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_d8038772",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2741,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-23T17:39:58Z",
+      "side": 1,
+      "message": "The pipeline manager manages this state machine and already has all the info that is needed so we shouldn\u0027t recalculate it here and duplicating logic. It just needs to annotate this information at the correct place. Basically we probably want to transition from waiting to queued when the node request is attached [1].\nWe could add a new other_attribute \u0027queued\u0027 [2] to the Job that is set to True at that point. The we can just use this information here during the serialization.\n\n[1] https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L2521\n[2] https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L1182",
+      "revId": "5d93224c67618512a3caf7f9547a38d2fedf6b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
