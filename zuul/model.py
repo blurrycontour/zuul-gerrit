@@ -4443,3 +4443,46 @@ class WebInfo(object):
         if self.tenant:
             d['tenant'] = self.tenant
         return d
+
+
+class Serializable(abc.ABC):
+    '''
+    Abstract base class for objects that will be stored in ZooKeeper.
+    '''
+
+    @abc.abstractmethod
+    def toDict(self):
+        '''
+        Return a dictionary representation of the object.
+        '''
+        pass
+
+    @staticmethod
+    @abc.abstractmethod
+    def fromDict(data):
+        '''
+        Return a new object from the given data dictionary.
+        '''
+        pass
+
+    def serialize(self):
+        '''
+        Return a representation of the object as a string.
+
+        Used for storing the object data in ZooKeeper.
+        '''
+        return json.dumps(self.toDict()).encode('utf8')
+
+
+class HoldRequest(Serializable):
+    def __init__(self):
+        self.id = None
+
+    def toDict(self):
+        d = dict()
+        d['id'] = self.id
+
+    @staticmethod
+    def fromDict(data):
+        obj = HoldRequest()
+        return obj
