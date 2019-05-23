@@ -34,6 +34,23 @@
       "revId": "62114c7fc7084b56974185f955c93660abcc5045",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_adea1772",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-23T16:54:11Z",
+      "side": 1,
+      "message": "One less markup format is always a win IMO, so +1 for adding YAML and deprecating ini. But for now, for this, I think just passing the list to configparser is a win.",
+      "revId": "62114c7fc7084b56974185f955c93660abcc5045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
