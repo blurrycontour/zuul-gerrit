@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    A new zuul CLI command, autohold-delete has been added support deleting
+    autohold requests that are now stored in ZooKeeper rather than memory.
