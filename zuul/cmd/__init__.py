@@ -19,6 +19,7 @@ import argparse
 import configparser
 import daemon
 import extras
+import glob
 import io
 import logging
 import logging.config
@@ -127,8 +128,10 @@ class ZuulApp(object):
         if self.args.config:
             locations = [self.args.config]
         else:
-            locations = ['/etc/zuul/zuul.conf',
-                         '~/zuul.conf']
+            locations = (['/etc/zuul/zuul.conf'] +
+                         glob.glob('/etc/zuul/conf.d/*.conf') +
+                         ['~/zuul.conf'] +
+                         glob.glob(os.path.expanduser('~/.zuul.d/*.conf')))
         for fp in locations:
             if os.path.exists(os.path.expanduser(fp)):
                 self.config.read(os.path.expanduser(fp))
