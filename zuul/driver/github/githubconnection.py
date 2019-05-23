@@ -178,7 +178,7 @@ class PrivilegedTeams(Privileged):
         teams = self._connection.getTeamsForRepo(self._org, self._repo)
         if self._privileged_teams is None:
             self._privileged_teams = frozenset(
-                team.name for (team, permission) in teams
+                team.name.lower() for (team, permission) in teams
                 if permission in ['push', 'admin'])
         return self._privileged_teams
 
@@ -1306,12 +1306,14 @@ class GithubConnection(BaseConnection):
         # This can happen if a team was added to the repo. During event
         # processing, we will not fetch the team, so we need to update the
         # cache here.
+        team_name = team_name.lower()
         if team_name not in self._team_cache:
             org_name, repo = project.split('/')
             github = self.getGithubClient(project)
             gh_repo = github.repository(org_name, repo)
             for team in gh_repo.teams():
-                cached_team_name = '%s/%s' % (org_name, team.name)
+                # Team names are matched case insensitive in github
+                cached_team_name = '%s/%s' % (org_name, team.name.lower())
                 if cached_team_name not in self._team_cache:
                     cached_team = CachedGithubTeam.from_github3_team(team)
                     self._team_cache[cached_team_name] = cached_team
@@ -1375,7 +1377,8 @@ class GithubConnection(BaseConnection):
             for required_review in required_reviews:
                 if required_review.startswith('@'):
                     if '/' in required_review:
-                        full_team_name = required_review[1:]
+                        # Team matching in github is case insensitive
+                        full_team_name = required_review[1:].lower()
                         team_org, team_name = full_team_name.split('/')
                         # This is a team, so we need to check if at least one
                         # member of that team is in the list of reviewers.
@@ -1720,7 +1723,7 @@ class GithubConnection(BaseConnection):
         :param member: Tells if the user is a member. If set to False, it will
                        be removed. If true, it will be added.
         """
-        cached_team = self._team_cache.get(team)
+        cached_team = self._team_cache.get(team.lower())
         if cached_team is not None:
             if member:
                 cached_team.add_member(user)
@@ -2045,7 +2048,8 @@ class GithubConnection(BaseConnection):
             gh_repo = github.repository(org, repo)
             repo_teams = dict()  # type: Dict[str, str]
             for team in gh_repo.teams():
-                team_name = '%s/%s' % (org, team.name)
+                # Teams are matched case insensitive in github
+                team_name = '%s/%s' % (org, team.name.lower())
                 repo_teams[team_name] = team.permission
                 if team_name not in self._team_cache:
                     cached_team = CachedGithubTeam.from_github3_team(team)
