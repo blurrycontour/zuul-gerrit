@@ -16,7 +16,8 @@ import logging
 import voluptuous as v
 import time
 
-from zuul.model import MERGER_MERGE_RESOLVE, MERGER_MERGE, MERGER_MAP
+from zuul.model import MERGER_MERGE_RESOLVE, MERGER_MERGE, MERGER_MAP, \
+    MERGER_SQUASH_MERGE
 from zuul.reporter import BaseReporter
 from zuul.exceptions import MergeFailure
 from zuul.driver.util import scalar_or_list
@@ -33,6 +34,7 @@ class GithubReporter(BaseReporter):
     merge_modes = {
         MERGER_MERGE: 'merge',
         MERGER_MERGE_RESOLVE: 'merge',
+        MERGER_SQUASH_MERGE: 'squash',
     }
 
     def __init__(self, driver, connection, pipeline, config=None):
