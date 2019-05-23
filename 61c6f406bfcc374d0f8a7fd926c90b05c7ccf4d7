@@ -288,6 +288,24 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_738deb79",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-23T05:22:49Z",
+      "side": 1,
+      "message": "That process should be part of the regular deployment role, and we need to do that in many situations, e.g. if a connection is added or if the scheduler deployment changed. Here is how i prototyped this in: https://github.com/TristanCacqueray/zuul-operator/blob/master/ansible/roles/deploy/tasks/main.yaml#L8\n\nFor executor/merger, it would be nice to have a gracefull stop signal we could use as a preStop container hook (e.g. finish the current jobs and kill yourself when you are done).",
+      "parentUuid": "bfb3d3c7_218720da",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_62a2054e",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
