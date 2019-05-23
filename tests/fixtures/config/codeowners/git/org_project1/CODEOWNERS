@@ -5,3 +5,4 @@
 *.rs                @org/team1 @org/team3
 /in/a/subdir/*.js   @org/team4
 *.js                @org/team5
+*.java               @org/TeAm4 @org/team2
