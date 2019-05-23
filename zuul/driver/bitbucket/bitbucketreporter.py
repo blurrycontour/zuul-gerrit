@@ -31,6 +31,7 @@ class BitbucketReporter(BaseReporter):
 
         if hasattr(item.change, 'id'):
             self.setBuildStatus(item)
+            self.commentPR(item)
             if self._merge:
                 self.mergePull(item)
 
@@ -49,6 +50,11 @@ class BitbucketReporter(BaseReporter):
             'Merge of change {} failed after 4 attempts, giving up',
             item.change)
 
+    def commentPR(self, item):
+        message = self._formatItemReport(item)
+        self.connection.commentPR(item.change.project.name, item.change.id,
+                                  message)
+
     def setBuildStatus(self, item, comment=None):
         message = comment or self._formatItemReport(item)
         state = 'FAILED'
@@ -58,14 +64,16 @@ class BitbucketReporter(BaseReporter):
             state = 'SUCCESSFUL'
         status = {
             'state': state,
-            'key': '{}-{}'.format(self.reportid, self.context),
+            'key': '{}-{}'.format(self._report_id, self.context),
             'name': '{}: {}'.format(self._label, self.context),
-            'description': message
+            'description': message,
+            'url': 'http://zuul.test'
         }
-        self.connection.setBuildStatus(item.change.patchset, status)
+        self.connection.reportBuild(item.change.patchset, status)
 
 
 def getSchema():
     bitbucket_reporter = v.Schema({
+        'merge': bool,
     })
     return bitbucket_reporter
