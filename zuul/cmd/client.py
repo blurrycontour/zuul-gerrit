@@ -233,7 +233,7 @@ class Client(zuul.cmd.ZuulApp):
             self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
         autohold_requests = client.autohold_list()
 
-        if len(autohold_requests.keys()) == 0:
+        if not autohold_requests:
             print("No autohold requests found")
             return True
 
@@ -242,15 +242,16 @@ class Client(zuul.cmd.ZuulApp):
                 'Tenant', 'Project', 'Job', 'Ref Filter', 'Count', 'Reason'
             ])
 
-        for key, value in autohold_requests.items():
-            # The key comes to us as a CSV string because json doesn't like
-            # non-str keys.
-            tenant_name, project_name, job_name, ref_filter = key.split(',')
-            count, reason, node_hold_expiration = value
-
+        for request in autohold_requests:
             table.add_row([
-                tenant_name, project_name, job_name, ref_filter, count, reason
+                request['tenant'],
+                request['project'],
+                request['job'],
+                request['ref_filter'],
+                request['count'],
+                request['reason'],
             ])
+
         print(table)
         return True
 
