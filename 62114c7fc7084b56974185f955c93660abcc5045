@@ -16,6 +16,24 @@
       "revId": "62114c7fc7084b56974185f955c93660abcc5045",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_2d22a701",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-23T16:49:44Z",
+      "side": 1,
+      "message": "The configparser just supports this $something out of the box. You can either just call sels.config.read several times or just give it the list of filenames and it will just do the correct thing.",
+      "parentUuid": "bfb3d3c7_8795b242",
+      "revId": "62114c7fc7084b56974185f955c93660abcc5045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
