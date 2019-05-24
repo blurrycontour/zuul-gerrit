@@ -29,7 +29,7 @@ source ${ZUUL_DIR}/.tox/venv/bin/activate
 python -c "import ara" &> /dev/null
 if [ $? -eq 1 ]; then
     echo "ARA isn't installed... Installing it."
-    pip install ara
+    pip install 'ara<1.0.0'
 fi
 ARA_DIR=$(dirname $(python3 -c 'import ara; print(ara.__file__)'))
 
