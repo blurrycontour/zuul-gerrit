@@ -5674,12 +5674,14 @@ class TestExecutor(ZuulTestCase):
 
         # Make sure that git.Repo objects have been garbage collected.
         repos = []
+        gc.disable()
         gc.collect()
         for obj in gc.get_objects():
             if isinstance(obj, git.Repo):
                 self.log.debug("Leaked git repo object: %s" % repr(obj))
                 repos.append(obj)
         self.assertEqual(len(repos), 0)
+        gc.enable()
 
     def test_executor_shutdown(self):
         "Test that the executor can shut down with jobs running"
