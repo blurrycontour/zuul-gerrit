@@ -1,0 +1,9 @@
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: Paul Belanger <pabelanger@redhat.com>
+Workflow+1: Paul Belanger <pabelanger@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 24 May 2019 03:48:00 +0000
+Reviewed-on: https://review.opendev.org/660859
+Project: zuul/zuul
+Branch: refs/heads/master
