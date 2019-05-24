@@ -5674,6 +5674,7 @@ class TestExecutor(ZuulTestCase):
 
         # Make sure that git.Repo objects have been garbage collected.
         repos = []
+        gc.disable()
         gc.collect()
         for obj in gc.get_objects():
             if isinstance(obj, git.Repo):
