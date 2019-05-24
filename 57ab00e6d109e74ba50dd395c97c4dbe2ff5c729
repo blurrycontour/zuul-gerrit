@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_ac6d2bcd",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2517,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-24T09:39:28Z",
+      "side": 1,
+      "message": "The job attributes are handled by generic properties, so you should be able to just do:\n\n  job.queued \u003d True",
+      "revId": "57ab00e6d109e74ba50dd395c97c4dbe2ff5c729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_cc72dfad",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2758,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-24T09:39:28Z",
+      "side": 1,
+      "message": "Same as above",
+      "revId": "57ab00e6d109e74ba50dd395c97c4dbe2ff5c729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
