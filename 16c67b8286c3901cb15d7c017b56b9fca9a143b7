@@ -46,6 +46,23 @@
       "revId": "16c67b8286c3901cb15d7c017b56b9fca9a143b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_9e3ddbc5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-05-25T14:43:16Z",
+      "side": 1,
+      "message": "Gerrit ref-updated events (like are used for merges to branches or pushes of tags) also lack a files list, if memory serves, so jobs with files matchers won\u0027t run for those triggers either.",
+      "revId": "16c67b8286c3901cb15d7c017b56b9fca9a143b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
