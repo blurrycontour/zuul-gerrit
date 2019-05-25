@@ -22,6 +22,30 @@
       "revId": "16c67b8286c3901cb15d7c017b56b9fca9a143b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_73570028",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-05-25T14:18:20Z",
+      "side": 1,
+      "message": "for now, timer triggers is the use case I\u0027m dealing with. Which other pipelines do you have in mind?",
+      "parentUuid": "bfb3d3c7_2604167b",
+      "range": {
+        "startLine": 689,
+        "startChar": 54,
+        "endLine": 689,
+        "endChar": 64
+      },
+      "revId": "16c67b8286c3901cb15d7c017b56b9fca9a143b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
