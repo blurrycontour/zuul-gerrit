@@ -63,6 +63,24 @@
       "revId": "16c67b8286c3901cb15d7c017b56b9fca9a143b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_5efbe345",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-25T23:45:22Z",
+      "side": 1,
+      "message": "When a pipeline has both a gerrit and timer trigger, then any(filter evaluates to True. Though now that the trigger event is attached to queue items, perhaps TriggerEvent we could have a \"skipFileMatcher()\" procedure that could be used here.",
+      "parentUuid": "bfb3d3c7_9e3ddbc5",
+      "revId": "16c67b8286c3901cb15d7c017b56b9fca9a143b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
