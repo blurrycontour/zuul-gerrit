@@ -165,6 +165,7 @@ class PipelineManager(object):
         Takes the action_reporters, item, message and extra options and
         sends them to the pluggable reporters.
         """
+        log = get_annotated_logger(self.log, item.event)
         report_errors = []
         if len(action_reporters) > 0:
             for reporter in action_reporters:
@@ -174,7 +175,7 @@ class PipelineManager(object):
                         report_errors.append(ret)
                 except Exception as e:
                     item.setReportedResult('ERROR')
-                    self.log.exception("Exception while reporting")
+                    log.exception("Exception while reporting")
                     report_errors.append(str(e))
         return report_errors
 
@@ -1017,10 +1018,10 @@ class PipelineManager(object):
             item.setReportedResult('FAILURE')
         elif not item.getJobs():
             # We don't send empty reports with +1
-            self.log.debug("No jobs for change %s" % (item.change,))
+            log.debug("No jobs for change %s", item.change)
             actions = []
         elif item.didAllJobsSucceed():
-            self.log.debug("success %s" % (self.pipeline.success_actions))
+            log.debug("success %s", self.pipeline.success_actions)
             actions = self.pipeline.success_actions
             item.setReportedResult('SUCCESS')
             self.pipeline._consecutive_failures = 0
@@ -1037,12 +1038,10 @@ class PipelineManager(object):
             self.pipeline._consecutive_failures >= self.pipeline.disable_at):
             self.pipeline._disabled = True
         if actions:
-            self.log.info("Reporting item %s, actions: %s" %
-                          (item, actions))
+            log.info("Reporting item %s, actions: %s", item, actions)
             ret = self.sendReport(actions, item)
             if ret:
-                self.log.error("Reporting item %s received: %s" %
-                               (item, ret))
+                log.error("Reporting item %s received: %s", item, ret)
         return ret
 
     def reportStats(self, item):
