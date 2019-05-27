@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_d1dca1e5",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3087,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-27T04:34:18Z",
+      "side": 1,
+      "message": "I struggled about the naming here as events are no matchers. Instead we probably want to name it needsFileMatching or something similar.",
+      "range": {
+        "startLine": 3087,
+        "startChar": 8,
+        "endLine": 3087,
+        "endChar": 21
+      },
+      "revId": "1a14acc6bade3115519fc6ee899d90e0bb1d8ed3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
