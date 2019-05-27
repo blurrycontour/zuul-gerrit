@@ -16,6 +16,24 @@
       "revId": "1cf104d55480b27ad8c7bc06d6593122f3100204",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_e793275a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-27T07:10:14Z",
+      "side": 1,
+      "message": "normally yes, but in this case it\u0027s more efficient to have self.log being already the annotated logger. This is also in other places the case where we have the logger for an entire instance.",
+      "parentUuid": "bfb3d3c7_070d1be7",
+      "revId": "1cf104d55480b27ad8c7bc06d6593122f3100204",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
