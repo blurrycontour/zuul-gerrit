@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_a7720f48",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-27T07:11:36Z",
+      "side": 0,
+      "message": "might be worth keeping positional information for such extra argument.",
+      "range": {
+        "startLine": 84,
+        "startChar": 32,
+        "endLine": 84,
+        "endChar": 36
+      },
+      "revId": "a07bed4e25f096926c94865b2431fe3670413de1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
