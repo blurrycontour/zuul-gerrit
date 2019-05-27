@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_87eeebea",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-05-27T07:06:43Z",
+      "side": 1,
+      "message": "in previous change, build is dropped from the log statement, perhaps we should drop it here too?",
+      "range": {
+        "startLine": 512,
+        "startChar": 18,
+        "endLine": 512,
+        "endChar": 23
+      },
+      "revId": "a07bed4e25f096926c94865b2431fe3670413de1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
