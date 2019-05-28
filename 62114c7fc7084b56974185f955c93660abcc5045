@@ -51,6 +51,23 @@
       "revId": "62114c7fc7084b56974185f955c93660abcc5045",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_058741b7",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-05-28T14:06:06Z",
+      "side": 1,
+      "message": "I\u0027m not completely opposed to switching to YAML (if we did, it should be a switch where we support both for a limited time for migration but definitely deprecate and then remove ini).  However, we did *choose* not to do that when it would have been easier as part of the zuul v3 work.  The ini format is actually pretty intuitive for this kind of data, and there is some utility to having a visual distinction between the different kind of config files.  The ini files configure how the system is constructed and runs, the yaml files are the data it uses.  Anway, that\u0027s a longer separate discussion.  I like the .d support once the comments here are addressed.",
+      "revId": "62114c7fc7084b56974185f955c93660abcc5045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
