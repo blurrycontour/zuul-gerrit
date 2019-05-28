@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_b52c5c02",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-28T19:28:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfb3d3c7_6791774e",
+      "range": {
+        "startLine": 376,
+        "startChar": 45,
+        "endLine": 376,
+        "endChar": 49
+      },
+      "revId": "b8c951ea80252dd4b685a21518d05eea275ec8fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_c7238355",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 2
@@ -77,6 +101,24 @@
       "writtenOn": "2019-05-27T07:11:30Z",
       "side": 1,
       "message": "right, will change that",
+      "parentUuid": "bfb3d3c7_c7238355",
+      "revId": "b8c951ea80252dd4b685a21518d05eea275ec8fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_9537d84d",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-28T19:28:01Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "bfb3d3c7_c7238355",
       "revId": "b8c951ea80252dd4b685a21518d05eea275ec8fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
