@@ -113,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_0a967094",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-05-28T12:47:41Z",
+      "side": 1,
+      "message": "I think we should support only DBURI and one and only one CRD that the zuul operator manages.\n\nDBURI handles all versions of the world where the user has an alternate opinion about what should happen with databases.\n\nOnly-one-CRD allows \"kubectl get-me-a-zuul\" to be about as straightforward as docker-compose.\n\nThe reason I think we should also support the db is that by and large the db for zuul is not interesting or hard to deal with and is an implementation detail for the simple case.",
+      "parentUuid": "bfb3d3c7_2074fe98",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_6a70b3a6",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -124,6 +142,24 @@
       "writtenOn": "2019-05-21T17:14:23Z",
       "side": 1,
       "message": "See above. I disagree with this point, but if we had to pick one, we\u0027d have to pick the one that most current users are on, which I believe is MySQL. Also, a nit, it\u0027s either Postgres, or PostgreSQL.",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_2ac9f4aa",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-05-28T12:47:41Z",
+      "side": 1,
+      "message": "Assuming we decide to support one, I agree that we should pick MySQL.",
+      "parentUuid": "bfb3d3c7_6a70b3a6",
       "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
