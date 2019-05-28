@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_db37c1fe",
+        "filename": "doc/source/admin/monitoring.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-05-28T21:55:08Z",
+      "side": 1,
+      "message": "Nit: should be project.",
+      "range": {
+        "startLine": 286,
+        "startChar": 55,
+        "endLine": 286,
+        "endChar": 61
+      },
+      "revId": "4cb6a33c1e3c99f0a5bacfd6a2249b6f08c30839",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
