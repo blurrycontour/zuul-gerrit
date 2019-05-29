@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_87b79d3a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-29T15:38:31Z",
+      "side": 1,
+      "message": "Please limit the short commit message to 50 chars",
+      "revId": "f86ce1bced46fe184b097642871d3ded530e7c6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
