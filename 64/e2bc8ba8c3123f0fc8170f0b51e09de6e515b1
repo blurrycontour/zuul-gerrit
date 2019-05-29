@@ -1,0 +1,12 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 29 May 2019 15:56:46 +0000
+Reviewed-on: https://review.opendev.org/661498
+Project: zuul/zuul
+Branch: refs/heads/master
