@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_55662ec3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-29T15:16:28Z",
+      "side": 1,
+      "message": "please limit short description to 50 chars. https://wiki.openstack.org/wiki/GitCommitMessages",
+      "revId": "67f986cc3847cfdaf86834dd8a313797aba3a86a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_f55882fa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-29T15:16:28Z",
+      "side": 1,
+      "message": "So is this mergable, or are you just experimenting?",
+      "revId": "67f986cc3847cfdaf86834dd8a313797aba3a86a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
