@@ -1533,11 +1533,19 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         build.jobdir = self.jobdir
 
         result = super(RecordingAnsibleJob, self).runPlaybooks(args)
-        self.recordResult(result)
+        if result is not None:
+            # Record result during the cleanup phase
+            self.result = result
+        else:
+            self.recordResult(result)
         return result
 
+    def runCleanupPlaybooks(self):
+        super(RecordingAnsibleJob, self).runCleanupPlaybooks()
+        self.recordResult(self.result)
+
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
-                   wrapped=True):
+                   wrapped=True, cleanup=False):
         build = self.executor_server.job_builds[self.job.unique]
 
         if self.executor_server._run_ansible:
@@ -1547,7 +1555,7 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                 build.run()
 
             result = super(RecordingAnsibleJob, self).runAnsible(
-                cmd, timeout, playbook, ansible_version, wrapped)
+                cmd, timeout, playbook, ansible_version, wrapped, cleanup)
         else:
             if playbook.path:
                 result = build.run()
