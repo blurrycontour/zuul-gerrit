@@ -681,12 +681,15 @@ class AnsibleJob(object):
         self.jobdir = None
         self.proc = None
         self.proc_lock = threading.Lock()
+        self.cleanup_proc = None
+        self.cleanup_proc_lock = threading.Lock()
         self.running = False
         self.started = False  # Whether playbooks have started running
         self.time_starting_build = None
         self.paused = False
         self.aborted = False
         self.aborted_reason = None
+        self.cleaned = False
         self._resume_event = threading.Event()
         self.thread = None
         self.project_info = {}
@@ -740,9 +743,13 @@ class AnsibleJob(object):
         self.aborted = True
         self.aborted_reason = reason
 
+        if self.started and not self.cleaned:
+            self.runCleanupPlaybooks()
+
         # if paused we need to resume the job so it can be stopped
         self.resume()
         self.abortRunningProc()
+        self.recordResult('ABORTED')
 
     def pause(self):
         self.log.info(
@@ -960,6 +967,11 @@ class AnsibleJob(object):
 
         result = self.runPlaybooks(args)
 
+        if result is not None and self.jobdir.cleanup_playbooks:
+            self.runCleanupPlaybooks()
+
+        self.recordResult(result)
+
         # Stop the persistent SSH connections.
         setup_status, setup_code = self.runAnsibleCleanup(
             self.jobdir.setup_playbook)
@@ -974,6 +986,10 @@ class AnsibleJob(object):
                                       data=data))
         self.log.debug("Sending result: %s" % (result_data,))
         self.job.sendWorkComplete(result_data)
+
+    def recordResult(self, result):
+        # Only used by unit tests
+        pass
 
     def getResultData(self):
         data = {}
@@ -1158,6 +1174,8 @@ class AnsibleJob(object):
                 key, (time.monotonic() - self.time_starting_build) * 1000)
 
         self.started = True
+        # Record ansible version being used for the cleanup phase
+        self.ansible_version = ansible_version
         time_started = time.time()
         # timeout value is "total" job timeout which accounts for
         # pre-run and run playbooks. post-run is different because
@@ -1250,6 +1268,21 @@ class AnsibleJob(object):
             return None
 
         return result
+
+    def runCleanupPlaybooks(self):
+        # TODO: make this configurable
+        cleanup_timeout = 300
+
+        with open(self.jobdir.job_output_file, 'a') as job_output:
+            job_output.write("{now} | Running Ansible cleanup...\n".format(
+                now=datetime.datetime.now()
+            ))
+
+        for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
+            self.runAnsiblePlaybook(
+                playbook, cleanup_timeout, self.ansible_version,
+                phase='cleanup', index=index)
+        self.cleaned = True
 
     def _logFinalPlaybookError(self):
         # Failures in the final post playbook can include failures
@@ -1848,7 +1881,7 @@ class AnsibleJob(object):
                 self.log.exception("Exception while killing ansible process:")
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
-                   wrapped=True):
+                   wrapped=True, cleanup=False):
         config_file = playbook.ansible_config
         env_copy = os.environ.copy()
         env_copy.update(self.ssh_agent.env)
@@ -1916,8 +1949,9 @@ class AnsibleJob(object):
         # possible we don't bind mount current zuul user home directory.
         env_copy['HOME'] = self.jobdir.work_root
 
-        with self.proc_lock:
-            if self.aborted:
+        lock = self.cleanup_proc_lock if cleanup else self.proc_lock
+        with lock:
+            if self.aborted and not (self.started and not self.cleaned):
                 return (self.RESULT_ABORTED, None)
             self.log.debug("Ansible command: ANSIBLE_CONFIG=%s ZUUL_JOBDIR=%s "
                            "ZUUL_JOB_LOG_CONFIG=%s PYTHONPATH=%s TMP=%s %s",
@@ -1927,7 +1961,7 @@ class AnsibleJob(object):
                            env_copy['PYTHONPATH'],
                            env_copy['TMP'],
                            " ".join(shlex.quote(c) for c in cmd))
-            self.proc = popen(
+            proc = popen(
                 cmd,
                 cwd=self.jobdir.work_root,
                 stdin=subprocess.DEVNULL,
@@ -1936,6 +1970,10 @@ class AnsibleJob(object):
                 preexec_fn=os.setsid,
                 env=env_copy,
             )
+            if cleanup:
+                self.cleanup_proc = proc
+            else:
+                self.proc = proc
 
         syntax_buffer = []
         ret = None
@@ -1947,7 +1985,7 @@ class AnsibleJob(object):
             # Use manual idx instead of enumerate so that RESULT lines
             # don't count towards BUFFER_LINES_FOR_SYNTAX
             idx = 0
-            for line in iter(self.proc.stdout.readline, b''):
+            for line in iter(proc.stdout.readline, b''):
                 if line.startswith(b'RESULT'):
                     # TODO(mordred) Process result commands if sent
                     continue
@@ -1958,7 +1996,7 @@ class AnsibleJob(object):
                 line = line[:1024].rstrip()
                 self.log.debug("Ansible output: %s" % (line,))
             self.log.debug("Ansible output terminated")
-            cpu_times = self.proc.cpu_times()
+            cpu_times = proc.cpu_times()
             self.log.debug("Ansible cpu times: user=%.2f, system=%.2f, "
                            "children_user=%.2f, "
                            "children_system=%.2f" %
@@ -1969,7 +2007,7 @@ class AnsibleJob(object):
             self.cpu_times['system'] += cpu_times.system
             self.cpu_times['children_user'] += cpu_times.children_user
             self.cpu_times['children_system'] += cpu_times.children_system
-            ret = self.proc.wait()
+            ret = proc.wait()
             self.log.debug("Ansible exit code: %s" % (ret,))
         finally:
             if timeout:
@@ -1977,9 +2015,12 @@ class AnsibleJob(object):
                 self.log.debug("Stopped watchdog")
             self.log.debug("Stopped disk job killer")
 
-        with self.proc_lock:
-            self.proc.stdout.close()
-            self.proc = None
+        with lock:
+            proc.stdout.close()
+            if cleanup:
+                self.cleanup_proc = None
+            else:
+                self.proc = None
 
         if timeout and watchdog.timed_out:
             return (self.RESULT_TIMED_OUT, None)
@@ -2057,6 +2098,9 @@ class AnsibleJob(object):
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
                         line=line.decode('utf-8').rstrip()))
+
+        if self.aborted:
+            return (self.RESULT_ABORTED, None)
 
         return (self.RESULT_NORMAL, ret)
 
@@ -2177,7 +2221,8 @@ class AnsibleJob(object):
 
         self.emitPlaybookBanner(playbook, 'START', phase)
 
-        result, code = self.runAnsible(cmd, timeout, playbook, ansible_version)
+        result, code = self.runAnsible(cmd, timeout, playbook, ansible_version,
+                                       cleanup=phase == 'cleanup')
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
         if self.executor_server.statsd:
