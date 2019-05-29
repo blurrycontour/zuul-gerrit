@@ -2855,6 +2855,42 @@ class TestPostPlaybooks(AnsibleZuulTestCase):
         self.assertFalse(os.path.exists(post_end))
 
 
+class TestCleanupPlaybooks(AnsibleZuulTestCase):
+    tenant_config_file = 'config/cleanup-playbook/main.yaml'
+
+    def test_cleanup_playbook(self):
+        # Test that when we abort a job the cleanup run is performed
+        self.executor_server.verbose = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        while not len(self.builds):
+            time.sleep(0.1)
+        build = self.builds[0]
+
+        post_start = os.path.join(self.test_root, build.uuid +
+                                  '.post_start.flag')
+        start = time.time()
+        while time.time() < start + 90:
+            if os.path.exists(post_start):
+                break
+            time.sleep(0.1)
+        # The post playbook has started, abort the job
+        self.fake_gerrit.addEvent(A.getChangeAbandonedEvent())
+        self.waitUntilSettled()
+
+        build = self.getJobFromHistory('python27')
+        self.assertEqual('ABORTED', build.result)
+
+        post_end = os.path.join(self.test_root, build.uuid +
+                                '.post_end.flag')
+        cleanup_flag = os.path.join(self.test_root, build.uuid +
+                                    '.cleanup.flag')
+        self.assertTrue(os.path.exists(cleanup_flag))
+        self.assertTrue(os.path.exists(post_start))
+        self.assertFalse(os.path.exists(post_end))
+
+
 class TestBrokenTrustedConfig(ZuulTestCase):
     # Test we can deal with a broken config only with trusted projects. This
     # is different then TestBrokenConfig, as it does not have a missing
