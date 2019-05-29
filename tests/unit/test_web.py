@@ -461,6 +461,9 @@ class TestWeb(BaseTestWeb):
             expected_pb("playbooks/post-run-01.yaml"),
             expected_pb("playbooks/post-run-02.yaml")
         ], data[0]['post_run'])
+        self.assertEqual([
+            expected_pb("playbooks/cleanup-run.yaml")
+        ], data[0]['cleanup_run'])
 
     def test_web_nodes_list(self):
         # can we fetch the nodes list
