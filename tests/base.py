@@ -1505,6 +1505,8 @@ class FakeBuild(object):
 
 
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
+    result = None
+
     def doMergeChanges(self, merger, items, repo_state):
         # Get a merger in order to update the repos involved in this job.
         commit = super(RecordingAnsibleJob, self).doMergeChanges(
@@ -1532,12 +1534,18 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         build = self.executor_server.job_builds[self.job.unique]
         build.jobdir = self.jobdir
 
-        result = super(RecordingAnsibleJob, self).runPlaybooks(args)
-        self.recordResult(result)
-        return result
+        self.result = super(RecordingAnsibleJob, self).runPlaybooks(args)
+        if self.result is None:
+            self.recordResult(None)
+        return self.result
+
+    def runCleanupPlaybooks(self):
+        super(RecordingAnsibleJob, self).runCleanupPlaybooks()
+        if self.result is not None:
+            self.recordResult(self.result)
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
-                   wrapped=True):
+                   wrapped=True, cleanup=False):
         build = self.executor_server.job_builds[self.job.unique]
 
         if self.executor_server._run_ansible:
@@ -1547,7 +1555,7 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                 build.run()
 
             result = super(RecordingAnsibleJob, self).runAnsible(
-                cmd, timeout, playbook, ansible_version, wrapped)
+                cmd, timeout, playbook, ansible_version, wrapped, cleanup)
         else:
             if playbook.path:
                 result = build.run()
