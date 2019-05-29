@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_b5d20a27",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-29T15:20:00Z",
+      "side": 1,
+      "message": "print(..., file\u003dsys.stderr) would be the simpler way to do this. ;)",
+      "revId": "0eb80dd3f4db45fd8a45bfa909cab2bb2909ad8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
