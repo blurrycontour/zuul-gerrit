@@ -61,6 +61,7 @@ import tests.fakegithub
 import zuul.driver.gerrit.gerritsource as gerritsource
 import zuul.driver.gerrit.gerritconnection as gerritconnection
 import zuul.driver.github.githubconnection as githubconnection
+import zuul.driver.bitbucket.bitbucketconnection as bitbucketconnection
 import zuul.driver.github
 import zuul.driver.sql
 import zuul.scheduler
@@ -2401,6 +2402,778 @@ class SymLink(object):
         self.target = target
 
 
+class BitbucketChangeReference(git.Reference):
+    _common_path_default = "refs/heads"
+    _points_to_commits_only = True
+
+
+class FakeBitbucketPullRequest():
+    def __init__(self, project_name, title, branch, source_branch,
+                 description, upstream_root):
+
+        self.lastUpdated = int(time.time() * 1000)
+
+        self.source_branch = source_branch
+        self.branch = branch
+        self.project_name = project_name
+        match = re.match(r'^(.+)\/(.+)$', project_name)
+        pro, rep = match.groups()
+        self.project = pro
+        self.repo = rep
+        self.description = description
+        self.title = title
+        self.upstream_root = upstream_root
+        self.headref = self._createPRRef()
+        self.head = self.headref.commit.hexsha
+        self.comments = []
+        self.number_of_commits = 0
+        self.canMerge = False
+        self.open = True
+        self.files = {'README.md': 'foobar'}
+
+    def _getRepo(self):
+        repo_path = os.path.join(self.upstream_root, self.project_name)
+        return git.Repo(repo_path)
+
+    def getPRReference(self):
+        return self.source_branch
+
+    def _createPRRef(self):
+        repo = self._getRepo()
+        return BitbucketChangeReference.create(
+            repo, self.getPRReference(), 'refs/tags/init')
+
+    def update(self):
+        self._addCommitInPR()
+        self.lastUpdated = int(time.time() * 1000)
+
+    def addComment(self, text):
+        self.lastUpdated = int(time.time() * 1000)
+        self.comments.append({'text': text,
+                              'timestamp': int(time.time() * 1000)})
+
+    def addCommit(self, files):
+        self.lastUpdated = int(time.time() * 1000)
+        self._addCommitInPR(files)
+
+    def _addCommitInPR(self, files=[], reset=False):
+        repo = self._getRepo()
+        ref = repo.references[self.getPRReference()]
+        if reset:
+            self.number_of_commits = 0
+            ref.set_object('refs/tags/init')
+        self.number_of_commits += 1
+        repo.head.reference = ref
+        repo.git.clean('-x', '-f', '-d')
+
+        if files:
+            self.files = files
+        else:
+            fn = '%s-%i' % (self.branch.replace('/', '_'), self.number)
+            self.files = {fn: "test %s %i\n" % (self.branch, self.number)}
+        msg = self.title + '-' + str(self.number_of_commits)
+        for fn, content in self.files.items():
+            fn = os.path.join(repo.working_dir, fn)
+            with open(fn, 'w') as f:
+                f.write(content)
+            repo.index.add([fn])
+
+        self.head = repo.index.commit(msg).hexsha
+
+        repo.create_head(self.getPRReference(), self.head, force=True)
+        self.headref.set_commit(self.head)
+        repo.head.reference = 'master'
+        repo.git.clean('-x', '-f', '-d')
+        repo.heads['master'].checkout()
+
+    def review(self):
+        self.lastUpdated = int(time.time() * 1000)
+        self.canMerge = True
+
+
+class FakeBitbucketClient():
+    log = logging.getLogger("zuul.test.FakeBitbucketClient")
+
+    def __init__(self, con):
+        self.con = con
+
+    def get(self, path):
+        self.log.debug('Get request {}'.format(path))
+
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)'
+                         r'/branches$', path)
+        if match:
+            project, repo = match.groups()
+            prs = self.con.pull_requests.get('{}/{}'.format(project, repo),
+                                             {}).values()
+
+            branches = [{
+                'id': 'refs/heads/{}'.format(pr.source_branch),
+                'displayId': pr.source_branch,
+                'type': 'BRANCH',
+                'latestCommit': pr.head,
+                'latestChangeSet': pr.head,
+                'isDefault': False,
+            } for pr in prs]
+
+            if project == 'project' and repo == 'repo':
+                gr = git.Repo(os.path.join(self.con.cloneurl,
+                                           'project/repo'))
+                for head in gr.heads:
+                    if head.name == 'master':
+                        continue
+                    branches.append({
+                        "id": "refs/heads/{}".format(head.name),
+                        "displayId": head.name,
+                        "type": "BRANCH",
+                        "latestCommit": head.commit.hexsha,
+                        "latestChangeset": head.commit.hexsha,
+                        "isDefault": False
+                    })
+
+            gr = git.Repo(os.path.join(self.con.cloneurl,
+                                       '{}/{}'.format(project, repo)))
+            for head in gr.heads:
+                sha = head.commit.hexsha
+                bname = head.name
+                if bname != 'master':
+                    continue
+                branches.append({
+                    "id": "refs/heads/{}".format(bname),
+                    "displayId": bname,
+                    "type": "BRANCH",
+                    "latestCommit": sha,
+                    "latestChangeset": sha,
+                    "isDefault": True
+                })
+
+            if project == 'org' and repo == 'common-config':
+
+                gr = git.Repo(os.path.join(self.con.cloneurl,
+                                           'org/common-config'))
+
+                for head in gr.heads:
+                    sha = head.commit.hexsha
+                    bname = head.name
+                    if bname == 'master':
+                        continue
+
+                    branches.append({
+                        "id": "refs/heads/{}".format(bname),
+                        "displayId": bname,
+                        "type": "BRANCH",
+                        "latestCommit": sha,
+                        "latestChangeset": sha,
+                        "isDefault": False
+                    })
+
+            r = {
+                'size': 1,
+                'limit': 25,
+                'isLastPage': True,
+            }
+            r['values'] = branches
+
+            return r
+
+        match = re.match(r'/rest/api/1.0/projects/{}/repos/{}/pull-requests/'
+                         r'{}/merge', path)
+
+        if match:
+            project, repo, prid = match.groups()
+
+            pr = self.con.pull_requests.get('{}/{}'.format(project, repo), {})\
+                .get(int(prid))
+
+            if pr.canMerge:
+                return {
+                    "canMerge": True,
+                    "conflicted": False,
+                }
+            else:
+                return {
+                    "canMerge": False,
+                    "conflicted": True,
+                    "outcome": "CONFLICTED",
+                    "vetoes": [
+                        {
+                            "summaryMessage": "You may not merge after 6pm"
+                                              " on a Friday.",
+                            "detailedMessage": "It is likely that your Blood"
+                                               " Alcohol Content (BAC) exceeds"
+                                               " the threshold for making"
+                                               " sensible decisions regarding"
+                                               " pull requests. Please try"
+                                               " again on Monday."
+                        }
+                    ]
+                }
+
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)/pull-requests$',
+                         path)
+        if match:
+            project, repo = match.groups()
+            prs = self.con.pull_requests.get('{}/{}'.format(project, repo),
+                                             {}).values()
+
+            state_lookup = {True: 'OPEN', False: 'MERGED'}
+            re_prs = [{
+                "id": pr.number,
+                "version": 1,
+                "title": pr.title,
+                "description": pr.description,
+                "state": state_lookup[pr.open],
+                "open": pr.open,
+                "closed": not pr.open,
+                "createdDate": 135907592,
+                "updatedDate": pr.lastUpdated,
+                "fromRef": {
+                    "id": "refs/heads/{}".format(pr.source_branch),
+                    "repository": {
+                        "slug": pr.repo,
+                        "name": None,
+                        "project": {
+                            "key": pr.project
+                        }
+                    }
+                },
+                "toRef": {
+                    "id": "refs/heads/{}".format(pr.branch),
+                    "repository": {
+                        "slug": pr.repo,
+                        "name": None,
+                        "project": {
+                            "key": pr.project
+                        }
+                    }
+                },
+                "locked": False,
+                "author": {
+                    "user": {
+                        "name": "tom",
+                        "emailAddress": "tom@example.test",
+                        "id": 115026,
+                        "displayName": "Tom",
+                        "active": True,
+                        "slug": "tom",
+                        "type": "NORMAL"
+                    },
+                    "role": "AUTHOR",
+                    "approved": True,
+                    "status": "APPROVED"
+                },
+                "reviewers": [
+                    {
+                        "user": {
+                            "name": "jcitizen",
+                            "emailAddress": "jane@example.test",
+                            "id": 101,
+                            "displayName": "Jane Citizen",
+                            "active": True,
+                            "slug": "jcitizen",
+                            "type": "NORMAL"
+                        },
+                        "lastReviewedCommit": "{}",
+                        "role": "REVIEWER",
+                        "approved": True,
+                        "status": "APPROVED"
+                    }
+                ],
+                "participants": [
+                    {
+                        "user": {
+                            "name": "dick",
+                            "emailAddress": "dick@example.test",
+                            "id": 3083181,
+                            "displayName": "Dick",
+                            "active": True,
+                            "slug": "dick",
+                            "type": "NORMAL"
+                        },
+                        "role": "PARTICIPANT",
+                        "approved": False,
+                        "status": "UNAPPROVED"
+                    },
+                    {
+                        "user": {
+                            "name": "harry",
+                            "emailAddress": "harry@example.test",
+                            "id": 99049120,
+                            "displayName": "Harry",
+                            "active": True,
+                            "slug": "harry",
+                            "type": "NORMAL"
+                        },
+                        "role": "PARTICIPANT",
+                        "approved": True,
+                        "status": "APPROVED"
+                    }
+                ],
+                "links": {
+                    "self": [
+                        {
+                            "href": "http://link/to/pullrequest"
+                        }
+                    ]
+                }
+            } for pr in prs]
+
+            r = {
+                'size': len(re_prs),
+                'limit': 25,
+                'isLastPage': True,
+            }
+            r['values'] = re_prs
+
+            return r
+
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)/'
+                         r'pull-requests/(\d+)$',
+                         path)
+        if match:
+            project, repo, prid = match.groups()
+            pr = self.con.pull_requests.get('{}/{}'.format(project, repo), {})\
+                .get(int(prid))
+
+            state_lookup = {True: 'OPEN', False: 'MERGED'}
+
+            re_pr = {
+                "id": pr.number,
+                "version": 1,
+                "title": pr.title,
+                "description": pr.description,
+                "state": state_lookup[pr.open],
+                "open": pr.open,
+                "closed": not pr.open,
+                "createdDate": 135907592,
+                "updatedDate": pr.lastUpdated,
+                "fromRef": {
+                    "id": "refs/heads/{}".format(pr.source_branch),
+                    "repository": {
+                        "slug": pr.repo,
+                        "name": None,
+                        "project": {
+                            "key": pr.project
+                        }
+                    }
+                },
+                "toRef": {
+                    "id": "refs/heads/{}".format(pr.branch),
+                    "repository": {
+                        "slug": pr.repo,
+                        "name": None,
+                        "project": {
+                            "key": pr.project
+                        }
+                    }
+                },
+                "locked": False,
+                "author": {
+                    "user": {
+                        "name": "tom",
+                        "emailAddress": "tom@example.test",
+                        "id": 115026,
+                        "displayName": "Tom",
+                        "active": True,
+                        "slug": "tom",
+                        "type": "NORMAL"
+                    },
+                    "role": "AUTHOR",
+                    "approved": True,
+                    "status": "APPROVED"
+                },
+                "reviewers": [
+                    {
+                        "user": {
+                            "name": "jcitizen",
+                            "emailAddress": "jane@example.test",
+                            "id": 101,
+                            "displayName": "Jane Citizen",
+                            "active": True,
+                            "slug": "jcitizen",
+                            "type": "NORMAL"
+                        },
+                        "lastReviewedCommit": "{}",
+                        "role": "REVIEWER",
+                        "approved": True,
+                        "status": "APPROVED"
+                    }
+                ],
+                "participants": [
+                    {
+                        "user": {
+                            "name": "dick",
+                            "emailAddress": "dick@example.test",
+                            "id": 3083181,
+                            "displayName": "Dick",
+                            "active": True,
+                            "slug": "dick",
+                            "type": "NORMAL"
+                        },
+                        "role": "PARTICIPANT",
+                        "approved": False,
+                        "status": "UNAPPROVED"
+                    },
+                    {
+                        "user": {
+                            "name": "harry",
+                            "emailAddress": "harry@example.test",
+                            "id": 99049120,
+                            "displayName": "Harry",
+                            "active": True,
+                            "slug": "harry",
+                            "type": "NORMAL"
+                        },
+                        "role": "PARTICIPANT",
+                        "approved": True,
+                        "status": "APPROVED"
+                    }
+                ],
+                "links": {
+                    "self": [
+                        {
+                            "href": "http://link/to/pullrequest"
+                        }
+                    ]
+                }
+            }
+            return re_pr
+
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)/'
+                         r'pull-requests/(\d+)/merge$',
+                         path)
+        if match:
+            project, repo, prid = match.groups()
+            pr = self.con.pull_requests.get('{}/{}'.format(project, repo), {})\
+                .get(int(prid))
+
+            if pr.canMerge:
+                return {
+                    "canMerge": True,
+                    "conflicted": False,
+                }
+            else:
+                return {
+                    "canMerge": False,
+                    "conflicted": True,
+                    "outcome": "CONFLICTED",
+                    "vetoes": [
+                        {
+                            "summaryMessage": "You may not merge after"
+                                              " 6pm on a Friday.",
+                            "detailedMessage": "It is likely that your Blood"
+                                              " Alcohol Content"
+                        }
+                    ]
+                }
+
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)/pull-requests/'
+                         r'(\d+)/activities', path)
+
+        if match:
+            project, repo, prid = match.groups()
+            pr = self.con.pull_requests.get('{}/{}'.format(project, repo), {})\
+                .get(int(prid))
+
+            vals = [{
+                "id": 101,
+                "createdDate": com['timestamp'],
+                "action": "COMMENTED",
+                "commentAction": "ADDED",
+                "comment": {
+                    "properties": {
+                        "key": "value"
+                    },
+                    "id": 1,
+                    "version": 1,
+                    "text": com['text'],
+                    "author": {
+                        "name": "jcitizen",
+                        "emailAddress": "jane@example.com",
+                        "id": 101,
+                        "displayName": "Jane Citizen",
+                        "active": True,
+                        "slug": "jcitizen",
+                        "type": "NORMAL"
+                    },
+                    "createdDate": com['timestamp'],
+                    "updatedDate": com['timestamp'],
+                    "comments": [
+
+                    ],
+                    "tasks": [],
+                },
+                "commentAnchor": {
+                    "line": 1,
+                    "lineType": "CONTEXT",
+                    "fileType": "FROM",
+                    "path": "path/to/file",
+                    "srcPath": "path/to/file"
+                }
+            } for com in pr.comments]
+
+            return {
+                "size": 1,
+                "limit": 25,
+                "isLastPage": True,
+                "values": vals
+            }
+
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)/pull-requests/'
+                         r'(\d+)/changes', path)
+
+        if match:
+            project, repo, prid = match.groups()
+            pr = self.con.pull_requests.get('{}/{}'.format(project, repo), {})\
+                .get(int(prid))
+
+            return {
+                "size": 1,
+                "limit": 25,
+                "isLastPage": True,
+                "values": [
+                    {
+                        "contentId": hashlib.sha256(content.encode())
+                                            .hexdigest(),
+                        "fromContentId": "7b86ad1a05b4259",
+                        "path": {
+                            "components": [
+                                "path",
+                                "to",
+                                "unreviewed",
+                                "file.txt"
+                            ],
+                            "parent": "path/to/unreviewed",
+                            "name": "file.txt",
+                            "extension": "txt",
+                            "toString": filename
+                        },
+                        "executable": False,
+                        "percentUnchanged": 98,
+                        "type": "MOVE",
+                        "nodeType": "FILE",
+                        "srcPath": {
+                            "components": [
+                                "path",
+                                "to",
+                                "file.txt"
+                            ],
+                            "parent": "path/to",
+                            "name": "file.txt",
+                            "extension": "txt",
+                            "toString": "path/to/file.txt"
+                        },
+                        "srcExecutable": False,
+                        "links": {
+                            "self": [
+                                None
+                            ]
+                        },
+                        "properties": {
+                            "unreviewedCommits": 1
+                        }
+                    } for filename, content in pr.files.items()
+                ],
+                "start": 0
+            }
+
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)/'
+                         r'commits/(.+)', path)
+
+        if match:
+            project, repo, commit = match.groups()
+
+            gr = git.Repo(os.path.join(self.con.cloneurl,
+                                       '{}/{}'.format(project, repo)))
+            com = gr.commit(commit)
+
+            return {
+                "id": com.hexsha,
+                "displayId": com.hexsha,
+                "author": {
+                    "name": "charlie",
+                    "emailAddress": "charlie@example.com"
+                },
+                "authorTimestamp": com.authored_date * 1000,
+                "committer": {
+                    "name": "charlie",
+                    "emailAddress": "charlie@example.com"
+                },
+                "committerTimestamp": com.committed_date * 1000,
+                "message": com.message,
+                "parents": [
+                ]
+            }
+
+    def post(self, path, payload):
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)/pull-requests/'
+                         r'(\d+)/comments', path)
+
+        if match:
+            project, repo, prid = match.groups()
+
+            pr = self.con.pull_requests.get('{}/{}'.format(project, repo), {})\
+                .get(int(prid))
+
+            pr.addComment(payload['text'])
+
+        match = re.match(r'.+/api/1.0/projects/(.+)/repos/(.+)/pull-requests/'
+                         r'(.+)/merge\?version=.+', path)
+
+        if match:
+            project, repo, prid = match.groups()
+
+            pr = self.con.pull_requests.get('{}/{}'.format(project, repo), {})\
+                .get(int(prid))
+
+            if pr.canMerge:
+                pr.open = False
+
+                state_lookup = {True: 'OPEN', False: 'MERGED'}
+
+                re_pr = {
+                    "id": pr.number,
+                    "version": 1,
+                    "title": pr.title,
+                    "description": pr.description,
+                    "state": state_lookup[pr.open],
+                    "open": pr.open,
+                    "closed": not pr.open,
+                    "createdDate": 135907592,
+                    "updatedDate": pr.lastUpdated,
+                    "fromRef": {
+                        "id": "refs/heads/{}".format(pr.source_branch),
+                        "repository": {
+                            "slug": pr.repo,
+                            "name": None,
+                            "project": {
+                                "key": pr.project
+                            }
+                        }
+                    },
+                    "toRef": {
+                        "id": "refs/heads/{}".format(pr.branch),
+                        "repository": {
+                            "slug": pr.repo,
+                            "name": None,
+                            "project": {
+                                "key": pr.project
+                            }
+                        }
+                    },
+                    "locked": False,
+                    "author": {
+                        "user": {
+                            "name": "tom",
+                            "emailAddress": "tom@example.test",
+                            "id": 115026,
+                            "displayName": "Tom",
+                            "active": True,
+                            "slug": "tom",
+                            "type": "NORMAL"
+                        },
+                        "role": "AUTHOR",
+                        "approved": True,
+                        "status": "APPROVED"
+                    },
+                    "reviewers": [
+                        {
+                            "user": {
+                                "name": "jcitizen",
+                                "emailAddress": "jane@example.test",
+                                "id": 101,
+                                "displayName": "Jane Citizen",
+                                "active": True,
+                                "slug": "jcitizen",
+                                "type": "NORMAL"
+                            },
+                            "lastReviewedCommit": "{}",
+                            "role": "REVIEWER",
+                            "approved": True,
+                            "status": "APPROVED"
+                        }
+                    ],
+                    "participants": [
+                        {
+                            "user": {
+                                "name": "dick",
+                                "emailAddress": "dick@example.test",
+                                "id": 3083181,
+                                "displayName": "Dick",
+                                "active": True,
+                                "slug": "dick",
+                                "type": "NORMAL"
+                            },
+                            "role": "PARTICIPANT",
+                            "approved": False,
+                            "status": "UNAPPROVED"
+                        },
+                        {
+                            "user": {
+                                "name": "harry",
+                                "emailAddress": "harry@example.test",
+                                "id": 99049120,
+                                "displayName": "Harry",
+                                "active": True,
+                                "slug": "harry",
+                                "type": "NORMAL"
+                            },
+                            "role": "PARTICIPANT",
+                            "approved": True,
+                            "status": "APPROVED"
+                        }
+                    ],
+                    "links": {
+                        "self": [
+                            {
+                                "href": "http://link/to/pullrequest"
+                            }
+                        ]
+                    }
+                }
+                return re_pr
+            else:
+                raise Exception('Cannot merge')
+
+
+class FakeBitbucketConnection(bitbucketconnection.BitbucketConnection):
+    def __init__(self, driver, connection_name, connection_config,
+                 changes_db=None, upstream_root=None):
+        super(FakeBitbucketConnection, self).__init__(driver, connection_name,
+                                                      connection_config)
+        self.connection_name = connection_name
+        self.pr_number = 0
+        self.pull_requests = changes_db
+        self.statuses = {}
+        self.reports = []
+        self.pause_watcher = True
+        self.poll_branches = True
+        self.poll_tags = False
+        self.cloneurl = upstream_root
+        self.watcher_thread.startup_time = -10000
+
+    def _getBitbucketClient(self):
+        return FakeBitbucketClient(self)
+
+    def getGitUrl(self, project):
+        return '{}/{}'.format(self.cloneurl, project.name)
+
+    def runWatcher(self):
+        self.watcher_thread._run()
+
+    def openFakePullRequest(self, project_name, title, branch, source_branch,
+                            description=''):
+
+        pr = FakeBitbucketPullRequest(project_name, title, branch,
+                                      source_branch,
+                                      description, self.cloneurl)
+        self.pr_number += 1
+        self.pull_requests.setdefault(project_name, {})[self.pr_number] =\
+            pr
+        pr.number = self.pr_number
+        return pr
+
+
 class ZuulTestCase(BaseTestCase):
     """A test case with a functioning Zuul.
 
@@ -2632,6 +3405,7 @@ class ZuulTestCase(BaseTestCase):
         # a virtual canonical database given by the configured hostname
         self.gerrit_changes_dbs = {}
         self.github_changes_dbs = {}
+        self.bitbucket_change_dbs = {}
 
         def getGerritConnection(driver, name, config):
             db = self.gerrit_changes_dbs.setdefault(config['server'], {})
@@ -2688,6 +3462,20 @@ class ZuulTestCase(BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'zuul.driver.github.GithubDriver.getConnection',
             getGithubConnection))
+
+        def getBitbucketConnection(driver, name, config):
+            server = config.get('server', 'bitbucket.test')
+            db = self.bitbucket_change_dbs.setdefault(server, {})
+            con = FakeBitbucketConnection(
+                driver, name, config,
+                changes_db=db,
+                upstream_root=self.upstream_root)
+            setattr(self, 'fake_' + name, con)
+            return con
+
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.driver.bitbucket.BitbucketDriver.getConnection',
+            getBitbucketConnection))
 
         # Set up smtp related fakes
         # TODO(jhesketh): This should come from lib.connections for better
