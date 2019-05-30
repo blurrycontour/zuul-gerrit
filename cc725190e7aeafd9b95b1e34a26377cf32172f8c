@@ -42,6 +42,23 @@
     },
     {
       "key": {
+        "uuid": "bfb3d3c7_43717975",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-30T22:57:08Z",
+      "side": 1,
+      "message": "When this spec goes from spec to documentation, let\u0027s make sure to link out to a definition of JWT, so these fields\u0027 formats are well understood, and issuing them is too. At the very least: https://tools.ietf.org/html/rfc7519",
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fce034c_e920724c",
         "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
         "patchSetId": 14
@@ -105,6 +122,40 @@
       "writtenOn": "2019-05-30T18:31:57Z",
       "side": 1,
       "message": "I think to support the future dequeue button in the ui we should also make dequeue by buildset id possible.",
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_e36bcd81",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-30T22:57:08Z",
+      "side": 1,
+      "message": "+1!",
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_036701b9",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-05-30T22:57:08Z",
+      "side": 1,
+      "message": "nit: tenants",
       "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
