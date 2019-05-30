@@ -3,7 +3,6 @@ import voluptuous as v
 import time
 
 from zuul.reporter import BaseReporter
-from zuul.exceptions import MergeFailure
 from zuul.driver.bitbucket.bitbucketsource import BitbucketSource
 
 
@@ -26,7 +25,7 @@ class BitbucketReporter(BaseReporter):
             return
 
         if (item.change.project.source.connection.server !=
-            self.connection.server):
+                self.connection.server):
             return
 
         if hasattr(item.change, 'id'):
@@ -38,10 +37,15 @@ class BitbucketReporter(BaseReporter):
     def mergePull(self, item):
         for i in [1, 2, 3, 4]:
             try:
-                self.connection.mergePull(item.change.project, item.change.id)
+                self.connection.mergePull(item.change.project.name,
+                                          item.change.id,
+                                          item.change.pr_version)
                 item.change.is_merged = True
+                self.log.debug('Successfully merged {}/{}'
+                               .format(item.change.project.name,
+                                       item.change.id))
                 return
-            except MergeFailure:
+            except BaseException:
                 self.log.exception(
                     'Merge attempt of change {} {}/4 failed.'
                     .format(item.change, i)
