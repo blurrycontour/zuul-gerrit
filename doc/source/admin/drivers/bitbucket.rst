@@ -5,9 +5,9 @@
 Bitbucket Server
 ================
 
-The Bitbucket Server driver supports sources. It is primarily intended
-to interact with Bitbucket Server instances, i.e. not useful for the
-Bitbucket Cloud offering.
+The Bitbucket Server driver supports sources, reporters and triggers.
+It is primarily intended to interact with Bitbucket Server instances,
+i.e. not useful for the Bitbucket Cloud offering.
 
 Configure Bitbucket Server
 --------------------------
@@ -53,6 +53,10 @@ via a named user. The options for the ``zuul.conf`` connections are:
 
     Password for the user to log in to the server.
 
+  .. attr:: canonical_hostname
+
+    Set canonical hostname, defaults to the hostname and port in the ``baseurl``.
+
 Reporter configuration
 ------------------------
 
@@ -88,3 +92,68 @@ the pipeline name and the string "Zuul".
       String value that acts as a prefix to the not user visible
       id of the build status. This can be useful if you use multiple
       Zuul servers that report.
+
+Trigger configuration
+---------------------
+
+Zuul can trigger on multiple conditions:
+
+.. attr:: pipeline.trigger.<bitbucket source>
+
+  The dictionary passed to the pipeline via the ``trigger`` attribute
+  suppots the following attributes:
+
+  ..attr:: event
+    :required:
+
+    The event from Bitbucket. The following events are supported:
+
+    .. value:: bb-pr
+
+    A pull request has been updated or created.
+
+    .. value:: bb-comment
+
+    A comment was added to a pull request.
+
+    .. value:: bb-push
+
+    A branch received a push.
+
+    .. value:: bb-tag
+
+    A tag has been pushed.
+
+  .. attr:: action
+    :required:
+
+    The action performed.
+
+    .. value:: opened
+
+    A pull request has been opened.
+
+    .. value:: updated
+
+    A pull request has been updated, a comment has been created, or a
+    branch/tag was pushed.
+
+  .. attr:: branch
+
+    This is used for ``bb-pr``, ``bb-branch`` and ``bb-tag`` events. It signifies
+    the branch the event happens on or the branch the pull request wants
+    to merge to.
+
+  .. attr:: comment
+
+    This is only set on ``bb-comment`` events, it's the comment's contents.
+
+  .. attr:: ref
+
+    This is set on ``bb-pr``, ``bb-branch`` and ``bb-tag`` events. It is the
+    git ref that is being changed, i.e. the source branch (on a PR) or the
+    branch or tag that is being pushed.
+
+Requirements configuration
+--------------------------
+
