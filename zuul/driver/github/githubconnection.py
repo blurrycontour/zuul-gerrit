@@ -1258,6 +1258,10 @@ class GithubConnection(BaseConnection):
         reviews = {}
 
         for rev in revs:
+            if rev.get('commit_id') is None:
+                # NOTE(pabelanger): It is possible the commit was force pushed
+                # out of the branch, if so discard the review.
+                continue
             user = rev.get('user').get('login')
             review = {
                 'by': {
