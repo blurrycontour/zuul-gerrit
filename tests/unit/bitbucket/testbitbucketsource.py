@@ -15,7 +15,9 @@
 from unittest.mock import patch
 import unittest
 
-from zuul.driver.bitbucket.bitbucketmodel import PullRequest
+from zuul.driver.bitbucket.bitbucketmodel import (
+    PullRequest, BitbucketChangeFilter
+)
 from tests.unit.bitbucket.mocks import BitbucketClientMock,\
     CommonConnectionTest
 
@@ -131,10 +133,18 @@ class TestBitbucketSource(CommonConnectionTest):
            new=BitbucketClientMock)
     def test_getRejectFilters(self):
         s = self._source()
-        self.assertEqual(s.getRejectFilters(), [])
+        self.assertEqual(s.getRejectFilters(None), [])
 
-    @patch('zuul.driver.bitbucket.bitbucketconnection.BitbucketClient',
-           new=BitbucketClientMock)
     def test_getRequireFilters(self):
         s = self._source()
-        self.assertEqual(s.getRequireFilters(), [])
+        conf = {
+            'open': 1,
+            'closed': 2,
+            'status': 3,
+            'canMerge': 4
+        }
+
+        rfl = s.getRequireFilters(conf)
+        self.assertGreater(len(rfl), 0)
+
+        self.assertIsInstance(rfl[0], BitbucketChangeFilter)
