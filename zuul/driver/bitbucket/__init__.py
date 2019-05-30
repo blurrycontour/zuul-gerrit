@@ -33,10 +33,10 @@ class BitbucketDriver(Driver, ConnectionInterface, SourceInterface,
         return bitbucketsource.BitbucketSource(self, connection)
 
     def getRequireSchema(self):
-        return {}
+        return bitbucketsource.getRequireSchema()
 
     def getRejectSchema(self):
-        return {}
+        return bitbucketsource.getRejectSchema()
 
     def getReporter(self, connection, pipeline, config=None):
         return bitbucketreporter.BitbucketReporter(
