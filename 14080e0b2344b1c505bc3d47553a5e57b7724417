@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_df7b0389",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1865,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-30T17:09:00Z",
+      "side": 1,
+      "message": "This will cancel the cleanup playbooks and run them again if we\u0027re already in cleanup phase. I think we should guard here against this.",
+      "revId": "14080e0b2344b1c505bc3d47553a5e57b7724417",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
