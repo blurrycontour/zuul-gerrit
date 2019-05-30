@@ -137,4 +137,4 @@ class TestBitbucketSource(CommonConnectionTest):
            new=BitbucketClientMock)
     def test_getRequireFilters(self):
         s = self._source()
-        self.assertEqual(s.getRequireFilters(), [])
+        self.assertGreater(s.getRequireFilters(), 0)
