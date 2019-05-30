@@ -31,8 +31,9 @@ class BitbucketTrigger(BaseTrigger):
             f = BitbucketEventFilter(
                 actions=to_list(trigger.get('action')),
                 comments=to_list(trigger.get('comment')),
-                refs=to_list(trigger.get('ref')),
+                branches=to_list(trigger.get('branch')),
                 statuses=to_list(trigger.get('status')),
+                refs=to_list(trigger.get('ref')),
                 trigger=self,
                 types=to_list(trigger['event']),
             )
@@ -44,10 +45,14 @@ class BitbucketTrigger(BaseTrigger):
 def getSchema():
     bitbucket_trigger = {
         'action': scalar_or_list(str),
+        'branch': scalar_or_list(str),
         'comment': scalar_or_list(str),
         'ref': scalar_or_list(str),
         'status': scalar_or_list(str),
-        v.Required('event'): scalar_or_list(v.Any('bb-pr')),
+        v.Required('event'): scalar_or_list(v.Any('bb-pr',
+                                                  'bb-comment',
+                                                  'bb-push',
+                                                  'bb-tag')),
     }
 
     return bitbucket_trigger
