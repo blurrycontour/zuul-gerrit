@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_e22d0e95",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1705,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-05-30T17:57:30Z",
+      "side": 1,
+      "message": "This should use client.autohold_delete()",
+      "range": {
+        "startLine": 1703,
+        "startChar": 1,
+        "endLine": 1705,
+        "endChar": 42
+      },
+      "revId": "004c65bb0b66a4fdc8f13c5e939fe9edd8b90a2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
