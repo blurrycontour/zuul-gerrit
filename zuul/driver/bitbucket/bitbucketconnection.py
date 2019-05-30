@@ -28,6 +28,8 @@ from zuul.driver.bitbucket.bitbucketsource import BitbucketSource
 from zuul.exceptions import MergeFailure
 from zuul.model import Project
 
+RECHECK_TOKEN = 'recheck'
+
 
 class BitbucketWatcher(threading.Thread):
     log = logging.getLogger("zuul.connection.bitbucket.watcher")
@@ -41,6 +43,9 @@ class BitbucketWatcher(threading.Thread):
         self.stopped = False
         self.branches = self.bitbucket_con.branches
         self.event_count = 0
+        self.startup_time = time.time()
+        self.lastcomment = {}
+        self.tags = {}
 
     def isNew(self, change):
         projectname = change.project.name
@@ -58,6 +63,20 @@ class BitbucketWatcher(threading.Thread):
             return oldpr
 
         return None
+
+    def _handleComment(self, change):
+        event = BitbucketTriggerEvent()
+        event.type = 'bb-comment'
+        event.title = change.title
+        event.project_name = change.project.name
+        event.change_id = change.id
+        event.updateDate = change.updatedDate
+        event.branch = change.branch
+        event.ref = change.patchset
+        event.project_hostname = self.bitbucket_con.canonical_hostname
+        event.action = 'updated'
+
+        return event
 
     def _handleBasePR(self, change):
         event = BitbucketTriggerEvent()
@@ -92,6 +111,114 @@ class BitbucketWatcher(threading.Thread):
 
         self.bitbucket_con.sched.addEvent(event)
 
+    def _handleOpenChange(self, change):
+        self.log.debug("Checking for change age: {} vs. {}"
+                       .format(change.updatedDate,
+                               self.startup_time))
+        if change.updatedDate < self.startup_time * 1000:
+            return
+        if self.isNew(change):
+            self.log.debug(
+                "New change: {} in {}".format(
+                    change, change.project.name)
+            )
+            self._handleNewPR(change)
+            return
+        oldpr = self.supersedes(change)
+        if oldpr:
+            self._handleUpdatePR(change, oldpr)
+            return
+
+    def _handleComments(self, change, comments):
+        self.log.debug("Processing comments {}: {}"
+                       .format(len(comments),
+                               self.bitbucket_con.connection_name))
+        commenttag = '{}-{}'.format(change.project.name, change.id)
+        maxage = 0
+        for comment in comments:
+            upd = comment.get('updatedDate')
+            if upd > self.startup_time * 1000:
+                # ok basically valid
+
+                if ((commenttag in self.lastcomment and
+                        self.lastcomment[commenttag] < upd) or
+                        (commenttag not in self.lastcomment)):
+                    txt = comment.get('text')
+                    event = self._handleComment(change)
+                    event.comment = txt
+                    self.log.debug('New event {}'.format(event))
+                    self.bitbucket_con.sched.addEvent(event)
+
+                if upd > maxage:
+                    maxage = upd
+        if maxage > 0:
+            self.lastcomment[commenttag] = maxage
+
+        self.log.debug("Comments processed: {}"
+                       .format(self.bitbucket_con.connection_name))
+
+    def _handleRefUpdate(self, project, ref_object, type='bb-push'):
+        event = BitbucketTriggerEvent()
+        event.type = 'bb-push'
+        event.title = ref_object.get('displayId')
+        event.project_name = project.name
+        event.updateDate = 'now'  # FIXME
+        event.branch = ref_object.get('displayId')
+        # FIXME double check, whether this is a typo in the bb docs
+        if type == 'bb-push':
+            event.ref = ref_object.get('id')
+        else:
+            event.ref = ref_object.get('displayId')
+        event.project_hostname = self.bitbucket_con.canonical_hostname
+        event.action = 'updated'
+
+        self.log.debug('New event {}'.format(event))
+
+        self.bitbucket_con.sched.addEvent(event)
+
+    def _handleBranches(self, project, branches):
+        bcon = self.bitbucket_con
+        for bo in branches:
+            head = bo.get('latestCommit')
+
+            # check if the hash is already known
+            if (project.name in bcon.branches and
+                    bo.get('displayId') in
+                    bcon.branches.get(project.name)):
+                old_bo = bcon.branches\
+                    .get(project.name).get(bo.get('displayId'))
+                if head == old_bo:
+                    continue
+
+            # check commit timestamp
+            com = bcon.getCommit(project, head)
+            if com.get('committerTimestamp') < self.startup_time * 1000:
+                continue
+
+            self._handleRefUpdate(project, bo)
+
+    def _handleTags(self, project, tags):
+        for to in tags:
+            head = to.get('latestCommit')
+
+            # check no force-push happened
+            if (project.name in self.tags and
+                    to.get('id') in self.tags.get(project.name)):
+                old_to = self.tags.get(project.name).get(to.get('id'))
+                if head == old_to:
+                    continue
+                else:
+                    p = self.tags.get(project.name, {})
+                    p[to.get('id')] = head
+                    self.tags[project.name] = p
+
+            bcon = self.bitbucket_con
+            com = bcon.getCommit(project, head)
+            if com.get('committerTimestamp') < self.startup_time * 1000:
+                continue
+
+            self._handleRefUpdate(project, to, type='bb-tag')
+
     def _run(self):
         self.log.debug("Check for updates: {}"
                        .format(self.bitbucket_con.connection_name))
@@ -100,23 +227,23 @@ class BitbucketWatcher(threading.Thread):
                 project = self.bitbucket_con.getProject(p)
                 for change in self.bitbucket_con.getProjectOpenChanges(
                         project, False):
-                    if self.isNew(change):
-                        self.log.debug(
-                            "New change: {} in {}".format(
-                                change, change.project)
-                        )
-                        self._handleNewPR(change)
-                        return
-                    oldpr = self.supersedes(change)
-                    if oldpr:
-                        self._handleUpdatePR(change, oldpr)
-                        return
+
+                    self._handleOpenChange(change)
+
+                    com = self.bitbucket_con.getPRComments(change.project.name,
+                                                           change.id)
+                    self._handleComments(change, com)
+
+                br = self.bitbucket_con._getProjectBranches(p,
+                                                           None, False)
+                self._handleBranches(project, br)
+
+                tags = self.bitbucket_con.getProjectTags(p)
+                self._handleTags(project, tags)
 
         except Exception as e:
-            self.log.debug("Unexpected issue in _run loop: {}"
-                           .format(str(e))
-                           )
-            self.log.debug(traceback.format_exception(Exception, e))
+            self.log.error("Unexpected issue in _run loop: {}"
+                           .format(str(e), exc_info=True))
 
     # core event loop, no unittest
     def run(self):
@@ -164,8 +291,15 @@ class BitbucketClient():
         retry = True
         while retry and retries < 3:
             try:
-                r = requests.post(url, auth=HTTPBasicAuth(self.user, self.pw),
-                                  json=payload, timeout=1)
+                auth = HTTPBasicAuth(self.user, self.pw)
+                if payload:
+                    r = requests.post(url, auth=auth,
+                                      json=payload, timeout=1)
+                else:
+                    r = requests.post(url, auth=auth,
+                                      timeout=1,
+                                      headers={'Content-type':
+                                               'application/json'})
                 retry = False
             except requests.exceptions.Timeout:
                 retries = retries + 1
@@ -256,24 +390,74 @@ class BitbucketConnection(BaseConnection):
 
         return None
 
+    def getPRComments(self, project, prid):
+        client = self._getBitbucketClient()
+
+        bb_project, repo = self._getProjectRepo(project)
+
+        res = client.get('/rest/api/1.0/projects/{}/repos'
+                         '/{}/pull-requests/{}/activities'
+                         .format(bb_project, repo, prid))
+
+        vals = res.get('values')
+
+        self.log.debug('getPRComments: {} values'.format(len(vals)))
+
+        res = []
+
+        for val in vals:
+            if 'comment' in val:
+                comment = val.get('comment')
+                res.append({
+                    'text': comment.get('text'),
+                    'updatedDate': comment.get('updatedDate')
+                })
+
+        return res
+
     def getBranchSha(self, project, branch):
         self.getProjectBranches(project, 'default')
 
         return self.branches[project][branch].get('latestCommit')
 
-    def getProjectBranches(self, project, tenant):
+    def getProjectBranches(self, project, tenant, cache=True):
+        bs = self._getProjectBranches(project, tenant, cache)
+
+        return [item.get('displayId') for item in bs]
+
+    def _getProjectBranches(self, project, tenant, cache=True):
         client = self._getBitbucketClient()
         bb_project, repo = self._getProjectRepo(project)
         res = client.get('/rest/api/1.0/projects/{}/repos/{}/branches'
                          .format(bb_project, repo))
 
-        project_branches = self.branches.get(project, {})
-        for item in res.get('values'):
-            project_branches[item.get('displayId')] = item
-        self.branches[project] = project_branches
+        if cache:
+            project_branches = self.branches.get(project, {})
+            for item in res.get('values'):
+                project_branches[item.get('displayId')] = item
+            self.branches[project] = project_branches
 
-        return [item.get('displayId') for item in res.get('values')
+        return [item
+                for item in res.get('values')
                 if item.get('type') == 'BRANCH']
+
+    def getProjectTags(self, project):
+        client = self._getBitbucketClient()
+        bb_project, repo = self._getProjectRepo(project)
+        res = client.get('/rest/api/1.0/projects/{}/repos/{}/tags'
+                         .format(bb_project, repo))
+
+        return [item
+                for item in res.get('values')
+                if item.get('type') == 'TAG']
+
+    def getCommit(self, project, commitId):
+        client = self._getBitbucketClient()
+        bb_project, repo = self._getProjectRepo(project.name)
+        res = client.get('/rest/api/1.0/projects/{}/repos/{}/commits/{}'
+                         .format(bb_project, repo, commitId))
+
+        return res
 
     def buildPR(self, project, repo, id, cache=True):
         pr = self.getPR(project, repo, id)
@@ -283,6 +467,10 @@ class BitbucketConnection(BaseConnection):
         pull.project = project
         pull.id = id
         pull.number = id
+        pull.pr_version = pr.get('version')
+        pull.open = pr.get('open')
+        pull.closed = pr.get('closed')
+        pull.state = pr.get('state')
         pull.updatedDate = pr.get('updatedDate')
         fromProj = '{}/{}'.format(pr.get('fromRef').get('repository')
                                   .get('project').get('key'),
@@ -298,6 +486,8 @@ class BitbucketConnection(BaseConnection):
             pull.branch = b
         pull.title = pr.get('title')
         pull.message = pr.get('description', '')
+
+        pull.canMerge = self.canMerge(pull, False)
 
         if cache:
             self.cachePR(pull)
@@ -366,14 +556,14 @@ class BitbucketConnection(BaseConnection):
             .format(project_name, repo, prid), {'text': message}
         )
 
-    def mergePull(self, projectName, prId):
+    def mergePull(self, projectName, prId, version):
         client = self._getBitbucketClient()
 
         project, repo = self._getProjectRepo(projectName)
 
         re = client.post('/rest/api/1.0/projects/{}/repos/{}/pull'
-                         '-requests/{}/merge',
-                         project, repo, prId)
+                         '-requests/{}/merge?version={}'
+                         .format(project, repo, prId, version), None)
 
         if re.get('state') != 'MERGED':
             raise MergeFailure()
