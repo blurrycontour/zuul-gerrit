@@ -73,6 +73,41 @@
       "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_e2a66ec1",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-30T18:31:57Z",
+      "side": 1,
+      "message": "I think it makes sense to have this on tenant level for now, we also have a tenant per project/department.",
+      "parentUuid": "dfbec78f_c7535a6a",
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_a2d2b6cf",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-30T18:31:57Z",
+      "side": 1,
+      "message": "I think to support the future dequeue button in the ui we should also make dequeue by buildset id possible.",
+      "revId": "cc725190e7aeafd9b95b1e34a26377cf32172f8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
