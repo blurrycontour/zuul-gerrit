@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_fff12796",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 1133,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-30T17:58:36Z",
+      "side": 1,
+      "message": "This actually looks like hostvars so we probably should name it hostvars.",
+      "range": {
+        "startLine": 1133,
+        "startChar": 18,
+        "endLine": 1133,
+        "endChar": 22
+      },
+      "revId": "ed4ee57c386a9f3be3b70c5b976cb69786cf70ba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
