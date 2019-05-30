@@ -18,6 +18,8 @@ import re2
 
 from zuul.source import BaseSource
 
+from zuul.driver.bitbucket.bitbucketmodel import BitbucketChangeFilter
+
 
 class BitbucketSource(BaseSource):
     change_re = \
@@ -71,7 +73,7 @@ class BitbucketSource(BaseSource):
         return change
 
     def getChange(self, event):
-        if event.type == 'bb-pr':
+        if event.type in ['bb-pr', 'bb-comment']:
             project_name, repo = self.connection._getProjectRepo(
                 event.project_name)
             return self.connection.buildPR(
@@ -88,5 +90,27 @@ class BitbucketSource(BaseSource):
     def getRejectFilters(self):
         return []
 
-    def getRequireFilters(self):
-        return []
+    def getRequireFilters(self, config):
+        f = BitbucketChangeFilter(
+            connection_name=self.connection.connection_name,
+            open=config.get('open'),
+            closed=config.get('closed'),
+            status=config.get('status'),
+            canMerge=config.get('canMerge'),
+        )
+        return [f]
+
+
+# require model
+def getRequireSchema():
+    require = {
+        'open': bool,
+        'closed': bool,
+        'status': str,
+        'canMerge': bool
+    }
+    return require
+
+def getRejectSchema():
+    reject = {}
+    return reject
