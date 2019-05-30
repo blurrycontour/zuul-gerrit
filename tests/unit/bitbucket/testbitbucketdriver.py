@@ -24,7 +24,7 @@ from unittest.mock import MagicMock
 class TestBitbucketDriver(BaseTestCase):
     def test_getRequireSchema(self):
         drv = BitbucketDriver()
-        self.assertEqual({}, drv.getRequireSchema())
+        self.assertIsInstance(drv.getRequireSchema(), Schema)
 
     def test_getRejectSchema(self):
         drv = BitbucketDriver()
