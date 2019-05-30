@@ -1071,6 +1071,7 @@ class FakeGithubPullRequest(object):
                 gh_time_format, granted_on.timetuple())
 
         self.reviews.append(tests.fakegithub.FakeGHReview({
+            'commit_id': random_sha1(),
             'state': state,
             'user': {
                 'login': user,

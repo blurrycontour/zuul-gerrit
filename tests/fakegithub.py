@@ -311,6 +311,7 @@ class FakePull(object):
                 'login': 'fakezuul',
                 'email': 'fakezuul@fake.test',
             },
+            'commit_id': commit_id,
             'submitted_at': time.gmtime(),
         })
         self._fake_pull_request.reviews.append(review)
