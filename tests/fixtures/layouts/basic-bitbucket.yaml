@@ -1,0 +1,55 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      bitbucket:
+        - event: bb-comment
+          action: 
+            - updated
+          comment: (?i)^\s*recheck\s*$
+        - event: bb-pr
+          action:
+            - opened
+            - updated
+    success:
+      bitbucket:
+        merge: False
+    failure:
+      bitbucket:
+        merge: False
+
+- pipeline:
+    name: post
+    post-review: true
+    manager: independent
+    trigger:
+      bitbucket:
+        - event: bb-push
+          ref: ^refs/heads/.*$
+
+- job:
+    name: base
+    parent: null
+    run: playbooks/base.yaml
+
+- job:
+    name: project-test1
+    run: playbooks/project-test1.yaml
+
+- job:
+    name: project-test2
+    run: playbooks/project-test2.yaml
+
+- job:
+    name: project-post-job
+    run: playbooks/project-post.yaml
+
+- project:
+    name: project/repo
+    check:
+      jobs:
+        - project-test1
+        - project-test2
+    post:
+      jobs:
+        - project-post-job
