@@ -53,6 +53,10 @@ via a named user. The options for the ``zuul.conf`` connections are:
 
     Password for the user to log in to the server.
 
+  .. attr:: canonical_hostname
+
+    Set canonical hostname, defaults to the hostname and port in the ``baseurl``.
+
 Reporter configuration
 ------------------------
 
