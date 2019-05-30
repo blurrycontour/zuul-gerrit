@@ -1,0 +1,90 @@
+- pipeline:
+    name: check
+    manager: independent
+    require:
+      bitbucket:
+        canMerge: False
+        open: True
+    trigger:
+      bitbucket:
+        - event: bb-comment
+          action: 
+            - updated
+          comment: (?i)^\s*recheck\s*$
+        - event: bb-pr
+          action:
+            - opened
+            - updated
+    success:
+      bitbucket:
+        merge: False
+    failure:
+      bitbucket:
+        merge: False
+
+- pipeline:
+    name: gate
+    manager: independent
+    require:
+      bitbucket:
+        canMerge: True
+        open: True
+    trigger:
+      bitbucket:
+        - event: bb-pr
+          action:
+            - updated
+    success:
+      bitbucket:
+        merge: True
+    failure:
+      bitbucket:
+        merge: False
+
+- pipeline:
+    name: post
+    post-review: true
+    manager: independent
+    trigger:
+      bitbucket:
+        - event: bb-push
+          ref: ^refs/heads/.*$
+
+- job:
+    name: base
+    parent: null
+    run: playbooks/base.yaml
+
+- job:
+    name: project-test1
+    run: playbooks/project-test1.yaml
+
+- job:
+    name: project-test2
+    run: playbooks/project-test2.yaml
+
+- job:
+    name: project-gate1
+    run: playbooks/project-test1.yaml
+
+- job:
+    name: project-gate2
+    run: playbooks/project-test2.yaml
+
+- job:
+    name: project-post-job
+    run: playbooks/project-post.yaml
+
+- project:
+    name: project/repo
+    check:
+      jobs:
+        - project-test1
+        - project-test2
+    gate:
+      jobs:
+        - project-gate1
+        - project-gate2
+    post:
+      jobs:
+        - project-post-job
