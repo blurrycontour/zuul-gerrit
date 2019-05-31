@@ -63,6 +63,7 @@ class RPCListener(object):
     def register(self):
         self.worker.registerFunction("zuul:autohold")
         self.worker.registerFunction("zuul:autohold_delete")
+        self.worker.registerFunction("zuul:autohold_info")
         self.worker.registerFunction("zuul:autohold_list")
         self.worker.registerFunction("zuul:allowed_labels_get")
         self.worker.registerFunction("zuul:dequeue")
@@ -132,6 +133,16 @@ class RPCListener(object):
             job.sendWorkException(str(e).encode('utf8'))
             return
         job.sendWorkComplete()
+
+    def handle_autohold_info(self, job):
+        args = json.loads(job.arguments)
+        request_id = args['request_id']
+        try:
+            data = self.sched.autohold_info(request_id)
+        except Exception as e:
+            job.sendWorkException(str(e).encode('utf8'))
+            return
+        job.sendWorkComplete(json.dumps(data))
 
     def handle_autohold_delete(self, job):
         args = json.loads(job.arguments)
