@@ -38,6 +38,14 @@ Example::
 
   zuul autohold-delete --id 0000000123
 
+Autohold Info
+^^^^^^^^^^^^^
+.. program-output:: zuul autohold-info --help
+
+Example::
+
+  zuul autohold-info --id 0000000123
+
 Autohold List
 ^^^^^^^^^^^^^
 .. program-output:: zuul autohold-list --help

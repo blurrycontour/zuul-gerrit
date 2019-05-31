@@ -76,6 +76,13 @@ class Client(zuul.cmd.ZuulApp):
                                          help='request ID',
                                          required=True)
 
+        cmd_autohold_info = subparsers.add_parser(
+            'autohold-info', help='retrieve autohold request detailed info')
+        cmd_autohold_info.set_defaults(func=self.autohold_info)
+        cmd_autohold_info.add_argument('--id',
+                                       help='request ID',
+                                       required=True)
+
         cmd_autohold_list = subparsers.add_parser(
             'autohold-list', help='list autohold requests')
         cmd_autohold_list.set_defaults(func=self.autohold_list)
@@ -239,6 +246,27 @@ class Client(zuul.cmd.ZuulApp):
         client = zuul.rpcclient.RPCClient(
             self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
         return client.autohold_delete(self.args.id)
+
+    def autohold_info(self):
+        client = zuul.rpcclient.RPCClient(
+            self.server, self.port, self.ssl_key, self.ssl_cert, self.ssl_ca)
+        request = client.autohold_info(self.args.id)
+
+        if not request:
+            print("Autohold request not found")
+            return True
+
+        print("ID: %s" % request['id'])
+        print("Tenant: %s" % request['tenant'])
+        print("Project: %s" % request['project'])
+        print("Job: %s" % request['job'])
+        print("Ref Filter: %s" % request['ref_filter'])
+        print("Max Count: %s" % request['max_count'])
+        print("Current Count: %s" % request['current_count'])
+        print("Node Expiration: %s" % request['node_expiration'])
+        print("Reason: %s" % request['reason'])
+
+        return True
 
     def autohold_list(self):
         client = zuul.rpcclient.RPCClient(
