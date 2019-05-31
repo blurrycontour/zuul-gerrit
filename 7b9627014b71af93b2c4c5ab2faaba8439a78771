@@ -16,6 +16,24 @@
       "revId": "7b9627014b71af93b2c4c5ab2faaba8439a78771",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bfb3d3c7_913010a1",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1261,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-05-31T10:57:19Z",
+      "side": 1,
+      "message": "given that we don\u0027t use commit_id any place that I can see, maybe we can not to anything. And remove this patch all together.",
+      "parentUuid": "bfb3d3c7_7281e1c2",
+      "revId": "7b9627014b71af93b2c4c5ab2faaba8439a78771",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
