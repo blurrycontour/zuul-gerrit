@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfb3d3c7_7281e1c2",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1261,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-05-31T06:50:10Z",
+      "side": 1,
+      "message": "We currently don\u0027t remove reviews on older commits as well. Further Github blocks a PR also on old negative reviews and old positive reviews are only discarded if enabled in the branch protection.\n\nSo we should not just ignore this review but it needs to be handled correctly depending on the branch protection settings.",
+      "revId": "7b9627014b71af93b2c4c5ab2faaba8439a78771",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
