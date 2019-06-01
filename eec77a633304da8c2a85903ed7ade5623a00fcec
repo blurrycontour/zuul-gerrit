@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_c969e88b",
+        "filename": "zuul/driver/bitbucket/bitbucketconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-06-01T20:24:10Z",
+      "side": 1,
+      "message": "This may be how BitBucket\u0027s API is designed, but generally anything under 400 is considered OK. You may want to change to use r.ok. https://2.python-requests.org/en/master/api/#requests.Response.ok",
+      "revId": "eec77a633304da8c2a85903ed7ade5623a00fcec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_69047cc7",
+        "filename": "zuul/driver/bitbucket/bitbucketreporter.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-06-01T20:24:10Z",
+      "side": 1,
+      "message": "This should reflect what the documentation shows as valid config options for the reporter. All of the others provide plenty of example to crib from.",
+      "revId": "eec77a633304da8c2a85903ed7ade5623a00fcec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
