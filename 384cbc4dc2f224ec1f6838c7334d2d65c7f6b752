@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_c9fec8ad",
+        "filename": "zuul/driver/slack/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-06-01T20:34:23Z",
+      "side": 1,
+      "message": "This needs to come from a connection configuration in zuul.conf.",
+      "revId": "384cbc4dc2f224ec1f6838c7334d2d65c7f6b752",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_692d5c45",
+        "filename": "zuul/driver/slack/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-06-01T20:34:23Z",
+      "side": 1,
+      "message": "Guessing tihs is just debugging, but, needs to use logging. :)",
+      "revId": "384cbc4dc2f224ec1f6838c7334d2d65c7f6b752",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
