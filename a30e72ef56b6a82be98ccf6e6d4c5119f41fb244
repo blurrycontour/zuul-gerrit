@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_29e66d46",
+        "filename": "zuul/ansible/base/lookup/password.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-06-03T23:31:51Z",
+      "side": 1,
+      "message": "Oops, this variable should have been named \"password\" instead (copy-paste error).",
+      "revId": "a30e72ef56b6a82be98ccf6e6d4c5119f41fb244",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
