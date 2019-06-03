@@ -2707,7 +2707,19 @@ class TestAnsible25(AnsibleZuulTestCase):
             ('file_local_good', 'SUCCESS'),
             ('file_local_bad', 'FAILURE'),
             ('zuul_return', 'SUCCESS'),
+            ('password_create_good', 'SUCCESS'),
+            ('password_null_good', 'SUCCESS'),
+            ('password_create_bad', 'FAILURE'),
+            ('password_read_bad', 'FAILURE'),
         ]
+
+        # The playbook password_read_good works only with Ansible < 2.7 because
+        # Ansible 2.7 introduced file-based locks beneath the playbook and not
+        # inside the tmpdir. Because the playbooks are mounted read-only this
+        # will not work within zuul's context.
+        if self.ansible_version in ('2.5', '2.6'):
+            plugin_tests.append(('password_read_good', 'SUCCESS'))
+
         for job_name, result in plugin_tests:
             count += 1
             self._add_job(job_name)
