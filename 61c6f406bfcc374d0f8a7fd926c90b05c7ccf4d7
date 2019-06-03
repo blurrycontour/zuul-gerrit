@@ -360,6 +360,23 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_3bf9d87f",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-03T16:59:48Z",
+      "side": 1,
+      "message": "Re graceful, yes, we should have that.  We did have it in v2.5, it just didn\u0027t make the initial v3 implementation: https://opendev.org/zuul/zuul/src/branch/master/zuul/executor/server.py#L2479",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_62a2054e",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
