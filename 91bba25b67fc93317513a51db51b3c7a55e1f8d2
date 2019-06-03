@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_82e65de8",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 5683,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-03T14:56:30Z",
+      "side": 1,
+      "message": "We should add gc.enable() here.",
+      "revId": "91bba25b67fc93317513a51db51b3c7a55e1f8d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
