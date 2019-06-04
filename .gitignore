@@ -19,6 +19,7 @@ zuul/versioninfo
 dist/
 cover/
 htmlcov/
+web/build
 zuul/web/static/*
 !.keep
 node_modules
