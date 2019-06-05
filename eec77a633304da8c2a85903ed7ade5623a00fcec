@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_4384beb1",
+        "filename": "zuul/driver/bitbucket/bitbucketconnection.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-06-05T12:24:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_c969e88b",
+      "revId": "eec77a633304da8c2a85903ed7ade5623a00fcec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_69047cc7",
         "filename": "zuul/driver/bitbucket/bitbucketreporter.py",
         "patchSetId": 13
@@ -30,6 +48,24 @@
       "writtenOn": "2019-06-01T20:24:10Z",
       "side": 1,
       "message": "This should reflect what the documentation shows as valid config options for the reporter. All of the others provide plenty of example to crib from.",
+      "revId": "eec77a633304da8c2a85903ed7ade5623a00fcec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_a3beda62",
+        "filename": "zuul/driver/bitbucket/bitbucketreporter.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-06-05T12:24:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_69047cc7",
       "revId": "eec77a633304da8c2a85903ed7ade5623a00fcec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
