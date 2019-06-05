@@ -2594,7 +2594,7 @@ class ZuulTestCase(BaseTestCase):
         self.merge_client = RecordingMergeClient(self.config, self.sched)
         self.merge_server = None
         self.nodepool = zuul.nodepool.Nodepool(self.sched)
-        self.zk = zuul.zk.ZooKeeper()
+        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
         self.zk.connect(self.zk_config, timeout=30.0)
 
         self.fake_nodepool = FakeNodepool(
