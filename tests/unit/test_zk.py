@@ -55,6 +55,7 @@ class TestZK(BaseTestCase):
         req1 = self._createRequest()
         self.zk.storeHoldRequest(req1)
         self.assertIsNotNone(req1.id)
+        self.assertIsNotNone(req1.created)
         self.assertEqual(1, len(self.zk.getHoldRequests()))
 
         # Test getting the request
