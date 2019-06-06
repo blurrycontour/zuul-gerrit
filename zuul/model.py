@@ -4455,6 +4455,7 @@ class HoldRequest(object):
         self.ref_filter = None
         self.reason = None
         self.node_expiration = None
+        self.request_expiration = None
         # When max_count == current_count, hold request can no longer be used.
         self.max_count = 1
         self.current_count = 0
@@ -4478,6 +4479,7 @@ class HoldRequest(object):
         obj.current_count = data.get('current_count')
         obj.reason = data.get('reason')
         obj.node_expiration = data.get('node_expiration')
+        obj.request_expiration = data.get('request_expiration')
         obj.nodes = data.get('nodes', [])
         return obj
 
@@ -4495,6 +4497,7 @@ class HoldRequest(object):
         d['current_count'] = self.current_count
         d['reason'] = self.reason
         d['node_expiration'] = self.node_expiration
+        d['request_expiration'] = self.request_expiration
         d['nodes'] = self.nodes
         return d
 

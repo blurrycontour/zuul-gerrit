@@ -263,6 +263,8 @@ class Client(zuul.cmd.ZuulApp):
         print("Ref Filter: %s" % request['ref_filter'])
         print("Max Count: %s" % request['max_count'])
         print("Current Count: %s" % request['current_count'])
+        print("Node Expiration: %s" % request['node_expiration'])
+        print("Request Expiration: %s" % request['request_expiration'])
         print("Reason: %s" % request['reason'])
         print("Held Nodes: %s" % request['nodes'])
 
