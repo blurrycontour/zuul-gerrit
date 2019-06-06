@@ -4449,12 +4449,14 @@ class HoldRequest(object):
     def __init__(self):
         self.lock = None
         self.id = None
+        self.created = None
         self.tenant = None
         self.project = None
         self.job = None
         self.ref_filter = None
         self.reason = None
         self.node_expiration = None
+        self.request_expiration = None
         # When max_count == current_count, hold request can no longer be used.
         self.max_count = 1
         self.current_count = 0
@@ -4470,6 +4472,7 @@ class HoldRequest(object):
         Return a new object from the given data dictionary.
         '''
         obj = HoldRequest()
+        obj.created = data.get('created')
         obj.tenant = data.get('tenant')
         obj.project = data.get('project')
         obj.job = data.get('job')
@@ -4478,6 +4481,7 @@ class HoldRequest(object):
         obj.current_count = data.get('current_count')
         obj.reason = data.get('reason')
         obj.node_expiration = data.get('node_expiration')
+        obj.request_expiration = data.get('request_expiration')
         obj.nodes = data.get('nodes', [])
         return obj
 
@@ -4487,6 +4491,7 @@ class HoldRequest(object):
         '''
         d = dict()
         d['id'] = self.id
+        d['created'] = self.created
         d['tenant'] = self.tenant
         d['project'] = self.project
         d['job'] = self.job
@@ -4495,6 +4500,7 @@ class HoldRequest(object):
         d['current_count'] = self.current_count
         d['reason'] = self.reason
         d['node_expiration'] = self.node_expiration
+        d['request_expiration'] = self.request_expiration
         d['nodes'] = self.nodes
         return d
 
