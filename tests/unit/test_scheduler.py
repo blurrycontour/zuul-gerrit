@@ -1965,6 +1965,40 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(".*", request['ref_filter'])
         self.assertEqual("reason text", request['reason'])
 
+    @simple_layout('layouts/autohold.yaml')
+    def test_autohold_request_expiration(self):
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+
+        # Temporarily shorten the hold request expiration time
+        self.sched.HOLD_REQUEST_EXPIRATION = 5
+
+        r = client.autohold('tenant-one', 'org/project', 'project-test2',
+                            "", "", "reason text", 1, 1)
+        self.assertTrue(r)
+
+        autohold_requests = client.autohold_list()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        req = autohold_requests[0]
+        self.assertGreater(req['request_expiration'], req['node_expiration'])
+
+        # Wait long enough for the request to have expired
+        time.sleep(self.sched.HOLD_REQUEST_EXPIRATION)
+
+        # Request expiration is checked only during failed builds, so
+        # fail this one, which should not hold because the request will
+        # disappear.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.failJob('project-test2', A)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, 'Wait for hold request expiration'):
+            if len(client.autohold_list()) == 0:
+                break
+
     @simple_layout('layouts/three-projects.yaml')
     def test_dependent_behind_dequeue(self):
         # This particular test does a large amount of merges and needs a little

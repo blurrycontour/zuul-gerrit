@@ -572,6 +572,7 @@ class ZooKeeper(object):
         :param HoldRequest hold_request: Object representing the hold request.
         '''
         if hold_request.id is None:
+            hold_request.created = time.monotonic()
             path = self.client.create(
                 self.HOLD_REQUEST_ROOT + "/",
                 value=hold_request.serialize(),
