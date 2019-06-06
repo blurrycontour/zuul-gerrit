@@ -267,6 +267,9 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
 
+    # Number of seconds past node expiration a hold request will remain
+    HOLD_REQUEST_EXPIRATION = 24 * 60 * 60
+
     def __init__(self, config, testonly=False):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -542,6 +545,10 @@ class Scheduler(threading.Thread):
         request.reason = reason
         request.count = count
         request.node_expiration = node_hold_expiration
+        # Keep the request 24 hours more after nodes expire
+        if node_hold_expiration:
+            request.request_expiration = (
+                node_hold_expiration + self.HOLD_REQUEST_EXPIRATION)
 
         # No need to lock it since we are creating a new one.
         self.zk.storeHoldRequest(request)
@@ -1253,6 +1260,34 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onBuildPaused(event.build)
 
+    def _holdRequestIsExpired(self, request):
+        '''
+        Check if a hold request is expired and delete it if it is.
+
+        :returns: True if it is expired, False otherwise.
+        '''
+        if not request.request_expiration:
+            return
+
+        elapsed_time = time.monotonic() - request.created
+        if elapsed_time < request.request_expiration:
+            return False
+
+        try:
+            self.zk.lockHoldRequest(request)
+            self.log.info("Removing expired hold request %s", request)
+            self.zk.deleteHoldRequest(request)
+        except Exception:
+            self.log.exception(
+                "Failed to delete expired hold request %s", request)
+        finally:
+            try:
+                self.zk.unlockHoldRequest(request)
+            except Exception:
+                pass
+
+        return True
+
     def _getAutoholdRequest(self, build):
         change = build.build_set.item.change
 
@@ -1289,6 +1324,10 @@ class Scheduler(threading.Thread):
             request = self.zk.getHoldRequest(request_id)
             if not request:
                 continue
+
+            if self._holdRequestIsExpired(request):
+                continue
+
             ref_filter = request.ref_filter
 
             if request.current_count >= request.max_count:
