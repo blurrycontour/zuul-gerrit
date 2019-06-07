@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_5aa3069f",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1986,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-07T19:53:30Z",
+      "side": 1,
+      "message": "You also need to:\n        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))\nThat will add the \u0027patchset-created\u0027 event into the system and get things started.\nAfter that, you can also do:\n        self.waitUntilSettled()\nWhich should return after zuul has reported on the change, so the next counter will start from right after that.\n\nNote that 10 seconds is a pretty short time in the unit tests when they\u0027re busy; you may need to wait for 30 or 60 seconds for this test to be stable.",
+      "revId": "e0da84d0a202e22f2d335bcef67bdacffb951ca9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
