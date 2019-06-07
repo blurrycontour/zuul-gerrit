@@ -583,12 +583,45 @@ class ZooKeeper(object):
             path = self.HOLD_REQUEST_ROOT + "/" + hold_request.id
             self.client.set(path, hold_request.serialize())
 
+    def _markHeldNodesAsUsed(self, hold_request):
+        '''
+        :returns: True if all nodes marked USED, False otherwise.
+        '''
+        failure = False
+        for node_id in hold_request.nodes:
+            node = self.getNode(node_id)
+            if not node:
+                continue
+
+            node.state = zuul.model.USED
+
+            try:
+                self.lockNode(node, blocking=False)
+                self.storeNode(node)
+            except Exception:
+                self.log.exception("Cannot change HELD node state to USED "
+                                   "for node %s in request %s",
+                                   node.id, hold_request.id)
+                failure = True
+            finally:
+                try:
+                    self.unlockNode(node)
+                except Exception:
+                    pass
+
+        return not failure
+
     def deleteHoldRequest(self, hold_request):
         '''
         Delete a hold request.
 
         :param HoldRequest hold_request: Object representing the hold request.
         '''
+        if not self._markHeldNodesAsUsed(hold_request):
+            self.log.info("Unable to delete hold request %s because "
+                          "not all nodes marked as USED.", hold_request.id)
+            return
+
         path = self.HOLD_REQUEST_ROOT + "/" + hold_request.id
         try:
             self.client.delete(path, recursive=True)
