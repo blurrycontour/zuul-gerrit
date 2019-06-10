@@ -15,8 +15,14 @@
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 
+import { loadUser } from 'redux-oidc'
+import userManager from './userManager'
+
 import appReducers from './reducers'
 
 export default function createZuulStore() {
-  return createStore(appReducers, applyMiddleware(thunk))
+  let zuulStore = createStore(appReducers, applyMiddleware(thunk))
+  // TODO this requires silent renew mode to be configured
+  loadUser(zuulStore, userManager)
+  return zuulStore
 }

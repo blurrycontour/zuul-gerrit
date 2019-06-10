@@ -29,6 +29,10 @@ import { fetchInfoIfNeeded } from './actions/info'
 import createZuulStore from './store'
 import App from './App'
 
+import { OidcProvider } from 'redux-oidc'
+import userManager from './userManager'
+
+
 const store = createZuulStore()
 
 // Load info endpoint
@@ -36,6 +40,8 @@ store.dispatch(fetchInfoIfNeeded())
 
 ReactDOM.render(
   <Provider store={store}>
-    <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
+    <OidcProvider store={store} userManager={userManager}>
+      <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
+    </OidcProvider>
   </Provider>, document.getElementById('root'))
 registerServiceWorker()
