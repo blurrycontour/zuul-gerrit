@@ -14,6 +14,7 @@
 
 import { combineReducers } from 'redux'
 
+import auth from './auth'
 import configErrors from './configErrors'
 import change from './change'
 import errors from './errors'
@@ -48,6 +49,7 @@ const reducers = {
   tenant,
   tenants,
   openapi,
+  auth,
 }
 
 export default combineReducers(reducers)
