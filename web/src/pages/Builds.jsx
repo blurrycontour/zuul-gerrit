@@ -18,13 +18,14 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 
-import { fetchBuilds } from '../api'
+import { fetchBuilds, autohold, fetchUserAuthZ } from '../api'
 import TableFilters from '../containers/TableFilters'
 
 
 class BuildsPage extends TableFilters {
   static propTypes = {
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    auth: PropTypes.object,
   }
 
   constructor () {
@@ -35,7 +36,8 @@ class BuildsPage extends TableFilters {
       builds: null,
       currentFilterType: this.filterTypes[0],
       activeFilters: [],
-      currentValue: ''
+      currentValue: '',
+      isAdmin: false,
     }
   }
 
@@ -50,17 +52,42 @@ class BuildsPage extends TableFilters {
     })
   }
 
+  updateAuthZ () {
+    this.setState({isAdmin: false})
+    if (this.props.auth.user) {
+      fetchUserAuthZ(this.props.auth.user.access_token).then(response => {
+        this.setState({isAdmin: response.data.zuul.admin.indexOf(this.props.tenant.name) > -1 ? true : false})
+      })
+    }
+  }
+
   componentDidMount () {
     document.title = 'Zuul Builds'
     if (this.props.tenant.name) {
       this.updateData(this.getFilterFromUrl())
+      this.updateAuthZ()
     }
   }
 
   componentDidUpdate (prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name) {
       this.updateData(this.getFilterFromUrl())
+      this.updateAuthZ()
     }
+  }
+
+  autohold (rowdata) {
+      let projectName = rowdata.rowData.project
+      let job = rowdata.rowData.job_name
+      let reason = 'Held from zuul-web by user ' + this.props.auth.user.profile.name
+      autohold(this.props.auth.user.access_token, this.props.tenant.apiPrefix, projectName, job, reason).then(() => {
+          alert('Resources will be held for 24 hours the next time job "' + job + '" fails on project "' + projectName + '"')
+      })
+  }
+
+  isAdmin() {
+     const { isAdmin } = this.state
+     return (this.props.auth.user && isAdmin)
   }
 
   prepareTableHeaders() {
@@ -70,6 +97,11 @@ class BuildsPage extends TableFilters {
     const linkBuildFormat = (value, rowdata) => (
       <Table.Cell>
         <Link to={this.props.tenant.linkPrefix + '/build/' + rowdata.rowData.uuid}>{value}</Link>
+        { this.isAdmin() ?
+            <button onClick={event => {
+                      event.preventDefault()
+                      this.autohold(rowdata) }}>autohold</button> : <br />
+        }
       </Table.Cell>
     )
     const linkChangeFormat = (value, rowdata) => (
@@ -160,4 +192,6 @@ class BuildsPage extends TableFilters {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(BuildsPage)
+export default connect(state => ({
+    tenant: state.tenant,
+    auth: state.auth}))(BuildsPage)

@@ -29,11 +29,24 @@ import { fetchInfoIfNeeded } from './actions/info'
 import store from './store'
 import App from './App'
 
+import { OidcProvider } from 'redux-oidc'
+import userManager from './userManager'
+
+
 // Load info endpoint
 store.dispatch(fetchInfoIfNeeded())
 
+if (userManager !== null) {
+ReactDOM.render(
+  <Provider store={store}>
+    <OidcProvider store={store} userManager={userManager}>
+      <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
+    </OidcProvider>
+  </Provider>, document.getElementById('root'))
+} else {
 ReactDOM.render(
   <Provider store={store}>
     <Router basename={new URL(getHomepageUrl()).pathname}><App /></Router>
   </Provider>, document.getElementById('root'))
+}
 registerServiceWorker()
