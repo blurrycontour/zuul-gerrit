@@ -16,19 +16,23 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { dequeue, dequeue_ref, fetchUserAuthZ } from '../../api'
+import { Icon } from 'patternfly-react'
 
 
 class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    pipeline: PropTypes.string.isRequired,
+    auth: PropTypes.object
   }
 
   constructor () {
     super()
     this.state = {
-      expanded: false
+      expanded: false,
     }
     this.onClick = this.onClick.bind(this)
     this.clicked = false
@@ -161,6 +165,31 @@ class ChangePanel extends React.Component {
     )
   }
 
+  isAdmin() {
+    return true
+    //return (this.props.auth.user && this.props.auth.adminTenants.indexOf(this.props.tenant.name) > -1)
+  }
+
+  dequeue(change) {
+      const { pipeline } = this.props
+      let projectName = change.project
+      let changeId = change.id || 'NA'
+      console.log(change)
+      let changeRef = change.ref
+      // if we have a commit, dequeue by ref
+      if (/^[0-9a-f]{40}$/.test(changeId)) {
+          dequeue_ref(this.props.auth.user.access_token, this.props.tenant.apiPrefix, projectName, pipeline, changeRef).then(() => {
+              alert('Buildset for change "' + changeId.slice(0, 7) + '" dequeued.')
+          })
+      } else if (changeId !== 'NA') {
+          dequeue(this.props.auth.user.access_token, this.props.tenant.apiPrefix, projectName, pipeline, changeId).then(() => {
+            alert('Buildset for change "' + changeId + '" dequeued.')
+          })
+      } else {
+          alert('Cannot perform dequeue.')
+      }
+  }
+
   renderTimer (change) {
     let remainingTime
     if (change.remaining_time === null) {
@@ -177,6 +206,11 @@ class ChangePanel extends React.Component {
         <small title='Elapsed Time' className='time'>
           {this.enqueueTime(change.enqueue_time)}
         </small>
+        { this.isAdmin() ?
+        <button onClick={(event) => { 
+            event.preventDefault()
+            console.log(this.props.auth.user.access_token)
+            this.dequeue(change) }}>dequeue</button> : <br /> }
       </React.Fragment>
     )
   }
@@ -341,4 +375,6 @@ class ChangePanel extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ChangePanel)
+export default connect(state => ({
+    tenant: state.tenant,
+    auth: state.auth}))(ChangePanel)
