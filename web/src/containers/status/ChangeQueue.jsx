@@ -40,6 +40,7 @@ class ChangeQueue extends React.Component {
             queue={queue}
             expanded={expanded}
             key={changeIdx.toString() + idx}
+            pipeline={pipeline}
             />)
       })
     })
