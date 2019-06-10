@@ -37,6 +37,12 @@ features:
     access rules to tenant-scoped protected actions such as `autohold` and
     `dequeue` in the REST API, provided the user presents a valid token matching
     these rules.
+  - |
+    Add OpenID Connect support to Zuul Web UI: users are redirected to an OIDC
+    compatible Identity Provider of the operator's choosing for authentication.
+  - |
+    Add protected actions to Zuul Web UI: authenticated users, if allowed to,
+    can trigger autoholds, enqueues, dequeues from the GUI.
 upgrade:
   - |
     The "autohold", "dequeue" and "enqueue" endpoints are deactivated by default.
