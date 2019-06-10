@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_c8d2b400",
+        "filename": "zuul/ansible/base/lookup/password.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-10T22:04:24Z",
+      "side": 1,
+      "message": "I think you could call \"password._parse_parameters(term)\" here if you wanted to, but this seems simple enough, if slightly more restrictive in usage.",
+      "revId": "2c870189ea1ea8c2a1b869993dc642ad32fc02f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
