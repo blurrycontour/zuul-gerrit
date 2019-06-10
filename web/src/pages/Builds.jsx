@@ -16,15 +16,17 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
+import { Table, Icon } from 'patternfly-react'
 
-import { fetchBuilds } from '../api'
+import { fetchBuilds, autohold } from '../api'
 import TableFilters from '../containers/TableFilters'
 
 
 class BuildsPage extends TableFilters {
   static propTypes = {
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    token: PropTypes.string,
+    adminTenants: PropTypes.array,
   }
 
   constructor () {
@@ -63,6 +65,14 @@ class BuildsPage extends TableFilters {
     }
   }
 
+  autohold (rowdata) {
+      let projectName = rowdata.rowData.project
+      let job = rowdata.rowData.job_name
+      autohold(this.props.token, this.props.tenant.apiPrefix, projectName, job).then(() => {
+          alert('Resources will be held for 24 hours the next time job "' + job + '" fails on project "' + projectName + '"')
+      })
+  }
+
   prepareTableHeaders() {
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = (value) => (
@@ -70,6 +80,9 @@ class BuildsPage extends TableFilters {
     const linkBuildFormat = (value, rowdata) => (
       <Table.Cell>
         <Link to={this.props.tenant.linkPrefix + '/build/' + rowdata.rowData.uuid}>{value}</Link>
+        { this.props.adminTenants.indexOf(this.props.tenant.name) > -1 ?
+            <Icon type='pf' name='locked' title='Hold resources on next failure' onClick={() => this.autohold(rowdata)} /> : <br />
+        }
       </Table.Cell>
     )
     const linkChangeFormat = (value, rowdata) => (
@@ -160,4 +173,7 @@ class BuildsPage extends TableFilters {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(BuildsPage)
+export default connect(state => ({
+    tenant: state.tenant,
+    token: state.auth.user.access_token,
+    adminTenants: state.auth.adminTenants }))(BuildsPage)
