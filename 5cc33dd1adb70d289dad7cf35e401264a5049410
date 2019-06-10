@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_acc75d96",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-10T15:05:41Z",
+      "side": 1,
+      "message": "This produces the wrong result if zuul-web hasn\u0027t been updated.  It\u0027s probably not important enough to worry about, but if we did want to, we could probably reverse the order and check for \"\u003d\u003d\u003d false\".",
+      "revId": "5cc33dd1adb70d289dad7cf35e401264a5049410",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
