@@ -18,13 +18,14 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 
-import { fetchBuildsets } from '../api'
+import { fetchBuildsets, enqueue, enqueue_ref, fetchUserAuthZ } from '../api'
 import TableFilters from '../containers/TableFilters'
 
 
 class BuildsetsPage extends TableFilters {
   static propTypes = {
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    auth: PropTypes.object,
   }
 
   constructor () {
@@ -35,7 +36,8 @@ class BuildsetsPage extends TableFilters {
       buildsets: null,
       currentFilterType: this.filterTypes[0],
       activeFilters: [],
-      currentValue: ''
+      currentValue: '',
+      isAdmin: false,
     }
   }
 
@@ -50,17 +52,51 @@ class BuildsetsPage extends TableFilters {
     })
   }
 
+  updateAuthZ () {
+    this.setState({isAdmin: false})
+    if (this.props.auth.user) {
+      fetchUserAuthZ(this.props.auth.user.access_token).then(response => {
+        this.setState({isAdmin: response.data.zuul.admin.indexOf(this.props.tenant.name) > -1 ? true : false})
+      })
+    }
+  }
+
   componentDidMount () {
     document.title = 'Zuul Buildsets'
     if (this.props.tenant.name) {
       this.updateData(this.getFilterFromUrl())
     }
+    this.updateAuthZ()
   }
 
   componentDidUpdate (prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name) {
       this.updateData(this.getFilterFromUrl())
-    }
+      this.updateAuthZ() 
+   }
+  }
+
+  reenqueue(rowdata) {
+      let projectName = rowdata.rowData.project
+      let pipeline = rowdata.rowData.pipeline
+      let change = rowdata.rowData.change
+      if ( change === null) {
+          let branch = rowdata.rowData.branch
+          let newrev = rowdata.rowData.newrev
+          enqueue_ref(this.props.auth.user.access_token, this.props.tenant.apiPrefix, projectName, pipeline, branch, newrev).then(() => {
+              alert('Change "' + branch + '/' + newrev.substr(0,7) + '" re-enqueued on pipeline "' + pipeline + '".')
+          }).catch((error) => { console.log(error)})
+      } else {
+          let changeId = rowdata.rowData.change + ',' + rowdata.rowData.patchset
+          enqueue(this.props.auth.user.access_token, this.props.tenant.apiPrefix, projectName, pipeline, changeId).then(() => {
+              alert('Change "' + changeId + '" re-enqueued on pipeline "' + pipeline + '".')
+          })
+      }
+  }
+
+  isAdmin() {
+    const { isAdmin } = this.state
+    return (this.props.auth.user && isAdmin)
   }
 
   prepareTableHeaders() {
@@ -86,6 +122,17 @@ class BuildsetsPage extends TableFilters {
         </Link>
       </Table.Cell>
     )
+    const addEnqueueButtonIfAdmin = (value, rowdata) => (
+        <Table.Cell>
+            <div>{value}
+            { this.isAdmin() ?
+              <button onClick={event => {
+                          event.preventDefault()
+                          this.reenqueue(rowdata) }}>re-enqueue</button> : <br />
+            // <Icon type='fa' title='Re-enqueue this buildset' name='refresh' onClick={() => this.reenqueue(rowdata) } /> : <br />
+            }</div>
+        </Table.Cell>
+    )
     this.columns = []
     this.filterTypes = []
     const myColumns = [
@@ -101,6 +148,9 @@ class BuildsetsPage extends TableFilters {
         formatter = linkChangeFormat
       } else if (column === 'result') {
         formatter = linkBuildsetFormat
+      }
+      if (column === 'result') {
+        formatter = addEnqueueButtonIfAdmin
       }
       const label = column.charAt(0).toUpperCase() + column.slice(1)
       this.columns.push({
@@ -159,4 +209,6 @@ class BuildsetsPage extends TableFilters {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(BuildsetsPage)
+export default connect(state => ({
+    tenant: state.tenant,
+    auth: state.auth}))(BuildsetsPage)
