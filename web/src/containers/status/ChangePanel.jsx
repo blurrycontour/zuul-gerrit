@@ -16,13 +16,16 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { dequeue } from '../../api'
+import { Icon } from 'patternfly-react'
 
 
 class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    auth: PropTypes.object
   }
 
   constructor () {
@@ -161,6 +164,23 @@ class ChangePanel extends React.Component {
     )
   }
 
+  isAdmin() {
+    return (this.props.auth.user && this.props.auth.adminTenants.indexOf(this.props.tenant.name) > -1)
+  }
+
+  dequeue(change) {
+      // TODO: dequeue should be a function of buildset ID
+      let projectName = change.project
+      // TODO: Trigger info needed in change or component property
+      let trigger = 'gerrit'
+      // TODO: Add pipeline info as a component property
+      let pipeline = 'check'
+      let changeId = change.id
+      dequeue(this.props.token, this.props.tenant.apiPrefix, projectName, trigger, changeId, pipeline).then(() => {
+          alert('change "' + changeId + '" dequeued.')
+      })
+  }
+
   renderTimer (change) {
     let remainingTime
     if (change.remaining_time === null) {
@@ -177,6 +197,8 @@ class ChangePanel extends React.Component {
         <small title='Elapsed Time' className='time'>
           {this.enqueueTime(change.enqueue_time)}
         </small>
+        { this.isAdmin() ?
+        <Icon type='fa' title='Dequeue this buildset' name='bolt' onClick={() => this.dequeue(change) } /> : <br /> }
       </React.Fragment>
     )
   }
@@ -338,4 +360,6 @@ class ChangePanel extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ChangePanel)
+export default connect(state => ({
+    tenant: state.tenant,
+    auth: state.auth}))(ChangePanel)

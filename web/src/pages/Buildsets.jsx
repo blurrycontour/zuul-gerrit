@@ -16,15 +16,16 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
+import { Table, Icon } from 'patternfly-react'
 
-import { fetchBuildsets } from '../api'
+import { fetchBuildsets, enqueue } from '../api'
 import TableFilters from '../containers/TableFilters'
 
 
 class BuildsetsPage extends TableFilters {
   static propTypes = {
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    auth: PropTypes.object,
   }
 
   constructor () {
@@ -63,6 +64,22 @@ class BuildsetsPage extends TableFilters {
     }
   }
 
+  reenqueue(rowdata) {
+      let projectName = rowdata.rowData.project
+      // TODO: Add trigger info to rowdata
+      let trigger = 'gerrit'
+      let pipeline = rowdata.rowData.pipeline
+      // TODO: Handle buildsets from refs, or better, handle buildset IDs
+      let changeId = rowdata.rowData.change + ',' + rowdata.rowData.patchset
+      enqueue(this.props.token, this.props.tenant.apiPrefix, projectName, trigger, changeId, pipeline).then(() => {
+          alert('Change "' + changeId + '" re-enqueued on pipeline "' + pipeline + '".')
+      })
+  }
+
+  isAdmin() {
+    return (this.props.auth.user && this.props.auth.adminTenants.indexOf(this.props.tenant.name) > -1)
+  }
+
   prepareTableHeaders() {
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = (value) => <Table.Cell>{value}</Table.Cell>
@@ -86,6 +103,14 @@ class BuildsetsPage extends TableFilters {
         </Link>
       </Table.Cell>
     )
+    const addEnqueueButtonIfAdmin = (value, rowdata) => (
+        <Table.Cell>
+            <div>{value}<br />
+            { this.isAdmin() ?
+            <Icon type='fa' title='Re-enqueue this buildset' name='refresh' onClick={() => this.reenqueue(rowdata) } /> : <br />
+            }</div>
+        </Table.Cell>
+    )
     this.columns = []
     this.filterTypes = []
     const myColumns = [
@@ -101,6 +126,9 @@ class BuildsetsPage extends TableFilters {
         formatter = linkChangeFormat
       } else if (column === 'result') {
         formatter = linkBuildsetFormat
+      }
+      if (column === 'result') {
+        formatter = addEnqueueButtonIfAdmin
       }
       const label = column.charAt(0).toUpperCase() + column.slice(1)
       this.columns.push({
@@ -159,4 +187,6 @@ class BuildsetsPage extends TableFilters {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(BuildsetsPage)
+export default connect(state => ({
+    tenant: state.tenant,
+    auth: state.auth}))(BuildsetsPage)
