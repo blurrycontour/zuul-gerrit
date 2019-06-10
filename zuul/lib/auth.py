@@ -35,7 +35,7 @@ class AuthenticatorRegistry(object):
         self.default_realm = None
 
     def configure(self, config):
-        capabilities = {'auth': {'realms': {}}}
+        capabilities = {'realms': {}}
         for section_name in config.sections():
             auth_match = re.match(r'^auth ([\'\"]?)(.*)(\1)$',
                                   section_name, re.I)
@@ -59,13 +59,13 @@ class AuthenticatorRegistry(object):
             caps = self.authenticators[auth_name].get_capabilities()
             # TODO there should be a bijective relationship between realms and
             # authenticators. This should be enforced at config parsing.
-            capabilities['auth']['realms'].update(caps)
+            capabilities['realms'].update(caps)
             if auth_config.get('default', 'false').lower() == 'true':
                 self.default_realm = auth_config.get('realm', 'DEFAULT')
         if self.default_realm is None:
             self.default_realm = 'DEFAULT'
-        capabilities['auth']['default_realm'] = self.default_realm
-        cpb.capabilities_registry.register_capabilities(capabilities)
+        capabilities['default_realm'] = self.default_realm
+        cpb.capabilities_registry.register_capabilities('auth', capabilities)
 
     def authenticate(self, rawToken):
         unverified = jwt.decode(rawToken, verify=False)

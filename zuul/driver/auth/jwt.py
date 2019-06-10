@@ -214,7 +214,7 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
 
     def get_capabilities(self):
         d = super(OpenIDConnectAuthenticator, self).get_capabilities()
-        d['auth'][self.realm]['scope'] = self.scope
+        d[self.realm]['scope'] = self.scope
         return d
 
     def _decode(self, rawToken):
