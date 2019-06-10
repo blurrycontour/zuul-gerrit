@@ -33,6 +33,24 @@
       "revId": "c8f6b7b9b103d620cedea5d5049a9bb1a32fc4fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_7e4a63ac",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2721,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-10T19:11:59Z",
+      "side": 1,
+      "message": "I think that should work.",
+      "parentUuid": "9fb8cfa7_29391fa3",
+      "revId": "c8f6b7b9b103d620cedea5d5049a9bb1a32fc4fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
