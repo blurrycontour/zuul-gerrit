@@ -37,6 +37,13 @@ import { fetchConfigErrorsAction } from './actions/configErrors'
 import { setTenantAction } from './actions/tenant'
 import { clearError } from './actions/errors'
 
+import LoginButton from './containers/auth/Login'
+
+
+var welcomeDivStyle = {
+    color: '#d1d1d1',
+}
+
 
 class App extends React.Component {
   static propTypes = {
@@ -46,7 +53,8 @@ class App extends React.Component {
     tenant: PropTypes.object,
     location: PropTypes.object,
     history: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    auth: PropTypes.object
   }
 
   state = {
@@ -232,7 +240,7 @@ class App extends React.Component {
 
   render() {
     const { menuCollapsed, showErrors } = this.state
-    const { errors, configErrors, tenant } = this.props
+    const { errors, configErrors, tenant, auth } = this.props
 
     return (
       <React.Fragment>
@@ -255,6 +263,9 @@ class App extends React.Component {
                     this.setState({showErrors: !this.state.showErrors})}}
                   />
               }
+              <li>
+                  { auth.user ? (<div style={welcomeDivStyle}>Welcome {auth.user.profile.name}</div>) : <LoginButton /> }
+              </li>
               <li>
                 <a href='https://zuul-ci.org/docs'
                    rel='noopener noreferrer' target='_blank'>
@@ -290,10 +301,13 @@ class App extends React.Component {
 
 // This connect the info state from the store to the info property of the App.
 export default withRouter(connect(
-  state => ({
+  state => {
+      console.log(state)
+      return ({
     errors: state.errors,
     configErrors: state.configErrors,
     info: state.info,
-    tenant: state.tenant
-  })
+    tenant: state.tenant,
+    auth: state.auth
+})}
 )(App))

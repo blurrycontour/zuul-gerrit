@@ -102,6 +102,53 @@ function getStreamUrl (apiPrefix) {
   return streamUrl
 }
 
+// Authenticated APIs
+function enqueue (token, apiPrefix, projectName, trigger, changeId, pipeline) {
+    Axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    let res = Axios.post(
+        apiUrl + apiPrefix +'project/' + projectName + '/enqueue',
+        {
+            trigger: trigger,
+            change: changeId,
+            pipeline: pipeline,
+        })
+    Axios.defaults.headers.common['Authorization'] = ''
+    return res
+}
+function dequeue (token, apiPrefix, projectName, trigger, changeId, pipeline) {
+    Axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    let res = Axios.post(
+        apiUrl + apiPrefix +'project/' + projectName + '/dequeue',
+        {
+            trigger: trigger,
+            change: changeId,
+            pipeline: pipeline,
+        })
+    Axios.defaults.headers.common['Authorization'] = ''
+    return res
+}
+function autohold (token, apiPrefix, projectName, job) {
+    Axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    let res = Axios.post(
+        apiUrl + apiPrefix +'project/' + projectName + '/autohold',
+        {
+            job: job,
+            reason: 'held from the GUI',
+            count: 1,
+            // TODO: allow duration to be set
+            node_hold_expiration: 86400
+        })
+    Axios.defaults.headers.common['Authorization'] = ''
+    return res
+}
+
+function fetchUserAuthZ (token) {
+    Axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    let res = Axios.get(apiUrl + 'user/authorizations')
+    Axios.defaults.headers.common['Authorization'] = ''
+    return res
+}
+
 // Direct APIs
 function fetchInfo () {
   return Axios.get(apiUrl + 'info')
@@ -155,6 +202,10 @@ function fetchNodes (apiPrefix) {
 }
 
 export {
+  enqueue,
+  dequeue,
+  autohold,
+  fetchUserAuthZ,
   getHomepageUrl,
   getStreamUrl,
   fetchChangeStatus,

@@ -14,6 +14,7 @@
 
 import { combineReducers } from 'redux'
 
+import auth from './auth'
 import configErrors from './configErrors'
 import change from './change'
 import errors from './errors'
@@ -44,6 +45,7 @@ const reducers = {
   status,
   tenant,
   tenants,
+  auth,
 }
 
 export default combineReducers(reducers)
