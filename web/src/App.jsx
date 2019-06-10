@@ -37,6 +37,8 @@ import { fetchConfigErrorsAction } from './actions/configErrors'
 import { setTenantAction } from './actions/tenant'
 import { clearError } from './actions/errors'
 
+import userManager from './userManager'
+import LoginButton from './loginButton'
 
 class App extends React.Component {
   static propTypes = {
@@ -46,7 +48,8 @@ class App extends React.Component {
     tenant: PropTypes.object,
     location: PropTypes.object,
     history: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    auth: PropTypes.object
   }
 
   state = {
@@ -234,7 +237,7 @@ class App extends React.Component {
 
   render() {
     const { menuCollapsed, showErrors } = this.state
-    const { errors, configErrors, tenant } = this.props
+    const { errors, configErrors, tenant, auth } = this.props
 
     return (
       <React.Fragment>
@@ -273,6 +276,23 @@ class App extends React.Component {
                   </Link>
                 </li>
               )}
+              { userManager !== null && (
+              <li>
+                { !auth.user || auth.user.expired ?
+                    <LoginButton /> : (
+                    <div>
+                      <font style={{color: '#fff',
+                                    fontSize: '11px'}}>
+                        Hello { auth.user.profile.name }
+                      </font>
+                      <button onClick={event => {
+                        event.preventDefault()
+                        userManager.removeUser() }}>
+                        Log out
+                      </button>
+                    </div>)
+                }
+              </li>) }
             </ul>
             {showErrors && this.renderConfigErrors(configErrors)}
           </div>
@@ -299,6 +319,7 @@ export default withRouter(connect(
     errors: state.errors,
     configErrors: state.configErrors,
     info: state.info,
-    tenant: state.tenant
-  })
+    tenant: state.tenant,
+    auth: state.auth
+})
 )(App))
