@@ -27,6 +27,7 @@ class Change extends React.Component {
     change: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
+    pipeline: PropTypes.string.isRequired
     tenant: PropTypes.object
   }
 
@@ -76,7 +77,7 @@ class Change extends React.Component {
   }
 
   render () {
-    const { change, queue, expanded } = this.props
+    const { change, queue, expanded, pipeline } = this.props
     let row = []
     let i
     for (i = 0; i < queue._tree_columns; i++) {
@@ -96,7 +97,7 @@ class Change extends React.Component {
       <td key={i + 1}
         className="zuul-change-cell"
         style={{width: changeWidth + 'px'}}>
-        <ChangePanel change={change} globalExpanded={expanded} />
+        <ChangePanel change={change} globalExpanded={expanded} pipeline={pipeline}/>
       </td>
     )
     return (
