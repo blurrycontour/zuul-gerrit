@@ -28,6 +28,7 @@ import ConfigErrorsPage from './pages/ConfigErrors'
 import TenantsPage from './pages/Tenants'
 import StreamPage from './pages/Stream'
 import OpenApiPage from './pages/OpenApi'
+import AuthCallbackPage from './pages/auth/Callback'
 
 // The Route object are created in the App component.
 // Object with a title are created in the menu.
@@ -38,7 +39,7 @@ const routes = () => [
     title: 'Status',
     to: '/status',
     component: StatusPage
-  },
+},
   {
     title: 'Projects',
     to: '/projects',
@@ -106,6 +107,11 @@ const routes = () => [
     to: '/openapi',
     component: OpenApiPage,
     noTenantPrefix: true,
+  },
+  {
+    to: '/auth_callback',
+    component: AuthCallbackPage,
+    globalRoute: true
   }
 ]
 

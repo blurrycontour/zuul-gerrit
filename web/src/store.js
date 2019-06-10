@@ -15,8 +15,13 @@
 import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 
+import { loadUser } from 'redux-oidc'
+import userManager from './userManager'
+
 import appReducers from './reducers'
 
 const store = createStore(appReducers, applyMiddleware(thunk))
+
+loadUser(store, userManager)
 
 export default store
