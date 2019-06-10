@@ -16,13 +16,17 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { dequeue, dequeue_ref } from '../../api'
+import { Icon } from 'patternfly-react'
 
 
 class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    pipeline: PropTypes.string.isRequired,
+    auth: PropTypes.object
   }
 
   constructor () {
@@ -161,6 +165,26 @@ class ChangePanel extends React.Component {
     )
   }
 
+  isAdmin() {
+    return (this.props.auth.user && this.props.auth.adminTenants.indexOf(this.props.tenant.name) > -1)
+  }
+
+  dequeue(change) {
+      const { pipeline } = this.props
+      let projectName = change.project
+      let changeId = change.id || 'NA'
+      if (changeId === 'NA' && change.ref) {
+          let changeRef = change.ref
+          dequeue_ref(this.props.token, this.props.tenant.apiPrefix, projectName, pipeline, changeRef).then(() => {
+              alert('ref "' + changeId + '" dequeued.')
+          })
+      } else {
+          dequeue(this.props.token, this.props.tenant.apiPrefix, projectName, pipeline, changeId).then(() => {
+              alert('change "' + changeId + '" dequeued.')
+          })
+      }
+  }
+
   renderTimer (change) {
     let remainingTime
     if (change.remaining_time === null) {
@@ -177,6 +201,8 @@ class ChangePanel extends React.Component {
         <small title='Elapsed Time' className='time'>
           {this.enqueueTime(change.enqueue_time)}
         </small>
+        { this.isAdmin() ?
+        <Icon type='fa' title='Dequeue this buildset' name='bolt' onClick={() => this.dequeue(change) } /> : <br /> }
       </React.Fragment>
     )
   }
@@ -338,4 +364,6 @@ class ChangePanel extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ChangePanel)
+export default connect(state => ({
+    tenant: state.tenant,
+    auth: state.auth}))(ChangePanel)
