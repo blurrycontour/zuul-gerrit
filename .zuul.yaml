@@ -168,16 +168,17 @@
         - zuul-build-image
         - tox-docs
         - tox-pep8
-        - tox-py35:
-            irrelevant-files:
+            irrelevant-files: &non-functional-files
               - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
+              - .*\.rst$
+              - .*\.yaml$
+              - doc/source/.*
+        - tox-py35:
+            irrelevant-files: *non-functional-files
             nodeset: ubuntu-xenial
             timeout: 3600  # 60 minutes
         - tox-py36:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
+            irrelevant-files: *non-functional-files
             timeout: 3600  # 60 minutes
         - zuul-build-dashboard
         - zuul-build-dashboard-multi-tenant
@@ -185,6 +186,8 @@
             vars:
               node_version: 10
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+            files:
+              - web/.*
         - nodejs-npm-run-test:
             vars:
               node_version: 10
@@ -202,21 +205,18 @@
             dependencies: zuul-build-image
         - nodepool-zuul-functional:
             voting: false
+            irrelevant-files: *non-functional-files
     gate:
       jobs:
         - zuul-upload-image
         - tox-docs
         - tox-pep8
         - tox-py35:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
+            irrelevant-files: *non-functional-files
             nodeset: ubuntu-xenial
             timeout: 2700  # 45 minutes
         - tox-py36:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
+            irrelevant-files: *non-functional-files
             timeout: 2700  # 45 minutes
         - zuul-build-dashboard
         - nodejs-npm-run-lint:
@@ -236,8 +236,10 @@
         - zuul-stream-functional-2.8
         - zuul-tox-remote:
             timeout: 2700  # 45 minutes
+            irrelevant-files: *non-functional-files
         - zuul-quick-start:
             dependencies: zuul-upload-image
+            irrelevant-files: *non-functional-files
     post:
       jobs:
         - publish-zuul-docs
