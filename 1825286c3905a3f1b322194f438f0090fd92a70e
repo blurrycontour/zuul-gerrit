@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_cb67fcb6",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 5750,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-11T18:12:22Z",
+      "side": 1,
+      "message": "We should make sure that this will run. Otherwise if the assert above fires the gc will stay off for the rest of the tests.",
+      "revId": "1825286c3905a3f1b322194f438f0090fd92a70e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
