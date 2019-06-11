@@ -403,14 +403,6 @@ class JobDir(object):
         self.job_unreachable_file = os.path.join(self.ansible_cache_root,
                                                  'nodes.unreachable')
         os.makedirs(self.control_path)
-        localhost_facts = os.path.join(self.fact_cache, 'localhost')
-        # NOTE(pabelanger): We do not want to leak zuul-executor facts to other
-        # playbooks now that smart fact gathering is enabled by default.  We
-        # can have ansible skip populating the cache with information by the
-        # doing the following.
-        with open(localhost_facts, 'w') as f:
-            f.write('{"module_setup": true}')
-
         self.result_data_file = os.path.join(self.work_root, 'results.json')
         with open(self.result_data_file, 'w'):
             pass
@@ -2071,7 +2063,7 @@ class AnsibleJob(object):
             command='ansible')
         cmd = [ansible, '*', verbose, '-m', 'setup',
                '-i', self.jobdir.setup_inventory,
-               '-a', 'gather_subset=!all']
+               '-a', 'gather_subset=!all', '-a filter=ansible_date_time']
         if self.executor_variables_file is not None:
             cmd.extend(['-e@%s' % self.executor_variables_file])
 
