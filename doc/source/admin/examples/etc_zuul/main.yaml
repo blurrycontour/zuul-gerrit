@@ -1,5 +1,15 @@
+- admin-rule:
+    name: ghostbuster
+    conditions:
+      realm_access.roles: "ghostbuster"
+- admin-rule:
+    name: gozerian
+    conditions:
+      realm_access.roles: "gozerian"
 - tenant:
-    name: example-tenant
+    name: example-tenant-one
+    admin-rules:
+      - ghostbuster
     source:
       gerrit:
         config-projects:
@@ -7,6 +17,22 @@
         untrusted-projects:
           - test1
           - test2
+      opendev.org:
+        untrusted-projects:
+          - zuul/zuul-jobs:
+              include:
+                - job
+- tenant:
+    name: example-tenant-two
+    admin-rules:
+      - gozerian
+    source:
+      gerrit:
+        config-projects:
+          - zuul-config
+        untrusted-projects:
+          - test3
+          - test4
       opendev.org:
         untrusted-projects:
           - zuul/zuul-jobs:

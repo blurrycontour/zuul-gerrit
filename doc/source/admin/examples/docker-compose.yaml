@@ -1,8 +1,40 @@
 # Version 2 is the latest that is supported by docker-compose in
 # Ubuntu Xenial.
-version: '2'
+version: '3.4'
 
 services:
+  keycloak:
+    image: jboss/keycloak
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - DB_VENDOR=h2
+      - KEYCLOAK_IMPORT=/var/keycloak_import/zuul-demo.json
+    volumes:
+      - "./keycloak/:/var/keycloak_import/:z"
+    ports:
+      - "8282:8080"
+    entrypoint: |
+      /bin/sh -c '\
+      /opt/jboss/keycloak/bin/add-user-keycloak.sh --realm zuul-demo --user venkman --password venkman --roles ghostbuster && \
+      /opt/jboss/keycloak/bin/add-user-keycloak.sh --realm zuul-demo --user gozer --password gozer --roles gozerian && \
+      /opt/jboss/tools/docker-entrypoint.sh -b 0.0.0.0'
+    command: []
+# TODO: configure gerrit with oidc, but create the admin account first
+#   gerrit:
+#     image: openfrontier/gerrit
+#     ports:
+#       - "8080:8080"
+#       - "29418:29418"
+#     environment:
+#       - UI=POLYGERRIT
+#       - WEBURL=http://localhost:8080/
+#       - NOTEDB_CHANGES_AUTOMIGRATE=true
+#       - AUTH_TYPE=OAUTH
+#       - OAUTH_KEYCLOAK_CLIENT_ID=gerrit-client
+#       - OAUTH_KEYCLOAK_CLIENT_SECRET=868e895b-73a7-4459-9347-cd85c05e9bd7
+#       - OAUTH_KEYCLOAK_REALM=zuul-demo
+#       - OAUTH_KEYCLOAK_ROOT_URL=http://localhost:8282
   gerrit:
     image: gerritcodereview/gerrit
     ports:
@@ -63,6 +95,11 @@ services:
     ports:
       - "9000:9000"
     image: zuul/zuul-web
+    # Not necessary once commit is merged
+    # build:
+    #   context: ../../../../
+    #   dockerfile: Dockerfile
+    #   target: zuul-web
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"

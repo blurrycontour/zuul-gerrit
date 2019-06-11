@@ -96,10 +96,10 @@ configuration.
 
 Zuul is a multi-tenant application, so that differing needs of
 independent work-groups can be supported from one system.  This
-example configures a single tenant named ``example-tenant``.  Assigned
-to this tenant are three projects: ``zuul-config``, ``test1`` and
-``test2``.  These have already been created in Gerrit and are ready
-for us to begin using.
+example configures a two tenants named ``example-tenant-one`` and ``example-tenant-two``.
+Assigned to these tenants are three projects: ``zuul-config``, ``test1`` and
+``test2``; and ``zuul-config``, ``test3`` and ``test4``.  These have already been
+created in Gerrit and are ready for us to begin using.
 
 Add Your Gerrit Account
 -----------------------
@@ -324,7 +324,7 @@ Test Zuul Pipelines
 
 Zuul is now running with a basic :term:`check` and :term:`gate`
 configuration.  Now is a good time to take a look at Zuul's web
-interface.  Visit http://localhost:9000/t/example-tenant/status to see
+interface.  Visit http://localhost:9000/t/example-tenant-one/status to see
 the current status of the system.  It should be idle, but if you leave
 this page open during the following steps, you will see it update
 automatically.
