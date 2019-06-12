@@ -1862,12 +1862,14 @@ class Worker(object):
         self.name = "Unknown"
         self.hostname = None
         self.log_port = None
+        self.zone = None
 
     def updateFromData(self, data):
         """Update worker information if contained in the WORK_DATA response."""
         self.name = data.get('worker_name', self.name)
         self.hostname = data.get('worker_hostname', self.hostname)
         self.log_port = data.get('worker_log_port', self.log_port)
+        self.zone = data.get('worker_zone', self.zone)
 
     def __repr__(self):
         return '<Worker %s>' % self.name

@@ -958,6 +958,8 @@ class AnsibleJob(object):
             data['url'] = 'finger://{hostname}/{uuid}'.format(
                 hostname=data['worker_hostname'],
                 uuid=self.job.unique)
+        if self.executor_server.zone:
+            data['worker_zone'] = self.executor_server.zone
 
         self.job.sendWorkData(json.dumps(data))
         self.job.sendWorkStatus(0, 100)

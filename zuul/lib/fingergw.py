@@ -18,6 +18,9 @@ import logging
 import socket
 import ssl
 import threading
+import time
+
+import gear
 
 import zuul.rpcclient
 
@@ -25,6 +28,7 @@ from zuul.lib import commandsocket
 from zuul.lib import streamer_utils
 from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
+from zuul.rpcclient import RPCFailure
 
 COMMANDS = ['stop']
 
@@ -309,3 +313,41 @@ class FingerGateway(object):
         '''
         self.gearworker.join()
         self.server_thread.join()
+
+
+class FingerClient:
+    log = logging.getLogger("zuul.FingerClient")
+
+    def __init__(self, server, port, ssl_key=None, ssl_cert=None, ssl_ca=None):
+        self.log.debug("Connecting to gearman at %s:%s" % (server, port))
+        self.gearman = gear.Client()
+        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
+                               keepalive=True, tcp_keepidle=60,
+                               tcp_keepintvl=30, tcp_keepcnt=5)
+        self.log.debug("Waiting for gearman")
+        self.gearman.waitForServer()
+
+    def submitJob(self, name, data):
+        self.log.debug("Submitting job %s with data %s" % (name, data))
+        job = gear.TextJob(name,
+                           json.dumps(data),
+                           unique=str(time.time()))
+        self.gearman.submitJob(job, timeout=300)
+
+        self.log.debug("Waiting for job completion")
+        while not job.complete:
+            time.sleep(0.1)
+        if job.exception:
+            raise RPCFailure(job.exception)
+        self.log.debug("Job complete, success: %s" % (not job.failure))
+        return job
+
+    def shutdown(self):
+        self.gearman.shutdown()
+
+    def get_fingergw_in_zone(self, zone):
+        job = self.submitJob('fingergw:info:%s' % zone, {})
+        if job.failure:
+            return None
+        else:
+            return json.loads(job.data[0])

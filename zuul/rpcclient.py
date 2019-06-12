@@ -118,8 +118,11 @@ class RPCClient(object):
     def shutdown(self):
         self.gearman.shutdown()
 
-    def get_job_log_stream_address(self, uuid, logfile='console.log'):
+    def get_job_log_stream_address(self, uuid, logfile='console.log',
+                                   source_zone=None):
         data = {'uuid': uuid, 'logfile': logfile}
+        if source_zone:
+            data['source_zone'] = source_zone
         job = self.submitJob('zuul:get_job_log_stream_address', data)
         if job.failure:
             return False

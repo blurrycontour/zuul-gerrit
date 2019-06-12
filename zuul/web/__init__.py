@@ -134,7 +134,7 @@ class LogStreamHandler(WebSocket):
                         key=key))
 
         port_location = self.zuulweb.rpc.get_job_log_stream_address(
-            request['uuid'])
+            request['uuid'], source_zone=self.zuulweb.zone)
         if not port_location:
             return self.logClose(4011, "Error with Gearman")
 
@@ -726,7 +726,8 @@ class ZuulWeb(object):
                  connections=None,
                  info=None,
                  static_path=None,
-                 zk_hosts=None):
+                 zk_hosts=None,
+                 zone=None):
         self.start_time = time.time()
         self.listen_address = listen_address
         self.listen_port = listen_port
@@ -744,6 +745,7 @@ class ZuulWeb(object):
             self.zk.connect(hosts=zk_hosts, read_only=True)
         self.connections = connections
         self.stream_manager = StreamManager()
+        self.zone = zone
 
         route_map = cherrypy.dispatch.RoutesDispatcher()
         api = ZuulWebAPI(self)
