@@ -19,6 +19,7 @@ import os
 import os.path
 import re
 import socket
+import ssl
 import tempfile
 import testtools
 import threading
@@ -28,7 +29,7 @@ import zuul.web
 import zuul.lib.log_streamer
 from zuul.lib.fingergw import FingerGateway
 import tests.base
-from tests.base import iterate_timeout, ZuulWebFixture
+from tests.base import iterate_timeout, ZuulWebFixture, FIXTURE_DIR
 
 from ws4py.client import WebSocketBaseClient
 
@@ -99,6 +100,7 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
 
     tenant_config_file = 'config/streamer/main.yaml'
     log = logging.getLogger("zuul.test_streaming")
+    fingergw_use_ssl = True
 
     def setUp(self):
         super().setUp()
@@ -150,6 +152,17 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
 
         self.streaming_data[name] = ''
         with socket.create_connection(gateway_address) as s:
+            if self.fingergw_use_ssl:
+                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                context.verify_mode = ssl.CERT_REQUIRED
+                context.check_hostname = False
+                context.load_cert_chain(
+                    os.path.join(FIXTURE_DIR, 'fingergw/client.pem'),
+                    os.path.join(FIXTURE_DIR, 'fingergw/client.key'))
+                context.load_verify_locations(
+                    os.path.join(FIXTURE_DIR, 'fingergw/root-ca.pem'))
+                s = context.wrap_socket(s)
+
             msg = "%s\r\n" % build_uuid
             s.sendall(msg.encode('utf-8'))
             event.set()  # notify we are connected and req sent
@@ -173,6 +186,21 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
         })
         if zone:
             config.set('fingergw', 'zone', zone)
+
+        if self.fingergw_use_ssl:
+            self.log.info('SSL enabled for fingergw')
+            config.set('fingergw', 'server_ssl_ca',
+                       os.path.join(FIXTURE_DIR, 'fingergw/root-ca.pem'))
+            config.set('fingergw', 'server_ssl_cert',
+                       os.path.join(FIXTURE_DIR, 'fingergw/server.pem'))
+            config.set('fingergw', 'server_ssl_key',
+                       os.path.join(FIXTURE_DIR, 'fingergw/server.key'))
+            config.set('fingergw', 'client_ssl_ca',
+                       os.path.join(FIXTURE_DIR, 'fingergw/root-ca.pem'))
+            config.set('fingergw', 'client_ssl_cert',
+                       os.path.join(FIXTURE_DIR, 'fingergw/client.pem'))
+            config.set('fingergw', 'client_ssl_key',
+                       os.path.join(FIXTURE_DIR, 'fingergw/client.key'))
 
         gateway = FingerGateway(
             config,
@@ -600,9 +628,9 @@ class CountingFingerRequestHandler(zuul.lib.fingergw.RequestHandler):
         # if not hasattr(self.fingergw, 'history'):
         #     self.fingergw.history = []
 
-    def _fingerClient(self, server, port, build_uuid):
+    def _fingerClient(self, server, port, build_uuid, use_ssl):
         self.fingergw.history.append(build_uuid)
-        super()._fingerClient(server, port, build_uuid)
+        super()._fingerClient(server, port, build_uuid, use_ssl)
 
 
 class TestStreamingZones(TestStreamingBase):
@@ -775,3 +803,7 @@ class TestStreamingZones(TestStreamingBase):
         self.assertEqual(file_contents, self.streaming_data['unzoned'])
         self.assertEqual(file_contents, self.streaming_data['unzoned2'])
         self.assertEqual(file_contents, self.streaming_data['eu-central'])
+
+
+class TestStreamingZonesSSL(TestStreamingZones):
+    fingergw_use_ssl = True
