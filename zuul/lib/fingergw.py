@@ -15,6 +15,7 @@
 import functools
 import logging
 import socket
+import ssl
 import threading
 
 import zuul.rpcclient
@@ -143,6 +144,14 @@ class FingerGateway(object):
 
         self.command_socket = command_socket
 
+        # Fingergw server ssl settings
+        self.finger_server_ssl_key = get_default(
+            config, 'fingergw', 'server_ssl_key')
+        self.finger_server_ssl_cert = get_default(
+            config, 'fingergw', 'server_ssl_cert')
+        self.finger_server_ssl_ca = get_default(
+            config, 'fingergw', 'server_ssl_ca')
+
         self.command_map = dict(
             stop=self.stop,
         )
@@ -176,6 +185,9 @@ class FingerGateway(object):
         self.server = streamer_utils.CustomThreadingTCPServer(
             self.address,
             functools.partial(RequestHandler, rpc=self.rpc),
+            server_ssl_key=self.finger_server_ssl_key,
+            server_ssl_cert=self.finger_server_ssl_cert,
+            server_ssl_ca=self.finger_server_ssl_ca,
             user=self.user,
             pid_file=self.pid_file)
 

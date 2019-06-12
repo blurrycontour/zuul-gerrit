@@ -23,6 +23,7 @@ import pwd
 import select
 import socket
 import socketserver
+import ssl
 import threading
 import time
 
@@ -93,6 +94,9 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
         self.address_family = address_family
         self.user = kwargs.pop('user', None)
         self.pid_file = kwargs.pop('pid_file', None)
+        self.server_ssl_key = kwargs.pop('server_ssl_key', None)
+        self.server_ssl_cert = kwargs.pop('server_ssl_cert', None)
+        self.server_ssl_ca = kwargs.pop('server_ssl_ca', None)
         socketserver.ThreadingTCPServer.__init__(self, *args, **kwargs)
 
     def change_privs(self):
@@ -146,3 +150,14 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
                              args=(request, client_address))
         t.daemon = self.daemon_threads
         t.start()
+
+    def get_request(self):
+        sock, addr = super().get_request()
+
+        if all([self.server_ssl_key, self.server_ssl_cert,
+                self.server_ssl_ca]):
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.load_cert_chain(self.server_ssl_cert, self.server_ssl_key)
+            context.verify_mode = ssl.CERT_REQUIRED
+            sock = context.wrap_socket(sock)
+        return sock, addr
