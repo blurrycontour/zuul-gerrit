@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import configparser
 
 from zuul.lib.fingergw import FingerGateway
 from zuul.zk import ZooKeeperClient
@@ -99,14 +100,17 @@ class TestComponentRegistry(ZuulTestCase):
         self.assertComponentStopped("merger")
 
     def test_fingergw_component(self):
-        self.config.read_dict({
+        config = configparser.ConfigParser()
+        config.read_dict(self.config)
+        config.read_dict({
             'fingergw': {
                 'listen_address': self.host,
                 'port': '0',
+                'hostname': 'localhost',
             }
         })
         gateway = FingerGateway(
-            self.config,
+            config,
             command_socket=None,
             pid_file=None
         )
@@ -116,7 +120,6 @@ class TestComponentRegistry(ZuulTestCase):
             self.assertComponentState("fingergw", BaseComponent.RUNNING)
         finally:
             gateway.stop()
-            gateway.wait()
 
         self.assertComponentStopped("fingergw")
 
