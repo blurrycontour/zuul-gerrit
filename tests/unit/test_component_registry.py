@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import configparser
 
 from zuul.lib.fingergw import FingerGateway
 from zuul.zk import ZooKeeperClient
@@ -25,6 +26,7 @@ class TestComponentRegistry(ZuulTestCase):
     def setUp(self):
         super().setUp()
 
+        self.host = '::'
         self.zk_client = ZooKeeperClient(
             self.zk_chroot_fixture.zk_hosts,
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
@@ -89,11 +91,14 @@ class TestComponentRegistry(ZuulTestCase):
         component_states = self.component_registry.all("finger-gateways")
         self.assertEqual(len(component_states), 0)
 
+        self.config.read_dict({
+            'fingergw': {
+                'listen_address': self.host,
+                'port': '0',
+            }
+        })
         gateway = FingerGateway(
             self.config,
-            ("127.0.0.1", self.gearman_server.port, None, None, None),
-            ("127.0.0.1", 0),
-            user=None,
             command_socket=None,
             pid_file=None
         )
