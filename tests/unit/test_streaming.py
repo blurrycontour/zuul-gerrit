@@ -11,7 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+import configparser
 import io
 import logging
 import json
@@ -26,6 +26,7 @@ import time
 
 import zuul.web
 import zuul.lib.log_streamer
+from zuul.lib.config import get_default
 from zuul.lib.fingergw import FingerGateway
 from zuul.zk import ZooKeeperClient
 import tests.base
@@ -528,13 +529,25 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.addCleanup(zk_client.disconnect)
 
         # Start the finger gateway daemon
-        gateway = FingerGateway(
-            ('127.0.0.1', self.gearman_server.port, None, None, None),
-            zk_client, (self.host, 0),
-            user=None,
-            command_socket=None,
-            pid_file=None
-        )
+        config = configparser.ConfigParser()
+        config.read_dict({
+            'zookeeper': {
+                'hosts': get_default(config, "zookeeper", "hosts"),
+                'tls_key': get_default(config, "zookeeper", "tls_key"),
+                'tls_cert': get_default(config, "zookeeper", "tls_cert"),
+                'tls_ca': get_default(config, "zookeeper", "tls_ca"),
+            },
+            'gearman': {
+                'server': '127.0.0.1',
+                'port': self.gearman_server.port,
+            },
+            'fingergw': {
+                'listen_address': '::',
+                'port': 0,
+            }
+        })
+
+        gateway = zuul.lib.fingergw.FingerGateway(config, None, None)
         gateway.start()
         self.addCleanup(gateway.stop)
 
