@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_a5066251",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2688,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-06-12T15:33:40Z",
+      "side": 1,
+      "message": "Additional research indicates this is not the test timeout, and in fact is 10 seconds in excess of our default hard timeout (OS_TEST_TIMEOUT\u003d240 passed in envvar from tox + 20 with gentle\u003dFalse from the BaseTestCase.setUp() method).",
+      "revId": "90dab68c21f78b218837db4c4b600a08c5e3b792",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
