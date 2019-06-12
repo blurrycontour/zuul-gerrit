@@ -67,6 +67,12 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_key'] = get_default(self.config, 'gearman', 'ssl_key')
         params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
+        params['finger_ssl_key'] = get_default(
+            self.config, 'fingergw', 'client_ssl_key')
+        params['finger_ssl_cert'] = get_default(
+            self.config, 'fingergw', 'client_ssl_cert')
+        params['finger_ssl_ca'] = get_default(
+            self.config, 'fingergw', 'client_ssl_ca')
 
         params['command_socket'] = get_default(
             self.config, 'web', 'command_socket',
