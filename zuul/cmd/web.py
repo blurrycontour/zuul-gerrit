@@ -72,6 +72,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
             self.config, 'web', 'command_socket',
             '/var/lib/zuul/web.socket')
 
+        params['zone'] = get_default(self.config, 'web', 'zone')
+
         params['connections'] = self.connections
         params['authenticators'] = self.authenticators
         # Validate config here before we spin up the ZuulWeb object
