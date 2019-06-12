@@ -16,6 +16,24 @@
       "revId": "f397aaba05ee25241dc01d6bb4ae2d122a8b795e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_88bfb3a8",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-06-12T16:07:25Z",
+      "side": 1,
+      "message": "This is missing the break after thing() to not retry on success (but that should be the only one we need).",
+      "parentUuid": "9fb8cfa7_6876ff40",
+      "revId": "f397aaba05ee25241dc01d6bb4ae2d122a8b795e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
