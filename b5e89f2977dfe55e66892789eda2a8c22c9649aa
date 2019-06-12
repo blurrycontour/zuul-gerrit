@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_a2de5d0e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-06-12T10:25:21Z",
+      "side": 1,
+      "message": "This needs a break when the method succeed to skip the else clause.",
+      "revId": "b5e89f2977dfe55e66892789eda2a8c22c9649aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
