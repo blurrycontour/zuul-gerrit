@@ -297,9 +297,7 @@ class RPCListener(RPCListenerBase):
                 if info:
                     job_log_stream_address['server'] = info.hostname
                     job_log_stream_address['port'] = info.public_port
-                    use_ssl = getattr(info, 'use_ssl', False)
-                    if use_ssl:
-                        job_log_stream_address['use_ssl'] = use_ssl
+                    job_log_stream_address['use_ssl'] = info.use_ssl
                     self.log.debug('Source (%s) and worker (%s) zone '
                                    'are different, routing via %s:%s',
                                    source_zone, build.worker.zone,
