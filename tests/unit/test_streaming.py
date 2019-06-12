@@ -32,6 +32,8 @@ from tests.base import iterate_timeout, ZuulWebFixture
 
 from ws4py.client import WebSocketBaseClient
 
+from zuul.lib.gear_utils import getGearmanFunctions
+
 
 class WSClient(WebSocketBaseClient):
     def __init__(self, port, build_uuid):
@@ -95,17 +97,17 @@ class TestLogStreamer(tests.base.BaseTestCase):
         s.close()
 
 
-class TestStreaming(tests.base.AnsibleZuulTestCase):
+class TestStreamingBase(tests.base.AnsibleZuulTestCase):
 
     tenant_config_file = 'config/streamer/main.yaml'
     log = logging.getLogger("zuul.test_streaming")
 
     def setUp(self):
-        super(TestStreaming, self).setUp()
+        super().setUp()
         self.host = '::'
         self.streamer = None
         self.stop_streamer = False
-        self.streaming_data = ''
+        self.streaming_data = {}
         self.test_streaming_event = threading.Event()
 
     def stopStreamer(self):
@@ -124,15 +126,74 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         s.sendall(req.encode('utf-8'))
         self.test_streaming_event.set()
 
+        self.streaming_data.setdefault(None, '')
         while not self.stop_streamer:
             data = s.recv(2048)
             if not data:
                 break
-            self.streaming_data += data.decode('utf-8')
+            self.streaming_data[None] += data.decode('utf-8')
 
         s.shutdown(socket.SHUT_RDWR)
         s.close()
         self.streamer.stop()
+
+    def runFingerClient(self, build_uuid, gateway_address, event, name=None):
+        # Wait until the gateway is started
+        for x in iterate_timeout(30, "finger client to start"):
+            try:
+                # NOTE(Shrews): This causes the gateway to begin to handle
+                # a request for which it never receives data, and thus
+                # causes the getCommand() method to timeout (seen in the
+                # test results, but is harmless).
+                with socket.create_connection(gateway_address) as s:
+                    break
+            except ConnectionRefusedError:
+                pass
+
+        self.streaming_data[name] = ''
+        with socket.create_connection(gateway_address) as s:
+            msg = "%s\r\n" % build_uuid
+            s.sendall(msg.encode('utf-8'))
+            event.set()  # notify we are connected and req sent
+            while True:
+                data = s.recv(1024)
+                if not data:
+                    break
+                self.streaming_data[name] += data.decode('utf-8')
+            s.shutdown(socket.SHUT_RDWR)
+
+    def runFingerGateway(self, zone=None):
+        self.log.info('Starting fingergw with zone %s', zone)
+        config = configparser.ConfigParser()
+        config.read_dict(self.config)
+        config.read_dict({
+            'fingergw': {
+                'listen_address': '::',
+                'port': 0,
+                'hostname': 'localhost',
+            }
+        })
+        if zone:
+            config.set('fingergw', 'zone', zone)
+        gateway = zuul.lib.fingergw.FingerGateway(config, None, None)
+        gateway.history = []
+        gateway.start()
+
+        if zone:
+            for _ in iterate_timeout(20, 'fingergw is registered'):
+                functions = getGearmanFunctions(gateway.gearworker.gearman)
+                jobname = 'fingergw:info:%s' % zone
+                if jobname in functions:
+                    break
+
+        self.addCleanup(gateway.stop)
+
+        gateway_port = gateway.server.socket.getsockname()[1]
+        gateway_address = (gateway.hostname, gateway_port)
+        return gateway, gateway_address
+
+
+class TestStreaming(TestStreamingBase):
 
     def test_streaming(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -195,44 +256,20 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         logfile.close()
 
         self.log.debug("\n\nFile contents: %s\n\n", file_contents)
-        self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data)
-        self.assertEqual(file_contents, self.streaming_data)
+        self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data[None])
+        self.assertEqual(file_contents, self.streaming_data[None])
 
         # Check that we logged a multiline debug message
         pattern = (r'^\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d \| '
                    r'Debug Test Token String$')
         r = re.compile(pattern, re.MULTILINE)
-        match = r.search(self.streaming_data)
+        match = r.search(self.streaming_data[None])
         self.assertNotEqual(match, None)
 
     def runWSClient(self, port, build_uuid):
         client = WSClient(port, build_uuid)
         client.event.wait()
         return client
-
-    def runFingerClient(self, build_uuid, gateway_address, event):
-        # Wait until the gateway is started
-        for x in iterate_timeout(30, "finger client to start"):
-            try:
-                # NOTE(Shrews): This causes the gateway to begin to handle
-                # a request for which it never receives data, and thus
-                # causes the getCommand() method to timeout (seen in the
-                # test results, but is harmless).
-                with socket.create_connection(gateway_address) as s:
-                    break
-            except ConnectionRefusedError:
-                pass
-
-        with socket.create_connection(gateway_address) as s:
-            msg = "%s\r\n" % build_uuid
-            s.sendall(msg.encode('utf-8'))
-            event.set()  # notify we are connected and req sent
-            while True:
-                data = s.recv(1024)
-                if not data:
-                    break
-                self.streaming_data += data.decode('utf-8')
-            s.shutdown(socket.SHUT_RDWR)
 
     def test_decode_boundaries(self):
         '''
@@ -513,23 +550,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         self.addCleanup(logfile.close)
 
         # Start the finger gateway daemon
-        config = configparser.ConfigParser()
-        config.read_dict({
-            'gearman': {
-                'server': '127.0.0.1',
-                'port': self.gearman_server.port,
-            },
-            'fingergw': {
-                'listen_address': '::',
-                'port': 0,
-            }
-        })
-        gateway = zuul.lib.fingergw.FingerGateway(config, None, None)
-        gateway.start()
-        self.addCleanup(gateway.stop)
-
-        gateway_port = gateway.server.socket.getsockname()[1]
-        gateway_address = (self.host, gateway_port)
+        _, gateway_address = self.runFingerGateway()
 
         # Start a thread with the finger client
         finger_client_event = threading.Event()
@@ -554,5 +575,183 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         file_contents = logfile.read()
         logfile.close()
         self.log.debug("\n\nFile contents: %s\n\n", file_contents)
-        self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data)
-        self.assertEqual(file_contents, self.streaming_data)
+        self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data[None])
+        self.assertEqual(file_contents, self.streaming_data[None])
+
+
+class CountingFingerRequestHandler(zuul.lib.fingergw.RequestHandler):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # if not hasattr(self.fingergw, 'history'):
+        #     self.fingergw.history = []
+
+    def _fingerClient(self, server, port, build_uuid):
+        self.fingergw.history.append(build_uuid)
+        super()._fingerClient(server, port, build_uuid)
+
+
+class TestStreamingZones(TestStreamingBase):
+
+    def setUp(self):
+        super().setUp()
+        self.fake_nodepool.attributes = {'executor-zone': 'eu-central'}
+        zuul.lib.fingergw.FingerGateway.handler_class = \
+            CountingFingerRequestHandler
+
+    def setup_config(self):
+        super().setup_config()
+        self.config.set('executor', 'zone', 'eu-central')
+
+    def _run_finger_client(self, build, address, name):
+        # Start a thread with the finger client
+        finger_client_event = threading.Event()
+        self.finger_client_results = ''
+        finger_client_thread = threading.Thread(
+            target=self.runFingerClient,
+            args=(build.uuid, address, finger_client_event),
+            kwargs={'name': name}
+        )
+        finger_client_thread.start()
+        finger_client_event.wait()
+        return finger_client_thread
+
+    def test_finger_gateway(self):
+        # Start the finger streamer daemon
+        streamer = zuul.lib.log_streamer.LogStreamer(
+            self.host, 0, self.executor_server.jobdir_root)
+        self.addCleanup(streamer.stop)
+        finger_port = streamer.server.socket.getsockname()[1]
+
+        # Need to set the streaming port before submitting the job
+        self.executor_server.log_streaming_port = finger_port
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        # We don't have any real synchronization for the ansible jobs, so
+        # just wait until we get our running build.
+        for x in iterate_timeout(30, "build"):
+            if len(self.builds):
+                break
+        build = self.builds[0]
+        self.assertEqual(build.name, 'python27')
+
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        for x in iterate_timeout(30, "build dir"):
+            if os.path.exists(build_dir):
+                break
+
+        # Need to wait to make sure that jobdir gets set
+        for x in iterate_timeout(30, "jobdir"):
+            if build.jobdir is not None:
+                break
+
+        # Wait for the job to begin running and create the ansible log file.
+        # The job waits to complete until the flag file exists, so we can
+        # safely access the log here. We only open it (to force a file handle
+        # to be kept open for it after the job finishes) but wait to read the
+        # contents until the job is done.
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        for x in iterate_timeout(30, "ansible log"):
+            if os.path.exists(ansible_log):
+                break
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        def wait_for_stream(name):
+            for x in iterate_timeout(30, "incoming streaming data"):
+                if len(self.streaming_data.get(name, '')) > 0:
+                    break
+
+        # Start the finger gateway daemons
+        gateway_unzoned, gateway_unzoned_address = self.runFingerGateway()
+        gateway_us_west, gateway_us_west_address = self.runFingerGateway(
+            zone='us-west')
+
+        # This finger client runs against a finger gateway in a different zone
+        # while there is no gateway in the worker zone yet. This should work.
+        finger_client_us_west_alone = self._run_finger_client(
+            build, gateway_us_west_address, name='us-west-alone')
+        # The stream must go only via gateway_us_west
+        wait_for_stream('us-west-alone')
+        self.assertEqual(0, len(gateway_unzoned.history))
+        self.assertEqual(1, len(gateway_us_west.history))
+        gateway_unzoned.history.clear()
+        gateway_us_west.history.clear()
+
+        # This finger client runs against an unzoned finger gateway
+        finger_client_unzoned = self._run_finger_client(
+            build, gateway_unzoned_address, name='unzoned')
+        wait_for_stream('unzoned')
+        self.assertEqual(1, len(gateway_unzoned.history))
+        self.assertEqual(0, len(gateway_us_west.history))
+        gateway_unzoned.history.clear()
+        gateway_us_west.history.clear()
+
+        # Now start a finger gateway in the target zone.
+        gateway_eu_central, gateway_eu_central_address = self.runFingerGateway(
+            zone='eu-central')
+
+        # This finger client runs against a finger gateway in a different zone
+        # while there is a gateway in the worker zone. This should route via
+        # the gateway in the worker zone.
+        finger_client_us_west = self._run_finger_client(
+            build, gateway_us_west_address, name='us-west')
+        # The stream must go only via gateway_us_west
+        wait_for_stream('us-west')
+        self.assertEqual(0, len(gateway_unzoned.history))
+        self.assertEqual(1, len(gateway_eu_central.history))
+        self.assertEqual(1, len(gateway_us_west.history))
+        gateway_unzoned.history.clear()
+        gateway_eu_central.history.clear()
+        gateway_us_west.history.clear()
+
+        # This finger client runs against an unzoned finger gateway while there
+        # is a target finger client. As it is unzoned it should not route via
+        # The finger gateway in eu-central.
+        finger_client_unzoned2 = self._run_finger_client(
+            build, gateway_unzoned_address, name='unzoned2')
+        wait_for_stream('unzoned2')
+        self.assertEqual(1, len(gateway_unzoned.history))
+        self.assertEqual(0, len(gateway_eu_central.history))
+        self.assertEqual(0, len(gateway_us_west.history))
+        gateway_unzoned.history.clear()
+        gateway_eu_central.history.clear()
+        gateway_us_west.history.clear()
+
+        # This finger client runs against the target finger gateway.
+        finger_client_eu_central = self._run_finger_client(
+            build, gateway_eu_central_address, name='eu-central')
+        wait_for_stream('eu-central')
+        self.assertEqual(0, len(gateway_unzoned.history))
+        self.assertEqual(1, len(gateway_eu_central.history))
+        self.assertEqual(0, len(gateway_us_west.history))
+        gateway_unzoned.history.clear()
+        gateway_eu_central.history.clear()
+        gateway_us_west.history.clear()
+
+        # Allow the job to complete
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+
+        # Wait for the finger client to complete, which it should when
+        # it's received the full log.
+        finger_client_us_west_alone.join()
+        finger_client_us_west.join()
+        finger_client_eu_central.join()
+        finger_client_unzoned.join()
+        finger_client_unzoned2.join()
+
+        self.waitUntilSettled()
+
+        file_contents = logfile.read()
+        logfile.close()
+        self.log.debug("\n\nFile contents: %s\n\n", file_contents)
+        self.log.debug("\n\nStreamed: %s\n\n",
+                       self.streaming_data['us-west-alone'])
+        self.assertEqual(file_contents, self.streaming_data['us-west-alone'])
+        self.assertEqual(file_contents, self.streaming_data['us-west'])
+        self.assertEqual(file_contents, self.streaming_data['unzoned'])
+        self.assertEqual(file_contents, self.streaming_data['unzoned2'])
+        self.assertEqual(file_contents, self.streaming_data['eu-central'])
