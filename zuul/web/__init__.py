@@ -27,6 +27,7 @@ import logging
 import os
 import time
 import select
+import ssl
 import threading
 
 import re2
@@ -156,13 +157,13 @@ class LogStreamHandler(WebSocket):
         self.streamer = LogStreamer(
             self.zuulweb, self,
             port_location['server'], port_location['port'],
-            request['uuid'])
+            request['uuid'], port_location.get('use_ssl'))
 
 
 class LogStreamer(object):
     log = logging.getLogger("zuul.web")
 
-    def __init__(self, zuulweb, websocket, server, port, build_uuid):
+    def __init__(self, zuulweb, websocket, server, port, build_uuid, use_ssl):
         """
         Create a client to connect to the finger streamer and pull results.
 
@@ -173,11 +174,21 @@ class LogStreamer(object):
         self.log.debug("Connecting to finger server %s:%s", server, port)
         Decoder = codecs.getincrementaldecoder('utf8')
         self.decoder = Decoder()
+        self.zuulweb = zuulweb
         self.finger_socket = socket.create_connection(
             (server, port), timeout=10)
+        if use_ssl:
+            context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+            context.verify_mode = ssl.CERT_REQUIRED
+            context.check_hostname = False
+            context.load_cert_chain(
+                self.zuulweb.finger_ssl_cert, self.zuulweb.finger_ssl_key)
+            context.load_verify_locations(self.zuulweb.finger_ssl_ca)
+            self.finger_socket = context.wrap_socket(
+                self.finger_socket, server_hostname=server)
+
         self.finger_socket.settimeout(None)
         self.websocket = websocket
-        self.zuulweb = zuulweb
         self.uuid = build_uuid
         msg = "%s\n" % build_uuid    # Must have a trailing newline!
         self.finger_socket.sendall(msg.encode('utf-8'))
@@ -962,6 +973,7 @@ class ZuulWeb(object):
     def __init__(self, listen_address, listen_port,
                  gear_server, gear_port,
                  ssl_key=None, ssl_cert=None, ssl_ca=None,
+                 finger_ssl_key=None, finger_ssl_cert=None, finger_ssl_ca=None,
                  static_cache_expiry=3600,
                  connections=None,
                  info=None,
@@ -999,6 +1011,10 @@ class ZuulWeb(object):
             'repl': self.start_repl,
             'norepl': self.stop_repl,
         }
+
+        self.finger_ssl_key = finger_ssl_key
+        self.finger_ssl_cert = finger_ssl_cert
+        self.finger_ssl_ca = finger_ssl_ca
 
         route_map = cherrypy.dispatch.RoutesDispatcher()
         api = ZuulWebAPI(self)
