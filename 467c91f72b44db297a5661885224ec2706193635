@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_0880a345",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-06-12T15:50:23Z",
+      "side": 1,
+      "message": "I think we should only sleep and retry in cases we expect to work on a retry. The generic exception above should probably log and break out of the loop as well.",
+      "range": {
+        "startLine": 273,
+        "startChar": 12,
+        "endLine": 273,
+        "endChar": 25
+      },
+      "revId": "467c91f72b44db297a5661885224ec2706193635",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
