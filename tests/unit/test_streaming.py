@@ -578,9 +578,9 @@ class CountingFingerRequestHandler(zuul.lib.fingergw.RequestHandler):
         # if not hasattr(self.fingergw, 'history'):
         #     self.fingergw.history = []
 
-    def _fingerClient(self, server, port, build_uuid):
+    def _fingerClient(self, server, port, build_uuid, use_ssl):
         self.fingergw.history.append(build_uuid)
-        super()._fingerClient(server, port, build_uuid)
+        super()._fingerClient(server, port, build_uuid, use_ssl)
 
 
 class TestStreamingZones(TestStreamingBase):
