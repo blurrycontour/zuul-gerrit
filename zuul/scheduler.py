@@ -35,6 +35,7 @@ from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
+from zuul.lib.fingergw import FingerClient
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
@@ -359,6 +360,14 @@ class Scheduler(threading.Thread):
         self.ansible_manager = AnsibleManager(
             default_version=default_ansible_version)
 
+        self.gear_server = get_default(config, 'gearman', 'server')
+        self.gear_port = get_default(config, 'gearman', 'port', 4730)
+        self.gear_ssl_key = get_default(config, 'gearman', 'ssl_key')
+        self.gear_ssl_cert = get_default(config, 'gearman', 'ssl_cert')
+        self.gear_ssl_ca = get_default(config, 'gearman', 'ssl_ca')
+
+        self.finger_client = None
+
     def start(self):
         super(Scheduler, self).start()
         self._command_running = True
@@ -368,6 +377,10 @@ class Scheduler(threading.Thread):
                                                name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
+
+        self.finger_client = FingerClient(
+            self.gear_server, self.gear_port, self.gear_ssl_key,
+            self.gear_ssl_cert, self.gear_ssl_ca)
 
         self.rpc.start()
         self.stats_thread.start()
@@ -381,6 +394,7 @@ class Scheduler(threading.Thread):
         self.rpc.stop()
         self.rpc.join()
         self.stop_repl()
+        self.finger_client.shutdown()
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
