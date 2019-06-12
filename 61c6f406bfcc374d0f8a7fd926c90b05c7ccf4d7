@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fb8cfa7_443d3129",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-06-12T08:28:31Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be specified? Fwiw here is the spec i used for the zuul+nodepool allinone operator poc:\n  https://github.com/TristanCacqueray/zuul-operator/blob/master/ansible/group_vars/all.yaml#L3-L24\n\nPerhaps we should isolate connections and tenants information, here are some proposals:\n\n  kind: Zuul\n  spec:\n    merger:\n      min: 0\n      max: 5\n    executor:\n      min: 1\n      max: 5\n    web:\n      min: 1\n      max: 1\n    executor_environment_configmap_name: null\n    \n\n  kind: ZuulConnection\n  spec:\n    name: ...\n    configmap_name: null\n\n  kind ZuulTenant\n  spec:\n    name: ...\n    source:\n      ...\n\nThen a ZuulConnection config map would be provided by the user like so:\n\n  kind: ConfigMap\n  data:\n    conn_rsa: ...\n    zuul.d/conn.conf: |\n      [connection name]\n      driver\u003dgerrit\n      host\u003d...\n      sshkey\u003d/etc/zuul/conn_rsa",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfb3d3c7_aa76aba3",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 1
@@ -13,6 +30,23 @@
       "writtenOn": "2019-05-21T17:14:23Z",
       "side": 1,
       "message": "s/operator/operate/",
+      "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_041c19bf",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-06-12T08:28:31Z",
+      "side": 1,
+      "message": "Similarly for Nodepool, we may want to have a CR per top-level nodepool configloader objects, e.g. NodepoolLabel, NodepoolProvider",
       "revId": "61c6f406bfcc374d0f8a7fd926c90b05c7ccf4d7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
