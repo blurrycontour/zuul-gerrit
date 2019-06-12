@@ -18,13 +18,18 @@ import logging
 import socket
 import ssl
 import threading
+import time
+
+import gear
 
 import zuul.rpcclient
 
 from zuul.lib import commandsocket
 from zuul.lib import streamer_utils
 from zuul.lib.config import get_default
+from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.gearworker import ZuulGearWorker
+from zuul.rpcclient import RPCFailure
 
 COMMANDS = ['stop']
 
@@ -37,12 +42,7 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
     log = logging.getLogger("zuul.fingergw")
 
     def __init__(self, *args, **kwargs):
-        self.rpc = kwargs.pop('rpc')
-
-        # Used for ssl client auth if target is encrypted
-        self.ssl_key = kwargs.pop('client_ssl_key')
-        self.ssl_cert = kwargs.pop('client_ssl_cert')
-        self.ssl_ca = kwargs.pop('client_ssl_ca')
+        self.fingergw = kwargs.pop('fingergw')
 
         super(RequestHandler, self).__init__(*args, **kwargs)
 
@@ -61,8 +61,9 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
                 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
                 context.verify_mode = ssl.CERT_REQUIRED
                 context.check_hostname = False
-                context.load_cert_chain(self.ssl_cert, self.ssl_key)
-                context.load_verify_locations(self.ssl_ca)
+                context.load_cert_chain(
+                    self.fingergw.ssl_cert, self.fingergw.ssl_key)
+                context.load_verify_locations(self.fingergw.ssl_ca)
                 s = context.wrap_socket(s, server_hostname=server)
 
             # timeout only on the connection, let recv() wait forever
@@ -85,7 +86,8 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         port = None
         try:
             build_uuid = self.getCommand()
-            port_location = self.rpc.get_job_log_stream_address(build_uuid)
+            port_location = self.fingergw.rpc.get_job_log_stream_address(
+                build_uuid, source_zone=self.fingergw.zone)
 
             if not port_location:
                 msg = 'Invalid build UUID %s' % build_uuid
@@ -118,6 +120,7 @@ class FingerGateway(object):
     '''
 
     log = logging.getLogger("zuul.fingergw")
+    handler_class = RequestHandler
 
     def __init__(self, config, command_socket, pid_file):
         '''
@@ -146,6 +149,8 @@ class FingerGateway(object):
 
         host = get_default(config, 'fingergw', 'listen_address', '::')
         self.port = int(get_default(config, 'fingergw', 'port', 79))
+        self.public_port = int(get_default(
+            config, 'fingergw', 'public_port', self.port))
         user = get_default(config, 'fingergw', 'user', None)
 
         self.address = (host, self.port)
@@ -202,7 +207,7 @@ class FingerGateway(object):
         self.log.debug('Got %s job: %s', job.name, job.unique)
         info = {
             'server': self.hostname,
-            'port': self.port,
+            'port': self.public_port,
         }
         if self.zone:
             info['zone'] = self.zone
@@ -239,16 +244,16 @@ class FingerGateway(object):
 
         self.server = streamer_utils.CustomThreadingTCPServer(
             self.address,
-            functools.partial(RequestHandler,
-                              rpc=self.rpc,
-                              client_ssl_key=self.finger_client_ssl_key,
-                              client_ssl_cert=self.finger_client_ssl_cert,
-                              client_ssl_ca=self.finger_client_ssl_ca),
+            functools.partial(self.handler_class, fingergw=self),
             server_ssl_key=self.finger_server_ssl_key,
             server_ssl_cert=self.finger_server_ssl_cert,
             server_ssl_ca=self.finger_server_ssl_ca,
             user=self.user,
             pid_file=self.pid_file)
+
+        # Update port that we really use if we configured a port of 0
+        if self.public_port == 0:
+            self.public_port = self.server.socket.getsockname()[1]
 
         # Start the command processor after the server and privilege drop
         if self.command_socket:
@@ -270,6 +275,7 @@ class FingerGateway(object):
 
         # Register this finger gateway in case we are zoned
         if self.gearworker:
+            self.log.info('Starting gearworker')
             self.gearworker.start()
 
         self.log.info("Finger gateway is started")
@@ -309,3 +315,47 @@ class FingerGateway(object):
         '''
         self.gearworker.join()
         self.server_thread.join()
+
+
+class FingerClient:
+    log = logging.getLogger("zuul.FingerClient")
+
+    def __init__(self, server, port, ssl_key=None, ssl_cert=None, ssl_ca=None):
+        self.log.debug("Connecting to gearman at %s:%s" % (server, port))
+        self.gearman = gear.Client()
+        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
+                               keepalive=True, tcp_keepidle=60,
+                               tcp_keepintvl=30, tcp_keepcnt=5)
+        self.log.debug("Waiting for gearman")
+        self.gearman.waitForServer()
+
+    def submitJob(self, name, data):
+        self.log.debug("Submitting job %s with data %s" % (name, data))
+        job = gear.TextJob(name,
+                           json.dumps(data),
+                           unique=str(time.time()))
+        self.gearman.submitJob(job, timeout=300)
+
+        self.log.debug("Waiting for job completion")
+        while not job.complete:
+            time.sleep(0.1)
+        if job.exception:
+            raise RPCFailure(job.exception)
+        self.log.debug("Job complete, success: %s" % (not job.failure))
+        return job
+
+    def shutdown(self):
+        self.gearman.shutdown()
+
+    def get_fingergw_in_zone(self, zone):
+        job_name = 'fingergw:info:%s' % zone
+        functions = getGearmanFunctions(self.gearman)
+        if job_name not in functions:
+            # There is no matching fingergw
+            return None
+
+        job = self.submitJob(job_name, {})
+        if job.failure:
+            return None
+        else:
+            return json.loads(job.data[0])

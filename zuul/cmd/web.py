@@ -77,6 +77,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
             self.config, 'web', 'command_socket',
             '/var/lib/zuul/web.socket')
 
+        params['zone'] = get_default(self.config, 'web', 'zone')
+
         params['connections'] = self.connections
         # Validate config here before we spin up the ZuulWeb object
         for conn_name, connection in self.connections.connections.items():
