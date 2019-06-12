@@ -270,13 +270,40 @@ class RPCListener(object):
             return None
 
         args = json.loads(job.arguments)
+        self.log.debug('Handle get_job_log_stream_address with arguments %s',
+                       job.arguments)
         uuid = args['uuid']
         # TODO: logfile = args['logfile']
         job_log_stream_address = {}
         build = find_build(uuid)
         if build:
-            job_log_stream_address['server'] = build.worker.hostname
-            job_log_stream_address['port'] = build.worker.log_port
+            # If zone and worker zone are both given check if we need to route
+            # via a finger gateway in that zone.
+            source_zone = args.get('source_zone')
+            if (source_zone and build.worker.zone and
+                    source_zone != build.worker.zone):
+                info = self.sched.finger_client.get_fingergw_in_zone(
+                    build.worker.zone)
+                if info:
+                    job_log_stream_address['server'] = info['server']
+                    job_log_stream_address['port'] = info['port']
+                    use_ssl = info.get('use_ssl')
+                    if use_ssl:
+                        job_log_stream_address['use_ssl'] = use_ssl
+                    self.log.debug('Source and worker zone are different, '
+                                   'routing via %s:%s', info['server'],
+                                   info['port'])
+                else:
+                    self.log.warning('Source and worker zone are different '
+                                     'but no fingergw in target zone found. '
+                                     'Falling back to direct connection.')
+            else:
+                self.log.debug('Source or worker zone undefined or equal, no'
+                               ' routing is needed.')
+
+            if 'server' not in job_log_stream_address:
+                job_log_stream_address['server'] = build.worker.hostname
+                job_log_stream_address['port'] = build.worker.log_port
         job.sendWorkComplete(json.dumps(job_log_stream_address))
 
     def handle_tenant_list(self, job):
