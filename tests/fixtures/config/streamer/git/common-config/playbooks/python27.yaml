@@ -1,7 +1,7 @@
 # NOTE(Shrews): Do not run any tasks that will need zuul_console to stream
 # output because that will not work. Since we just need any output in our
 # ansible log, the test coordination tasks should be sufficient.
-- hosts: all
+- hosts: localhost
   tasks:
     - debug: var=waitpath
 
