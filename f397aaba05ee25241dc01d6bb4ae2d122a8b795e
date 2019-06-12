@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_6876ff40",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-06-12T16:05:12Z",
+      "side": 1,
+      "message": "To simplify this I think the general structure could be:\n\n  try:\n      for retry in range(5):\n          try:\n              thing()\n          except specific.exception1:\n              specific log for this\n          except specific.exception2:\n              specific log for this\n          sleep(1)\n  except Exception:\n      Top level log\n\nThis way we\u0027ll log the retries if they happen or we\u0027ll log more fatal errors and not retry. My concern is that if we miss a break we\u0027ll end up stuck in the loop for exceptions we don\u0027t want to retry on.",
+      "revId": "f397aaba05ee25241dc01d6bb4ae2d122a8b795e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
