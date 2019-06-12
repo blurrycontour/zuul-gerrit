@@ -15,6 +15,7 @@
 import functools
 import logging
 import socket
+import ssl
 import threading
 from configparser import ConfigParser
 from typing import Optional
@@ -38,10 +39,9 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
 
     def __init__(self, *args, **kwargs):
         self.fingergw = kwargs.pop('fingergw')
-
         super(RequestHandler, self).__init__(*args, **kwargs)
 
-    def _fingerClient(self, server, port, build_uuid):
+    def _fingerClient(self, server, port, build_uuid, use_ssl):
         '''
         Open a finger connection and return all streaming results.
 
@@ -52,6 +52,16 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         Both IPv4 and IPv6 are supported.
         '''
         with socket.create_connection((server, port), timeout=10) as s:
+            if use_ssl:
+                context = ssl.SSLContext(ssl.PROTOCOL_TLS)
+                context.verify_mode = ssl.CERT_REQUIRED
+                context.check_hostname = False
+                context.load_cert_chain(self.fingergw.finger_client_ssl_cert,
+                                        self.fingergw.finger_client_ssl_key)
+                context.load_verify_locations(
+                    self.fingergw.finger_client_ssl_ca)
+                s = context.wrap_socket(s, server_hostname=server)
+
             # timeout only on the connection, let recv() wait forever
             s.settimeout(None)
             msg = "%s\n" % build_uuid    # Must have a trailing newline!
@@ -82,7 +92,8 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
 
             server = port_location['server']
             port = port_location['port']
-            self._fingerClient(server, port, build_uuid)
+            use_ssl = port_location.get('use_ssl', False)
+            self._fingerClient(server, port, build_uuid, use_ssl)
         except BrokenPipeError:   # Client disconnect
             return
         except Exception:
@@ -157,6 +168,22 @@ class FingerGateway(object):
         self.command_socket_path = command_socket
         self.command_socket = None
 
+        # Fingergw server ssl settings
+        self.finger_server_ssl_key = get_default(
+            config, 'fingergw', 'server_ssl_key')
+        self.finger_server_ssl_cert = get_default(
+            config, 'fingergw', 'server_ssl_cert')
+        self.finger_server_ssl_ca = get_default(
+            config, 'fingergw', 'server_ssl_ca')
+
+        # Fingergw client ssl settings
+        self.finger_client_ssl_key = get_default(
+            config, 'fingergw', 'client_ssl_key')
+        self.finger_client_ssl_cert = get_default(
+            config, 'fingergw', 'client_ssl_cert')
+        self.finger_client_ssl_ca = get_default(
+            config, 'fingergw', 'client_ssl_ca')
+
         self.command_map = dict(
             stop=self.stop,
         )
@@ -173,6 +200,9 @@ class FingerGateway(object):
         if self.zone is not None:
             self.component_info.zone = self.zone
             self.component_info.public_port = self.public_port
+        if all([self.finger_server_ssl_key,
+                self.finger_server_ssl_cert, self.finger_server_ssl_ca]):
+            self.component_info.use_ssl = True
         self.component_info.register()
 
     def _runCommand(self):
@@ -205,6 +235,9 @@ class FingerGateway(object):
         self.server = streamer_utils.CustomThreadingTCPServer(
             self.address,
             functools.partial(self.handler_class, fingergw=self),
+            server_ssl_ca=self.finger_server_ssl_ca,
+            server_ssl_cert=self.finger_server_ssl_cert,
+            server_ssl_key=self.finger_server_ssl_key,
             user=self.user,
             pid_file=self.pid_file)
 
