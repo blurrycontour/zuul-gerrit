@@ -13,6 +13,7 @@
 # under the License.
 
 import functools
+import json
 import logging
 import socket
 import ssl
@@ -23,6 +24,7 @@ import zuul.rpcclient
 from zuul.lib import commandsocket
 from zuul.lib import streamer_utils
 from zuul.lib.config import get_default
+from zuul.lib.gearworker import ZuulGearWorker
 
 COMMANDS = ['stop']
 
@@ -143,10 +145,10 @@ class FingerGateway(object):
         self.gear_ssl_ca = gear_ssl_ca
 
         host = get_default(config, 'fingergw', 'listen_address', '::')
-        port = int(get_default(config, 'fingergw', 'port', 79))
+        self.port = int(get_default(config, 'fingergw', 'port', 79))
         user = get_default(config, 'fingergw', 'user', None)
 
-        self.address = (host, port)
+        self.address = (host, self.port)
         self.user = user
         self.pid_file = pid_file
 
@@ -178,6 +180,36 @@ class FingerGateway(object):
         self.command_map = dict(
             stop=self.stop,
         )
+
+        self.hostname = get_default(config, 'fingergw', 'hostname',
+                                    socket.getfqdn())
+        self.zone = get_default(config, 'fingergw', 'zone')
+
+        if self.zone is not None:
+            jobs = {
+                'fingergw:info:%s' % self.zone: self.handle_info,
+            }
+            self.gearworker = ZuulGearWorker(
+                'Finger Gateway',
+                'zuul.fingergw',
+                'fingergw-gearman-worker',
+                config,
+                jobs)
+        else:
+            self.gearworker = None
+
+    def handle_info(self, job):
+        self.log.debug('Got %s job: %s', job.name, job.unique)
+        info = {
+            'server': self.hostname,
+            'port': self.port,
+        }
+        if self.zone:
+            info['zone'] = self.zone
+        if all([self.finger_server_ssl_key,
+                self.finger_server_ssl_cert, self.finger_server_ssl_ca]):
+            info['use_ssl'] = True
+        job.sendWorkComplete(json.dumps(info))
 
     def _runCommand(self):
         while self.command_running:
@@ -235,9 +267,17 @@ class FingerGateway(object):
         self.server_thread = threading.Thread(target=self._run)
         self.server_thread.daemon = True
         self.server_thread.start()
+
+        # Register this finger gateway in case we are zoned
+        if self.gearworker:
+            self.gearworker.start()
+
         self.log.info("Finger gateway is started")
 
     def stop(self):
+        if self.gearworker:
+            self.gearworker.stop()
+
         if self.server:
             try:
                 self.server.shutdown()
@@ -267,4 +307,5 @@ class FingerGateway(object):
         '''
         Wait on the gateway to shutdown.
         '''
+        self.gearworker.join()
         self.server_thread.join()
