@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_a2e978e6",
+        "filename": "web/yarn.lock",
+        "patchSetId": 17
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-12T14:36:26Z",
+      "side": 1,
+      "message": "This needs to be corrected.",
+      "revId": "4723383909a4e55d61faae677ec5723b472ac0ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_c2e4ac0f",
+        "filename": "web/yarn.lock",
+        "patchSetId": 17
+      },
+      "lineNbr": 2203,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-12T14:36:26Z",
+      "side": 1,
+      "message": "Another.",
+      "revId": "4723383909a4e55d61faae677ec5723b472ac0ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_62ef00e9",
+        "filename": "web/yarn.lock",
+        "patchSetId": 17
+      },
+      "lineNbr": 2340,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-12T14:36:26Z",
+      "side": 1,
+      "message": "Another.",
+      "revId": "4723383909a4e55d61faae677ec5723b472ac0ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_82ea34d5",
+        "filename": "web/yarn.lock",
+        "patchSetId": 17
+      },
+      "lineNbr": 2429,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-12T14:36:26Z",
+      "side": 1,
+      "message": "I\u0027m going to stop now.",
+      "revId": "4723383909a4e55d61faae677ec5723b472ac0ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
