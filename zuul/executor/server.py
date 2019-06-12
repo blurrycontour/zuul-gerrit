@@ -1216,6 +1216,8 @@ class AnsibleJob(object):
             data['url'] = 'finger://{hostname}/{uuid}'.format(
                 hostname=self.executor_server.hostname,
                 uuid=self.job.unique)
+        if self.executor_server.zone:
+            data['worker_zone'] = self.executor_server.zone
 
         self.executor_server.updateBuildStatus(self.job, data)
 

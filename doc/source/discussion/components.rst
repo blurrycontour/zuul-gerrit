@@ -1036,6 +1036,20 @@ sections of ``zuul.conf`` are used by the web server:
       The Cache-Control max-age response header value for static files served
       by the zuul-web. Set to 0 during development to disable Cache-Control.
 
+   .. attr:: zone
+
+      The zone in which zuul-web is deployed. This is only needed if there are
+      executors with different zones in the environment and not all executors
+      are directly addressable from zuul-web. This can be the case within a
+      k8s based zuul deployment spread over multiple sites. The zone defines
+      the zone where the executors are directly adressable. Live log streaming
+      will go directly to the executors of the same zone and be routed to
+      a finger gateway of the target zone of the zones are different. The
+      finger gateway of the other zone is a central entrypoint for all live
+      log streams of that zone.
+
+      If this is used the finger gateways should be configured accordingly.
+
 .. _web-server-tenant-scoped-api:
 
 Enabling tenant-scoped access to privileged actions
@@ -1289,6 +1303,13 @@ sections of ``zuul.conf`` are used by the finger gateway:
       user, but if this option is set, it will drop privileges to this
       user during startup.  It is recommended to set this option to an
       unprivileged user.
+
+   .. attr:: zone
+
+      The zone where the finger gateway is located. This is only needed for
+      live log streaming if the zuul deployment is spread over multiple
+      zones without the ability to directly connect to all executors from
+      zuul-web. See :attr:`executor.zone` for further information.
 
 Operation
 ~~~~~~~~~
