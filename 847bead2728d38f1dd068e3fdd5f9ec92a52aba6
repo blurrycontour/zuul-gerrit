@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_a4e4090e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-13T19:28:57Z",
+      "side": 1,
+      "message": "How about we include two more bits of information in the exception log: 1) the contents of the retry-header (so we collect information about github\u0027s behavior) 2) the amount of time we\u0027re going to retry (so that operators know how long zuul is going to wait without reading the code to find the default value).",
+      "revId": "847bead2728d38f1dd068e3fdd5f9ec92a52aba6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
