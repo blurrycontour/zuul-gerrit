@@ -260,14 +260,20 @@ class GithubEventProcessor(object):
         self.log.debug("Handling %s event", self.event_type)
         event = None
         try:
-            for retry in range(5):
+            for retry in range(1, 6):
                 try:
                     event = method()
                     break
-                except github3.exceptions.ServerError:
+                except (github3.exceptions.ForbiddenError,
+                        github3.exceptions.ServerError) as e:
+                    # NOTE(pabelanger) Check for 'Retry-After' header, if
+                    # missing default to 60, to try to keep github happy.
+                    retry_after = int(e.response.headers.get(
+                        'Retry-After', 60))
                     self.log.exception(
-                        "Failed handling %s event; retrying", self.event_type)
-                time.sleep(1)
+                        "Failed handling %s event; retry attempt %s/5 in "
+                        "%s seconds", self.event_type, retry, retry_after)
+                time.sleep(retry_after)
         except Exception:
             # NOTE(pabelanger): We should report back to the PR we could
             # not process the event, to give the user a chance to
