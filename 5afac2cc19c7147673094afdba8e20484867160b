@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_57662f2c",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-13T04:35:56Z",
+      "side": 1,
+      "message": "In python3 this can just be super().setup...",
+      "parentUuid": "",
+      "revId": "5afac2cc19c7147673094afdba8e20484867160b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
