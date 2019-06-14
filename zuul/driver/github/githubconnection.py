@@ -1305,6 +1305,8 @@ class GithubConnection(BaseConnection):
 
     def getPullBySha(self, sha, project_name, event):
         log = get_annotated_logger(self.log, event)
+
+        # Serve from the cache if existing
         cached_pr_numbers = self._sha_pr_cache.get(project_name, sha)
         if len(cached_pr_numbers) > 1:
             raise Exception('Multiple pulls found with head sha %s' % sha)
@@ -1313,32 +1315,34 @@ class GithubConnection(BaseConnection):
                 pr_body, pr_obj = self.getPull(project_name, pr, event)
                 return pr_body
 
-        pulls = []
         github = self.getGithubClient(project_name)
-        owner, repository = project_name.split('/')
-        repo = github.repository(owner, repository)
-        for pr in repo.pull_requests(state='open',
-                                     # We sort by updated from oldest to newest
-                                     # as that will prefer more recently
-                                     # PRs in our LRU cache.
-                                     sort='updated',
-                                     direction='asc'):
-            pr_dict = pr.as_dict()
-            self._sha_pr_cache.update(project_name, pr_dict)
-            if pr.head.sha != sha:
-                continue
-            if pr_dict in pulls:
-                continue
-            pulls.append(pr_dict)
+        issues = github.search_issues(sha)
+        try:
+            # This performs
+            next(issues)
+        except github3.exceptions.ForbiddenError as e:
+            if not e.msg.startswith('API rate limit'):
+                raise
+            reset = issues.last_response.headers.get('x-ratelimit-reset')
+            wait_time = int(reset) - int(time.time()) + 1
+            log.warning('Search rate limit reached, need to wait for '
+                        '%s seconds', wait_time)
+            time.sleep(wait_time)
+            return self.getPullBySha(sha, project_name, event)
 
         log.debug('Got PR on project %s for sha %s', project_name, sha)
         self.log_rate_limit(self.log, github)
+        pulls = issues.items
         if len(pulls) > 1:
             raise Exception('Multiple pulls found with head sha %s' % sha)
 
         if len(pulls) == 0:
             return None
-        return pulls.pop()
+
+        pr_body, pr_obj = self.getPull(
+            project_name, pulls[0]['number'], event)
+        self._sha_pr_cache.update(project_name, pr_body)
+        return pr_body
 
     def getPullReviews(self, pr_obj, project, number, event):
         log = get_annotated_logger(self.log, event)
