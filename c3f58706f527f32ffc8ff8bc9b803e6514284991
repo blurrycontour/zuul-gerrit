@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_6797e93b",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 13
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 28047
+      },
+      "writtenOn": "2019-06-14T10:41:32Z",
+      "side": 1,
+      "message": "in javascript state \u003d\u003e ({}) is equivalent to \n\nfunction (state) {\n    return {}\n}\n\nstate \u003d\u003e {} will result in a syntax error",
+      "range": {
+        "startLine": 304,
+        "startChar": 11,
+        "endLine": 311,
+        "endChar": 11
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_a7c96126",
+        "filename": "web/src/actions/auth.js",
+        "patchSetId": 13
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 28047
+      },
+      "writtenOn": "2019-06-14T10:41:32Z",
+      "side": 1,
+      "message": "remove this, you have access to it un the reduc-oidc component",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 59
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_87e8ddb2",
+        "filename": "web/src/api.js",
+        "patchSetId": 13
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 28047
+      },
+      "writtenOn": "2019-06-14T10:41:32Z",
+      "side": 1,
+      "message": "instead of doing this every time on every request, you probably need to configure axios globally and call the module everytime you need it.",
+      "range": {
+        "startLine": 107,
+        "startChar": 4,
+        "endLine": 107,
+        "endChar": 70
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_e74679c0",
+        "filename": "web/src/containers/auth/Login.jsx",
+        "patchSetId": 13
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 28047
+      },
+      "writtenOn": "2019-06-14T10:41:32Z",
+      "side": 1,
+      "message": "This wont work because the method is not binded to the component\n\nWhat you want is \n\nonLoginButtonClick \u003d (event) \u003d\u003e {\n    event.preventDefault()\n    userManager.signinRedirect()\n}\n\nor bind your method in the constructor\n\nconstructor(props) {\n    super(props);\n    // This binding is necessary to make `this` work in the render method\n    this.onLoginButtonClick \u003d this.onLoginButtonClick.bind(this);\n  }\n\nI prefer the first one. Just you need to understand that the this is binded automatically thanks to the ES6 arrow function () \u003d\u003e ()",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 5
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_07de2dd9",
+        "filename": "web/src/reducers/auth.js",
+        "patchSetId": 13
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 28047
+      },
+      "writtenOn": "2019-06-14T10:41:32Z",
+      "side": 1,
+      "message": "import {\n  USER_EXPIRED,\n  USER_FOUND,\n  SILENT_RENEW_ERROR,\n  SESSION_TERMINATED,\n  LOADING_USER,\n  USER_SIGNED_OUT\n} from \u0027redux-oidc\u0027\nimport {\n  LOADING_USER_AUTHORIZATIONS,\n  USER_AUTHORIZATIONS_LOADED\n} from \u0027../actions/auth\u0027",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 24
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_875d3d7a",
+        "filename": "web/src/store.js",
+        "patchSetId": 13
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 28047
+      },
+      "writtenOn": "2019-06-14T10:41:32Z",
+      "side": 1,
+      "message": "hum, you probably want to avoid that and do the loadUser(store, userManager) in the componentDidMount of your app.js\n\nIt will be easier to test",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 1
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
