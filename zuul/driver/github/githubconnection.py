@@ -269,7 +269,9 @@ class GithubEventProcessor(object):
                     # NOTE(pabelanger) Check for 'Retry-After' header, if
                     # missing default to 60, to try to keep github happy.
                     retry_after = e.response.headers.get('Retry-After')
-                    retry_delay = float(retry_after or 60)
+                    # Incude a 5 seconds buffer, as not to loop again for
+                    # another 60 seconds.
+                    retry_delay = float(retry_after or 60) + 5
                     self.log.exception(
                         "Failed handling %s event; remote said retry after %s,"
                         "will retry attempt %s/5 in %s seconds",
