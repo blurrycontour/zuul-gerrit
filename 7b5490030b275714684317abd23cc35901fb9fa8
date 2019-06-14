@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_dc79bbc4",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 22
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-14T21:18:12Z",
+      "side": 1,
+      "message": "This is correct in this patch, but is not updated in the later ones.  You may as well just drop the \"supports sources\" bit and write for the end state.",
+      "revId": "7b5490030b275714684317abd23cc35901fb9fa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
