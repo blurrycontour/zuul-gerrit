@@ -16,6 +16,23 @@
       "revId": "7b5490030b275714684317abd23cc35901fb9fa8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_676efc00",
+        "filename": "zuul/driver/bitbucket/bitbucketconnection.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-06-14T22:54:52Z",
+      "side": 1,
+      "message": "You might consider setting a self.client here then you don\u0027t have to re request a new client object each time a client is needed. I think that will simplify things a bit in the code below.",
+      "revId": "7b5490030b275714684317abd23cc35901fb9fa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
