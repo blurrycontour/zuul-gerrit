@@ -471,4 +471,4 @@ class FakeGithubClient(object):
                 issue = FakeIssue(pr)
                 results.append(FakeIssueSearchResult(issue))
 
-        return results
+        return iter(results)
