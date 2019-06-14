@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_5c6e2b00",
+        "filename": "zuul/driver/bitbucket/bitbucketconnection.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-14T21:18:04Z",
+      "side": 1,
+      "message": "We should allow the canonical hostname to be specified separately from the server name (but it should default to that).  Take zuul itself for example -- our changes are in gerrit, so the hostname is \u0027review.opendev.org\u0027, but the canonical name for the repository (where we expect people to clone from) is \u0027opendev.org\u0027.  This is especially important for languages like Go, where the canonical repo hostname ends up in the filesystem path (Zuul lays out repos on disk in golang form for that reason).\n\nAnyway, I think we just need to add one more \"connection_config.get\" line for \u0027canonical_hostname\u0027 and default it to what you have here (and adds docs of course).",
+      "revId": "24ad31f5ce39c1e07bd6892f6de9477c6516b396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_fc783fc4",
+        "filename": "zuul/driver/bitbucket/bitbucketsource.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-14T21:18:04Z",
+      "side": 1,
+      "message": "Given that this driver has a local copy of every open PR for managed projects, can we search all of their descriptions for Depends-On headers which match?",
+      "revId": "24ad31f5ce39c1e07bd6892f6de9477c6516b396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_1c7433ce",
+        "filename": "zuul/driver/bitbucket/bitbuckettrigger.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-14T21:18:04Z",
+      "side": 1,
+      "message": "The docs should be updated for this too.",
+      "revId": "24ad31f5ce39c1e07bd6892f6de9477c6516b396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
