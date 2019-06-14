@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_7d5bf6f4",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 13
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-14T12:23:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_6797e93b",
+      "range": {
+        "startLine": 304,
+        "startChar": 11,
+        "endLine": 311,
+        "endChar": 11
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_a7c96126",
         "filename": "web/src/actions/auth.js",
         "patchSetId": 13
@@ -71,6 +95,29 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_fde926e2",
+        "filename": "web/src/config.js",
+        "patchSetId": 13
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-14T12:23:04Z",
+      "side": 1,
+      "message": "What\u0027s the best way to allow operators to set this config? IIUC the whole project is compiled with yarn before shipping. Can this file be excluded so that it can be modified depending on your deployment?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 60
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_e74679c0",
         "filename": "web/src/containers/auth/Login.jsx",
         "patchSetId": 13
@@ -87,6 +134,53 @@
         "startChar": 0,
         "endLine": 10,
         "endChar": 5
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_7d29b634",
+        "filename": "web/src/containers/auth/Login.jsx",
+        "patchSetId": 13
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-14T12:23:04Z",
+      "side": 1,
+      "message": "This was working for me, and straight from redux-oidc\u0027s doc, but I trust you!",
+      "parentUuid": "9fb8cfa7_e74679c0",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 5
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_9da34ab2",
+        "filename": "web/src/pages/auth/Callback.jsx",
+        "patchSetId": 13
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-14T12:23:04Z",
+      "side": 1,
+      "message": "Authorizations are fetched only when this callback page is loaded. If I\u0027m already authenticated on the SSO service, my user details are loaded in the store but the authorizations aren\u0027t. Is there a way to load them properly?",
+      "range": {
+        "startLine": 12,
+        "startChar": 6,
+        "endLine": 12,
+        "endChar": 56
       },
       "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
@@ -128,6 +222,30 @@
       "writtenOn": "2019-06-14T10:41:32Z",
       "side": 1,
       "message": "hum, you probably want to avoid that and do the loadUser(store, userManager) in the componentDidMount of your app.js\n\nIt will be easier to test",
+      "range": {
+        "startLine": 23,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 1
+      },
+      "revId": "c3f58706f527f32ffc8ff8bc9b803e6514284991",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_7df456f1",
+        "filename": "web/src/store.js",
+        "patchSetId": 13
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-14T12:23:04Z",
+      "side": 1,
+      "message": "If I read the doc correctly that\u0027s where you\u0027re supposed to do it: https://github.com/maxmantz/redux-oidc/blob/master/docs/API.md#loaduser\nIt\u0027s not active anyway because I haven\u0027t figured out how silent renew works",
+      "parentUuid": "9fb8cfa7_875d3d7a",
       "range": {
         "startLine": 23,
         "startChar": 0,
