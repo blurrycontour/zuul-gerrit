@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_dca45b4d",
+        "filename": "tests/unit/bitbucket/testbitbucketfunctional.py",
+        "patchSetId": 54
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-14T21:17:50Z",
+      "side": 1,
+      "message": "It would be good to have both a forward and reverse cross-repo-dependency test.  And also a cross-source dependency test too (where you have bitbucked and gerrit changes depending on each other).",
+      "revId": "93842514f67605146dfcb2b0b65154eea6700e0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_7c652f1d",
+        "filename": "zuul/driver/bitbucket/bitbucketconnection.py",
+        "patchSetId": 54
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-14T21:17:50Z",
+      "side": 1,
+      "message": "The other drivers cache their resulting change/pr objects so that if Source.getChange is called multiple times, the same object is returned.  This also has the side effect that if the driver updates a change (say an approval is revoked), Zuul will see that change, since single object in the system representing it is updated.  I see there\u0027s a cache here, but we don\u0027t read from it in this method.  I think we probably want to do that... and we should probably update the developer docs to make that API expectation clear.\n\nAlso, we need to set pull.uris in order for reverse cross-project deps to work.",
+      "revId": "93842514f67605146dfcb2b0b65154eea6700e0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_9c6823f5",
+        "filename": "zuul/driver/bitbucket/bitbucketsource.py",
+        "patchSetId": 54
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-14T21:17:50Z",
+      "side": 1,
+      "message": "If we change the BitbucketTriggerEvent.change_id to change_number, we can drop the introspection of the event type here and just use buildPR on event.change_number in both cases.",
+      "revId": "93842514f67605146dfcb2b0b65154eea6700e0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
