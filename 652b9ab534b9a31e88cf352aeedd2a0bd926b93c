@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_5fa2864d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-17T15:56:02Z",
+      "side": 1,
+      "message": "I think we should use utcnow() (and probably include a tz/tz_offset to match), for 2 reasons:\n1) Without a tz or offset, it\u0027s hard for users to know how to use this time.\n2) Because we\u0027re actually giving the local time here, and below, we give the UTC time, users who know this can calculate the tz offset and get an approximate location of the server.  That doesn\u0027t bother me that much, but it does run counter to one of the stated goals.  At the very least, it does seem a good idea to make executors in different locations behave consistently, so UTC would be a good match here.",
+      "revId": "652b9ab534b9a31e88cf352aeedd2a0bd926b93c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
