@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_9f18f984",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-17T20:33:04Z",
+      "side": 1,
+      "message": "oops, this is just a comment leftover from a refactoring. The rate limit header only triggers rate limit logging. The handling itself is triggered by 403 combined with the according messages (in this case the needed header is always there).",
+      "parentUuid": "9fb8cfa7_bfc13de7",
+      "revId": "4dc090ce1cd0ec0d6bf10256055e041a3a4587c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_5fb6018d",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 4
