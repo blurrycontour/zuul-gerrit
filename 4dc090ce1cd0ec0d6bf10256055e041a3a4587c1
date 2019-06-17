@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_bfc13de7",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-17T20:28:29Z",
+      "side": 1,
+      "message": "The comment makes me wonder if this is complete?  Did you mean to return if there is not rate_limit header?  If there is a case where we get a 403 but no rate limit headers, I think we will hit an exception inside handle_rate_limit, right?",
+      "revId": "4dc090ce1cd0ec0d6bf10256055e041a3a4587c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_5fb6018d",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-17T20:28:29Z",
+      "side": 1,
+      "message": "Nit: really good time to use \"double quotes\". :)",
+      "revId": "4dc090ce1cd0ec0d6bf10256055e041a3a4587c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
