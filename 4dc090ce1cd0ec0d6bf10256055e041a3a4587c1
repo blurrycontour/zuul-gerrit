@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_42370ae5",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-17T20:35:59Z",
+      "side": 1,
+      "message": "If the header is always there, I agree there isn\u0027t a problem, and this is just a confusing comment.  I suggest we remove it (because of how confusing it could be).",
+      "revId": "4dc090ce1cd0ec0d6bf10256055e041a3a4587c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_5fb6018d",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 4
