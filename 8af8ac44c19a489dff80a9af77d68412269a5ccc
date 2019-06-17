@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_f664cee7",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-06-17T07:43:55Z",
+      "side": 1,
+      "message": "(nit) `expired` implies a boolean imo. It\u0027d be clearer to use `expired_time`",
+      "range": {
+        "startLine": 157,
+        "startChar": 20,
+        "endLine": 157,
+        "endChar": 27
+      },
+      "revId": "8af8ac44c19a489dff80a9af77d68412269a5ccc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
