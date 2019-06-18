@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_b28162c6",
+        "filename": "releasenotes/notes/admin_web_api-1331c81070a3e67f.yaml",
+        "patchSetId": 26
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-18T17:01:28Z",
+      "side": 1,
+      "message": "Again, let\u0027s just stick to the one note about the new feature.",
+      "revId": "aca74f40fee9aec83840b4c549935dbff853f779",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
