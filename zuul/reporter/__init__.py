@@ -129,6 +129,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         status_url = get_default(self.connection.sched.config,
                                  'web', 'status_url', '')
         return item.pipeline.start_message.format(pipeline=item.pipeline,
+                                                  change=item.change,
                                                   status_url=status_url)
 
     def _formatItemReportSuccess(self, item, with_jobs=True):
