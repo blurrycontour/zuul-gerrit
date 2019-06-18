@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_329d7266",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-06-18T16:55:34Z",
+      "side": 1,
+      "message": "In testing our current 502 retry logic, I have see changes where we want 5 times at 60 seconds between requests still now work. But that has only been a few cases.",
+      "revId": "dc42084913da29866562a452f365592fbfce29ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_f2883a23",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 840,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-06-18T16:55:34Z",
+      "side": 1,
+      "message": "I\u0027d be okay bumping this up to 60, based on zuul.a.c testing.",
+      "range": {
+        "startLine": 840,
+        "startChar": 54,
+        "endLine": 840,
+        "endChar": 56
+      },
+      "revId": "dc42084913da29866562a452f365592fbfce29ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
