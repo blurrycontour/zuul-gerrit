@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_324ed2c1",
+        "filename": "releasenotes/notes/admin_web_api-1331c81070a3e67f.yaml",
+        "patchSetId": 32
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-18T17:03:10Z",
+      "side": 1,
+      "message": "Ditto about the release notes.",
+      "revId": "2418d79f3dd2329f2381fc1672933f7152343028",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
