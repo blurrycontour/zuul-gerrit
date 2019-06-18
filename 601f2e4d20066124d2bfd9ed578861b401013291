@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_12938e51",
+        "filename": "releasenotes/notes/admin_web_api-1331c81070a3e67f.yaml",
+        "patchSetId": 60
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-18T16:56:23Z",
+      "side": 1,
+      "message": "Let\u0027s just summarize this as a single feature addition -- probably the first entry is enough (but maybe add the endpoints as examples of what can be done?).  This is interpreted as sphinx as part of the docs, so you can do an internal link to the documentation.\n\nWe don\u0027t want this to be too long, otherwise people won\u0027t read it.",
+      "revId": "601f2e4d20066124d2bfd9ed578861b401013291",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_b297223b",
+        "filename": "releasenotes/notes/admin_web_api-1331c81070a3e67f.yaml",
+        "patchSetId": 60
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-18T16:56:23Z",
+      "side": 1,
+      "message": "I don\u0027t think we need either the security or upgrade notes.  We usually use \"upgrade\" for telling people about actions which may need to be performed in order to upgrade, but this is disabled by default, so people will get the current behavior unless they opt-in to the new feature.  Similarly, \"security\" is usually where we let people know about vulnerabilities, but since this is disabled by default, there won\u0027t be any at this point.",
+      "revId": "601f2e4d20066124d2bfd9ed578861b401013291",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
