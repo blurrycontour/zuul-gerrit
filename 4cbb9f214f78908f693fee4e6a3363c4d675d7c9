@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_d88d2232",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-18T07:37:15Z",
+      "side": 1,
+      "message": "That looks a lot like the existing autohold_list but with a filter, how about merging both by just adding a --filter option to autohold_list? And eventually a --detailed one to add more info to the output?",
+      "range": {
+        "startLine": 250,
+        "startChar": 0,
+        "endLine": 269,
+        "endChar": 19
+      },
+      "revId": "4cbb9f214f78908f693fee4e6a3363c4d675d7c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
