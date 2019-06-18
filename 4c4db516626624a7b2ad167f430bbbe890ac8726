@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_52efc6af",
+        "filename": "releasenotes/notes/admin_web_api-1331c81070a3e67f.yaml",
+        "patchSetId": 25
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-18T16:59:08Z",
+      "side": 1,
+      "message": "The release notes don\u0027t need to duplicate the commit log.  Just one note to let people know there is a new feature is all we need.",
+      "revId": "4c4db516626624a7b2ad167f430bbbe890ac8726",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
