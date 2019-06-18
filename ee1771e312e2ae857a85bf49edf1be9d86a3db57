@@ -22,6 +22,23 @@
       "revId": "ee1771e312e2ae857a85bf49edf1be9d86a3db57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_17506032",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-18T16:20:20Z",
+      "side": 1,
+      "message": "Yes, but omitting the TZ was also different, right?  And, really, the only difference here is that we\u0027re forcing the host to be on UTC time whether it is or not.  If the host happened to be configured to keep its local time in UTC, the behavior would be the same.  So I think this is less different than the alternative.  :)",
+      "revId": "ee1771e312e2ae857a85bf49edf1be9d86a3db57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
