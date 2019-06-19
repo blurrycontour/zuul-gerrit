@@ -161,6 +161,14 @@ class ChangePanel extends React.Component {
     )
   }
 
+  renderBuildSetUUID (change) {
+      return (
+        <React.Fragment>
+            <small>Buildset ID: {change.buildset_uuid}</small>
+        </React.Fragment>
+      )
+  }
+
   renderTimer (change) {
     let remainingTime
     if (change.remaining_time === null) {
@@ -310,6 +318,9 @@ class ChangePanel extends React.Component {
               <div className='row'>
                 <div className='col-xs-4'>
                   {this.renderChangeLink(change)}
+                </div>
+                <div className='col-xs-4'>
+                  {this.renderBuildSetUUID(change)}
                 </div>
                 <div className='col-xs-8'>
                   {this.renderProgressBar(change)}
