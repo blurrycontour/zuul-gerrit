@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_81039b0f",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-19T15:24:10Z",
+      "side": 1,
+      "message": "Not a big fan of the render, if you have any suggestions on how/when to display this info, I\u0027ll gladly take them",
+      "range": {
+        "startLine": 322,
+        "startChar": 0,
+        "endLine": 324,
+        "endChar": 22
+      },
+      "revId": "b372b732b2e48f7e9fc97270bf387a316f5a8914",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
