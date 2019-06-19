@@ -117,9 +117,11 @@ class RPCListener(object):
         project_name = args['project']
         change = args['change']
         ref = args['ref']
+        buildset_uuid = args['buildset_uuid']
         try:
             self.sched.dequeue(
-                tenant_name, pipeline_name, project_name, change, ref)
+                tenant_name, pipeline_name, project_name,
+                change, ref, buildset_uuid)
         except Exception as e:
             job.sendWorkException(str(e).encode('utf8'))
             return

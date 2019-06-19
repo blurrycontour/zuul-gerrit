@@ -1024,7 +1024,8 @@ class TestGithubDriver(ZuulTestCase):
             pipeline='check',
             project='org/project',
             change='{},{}'.format(A.number, A.head_sha),
-            ref=None)
+            ref=None,
+            buildset_uuid=None)
 
         self.waitUntilSettled()
 
