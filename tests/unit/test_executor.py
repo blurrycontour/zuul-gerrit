@@ -718,18 +718,24 @@ class TestExecutorFacts(AnsibleZuulTestCase):
         with open(p) as f:
             return f.read()
 
-    def test_datetime_fact(self):
+    def test_fact_exposition(self):
         self.executor_server.keep_jobdir = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
         self.waitUntilSettled()
 
+        # Ensure ansible_date_time fact is correctly exposed
         self.assertEqual(self.getJobFromHistory('datetime-fact').result,
                          'SUCCESS')
-
         j = json.loads(self._get_file(self.history[0],
                                       'work/logs/job-output.json'))
 
         date_time = \
-            j[0]['plays'][0]['tasks'][0]['hosts']['localhost']['date_time']
-        self.assertEqual(18, len(date_time))
+            j[0]['plays'][0]['tasks'][0]['hosts']['localhost']['ansible_date_time']
+        self.assertEqual(18, len(ansible_date_time))
+        #This ensures we are exposing the right TZ offset, and not ansible one.
+        self.assertEqual('+0000', ansible_date_time['tz_offset'])
+
+        # Ensure other facts are not exposed
+        self.assertEqual(self.getJobFromHistory('other-fact').result,
+                         'SUCCESS')
