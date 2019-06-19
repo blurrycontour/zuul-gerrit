@@ -39,6 +39,24 @@
       "revId": "ee1771e312e2ae857a85bf49edf1be9d86a3db57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_b5a14298",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 17068
+      },
+      "writtenOn": "2019-06-19T06:22:59Z",
+      "side": 1,
+      "message": "Sorry for my poor wording, I was explaining my agreement, but storing that for the record :)\n\nIt seems we are all in agreement.",
+      "parentUuid": "9fb8cfa7_17506032",
+      "revId": "ee1771e312e2ae857a85bf49edf1be9d86a3db57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
