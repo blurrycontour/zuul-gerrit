@@ -3941,7 +3941,8 @@ class TestScheduler(ZuulTestCase):
             pipeline='post',
             project='org/project1',
             change=None,
-            ref='master')
+            ref='master',
+            buildset_uuid=None)
         self.executor_server.release('.*')
         self.waitUntilSettled()
         job_names = [x.name for x in self.history]
@@ -3982,7 +3983,8 @@ class TestScheduler(ZuulTestCase):
             pipeline='gate',
             project='org/project',
             change='1,1',
-            ref=None)
+            ref=None,
+            buildset_uuid=None)
 
         self.waitUntilSettled()
 
@@ -4021,7 +4023,60 @@ class TestScheduler(ZuulTestCase):
             pipeline='check',
             project='org/project',
             change='1,1',
-            ref=None)
+            ref=None,
+            buildset_uuid=None)
+        self.waitUntilSettled()
+
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        check_pipeline = tenant.layout.pipelines['check']
+        self.assertEqual(len(check_pipeline.getAllItems()), 2)
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    def test_client_dequeue_change_by_buildset_id(self):
+        "Test that the RPC client can dequeue a change by buildset uuid"
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Get the buildset uuid
+        def _get_uuid():
+            _status = client.submitJob('zuul:status_get',
+                                       {'tenant': 'tenant-one'})
+            status = json.loads(_status.data[0])
+            # TODO we know the pipeline, there should be a cleverer way
+            for pipeline in status['pipelines']:
+                for change_queue in pipeline['change_queues']:
+                    for head in change_queue['heads']:
+                        for change in head:
+                            if change['id'] == '1,1':
+                                return change.buildset_uuid
+
+        client.dequeue(
+            tenant=None,
+            pipeline=None,
+            project=None,
+            change=None,
+            ref=None,
+            buildset_uuid=_get_uuid())
         self.waitUntilSettled()
 
         tenant = self.sched.abide.tenants.get('tenant-one')
@@ -4066,7 +4121,8 @@ class TestScheduler(ZuulTestCase):
                 pipeline='check',
                 project='org/project1',
                 change='4,1',
-                ref=None)
+                ref=None,
+                buildset_uuid=None)
             self.waitUntilSettled()
             self.assertEqual(r, False)
 
@@ -4102,7 +4158,8 @@ class TestScheduler(ZuulTestCase):
             pipeline='periodic',
             project='org/project',
             change=None,
-            ref='refs/heads/stable')
+            ref='refs/heads/stable',
+            buildset_uuid=None)
         self.waitUntilSettled()
 
         self.commitConfigUpdate('common-config',
