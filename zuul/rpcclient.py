@@ -91,12 +91,13 @@ class RPCClient(object):
                 }
         return not self.submitJob('zuul:enqueue_ref', data).failure
 
-    def dequeue(self, tenant, pipeline, project, change, ref):
+    def dequeue(self, tenant, pipeline, project, change, ref, buildset_uuid):
         data = {'tenant': tenant,
                 'pipeline': pipeline,
                 'project': project,
                 'change': change,
                 'ref': ref,
+                'buildset_uuid': buildset_uuid,
                 }
         return not self.submitJob('zuul:dequeue', data).failure
 
