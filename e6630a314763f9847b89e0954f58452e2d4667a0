@@ -2,6 +2,46 @@
   "comments": [
     {
       "key": {
+        "uuid": "9fb8cfa7_03048bc5",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 15
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-19T19:20:56Z",
+      "side": 1,
+      "message": "same as for buildsets, I think a specific trigger would work better there",
+      "revId": "e6630a314763f9847b89e0954f58452e2d4667a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_8372bb7b",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 15
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-19T19:20:56Z",
+      "side": 1,
+      "message": "Can this be inherited from a parent react component? But how do we get this info if only one change is shown?",
+      "range": {
+        "startLine": 173,
+        "startChar": 0,
+        "endLine": 174,
+        "endChar": 28
+      },
+      "revId": "e6630a314763f9847b89e0954f58452e2d4667a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_c8f1b003",
         "filename": "web/src/pages/Buildsets.jsx",
         "patchSetId": 15
