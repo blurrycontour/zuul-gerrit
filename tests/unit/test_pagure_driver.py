@@ -256,7 +256,8 @@ class TestPagureDriver(ZuulTestCase):
             pipeline='check',
             project='org/project',
             change='%s,%s' % (A.number, A.commit_stop),
-            ref=None)
+            ref=None,
+            buildset_uuid=None)
 
         self.waitUntilSettled()
 
