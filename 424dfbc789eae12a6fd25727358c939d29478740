@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_a4cfd255",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 736,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-06-19T11:28:18Z",
+      "side": 1,
+      "message": "I think pep8 will complain about not having a space after the #",
+      "revId": "424dfbc789eae12a6fd25727358c939d29478740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_04eb3eb0",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-06-19T11:28:18Z",
+      "side": 1,
+      "message": "(nit) It\u0027s a bit of duplication, but this could be a separate job to confirm the facts are indeed restricted. Alternatively, if there is a way in ansible to list all the facts we could check that it only has what we want.",
+      "range": {
+        "startLine": 739,
+        "startChar": 10,
+        "endLine": 739,
+        "endChar": 44
+      },
+      "revId": "424dfbc789eae12a6fd25727358c939d29478740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
