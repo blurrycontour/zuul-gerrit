@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_bed6fac2",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-06-19T14:26:05Z",
+      "side": 1,
+      "message": "Nit: Should probably decide whether you want these lines in or out. :)",
+      "revId": "c26141aaf96c8cda10617231a1790390a58ad1de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
