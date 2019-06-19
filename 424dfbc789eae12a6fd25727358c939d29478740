@@ -105,6 +105,30 @@
       "revId": "424dfbc789eae12a6fd25727358c939d29478740",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_c4ad2632",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 17068
+      },
+      "writtenOn": "2019-06-19T11:42:09Z",
+      "side": 1,
+      "message": "Ok got it. I thought that, due to the fact I would be testing something very close to standard, it would expose things so ensuring the rest is not exposed seemed the same topic.\nI can split in two patches. I will first check it passes to not loose precious infra testing time :)",
+      "parentUuid": "9fb8cfa7_04d57eb9",
+      "range": {
+        "startLine": 739,
+        "startChar": 10,
+        "endLine": 739,
+        "endChar": 44
+      },
+      "revId": "424dfbc789eae12a6fd25727358c939d29478740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
