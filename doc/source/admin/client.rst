@@ -38,6 +38,7 @@ Examples::
 
     zuul dequeue --tenant openstack --pipeline check --project example_project --change 5,1
     zuul dequeue --tenant openstack --pipeline periodic --project example_project --ref refs/heads/master
+    zuul dequeue --buildset-id 123456
 
 Enqueue
 ^^^^^^^

@@ -2691,6 +2691,7 @@ class QueueItem(object):
         ret['items_behind'] = [i.change._id() for i in self.items_behind]
         ret['failing_reasons'] = self.current_build_set.failing_reasons
         ret['zuul_ref'] = self.current_build_set.ref
+        ret['buildset_uuid'] = self.current_build_set.uuid
         if self.change.project:
             ret['project'] = self.change.project.name
             ret['project_canonical'] = self.change.project.canonical_name
