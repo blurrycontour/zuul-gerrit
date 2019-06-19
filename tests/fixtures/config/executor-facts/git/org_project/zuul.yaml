@@ -3,8 +3,14 @@
     name: datetime-fact
     run: playbooks/datetime-fact.yaml
 
+- job:
+    parent: base
+    name: other-fact
+    run: playbooks/other-fact.yaml
+
 - project:
     name: org/project
     promote:
       jobs:
         - datetime-fact
+        - other-fact
