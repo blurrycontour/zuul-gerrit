@@ -2,6 +2,6 @@
   gather_facts: smart
   tasks:
     - debug:
-        var: ansible_date_time
+        var: ansible_hostname
     - assert:
-        that: ansible_date_time is defined
+        that: ansible_hostname is not defined

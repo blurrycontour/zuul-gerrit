@@ -432,7 +432,7 @@ class JobDir(object):
         date_time_facts['tz_offset'] = '+0000'
 
         executor_facts = {}
-        executor_facts['date_time'] = date_time_facts
+        executor_facts['ansible_date_time'] = date_time_facts
         executor_facts['module_setup'] = True
 
         # NOTE(pabelanger): We do not want to leak zuul-executor facts to other
