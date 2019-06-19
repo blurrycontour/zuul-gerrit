@@ -81,6 +81,30 @@
       "revId": "424dfbc789eae12a6fd25727358c939d29478740",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_04d57eb9",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-06-19T11:37:23Z",
+      "side": 1,
+      "message": "Yes, I did mean \u0027test\u0027 sorry. And yes, the pre-work to run it requires a bit of repetition so it was more a nit/comment and I could go either way on it.\n\nIt would be neat to confirm that we aren\u0027t exposing other facts to affirm we are correctly restricting the executors. However that doesn\u0027t have to be done in this patch.",
+      "parentUuid": "9fb8cfa7_e4814ac5",
+      "range": {
+        "startLine": 739,
+        "startChar": 10,
+        "endLine": 739,
+        "endChar": 44
+      },
+      "revId": "424dfbc789eae12a6fd25727358c939d29478740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
