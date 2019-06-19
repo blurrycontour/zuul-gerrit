@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_84440eb9",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 736,
+      "author": {
+        "id": 17068
+      },
+      "writtenOn": "2019-06-19T11:34:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_a4cfd255",
+      "revId": "424dfbc789eae12a6fd25727358c939d29478740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_04eb3eb0",
         "filename": "tests/unit/test_executor.py",
         "patchSetId": 1
@@ -30,6 +48,30 @@
       "writtenOn": "2019-06-19T11:28:18Z",
       "side": 1,
       "message": "(nit) It\u0027s a bit of duplication, but this could be a separate job to confirm the facts are indeed restricted. Alternatively, if there is a way in ansible to list all the facts we could check that it only has what we want.",
+      "range": {
+        "startLine": 739,
+        "startChar": 10,
+        "endLine": 739,
+        "endChar": 44
+      },
+      "revId": "424dfbc789eae12a6fd25727358c939d29478740",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_e4814ac5",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 17068
+      },
+      "writtenOn": "2019-06-19T11:34:08Z",
+      "side": 1,
+      "message": "It is a separate \"job\".\nIt isn\u0027t a separate test. I thought using a setUp/teardown for this was too much and running those time the executor to waitUntilSettled was a waste of resoures.\nDid you mean a separate test?\n\nThere is a way to list all facts is to query for {{ ansible_facts }}. Did you want to register this, and evaluate its length? This is also something we can do.",
+      "parentUuid": "9fb8cfa7_04eb3eb0",
       "range": {
         "startLine": 739,
         "startChar": 10,
