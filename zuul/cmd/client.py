@@ -113,7 +113,7 @@ class Client(zuul.cmd.ZuulApp):
 
         cmd_dequeue = subparsers.add_parser('dequeue',
                                             help='dequeue a buildset by its '
-                                                 'change or ref')
+                                                 'change, ref or UUID')
         cmd_dequeue.add_argument('--tenant', help='tenant name',
                                  required=True)
         cmd_dequeue.add_argument('--pipeline', help='pipeline name',
@@ -123,6 +123,8 @@ class Client(zuul.cmd.ZuulApp):
         cmd_dequeue.add_argument('--change', help='change id',
                                  default=None)
         cmd_dequeue.add_argument('--ref', help='ref name',
+                                 default=None)
+        cmd_dequeue.add_argument('--buildset-id', help='buildset UUID',
                                  default=None)
         cmd_dequeue.set_defaults(func=self.dequeue)
 
@@ -180,11 +182,16 @@ class Client(zuul.cmd.ZuulApp):
             if self.args.newrev is None:
                 self.args.newrev = '0000000000000000000000000000000000000000'
         if self.args.func == self.dequeue:
-            if self.args.change is None and self.args.ref is None:
-                parser.error("Change or ref needed.")
-            if self.args.change is not None and self.args.ref is not None:
+            if self.args.change is None and self.args.ref is None and\
+               self.args.buildset_id is None:
+                parser.error("Change, ref or buildset UUID needed.")
+            if sum([1 and (x is not None) or 0
+                    for x in (self.args.ref,
+                              self.args.change,
+                              self.args.buildset_id)]) != 1:
                 parser.error(
-                    "The 'change' and 'ref' arguments are mutually exclusive.")
+                    "The 'change', 'ref' and 'buildset-id' arguments are "
+                    "mutually exclusive.")
 
     def setup_logging(self):
         """Client logging does not rely on conf file"""
@@ -283,7 +290,8 @@ class Client(zuul.cmd.ZuulApp):
                            pipeline=self.args.pipeline,
                            project=self.args.project,
                            change=self.args.change,
-                           ref=self.args.ref)
+                           ref=self.args.ref,
+                           buildset_uuid=self.args.buildset_id)
         return r
 
     def promote(self):

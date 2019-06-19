@@ -132,9 +132,11 @@ class DequeueEvent(ManagementEvent):
     :arg str project_name: the name of the project
     :arg str change: optional, the change to dequeue
     :arg str ref: optional, the ref to look for
+    :arg str buildset_uuid: optional, the buildset UUID to look for
     """
 
-    def __init__(self, tenant_name, pipeline_name, project_name, change, ref):
+    def __init__(self, tenant_name, pipeline_name, project_name,
+                 change, ref, buildset_uuid):
         super(DequeueEvent, self).__init__()
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
@@ -145,6 +147,7 @@ class DequeueEvent(ManagementEvent):
         else:
             self.change_number, self.patch_number = (None, None)
         self.ref = ref
+        self.buildset_uuid = buildset_uuid
         # set to mock values
         self.oldrev = '0000000000000000000000000000000000000000'
         self.newrev = '0000000000000000000000000000000000000000'
@@ -548,9 +551,11 @@ class Scheduler(threading.Thread):
         event.wait()
         self.log.debug("Promotion complete")
 
-    def dequeue(self, tenant_name, pipeline_name, project_name, change, ref):
+    def dequeue(self, tenant_name, pipeline_name, project_name,
+                change=None, ref=None, buildset_uuid=None):
         event = DequeueEvent(
-            tenant_name, pipeline_name, project_name, change, ref)
+            tenant_name, pipeline_name, project_name,
+            change, ref, buildset_uuid)
         self.management_event_queue.put(event)
         self.wake_event.set()
         self.log.debug("Waiting for dequeue")
@@ -936,7 +941,23 @@ class Scheduler(threading.Thread):
                 quiet=True,
                 ignore_requirements=True)
 
+    def _doDequeueByBuildSetUUIDEvent(self, event):
+        if event.tenant_name:
+            tenant = self.abide.tenants.get(event.tenant_name)
+            pipelines = [tenant.layout.pipelines[event.pipeline_name], ]
+        else:
+            pipelines = list(tenant.layout.pipelines.values())
+        for pipeline in pipelines:
+            for shared_queue in pipeline.queues:
+                for item in shared_queue.queue:
+                    if item.current_build_set.uuid == event.buildset_uuid:
+                        pipeline.manager.removeItem(item)
+                        return
+        raise Exception("Unable to find buildset %s" % event.buildset_uuid)
+
     def _doDequeueEvent(self, event):
+        if event.buildset_uuid:
+            return self._doDequeueByBuildSetUUIDEvent(event)
         tenant = self.abide.tenants.get(event.tenant_name)
         pipeline = tenant.layout.pipelines[event.pipeline_name]
         (trusted, project) = tenant.getProject(event.project_name)
