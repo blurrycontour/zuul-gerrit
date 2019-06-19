@@ -22,6 +22,7 @@ import zuul.model
 import zuul.web
 import zuul.driver.sql
 import zuul.driver.github
+from zuul.lib import commandsocket
 
 from zuul.lib.config import get_default
 
@@ -54,6 +55,10 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_key'] = get_default(self.config, 'gearman', 'ssl_key')
         params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
+
+        params['command_socket'] = get_default(
+            self.config, 'web', 'command_socket',
+            '/var/lib/zuul/web.socket')
 
         params['connections'] = self.connections
         # Validate config here before we spin up the ZuulWeb object
