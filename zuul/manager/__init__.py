@@ -629,16 +629,26 @@ class PipelineManager(object):
                   (item, files, dirs))
         build_set = item.current_build_set
         build_set.merge_state = build_set.PENDING
+
+        # If the project excludes unprotected branches we should also exclude
+        # them from the merge and repo state.
+        project = item.change.project
+        tenant = item.pipeline.tenant
+        if tenant.getExcludeUnprotectedBranches(project):
+            branches = tenant.getProjectBranches(project)
+        else:
+            branches = None
+
         if isinstance(item.change, model.Change):
             self.sched.merger.mergeChanges(build_set.merger_items,
                                            item.current_build_set, files, dirs,
                                            precedence=self.pipeline.precedence,
-                                           event=item.event)
+                                           event=item.event, branches=branches)
         else:
             self.sched.merger.getRepoState(build_set.merger_items,
                                            item.current_build_set,
                                            precedence=self.pipeline.precedence,
-                                           event=item.event)
+                                           event=item.event, branches=branches)
         return False
 
     def scheduleFilesChanges(self, item):
