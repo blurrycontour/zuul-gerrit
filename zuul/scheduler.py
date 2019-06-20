@@ -195,8 +195,9 @@ class BuildCompletedEvent(ResultEvent):
     :arg Build build: The build which has completed.
     """
 
-    def __init__(self, build):
+    def __init__(self, build, result):
         self.build = build
+        self.result = result
 
 
 class MergeCompletedEvent(ResultEvent):
@@ -450,9 +451,9 @@ class Scheduler(threading.Thread):
         build.build_set.warning_messages.extend(warnings)
         # Note, as soon as the result is set, other threads may act
         # upon this, even though the event hasn't been fully
-        # processed.  Ensure that any other data from the event (eg,
-        # timing) is recorded before setting the result.
-        build.result = result
+        # processed. This could result in race conditions when e.g. skipping
+        # child jobs via zuul_return. Therefore we must delay setting the
+        # result to the main event loop.
         try:
             if self.statsd and build.pipeline:
                 tenant = build.pipeline.tenant
@@ -473,8 +474,8 @@ class Scheduler(threading.Thread):
                     pipekey, hostname, projectname, branchname, jobname)
                 # zuul.tenant.<tenant>.pipeline.<pipeline>.project.
                 #   <host>.<project>.<branch>.job.<job>.<result>
-                key = '%s.%s' % (jobkey, build.result)
-                if build.result in ['SUCCESS', 'FAILURE'] and build.start_time:
+                key = '%s.%s' % (jobkey, result)
+                if result in ['SUCCESS', 'FAILURE'] and build.start_time:
                     dt = int((build.end_time - build.start_time) * 1000)
                     self.statsd.timing(key, dt)
                 self.statsd.incr(key)
@@ -486,7 +487,7 @@ class Scheduler(threading.Thread):
                     self.statsd.timing(key, dt)
         except Exception:
             self.log.exception("Exception reporting runtime stats")
-        event = BuildCompletedEvent(build)
+        event = BuildCompletedEvent(build, result)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
@@ -1267,6 +1268,7 @@ class Scheduler(threading.Thread):
 
     def _doBuildCompletedEvent(self, event):
         build = event.build
+        build.result = event.result
         zuul_event_id = build.zuul_event_id
         log = get_annotated_logger(self.log, zuul_event_id)
 
