@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_c3c0aee3",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2019-06-20T00:42:59Z",
+      "side": 1,
+      "message": "(nit) well, I mean it\u0027s possible this test is running on a UTC+0 host",
+      "revId": "dd55cac45a19cdd65363d654878346fe11ab9729",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
