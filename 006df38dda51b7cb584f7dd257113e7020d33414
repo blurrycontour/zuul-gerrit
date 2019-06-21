@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_54377b4e",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-21T07:22:19Z",
+      "side": 1,
+      "message": "It looks a little bit awkward to me to reuse those server side config (especially listen_address) for the client. Instead I\u0027d suggest adding a new section webclient for those. The same is true for port as the port the client should use is often a different one when zuul-web is behind a reverse proxy.",
+      "range": {
+        "startLine": 407,
+        "startChar": 0,
+        "endLine": 408,
+        "endChar": 62
+      },
+      "revId": "006df38dda51b7cb584f7dd257113e7020d33414",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
