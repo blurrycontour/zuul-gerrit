@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_34276767",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 61
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-21T07:09:10Z",
+      "side": 1,
+      "message": "Should we get 400 (bad request) or 401 (unauthorized) without token?",
+      "range": {
+        "startLine": 1127,
+        "startChar": 25,
+        "endLine": 1127,
+        "endChar": 28
+      },
+      "revId": "7926e09452df44aeed3946d79f6cc01f7a906953",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_f4ceaf81",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 61
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-21T07:09:10Z",
+      "side": 1,
+      "message": "This means there was no Authorization header at all so shouldn\u0027t we respond with 401 unauthorized instead of bad request here?",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 39
+      },
+      "revId": "7926e09452df44aeed3946d79f6cc01f7a906953",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
