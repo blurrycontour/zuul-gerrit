@@ -93,6 +93,30 @@
       "revId": "7926e09452df44aeed3946d79f6cc01f7a906953",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_4be039cd",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 61
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-21T09:48:53Z",
+      "side": 1,
+      "message": "The realm is authenticator-bound by design, but I can add a default setting to pick a default realm when no authentication is found in the request.",
+      "parentUuid": "9fb8cfa7_abe69515",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 39
+      },
+      "revId": "7926e09452df44aeed3946d79f6cc01f7a906953",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
