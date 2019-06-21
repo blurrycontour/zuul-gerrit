@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_14d583b7",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-21T07:40:04Z",
+      "side": 1,
+      "message": "nit: This could probably a little bit simplified by letting self.is_authorized directly throw the exception. That way we\u0027d reduce the redundancy in the code a bit.",
+      "range": {
+        "startLine": 247,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 41
+      },
+      "revId": "71e468894541e3f1c52bf30054d14165a966c56d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
