@@ -69,6 +69,7 @@ import zuul.executor.server
 import zuul.executor.client
 import zuul.lib.ansible
 import zuul.lib.connections
+import zuul.lib.auth
 import zuul.merger.client
 import zuul.merger.merger
 import zuul.merger.server
@@ -2514,6 +2515,8 @@ class ZuulWebFixture(fixtures.Fixture):
             include_drivers=[zuul.driver.sql.SQLDriver,
                              zuul.driver.github.GithubDriver,
                              zuul.driver.pagure.PagureDriver])
+        self.auths = zuul.lib.auth.AuthenticatorRegistry()
+        self.auths.configure(config)
         if info is None:
             self.info = zuul.model.WebInfo()
         else:
@@ -2527,7 +2530,8 @@ class ZuulWebFixture(fixtures.Fixture):
             gear_server='127.0.0.1', gear_port=self.gearman_server_port,
             info=self.info,
             connections=self.connections,
-            zk_hosts=self.zk_hosts)
+            zk_hosts=self.zk_hosts,
+            auths=self.auths)
         self.web.start()
         self.addCleanup(self.stop)
 
