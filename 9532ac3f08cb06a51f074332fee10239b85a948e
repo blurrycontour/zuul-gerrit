@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_2f2152a0",
+        "filename": "tests/unit/test_url_driver.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-21T08:02:41Z",
+      "side": 1,
+      "message": "Can you think of a way to make this sleep deterministic? Those sleeps often tend to create test races which destabilize the gate. We typically use iterate_timeout combined with some status check in those cases.",
+      "revId": "9532ac3f08cb06a51f074332fee10239b85a948e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_4f24c6af",
+        "filename": "tests/unit/test_url_driver.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-21T08:02:41Z",
+      "side": 1,
+      "message": "Same",
+      "revId": "9532ac3f08cb06a51f074332fee10239b85a948e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_ef3a5acb",
+        "filename": "zuul/driver/url/__init__.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-21T08:02:41Z",
+      "side": 1,
+      "message": "The trigger is per pipeline so shouldn\u0027t we make the http query before the loop and within the loop just emit the trigger events?",
+      "revId": "9532ac3f08cb06a51f074332fee10239b85a948e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
