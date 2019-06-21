@@ -22,6 +22,7 @@ import zuul.model
 import zuul.web
 import zuul.driver.sql
 import zuul.driver.github
+import zuul.lib.auth
 
 from zuul.lib.config import get_default
 
@@ -56,6 +57,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
 
         params['connections'] = self.connections
+        params['auths'] = self.auths
         # Validate config here before we spin up the ZuulWeb object
         for conn_name, connection in self.connections.connections.items():
             try:
@@ -90,6 +92,10 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.web.stop()
         self.log.info("Zuul Web Server stopped")
 
+    def configure_auth(self):
+        self.auths = zuul.lib.auth.AuthenticatorRegistry()
+        self.auths.configure(self.config)
+
     def run(self):
         self.setup_logging('web', 'log_config')
         self.log = logging.getLogger("zuul.WebServer")
@@ -99,6 +105,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                 include_drivers=[zuul.driver.sql.SQLDriver,
                                  zuul.driver.github.GithubDriver,
                                  zuul.driver.pagure.PagureDriver])
+            self.configure_auth()
             self._run()
         except Exception:
             self.log.exception("Exception from WebServer:")
