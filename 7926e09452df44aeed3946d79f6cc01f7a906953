@@ -69,6 +69,30 @@
       "revId": "7926e09452df44aeed3946d79f6cc01f7a906953",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_abe69515",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 61
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-21T09:31:17Z",
+      "side": 1,
+      "message": "According to rfc 6750 my understanding is that this should be 401 [1]:\n\n   For example, in response to a protected resource request without\n   authentication:\n\n     HTTP/1.1 401 Unauthorized\n     WWW-Authenticate: Bearer realm\u003d\"example\"\n\nWhile reading this I guess we should also send the \u0027WWW-Authenticate\u0027 headers for all of those 40x errors.\n\n[1] https://tools.ietf.org/html/rfc6750#section-3",
+      "parentUuid": "9fb8cfa7_6f62ea18",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 39
+      },
+      "revId": "7926e09452df44aeed3946d79f6cc01f7a906953",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
