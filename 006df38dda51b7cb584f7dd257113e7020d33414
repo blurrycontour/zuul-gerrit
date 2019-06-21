@@ -22,6 +22,30 @@
       "revId": "006df38dda51b7cb584f7dd257113e7020d33414",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_cb3669e8",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-21T09:07:59Z",
+      "side": 1,
+      "message": "We could also not use a config file for just 3 parameters (really 2, as the port info can be set in the URL) and rely on command line params, or read env variables. WDYT?",
+      "parentUuid": "9fb8cfa7_54377b4e",
+      "range": {
+        "startLine": 407,
+        "startChar": 0,
+        "endLine": 408,
+        "endChar": 62
+      },
+      "revId": "006df38dda51b7cb584f7dd257113e7020d33414",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
