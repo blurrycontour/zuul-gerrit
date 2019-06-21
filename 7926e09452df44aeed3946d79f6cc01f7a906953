@@ -45,6 +45,30 @@
       "revId": "7926e09452df44aeed3946d79f6cc01f7a906953",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_6f62ea18",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 61
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-06-21T08:54:52Z",
+      "side": 1,
+      "message": "This is open for debate: my understanding of https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1 is that a missing Authorization header is a malformed request, so the answer should be a 400.\n\nNevertheless the error message is incorrect, I\u0027ll fix it.",
+      "parentUuid": "9fb8cfa7_f4ceaf81",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 39
+      },
+      "revId": "7926e09452df44aeed3946d79f6cc01f7a906953",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
