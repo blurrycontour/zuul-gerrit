@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_a6ef881b",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-06-24T20:50:44Z",
+      "side": 1,
+      "message": "We need this value to be a positive non zero value. I think we should wrap it in max(1, value retrieved above) to ensure we don\u0027t supply invalid input.",
+      "revId": "3e98c7012747c8b28b938a97f3602c309a2a7573",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
