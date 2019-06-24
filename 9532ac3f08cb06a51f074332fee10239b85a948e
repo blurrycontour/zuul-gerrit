@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_753b7dc7",
+        "filename": "tests/unit/test_url_driver.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-06-24T13:48:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_2f2152a0",
+      "revId": "9532ac3f08cb06a51f074332fee10239b85a948e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_4f24c6af",
         "filename": "tests/unit/test_url_driver.py",
         "patchSetId": 14
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_154a4154",
+        "filename": "tests/unit/test_url_driver.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-06-24T13:48:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_4f24c6af",
+      "revId": "9532ac3f08cb06a51f074332fee10239b85a948e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_ef3a5acb",
         "filename": "zuul/driver/url/__init__.py",
         "patchSetId": 14
@@ -47,6 +83,24 @@
       "writtenOn": "2019-06-21T08:02:41Z",
       "side": 1,
       "message": "The trigger is per pipeline so shouldn\u0027t we make the http query before the loop and within the loop just emit the trigger events?",
+      "revId": "9532ac3f08cb06a51f074332fee10239b85a948e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_35450544",
+        "filename": "zuul/driver/url/__init__.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-06-24T13:48:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_ef3a5acb",
       "revId": "9532ac3f08cb06a51f074332fee10239b85a948e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
