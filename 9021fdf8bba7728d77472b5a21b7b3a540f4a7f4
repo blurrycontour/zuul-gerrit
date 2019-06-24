@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_b1e340d8",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1128,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-06-24T22:05:22Z",
+      "side": 1,
+      "message": "I think that maybe we should add a warning or note here that circumventing this protection could allow a destination project to expose a source project\u0027s secret.",
+      "revId": "9021fdf8bba7728d77472b5a21b7b3a540f4a7f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
