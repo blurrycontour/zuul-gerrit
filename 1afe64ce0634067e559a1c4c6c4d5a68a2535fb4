@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_77f620da",
+        "filename": "tests/fixtures/config/allowed-projects-trusted/git/common-config/zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-06-24T16:30:08Z",
+      "side": 1,
+      "message": "trailing whitespace",
+      "revId": "1afe64ce0634067e559a1c4c6c4d5a68a2535fb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
