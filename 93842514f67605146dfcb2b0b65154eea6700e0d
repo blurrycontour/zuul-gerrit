@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_ca24f662",
+        "filename": "zuul/driver/bitbucket/bitbucketconnection.py",
+        "patchSetId": 54
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-06-25T10:56:39Z",
+      "side": 1,
+      "message": "Addressed in most recent change set.",
+      "parentUuid": "9fb8cfa7_7c652f1d",
+      "revId": "93842514f67605146dfcb2b0b65154eea6700e0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_9c6823f5",
         "filename": "zuul/driver/bitbucket/bitbucketsource.py",
         "patchSetId": 54
@@ -47,6 +65,24 @@
       "writtenOn": "2019-06-14T21:17:50Z",
       "side": 1,
       "message": "If we change the BitbucketTriggerEvent.change_id to change_number, we can drop the introspection of the event type here and just use buildPR on event.change_number in both cases.",
+      "revId": "93842514f67605146dfcb2b0b65154eea6700e0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_ea29ba36",
+        "filename": "zuul/driver/bitbucket/bitbucketsource.py",
+        "patchSetId": 54
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-06-25T10:56:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_9c6823f5",
       "revId": "93842514f67605146dfcb2b0b65154eea6700e0d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
