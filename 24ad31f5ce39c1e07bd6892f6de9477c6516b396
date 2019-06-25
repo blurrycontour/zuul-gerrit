@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_aa1f4206",
+        "filename": "zuul/driver/bitbucket/bitbucketconnection.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-06-25T10:56:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_5c6e2b00",
+      "revId": "24ad31f5ce39c1e07bd6892f6de9477c6516b396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_fc783fc4",
         "filename": "zuul/driver/bitbucket/bitbucketsource.py",
         "patchSetId": 12
@@ -47,6 +65,24 @@
       "writtenOn": "2019-06-14T21:18:04Z",
       "side": 1,
       "message": "The docs should be updated for this too.",
+      "revId": "24ad31f5ce39c1e07bd6892f6de9477c6516b396",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_4a18061d",
+        "filename": "zuul/driver/bitbucket/bitbuckettrigger.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 30404
+      },
+      "writtenOn": "2019-06-25T10:56:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_1c7433ce",
       "revId": "24ad31f5ce39c1e07bd6892f6de9477c6516b396",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
