@@ -1718,6 +1718,9 @@ pragma directives may not be set and then unset within the same file.
       Note that if a job contains an explicit branch matcher, it will
       be used regardless of the value supplied here.
 
+      If this is used in a branch, it should include that branch name
+      or changes on that branch may be ignored.
+
    .. attr:: implied-branches
 
       This is a list of regular expressions, just as
