@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fb8cfa7_4a92d3fe",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-02T15:13:07Z",
+      "side": 1,
+      "message": "Or we could take a page from the Rook design, and only support one Zuul in a namespace, then every ZuulConnection is automatically for that Zuul.",
+      "revId": "5ed14da8f1799851d56f3289ffa88e79c3b1779f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
