@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9fb8cfa7_a5d707ee",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-02T12:15:54Z",
+      "side": 1,
+      "message": "Good point.",
+      "parentUuid": "9fb8cfa7_255797cc",
+      "range": {
+        "startLine": 10,
+        "startChar": 56,
+        "endLine": 10,
+        "endChar": 62
+      },
+      "revId": "0908590300256f6de2c38a30faac8600fc4d551f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9fb8cfa7_45416b09",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 6
@@ -36,6 +60,30 @@
       "writtenOn": "2019-07-02T11:53:28Z",
       "side": 1,
       "message": "nit: Extra whitespace",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 4
+      },
+      "revId": "0908590300256f6de2c38a30faac8600fc4d551f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9fb8cfa7_c5d23bfd",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-02T12:15:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fb8cfa7_45416b09",
       "range": {
         "startLine": 51,
         "startChar": 0,
