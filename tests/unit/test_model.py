@@ -85,22 +85,30 @@ class TestJob(BaseTestCase):
     def test_change_matches_returns_false_for_matched_skip_if(self):
         change = model.Change('project')
         change.files = ['/COMMIT_MSG', 'docs/foo']
-        self.assertFalse(self.job.changeMatchesFiles(change))
+        queue = model.ChangeQueue(self.pipeline)
+        item = queue.enqueueChange(change, None)
+        self.assertFalse(self.job.itemMatchesFiles(item))
 
     def test_change_matches_returns_false_for_single_matched_skip_if(self):
         change = model.Change('project')
         change.files = ['docs/foo']
-        self.assertFalse(self.job.changeMatchesFiles(change))
+        queue = model.ChangeQueue(self.pipeline)
+        item = queue.enqueueChange(change, None)
+        self.assertFalse(self.job.itemMatchesFiles(item))
 
     def test_change_matches_returns_true_for_unmatched_skip_if(self):
         change = model.Change('project')
         change.files = ['/COMMIT_MSG', 'foo']
-        self.assertTrue(self.job.changeMatchesFiles(change))
+        queue = model.ChangeQueue(self.pipeline)
+        item = queue.enqueueChange(change, None)
+        self.assertTrue(self.job.itemMatchesFiles(item))
 
     def test_change_matches_returns_true_for_single_unmatched_skip_if(self):
         change = model.Change('project')
         change.files = ['foo']
-        self.assertTrue(self.job.changeMatchesFiles(change))
+        queue = model.ChangeQueue(self.pipeline)
+        item = queue.enqueueChange(change, None)
+        self.assertTrue(self.job.itemMatchesFiles(item))
 
     def test_job_sets_defaults_for_boolean_attributes(self):
         self.assertIsNotNone(self.job.voting)
@@ -266,8 +274,8 @@ class TestJob(BaseTestCase):
         item = queue.enqueueChange(change, None)
         item.layout = self.layout
 
-        self.assertTrue(base.changeMatchesFiles(change))
-        self.assertFalse(python27.changeMatchesFiles(change))
+        self.assertTrue(base.itemMatchesFiles(item))
+        self.assertFalse(python27.itemMatchesFiles(item))
 
         item.freezeJobGraph()
         self.assertEqual([], item.getJobs())

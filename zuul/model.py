@@ -1652,13 +1652,28 @@ class Job(ConfigObject):
             return False
         return True
 
-    def changeMatchesFiles(self, change):
-        if self.file_matcher and not self.file_matcher.matches(change):
+    def itemMatchesFiles(self, item):
+        layout_ahead = item.pipeline.tenant.layout
+        if item.item_ahead and item.item_ahead.layout:
+            layout_ahead = item.item_ahead.layout
+        if layout_ahead and item.layout and item.layout is not layout_ahead:
+            # This change updates the layout.  Calculate the job as it
+            # would be if the layout had not changed.
+            ppc = item.layout.getProjectPipelineConfig(item)
+            job_graph = layout_ahead.createJobGraph(item, ppc)
+            job = job_graph.jobs.get(self.name)
+            if job is None:
+                return True  # A newly created job matches
+            if (job.toDict(item.pipeline.tenant) !=
+                self.toDict(item.pipeline.tenant)):
+                return True  # This job's configuration has changed
+
+        if self.file_matcher and not self.file_matcher.matches(item.change):
             return False
 
         # NB: This is a negative match.
         if (self.irrelevant_file_matcher and
-            self.irrelevant_file_matcher.matches(change)):
+            self.irrelevant_file_matcher.matches(item.change)):
             return False
 
         return True
@@ -3966,7 +3981,7 @@ class Layout(object):
                            format(jobname=jobname), indent=2)
                 continue
             if not skip_file_matcher and \
-               not frozen_job.changeMatchesFiles(change):
+               not frozen_job.itemMatchesFiles(item):
                 log.debug("Job %s did not match files in %s",
                           repr(frozen_job), change)
                 item.debug("Job {jobname} did not match files".
