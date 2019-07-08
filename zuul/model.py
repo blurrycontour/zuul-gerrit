@@ -2111,6 +2111,7 @@ class QueueItem(object):
         self.layout = None
         self.project_pipeline_config = None
         self.job_graph = None
+        self._old_job_graph = None  # Cached job graph of previous layout
         self._cached_sql_results = {}
         self.event = event  # The trigger event that lead to this queue item
 
@@ -2131,6 +2132,7 @@ class QueueItem(object):
         self.layout = None
         self.project_pipeline_config = None
         self.job_graph = None
+        self._old_job_graph = None
 
     def addBuild(self, build):
         self.current_build_set.addBuild(build)
@@ -2176,6 +2178,7 @@ class QueueItem(object):
         except Exception:
             self.project_pipeline_config = None
             self.job_graph = None
+            self._old_job_graph = None
             raise
 
     def hasJobGraph(self):
@@ -2863,6 +2866,25 @@ class QueueItem(object):
                     oldrev=oldrev,
                     newrev=newrev,
                     )
+
+    def updatesJobConfig(self, job):
+        layout_ahead = self.pipeline.tenant.layout
+        if self.item_ahead and self.item_ahead.layout:
+            layout_ahead = self.item_ahead.layout
+        if layout_ahead and self.layout and self.layout is not layout_ahead:
+            # This change updates the layout.  Calculate the job as it
+            # would be if the layout had not changed.
+            if self._old_job_graph is None:
+                ppc = layout_ahead.getProjectPipelineConfig(self)
+                self._old_job_graph = layout_ahead.createJobGraph(
+                    self, ppc, skip_file_matcher=True)
+            old_job = self._old_job_graph.jobs.get(job.name)
+            if old_job is None:
+                return True  # A newly created job matches
+            if (job.toDict(self.pipeline.tenant) !=
+                old_job.toDict(self.pipeline.tenant)):
+                return True  # This job's configuration has changed
+        return False
 
 
 class Ref(object):
@@ -3942,6 +3964,17 @@ class Layout(object):
                     frozen_job.applyVariant(variant, item.layout)
                     frozen_job.name = variant.name
             frozen_job.name = jobname
+
+            # Now merge variables set from this parent ppc
+            # (i.e. project+templates) directly into the job vars
+            frozen_job.updateProjectVariables(ppc.variables)
+
+            # If the job does not specify an ansible version default to the
+            # tenant default.
+            if not frozen_job.ansible_version:
+                frozen_job.ansible_version = \
+                    item.layout.tenant.default_ansible_version
+
             log.debug("Froze job %s for %s", jobname, change)
             # Whether the change matches any of the project pipeline
             # variants
@@ -3967,11 +4000,25 @@ class Layout(object):
                 continue
             if not skip_file_matcher and \
                not frozen_job.changeMatchesFiles(change):
-                log.debug("Job %s did not match files in %s",
-                          repr(frozen_job), change)
-                item.debug("Job {jobname} did not match files".
-                           format(jobname=jobname), indent=2)
-                continue
+                matched_files = False
+                updates_job_config = item.updatesJobConfig(frozen_job)
+            else:
+                matched_files = True
+            if not matched_files:
+                if updates_job_config:
+                    # Log the reason we're ignoring the file matcher
+                    log.debug("The configuration of job %s is changed by %s; "
+                              "ignoring file matcher",
+                              repr(frozen_job), change)
+                    item.debug("The configuration of job {jobname} is changed; "
+                               "ignoring file matcher".
+                               format(jobname=jobname), indent=2)
+                else:
+                    log.debug("Job %s did not match files in %s",
+                              repr(frozen_job), change)
+                    item.debug("Job {jobname} did not match files".
+                               format(jobname=jobname), indent=2)
+                    continue
             if frozen_job.abstract:
                 raise Exception("Job %s is abstract and may not be "
                                 "directly run" %
@@ -3988,16 +4035,6 @@ class Layout(object):
             if not frozen_job.run:
                 raise Exception("Job %s does not specify a run playbook" % (
                     frozen_job.name,))
-
-            # Now merge variables set from this parent ppc
-            # (i.e. project+templates) directly into the job vars
-            frozen_job.updateProjectVariables(ppc.variables)
-
-            # If the job does not specify an ansible version default to the
-            # tenant default.
-            if not frozen_job.ansible_version:
-                frozen_job.ansible_version = \
-                    item.layout.tenant.default_ansible_version
 
             job_graph.addJob(frozen_job)
 
