@@ -46,6 +46,23 @@
       "revId": "006df38dda51b7cb584f7dd257113e7020d33414",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_5a09fa2e",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-09T15:52:19Z",
+      "side": 1,
+      "message": "I\u0027m not opposed to also supporting env vars and command-line options, but I agree with Tobias that we should have a \u0027webclient\u0027 section of the config file.",
+      "revId": "006df38dda51b7cb584f7dd257113e7020d33414",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
