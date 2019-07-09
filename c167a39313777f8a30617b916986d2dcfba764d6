@@ -16,6 +16,24 @@
       "revId": "c167a39313777f8a30617b916986d2dcfba764d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_cb31a2a4",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-09T11:31:07Z",
+      "side": 1,
+      "message": "Oh - good point!",
+      "parentUuid": "7faddb67_55c9e175",
+      "revId": "c167a39313777f8a30617b916986d2dcfba764d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
