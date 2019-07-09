@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_d0b14691",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2882,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-09T20:23:55Z",
+      "side": 1,
+      "message": "nit: typo detection",
+      "revId": "7fba932e5dfbabe80b9a1faadf0b0927f7ad01ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
