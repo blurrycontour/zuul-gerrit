@@ -16,6 +16,24 @@
       "revId": "243d92047a69fcc40b43da6248d34597ca965d9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_4cbdafd6",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-10T16:40:12Z",
+      "side": 1,
+      "message": "No - I think we should be able to do direct passthrough. (let the operator yaml specify an arbitrary unspecified dict for each thing) ... then we only need to update the operator when we add new options that are secrets ... but we\u0027ll probably want to be making a patch to the operator in those cases to exercise such a new feature anyway.",
+      "parentUuid": "7faddb67_acbb030c",
+      "revId": "243d92047a69fcc40b43da6248d34597ca965d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
