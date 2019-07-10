@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_acbb030c",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-07-10T16:34:13Z",
+      "side": 1,
+      "message": "My only real concern, is for each new setting we add into zuul.conf, we also need to update the spec, is that right?\n\nThis is something I didn\u0027t like how we handled puppet modules, as each time we added a new setting, we also needed to go through 4 levels to add it.\n\nWhere, with a static file, we can just make the change in one place and not remember how the template of the template works.\n\nIf not, my comment can be ignored :)",
+      "revId": "243d92047a69fcc40b43da6248d34597ca965d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
