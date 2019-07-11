@@ -45,6 +45,29 @@
       "revId": "e4907a8ed39182d670a1f946b122fb2d8c5e3e8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_f968c31d",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2019-07-11T22:43:00Z",
+      "side": 1,
+      "message": "The nodeset \"ubuntu-xenial\" was not found.",
+      "range": {
+        "startLine": 165,
+        "startChar": 2,
+        "endLine": 265,
+        "endChar": 0
+      },
+      "revId": "e4907a8ed39182d670a1f946b122fb2d8c5e3e8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
