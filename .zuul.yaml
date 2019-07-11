@@ -254,7 +254,6 @@
       jobs:
         - publish-zuul-docs
         - publish-zuul-python-branch-tarball
-        - release-zuul-python
     promote:
       jobs:
         - zuul-promote-image
@@ -262,5 +261,5 @@
         - opendev-promote-javascript-content
     release:
       jobs:
-        - release-zuul-python
+        - opendev-release-python
         - publish-zuul-docs
