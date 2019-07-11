@@ -713,11 +713,16 @@ class PipelineManager(object):
         # This only runs once the item is in the pipeline's action window
         # Returns True if the item is ready, false otherwise
         if not item.live:
-            # Short circuit as non live items don't need layouts.
-            # We also don't need to take further ready actions in
-            # _processOneItem() so we return false.
-            return False
-        elif not item.layout:
+            live_item_behind = [x for x in item.items_behind if x.live]
+            # Short circuit as non live items with non-live items
+            # behind don't need layouts.  But we do want the last
+            # non-live item to have a layout in order to see job
+            # config changes for live items.  We also don't need to
+            # take further ready actions in _processOneItem() so we
+            # return false.
+            if not live_item_behind:
+                return False
+        if not item.layout:
             item.layout = self.getLayout(item)
         if not item.layout:
             return False
@@ -784,8 +789,10 @@ class PipelineManager(object):
                 change_queue.moveItem(item, nnfi)
                 changed = True
                 self.cancelJobs(item)
-            if actionable and item.live:
-                ready = self.prepareItem(item) and self.prepareJobs(item)
+            if actionable:
+                ready = (self.prepareItem(item) and self.prepareJobs(item)
+                         and item.live)
+            if item.live:
                 # Starting jobs reporting should only be done once if there are
                 # jobs to run for this item.
                 if ready and len(self.pipeline.start_actions) > 0 \
