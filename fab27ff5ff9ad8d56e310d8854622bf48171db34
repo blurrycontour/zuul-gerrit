@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_4c77d6d5",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 22348
+      },
+      "writtenOn": "2019-07-11T20:16:41Z",
+      "side": 1,
+      "message": "Job publish-zuul-docs not defined",
+      "range": {
+        "startLine": 165,
+        "startChar": 2,
+        "endLine": 265,
+        "endChar": 0
+      },
+      "revId": "fab27ff5ff9ad8d56e310d8854622bf48171db34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
