@@ -22,6 +22,30 @@
       "revId": "71e468894541e3f1c52bf30054d14165a966c56d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_f3bf775e",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-07-12T12:42:15Z",
+      "side": 1,
+      "message": "I\u0027ll fix that in the next rebase",
+      "parentUuid": "9fb8cfa7_14d583b7",
+      "range": {
+        "startLine": 247,
+        "startChar": 0,
+        "endLine": 248,
+        "endChar": 41
+      },
+      "revId": "71e468894541e3f1c52bf30054d14165a966c56d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
