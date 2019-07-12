@@ -38,10 +38,21 @@ class ZuulRESTClient(object):
     def __init__(self, url, verify=False, auth_token=None):
         self.url = url
         self.auth_token = auth_token
-        self.base_url = self.url.rstrip('/')
+
+        # Why does the urllib library make this so ugly?
+        parsed_url = urllib.parse.urlparse(self.url.rstrip('/'))
+        path = parsed_url.path + '/api'
+        netloc = parsed_url.netloc
+        # TODO: How would self.port ever be set?
         if self.port:
-            self.base_url += ':' + str(self.port)
-        self.base_url += '/api/'
+            host = netloc.split(':')[0]
+            netloc = host + ':' + str(self.port)
+        # ParseResult is a NamedTuple. The urllib.parse.urlparse docs
+        # https://docs.python.org/3/library/urllib.parse.html
+        # indicate that the _replace method is how one gets a new object
+        # replacing some of the fields.
+        self.base_url = parsed_url._replace(path=path, netloc=netloc).geturl()
+
         self.verify = verify
         self.session = requests.Session(
             verify=self.verify,
