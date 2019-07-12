@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_986bb7b5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 616,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-12T22:38:36Z",
+      "side": 1,
+      "message": "Line 735 doesn\u0027t assume a None result, and it is not redundant (unlike line 737 which is).  This lets us have a layout on a non-live item with a merge conflict, which seems nice because of the consistency.  As far as what happens next, this is very similar to the case with config errors, except unlike in that case, it is not possible for a child change to merge cleanly if its parent does not.  That means that if B-\u003eA, and A is unable to merge, then B will also be unable to merge.  So the end result is the same: we won\u0027t run jobs for B.\n\nI think we could optimize this and make it behave in the same way as the config error case, because the end result is going to be the same.  But somehow, this seems the slightly more \"correct\" way, only because we\u0027re setting the layout on the item since we can.  That might make a difference in what we report in, say, a third change (C) which has a config error and depends on B.  As written, we should report the config error, but if we make this optimization, we won\u0027t have the right data and will probably just report that a parent had a merge failure.\n\nThat\u0027s how I see it, but I hold these beliefs weakly and can probably be swayed easily.  :)",
+      "revId": "de1a8372a8049fd2ded867ed61bfdc14dd506e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ed9c6b0f",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
