@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7faddb67_ad0f5335",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 616,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-07-12T22:23:05Z",
+      "side": 1,
+      "message": "Will this cause confusion below. Specifically around the code I Thought made other code redundant? line 731 assumes a None result on merge failures which won\u0027t happen anymore?",
+      "revId": "de1a8372a8049fd2ded867ed61bfdc14dd506e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ed9c6b0f",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
