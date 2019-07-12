@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_cd3def2b",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5736,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-07-12T21:32:30Z",
+      "side": 1,
+      "message": "Isn\u0027t there a risk here of nothing running because the config is broken?\n\nSeems like we need to check that no jobs ran successfully rather than inappropriately? Maybe we can check what was reported?",
+      "revId": "8b6ad44fb949e544ef5c2bbb57f3fe3345df1395",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
