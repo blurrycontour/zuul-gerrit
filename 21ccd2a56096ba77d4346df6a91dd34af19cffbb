@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_0c9d50bb",
+        "filename": "tests/unit/test_executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 501,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-12T14:26:37Z",
+      "side": 1,
+      "message": "This fails on bigger machines because then max_starting_builds is less than cores / 2",
+      "range": {
+        "startLine": 501,
+        "startChar": 0,
+        "endLine": 501,
+        "endChar": 76
+      },
+      "revId": "21ccd2a56096ba77d4346df6a91dd34af19cffbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
