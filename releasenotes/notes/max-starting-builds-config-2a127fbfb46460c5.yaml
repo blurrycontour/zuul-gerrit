@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The maximum starting builds depending on cpu cores can be limited using
+    :ref:`max_starting_builds` configuration in :ref:`executor` section.
