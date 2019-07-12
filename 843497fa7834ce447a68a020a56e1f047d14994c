@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_1d06e41e",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-12T09:02:45Z",
+      "side": 1,
+      "message": "nit: systems",
+      "range": {
+        "startLine": 689,
+        "startChar": 9,
+        "endLine": 689,
+        "endChar": 15
+      },
+      "revId": "843497fa7834ce447a68a020a56e1f047d14994c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_8b236dbd",
+        "filename": "releasenotes/notes/max-starting-builds-config-2a127fbfb46460c5.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-12T09:02:45Z",
+      "side": 1,
+      "message": "This probably needs to be:\n\n  :ref:`executor.max_starting_builds`",
+      "range": {
+        "startLine": 5,
+        "startChar": 4,
+        "endLine": 5,
+        "endChar": 30
+      },
+      "revId": "843497fa7834ce447a68a020a56e1f047d14994c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
