@@ -1163,6 +1163,7 @@ class PipelineParser(object):
         pipeline = {vs.Required('name'): str,
                     vs.Required('manager'): manager,
                     'precedence': precedence,
+                    'supercedes': to_list(str),
                     'description': str,
                     'success-message': str,
                     'failure-message': str,
@@ -1197,6 +1198,7 @@ class PipelineParser(object):
         pipeline.source_context = conf['_source_context']
         pipeline.start_mark = conf['_start_mark']
         pipeline.description = conf.get('description')
+        pipeline.supercedes = as_list(conf.get('supercedes', []))
 
         precedence = model.PRECEDENCE_MAP[conf.get('precedence')]
         pipeline.precedence = precedence
