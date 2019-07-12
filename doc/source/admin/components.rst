@@ -679,6 +679,17 @@ The following sections of ``zuul.conf`` are used by the executor:
       The executor will observe system load and determine whether
       to accept more jobs every 30 seconds.
 
+   .. attr:: max_starting_builds
+      :default: None
+
+      An executor is accepting up to twice as many starting builds as defined
+      by the :attr:`executor.load_multiplier`. E.g., on a system with 2 CPUs:
+      2 * 2.5 * 2 - up to 10 starting builds may run on such executor.
+
+      On systems with high CPU/vCPU count an executor may accept too many
+      starting builds. This can be overwritten using this option providing a
+      fixed number of maximum starting builds on an executor.
+
    .. attr:: min_avail_hdd
       :default: 5.0
 
