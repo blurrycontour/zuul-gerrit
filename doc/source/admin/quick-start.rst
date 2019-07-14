@@ -33,20 +33,24 @@ Before you start, ensure that some needed packages are installed.
 
    # Red Hat / Fedora / CentOS:
 
-   sudo yum install docker docker-compose git
+   sudo yum install epel-release
+   sudo yum update
+   sudo yum install docker docker-compose git python-pip
+   sudo pip install git-review
 
    # OpenSuse:
 
    sudo zypper install docker docker-compose git
+   sudo python3 -m pip install git-review
 
    # Ubuntu / Debian:
 
    sudo apt-get install docker-compose docker.io git python3-pip
+   sudo python3 -m pip install git-review
 
    # Start and Enable the docker service on Fedora / CentOS
    # Red Hat / OpenSuse / Ubuntu / Debian:
 
-   sudo python3 -m pip install git-review
    sudo systemctl enable docker.service
    sudo systemctl start docker.service
 
