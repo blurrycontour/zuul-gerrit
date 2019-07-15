@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_7a7ee8af",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 5744,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-15T04:31:31Z",
+      "side": 1,
+      "message": "Should we also assert that we report success here?",
+      "revId": "0fc385ebed38f8d49d275bf39403b723a462e649",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
