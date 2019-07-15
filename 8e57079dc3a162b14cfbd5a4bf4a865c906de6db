@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_5ab8c9e3",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 721,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-15T09:01:47Z",
+      "side": 1,
+      "message": "nit: explicit conversion to str is not really needed here.",
+      "range": {
+        "startLine": 721,
+        "startChar": 22,
+        "endLine": 721,
+        "endChar": 35
+      },
+      "revId": "8e57079dc3a162b14cfbd5a4bf4a865c906de6db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
