@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_af0c15a5",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-15T15:41:19Z",
+      "side": 1,
+      "message": "We need a git-review install here now.",
+      "revId": "2eb1833ccdfc5082a17b52104d440c677c9ac940",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
