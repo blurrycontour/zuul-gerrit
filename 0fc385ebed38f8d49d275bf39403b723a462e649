@@ -16,6 +16,23 @@
       "revId": "0fc385ebed38f8d49d275bf39403b723a462e649",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_b42eac8f",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 5744,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-15T14:38:43Z",
+      "side": 1,
+      "message": "We could, but I don\u0027t think it\u0027s that important; we care about whether the jobs are run (and the reporting verification just lets us know we completed).",
+      "revId": "0fc385ebed38f8d49d275bf39403b723a462e649",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
