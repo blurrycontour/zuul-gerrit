@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_b0dc7fe4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 693,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-15T08:19:17Z",
+      "side": 1,
+      "message": "We should use time.monotonic [1] which gives us a float in seconds.\nThis makes it much easier to calculate the duration and also handles jumps of the system time fine.\n\n[1] https://docs.python.org/3/library/time.html#time.monotonic",
+      "revId": "f10691bd3b9d9801d1eb289ed4be27a43a254b19",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
