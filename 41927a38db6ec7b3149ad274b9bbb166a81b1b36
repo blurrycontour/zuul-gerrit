@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_e9a52d48",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 692,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-15T14:35:59Z",
+      "side": 0,
+      "message": "Unconditional tpc lookup.",
+      "revId": "41927a38db6ec7b3149ad274b9bbb166a81b1b36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

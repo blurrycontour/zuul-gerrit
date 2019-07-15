@@ -59,6 +59,23 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_8964b923",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-15T14:35:59Z",
+      "side": 1,
+      "message": "tpc has a value for every project that appears in the tenant config (even if we don\u0027t load any config from it).  The current code assumes that the project of every item this function is run on appears in the config (see line 692 of the old side) and that is true because this was only run on live changes (and a live change must be for a project in the config).  However, we now want to run this on some non-live changes, so we need to check whether their projects are in the tenant (if they aren\u0027t, we don\u0027t need to do any merges since they can\u0027t have config or match file matchers).",
+      "revId": "de1a8372a8049fd2ded867ed61bfdc14dd506e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ed9c6b0f",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
