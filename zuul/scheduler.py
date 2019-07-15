@@ -25,6 +25,7 @@ import socket
 import sys
 import threading
 import time
+from datetime import datetime
 
 from zuul import configloader
 from zuul import model
@@ -689,6 +690,7 @@ class Scheduler(threading.Thread):
         self.config = event.config
         try:
             self.log.info("Full reconfiguration beginning")
+            start = datetime.now()
 
             # Reload the ansible manager in case the default ansible version
             # changed.
@@ -714,7 +716,13 @@ class Scheduler(threading.Thread):
             self.abide = abide
         finally:
             self.layout_lock.release()
-        self.log.info("Full reconfiguration complete")
+
+        delta = datetime.now() - start
+        duration = int((delta.days * 86400000)
+                       + (delta.seconds * 1000)
+                       + (delta.microseconds / 1000)) / 1000
+        self.log.info("Full reconfiguration complete (duration: %s seconds)",
+                      str(duration))
 
     def _doTenantReconfigureEvent(self, event):
         # This is called in the scheduler loop after another thread submits
