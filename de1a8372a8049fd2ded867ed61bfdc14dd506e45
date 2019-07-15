@@ -36,6 +36,29 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_1a7014dc",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-15T04:25:56Z",
+      "side": 1,
+      "message": "This is not only about config changes but also to make file filters work on pull requests with \u003e300 files (this is the case when we don\u0027t know the file list upfront). If this PR is on a project without config this will probably break because tpc evaluates to false.",
+      "range": {
+        "startLine": 698,
+        "startChar": 0,
+        "endLine": 704,
+        "endChar": 29
+      },
+      "revId": "de1a8372a8049fd2ded867ed61bfdc14dd506e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ed9c6b0f",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 4
