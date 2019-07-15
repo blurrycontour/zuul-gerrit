@@ -1,0 +1,10 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+1: Vieri <15050873171@163.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: Tobias Henkel <tobias.henkel@bmw.de>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 15 Jul 2019 17:49:04 +0000
+Reviewed-on: https://review.opendev.org/670666
+Project: zuul/zuul
+Branch: refs/heads/master
