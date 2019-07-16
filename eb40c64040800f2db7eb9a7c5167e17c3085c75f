@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_0ec3e139",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-07-16T07:51:46Z",
+      "side": 1,
+      "message": "I think even pushing a revert might make the situation worse than just properly reporting what succeeded and what failed and fall back to human intervention for resolving the inconsistent state.",
+      "parentUuid": "5fc1f717_6ab9c5e7",
+      "revId": "eb40c64040800f2db7eb9a7c5167e17c3085c75f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5fc1f717_0ace0183",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2019-03-19T18:20:15Z",
       "side": 1,
       "message": "In our previous discussions on the topic, we generally considered \"Zuul push\", ie, having Zuul push the merge rather than asking Gerrit or GitHub to do it, to be a pre-requisite for this, because we thought that errors (for example, due to merge or permissions discrepancies between Zuul and the code review system) were likely and error recovery (by reverting previously merged patches) was important.  I still think that\u0027s the best way to handle it, so I think we should look into that.\n\nIn both Gerrit and GitHub\u0027s case, if Zuul pushes a commit for a change/PR, the change/PR will be closed.  And it should be a simple matter to add a \"push\" command to the merger.",
+      "revId": "eb40c64040800f2db7eb9a7c5167e17c3085c75f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_2ed57de5",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-07-16T07:51:46Z",
+      "side": 1,
+      "message": "Agree, that this could be added. However, IIRC with Github Apps it is not possible to allow pushes to a protected branch. So this would be mainly useful for Gerrit.",
+      "parentUuid": "5fc1f717_0ace0183",
       "revId": "eb40c64040800f2db7eb9a7c5167e17c3085c75f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
