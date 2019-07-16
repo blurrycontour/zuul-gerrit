@@ -70,6 +70,30 @@
       "revId": "9a2cf8bc0a2796b58b40ec379e9dbe3dfe183674",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_42dc48e3",
+        "filename": "releasenotes/notes/evaluate-codeowners-during-canmerge-e0ca7b422e7ac034.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T12:05:14Z",
+      "side": 1,
+      "message": "Or something like: ... will now only performed if reviews according to codeowners rules are available if requested by the branch protection.",
+      "parentUuid": "7faddb67_024df0c2",
+      "range": {
+        "startLine": 6,
+        "startChar": 56,
+        "endLine": 6,
+        "endChar": 70
+      },
+      "revId": "9a2cf8bc0a2796b58b40ec379e9dbe3dfe183674",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
