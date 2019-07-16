@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_82e480e1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:49:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_8281e0fd",
+      "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_22fd8cb0",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -48,6 +66,30 @@
       "writtenOn": "2019-07-16T11:37:20Z",
       "side": 1,
       "message": "So that we can include a similar info in the log message.",
+      "range": {
+        "startLine": 738,
+        "startChar": 53,
+        "endLine": 738,
+        "endChar": 75
+      },
+      "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_a2e97cb7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:49:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_22fd8cb0",
       "range": {
         "startLine": 738,
         "startChar": 53,
@@ -89,6 +131,24 @@
       "side": 1,
       "message": "++",
       "parentUuid": "7faddb67_e2345495",
+      "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_42d20802",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:49:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_0275f031",
       "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
