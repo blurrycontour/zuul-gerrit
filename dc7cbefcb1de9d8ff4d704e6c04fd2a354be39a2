@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_c2d3585f",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:41:07Z",
+      "side": 1,
+      "message": "@Monty: Configuration of this feature is mentioned here (together with the note that it\u0027s off by default)\n\n@Simon: We should also add a config option to completely disallow this in the whole tenant. Or we allow them in the tenant and enable per repo.",
+      "revId": "dc7cbefcb1de9d8ff4d704e6c04fd2a354be39a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_42144844",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:41:07Z",
+      "side": 1,
+      "message": "Maybe it makes sense to elaborate a little bit more about that. Reading further down it becomes clear that the intention is to enqueue one queue item for each change in the cycle and hold back reporting until the whole cycle is finished. This is the essential part that makes it possible to enqueue such a cycle over multiple change queues.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 55
+      },
+      "revId": "dc7cbefcb1de9d8ff4d704e6c04fd2a354be39a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_62962496",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:41:07Z",
+      "side": 1,
+      "message": "If we hold back the reporting until the whole bundle is finished we actually have all the needed information already. So in fact we could report each item in one go with the bundle result.",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 139,
+        "endChar": 77
+      },
+      "revId": "dc7cbefcb1de9d8ff4d704e6c04fd2a354be39a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
