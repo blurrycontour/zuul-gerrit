@@ -87,6 +87,24 @@
       "revId": "eb40c64040800f2db7eb9a7c5167e17c3085c75f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_026bb084",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:41:07Z",
+      "side": 1,
+      "message": "Using a push account is not really feasible from my role as an operator of a large scale multi tenant setup.\n\nHowever where we support it (probably all but Github) we should be able to use it in order to at least rule out algorithmic differences between different git versions/implementations.\n\nBut I\u0027m not sure if we can just default to push in Gerrit or make that configurable separately per project (I guess in Gerrit we might need different permissions for push than submit).\n\nThat said I think we should make this as best effort as possible but don\u0027t try to \u0027repair\u0027 things if they still go wrong. And we should make this very clean in the docs that this is a tradeof that has to be made when allowing circular dependencies.",
+      "parentUuid": "7faddb67_a20bbc21",
+      "revId": "eb40c64040800f2db7eb9a7c5167e17c3085c75f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
