@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_a2117c06",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-16T11:37:20Z",
+      "side": 1,
+      "message": "Maybe we should do this in SmartReconfigure too",
+      "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_22fd8cb0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-16T11:37:20Z",
+      "side": 1,
+      "message": "So that we can include a similar info in the log message.",
+      "range": {
+        "startLine": 738,
+        "startChar": 53,
+        "endLine": 738,
+        "endChar": 75
+      },
+      "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_e2345495",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-16T11:37:20Z",
+      "side": 1,
+      "message": "In addition to the duration, should we log which tenants we reconfigured?",
+      "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
