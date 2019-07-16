@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_8281e0fd",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:44:19Z",
+      "side": 1,
+      "message": "Yepp, we should",
+      "parentUuid": "7faddb67_a2117c06",
+      "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_22fd8cb0",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
@@ -53,6 +71,24 @@
       "writtenOn": "2019-07-16T11:37:20Z",
       "side": 1,
       "message": "In addition to the duration, should we log which tenants we reconfigured?",
+      "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_0275f031",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-16T11:44:19Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "7faddb67_e2345495",
       "revId": "be7588209ad05033ecc315340fa3e574ebdeb188",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
