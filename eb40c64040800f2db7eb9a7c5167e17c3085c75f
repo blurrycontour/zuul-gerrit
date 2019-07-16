@@ -69,6 +69,24 @@
       "revId": "eb40c64040800f2db7eb9a7c5167e17c3085c75f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_a20bbc21",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-16T11:20:55Z",
+      "side": 1,
+      "message": "Yeah - which is super sad making.\n\nPerhaps when we look at \"Zuul push\" we could consider allowing a \"push\" account to be configured in the github driver that would be a regular account for Zuul to use to push things, separate from the App. (it\u0027s an ugly workaround, but such is life)",
+      "parentUuid": "7faddb67_2ed57de5",
+      "revId": "eb40c64040800f2db7eb9a7c5167e17c3085c75f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
