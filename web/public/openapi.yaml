@@ -6,6 +6,70 @@ openapi: 3.0.0
 tags:
 - name: tenant
 paths:
+  /api/info:
+    get:
+      operationId: get-info
+      summary: Get Zuul Service Info
+      responses:
+        '200':
+          description: Zuul Service Info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    $ref: '#/components/schemas/info'
+      tags:
+      - info
+  /api/tenants:
+    get:
+      operationId: list-tenants
+      parameters:
+      - description: The tenant name
+        in: path
+        name: tenant
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  properties:
+                    name:
+                      description: Tenant name
+                      type: string
+                    projects:
+                      description: Tenant project count
+                      type: integer
+                    queue:
+                      description: Active changes count
+                      type: integer
+                  type: object
+                type: array
+          description: Returns the list of tenants
+      summary: List the tenants
+      tags:
+      - tenant
+  /api/tenant/{tenant}/info:
+    get:
+      operationId: get-tenant-info
+      summary: Get Zuul Tenant Info
+      responses:
+        '200':
+          description: Zuul Tenant Info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  info:
+                    $ref: '#/components/schemas/tenantInfo'
+      tags:
+      - tenant
   /api/tenant/{tenant}/builds:
     get:
       operationId: list-builds
@@ -206,33 +270,65 @@ paths:
       summary: Get tenant status
       tags:
       - tenant
-  /api/tenants:
-    get:
-      operationId: list-tenants
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                items:
-                  properties:
-                    name:
-                      description: Tenant name
-                      type: string
-                    projects:
-                      description: Tenant project count
-                      type: integer
-                    queue:
-                      description: Active changes count
-                      type: integer
-                  type: object
-                type: array
-          description: Returns the list of tenants
-      summary: List the tenants
-      tags:
-      - tenant
 components:
   schemas:
+    info:
+      description: Info about the running Zuul service
+      type: object
+      properties:
+        stats:
+          description: Information about statistics reporting
+          type: object
+          properties:
+            type:
+              description: Type of stats system in use
+              type: string
+            url:
+              description: Base URL of stats system
+              type: string
+            prefix:
+              description: URL prefix of stats system
+              type: string
+        capabilities:
+          description: Flags indicating feature support in Zuul
+          type: object
+          properties:
+            job_history:
+              description: Whether this Zuul supports storing job history
+              type: bool
+        websocket_url:
+          description: The URL of the websocket URL for log streaming
+          type: string
+    tenantInfo:
+      description: Info about the running Zuul service
+      type: object
+      properties:
+        tenant:
+          description: The name of the current tenant
+          type: string
+        stats:
+          description: Information about statistics reporting
+          type: object
+          properties:
+            type:
+              description: Type of stats system in use
+              type: string
+            url:
+              description: Base URL of stats system
+              type: string
+            prefix:
+              description: URL prefix of stats system
+              type: string
+        capabilities:
+          description: Flags indicating feature support in Zuul
+          type: object
+          properties:
+            job_history:
+              description: Whether this Zuul supports storing job history
+              type: bool
+        websocket_url:
+          description: The URL of the websocket URL for log streaming
+          type: string
     build:
       description: A build
       properties:
