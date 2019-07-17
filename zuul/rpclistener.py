@@ -16,6 +16,7 @@
 import json
 import logging
 import threading
+import time
 import traceback
 
 import gear
@@ -186,6 +187,7 @@ class RPCListener(object):
     def _common_enqueue(self, job):
         args = json.loads(job.arguments)
         event = model.TriggerEvent()
+        event.timestamp = time.time()
         errors = ''
         tenant = None
         project = None
