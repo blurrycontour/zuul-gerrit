@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_5515c8e3",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 35
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-17T22:15:56Z",
+      "side": 1,
+      "message": "Can you point that at zuul.example.com?  :)",
+      "revId": "8741f1611ef6dc38534be5d921b6fff2e5f3c44c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
