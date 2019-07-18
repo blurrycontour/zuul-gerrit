@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "7faddb67_b7de6e3b",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-18T20:14:11Z",
+      "side": 1,
+      "message": "Wouldn\u0027t that prevent using multi-nodes job across multiple region (if/when that\u0027s implemented)? Why not sharding per pool?",
+      "range": {
+        "startLine": 206,
+        "startChar": 44,
+        "endLine": 206,
+        "endChar": 62
+      },
+      "revId": "243d92047a69fcc40b43da6248d34597ca965d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_acbb030c",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 11
