@@ -1,0 +1,47 @@
+- pipeline:
+    name: post
+    manager: independent
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^(?!refs/).*$
+    post-review: True
+
+- job:
+    name: base
+    parent: null
+    nodeset:
+      nodes:
+        - name: controller
+          label: label1
+    run: playbooks/run.yaml
+
+- job:
+    name: test-normal
+
+- job:
+    name: test-shared
+    final: True
+    allowed-projects:
+      - org/project
+
+- project:
+    name: common-config
+    post:
+      jobs:
+        - test-normal
+        - test-shared
+
+- project:
+    name: org/project
+    post:
+      jobs:
+        - test-normal
+        - test-shared
+
+- project:
+    name: org/other-project
+    post:
+      jobs:
+        - test-normal
+        - test-shared

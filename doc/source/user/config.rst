@@ -1162,6 +1162,12 @@ Here is an example of two job definitions:
          :term:`config-project`, or jobs in an `untrusted-project`
          which use a secret.
 
+      If the job is marked :attr:`job.final` and is used in a
+      post-review pipeline triggered by a project listed in
+      `allowed-projects`, then the `project key` of the defining
+      project is made available to the job.  See
+      :ref:`user_jobs_project_key` for more information.
+
    .. attr:: post-review
       :default: false
 

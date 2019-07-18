@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+    - name: print ssh keys
+      command: ssh-add -l

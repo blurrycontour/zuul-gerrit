@@ -1212,6 +1212,7 @@ class Job(ConfigObject):
             _irrelevant_files=(),
             secrets=(),  # secrets aren't inheritable
             queued=False,
+            finalized_project=None,  # Which project set final=true
         )
 
         self.inheritable_attributes = {}
@@ -1567,6 +1568,7 @@ class Job(ConfigObject):
         # through assignment.
         if other.final != self.attributes['final']:
             self.final = other.final
+            self.finalized_project = other.source_context.project
 
         # Abstract may not be reset by a variant, it may only be
         # cleared by inheriting.

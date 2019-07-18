@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import base64
+import hashlib
 import io
 import json
 import logging
@@ -6213,3 +6215,135 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
             dict(name='ansible-27', result='SUCCESS', changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+
+class TestSSHKeys(AnsibleZuulTestCase):
+    tenant_config_file = 'config/ssh-keys/main.yaml'
+    create_project_keys = True
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def _get_fingerprint(self, project):
+        key_root = os.path.join(self.state_root, 'keys')
+        ssh_key_file = os.path.join(
+            key_root,
+            'ssh/project/gerrit/%s/0.pem' % project)
+        ssh_key = paramiko.RSAKey.from_private_key_file(ssh_key_file)
+        public_key = ssh_key.get_base64()
+        fingerprint = base64.b64encode(hashlib.sha256(
+            base64.b64decode(public_key.encode('ascii'))).digest()) \
+            .decode('ascii').replace('=', '')
+        return fingerprint
+
+    def test_ssh_keys_normal(self):
+        """Test that if a final job with allowed projects is used in the
+        project where it was finalized, only that project's ssh key is
+        available.
+
+        """
+        self.executor_server.verbose = True
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        common_config_fp = self._get_fingerprint('common-config')
+        org_project_fp = self._get_fingerprint('org/project')
+        org_other_project_fp = self._get_fingerprint('org/other-project')
+
+        j = json.loads(self._get_file(self.getJobFromHistory('test-normal'),
+                                      'work/logs/job-output.json'))
+        stdout = j[0]['plays'][0]['tasks'][0]['hosts']['controller']['stdout']
+        # The zuul process key plus common-config (the triggering project)
+        self.assertEqual(len(stdout.strip().split('\n')), 2)
+        self.assertIn(common_config_fp, stdout)
+        self.assertNotIn(org_project_fp, stdout)
+        self.assertNotIn(org_other_project_fp, stdout)
+
+        j = json.loads(self._get_file(self.getJobFromHistory('test-shared'),
+                                      'work/logs/job-output.json'))
+        stdout = j[0]['plays'][0]['tasks'][0]['hosts']['controller']['stdout']
+        # The zuul process key plus common-config (the triggering project)
+        self.assertEqual(len(stdout.strip().split('\n')), 2)
+        self.assertIn(common_config_fp, stdout)
+        self.assertNotIn(org_project_fp, stdout)
+        self.assertNotIn(org_other_project_fp, stdout)
+
+    def test_ssh_keys_shared(self):
+        """Test that if a final job with allowed projects is used in a one of
+        the allowed-projects, the ssh key of the triggering project as
+        well as the project where the job was finalized are both
+        available.
+
+        """
+
+        self.executor_server.verbose = True
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        common_config_fp = self._get_fingerprint('common-config')
+        org_project_fp = self._get_fingerprint('org/project')
+        org_other_project_fp = self._get_fingerprint('org/other-project')
+
+        j = json.loads(self._get_file(self.getJobFromHistory('test-normal'),
+                                      'work/logs/job-output.json'))
+        stdout = j[0]['plays'][0]['tasks'][0]['hosts']['controller']['stdout']
+        # The zuul process key plus org/project (the triggering project)
+        self.assertEqual(len(stdout.strip().split('\n')), 2)
+        self.assertNotIn(common_config_fp, stdout)
+        self.assertIn(org_project_fp, stdout)
+        self.assertNotIn(org_other_project_fp, stdout)
+
+        j = json.loads(self._get_file(self.getJobFromHistory('test-shared'),
+                                      'work/logs/job-output.json'))
+        stdout = j[0]['plays'][0]['tasks'][0]['hosts']['controller']['stdout']
+        # The zuul process key plus common-config (the finalizing project)
+        # plus org/project  (the triggering project)
+        self.assertEqual(len(stdout.strip().split('\n')), 3)
+        self.assertIn(common_config_fp, stdout)
+        self.assertIn(org_project_fp, stdout)
+        self.assertNotIn(org_other_project_fp, stdout)
+
+    def test_ssh_keys_other(self):
+        """Test that if a final job with allowed projects is used in a
+        non-allowed project (via the mechanism which allows config
+        projects to ignore allowed-projects), the ssh key for the
+        project where the job is defined is nonetheless not used.
+
+        """
+
+        self.executor_server.verbose = True
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('org/other-project', 'master', 'A')
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        common_config_fp = self._get_fingerprint('common-config')
+        org_project_fp = self._get_fingerprint('org/project')
+        org_other_project_fp = self._get_fingerprint('org/other-project')
+
+        j = json.loads(self._get_file(self.getJobFromHistory('test-normal'),
+                                      'work/logs/job-output.json'))
+        stdout = j[0]['plays'][0]['tasks'][0]['hosts']['controller']['stdout']
+        # The zuul process key plus org/other-project (the triggering project)
+        self.assertEqual(len(stdout.strip().split('\n')), 2)
+        self.assertNotIn(common_config_fp, stdout)
+        self.assertNotIn(org_project_fp, stdout)
+        self.assertIn(org_other_project_fp, stdout)
+
+        j = json.loads(self._get_file(self.getJobFromHistory('test-shared'),
+                                      'work/logs/job-output.json'))
+        stdout = j[0]['plays'][0]['tasks'][0]['hosts']['controller']['stdout']
+        # The zuul process key plus org/other-project (the triggering project)
+        self.assertEqual(len(stdout.strip().split('\n')), 2)
+        self.assertNotIn(common_config_fp, stdout)
+        self.assertNotIn(org_project_fp, stdout)
+        self.assertIn(org_other_project_fp, stdout)

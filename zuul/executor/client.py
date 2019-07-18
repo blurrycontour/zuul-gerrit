@@ -243,10 +243,20 @@ class ExecutorClient(object):
         params['nodes'] = nodes
         params['groups'] = [group.toDict() for group in nodeset.getGroups()]
         params['ssh_keys'] = []
+        project_keys = set()
         if pipeline.post_review:
             params['ssh_keys'].append(dict(
                 name='%s project key' % item.change.project.canonical_name,
                 key=item.change.project.private_ssh_key))
+            project_keys.add(item.change.project)
+            if job.final:
+                if item.change.project.name in job.allowed_projects:
+                    if job.finalized_project not in project_keys:
+                        params['ssh_keys'].append(dict(
+                            name='%s project key' %
+                            job.finalized_project.canonical_name,
+                            key=job.finalized_project.private_ssh_key))
+                        project_keys.add(job.finalized_project)
         params['vars'] = job.variables
         params['extra_vars'] = job.extra_variables
         params['host_vars'] = job.host_variables

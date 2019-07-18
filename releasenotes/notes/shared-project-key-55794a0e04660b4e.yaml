@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Post-review jobs can now allow other projects to "borrow" their
+    ssh keys.
+    
+    If a job is declared :attr:`job.final` and is used in a
+    :attr:`pipeline.post-review` pipeline of a project listed in
+    :attr:`job.allowed-projects`, then the :ref:`project SSH key
+    <user_jobs_project_key>` of the project where the job was marked
+    final is also made available to the job.

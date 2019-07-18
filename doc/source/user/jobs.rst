@@ -724,6 +724,8 @@ or a static host), the use of the `add-build-sshkey
 <https://zuul-ci.org/docs/zuul-jobs/roles.html#role-add-build-sshkey>`
 role is recommended.
 
+.. _user_jobs_project_key:
+
 Project Key
 ~~~~~~~~~~~
 
@@ -734,6 +736,30 @@ public key to systems to allow post-review jobs to access those
 systems.  The systems may be added to the inventory using the
 ``add_host`` Ansible module, or they may be supplied by static nodes
 in Nodepool.
+
+If the job sets :attr:`job.final` to ``true`` and the project
+triggering the job is listed in :attr:`job.allowed-projects`, then the
+key of the project where :attr:`job.final` was set to ``true``
+(usually the project which defines the job) is also added.
+
+For example, if the following job were defined in a project called
+``deploy-scripts``:
+
+.. code-block:: yaml
+
+   - job:
+       name: deploy
+       final: true
+       allowed-projects:
+         - datafiles
+
+Then if that job runs in a post-review pipeline on changes to the
+``deploy-scripts`` project, the project key of ``deploy-scripts`` will
+be available.  If it runs on changes to the ``datafiles`` project,
+then not only will the ``datafiles`` project key be available, but the
+``deploy-scripts`` project key will also be available.  With this
+configuration, one project may permit another to "borrow" its
+credentials for specific jobs.
 
 Zuul serves each project's public SSH key using its build-in
 webserver.  They can be fetched at the path
