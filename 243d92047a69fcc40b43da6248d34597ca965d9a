@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_69e81a7b",
+        "filename": "doc/source/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-18T21:33:49Z",
+      "side": 1,
+      "message": "If we implement multi-node jobs across regions, we\u0027re really implementing them across pools, and right now we don\u0027t have a way for Nodepool to handle that, so it\u0027s hard to say whether this would prohibit that or not.  My guess is that this won\u0027t prevent that, since to handle that will almost certainly involve some kind of multi-process coordination.\n\nAs for sharding per-pool -- you\u0027re right, that\u0027s actually the smallest unit we can shard, so maybe we should do that.",
+      "revId": "243d92047a69fcc40b43da6248d34597ca965d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_acbb030c",
         "filename": "doc/source/developer/specs/kubernetes-operator.rst",
         "patchSetId": 11
