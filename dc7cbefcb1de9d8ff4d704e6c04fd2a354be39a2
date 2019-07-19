@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_d37bf788",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-07-19T08:53:54Z",
+      "side": 1,
+      "message": "Ok, will add that this must be enabled explicitly in the tenant config.",
+      "parentUuid": "7faddb67_c2d3585f",
+      "revId": "dc7cbefcb1de9d8ff4d704e6c04fd2a354be39a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_42144844",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 4
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_336ccbcc",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-07-19T08:53:54Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "7faddb67_42144844",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 56,
+        "endChar": 55
+      },
+      "revId": "dc7cbefcb1de9d8ff4d704e6c04fd2a354be39a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_62962496",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 4
@@ -53,6 +95,30 @@
       "writtenOn": "2019-07-16T11:41:07Z",
       "side": 1,
       "message": "If we hold back the reporting until the whole bundle is finished we actually have all the needed information already. So in fact we could report each item in one go with the bundle result.",
+      "range": {
+        "startLine": 138,
+        "startChar": 0,
+        "endLine": 139,
+        "endChar": 77
+      },
+      "revId": "dc7cbefcb1de9d8ff4d704e6c04fd2a354be39a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_f805b214",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-07-19T08:53:54Z",
+      "side": 1,
+      "message": "The reason for holding back the bundle reporting is that we don\u0027t know at this point if all items could be merged. We could of course assume (the very likely) happy path and report the whole bundle. Then we only have to come back and report again in the error case.",
+      "parentUuid": "7faddb67_62962496",
       "range": {
         "startLine": 138,
         "startChar": 0,
