@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_50584f2f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-07-19T22:18:02Z",
+      "side": 1,
+      "message": "I\u0027ve debugged this and it appears to have been related to me setting hardware acceleration to enabled rather than the default of disabled.\n\nThat said newer firefox is starting to enable webrender which does rely on hardware acceleration so we may want to test that the log streaming works with firefox on platforms where hardware acceleration is enabled.",
+      "revId": "672c4160ee8f78c36175946d2bcaea5d3d39df57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
