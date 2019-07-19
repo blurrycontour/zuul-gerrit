@@ -1044,8 +1044,14 @@ class PipelineManager(object):
                      "merged: %s", item.change, succeeded, merged)
             change_queue = item.queue
             if not (succeeded and merged):
-                log.debug("Reported change %s failed tests or failed to merge",
-                          item.change)
+                if not item.job_graph or not item.job_graph.jobs:
+                    error_reason = "didn't had any job"
+                elif not merged:
+                    error_reason = "failed to merge"
+                else:
+                    error_reason = "failed tests"
+                log.error("Reported change %s %s.",
+                          item.change, error_reason)
                 change_queue.decreaseWindowSize()
                 log.debug("%s window size decreased to %s",
                           change_queue, change_queue.window)
