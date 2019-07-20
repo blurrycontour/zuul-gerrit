@@ -18,7 +18,8 @@ import {
   BUILD_FETCH_FAIL,
   BUILD_FETCH_REQUEST,
   BUILD_FETCH_SUCCESS,
-  BUILD_OUTPUT_FETCH_SUCCESS
+  BUILD_OUTPUT_FETCH_SUCCESS,
+  BUILD_MANIFEST_FETCH_SUCCESS
 } from '../actions/build'
 
 
@@ -38,6 +39,9 @@ export default (state = {
     case BUILD_OUTPUT_FETCH_SUCCESS:
       return update(
         state, {builds: {[action.buildId]: {$merge: {output: action.output}}}})
+    case BUILD_MANIFEST_FETCH_SUCCESS:
+      return update(
+        state, {builds: {[action.buildId]: {$merge: {manifest: action.manifest}}}})
     default:
       return state
   }
