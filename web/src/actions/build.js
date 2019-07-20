@@ -20,6 +20,7 @@ export const BUILD_FETCH_REQUEST = 'BUILD_FETCH_REQUEST'
 export const BUILD_FETCH_SUCCESS = 'BUILD_FETCH_SUCCESS'
 export const BUILD_FETCH_FAIL = 'BUILD_FETCH_FAIL'
 export const BUILD_OUTPUT_FETCH_SUCCESS = 'BUILD_OUTPUT_FETCH_SUCCESS'
+export const BUILD_MANIFEST_FETCH_SUCCESS = 'BUILD_MANIFEST_FETCH_SUCCESS'
 
 export const requestBuild = () => ({
   type: BUILD_FETCH_REQUEST
@@ -77,6 +78,31 @@ const receiveBuildOutput = (buildId, output) => {
   }
 }
 
+const renderNode = (object) => {
+  console.log(object)
+  const node = {
+    text: object.name
+  }
+  if ("children" in object && object.children) {
+    node.nodes = object.children.map(n => renderNode(n))
+  }
+  if (object.mimetype !== "application/directory") {
+    node.icon = "fa fa-file-o"
+  }
+    
+  return node
+}
+
+const receiveManifest = (buildId, manifest) => {
+  console.log(manifest.tree.map(n => renderNode(n)))
+  return {
+    type: BUILD_MANIFEST_FETCH_SUCCESS,
+    buildId: buildId,
+    manifest: {nodes: manifest.tree.map(n => renderNode(n))},
+    receivedAt: Date.now()
+  }
+}
+
 const failedBuild = error => ({
   type: BUILD_FETCH_FAIL,
   error
@@ -103,6 +129,16 @@ const fetchBuild = (tenant, build) => dispatch => {
           })
           .catch(error => console.error(
             'Couldn\'t decode job-output...', error))
+      }
+      for (let artifact of response.data.artifacts) {
+	if ("metadata" in artifact &&
+	    "type" in artifact.metadata &&
+	    artifact.metadata.type === "test_zuul_manifest") {
+          Axios.get(artifact.url)
+            .then(response => dispatch(receiveManifest(build, response.data)))
+            .catch(error => console.error(
+              'Couldn\'t decode manifest...', error))
+	}
       }
     })
     .catch(error => dispatch(failedBuild(error)))

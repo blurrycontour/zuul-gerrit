@@ -20,6 +20,7 @@ import { Panel } from 'react-bootstrap'
 
 import Artifact from './Artifact'
 import BuildOutput from './BuildOutput'
+import Manifest from './Manifest'
 
 
 class Build extends React.Component {
@@ -92,6 +93,7 @@ class Build extends React.Component {
             </tbody>
           </table>
           {build.output && <BuildOutput output={build.output}/>}
+          {build.manifest && <Manifest manifest={build.manifest}/>}
         </Panel.Body>
       </Panel>
     )
