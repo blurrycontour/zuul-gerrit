@@ -19,8 +19,14 @@ import * as API from '../api'
 export const BUILD_FETCH_REQUEST = 'BUILD_FETCH_REQUEST'
 export const BUILD_FETCH_SUCCESS = 'BUILD_FETCH_SUCCESS'
 export const BUILD_FETCH_FAIL = 'BUILD_FETCH_FAIL'
-export const BUILD_OUTPUT_FETCH_SUCCESS = 'BUILD_OUTPUT_FETCH_SUCCESS'
-export const BUILD_MANIFEST_FETCH_SUCCESS = 'BUILD_MANIFEST_FETCH_SUCCESS'
+
+export const BUILD_OUTPUT_REQUEST = 'BUILD_OUTPUT_REQUEST'
+export const BUILD_OUTPUT_SUCCESS = 'BUILD_OUTPUT_SUCCESS'
+export const BUILD_OUTPUT_FAIL = 'BUILD_OUTPUT_FAIL'
+
+export const BUILD_MANIFEST_REQUEST = 'BUILD_MANIFEST_REQUEST'
+export const BUILD_MANIFEST_SUCCESS = 'BUILD_MANIFEST_SUCCESS'
+export const BUILD_MANIFEST_FAIL = 'BUILD_MANIFEST_FAIL'
 
 export const requestBuild = () => ({
   type: BUILD_FETCH_REQUEST
@@ -31,6 +37,15 @@ export const receiveBuild = (buildId, build) => ({
   buildId: buildId,
   build: build,
   receivedAt: Date.now()
+})
+
+const failedBuild = error => ({
+  type: BUILD_FETCH_FAIL,
+  error
+})
+
+export const requestBuildOutput = () => ({
+  type: BUILD_OUTPUT_REQUEST
 })
 
 const receiveBuildOutput = (buildId, output) => {
@@ -71,92 +86,115 @@ const receiveBuildOutput = (buildId, output) => {
     })
   })
   return {
-    type: BUILD_OUTPUT_FETCH_SUCCESS,
+    type: BUILD_OUTPUT_SUCCESS,
     buildId: buildId,
     output: hosts,
     receivedAt: Date.now()
   }
 }
 
-const renderNode = (object) => {
-  console.log(object)
-  const node = {
-    text: object.name
-  }
-  if ('children' in object && object.children) {
-    node.nodes = object.children.map(n => renderNode(n))
-  }
-  if (object.mimetype !== 'application/directory') {
-    node.icon = 'fa fa-file-o'
-  }
-  return node
-}
+const failedBuildOutput = error => ({
+  type: BUILD_OUTPUT_FAIL,
+  error
+})
 
-const receiveManifest = (buildId, manifest) => {
-  console.log(manifest.tree.map(n => renderNode(n)))
+export const requestBuildManifest = () => ({
+  type: BUILD_MANIFEST_REQUEST
+})
+
+const receiveBuildManifest = (buildId, manifest) => {
+  const index = {}
+
+  const renderNode = (root, object) => {
+    const path = root + '/' + object.name
+
+    const node = {
+      text: object.name
+    }
+    if ('children' in object && object.children) {
+      node.nodes = object.children.map(n => renderNode(path, n))
+    } else {
+      index[path] = object
+    }
+    if (object.mimetype !== 'application/directory') {
+      node.icon = 'fa fa-file-o'
+    }
+    return node
+  }
+
+  const nodes = manifest.tree.map(n => renderNode('', n))
   return {
-    type: BUILD_MANIFEST_FETCH_SUCCESS,
+    type: BUILD_MANIFEST_SUCCESS,
     buildId: buildId,
-    manifest: {nodes: manifest.tree.map(n => renderNode(n))},
+    manifest: {nodes: nodes, index: index},
     receivedAt: Date.now()
   }
 }
 
-const failedBuild = error => ({
-  type: BUILD_FETCH_FAIL,
+const failedBuildManifest = error => ({
+  type: BUILD_MANIFEST_FAIL,
   error
 })
 
-const fetchBuild = (tenant, build) => dispatch => {
+export const fetchBuild = (tenant, buildId, state, force) => dispatch => {
+  const build = state.build.builds[buildId]
+  if (!force && build) {
+    return
+  }
   dispatch(requestBuild())
-  return API.fetchBuild(tenant.apiPrefix, build)
+  return API.fetchBuild(tenant.apiPrefix, buildId)
     .then(response => {
-      dispatch(receiveBuild(build, response.data))
-      if (response.data.log_url) {
-        const url = response.data.log_url.substr(
-          0, response.data.log_url.lastIndexOf('/') + 1)
-        Axios.get(url + 'job-output.json.gz')
-          .then(response => dispatch(receiveBuildOutput(build, response.data)))
-          .catch(error => {
-            if (!error.request) {
-              throw error
-            }
-            // Try without compression
-            Axios.get(url + 'job-output.json')
-              .then(response => dispatch(receiveBuildOutput(
-                build, response.data)))
-          })
-          .catch(error => console.error(
-            'Couldn\'t decode job-output...', error))
-      }
-      for (let artifact of response.data.artifacts) {
-        if ('metadata' in artifact &&
-            'type' in artifact.metadata &&
-            artifact.metadata.type === 'test_zuul_manifest') {
-          Axios.get(artifact.url)
-            .then(response => dispatch(receiveManifest(build, response.data)))
-            .catch(error => console.error(
-              'Couldn\'t decode manifest...', error))
-        }
-      }
+      dispatch(receiveBuild(buildId, response.data))
     })
     .catch(error => dispatch(failedBuild(error)))
 }
 
-const shouldFetchBuild = (buildId, state) => {
+const fetchBuildOutput = (buildId, state, force) => dispatch => {
   const build = state.build.builds[buildId]
-  if (!build) {
-    return true
+  const url = build.log_url.substr(0, build.log_url.lastIndexOf('/') + 1)
+  if (!force && build.output) {
+    return
   }
-  if (build.isFetching) {
-    return false
-  }
-  return false
+  dispatch(requestBuildOutput())
+  return Axios.get(url + 'job-output.json.gz')
+    .then(response => dispatch(receiveBuildOutput(buildId, response.data)))
+    .catch(error => {
+      if (!error.request) {
+        throw error
+      }
+      // Try without compression
+      Axios.get(url + 'job-output.json')
+        .then(response => dispatch(receiveBuildOutput(
+          buildId, response.data)))
+    })
+    .catch(error => dispatch(failedBuildOutput(error)))
 }
 
-export const fetchBuildIfNeeded = (tenant, buildId, force) => (
-  dispatch, getState) => {
-    if (force || shouldFetchBuild(buildId, getState())) {
-      return dispatch(fetchBuild(tenant, buildId))
+export const fetchBuildManifest = (buildId, state, force) => dispatch => {
+  const build = state.build.builds[buildId]
+  if (!force && build.manifest) {
+    return
+  }
+
+  dispatch(requestBuildManifest())
+  for (let artifact of build.artifacts) {
+    if ('metadata' in artifact &&
+        'type' in artifact.metadata &&
+        artifact.metadata.type === 'test_zuul_manifest') {
+      return Axios.get(artifact.url)
+        .then(manifest => {
+          dispatch(receiveBuildManifest(buildId, manifest.data))
+        })
+        .catch(error => dispatch(failedBuildManifest(error)))
     }
+  }
+  dispatch(failedBuildManifest('no manifest found'))
+}
+
+export const fetchBuildIfNeeded = (tenant, buildId, force) => (dispatch, getState) => {
+  dispatch(fetchBuild(tenant, buildId, getState(), force))
+    .then(() => {
+      dispatch(fetchBuildOutput(buildId, getState(), force))
+      dispatch(fetchBuildManifest(buildId, getState(), force))
+    })
 }
