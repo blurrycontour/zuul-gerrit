@@ -21,6 +21,9 @@ export const BUILD_FETCH_SUCCESS = 'BUILD_FETCH_SUCCESS'
 export const BUILD_FETCH_FAIL = 'BUILD_FETCH_FAIL'
 export const BUILD_OUTPUT_FETCH_SUCCESS = 'BUILD_OUTPUT_FETCH_SUCCESS'
 export const BUILD_MANIFEST_FETCH_SUCCESS = 'BUILD_MANIFEST_FETCH_SUCCESS'
+export const BUILD_VIEW_FETCH_REQUEST = 'BUILD_VIEW_FETCH_REQUEST'
+export const BUILD_VIEW_FETCH_SUCCESS = 'BUILD_VIEW_FETCH_SUCCESS'
+export const BUILD_VIEW_FETCH_FAIL = 'BUILD_VIEW_FETCH_FAIL'
 
 export const requestBuild = () => ({
   type: BUILD_FETCH_REQUEST
@@ -78,28 +81,76 @@ const receiveBuildOutput = (buildId, output) => {
   }
 }
 
-const renderNode = (object) => {
-  console.log(object)
-  const node = {
-    text: object.name
-  }
-  if ('children' in object && object.children) {
-    node.nodes = object.children.map(n => renderNode(n))
-  }
-  if (object.mimetype !== 'application/directory') {
-    node.icon = 'fa fa-file-o'
-  }
-  return node
-}
-
 const receiveManifest = (buildId, manifest) => {
-  console.log(manifest.tree.map(n => renderNode(n)))
+  const index = {}
+
+  const renderNode = (root, object) => {
+    const path = root + '/' + object.name
+    
+    const node = {
+      text: object.name
+    }
+    if ('children' in object && object.children) {
+      node.nodes = object.children.map(n => renderNode(path, n))
+    } else {
+      index[path] = object
+    }
+    if (object.mimetype !== 'application/directory') {
+      node.icon = 'fa fa-file-o'
+    }
+    return node
+  }
+
+  const nodes = manifest.tree.map(n => renderNode('', n))
+  console.log('got manifest')
   return {
     type: BUILD_MANIFEST_FETCH_SUCCESS,
     buildId: buildId,
-    manifest: {nodes: manifest.tree.map(n => renderNode(n))},
+    manifest: {nodes: nodes, index: index},
     receivedAt: Date.now()
   }
+}
+
+export const requestView = (tenant, buildId, file) => ({
+  type: BUILD_VIEW_FETCH_REQUEST,
+  tenant: tenant,
+  buildId: buildId,
+  file: file
+})
+
+const receiveView = (data) => ({
+    type: BUILD_VIEW_FETCH_SUCCESS,
+    data: data,
+    receivedAt: Date.now()
+})
+
+const failedView = error => ({
+  type: BUILD_VIEW_FETCH_FAIL,
+  error
+})
+
+const fetchView = (tenant, buildId, file) => (dispatch, getState) => {
+  dispatch(requestView(tenant, buildId, file))
+  console.log('fetch build')
+  return dispatch(fetchBuild(tenant, buildId, file))
+}
+
+const shouldFetchView = (tenant, buildId, file, state) => {
+  if (state.viewdata_tenant === tenant &&
+      state.viewdata_buildId === buildId &&
+      state.viewData_file === file) {
+    console.log("should not fetch")
+    return false
+  }
+  console.log("should fetch")
+  return true
+}
+
+export const fetchViewIfNeeded = (tenant, buildId, file, force) => (
+  dispatch, getState) => {
+    if (force || shouldFetchView(tenant, buildId, file, getState())) {
+      return dispatch(fetchView(tenant, buildId, file))
+    }
 }
 
 const failedBuild = error => ({
@@ -107,7 +158,8 @@ const failedBuild = error => ({
   error
 })
 
-const fetchBuild = (tenant, build) => dispatch => {
+const fetchBuild = (tenant, build, file) => dispatch => {
+  console.log('fetch build 2')
   dispatch(requestBuild())
   return API.fetchBuild(tenant.apiPrefix, build)
     .then(response => {
@@ -133,8 +185,20 @@ const fetchBuild = (tenant, build) => dispatch => {
         if ('metadata' in artifact &&
             'type' in artifact.metadata &&
             artifact.metadata.type === 'test_zuul_manifest') {
+	  console.log('get manifest')
           Axios.get(artifact.url)
-            .then(response => dispatch(receiveManifest(build, response.data)))
+            .then(manifest => {
+	      dispatch(receiveManifest(build, manifest.data))
+	      if (file) {
+		//const item = build.manifest.index['/' + file]
+		//console.log('found', item)
+		//if (item.mimetype === 'text/plain') {
+		  Axios.get(response.data.log_url+'/job-output.txt.gz')
+		    .then(response => dispatch(receiveView(response.data)))
+		    .catch(error => dispatch(failedView(error)))
+		//}
+	      }
+	    })
             .catch(error => console.error(
               'Couldn\'t decode manifest...', error))
         }

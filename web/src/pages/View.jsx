@@ -16,37 +16,41 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 
-import { fetchBuildIfNeeded } from '../actions/build'
+import { fetchBuildIfNeeded, fetchViewIfNeeded } from '../actions/build'
 import Refreshable from '../containers/Refreshable'
-import Build from '../containers/build/Build'
+import View from '../containers/build/View'
 
 
-class BuildPage extends Refreshable {
+class ViewPage extends Refreshable {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
   }
 
   updateData = (force) => {
-    this.props.dispatch(fetchBuildIfNeeded(
-      this.props.tenant, this.props.match.params.buildId, null, force))
+    this.props.dispatch(fetchViewIfNeeded(
+      this.props.tenant,
+      this.props.match.params.buildId,
+      this.props.match.params.file,
+      force))
   }
 
   componentDidMount () {
-    document.title = 'Zuul Build'
+    document.title = 'Zuul Build Viewer'
     super.componentDidMount()
   }
 
   render () {
     const { remoteData } = this.props
+    console.log('render', remoteData)
     const build = remoteData.builds[this.props.match.params.buildId]
     return (
       <React.Fragment>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
-        {build && <Build build={build}/>}
+        {remoteData.viewdata && <View build={build} data={remoteData.viewdata}/>}
       </React.Fragment>
     )
   }
@@ -55,4 +59,4 @@ class BuildPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.build,
-}))(BuildPage)
+}))(ViewPage)

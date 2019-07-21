@@ -19,13 +19,20 @@ import {
   BUILD_FETCH_REQUEST,
   BUILD_FETCH_SUCCESS,
   BUILD_OUTPUT_FETCH_SUCCESS,
-  BUILD_MANIFEST_FETCH_SUCCESS
+  BUILD_MANIFEST_FETCH_SUCCESS,
+  BUILD_VIEW_FETCH_REQUEST,
+  BUILD_VIEW_FETCH_SUCCESS,
+  BUILD_VIEW_FETCH_FAIL
 } from '../actions/build'
 
 
 export default (state = {
   isFetching: false,
   builds: {},
+  viewdata: null,
+  viewdata_tenant: null,
+  viewdata_buildId: null,
+  viewdata_file: null
 }, action) => {
   switch (action.type) {
     case BUILD_FETCH_REQUEST:
@@ -42,6 +49,20 @@ export default (state = {
     case BUILD_MANIFEST_FETCH_SUCCESS:
       return update(
         state, {builds: {[action.buildId]: {$merge: {manifest: action.manifest}}}})
+
+    case BUILD_VIEW_FETCH_REQUEST:
+      console.log('reduce start')
+      return update(state, {$merge: {viewdata_tenant: action.tenant,
+  				     viewdata_buildId: action.buildId,
+				     viewData_file: action.file,
+				     viewdata: null}})
+    case BUILD_VIEW_FETCH_SUCCESS:
+      console.log('reduce success')
+      return update(state, {$merge: {isFetching: false, viewdata: action.data}})
+    case BUILD_VIEW_FETCH_FAIL:
+      console.log('reduce fail')
+      return update(state, {$merge: {viewdata_tenant: null, viewdata: null}})
+
     default:
       return state
   }
