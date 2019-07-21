@@ -93,7 +93,7 @@ class Build extends React.Component {
             </tbody>
           </table>
           {build.output && <BuildOutput output={build.output}/>}
-          {build.manifest && <Manifest manifest={build.manifest}/>}
+          {build.manifest && <Manifest tenant={this.props.tenant} build={build}/>}
         </Panel.Body>
       </Panel>
     )
