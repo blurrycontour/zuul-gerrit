@@ -17,19 +17,42 @@ import PropTypes from 'prop-types'
 import {
   TreeView,
 } from 'patternfly-react'
+import { Link } from 'react-router-dom'
 
+const renderTree = (tenant, build, obj) => {
+  const node = {}
+
+  if ('children' in obj && obj.children) {
+    node.nodes = obj.children.map(n => renderTree(tenant, build, n))
+  }
+  if (obj.mimetype === 'application/directory') {
+    node.text = obj.name
+  } else {
+    node.icon = 'fa fa-file-o'
+    if (obj.mimetype === 'text/plain') {
+      node.text = (<Link to={tenant.linkPrefix + '/build/' + build.uuid + '/view/' + obj.name}>{obj.name}</Link>)
+    } else {
+      node.text = (<a href={build.log_url + obj.name}>{obj.name}</a>)
+    }
+  }
+  return node
+}
 
 class Manifest extends React.Component {
   static propTypes = {
-    manifest: PropTypes.object.isRequired
+    tenant: PropTypes.object.isRequired,
+    build: PropTypes.object.isRequired
   }
 
   render() {
-    const { manifest } = this.props
+    const { tenant, build } = this.props
+
+    const nodes = build.manifest.tree.map(n => renderTree(tenant, build, n))
+
     return (
       <div className="tree-view-container">
         <TreeView
-          nodes={manifest.nodes}
+          nodes={nodes}
         />
       </div>
     )
