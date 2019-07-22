@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_c6eeb7b3",
+        "filename": "web/src/actions/build.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-22T14:25:06Z",
+      "side": 1,
+      "message": "Having this in here feels wrong because it\u0027s getting way too complicated for a chain of functions, and it also doesn\u0027t have access to the processed data on the state object which we need.  We could move this out to its own function, but this is all tied to dispatching events to the reducer.  Should we put some logic in the reducer so that once the manifest has arrived, if we\u0027re also looking for a log file, the reducer starts the process to fetch that?",
+      "revId": "e055d82e68dd5274810e73a885f39986d1315429",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
