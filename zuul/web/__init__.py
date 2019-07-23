@@ -16,7 +16,6 @@
 
 
 import cherrypy
-import cherrypy_cors
 import socket
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
@@ -43,6 +42,14 @@ STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
 
 COMMANDS = ['stop', 'repl', 'norepl']
+
+
+def public_cors(origin):
+    cherrypy.serving.response.headers['Access-Control-Allow-Origin'] = origin
+
+cherrypy.tools.cors_public = cherrypy.Tool('before_handler', public_cors)
+cherrypy.tools.cors_error_public = cherrypy.Tool(
+    'after_error_response', public_cors)
 
 
 def is_authorized(uid, tenant, authN=None):
@@ -1044,12 +1051,14 @@ class ZuulWeb(object):
             controller=StaticHandler(self.static_path),
             action='default')
 
-        cherrypy_cors.tools.expose_errors_public = cherrypy.Tool(
-            'after_error_response', cherrypy_cors.expose_public)
+        # TODO(mordred) Allow this to be configured
+        allowed_origin = '*'
         conf = {
             '/': {
-                'cors.expose_public.on': True,
-                'cors.expose_errors_public.on': True,
+                'cors_public.on': True,
+                'cors_public.origin': allowed_origin,
+                'cors_error_public.on': True,
+                'cors_error_public.origin': allowed_origin,
                 'request.dispatch': route_map
             }
         }
