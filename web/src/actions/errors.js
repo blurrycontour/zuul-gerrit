@@ -27,8 +27,8 @@ export const addError = error => ({
 export const addApiError = error => (
   addError({
     url: error.request.responseURL,
-    status: error.response.status,
-    text: error.response.statusText,
+    status: error.response ? error.response.status : 500,
+    text: error.response ? error.response.statusText : 'CORS policy violation',
   })
 )
 
