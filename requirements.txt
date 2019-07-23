@@ -26,5 +26,6 @@ psutil
 fb-re2>=1.0.6
 paho-mqtt
 cherrypy
+cherrypy-cors
 ws4py
 routes
