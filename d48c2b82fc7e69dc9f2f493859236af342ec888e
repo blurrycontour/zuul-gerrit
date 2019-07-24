@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_2d4c1f75",
+        "filename": "web/src/containers/build/Artifact.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-24T15:43:29Z",
+      "side": 1,
+      "message": "Such list are often better displayed with ListView, but that also looks good to me.",
+      "range": {
+        "startLine": 27,
+        "startChar": 7,
+        "endLine": 27,
+        "endChar": 12
+      },
+      "revId": "d48c2b82fc7e69dc9f2f493859236af342ec888e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
