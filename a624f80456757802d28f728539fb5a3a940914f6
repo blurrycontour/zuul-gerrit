@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_4d507b33",
+        "filename": "web/src/actions/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-24T16:20:03Z",
+      "side": 1,
+      "message": "Oh, I made a change to that method so that performs the check internally.  I did that because otherwise it\u0027s hard to chain these together like this.  I wanted it to be so that we would fetch the build if needed, then fetch the manifest if needed, then fetch the logfile if needed.  So we can just call all three of these, and they will check internally (we pass the force parameter in too).  They return a promise which is fulfilled immediately if nothing needs to be done, so that this moves on to the next step.\n\nThis is all because if you hit the build page first, you\u0027ll get the build info, then the manifest and job output.  So if you then go to the log viewer page, you only need to fetch the logfile. But if someone sends you a deep link to a log viewer, you\u0027ll get the build info, the manifest and logfile.  Then if you go back to the build page, you only need to fetch the build output.\n\nI just noticed I forgot to add the force argument to fetchBuildManifest here, so that needs to be updated.",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ad724f7b",
         "filename": "web/src/actions/logfile.js",
         "patchSetId": 4
@@ -65,6 +82,23 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_ed44c776",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-24T16:20:03Z",
+      "side": 1,
+      "message": "That\u0027s how I did it at first, but I thought the page was getting kind of long -- it keeps pushing the hosts/tasks summary down the page, but I think that\u0027s really important.  90% of the time, it\u0027s going to just tell you what\u0027s wrong with the job.  I felt like the tabs idea makes all of the important tools more accessible.\n\nI agree, if we keep tabs, we should have back return to the correct tab.  I haven\u0027t figured that out yet.",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_adcecf80",
         "filename": "web/src/reducers/logfile.js",
         "patchSetId": 4
@@ -76,6 +110,23 @@
       "writtenOn": "2019-07-24T16:05:44Z",
       "side": 1,
       "message": "We might want to structure the logfile store using a map[url, data] so that we cache already fetched results.\n\nThis could also be used by the build.output which already cache the job-output.json.",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_0d4a837f",
+        "filename": "web/src/reducers/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-24T16:20:03Z",
+      "side": 1,
+      "message": "I thought about that, but some of the logfiles are going to be huge, so I thought we should store only one at a time, otherwise if you browse several, we might use all the ram.",
       "revId": "a624f80456757802d28f728539fb5a3a940914f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
