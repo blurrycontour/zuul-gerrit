@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_074a627f",
+        "filename": "tests/unit/test_cross_crd.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-24T14:54:24Z",
+      "side": 1,
+      "message": "Can you add a check that A.messages[0] includes the \u0027Dependency cycle\u0027 text?  Just to make sure we\u0027re not reporting some other error.",
+      "revId": "1c3a86bd311f32dab002112f1e40933fb7b449e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
