@@ -22,6 +22,23 @@
       "revId": "d48c2b82fc7e69dc9f2f493859236af342ec888e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_5f1b4272",
+        "filename": "web/src/containers/build/Artifact.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-24T16:23:46Z",
+      "side": 1,
+      "message": "Yeah, I actually switch this to a TreeView in https://review.opendev.org/672379 to try to get something that usually only takes up one line, but can be expanded to include more metadata.  I\u0027m not 100% happy with the way that looks, but it works pretty well I think.",
+      "revId": "d48c2b82fc7e69dc9f2f493859236af342ec888e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
