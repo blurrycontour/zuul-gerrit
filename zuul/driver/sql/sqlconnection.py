@@ -155,11 +155,8 @@ class SQLConnection(BaseConnection):
                 else:
                     column = buildset.c
                 query = query.where(getattr(column, key).in_(val))
-        return query.\
-            limit(args['limit']).\
-            offset(args['skip']).\
-            order_by(build.c.id.desc()).\
-            with_hint(build, 'USE INDEX (PRIMARY)', 'mysql')
+        return query.limit(args['limit']).offset(args['skip']).order_by(
+            build.c.id.desc())
 
     def get_builds(self, args):
         """Return a list of build"""
