@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_22a0a9a5",
+        "filename": "web/src/actions/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-24T17:45:43Z",
+      "side": 1,
+      "message": "Ok, then a follow-up could merge fetchBuildIfNeeded with fetchBuild for consistency.",
+      "parentUuid": "7faddb67_4d507b33",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ad724f7b",
         "filename": "web/src/actions/logfile.js",
         "patchSetId": 4
@@ -99,6 +117,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_02afad94",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-24T17:45:43Z",
+      "side": 1,
+      "message": "Maybe using a paneIndex in the Build component state. If the state is not kept when using back, then we could store the index in the queryString and push it to the browser history (similarly to what the builds page does with the filters).",
+      "parentUuid": "7faddb67_ed44c776",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_adcecf80",
         "filename": "web/src/reducers/logfile.js",
         "patchSetId": 4
@@ -127,6 +163,24 @@
       "writtenOn": "2019-07-24T16:20:03Z",
       "side": 1,
       "message": "I thought about that, but some of the logfiles are going to be huge, so I thought we should store only one at a time, otherwise if you browse several, we might use all the ram.",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_e2829100",
+        "filename": "web/src/reducers/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-24T17:45:43Z",
+      "side": 1,
+      "message": "I think there are middleware to deal with that. Or when reducing, we could manually walk the store and delete old \u0026 heavy log files.\n\nHaving the files in the store would help if we want to display the file content inlined in the tree view. Though that could be improved in a followup.",
+      "parentUuid": "7faddb67_0d4a837f",
       "revId": "a624f80456757802d28f728539fb5a3a940914f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
