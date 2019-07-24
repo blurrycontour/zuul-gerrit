@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_89ad00ec",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2019-07-24T23:53:51Z",
+      "side": 1,
+      "message": "I think that\u0027s \"not include it\"?",
+      "range": {
+        "startLine": 85,
+        "startChar": 19,
+        "endLine": 85,
+        "endChar": 45
+      },
+      "revId": "baaa77480603bce0ab0faca1969e0243969d8b5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
