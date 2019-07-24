@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_ed5847fb",
+        "filename": "web/src/actions/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-24T16:05:44Z",
+      "side": 1,
+      "message": "Perhaps we should check if the build is already fetched using fetchBuildIfNeeded.",
+      "range": {
+        "startLine": 57,
+        "startChar": 11,
+        "endLine": 57,
+        "endChar": 21
+      },
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_ad724f7b",
+        "filename": "web/src/actions/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-24T16:05:44Z",
+      "side": 1,
+      "message": "Similarly, we could use fetch.*IfNeeded method here too.",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_8d9af36b",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-24T16:05:44Z",
+      "side": 1,
+      "message": "We would need to keep track of the pane, when using \u0027back\u0027 from a logfile, the view resets to the first tab. Perhaps we should put the logtree between the job table and the hosts/tasks summary?",
+      "range": {
+        "startLine": 92,
+        "startChar": 11,
+        "endLine": 92,
+        "endChar": 23
+      },
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_adcecf80",
+        "filename": "web/src/reducers/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-24T16:05:44Z",
+      "side": 1,
+      "message": "We might want to structure the logfile store using a map[url, data] so that we cache already fetched results.\n\nThis could also be used by the build.output which already cache the job-output.json.",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
