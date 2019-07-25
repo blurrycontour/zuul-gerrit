@@ -25,11 +25,19 @@ export const requestLogfile = (url) => ({
   url: url,
 })
 
-const receiveLogfile = (data) => ({
+const receiveLogfile = (data) => {
+  const out = data.split(/\r?\n/).map((line, idx) => {
+    return {
+      text: line,
+      index: idx+1,
+    }
+  })
+  return {
     type: LOGFILE_FETCH_SUCCESS,
-    data: data,
+    data: out,
     receivedAt: Date.now()
-})
+  }
+}
 
 const failedLogfile = error => ({
   type: LOGFILE_FETCH_FAIL,
@@ -39,7 +47,10 @@ const failedLogfile = error => ({
 const fetchLogfile = (buildId, file, state, force) => dispatch => {
   const build = state.build.builds[buildId]
   const item = build.manifest.index['/' + file]
-  const url = build.log_url + item.name
+
+  if (!item)
+    dispatch(failedLogfile(null))
+  const url = build.log_url + file
 
   if (!force && state.logfile.url === url) {
     return Promise.resolve()
@@ -48,7 +59,7 @@ const fetchLogfile = (buildId, file, state, force) => dispatch => {
   if (item.mimetype === 'text/plain') {
     return Axios.get(url)
       .then(response => dispatch(receiveLogfile(response.data)))
-      .catch(error => dispatch(failedLogfile(error)))
+    .catch(error => dispatch(failedLogfile(error)))
   }
   dispatch(failedLogfile(null))
 }

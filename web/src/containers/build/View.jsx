@@ -17,16 +17,12 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Panel } from 'react-bootstrap'
 
-const linkify = (ln, num) => {
-  return (<a name={num+1} href={'#'+(num+1)}>{ln}</a>)
-}
-
 class View extends React.Component {
   static propTypes = {
     build: PropTypes.object,
     item: PropTypes.object,
     tenant: PropTypes.object,
-    data: PropTypes.string,
+    data: PropTypes.array,
   }
 
   render () {
@@ -37,9 +33,9 @@ class View extends React.Component {
         <Panel.Heading>Build result {build.uuid}</Panel.Heading>
         <Panel.Body>
           <pre className="zuul-log-output">
-            {data.split(/\r?\n/).map((line, idx) => (
-              <span key={idx}>
-                {linkify(line, idx)}{'\n'}
+            {data.map((line) => (
+              <span key={line.index}>
+                <a name={line.index} href={'#'+(line.index)}>{line.text+'\n'}</a>
               </span>
             ))}
           </pre>
