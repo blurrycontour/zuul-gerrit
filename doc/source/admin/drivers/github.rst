@@ -467,3 +467,11 @@ enqueued into the pipeline.
       provided criteria the pull request can not be entered into the
       pipeline.  It follows the same syntax as
       :attr:`pipeline.require.<github source>.review`
+
+Reference pipelines configuration
+---------------------------------
+
+Here is an example of standard pipelines you may want to define:
+
+.. literalinclude:: ../examples/zuul-config/zuul.d/github-reference-pipelines.yaml
+   :language: yaml
