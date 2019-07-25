@@ -63,6 +63,24 @@
       "revId": "267345125f8ca9907b9478ebb97cfe7af94c458b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_ae4b1485",
+        "filename": "zuul/driver/sql/alembic/versions/e0eda5d09eae_add_uuid_indexes.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-25T17:22:38Z",
+      "side": 1,
+      "message": "Doh",
+      "parentUuid": "7faddb67_8e6f38fb",
+      "revId": "267345125f8ca9907b9478ebb97cfe7af94c458b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
