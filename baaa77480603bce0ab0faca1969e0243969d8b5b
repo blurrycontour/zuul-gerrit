@@ -46,6 +46,30 @@
       "revId": "baaa77480603bce0ab0faca1969e0243969d8b5b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_9dbbf7e3",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-25T12:32:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_710bca23",
+      "range": {
+        "startLine": 85,
+        "startChar": 19,
+        "endLine": 85,
+        "endChar": 45
+      },
+      "revId": "baaa77480603bce0ab0faca1969e0243969d8b5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
