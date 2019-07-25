@@ -184,6 +184,24 @@
       "revId": "a624f80456757802d28f728539fb5a3a940914f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_9cd9af23",
+        "filename": "web/src/reducers/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-25T22:59:13Z",
+      "side": 1,
+      "message": "There\u0027s definitely a tradeoff here. Caching multiple files could be nice for switching around. However, for the large files streaming the contents and only storing what the user is actually looking at in ram is also potentially friendlier.\n\nMaybe a ringbuffer that holds anything we actually completely fetched, ditching older ones? But dont\u0027 store them if we only partially streamed a result?",
+      "parentUuid": "7faddb67_e2829100",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
