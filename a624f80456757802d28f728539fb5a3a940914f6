@@ -202,6 +202,24 @@
       "revId": "a624f80456757802d28f728539fb5a3a940914f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_a32a3f7b",
+        "filename": "web/src/reducers/logfile.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-07-26T12:49:59Z",
+      "side": 1,
+      "message": "It should be fine to store, for example, a 50MB file in the redux store, what really slows down the browser is when it has to render that file. Thus I think we could limit the maximum size of the map, and perhaps force very large file to be opened in a new tab. e.g. a max size of 200MB should give plenty of room to cache most build\u0027s logs.\n\nIn any case, we could implement a client side filter logic to reduce the amount of text rendering. In that situation, I don\u0027t think we should worry about ringbuffer, unless the user click a \u003eGB log file.",
+      "parentUuid": "7faddb67_9cd9af23",
+      "revId": "a624f80456757802d28f728539fb5a3a940914f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
