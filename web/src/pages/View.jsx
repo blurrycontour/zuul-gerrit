@@ -49,7 +49,7 @@ class ViewPage extends Refreshable {
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
-        {remoteData.data && <View build={build} data={remoteData.data}/>}
+        {remoteData.url && <View build={build} url={remoteData.url}/>}
       </React.Fragment>
     )
   }

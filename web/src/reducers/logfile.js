@@ -16,7 +16,6 @@ import update from 'immutability-helper'
 
 import {
   LOGFILE_FETCH_FAIL,
-  LOGFILE_FETCH_REQUEST,
   LOGFILE_FETCH_SUCCESS,
 } from '../actions/logfile'
 
@@ -24,20 +23,12 @@ import {
 export default (state = {
   isFetching: false,
   url: null,
-  data: null
 }, action) => {
   switch (action.type) {
-    case LOGFILE_FETCH_REQUEST:
-      return update(state, {$merge: {isFetching: true,
-                                     url: action.url,
-                                     data: null}})
     case LOGFILE_FETCH_SUCCESS:
-      return update(state, {$merge: {isFetching: false,
-                                     data: action.data}})
+      return update(state, {$merge: {url: action.url}})
     case LOGFILE_FETCH_FAIL:
-      return update(state, {$merge: {isFetching: false,
-                                     url: null,
-                                     data: null}})
+      return update(state, {$merge: {url: null}})
     default:
       return state
   }
