@@ -16,29 +16,27 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Panel } from 'react-bootstrap'
+import { LazyLog } from 'react-lazylog'
 
 class View extends React.Component {
   static propTypes = {
     build: PropTypes.object,
     item: PropTypes.object,
     tenant: PropTypes.object,
-    data: PropTypes.array,
+    url: PropTypes.string,
   }
 
   render () {
-    const { build, data } = this.props
+    const { build, url } = this.props
 
+    console.log('render', url)
     return (
       <Panel>
         <Panel.Heading>Build result {build.uuid}</Panel.Heading>
         <Panel.Body>
-          <pre className="zuul-log-output">
-            {data.map((line) => (
-              <span key={line.index}>
-                <a name={line.index} href={'#'+(line.index)}>{line.text+'\n'}</a>
-              </span>
-            ))}
-          </pre>
+          <div style={{ height: 900, width: '100%' }}>
+            <LazyLog url={url} />
+          </div>
         </Panel.Body>
       </Panel>
     )

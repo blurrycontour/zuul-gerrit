@@ -12,32 +12,15 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import Axios from 'axios'
-
 import {fetchBuild, fetchBuildManifest} from './build'
 
-export const LOGFILE_FETCH_REQUEST = 'LOGFILE_FETCH_REQUEST'
 export const LOGFILE_FETCH_SUCCESS = 'LOGFILE_FETCH_SUCCESS'
 export const LOGFILE_FETCH_FAIL = 'LOGFILE_FETCH_FAIL'
 
-export const requestLogfile = (url) => ({
-  type: LOGFILE_FETCH_REQUEST,
-  url: url,
+const receiveLogfile = (url) => ({
+  type: LOGFILE_FETCH_SUCCESS,
+  url: url
 })
-
-const receiveLogfile = (data) => {
-  const out = data.split(/\r?\n/).map((line, idx) => {
-    return {
-      text: line,
-      index: idx+1,
-    }
-  })
-  return {
-    type: LOGFILE_FETCH_SUCCESS,
-    data: out,
-    receivedAt: Date.now()
-  }
-}
 
 const failedLogfile = error => ({
   type: LOGFILE_FETCH_FAIL,
@@ -51,17 +34,8 @@ const fetchLogfile = (buildId, file, state, force) => dispatch => {
   if (!item)
     dispatch(failedLogfile(null))
   const url = build.log_url + file
-
-  if (!force && state.logfile.url === url) {
-    return Promise.resolve()
-  }
-  dispatch(requestLogfile())
-  if (item.mimetype === 'text/plain') {
-    return Axios.get(url)
-      .then(response => dispatch(receiveLogfile(response.data)))
-    .catch(error => dispatch(failedLogfile(error)))
-  }
-  dispatch(failedLogfile(null))
+  console.log('receive url', url)
+  dispatch(receiveLogfile(url))
 }
 
 export const fetchLogfileIfNeeded = (tenant, buildId, file, force) => (dispatch, getState) => {
