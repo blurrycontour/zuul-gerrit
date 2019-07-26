@@ -88,6 +88,7 @@
 # because that is where the docker-compose file is located.
 - job:
     name: zuul-quick-start
+    parent: base-test
     description: Run the commands in the Zuul quick-start documentation.
     run: playbooks/quick-start/run.yaml
     post-run: playbooks/quick-start/post.yaml
