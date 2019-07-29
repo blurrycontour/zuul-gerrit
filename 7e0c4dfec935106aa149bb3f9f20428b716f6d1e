@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_af59a7fe",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 37
+      },
+      "lineNbr": 960,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-29T16:20:37Z",
+      "side": 1,
+      "message": "This shouldn\u0027t have a default.",
+      "revId": "7e0c4dfec935106aa149bb3f9f20428b716f6d1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_cf5c23ef",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-29T16:20:37Z",
+      "side": 1,
+      "message": "This shouldn\u0027t have a default.",
+      "revId": "7e0c4dfec935106aa149bb3f9f20428b716f6d1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
