@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_8a7136e1",
+        "filename": "web/src/actions/logfile.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-07-29T21:31:37Z",
+      "side": 1,
+      "message": "Are these indexes into the match correct? Docs say the first element is the entire matched string then the others are the parenthetical group matches. I don\u0027t count 7 total matches for either regex?",
+      "range": {
+        "startLine": 57,
+        "startChar": 28,
+        "endLine": 57,
+        "endChar": 29
+      },
+      "revId": "3a48f8a18e7af3a1bb938e911df1e35f03fc24ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_ca3deedd",
+        "filename": "web/src/containers/build/View.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-07-29T21:31:37Z",
+      "side": 1,
+      "message": "One thing osla does/did is associate lines with no matched severity to the severity of the most recently matched line. This way if a log message is multiple lines you associate the multiline output with the initial output of that text.\n\nI don\u0027t think this is an immediate need, but may be something we can improve.",
+      "range": {
+        "startLine": 46,
+        "startChar": 16,
+        "endLine": 46,
+        "endChar": 25
+      },
+      "revId": "3a48f8a18e7af3a1bb938e911df1e35f03fc24ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
