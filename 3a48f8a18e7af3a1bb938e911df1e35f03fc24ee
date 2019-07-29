@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_2a07e21e",
+        "filename": "web/src/actions/logfile.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-29T21:33:18Z",
+      "side": 1,
+      "message": "Date formats include a few match groups -- they\u0027re interpolated in.",
+      "revId": "3a48f8a18e7af3a1bb938e911df1e35f03fc24ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ca3deedd",
         "filename": "web/src/containers/build/View.jsx",
         "patchSetId": 3
@@ -42,6 +59,23 @@
         "endLine": 46,
         "endChar": 25
       },
+      "revId": "3a48f8a18e7af3a1bb938e911df1e35f03fc24ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_4a025e0d",
+        "filename": "web/src/containers/build/View.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-29T21:33:18Z",
+      "side": 1,
+      "message": "Oh yeah, we can totally do that in a followup.",
       "revId": "3a48f8a18e7af3a1bb938e911df1e35f03fc24ee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
