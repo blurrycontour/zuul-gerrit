@@ -16,6 +16,24 @@
       "revId": "9d86c00111f5028bef9913835669391ad381ad32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_b0425867",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 38
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-07-30T15:12:19Z",
+      "side": 1,
+      "message": "This looks almost like the RPCClient class so it might make sense to move it there or into its own file beneath.\n\nThinking about that and comparing this with the other server client parts it might make sense to refactor the scheduler into its own module and have there a client.py containing RPCClient and RESTClient. But I\u0027m not sure if we should open this can of worms now.",
+      "parentUuid": "7faddb67_2574e835",
+      "revId": "9d86c00111f5028bef9913835669391ad381ad32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
