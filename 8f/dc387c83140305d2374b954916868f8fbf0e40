@@ -1,0 +1,10 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Code-Review+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+1: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 30 Jul 2019 00:10:24 +0000
+Reviewed-on: https://review.opendev.org/671906
+Project: zuul/zuul
+Branch: refs/heads/master
