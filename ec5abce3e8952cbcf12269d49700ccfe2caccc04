@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_a701b53a",
+        "filename": "web/src/containers/build/Manifest.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-30T21:19:07Z",
+      "side": 1,
+      "message": "Need \"var log_prefix\" here to define the variable.",
+      "revId": "ec5abce3e8952cbcf12269d49700ccfe2caccc04",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
