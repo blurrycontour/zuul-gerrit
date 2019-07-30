@@ -24,25 +24,30 @@ const renderTree = (tenant, build, path, obj) => {
   let name = obj.name
 
   if ('children' in obj && obj.children) {
-    node.nodes = obj.children.map(n => renderTree(tenant, build, path+'/'+obj.name, n))
+    node.nodes = obj.children.map(n => renderTree(tenant, build, path+'/'+obj.name+'/', n))
   }
   if (obj.mimetype === 'application/directory') {
     name = obj.name + '/'
   } else {
     node.icon = 'fa fa-file-o'
   }
+  if (path === '') {
+    log_prefix = '/log/'
+  } else {
+    log_prefix = '/log'
+  }
   if (obj.mimetype === 'text/plain') {
     node.text = (
       <span>
-        <Link to={tenant.linkPrefix + '/build/' + build.uuid + '/log' + path + '/' + name}>{obj.name}</Link>
+        <Link to={tenant.linkPrefix + '/build/' + build.uuid + log_prefix + path + name}>{obj.name}</Link>
         &nbsp;&nbsp;
-        (<a href={build.log_url + path + '/' + name}>raw</a>
+        (<a href={build.log_url + path + name}>raw</a>
         &nbsp;<span className="fa fa-external-link"/>)
       </span>)
   } else {
     node.text = (
       <span>
-        <a href={build.log_url + path + '/' + name}>{obj.name}</a>
+        <a href={build.log_url + path + name}>{obj.name}</a>
         &nbsp;<span className="fa fa-external-link"/>
       </span>
     )
