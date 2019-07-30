@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_2574e835",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 38
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-07-30T14:06:53Z",
+      "side": 1,
+      "message": "I agree the files are supper long and its hard to navigate in them.",
+      "revId": "9d86c00111f5028bef9913835669391ad381ad32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
