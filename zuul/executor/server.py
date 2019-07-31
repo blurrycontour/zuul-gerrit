@@ -2420,6 +2420,8 @@ class ExecutorServer(object):
         self.setup_timeout = int(get_default(self.config, 'executor',
                                              'ansible_setup_timeout', 60))
         self.zone = get_default(self.config, 'executor', 'zone')
+        self.allow_unzoned = get_default(self.config, 'executor',
+                                         'allow-unzoned', False)
         self.merge_email = get_default(self.config, 'merger', 'git_user_email')
         self.merge_name = get_default(self.config, 'merger', 'git_user_name')
         self.merge_speed_limit = get_default(
@@ -2527,15 +2529,12 @@ class ExecutorServer(object):
         else:
             self.merger_gearworker = None
 
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-
         self.executor_jobs = {
             "executor:resume:%s" % self.hostname: self.resumeJob,
             "executor:stop:%s" % self.hostname: self.stopJob,
-            function_name: self.executeJob,
         }
+        for function_name in self._getExecuteFunctionNames():
+            self.executor_jobs[function_name] = self.executeJob
 
         self.executor_gearworker = ZuulGearWorker(
             'Zuul Executor Server',
@@ -2545,6 +2544,17 @@ class ExecutorServer(object):
             self.executor_jobs,
             worker_class=ExecutorExecuteWorker,
             worker_args=[self])
+
+    def _getExecuteFunctionNames(self):
+        functions = []
+        basename = 'executor:execute'
+        if self.zone:
+            functions.append('%s:%s' % (basename, self.zone))
+            if self.allow_unzoned:
+                functions.append(basename)
+        else:
+            functions.append(basename)
+        return functions
 
         # Used to offload expensive operations to different processes
         self.process_worker = None
@@ -2597,10 +2607,8 @@ class ExecutorServer(object):
     def register_work(self):
         if self._running:
             self.accepting_work = True
-            function_name = 'executor:execute'
-            if self.zone:
-                function_name += ':%s' % self.zone
-            self.executor_gearworker.gearman.registerFunction(function_name)
+            for function in self._getExecuteFunctionNames():
+                self.executor_gearworker.gearman.registerFunction(function)
             # TODO(jeblair): Update geard to send a noop after
             # registering for a job which is in the queue, then remove
             # this API violation.
@@ -2608,10 +2616,8 @@ class ExecutorServer(object):
 
     def unregister_work(self):
         self.accepting_work = False
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-        self.executor_gearworker.gearman.unRegisterFunction(function_name)
+        for function in self._getExecuteFunctionNames():
+            self.executor_gearworker.gearman.unRegisterFunction(function)
 
     def stop(self):
         self.log.debug("Stopping")
