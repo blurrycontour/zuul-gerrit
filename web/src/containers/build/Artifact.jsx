@@ -26,10 +26,11 @@ class Artifact extends React.Component {
 
   render() {
     const { artifact } = this.props
+    const md = artifact.metadata || {}
     return (
       <table className="table table-striped table-bordered" style={{width:'50%'}}>
         <tbody>
-          {Object.keys(artifact.metadata).map(key => (
+          {Object.keys(md).map(key => (
             <tr key={key}>
               <td>{key}</td>
               <td style={{width:'100%'}}>{artifact.metadata[key]}</td>
