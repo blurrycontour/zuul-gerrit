@@ -22,7 +22,7 @@ import { Link } from 'react-router-dom'
 const renderTree = (tenant, build, path, obj) => {
   const node = {}
   let name = obj.name
-  var log_prefix : string
+  let log_prefix : string
 
   if ('children' in obj && obj.children) {
     node.nodes = obj.children.map(n => renderTree(tenant, build, path+'/'+obj.name+'/', n))
