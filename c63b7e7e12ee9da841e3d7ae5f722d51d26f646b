@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_e4531d6a",
+        "filename": "web/src/containers/build/Manifest.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-31T14:55:27Z",
+      "side": 1,
+      "message": "Using let instead of var is better, although this is working code, so I\u0027m fine with it.\n\nThe scoping rules between the two are different - it doesn\u0027t matter in this patch, but in general var is WEIRD so it\u0027s good to develop a habit of using let instead.\n\n(tl;dr - if you do:\n\n console.log(x)\n var x \u003d 5\n\nThe console log will print \"undefined\" because for strange reasons javascript decides to scope var x to the entire surrounding block.\n\nlet works like we expect variables to work from python:\n\n  console.log(x)\n  let x \u003d 5\n\nresults in an error of x not being defined - because x isn\u0027t defined until it is when you use let.",
+      "range": {
+        "startLine": 25,
+        "startChar": 2,
+        "endLine": 25,
+        "endChar": 5
+      },
+      "revId": "c63b7e7e12ee9da841e3d7ae5f722d51d26f646b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
