@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_a0518a38",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-07-31T20:33:05Z",
+      "side": 1,
+      "message": "Is it worth having a todo here to switch to using the url returned on line 68 once success/failure url support is removed?\n\nIt looks like formatJobResult defaults to using the log_url if it is present. Then we could do the / appending there and clean up this method.",
+      "revId": "3c242036726f8b89072a3d7078362a36ba501c5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
