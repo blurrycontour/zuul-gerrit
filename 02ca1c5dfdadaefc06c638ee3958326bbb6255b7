@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_bf56925b",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-31T15:30:36Z",
+      "side": 1,
+      "message": "Let\u0027s not link to the infra manual.",
+      "revId": "02ca1c5dfdadaefc06c638ee3958326bbb6255b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_df534e6a",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-31T15:30:36Z",
+      "side": 1,
+      "message": "I don\u0027t think we should promote clean check.  Zuul\u0027s own Zuul doesn\u0027t use it.",
+      "revId": "02ca1c5dfdadaefc06c638ee3958326bbb6255b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_7f4c9ac7",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-31T15:30:36Z",
+      "side": 1,
+      "message": "Email address is too specific.",
+      "revId": "02ca1c5dfdadaefc06c638ee3958326bbb6255b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
