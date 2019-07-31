@@ -16,6 +16,23 @@
       "revId": "3c242036726f8b89072a3d7078362a36ba501c5c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_433780ff",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-31T21:25:16Z",
+      "side": 1,
+      "message": "I\u0027m not sure what that\u0027s going to look like in the long run, but I agree, if that\u0027s how it ends up, that would be desirable.",
+      "revId": "3c242036726f8b89072a3d7078362a36ba501c5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
