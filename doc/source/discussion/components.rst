@@ -829,6 +829,14 @@ The following sections of ``zuul.conf`` are used by the executor:
             node-attributes:
               executor-zone: vpn
 
+   .. attr:: allow_unzoned
+      :default: False
+
+      If :attr:`executor.zone` is set it by default only processes jobs with
+      nodes of that specific zone even if the nodes have no zone at all.
+      Enabling ``allow_unzoned`` lets the executor also take jobs with nodes
+      without zone.
+
    .. attr:: merge_jobs
       :default: True
 
@@ -836,7 +844,6 @@ The following sections of ``zuul.conf`` are used by the executor:
       executors that are running on slow network where you don't want them to
       perform merge operations for any events. The executor will still perform
       the merge operations required for the build they are executing.
-
 
 .. attr:: merger
 
