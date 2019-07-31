@@ -39,6 +39,24 @@
       "revId": "c63b7e7e12ee9da841e3d7ae5f722d51d26f646b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_84a82920",
+        "filename": "web/src/containers/build/Manifest.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-07-31T14:59:14Z",
+      "side": 1,
+      "message": "Same thing - the console.log is still an error, because x hasn\u0027t been defined yet. You can even do:\n\n  console.log(x)\n  let x\n\nand the first line will be an error.\n\n(incidentally, you can put those lines in a foo.js file and run \"node foo.js\" on the CLI and it\u0027ll demonstrate the behavior differences)",
+      "parentUuid": "7faddb67_c404e14c",
+      "revId": "c63b7e7e12ee9da841e3d7ae5f722d51d26f646b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
