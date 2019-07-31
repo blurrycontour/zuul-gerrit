@@ -2597,6 +2597,8 @@ class ExecutorServer(BaseMergeServer):
         self.setup_timeout = int(get_default(self.config, 'executor',
                                              'ansible_setup_timeout', 60))
         self.zone = get_default(self.config, 'executor', 'zone')
+        self.allow_unzoned = get_default(self.config, 'executor',
+                                         'allow_unzoned', False)
 
         self.ansible_callbacks = {}
         for section_name in self.config.sections():
@@ -2695,22 +2697,12 @@ class ExecutorServer(BaseMergeServer):
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
 
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-
-        # This function only exists so we can count how many executors
-        # are online.
-        online_name = 'executor:online'
-        if self.zone:
-            online_name += ':%s' % self.zone
-
         self.executor_jobs = {
             "executor:resume:%s" % self.hostname: self.resumeJob,
             "executor:stop:%s" % self.hostname: self.stopJob,
-            function_name: self.executeJob,
-            online_name: self.noop,
         }
+        for function_name in self._getExecuteFunctionNames():
+            self.executor_jobs[function_name] = self.executeJob
 
         self.executor_gearworker = ZuulGearWorker(
             'Zuul Executor Server',
@@ -2723,6 +2715,21 @@ class ExecutorServer(BaseMergeServer):
 
         # Used to offload expensive operations to different processes
         self.process_worker = None
+
+    def _getExecuteFunctionNames(self):
+        functions = []
+        exec_name = 'executor:execute'
+        online_name = 'executor:online'
+        if self.zone:
+            functions.append('%s:%s' % (exec_name, self.zone))
+            functions.append('%s:%s' % (online_name, self.zone))
+            if self.allow_unzoned:
+                functions.append(exec_name)
+                functions.append(online_name)
+        else:
+            functions.append(exec_name)
+            functions.append(online_name)
+        return functions
 
     def _repoLock(self, connection_name, project_name):
         return self.repo_locks.getRepoLock(connection_name, project_name)
@@ -2775,10 +2782,8 @@ class ExecutorServer(BaseMergeServer):
     def register_work(self):
         if self._running:
             self.accepting_work = True
-            function_name = 'executor:execute'
-            if self.zone:
-                function_name += ':%s' % self.zone
-            self.executor_gearworker.gearman.registerFunction(function_name)
+            for function in self._getExecuteFunctionNames():
+                self.executor_gearworker.gearman.registerFunction(function)
             # TODO(jeblair): Update geard to send a noop after
             # registering for a job which is in the queue, then remove
             # this API violation.
@@ -2786,10 +2791,8 @@ class ExecutorServer(BaseMergeServer):
 
     def unregister_work(self):
         self.accepting_work = False
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-        self.executor_gearworker.gearman.unRegisterFunction(function_name)
+        for function in self._getExecuteFunctionNames():
+            self.executor_gearworker.gearman.unRegisterFunction(function)
 
     def stop(self):
         self.log.debug("Stopping")
