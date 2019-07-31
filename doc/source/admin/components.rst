@@ -727,6 +727,14 @@ The following sections of ``zuul.conf`` are used by the executor:
             node-attributes:
               executor-zone: vpn
 
+   .. attr:: allow-unzoned
+      :default: False
+
+      If :attr:`executor.zone` is set it by default only processes jobs with
+      nodes of that specific zone even if the nodes have no zone at all.
+      Enabling ``allow-unzoned`` lets the executor also take jobs with nodes
+      without zone.
+
 .. attr:: merger
 
    .. attr:: git_user_email
