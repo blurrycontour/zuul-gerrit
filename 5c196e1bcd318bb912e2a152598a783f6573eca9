@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_3a007001",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1044,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-31T15:39:22Z",
+      "side": 1,
+      "message": "This line already tells you if it succeeded or merged.  The only info you add below that\u0027s missing here is the empty job graph.  Why not add that to this line?",
+      "revId": "5c196e1bcd318bb912e2a152598a783f6573eca9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_5a052c10",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-07-31T15:39:22Z",
+      "side": 1,
+      "message": "It\u0027s not an error for a change to fail tests; this should be debug.  We already reported the result as info above.",
+      "revId": "5c196e1bcd318bb912e2a152598a783f6573eca9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
