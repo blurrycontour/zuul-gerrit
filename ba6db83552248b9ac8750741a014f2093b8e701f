@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_57bc17db",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 1569,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-01T08:56:18Z",
+      "side": 1,
+      "message": "Instead of handling ttl in the cached item and validating it ourselves we should use cachetools.TTLCache which handles this (and also prevents the cache from growing indefinitely).\n\nWe can then just retrieve the cached team via self._team_cache.get(cached_team_name) and if it\u0027s None we have a cache miss.",
+      "range": {
+        "startLine": 1569,
+        "startChar": 21,
+        "endLine": 1569,
+        "endChar": 32
+      },
+      "revId": "ba6db83552248b9ac8750741a014f2093b8e701f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_f7cc238a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 1571,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-01T08:56:18Z",
+      "side": 1,
+      "message": "nit: I find the log easier to read if we have spell miss and hit lowercase as part of the message.",
+      "range": {
+        "startLine": 1571,
+        "startChar": 49,
+        "endLine": 1571,
+        "endChar": 53
+      },
+      "revId": "ba6db83552248b9ac8750741a014f2093b8e701f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
