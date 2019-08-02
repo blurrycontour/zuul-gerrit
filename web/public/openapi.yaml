@@ -5,6 +5,9 @@ info:
 openapi: 3.0.0
 tags:
 - name: tenant
+- name: project
+- name: admin
+  description: actions that require a valid bearer token to be performed
 paths:
   /api/tenant/{tenant}/builds:
     get:
@@ -206,6 +209,57 @@ paths:
       summary: Get tenant status
       tags:
       - tenant
+  /api/tenant/{tenant}/project/{project}/enqueue:
+    post:
+      operationId: buildset-enqueue
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: A JSON object containing enqueueing information
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - description: enqueue from change
+                  properties:
+                    trigger:
+                      type: string
+                    change:
+                      type: string
+                    pipeline:
+                      type: string
+                  type: object
+                - description: enqueue from ref (typically, post-merge pipelines)
+                  properties:
+                    trigger:
+                      type: string
+                    ref:
+                      type: string
+                    oldrev:
+                      type: string
+                    newrev:
+                      type: string
+                    pipeline:
+                      type: string
+                  type: object
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Insufficient privileges
+      summary: Re-enqueue a previous buildset
+      tags:
+      - tenant
+      - project
+      - admin
   /api/tenants:
     get:
       operationId: list-tenants
@@ -437,3 +491,8 @@ components:
           description: The worker version
           type: string
       type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
