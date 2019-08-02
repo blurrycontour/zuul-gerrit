@@ -5,6 +5,9 @@ info:
 openapi: 3.0.0
 tags:
 - name: tenant
+- name: project
+- name: admin
+  description: actions that require a valid bearer token to be performed
 paths:
   /api/tenant/{tenant}/builds:
     get:
@@ -206,6 +209,247 @@ paths:
       summary: Get tenant status
       tags:
       - tenant
+  /api/tenant/{tenant}/project/{project}/enqueue:
+    post:
+      operationId: buildset-enqueue
+      security:
+        - bearerAuth: []
+      parameters:
+      - description: The tenant name
+        in: path
+        name: tenant
+        required: true
+        schema:
+          type: string
+      - description: The project name
+        in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: A JSON object containing enqueueing information
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - description: enqueue from change
+                  properties:
+                    trigger:
+                      type: string
+                    change:
+                      type: string
+                    pipeline:
+                      type: string
+                  type: object
+                - description: enqueue from ref (typically, post-merge pipelines)
+                  properties:
+                    trigger:
+                      type: string
+                    ref:
+                      type: string
+                    oldrev:
+                      type: string
+                    newrev:
+                      type: string
+                    pipeline:
+                      type: string
+                  type: object
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Insufficient privileges
+      summary: Re-enqueue a previous buildset
+      tags:
+      - tenant
+      - project
+      - admin
+  /api/tenant/{tenant}/project/{project}/dequeue:
+    post:
+      operationId: buildset-dequeue
+      security:
+        - bearerAuth: []
+      parameters:
+      - description: The tenant name
+        in: path
+        name: tenant
+        required: true
+        schema:
+          type: string
+      - description: The project name
+        in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: A JSON object containing dequeueing information
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - description: dequeue from change
+                  properties:
+                    change:
+                      type: string
+                    pipeline:
+                      type: string
+                  type: object
+                - description: dequeue from ref (typically, post-merge pipelines)
+                  properties:
+                    ref:
+                      type: string
+                    pipeline:
+                      type: string
+                  type: object
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Insufficient privileges
+      summary: Re-enqueue a previous buildset
+      tags:
+      - tenant
+      - project
+      - admin
+  /api/tenant/{tenant}/autohold:
+    get:
+      operationId: autohold-list
+      summary: list the active autoholds on the tenant. Can be filtered by project.
+      parameters:
+      - description: The tenant name
+        in: path
+        name: tenant
+        required: true
+        schema:
+          type: string
+      - description: The project name
+        in: query
+        name: project
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: The list of active autoholds
+                items:
+                  $ref: '#/components/schemas/autohold'
+                type: array
+          description: Returns the list of active autoholds
+        '404':
+          description: Tenant or project not found
+      tags:
+      - tenant
+      - project
+  /api/tenant/{tenant}/project/{project}/autohold:
+    get:
+      operationId: autohold-list-project
+      summary: list the active autoholds related to the project.
+      parameters:
+      - description: The tenant name
+        in: path
+        name: tenant
+        required: true
+        schema:
+          type: string
+      - description: The project name
+        in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: The list of active autoholds
+                items:
+                  $ref: '#/components/schemas/autohold'
+                type: array
+          description: Returns the list of active autoholds
+        '404':
+          description: Tenant or project not found
+      tags:
+      - tenant
+      - project
+    post:
+      operationId: autohold-job
+      security:
+        - bearerAuth: []
+      parameters:
+      - description: The tenant name
+        in: path
+        name: tenant
+        required: true
+        schema:
+          type: string
+      - description: The project name
+        in: path
+        name: project
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: A JSON object containing autohold information
+        content:
+          application/json:
+            schema:
+              description: autohold information
+              properties:
+                ref:
+                  type: string
+                  description: ref and change are mutually exclusive
+                reason:
+                  type: string
+                change:
+                  type: string
+                  description: ref and change are mutually exclusive
+                job:
+                  type: string
+                count:
+                  type: integer
+                node_hold_expiration:
+                  type: integer
+              type: object
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+        '400':
+          description: Invalid request body
+        '401':
+          description: Unauthorized
+        '403':
+          description: Insufficient privileges
+      summary: Re-enqueue a previous buildset
+      tags:
+      - tenant
+      - project
+      - admin
   /api/tenants:
     get:
       operationId: list-tenants
@@ -233,6 +477,22 @@ paths:
       - tenant
 components:
   schemas:
+    autohold:
+      description: autohold information
+      properties:
+        tenant:
+          type: string
+        project:
+          type: string
+        job:
+          type: string
+        ref_filter:
+          type: string
+        count:
+          type: integer
+        reason:
+          type: string
+      type: object
     build:
       description: A build
       properties:
@@ -437,3 +697,8 @@ components:
           description: The worker version
           type: string
       type: object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
