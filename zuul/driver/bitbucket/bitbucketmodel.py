@@ -85,7 +85,7 @@ class BitbucketChangeFilter(RefFilter):
         if self.status:
             ret += ' status: {}'.format(self.status)
         if self.canMerge:
-            ret += ' canMerge: {}'.format(self.status)
+            ret += ' canMerge: {}'.format(self.canMerge)
 
         ret += '>'
         return ret

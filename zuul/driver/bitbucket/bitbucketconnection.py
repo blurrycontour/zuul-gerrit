@@ -40,7 +40,7 @@ class BitbucketWatcher(threading.Thread):
         self.stopped = False
         self.branches = self.bitbucket_con.branches
         self.event_count = 0
-        self.startup_time = time.time()
+        self.startup_time = bitbucket_con.startup_time
         self.lastcomment = {}
         self.tags = {}
 
@@ -56,7 +56,9 @@ class BitbucketWatcher(threading.Thread):
         prid = change.id
 
         oldpr = self.bitbucket_con.cachedPR(projectname, prid)
+        self.log.debug('Superseding {}-{}'.format(oldpr, change))
         if oldpr and change.isNewerThan(oldpr):
+            self.log.debug('Yes it is newer')
             return oldpr
 
         return None
@@ -111,6 +113,7 @@ class BitbucketWatcher(threading.Thread):
         self.bitbucket_con.sched.addEvent(event)
 
     def _handleOpenChange(self, change):
+        self.log.debug('Handling open change {}-{}'.format(change.project.name,change.id))
         if self.isNew(change):
             self.log.debug("Checking for change age: {} vs. {}"
                            .format(change.updatedDate,
@@ -126,10 +129,12 @@ class BitbucketWatcher(threading.Thread):
             return
         oldpr = self.supersedes(change)
         if oldpr:
+            self.log.debug('Have old pr')
             of = set([f['hash'] for f in oldpr._files])
             nf = set([f['hash'] for f in change._files])
 
             changes = of.difference(nf)
+            self.log.debug('Change len()={}'.format(len(changes)))
             if len(changes) > 0 or self.bitbucket_con.canMerge(change, False):
                 self._handleUpdatePR(change, oldpr)
             return
@@ -154,8 +159,12 @@ class BitbucketWatcher(threading.Thread):
                     self.log.debug('New event {}'.format(event))
                     self.bitbucket_con.sched.addEvent(event)
 
+                else:
+                    self.log.debug("Comment too old: {} in tag {}"
+                                   .format(upd, commenttag))
                 if upd > maxage:
                     maxage = upd
+
         if maxage > 0:
             self.lastcomment[commenttag] = maxage
 
@@ -275,6 +284,9 @@ class BitbucketConnectionError(BaseException):
 
 
 class BitbucketClient():
+
+    limit = 50
+
     def __init__(self, baseurl):
         self.baseurl = baseurl
 
@@ -296,9 +308,11 @@ class BitbucketClient():
         rj = r.json()
         vals = rj.get('values')
 
-        while rj.get("isLastPage") == False:
+        while 'isLastPage' in rj and not rj.get('isLastPage'):
             r = requests.get(url, auth=HTTPBasicAuth(self.user, self.pw),
-                         timeout=1, params={'start': rj.get('nextPageStart')})
+                             timeout=1,
+                             params={'start': rj.get('nextPageStart'),
+                                     'limit': self.limit})
             rj = r.json()
             vals = vals + rj.get('values')
 
@@ -323,7 +337,6 @@ class BitbucketClient():
                 retry = False
             except requests.exceptions.Timeout:
                 retries = retries + 1
-
         if r.status_code not in [requests.codes.ok,
                                  requests.codes.created,
                                  requests.codes.no_content]:
@@ -347,6 +360,8 @@ class BitbucketConnection(BaseConnection):
         )
         self.projects = {}
         self.prs = {}
+
+        self.startup_time = time.time()
 
         self.base_url = self.connection_config.get('baseurl').rstrip('/')
         self.cloneurl = self.connection_config.get('cloneurl').rstrip('/')
@@ -433,7 +448,7 @@ class BitbucketConnection(BaseConnection):
 
         vals = res.get('values')
 
-        self.log.debug('getPRComments: {} values'.format(len(vals)))
+        self.log.debug('getPRComments: {} values in'.format(len(vals)))
 
         res = []
 
@@ -444,6 +459,8 @@ class BitbucketConnection(BaseConnection):
                     'text': comment.get('text'),
                     'updatedDate': comment.get('updatedDate')
                 })
+
+        self.log.debug('getPRComments: {} values out'.format(len(res)))
 
         return res
 
@@ -497,7 +514,7 @@ class BitbucketConnection(BaseConnection):
         proj = '/'.join([project, repo])
         cpr = self.cachedPR(proj, id)
 
-        if cpr and pr.get('updatedDate') == cpr.updatedDate:
+        if cpr and pr.get('updatedDate') == cpr.updatedDate and pr.get('version') == cpr.pr_version:
             return cpr
 
         pri = self.getPRInventory(project, repo, id)
