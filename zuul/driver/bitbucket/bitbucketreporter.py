@@ -29,10 +29,10 @@ class BitbucketReporter(BaseReporter):
             return
 
         if hasattr(item.change, 'id'):
-            self.setBuildStatus(item)
-            self.commentPR(item)
             if self._merge:
                 self.mergePull(item)
+            self.setBuildStatus(item)
+            self.commentPR(item)
 
     def mergePull(self, item):
         for i in [1, 2, 3, 4]:
