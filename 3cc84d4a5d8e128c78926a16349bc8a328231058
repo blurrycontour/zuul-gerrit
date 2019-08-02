@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_85d8f91d",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-02T18:41:45Z",
+      "side": 1,
+      "message": "shouldn\u0027t the section be named \"stream\" ? (iiuc, these options are used between fingergw or zuul-web and the executor).",
+      "range": {
+        "startLine": 71,
+        "startChar": 26,
+        "endLine": 71,
+        "endChar": 34
+      },
+      "revId": "3cc84d4a5d8e128c78926a16349bc8a328231058",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
