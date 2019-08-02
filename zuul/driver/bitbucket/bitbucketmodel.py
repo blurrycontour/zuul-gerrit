@@ -55,6 +55,23 @@ class PullRequest(Change):
             return True
         return False
 
+    def __repr__(self):
+        ret = '<PullRequest connection_name: {} '\
+            .format(self.connection_name)
+        if hasattr(self, 'title'):
+            ret += ' title: {}'.format(self.title)
+        if hasattr(self, 'id'):
+            ret += ' id: {}'.format(self.id)
+        if hasattr(self, 'canMerge'):
+            ret += ' canMerge: {}'.format(self.canMerge)
+        if hasattr(self, 'updatedDate'):
+            ret += ' updatedDate: {}'.format(self.updatedDate)
+        if hasattr(self, 'pr_version'):
+            ret += ' pr_version: {}'.format(self.pr_version)
+
+        ret += '>'
+        return ret
+
 
 class BitbucketTriggerEvent(TriggerEvent):
     def __init__(self):
@@ -85,7 +102,7 @@ class BitbucketChangeFilter(RefFilter):
         if self.status:
             ret += ' status: {}'.format(self.status)
         if self.canMerge:
-            ret += ' canMerge: {}'.format(self.status)
+            ret += ' canMerge: {}'.format(self.canMerge)
 
         ret += '>'
         return ret
