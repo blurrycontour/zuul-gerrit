@@ -123,7 +123,7 @@ class BitbucketSource(BaseSource):
             open=config.get('open'),
             closed=config.get('closed'),
             status=config.get('status'),
-            canMerge=config.get('canMerge'),
+            canMerge=config.get('canMerge', None),
         )
         return [f]
 
