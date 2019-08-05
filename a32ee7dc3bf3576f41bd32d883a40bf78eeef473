@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_80f69c8e",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-08-05T06:40:55Z",
+      "side": 1,
+      "message": "typo: abstractmethod",
+      "range": {
+        "startLine": 414,
+        "startChar": 9,
+        "endLine": 414,
+        "endChar": 23
+      },
+      "revId": "a32ee7dc3bf3576f41bd32d883a40bf78eeef473",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
