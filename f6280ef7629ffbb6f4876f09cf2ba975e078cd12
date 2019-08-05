@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_a924e00d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-05T13:09:05Z",
+      "side": 1,
+      "message": "It would be great to have some more information here that describe the bugs.",
+      "revId": "f6280ef7629ffbb6f4876f09cf2ba975e078cd12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
