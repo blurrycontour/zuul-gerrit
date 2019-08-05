@@ -119,7 +119,7 @@ class Build extends React.Component {
                  <TabPane eventKey={'logs'}>
                    <Manifest tenant={this.props.tenant} build={build}/>
                  </TabPane>}
-                {build.manifest &&
+                {build.output &&
                  <TabPane eventKey={'console'}>
                    <Console output={build.output}/>
                  </TabPane>}
