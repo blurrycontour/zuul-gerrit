@@ -12,11 +12,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import logging
 import urllib
 
 import re2
 
 from zuul.source import BaseSource
+from zuul.model import Ref, Branch, Tag
+from zuul.scheduler import DequeueEvent
+
+from zuul.driver.bitbucket.bitbucketmodel import (
+    BitbucketChangeFilter, BitbucketTriggerEvent
+)
 
 
 class BitbucketSource(BaseSource):
@@ -25,6 +32,7 @@ class BitbucketSource(BaseSource):
 
     def __init__(self, driver, connection, config=None):
         hostname = connection.server
+        self.log = logging.getLogger('zuul.BitbucketSource')
         super(BitbucketSource, self).__init__(driver, connection,
                                               hostname, config)
 
@@ -43,7 +51,7 @@ class BitbucketSource(BaseSource):
         return self.connection.getProjectBranches(project.name, tenant)
 
     def getGitUrl(self, project):
-        return '{}/{}.git'.format(self.connection.cloneurl, project.name)
+        return self.connection.getGitUrl(project)
 
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
@@ -70,12 +78,33 @@ class BitbucketSource(BaseSource):
 
         return change
 
-    def getChange(self, event):
-        if event.type == 'bb-pr':
+    def getChange(self, event, refresh=False):
+
+        if (isinstance(event, BitbucketTriggerEvent) and
+                event.type in ['bb-pr', 'bb-comment'] or
+                isinstance(event, DequeueEvent)):
             project_name, repo = self.connection._getProjectRepo(
                 event.project_name)
             return self.connection.buildPR(
-                project_name, repo, event.change_id)
+                project_name, repo, event.change_number)
+
+        else:
+            self.log.info("Getting change for %s ref:%s" % (
+                event.project_name, event.ref))
+            if event.ref and event.ref.startswith('refs/tags/'):
+                change = Tag(self.getProject(event.project_name))
+                change.tag = event.ref[len('refs/tags/'):]
+            elif event.ref and event.ref.startswith('refs/heads/'):
+                change = Branch(self.getProject(event.project_name))
+                change.branch = event.ref[len('refs/heads/'):]
+            else:
+                change = Ref(self.getProject(event.project_name))
+            change.ref = event.ref
+            change.oldrev = event.oldrev
+            change.newrev = event.newrev
+            change.branch = event.branch
+            change.url = ''
+            return change
 
         return None
 
@@ -85,8 +114,31 @@ class BitbucketSource(BaseSource):
     def isMerged(self, change, head):
         return self.connection.isMerged(change, head)
 
-    def getRejectFilters(self):
+    def getRejectFilters(self, config):
         return []
 
-    def getRequireFilters(self):
-        return []
+    def getRequireFilters(self, config):
+        f = BitbucketChangeFilter(
+            connection_name=self.connection.connection_name,
+            open=config.get('open'),
+            closed=config.get('closed'),
+            status=config.get('status'),
+            canMerge=config.get('canMerge'),
+        )
+        return [f]
+
+
+# require model
+def getRequireSchema():
+    require = {
+        'open': bool,
+        'closed': bool,
+        'status': str,
+        'canMerge': bool
+    }
+    return require
+
+
+def getRejectSchema():
+    reject = {}
+    return reject
