@@ -175,13 +175,21 @@ pre.version {
     margin-top: 1px;
     margin-bottom: 1px;
 }
-
 .zuul-console .list-view-pf-main-info
 {
     padding-top: 1px;
     padding-bottom: 1px;
 }
-
+.zuul-console .list-view-pf-expand
+{
+    padding: 0;
+}
+.zuul-console .list-group-item-heading
+{
+    line-height: 20px;
+    font-size: 12px;
+    margin-bottom: 0;
+}
 .zuul-console .task-skipped
 {
     color: white;

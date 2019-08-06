@@ -382,6 +382,7 @@ class PlayBook extends React.Component {
 
     return (
       <ListView.Item
+        stacked={true}
         additionalInfo={ai}
         initExpanded={expand}
         heading={playbook.phase[0].toUpperCase() + playbook.phase.slice(1) + ' playbook'}
