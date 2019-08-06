@@ -384,8 +384,8 @@ class PlayBook extends React.Component {
       <ListView.Item
         additionalInfo={ai}
         initExpanded={expand}
-        heading={playbook.phase[0].toUpperCase() + playbook.phase.slice(1) +
-                 ' playbook: '+ playbook.playbook}
+        heading={playbook.phase[0].toUpperCase() + playbook.phase.slice(1) + ' playbook'}
+        description={playbook.playbook}
       >
         <Row>
           <Col sm={12}>
