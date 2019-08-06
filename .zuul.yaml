@@ -54,6 +54,14 @@
       zuul_ansible_version: 2.8
 
 - job:
+    name: zuul-stream-functional-2.9
+    parent: zuul-stream-functional
+    success-url: 'http://zuul.opendev.org/t/zuul/build/{build.uuid}'
+    failure-url: 'http://zuul.opendev.org/t/zuul/build/{build.uuid}'
+    vars:
+      zuul_ansible_version: 2.9
+
+- job:
     name: zuul-tox-remote
     parent: tox
     success-url: 'http://zuul.opendev.org/t/zuul/build/{build.uuid}'
@@ -221,6 +229,7 @@
         - zuul-stream-functional-2.6
         - zuul-stream-functional-2.7
         - zuul-stream-functional-2.8
+        - zuul-stream-functional-2.9
         - zuul-tox-remote:
             timeout: 2700  # 45 minutes
         - zuul-quick-start:
@@ -281,6 +290,7 @@
         - zuul-stream-functional-2.6
         - zuul-stream-functional-2.7
         - zuul-stream-functional-2.8
+        - zuul-stream-functional-2.9
         - zuul-tox-remote:
             timeout: 2700  # 45 minutes
         - zuul-quick-start:
