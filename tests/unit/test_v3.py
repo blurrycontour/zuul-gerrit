@@ -2776,6 +2776,10 @@ class TestAnsible28(TestAnsible25):
     ansible_version = '2.8'
 
 
+class TestAnsible29(TestAnsible28):
+    ansible_version = '2.9'
+
+
 class TestPrePlaybooks(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
