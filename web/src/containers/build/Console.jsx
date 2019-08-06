@@ -48,19 +48,6 @@ function hostTaskStats (state, host) {
   else { state.ok += 1}
 }
 
-function hasInterestingKeys (obj, keys) {
-  let ret = false
-
-  Object.entries(obj).forEach(([k, v]) => {
-    if (keys.includes(k)) {
-      if (v !== '') {
-        ret = true
-      }
-    }
-  })
-  return ret
-}
-
 class TaskOutput extends React.Component {
   static propTypes = {
     data: PropTypes.object,
@@ -159,7 +146,9 @@ class TaskOutput extends React.Component {
 class HostTask extends React.Component {
   static propTypes = {
     hostname: PropTypes.string,
+    task: PropTypes.object,
     host: PropTypes.object,
+    errorIds: PropTypes.object,
   }
 
   state = {
@@ -187,7 +176,7 @@ class HostTask extends React.Component {
   }
 
   render () {
-    const { hostname, host } = this.props
+    const { hostname, task, host, errorIds } = this.props
 
     const ai = []
     if (this.state.skipped) {
@@ -220,14 +209,14 @@ class HostTask extends React.Component {
       </Button>
     )
 
-    const has_interesting_keys = hasInterestingKeys(this.props.host, INTERESTING_KEYS)
+    const expand = errorIds.has(task.task.id)
 
     return (
       <React.Fragment>
         <ListView.Item
           key='header'
-          heading={hostname}
-          initExpanded={has_interesting_keys}
+          heading={task.task.name + ' (' + hostname + ')'}
+          initExpanded={expand}
           additionalInfo={ai}
         >
          <Row>
@@ -256,76 +245,6 @@ class HostTask extends React.Component {
           </Modal.Body>
         </Modal>
       </React.Fragment>
-    )
-  }
-}
-
-class Task extends React.Component {
-  static propTypes = {
-    task: PropTypes.object,
-    errorIds: PropTypes.object,
-  }
-
-  state = {
-    failed: 0,
-    changed: 0,
-    skipped: 0,
-    ok: 0
-  }
-
-  constructor (props) {
-    super(props)
-
-    Object.entries(props.task.hosts).forEach(([, host]) => {
-      hostTaskStats(this.state, host)
-    })
-  }
-
-  render () {
-    const { task, errorIds } = this.props
-
-    const ai = []
-    if (this.state.skipped) {
-      ai.push(
-        <ListView.InfoItem key="skipped" title="Skipped hosts">
-          <span className="task-skipped">SKIPPED</span>
-        </ListView.InfoItem>)
-    }
-    if (this.state.changed) {
-      ai.push(
-        <ListView.InfoItem key="changed" title="Changed hosts">
-          <span className="task-changed">CHANGED</span>
-        </ListView.InfoItem>)
-    }
-    if (this.state.failed) {
-      ai.push(
-        <ListView.InfoItem key="failed" title="Failed hosts">
-          <span className="task-failed">FAILED</span>
-        </ListView.InfoItem>)
-    }
-    if (this.state.ok) {
-      ai.push(
-        <ListView.InfoItem key="ok" title="OK hosts">
-          <span className="task-ok">OK</span>
-        </ListView.InfoItem>)
-    }
-
-    const expand = errorIds.has(task.task.id)
-
-    return (
-      <ListView.Item
-        heading={task.task.name}
-        additionalInfo={ai}
-        initExpanded={expand}
-      >
-        <Row>
-          <Col sm={12}>
-            {Object.entries(task.hosts).map(([hostname, host]) => (
-              <HostTask key={hostname} hostname={hostname} host={host}/>
-            ))}
-          </Col>
-        </Row>
-      </ListView.Item>
     )
   }
 }
@@ -362,8 +281,10 @@ class PlayBook extends React.Component {
           <Col sm={12}>
             {playbook.plays.map((play, idx) => (
               play.tasks.map((task, idx2) => (
-                <Task key={idx+'-'+idx2} task={task} errorIds={errorIds}/>
-              ))))}
+                Object.entries(task.hosts).map(([hostname, host]) => (
+                  <HostTask key={idx+'-'+idx2+hostname} hostname={hostname}
+                            task={task} host={host} errorIds={errorIds}/>
+                ))))))}
           </Col>
         </Row>
       </ListView.Item>
