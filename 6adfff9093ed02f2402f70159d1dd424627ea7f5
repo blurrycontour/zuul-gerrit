@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_ead2adfc",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-08-06T18:02:01Z",
+      "side": 1,
+      "message": "Open to suggestions on how better to manage this version of ansible in docker-compose.",
+      "revId": "6adfff9093ed02f2402f70159d1dd424627ea7f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
