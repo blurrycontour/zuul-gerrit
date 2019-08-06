@@ -2772,6 +2772,10 @@ class TestAnsible28(TestAnsible27):
     ansible_version = '2.8'
 
 
+class TestAnsible29(TestAnsible28):
+    ansible_version = '2.9'
+
+
 class TestPrePlaybooks(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
@@ -6219,6 +6223,7 @@ class TestAnsibleVersion(AnsibleZuulTestCase):
             dict(name='ansible-26', result='SUCCESS', changes='1,1'),
             dict(name='ansible-27', result='SUCCESS', changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
+            dict(name='ansible-29', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
 
@@ -6240,4 +6245,5 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
             dict(name='ansible-26', result='SUCCESS', changes='1,1'),
             dict(name='ansible-27', result='SUCCESS', changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
+            dict(name='ansible-29', result='SUCCESS', changes='1,1'),
         ], ordered=False)
