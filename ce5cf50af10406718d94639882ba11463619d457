@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_e28e5f77",
+        "filename": "zuul/lib/gearworker.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-08-06T09:34:44Z",
+      "side": 1,
+      "message": "[NIT]: self.worker_args \u003d worker_args if worker_args not None else []\nThen the if/else below can be omitted.",
+      "range": {
+        "startLine": 32,
+        "startChar": 8,
+        "endLine": 32,
+        "endChar": 38
+      },
+      "revId": "ce5cf50af10406718d94639882ba11463619d457",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
