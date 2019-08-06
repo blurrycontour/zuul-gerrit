@@ -202,6 +202,11 @@ class HostTask extends React.Component {
           <span className="task-ok" onClick={this.open}>OK</span>
         </ListView.InfoItem>)
     }
+    ai.push(
+      <ListView.InfoItem key="hostname">
+        {hostname}
+      </ListView.InfoItem>
+    )
 
     const expand = errorIds.has(task.task.id)
 
@@ -209,7 +214,7 @@ class HostTask extends React.Component {
       <React.Fragment>
         <ListView.Item
           key='header'
-          heading={task.task.name + ' (' + hostname + ')'}
+          heading={task.task.name}
           initExpanded={expand}
           additionalInfo={ai}
         >
