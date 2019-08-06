@@ -330,35 +330,6 @@ class Task extends React.Component {
   }
 }
 
-class Play extends React.Component {
-  static propTypes = {
-    play: PropTypes.object,
-    expandAll: PropTypes.bool,
-    errorIds: PropTypes.object,
-  }
-
-  render () {
-    const { play, expandAll, errorIds } = this.props
-
-    const expand = (expandAll || errorIds.has(play.play.id))
-
-    return (
-      <ListView.Item
-        heading={'Play: ' + play.play.name}
-        initExpanded={expand}
-      >
-        <Row>
-          <Col sm={12}>
-            {play.tasks.map((task, idx) => (
-              <Task key={idx} task={task} errorIds={errorIds}/>
-            ))}
-          </Col>
-        </Row>
-      </ListView.Item>
-    )
-  }
-}
-
 class PlayBook extends React.Component {
   static propTypes = {
     playbook: PropTypes.object,
@@ -390,7 +361,9 @@ class PlayBook extends React.Component {
         <Row>
           <Col sm={12}>
             {playbook.plays.map((play, idx) => (
-              <Play key={idx} play={play} errorIds={errorIds} expandAll={expandAll}/>))}
+              play.tasks.map((task, idx2) => (
+                <Task key={idx+'-'+idx2} task={task} errorIds={errorIds}/>
+              ))))}
           </Col>
         </Row>
       </ListView.Item>
