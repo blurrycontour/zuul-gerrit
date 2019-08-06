@@ -263,7 +263,6 @@ class HostTask extends React.Component {
 class Task extends React.Component {
   static propTypes = {
     task: PropTypes.object,
-    expandAll: PropTypes.bool,
     errorIds: PropTypes.object,
   }
 
@@ -283,7 +282,7 @@ class Task extends React.Component {
   }
 
   render () {
-    const { task, expandAll, errorIds } = this.props
+    const { task, errorIds } = this.props
 
     const ai = []
     if (this.state.skipped) {
@@ -311,15 +310,7 @@ class Task extends React.Component {
         </ListView.InfoItem>)
     }
 
-    let child_has_interesting_keys = false
-
-    Object.entries(task.hosts).forEach(([, host]) => {
-      if (hasInterestingKeys(host, INTERESTING_KEYS)) {
-        child_has_interesting_keys = true
-      }
-    })
-
-    const expand = ((expandAll && child_has_interesting_keys) || errorIds.has(task.task.id))
+    const expand = errorIds.has(task.task.id)
 
     return (
       <ListView.Item
@@ -359,7 +350,7 @@ class Play extends React.Component {
         <Row>
           <Col sm={12}>
             {play.tasks.map((task, idx) => (
-              <Task key={idx} task={task} expandAll={expandAll} errorIds={errorIds}/>
+              <Task key={idx} task={task} errorIds={errorIds}/>
             ))}
           </Col>
         </Row>
