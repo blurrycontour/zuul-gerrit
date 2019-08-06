@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_1f051846",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-08-06T09:13:35Z",
+      "side": 1,
+      "message": "why is this not flattened? E.g. ``\u0027uuid\u0027: buildset.uuid`` like the ones above?",
+      "range": {
+        "startLine": 736,
+        "startChar": 16,
+        "endLine": 738,
+        "endChar": 18
+      },
+      "revId": "42312a4580fcb496d248971476e73f00446aae85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
