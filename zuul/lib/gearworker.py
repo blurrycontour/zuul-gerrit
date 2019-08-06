@@ -23,12 +23,13 @@ from zuul.lib.config import get_default
 class ZuulGearWorker:
 
     def __init__(self, name, logger_name, thread_name, config, jobs,
-                 worker_class=gear.TextWorker):
+                 worker_class=gear.TextWorker, worker_args=None):
         self.log = logging.getLogger(logger_name)
 
         self._running = True
         self.name = name
         self.worker_class = worker_class
+        self.worker_args = worker_args
 
         self.server = config.get('gearman', 'server')
         self.port = get_default(config, 'gearman', 'port', 4730)
@@ -43,7 +44,11 @@ class ZuulGearWorker:
         self.thread.daemon = True
 
     def start(self):
-        self.gearman = self.worker_class(self.name)
+        if self.worker_args:
+            args = self.worker_args + [self.name]
+        else:
+            args = [self.name]
+        self.gearman = self.worker_class(*args)
         self.log.debug('Connect to gearman')
         self.gearman.addServer(self.server, self.port, self.ssl_key,
                                self.ssl_cert, self.ssl_ca,
