@@ -45,6 +45,30 @@
       "revId": "42312a4580fcb496d248971476e73f00446aae85",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_c266c351",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2019-08-06T09:56:39Z",
+      "side": 1,
+      "message": "I thought about that, too. But all other attributes that are flattened, could also be applied to the build directly. The UUID is only applicable to the buildset in this case, so I wanted to keep it separated. I think that also in other cases (e.g. the payloads sent via MQTT) the buildset is provided as own entity.",
+      "parentUuid": "7faddb67_1f051846",
+      "range": {
+        "startLine": 736,
+        "startChar": 16,
+        "endLine": 738,
+        "endChar": 18
+      },
+      "revId": "42312a4580fcb496d248971476e73f00446aae85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
