@@ -21,7 +21,6 @@ import {
   Row,
   Col,
   Modal,
-  Button
 } from 'patternfly-react'
 
 
@@ -181,33 +180,28 @@ class HostTask extends React.Component {
     const ai = []
     if (this.state.skipped) {
       ai.push(
-        <ListView.InfoItem key="skipped" title="Skipped hosts">
-          <span className="task-skipped">SKIPPED</span>
+        <ListView.InfoItem key="skipped" title="Click for details">
+          <span className="task-skipped" onClick={this.open}>SKIPPED</span>
         </ListView.InfoItem>)
     }
     if (this.state.changed) {
       ai.push(
-        <ListView.InfoItem key="changed" title="Changed hosts">
-          <span className="task-changed">CHANGED</span>
+        <ListView.InfoItem key="changed" title="Click for details">
+          <span className="task-changed" onClick={this.open}>CHANGED</span>
         </ListView.InfoItem>)
     }
     if (this.state.failed) {
       ai.push(
-        <ListView.InfoItem key="failed" title="Failed hosts">
-          <span className="task-failed">FAILED</span>
+        <ListView.InfoItem key="failed" title="Click for details">
+          <span className="task-failed" onClick={this.open}>FAILED</span>
         </ListView.InfoItem>)
     }
     if (this.state.ok) {
       ai.push(
-        <ListView.InfoItem key="ok" title="OK hosts">
-          <span className="task-ok">OK</span>
+        <ListView.InfoItem key="ok" title="Click for details">
+          <span className="task-ok" onClick={this.open}>OK</span>
         </ListView.InfoItem>)
     }
-    ai.push(
-      <Button key='button' bsStyle="primary" bsSize="small" onClick={this.open}>
-        Details
-      </Button>
-    )
 
     const expand = errorIds.has(task.task.id)
 
