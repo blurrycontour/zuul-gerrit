@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_839d11bd",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-07T15:02:58Z",
+      "side": 1,
+      "message": "This could use a \u003cIcon type\u003d\u0027pf\u0027 name\u003d\u0027container-node\u0027 /\u003e to indicate it\u0027s a host info",
+      "revId": "45d0301ae26f4dee837c0a989c78c7cc569523a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
