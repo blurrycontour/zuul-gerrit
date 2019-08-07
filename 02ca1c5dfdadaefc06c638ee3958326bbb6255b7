@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_6ff24172",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-07T09:25:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_bf56925b",
+      "revId": "02ca1c5dfdadaefc06c638ee3958326bbb6255b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_df534e6a",
         "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_4fed058d",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-07T09:25:10Z",
+      "side": 1,
+      "message": "Sorry James, I don\u0027t get it. What do you mean ? This is the same config as in project-config/zuul.d/pipelines.yaml",
+      "parentUuid": "7faddb67_df534e6a",
+      "revId": "02ca1c5dfdadaefc06c638ee3958326bbb6255b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_7f4c9ac7",
         "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2019-07-31T15:30:36Z",
       "side": 1,
       "message": "Email address is too specific.",
+      "revId": "02ca1c5dfdadaefc06c638ee3958326bbb6255b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_4f92e5fe",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-07T09:25:10Z",
+      "side": 1,
+      "message": "I\u0027ve removed the smtp reporter from this tag pipeline definition. I prefer to keep the reporters as minimal as possible in the examples.",
+      "parentUuid": "7faddb67_7f4c9ac7",
       "revId": "02ca1c5dfdadaefc06c638ee3958326bbb6255b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
