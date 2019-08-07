@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_f27a8d23",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-07T20:17:40Z",
+      "side": 1,
+      "message": "This type of onetime computation could be performed by the action and saved in the store along with the output. This would ensure it\u0027s not re-computed when switching pane, and this would also better separate data processing from data rendering.",
+      "range": {
+        "startLine": 305,
+        "startChar": 0,
+        "endLine": 334,
+        "endChar": 6
+      },
+      "revId": "c035bc69babb8150d50fe6f6f9ac0fff350715f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
