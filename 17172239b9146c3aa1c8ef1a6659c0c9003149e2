@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_92df990b",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-07T20:19:28Z",
+      "side": 1,
+      "message": "nit: is this really related to this change?",
+      "range": {
+        "startLine": 297,
+        "startChar": 10,
+        "endLine": 297,
+        "endChar": 48
+      },
+      "revId": "17172239b9146c3aa1c8ef1a6659c0c9003149e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
