@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_7e25f509",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2406,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-08T17:27:19Z",
+      "side": 0,
+      "message": "I\u0027m beginning to wonder if it was done this way because zuul won\u0027t typically have permission to write to /usr/lib/zuul but will have permissions to /var/lib/zuul/. If that is the case I think we should consider fixing this by converting to /var/lib/zuul instead. I think that may be less backward compatible for users of manage_ansible.py though.",
+      "revId": "fb595693152a2704352b084ce43fef8985e3d2a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
