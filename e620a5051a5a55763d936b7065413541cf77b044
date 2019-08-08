@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_f4010106",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-08T22:05:12Z",
+      "side": 1,
+      "message": ".set doesn\u0027t seem to exist, so I\u0027ll change this to .object.",
+      "revId": "e620a5051a5a55763d936b7065413541cf77b044",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
