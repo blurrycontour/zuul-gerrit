@@ -23,7 +23,13 @@ import {
   Modal,
 } from 'patternfly-react'
 
-import { didTaskFail } from '../../actions/build'
+import {
+  didTaskFail,
+  hasInterestingKeys,
+  findLoopLabel,
+  shouldIncludeKey,
+  makeTaskPath,
+} from '../../actions/build'
 
 
 const INTERESTING_KEYS = ['msg', 'stdout', 'stderr']
@@ -36,56 +42,18 @@ function hostTaskStats (state, host) {
   else { state.ok += 1}
 }
 
-function hasInterestingKeys (obj, keys) {
-  let ret = false
-
-  Object.entries(obj).forEach(([k, v]) => {
-    if (keys.includes(k)) {
-      if (v !== '') {
-        ret = true
-      }
-    }
-  })
-  return ret
-}
-
-function makeTaskPath (path) {
-  return path.join('/')
-}
-
 class TaskOutput extends React.Component {
   static propTypes = {
     data: PropTypes.object,
     include: PropTypes.array,
   }
 
-  findLoopLabel(item) {
-    const label = item._ansible_item_label
-    if (typeof(label) === 'string') {
-      return label
-    }
-    return ''
-  }
-
-  shouldIncludeKey(key, value, ignore_underscore) {
-    if (ignore_underscore && key[0] === '_') {
-      return false
-    }
-    if (this.props.include) {
-      if (!this.props.include.includes(key)) {
-        return false
-      }
-      if (value === '') {
-        return false
-      }
-    }
-    return true
-  }
-
   renderResults(value) {
     const interesting_results = []
     value.forEach((result, idx) => {
-      const keys = Object.entries(result).filter(([key, value]) => this.shouldIncludeKey(key, value, true))
+      const keys = Object.entries(result).filter(
+        ([key, value]) => shouldIncludeKey(
+          key, value, true, this.props.include))
       if (keys.length) {
         interesting_results.push(idx)
       }
@@ -98,7 +66,7 @@ class TaskOutput extends React.Component {
            <h5 key='results-header'>results</h5>
            {interesting_results.map((idx) => (
              <div className='zuul-console-task-result' key={idx}>
-               <h4 key={idx}>{idx}: {this.findLoopLabel(value[idx])}</h4>
+               <h4 key={idx}>{idx}: {findLoopLabel(value[idx])}</h4>
                {Object.entries(value[idx]).map(([key, value]) => (
                  this.renderData(key, value, true)
                ))}
@@ -112,7 +80,7 @@ class TaskOutput extends React.Component {
 
   renderData(key, value, ignore_underscore) {
     let ret
-    if (!this.shouldIncludeKey(key, value, ignore_underscore)) {
+    if (!shouldIncludeKey(key, value, ignore_underscore, this.props.include)) {
       return (<React.Fragment key={key}/>)
     }
     if (value === null) {
