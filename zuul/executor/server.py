@@ -2402,8 +2402,6 @@ class ExecutorServer(object):
         ansible_dir = os.path.join(state_dir, 'ansible')
         ansible_install_root = get_default(
             self.config, 'executor', 'ansible_root', None)
-        if not ansible_install_root:
-            ansible_install_root = os.path.join(state_dir, 'ansible-bin')
         self.ansible_manager = self._ansible_manager_class(
             ansible_dir, runtime_install_path=ansible_install_root)
         if not self.ansible_manager.validate():

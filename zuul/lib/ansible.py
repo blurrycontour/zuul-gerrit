@@ -41,10 +41,13 @@ class ManagedAnsible:
 
         self.deprecated = get_default(config, version, 'deprecated', False)
 
-        self._ansible_roots = [os.path.join(
-            sys.exec_prefix, 'lib', 'zuul', 'ansible')]
+        self._ansible_roots = []
         if runtime_install_root:
+            # Added first so that user provided paths are preferred and
+            # checked first.
             self._ansible_roots.append(runtime_install_root)
+        self._ansible_roots.append(os.path.join(
+            sys.exec_prefix, 'lib', 'zuul', 'ansible'))
 
         self.install_root = self._ansible_roots[-1]
 
