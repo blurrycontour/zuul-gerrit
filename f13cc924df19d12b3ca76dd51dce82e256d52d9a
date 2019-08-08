@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_5e17d946",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1475,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-08T17:08:11Z",
+      "side": 1,
+      "message": "Minor simplification potential:\n\n  tenant.report_build_page \u003d conf.get(\u0027report-build-page\u0027, False)\n\nThen you can avoid the if. However the if check is what is used for everything here so probably better to rewrite the whole lot if we decide that reads better.",
+      "revId": "f13cc924df19d12b3ca76dd51dce82e256d52d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
