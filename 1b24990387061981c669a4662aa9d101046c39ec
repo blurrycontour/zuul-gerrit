@@ -22,6 +22,23 @@
       "revId": "1b24990387061981c669a4662aa9d101046c39ec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_244f6a93",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-08T19:36:10Z",
+      "side": 1,
+      "message": "Yes, if there\u0027s a host that is \"ubuntu\" and also \"ubuntu-xenial\".  For that matter, the other checks might be suceptible to needlessly expanding playbook 10 when playbook 1 is selected.  We should rework both of those to actually split the paths on the separator.",
+      "revId": "1b24990387061981c669a4662aa9d101046c39ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
