@@ -33,6 +33,23 @@
       "revId": "f13cc924df19d12b3ca76dd51dce82e256d52d9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_9e50f160",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1475,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-08T17:29:09Z",
+      "side": 1,
+      "message": "Yeah, I wrote it that way originally, but matched the rest to keep more of the defaults for this in the model.  But maybe we should move them all in here, where other defaults are.\nI like Jeremy\u0027s idea too.",
+      "revId": "f13cc924df19d12b3ca76dd51dce82e256d52d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
