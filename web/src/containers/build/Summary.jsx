@@ -31,7 +31,7 @@ class Summary extends React.Component {
     const { build } = this.props
     const rows = []
     const myColumns = [
-      'job_name', 'result', 'voting',
+      'job_name', 'result', 'buildset', 'voting',
       'pipeline', 'start_time', 'end_time', 'duration',
       'project', 'branch', 'change', 'patchset', 'oldrev', 'newrev',
       'ref', 'new_rev', 'ref_url', 'log_url']
@@ -44,6 +44,13 @@ class Summary extends React.Component {
         value = (
           <Link to={this.props.tenant.linkPrefix + '/job/' + value}>
             {value}
+          </Link>
+        )
+      }
+      if (column === 'buildset') {
+        value = (
+          <Link to={this.props.tenant.linkPrefix + '/buildset/' + value.uuid}>
+            {value.uuid}
           </Link>
         )
       }
