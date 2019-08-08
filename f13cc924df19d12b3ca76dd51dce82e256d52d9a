@@ -50,6 +50,24 @@
       "revId": "f13cc924df19d12b3ca76dd51dce82e256d52d9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_c4a8d68d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1475,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-08T19:07:46Z",
+      "side": 1,
+      "message": "I also like Jeremy\u0027s idea as a possible future refactoring.",
+      "parentUuid": "7faddb67_9e50f160",
+      "revId": "f13cc924df19d12b3ca76dd51dce82e256d52d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
