@@ -16,6 +16,23 @@
       "revId": "f13cc924df19d12b3ca76dd51dce82e256d52d9a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_9e6eb194",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1475,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-08-08T17:15:17Z",
+      "side": 1,
+      "message": "That does make it slightly less future-proof, since when the implicit default is later changed in the Tenant class this would need updating too. As it is now, only the initial state of the classvar needs to be changed to change the default (which I gather is a planned future state).\n\nAn alternative hybrid with your suggestion but maintaining the future flexibility characteristic might be:\n\n    tenant.report_build_page \u003d conf.get(\u0027report-build-page\u0027, tenant.report_build_page)",
+      "revId": "f13cc924df19d12b3ca76dd51dce82e256d52d9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
