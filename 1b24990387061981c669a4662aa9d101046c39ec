@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_4474e6fe",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-08T19:21:17Z",
+      "side": 1,
+      "message": "Could this result in collisions where displaypath[0:len(taskPath)] produces a displaypath substring that matches makeTaskPath(taskPath) but the longer complete displayPath string will not?",
+      "range": {
+        "startLine": 214,
+        "startChar": 69,
+        "endLine": 214,
+        "endChar": 84
+      },
+      "revId": "1b24990387061981c669a4662aa9d101046c39ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
