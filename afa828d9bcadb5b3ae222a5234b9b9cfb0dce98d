@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_aba53ba1",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-12T16:39:48Z",
+      "side": 1,
+      "message": "Might want to leave out these success-urls (there are some below too) and rely on the build page to link to the artifacts instead.",
+      "revId": "afa828d9bcadb5b3ae222a5234b9b9cfb0dce98d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
