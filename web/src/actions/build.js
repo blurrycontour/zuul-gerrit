@@ -13,6 +13,7 @@
 // under the License.
 
 import Axios from 'axios'
+import yaml from 'js-yaml'
 
 import * as API from '../api'
 
@@ -205,18 +206,39 @@ const fetchBuildOutput = (buildId, state, force) => dispatch => {
     return Promise.resolve()
   }
   dispatch(requestBuildOutput())
-  return Axios.get(url + 'job-output.json.gz')
+  // Try compressed yaml
+  return Axios.get(url + 'job-output.yaml.gz', {
+    transformResponse: (data) => {return yaml.load(data)}
+  })
     .then(response => dispatch(receiveBuildOutput(buildId, response.data)))
     .catch(error => {
       if (!error.request) {
         throw error
       }
       // Try without compression
-      Axios.get(url + 'job-output.json')
+      Axios.get(url + 'job-output.yaml', {
+        transformResponse: (data) => {return yaml.load(data)}
+      })
         .then(response => dispatch(receiveBuildOutput(
           buildId, response.data)))
-    })
-    .catch(error => dispatch(failedBuildOutput(error, url)))
+        .catch(error => {
+          if (!error.request) {
+            throw error
+          }
+          Axios.get(url + 'job-output.json.gz')
+            .then(response => dispatch(receiveBuildOutput(buildId, response.data)))
+            .catch(error => {
+              if (!error.request) {
+                throw error
+              }
+              // Try without compression
+              Axios.get(url + 'job-output.json')
+                .then(response => dispatch(receiveBuildOutput(
+                  buildId, response.data)))
+                .catch(error => dispatch(failedBuildOutput(error, url)))
+            })
+        })
+     })
 }
 
 export const fetchBuildManifest = (buildId, state, force) => dispatch => {
