@@ -40,6 +40,7 @@ except ImportError:
         from ansible.vars.clean import strip_internal_keys
 
 from zuul.ansible import logconfig
+from zuul.ansible import util
 
 
 def current_time():
@@ -176,24 +177,6 @@ class CallbackModule(CallbackBase):
         self.playbook['plays'] = self.results
         self.playbook['stats'] = summary
 
-        first_time = not os.path.exists(self.output_path)
-
-        if first_time:
-            with open(self.output_path, 'w') as outfile:
-                outfile.write('[\n\n]\n')
-
-        with open(self.output_path, 'r+') as outfile:
-            self._append_playbook(outfile, first_time)
-
-    def _append_playbook(self, outfile, first_time):
-        file_len = outfile.seek(0, os.SEEK_END)
-        # Remove three bytes to eat the trailing newline written by the
-        # json.dump. This puts the ',' on the end of lines.
-        outfile.seek(file_len - 3)
-        if not first_time:
-            outfile.write(',\n')
-        json.dump(self.playbook, outfile,
-                  indent=4, sort_keys=True, separators=(',', ': '))
-        outfile.write('\n]\n')
+        util.append_playbook(self.playbook, outfile)
 
     v2_runner_on_unreachable = v2_runner_on_ok

@@ -44,6 +44,7 @@ import gear
 import zuul.lib.repl
 import zuul.merger.merger
 import zuul.ansible.logconfig
+import zuul.ansible.util
 from zuul.executor.sensors.cpu import CPUSensor
 from zuul.executor.sensors.hdd import HDDSensor
 from zuul.executor.sensors.pause import PauseSensor
@@ -458,6 +459,7 @@ class JobDir(object):
         self.post_playbooks = []
         self.cleanup_playbooks = []
         self.job_output_file = os.path.join(self.log_root, 'job-output.txt')
+        self.job_output_json = os.path.join(self.log_root, 'job-output.json')
         # We need to create the job-output.txt upfront in order to close the
         # gap between url reporting and ansible creating the file. Otherwise
         # there is a period of time where the user can click on the live log
@@ -2066,6 +2068,10 @@ class AnsibleJob(object):
             # Received abort request.
             return (self.RESULT_ABORTED, None)
         elif ret == 1:
+            fake_playbook = dict(
+                playbook=playbook.path,
+                ansible_error="Error",
+                error=[])
             with open(self.jobdir.job_output_file, 'a') as job_output:
                 found_marker = False
                 for line in syntax_buffer:
@@ -2073,26 +2079,39 @@ class AnsibleJob(object):
                         found_marker = True
                     if not found_marker:
                         continue
+                    line = line.decode('utf-8').rstrip()
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
+                        line=line))
+            zuul.ansible.util.append_playbook(
+                playbook, self.jobdir.job_output_json)
         elif ret == 4:
             # Ansible could not parse the yaml.
             self.log.debug("Ansible parse error")
             # TODO(mordred) If/when we rework use of logger in ansible-playbook
             # we'll want to change how this works to use that as well. For now,
             # this is what we need to do.
-            # TODO(mordred) We probably want to put this into the json output
-            # as well.
+            fake_playbook = dict(
+                playbook=playbook.path,
+                ansible_error="Parse Error",
+                error=[])
             with open(self.jobdir.job_output_file, 'a') as job_output:
                 job_output.write("{now} | ANSIBLE PARSE ERROR\n".format(
                     now=datetime.datetime.now()))
                 for line in syntax_buffer:
+                    line = line.decode('utf-8').rstrip()
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
+                        line=line))
+                    fake_playbook['error'].append(line)
+            zuul.ansible.util.append_playbook(
+                playbook, self.jobdir.job_output_json)
         elif ret == 250:
             # Unexpected error from ansible
+            fake_playbook = dict(
+                playbook=playbook.path,
+                ansible_error="Unexpected",
+                error=[])
             with open(self.jobdir.job_output_file, 'a') as job_output:
                 job_output.write("{now} | UNEXPECTED ANSIBLE ERROR\n".format(
                     now=datetime.datetime.now()))
@@ -2102,9 +2121,13 @@ class AnsibleJob(object):
                         found_marker = True
                     if not found_marker:
                         continue
+                    line = line.decode('utf-8').rstrip()
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
+                        line=line))
+                    fake_playbook['error'].append(line)
+            zuul.ansible.util.append_playbook(
+                playbook, self.jobdir.job_output_json)
         elif ret == 2:
             with open(self.jobdir.job_output_file, 'a') as job_output:
                 found_marker = False
