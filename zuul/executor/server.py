@@ -458,6 +458,7 @@ class JobDir(object):
         self.post_playbooks = []
         self.cleanup_playbooks = []
         self.job_output_file = os.path.join(self.log_root, 'job-output.txt')
+        self.job_output_json = os.path.join(self.log_root, 'job-output.json')
         # We need to create the job-output.txt upfront in order to close the
         # gap between url reporting and ansible creating the file. Otherwise
         # there is a period of time where the user can click on the live log
@@ -2066,6 +2067,10 @@ class AnsibleJob(object):
             # Received abort request.
             return (self.RESULT_ABORTED, None)
         elif ret == 1:
+            fake_playbook = dict(
+                playbook=playbook.path,
+                ansible_error="Error",
+                error=[])
             with open(self.jobdir.job_output_file, 'a') as job_output:
                 found_marker = False
                 for line in syntax_buffer:
@@ -2073,27 +2078,38 @@ class AnsibleJob(object):
                         found_marker = True
                     if not found_marker:
                         continue
+                    line = line.decode('utf-8').rstrip()
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
+                        line=line))
+            self._append_playbook(fake_playbook)
         elif ret == 4:
             # Ansible could not parse the yaml.
             self.log.debug("Ansible parse error")
             # TODO(mordred) If/when we rework use of logger in ansible-playbook
             # we'll want to change how this works to use that as well. For now,
             # this is what we need to do.
-            # TODO(mordred) We probably want to put this into the json output
-            # as well.
+            fake_playbook = dict(
+                playbook=playbook.path,
+                ansible_error="Parse Error",
+                error=[])
             with open(self.jobdir.job_output_file, 'a') as job_output:
                 job_output.write("{now} | ANSIBLE PARSE ERROR\n".format(
                     now=datetime.datetime.now()))
                 for line in syntax_buffer:
+                    line = line.decode('utf-8').rstrip()
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
+                        line=line))
+                    fake_playbook['error'].append(line)
+            self._append_playbook(fake_playbook)
         elif ret == 250:
             # Unexpected error from ansible
-            with open(self.jobdir.job_output_file, 'a') as job_output:
+            fake_playbook = dict(
+                playbook=playbook.path,
+                ansible_error="Unexpected",
+                error=[])
+            with open(self.jobdir.job_output_file, 'a') as job_output,
                 job_output.write("{now} | UNEXPECTED ANSIBLE ERROR\n".format(
                     now=datetime.datetime.now()))
                 found_marker = False
@@ -2102,9 +2118,12 @@ class AnsibleJob(object):
                         found_marker = True
                     if not found_marker:
                         continue
+                    line = line.decode('utf-8').rstrip()
                     job_output.write("{now} | {line}\n".format(
                         now=datetime.datetime.now(),
-                        line=line.decode('utf-8').rstrip()))
+                        line=line))
+                    fake_playbook['error'].append(line)
+            self._append_playbook(fake_playbook)
         elif ret == 2:
             with open(self.jobdir.job_output_file, 'a') as job_output:
                 found_marker = False
@@ -2132,6 +2151,16 @@ class AnsibleJob(object):
             return (self.RESULT_ABORTED, None)
 
         return (self.RESULT_NORMAL, ret)
+
+    def _append_playbook(self, playbook):
+        with open(self.jobdir.job_output_json, 'r+') as outfile:
+            outfile.seek(0, 2)
+            # Remove three bytes to eat the trailing newline written by the
+            # json.dump. This puts the ',' on the end of lines.
+            outfile.seek(outfile.tell() - 3)
+            outfile.write(',\n')
+            json.dump(playbook, outfile,
+                      indent=4, sort_keys=True, separators=(',', ': '))
 
     def runAnsibleSetup(self, playbook, ansible_version):
         if self.executor_server.verbose:
