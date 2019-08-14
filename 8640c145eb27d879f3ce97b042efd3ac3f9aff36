@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_7c528169",
+        "filename": "playbooks/release/pre.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-14T17:01:54Z",
+      "side": 1,
+      "message": "old job has:\n      yarn_lock_file_path: \"{{ zuul.project.src_dir }}/web/yarn.lock\"",
+      "revId": "8640c145eb27d879f3ce97b042efd3ac3f9aff36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
