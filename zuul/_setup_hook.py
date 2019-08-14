@@ -35,7 +35,8 @@ def _build_javascript():
 
 
 def _from_git(distribution):
-    _build_javascript()
+    if not os.environ.get('ZUUL_SKIP_JAVASCRIPT'):
+        _build_javascript()
     return _old_from_git(distribution)
 
 
