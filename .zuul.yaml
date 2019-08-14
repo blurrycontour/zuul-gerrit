@@ -169,12 +169,14 @@
     vars: &zuul_build_vars
       node_version: 10
       release_python: python3
+    run: playbooks/release/run.yaml
 
 - job:
     name: zuul-release-python
     parent: opendev-release-python
     pre-run: playbooks/release/pre.yaml
     vars: *zuul_build_vars
+    run: playbooks/release/run.yaml
 
 - project:
     check:
