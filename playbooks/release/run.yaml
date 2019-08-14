@@ -1,0 +1,18 @@
+- hosts: all
+  roles:
+    - revoke-sudo
+
+- hosts: all
+  tasks:
+
+    - name: Build a tarball without javascript
+      command: "python3 setup.py sdist"
+      args:
+        chdir: "{{ zuul.project.src_dir }}"
+        environment:
+          ZUUL_SKIP_JAVASCRIPT: 1
+
+    - name: Build a wheel with javascript
+      command: "python3 setup.py bdist_wheel"
+      args:
+        chdir: "{{ zuul.project.src_dir }}"
