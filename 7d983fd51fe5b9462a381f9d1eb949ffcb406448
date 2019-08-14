@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_2c013a07",
+        "filename": "tools/zuul-changes.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-08-14T15:02:46Z",
+      "side": 1,
+      "message": "should we even still support python2 here? No other code in zuul does",
+      "revId": "7d983fd51fe5b9462a381f9d1eb949ffcb406448",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
