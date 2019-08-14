@@ -166,15 +166,13 @@
     name: zuul-build-python-release
     parent: build-python-release
     pre-run: playbooks/release/pre.yaml
-    vars:
-      release_python: python3
+    run: playbooks/release/run.yaml
 
 - job:
     name: zuul-release-python
     parent: opendev-release-python
     pre-run: playbooks/release/pre.yaml
-    vars:
-      release_python: python3
+    run: playbooks/release/run.yaml
 
 - project:
     check:

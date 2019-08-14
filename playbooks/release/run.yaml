@@ -1,0 +1,28 @@
+- hosts: all
+  roles:
+    - revoke-sudo
+
+- hosts: all
+  tasks:
+    
+    - name: Build a tarball
+      command: "python3 setup.py sdist"
+      args:
+        chdir: "{{ zuul_work_dir }}"
+        environment:
+          ZUUL_SKIP_JAVASCRIPT: 1
+
+    - name: Install javascript depends
+      command: "yarn install"
+      args:
+        chdir: "{{ zuul_work_dir }}/web"
+
+    - name: Build javascript
+      command: "yarn build"
+      args:
+        chdir: "{{ zuul_work_dir }}/web"
+
+    - name: Build a wheel
+      command: "python3 setup.py bdist_wheel"
+      args:
+        chdir: "{{ zuul_work_dir }}"
