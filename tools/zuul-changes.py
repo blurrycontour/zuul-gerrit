@@ -14,9 +14,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import urllib2
 import json
 import argparse
+
+from urllib.request import urlopen
 
 parser = argparse.ArgumentParser()
 parser.add_argument('url', help='The URL of the running Zuul instance')
@@ -25,7 +26,7 @@ parser.add_argument('pipeline', help='The name of the Zuul pipeline')
 options = parser.parse_args()
 
 # Check if tenant is white label
-info = json.loads(urllib2.urlopen('%s/api/info' % options.url).read())
+info = json.loads(urlopen('%s/api/info' % options.url).read())
 api_tenant = info.get('info', {}).get('tenant')
 if api_tenant:
     if api_tenant == options.tenant:
@@ -37,7 +38,7 @@ if api_tenant:
 else:
     status_url = '%s/api/tenant/%s/status' % (options.url, options.tenant)
 
-data = json.loads(urllib2.urlopen(status_url).read())
+data = json.loads(urlopen(status_url).read())
 
 for pipeline in data['pipelines']:
     if pipeline['name'] != options.pipeline:
