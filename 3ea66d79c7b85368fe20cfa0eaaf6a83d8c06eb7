@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_5c030543",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-08-14T17:05:11Z",
+      "side": 1,
+      "message": "we also need to fix here",
+      "revId": "3ea66d79c7b85368fe20cfa0eaaf6a83d8c06eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_1cf90d4d",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-08-14T17:05:11Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "3ea66d79c7b85368fe20cfa0eaaf6a83d8c06eb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
