@@ -2,6 +2,9 @@
 
 echo $*
 case "$1" in
+    push)
+      exit 9
+      ;;
     clone)
         dest=$3
         mkdir -p $dest/.git

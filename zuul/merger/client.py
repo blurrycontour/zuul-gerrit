@@ -130,6 +130,21 @@ class MergeClient(object):
         self.submitJob('merger:merge', data, build_set, precedence,
                        event=event)
 
+    def pushChanges(self, items, build_set, repo_state=None,
+                    precedence=zuul.model.PRECEDENCE_NORMAL,
+                    branches=None, event=None):
+        if event is not None:
+            zuul_event_id = event.zuul_event_id
+        else:
+            zuul_event_id = None
+        data = dict(items=items,
+                    repo_state=repo_state,
+                    branches=branches,
+                    zuul_event_id=zuul_event_id)
+        job = self.submitJob('merger:push', data, build_set, precedence,
+                             event=event)
+        return job
+
     def getRepoState(self, items, build_set,
                      precedence=zuul.model.PRECEDENCE_NORMAL,
                      branches=None, event=None):
