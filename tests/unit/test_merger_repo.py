@@ -16,6 +16,7 @@
 import datetime
 import logging
 import os
+from unittest import mock
 
 import git
 import testtools
@@ -141,12 +142,40 @@ class TestMergerRepo(ZuulTestCase):
                          'none@example.org', 'User Name', '0', '0',
                          retry_interval=1)
         self.patch(git.Git, 'GIT_PYTHON_GIT_EXECUTABLE',
-                   os.path.join(FIXTURE_DIR, 'git_fetch_error.sh'))
+                   os.path.join(FIXTURE_DIR, 'git_error.sh'))
         work_repo.update()
         # This is created on the first fetch
         self.assertTrue(os.path.exists(os.path.join(
             self.workspace_root, 'stamp1')))
         # This is created on the second fetch
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workspace_root, 'stamp2')))
+
+    def test_push_timeout(self):
+        parent_path = os.path.join(self.upstream_root, 'org/project')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        work_repo.git_timeout = 0.001
+        self.patch(git.Git, 'GIT_PYTHON_GIT_EXECUTABLE',
+                   os.path.join(FIXTURE_DIR, 'fake_git.sh'))
+        with testtools.ExpectedException(git.exc.GitCommandError,
+                                         r'.*exit code\(9\)'):
+            work_repo.push('master')
+
+    def test_push_retry(self):
+        parent_path = os.path.join(self.upstream_root, 'org/project')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        work_repo.git_timeout = 0.0001
+        self.patch(git.Git, 'GIT_PYTHON_GIT_EXECUTABLE',
+                   os.path.join(FIXTURE_DIR, 'git_error.sh'))
+        work_repo.push('master')
+        # This is created on the first push
+        self.assertTrue(os.path.exists(os.path.join(
+            self.workspace_root, 'stamp1')))
+        # This is created on the second push
         self.assertTrue(os.path.exists(os.path.join(
             self.workspace_root, 'stamp2')))
 
@@ -523,3 +552,77 @@ class TestMerger(ZuulTestCase):
         self.assertEqual(read_files[3]['branch'], 'master')
         self.assertEqual(read_files[3]['files']['zuul.d/a.yaml'],
                          'a-in-project1')
+
+    def test_push_item(self):
+        merger = self.executor_server.merger
+
+        # Simple change A
+        file_dict_a = {'zuul.d/a.yaml': 'a'}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict_a)
+        item_a = self._item_from_fake_change(A)
+
+        # Simple change B
+        file_dict_b = {'zuul.d/b.yaml': 'b'}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict_b)
+        item_b = self._item_from_fake_change(B)
+
+        expected_push_state = [{
+            'connection': 'gerrit',
+            'project': 'org/project',
+            'branch': 'master',
+            'pushed': True,
+        }]
+
+        upstream_path = os.path.join(self.upstream_root, 'org/project')
+        remote_repo = git.Repo(upstream_path)
+        # To allow pushing to HEAD:master, the remote must be a bare repository
+        with remote_repo.config_writer() as config_writer:
+            config_writer.set_value('core', 'bare', True)
+
+        local_repo = merger.getRepo('gerrit', 'org/project').createRepoObject(
+            zuul_event_id=None)
+
+        # Merge and push A
+        commit_sha, pushed_state, _ = merger.pushChanges([item_a])
+
+        # Ensure that the pushed_state is returned correctly
+        self.assertEqual(expected_push_state, pushed_state)
+
+        # Ensure that the commit_sha returned by pushChanges() is the latest in
+        # the local and remote repositories.
+        self.assertEqual(remote_repo.head.commit.hexsha, commit_sha)
+        self.assertEqual(local_repo.head.commit.hexsha, commit_sha)
+
+        # Merge and push B
+        commit_sha, pushed_state, _ = merger.pushChanges([item_b])
+
+        # Ensure that the pushed_state is returned correctly
+        self.assertEqual(expected_push_state, pushed_state)
+
+        # Ensure that the commit_sha returned by pushChanges() is the latest in
+        # the local and remote repositories
+        self.assertEqual(remote_repo.head.commit.hexsha, commit_sha)
+        self.assertEqual(local_repo.head.commit.hexsha, commit_sha)
+
+    def test_push_item_merge_failed(self):
+        merger = self.executor_server.merger
+
+        # Simple change A
+        file_dict_a = {'zuul.d/a.yaml': 'a'}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict_a)
+        item_a = self._item_from_fake_change(A)
+
+        with mock.patch('zuul.merger.merger.Repo.merge', return_value=None):
+            # If the merge failed, the change should not be pushed
+            commit = merger.pushChanges([item_a])
+        self.assertEqual(commit, None)
+
+        # Ensure that the remote repository has still the latest commit from
+        # the test setup
+        upstream_path = os.path.join(self.upstream_root, 'org/project')
+        remote_repo = git.Repo(upstream_path)
+        self.assertEqual(remote_repo.head.commit.message,
+                         'add content from fixture')
