@@ -16,6 +16,8 @@ import os
 import textwrap
 from unittest import mock
 
+import git
+
 import tests.base
 from tests.base import (
     BaseTestCase, ZuulTestCase, AnsibleZuulTestCase,
@@ -376,3 +378,45 @@ class TestChecksApi(ZuulTestCase):
                          'NOT_RELEVANT')
         self.assertEqual(len(A.checks_history), 3)
         self.assertEqual(A.data['status'], 'NEW')
+
+
+class TestDirectPush(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+
+    @simple_layout('layouts/direct-push-gerrit.yaml')
+    def test_direct_push(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        # NOTE: To allow direct push, the remote must be a bare repository.
+        # This must be called after the fake change was created, otherwise
+        # the creation of the change fails.
+        upstream_path = os.path.join(self.upstream_root, 'org/project')
+        remote_repo = git.Repo(upstream_path)
+        with remote_repo.config_writer() as config_writer:
+            config_writer.set_value('core', 'bare', True)
+
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+
+    @simple_layout('layouts/direct-push-gerrit.yaml')
+    def test_direct_push_failed(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        # NOTE: Without adapting the repo config, the direct-push will fail,
+        # because we are not allowed to update the current remote branch in
+        # a non-bare repository.
+
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 2)
+        self.assertIn("could not be pushed directly", A.messages[1])
