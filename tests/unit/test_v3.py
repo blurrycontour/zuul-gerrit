@@ -4916,11 +4916,11 @@ class TestJobOutput(AnsibleZuulTestCase):
         j = json.loads(self._get_file(self.history[0],
                                       'work/logs/job-output.json'))
         self.assertEqual(token,
-                         j[0]['plays'][0]['tasks'][0]
+                         j[0]['plays'][0]['tasks'][1]
                          ['hosts']['localhost']['stdout'])
-        self.assertTrue(j[0]['plays'][0]['tasks'][1]
-                        ['hosts']['localhost']['skipped'])
         self.assertTrue(j[0]['plays'][0]['tasks'][2]
+                        ['hosts']['localhost']['skipped'])
+        self.assertTrue(j[0]['plays'][0]['tasks'][3]
                         ['hosts']['localhost']['failed'])
 
         self.log.info(self._get_file(self.history[0],
@@ -4970,7 +4970,7 @@ class TestJobOutput(AnsibleZuulTestCase):
         j = json.loads(self._get_file(self.history[0],
                                       'work/logs/job-output.json'))
         self.assertEqual(token,
-                         j[0]['plays'][0]['tasks'][0]
+                         j[0]['plays'][0]['tasks'][1]
                          ['hosts']['localhost']['stdout'])
 
         self.log.info(self._get_file(self.history[0],
