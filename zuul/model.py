@@ -2097,6 +2097,26 @@ class BuildSet(object):
                 return project_metadata.merge_mode
         return MERGER_MERGE_RESOLVE
 
+    def getDirectPush(self):
+        # TODO (felix): Do we have to look up the direct-push setting similar
+        # to the merge-mode above (taking care of layout hierarchy)?
+        item = self.item
+        layout = None
+        while item:
+            layout = item.layout
+            if layout:
+                break
+            item = item.item_ahead
+        if not layout:
+            layout = self.item.pipeline.tenant.Layout
+        if layout:
+            project = self.item.change.project
+            project_metadata = layout.getProjectMetadata(
+                project.canonical_name)
+            if project_metadata:
+                return project_metadata.direct_push
+        return False
+
     def getSafeAttributes(self):
         return Attributes(uuid=self.uuid)
 
@@ -3319,6 +3339,7 @@ class ProjectConfig(ConfigObject):
         # stanzas.
         self.merge_mode = None
         self.default_branch = None
+        self.direct_push = None
 
     def __repr__(self):
         return '<ProjectConfig %s source: %s %s>' % (
@@ -3334,6 +3355,7 @@ class ProjectConfig(ConfigObject):
         r.variables = self.variables
         r.merge_mode = self.merge_mode
         r.default_branch = self.default_branch
+        r.direct_push = self.direct_push
         return r
 
     def setImpliedBranchMatchers(self, branches):
@@ -3361,6 +3383,7 @@ class ProjectConfig(ConfigObject):
         else:
             d['merge_mode'] = None
         d['templates'] = self.templates
+        d['direct_push'] = self.direct_push
         return d
 
 
@@ -3375,6 +3398,7 @@ class ProjectMetadata(object):
     def __init__(self):
         self.merge_mode = None
         self.default_branch = None
+        self.direct_push = None
 
 
 class ConfigItemNotListError(Exception):
@@ -3799,6 +3823,8 @@ class Layout(object):
         if (md.default_branch is None and
             project_config.default_branch is not None):
             md.default_branch = project_config.default_branch
+        if md.direct_push is None and project_config.direct_push is not None:
+            md.direct_push = project_config.direct_push
 
     def getProjectConfigs(self, name):
         return self.project_configs.get(name, [])
