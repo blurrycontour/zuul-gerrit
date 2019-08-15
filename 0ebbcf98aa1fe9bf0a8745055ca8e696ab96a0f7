@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_337e64e4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1057,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-15T16:14:03Z",
+      "side": 1,
+      "message": "did not have any jobs configured",
+      "revId": "0ebbcf98aa1fe9bf0a8745055ca8e696ab96a0f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_d37ef0e1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1062,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-15T16:14:03Z",
+      "side": 1,
+      "message": "s/didn\u0027t merged/did not merge/",
+      "revId": "0ebbcf98aa1fe9bf0a8745055ca8e696ab96a0f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
