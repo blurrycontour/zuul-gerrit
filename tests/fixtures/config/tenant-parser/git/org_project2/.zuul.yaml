@@ -8,6 +8,7 @@
 
 - project:
     name: org/project2
+    direct-push: True
     check:
       jobs:
         - project2-job
