@@ -68,6 +68,9 @@ class TestTenantSimple(TenantParserTestCase):
         self.assertTrue('project2-job' in
                         project2_config[1].pipelines['check'].job_list.jobs)
 
+        self.assertFalse(project1_config[0].direct_push)
+        self.assertTrue(project2_config[1].direct_push)
+
     def test_variant_description(self):
         tenant = self.sched.abide.tenants.get('tenant-one')
         job = tenant.layout.jobs.get("project2-job")
