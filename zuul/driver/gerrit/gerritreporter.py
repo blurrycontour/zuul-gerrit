@@ -72,9 +72,65 @@ class GerritReporter(BaseReporter):
         item.change._ref_sha = item.change.project.source.getRefSha(
             item.change.project, 'refs/heads/' + item.change.branch)
 
-        return self.connection.review(item, message, self._submit,
-                                      self._labels, self._checks_api,
-                                      comments, zuul_event_id=item.event)
+        direct_push = False
+        # If the gerrit reporter is enabled for submitting the change, we
+        # evaluate the direct-push flag from the config.
+        if self._submit:
+            direct_push = item.current_build_set.getDirectPush()
+            if direct_push:
+                # Prevent gerrit from submitting the change in any case.
+                # If the push is successful, this would lead to a
+                # 409 - change is merged response from gerrit.
+                # If the push fails, we don't want gerrit to submit it
+                # as this might still work - dependening on the merge
+                # algorithm used - but could lead to a different result.
+
+                # FIXME (felix): To make the tests work, we need to keep the
+                # _submit flag when the change was pushed directly, as the
+                # FakeGerritConnection and the (Fake)GerritWebServer use this
+                # flag as indicator that the change was merged.
+                # However, in production, this will lead to failing Gerrit API
+                # requests, and the connection will report a 409 as the change
+                # failed to submit.
+                # To fix this, we could introduce a submit_mode (similar to)
+                # GitHub's merge mode with values e.g. PUSH, SUBMIT, None? and
+                # use this to evaluate if the connection should still try to
+                # push the change.
+
+                # self._submit = False
+                log.debug("Direct-push is enabled. Going to push the change.")
+                # As we are going to push the change directly, there is no need
+                success, error = self.pushChange(item)
+                if not success:
+                    self._submit = False
+                    # Report failure reason to gerrit review
+                    message = (
+                        "{} \n\n ERROR: Change could not be pushed "
+                        "directly: {}"
+                    ).format(message, error)
+
+        self.log.debug("Gerrit message: %s", message)
+        self.connection.review(item, message, self._submit,
+                               self._labels, self._checks_api,
+                               comments, zuul_event_id=item.event)
+
+    def pushChange(self, item):
+        log = get_annotated_logger(self.log, item.event)
+        build_set = item.current_build_set
+        log.debug("Pushing items %s for buildset %s",
+                  build_set.merger_items, build_set)
+
+        job = self.connection.sched.merger.pushChanges(
+            build_set.merger_items,  # TODO or [item] ?
+            build_set
+        )
+        self.log.debug("Waiting for pushChanges job %s" % job)
+        job.wait()
+
+        if not job.updated:
+            return False, "PushChanges job {} failed".format(job)
+
+        return True, None
 
     def getSubmitAllowNeeds(self):
         """Get a list of code review labels that are allowed to be

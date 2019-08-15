@@ -675,6 +675,7 @@ class TestWeb(BaseTestWeb):
                     'templates': [],
                     'default_branch': 'master',
                     'merge_mode': 'merge-resolve',
+                    'direct_push': False,
                     'pipelines': [{
                         'name': 'check',
                         'queue_name': None,
