@@ -2435,6 +2435,7 @@ class ExecutorServer(object):
             'merger:cat': self.cat,
             'merger:refstate': self.refstate,
             'merger:fileschanges': self.fileschanges,
+            'merger:push': self.push,
         }
         self.merger_gearworker = ZuulGearWorker(
             'Zuul Executor Merger',
@@ -2845,5 +2846,24 @@ class ExecutorServer(object):
         else:
             (result['commit'], result['files'], result['repo_state'],
              recent, orig_commit) = ret
+        result['zuul_event_id'] = zuul_event_id
+        job.sendWorkComplete(json.dumps(result))
+
+    def push(self, job):
+        self.log.debug("Got push job: %s" % job.unique)
+        args = json.loads(job.arguments)
+        zuul_event_id = args.get('zuul_event_id')
+        ret = self.merger.pushChanges(
+            args['items'], args.get('repo_state'),
+            branches=args.get('branches'),
+            zuul_event_id=zuul_event_id)
+        result = dict(pushed=(ret is not None))
+        if ret is None:
+            result['commit'] = result['repo_state'] = None
+        else:
+            (result['commit'], result['push_details'],
+             result['repo_state']) = ret
+            result['merged'] = True
+            result['updated'] = True
         result['zuul_event_id'] = zuul_event_id
         job.sendWorkComplete(json.dumps(result))
