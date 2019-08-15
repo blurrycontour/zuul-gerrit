@@ -61,8 +61,46 @@ class GerritReporter(BaseReporter):
         item.change._ref_sha = item.change.project.source.getRefSha(
             item.change.project, 'refs/heads/' + item.change.branch)
 
-        return self.connection.review(item.change, message, self.config,
-                                      comments, zuul_event_id=item.event)
+        # NOTE (felix): Is anything else from the config of interest for the later
+        # gerrit action? Otherwise we can just evaluate the submit flag here.
+        log.warning("config: %s" % self.config)
+        action = {**self.config}
+        log.warning("action before: %s" % action)
+        direct_push = False
+        if self.config.get("submit", False):
+            direct_push = item.current_build_set.getDirectPush()
+            if direct_push:
+                log.debug("Submit and direct-push are enabled."
+                          " Overwriting submit flag for gerrit review.")
+                # We don't want the gerrit review to automatically submit the change,
+                # thus we simply overwrite the submit flag for the gerrit review.
+                action.pop("submit")
+                #action["submit"] = False
+        log.warning("action after: %s" % action)
+        self.connection.review(item.change, message, action,
+                               comments, zuul_event_id=item.event)
+
+        # If the gerrit reporter is enabled to submit a change and direct-push
+        # is activated for the active project, we directly push the change to
+        # the remote
+        if direct_push:
+            log.debug("Direct-push is enabled. Going to push the change.")
+            self.pushChange(item)
+
+    def pushChange(self, item):
+        log = get_annotated_logger(self.log, item.event)
+
+        build_set = item.current_build_set
+
+        self.connection.sched.merger.pushChanges(
+            build_set.merger_items,  # TODO or [item] ?
+            build_set
+        )
+        # TODO Wait for job to finish?
+
+        # TODO How to determine if job was successful?
+        item.change.is_merged = True
+        return
 
     def getSubmitAllowNeeds(self):
         """Get a list of code review labels that are allowed to be
