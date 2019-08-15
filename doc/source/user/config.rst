@@ -1466,6 +1466,13 @@ pipeline.
          Squash merges each change onto the branch. This maps to the
          merge mode ``squash`` in Github.
 
+   .. attr: direct-push
+      :default: False
+
+      When enabled, Zuul will try to directly push the change to the remote
+      repository and prevent the remote system from merging the change.
+      Currently, this is only supported by Gerrit.
+
    .. attr:: vars
       :default: None
 

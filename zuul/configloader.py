@@ -935,7 +935,8 @@ class ProjectTemplateParser(object):
         self.schema = self.getSchema()
         self.not_pipelines = ['name', 'description', 'templates',
                               'merge-mode', 'default-branch', 'vars',
-                              '_source_context', '_start_mark']
+                              '_source_context', '_start_mark',
+                              'direct-push']
 
     def getSchema(self):
         job = {str: vs.Any(str, JobParser.job_attributes)}
@@ -952,6 +953,7 @@ class ProjectTemplateParser(object):
             'name': str,
             'description': str,
             'vars': ansible_vars_dict,
+            'direct-push': bool,
             str: pipeline_contents,
             '_source_context': model.SourceContext,
             '_start_mark': ZuulMark,
@@ -967,6 +969,7 @@ class ProjectTemplateParser(object):
         project_template = model.ProjectConfig(conf.get('name'))
         project_template.source_context = conf['_source_context']
         project_template.start_mark = conf['_start_mark']
+        project_template.direct_push = conf.get('direct-push', False)
         for pipeline_name, conf_pipeline in conf.items():
             if pipeline_name in self.not_pipelines:
                 continue
@@ -1039,6 +1042,7 @@ class ProjectParser(object):
             'templates': [str],
             'merge-mode': vs.Any('merge', 'merge-resolve',
                                  'cherry-pick', 'squash-merge'),
+            'direct-push': bool,
             'default-branch': str,
             str: pipeline_contents,
             '_source_context': model.SourceContext,
@@ -1104,6 +1108,9 @@ class ProjectParser(object):
 
         default_branch = conf.get('default-branch', 'master')
         project_config.default_branch = default_branch
+
+        direct_push = conf.get('direct-push', False)
+        project_config.direct_push = direct_push
 
         variables = conf.get('vars', {})
         if variables:
