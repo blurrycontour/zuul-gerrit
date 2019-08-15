@@ -72,9 +72,52 @@ class GerritReporter(BaseReporter):
         item.change._ref_sha = item.change.project.source.getRefSha(
             item.change.project, 'refs/heads/' + item.change.branch)
 
-        return self.connection.review(item, message, self._submit,
-                                      self._labels, self._checks_api,
-                                      comments, zuul_event_id=item.event)
+        direct_push = False
+        # If the gerrit reporter is enabled for submitting the change, we
+        # evaluate the direct-push flag from the config.
+        if self._submit:
+            direct_push = item.current_build_set.getDirectPush()
+            if direct_push:
+                log.debug("Direct-push is enabled. Going to push the change.")
+                # As we are going to push the change directly, there is no need
+                success, error = self.pushChange(item)
+                if not success:
+                    # Report failure reason to gerrit review
+                    message = "{} But could not be pushed directly: {}".format(
+                        message, error)
+                    # TODO Test if the _submit=True has any drawback if the change
+                    # is already pushed.
+
+                    # If the direct-push failes, prevent gerrit from submitting
+                    # the change. Dependening on the merge algorithm used, this
+                    # might still be possible, but could lead to a different
+                    # result.
+                    self._submit = False
+
+        self.log.debug("Gerrit message: %s", message)
+        self.connection.review(item, message, self._submit,
+                               self._labels, self._checks_api,
+                               comments, zuul_event_id=item.event)
+
+    def pushChange(self, item):
+        log = get_annotated_logger(self.log, item.event)
+        build_set = item.current_build_set
+        log.debug("Pushing items %s for buildset %s",
+                  build_set.merger_items, build_set)
+
+        job = self.connection.sched.merger.pushChanges(
+            build_set.merger_items,  # TODO or [item] ?
+            build_set
+        )
+        self.log.debug("Waiting for pushChanges job %s" % job)
+        job.wait()
+
+        if not job.updated:
+            return False, "PushChanges job {} failed".format(job)
+
+        #item.change.is_merged = True
+        #item.change["status"] = "MERGED"
+        return True, None
 
     def getSubmitAllowNeeds(self):
         """Get a list of code review labels that are allowed to be
