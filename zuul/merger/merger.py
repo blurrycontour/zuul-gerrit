@@ -256,6 +256,27 @@ class Repo(object):
                 else:
                     raise
 
+    def _git_push(self, repo, remote, branch, zuul_event_id):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        # Specify the remote branch, we want to push the changes to
+        remote_ref = "HEAD:{}".format(branch)
+        log.debug("Push %s %s %s" % (self.local_path, remote, remote_ref))
+        for attempt in range(1, self.retry_attempts + 1):
+            try:
+                with timeout_handler(self.local_path):
+                    repo.git.push(remote, remote_ref)
+                    return True
+            except Exception as e:
+                if attempt < self.retry_attempts:
+                    # TODO Error handling
+                    time.sleep(self.retry_interval)
+                    log.exception("Retry %s: Push %s %s %s" % (
+                        attempt, self.local_path, remote, remote_ref))
+                    self._ensure_cloned(zuul_event_id)
+                else:
+                    raise
+        return False
+
     def _git_set_remote_url(self, repo, url):
         with repo.remotes.origin.config_writer as config_writer:
             config_writer.set('url', url)
@@ -451,11 +472,11 @@ class Repo(object):
         repo = self.createRepoObject(zuul_event_id)
         self._git_fetch(repo, repository, zuul_event_id, ref=ref)
 
-    def push(self, local, remote, zuul_event_id=None):
+    def push(self, branch, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
-        log.debug("Pushing %s:%s to %s", local, remote, self.remote_url)
-        repo.remotes.origin.push('%s:%s' % (local, remote))
+        log.debug("Pushing repository %s" % self.local_path)
+        return self._git_push(repo, 'origin', branch, zuul_event_id)
 
     def update(self, zuul_event_id=None, build=None):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
@@ -811,6 +832,57 @@ class Merger(object):
         for k, v in recent.items():
             ret_recent[k] = v.hexsha
         return commit.hexsha, read_files, repo_state, ret_recent, orig_commit
+
+    def _pushItem(self, item, zuul_event_id=None):
+        repo = self.getRepo(item['connection'], item['project'],
+                            zuul_event_id=zuul_event_id)
+        return repo.push(item['branch'], zuul_event_id=zuul_event_id)
+
+    def pushChanges(self, items, repo_state=None, repo_locks=None,
+                    branches=None, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        recent = {}
+        commit = None
+        pushed = []
+
+        # NOTE (felix): Instead of mergeChanges(), we use _mergeItem() directly
+        # and deal with the repo_state and repo_locks in here to do both, merge and push,
+        # in one go. Otherwise, we might get conflicts in between those two operations.
+        if repo_state is None:
+            repo_state = {}
+        for item in items:
+            log.warning("item: %s" % item)
+            # If we're in the executor context we have the repo_locks object
+            # and perform per repo locking.
+            if repo_locks is not None:
+                lock = repo_locks.getRepoLock(
+                    item['connection'], item['project'])
+            else:
+                lock = nullcontext()
+            with lock:
+                # We need to merge the changes first, before we can push the
+                # local state to the remote branch
+                log.debug("Merging for change %s,%s before pushing" %
+                          (item["number"], item["patchset"]))
+                orig_commit, commit = self._mergeItem(
+                    item, recent, repo_state, zuul_event_id, branches=branches)
+                if not commit:
+                    return None
+                # As the repo object should still be in the same state,
+                # we can just do the push
+                log.debug("Pushing change %s,%s to remote branch %s" %
+                          (item["number"], item["patchset"], item["branch"]))
+                success = self._pushItem(item, zuul_event_id=zuul_event_id)
+                pushed.append(dict(
+                    connection=item['connection'],
+                    project=item['project'],
+                    branch=item['branch'],
+                    pushed=success))
+        # TODO (felix): Is it necessary to return commit and repo_state here?
+        #  As far as I understood, those values are used to restore the merged
+        #  state in a follow up merger call. But once the change is pushed,
+        #  this should not be necessary anymore.
+        return commit.hexsha, pushed, repo_state
 
     def setRepoState(self, items, repo_state, zuul_event_id=None):
         # Sets the repo state for the items
