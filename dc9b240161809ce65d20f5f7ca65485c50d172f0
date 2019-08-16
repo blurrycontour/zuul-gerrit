@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_f7098330",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 23
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-16T16:50:08Z",
+      "side": 1,
+      "message": "If ssh is used for cloning (it is in the example above) we should add an option for the ssh key path here so that we don\u0027t have to assume it\u0027s ~/.ssh/id_rsa.  That way different sources can have different keys.",
+      "revId": "dc9b240161809ce65d20f5f7ca65485c50d172f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
