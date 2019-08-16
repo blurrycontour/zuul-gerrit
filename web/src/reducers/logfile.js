@@ -23,21 +23,26 @@ import {
 
 export default (state = {
   isFetching: false,
-  url: null,
-  data: null
+  buildId: null,
+  buildLogfiles: {},
 }, action) => {
   switch (action.type) {
     case LOGFILE_FETCH_REQUEST:
-      return update(state, {$merge: {isFetching: true,
-                                     url: action.url,
-                                     data: null}})
+      if (action.buildId !== state.buildId) {
+        state = update(state, {$merge: {buildId: action.buildId,
+                                        buildLogfiles: {}}})
+      }
+      return update(state, {$merge: {isFetching: true}})
     case LOGFILE_FETCH_SUCCESS:
-      return update(state, {$merge: {isFetching: false,
-                                     data: action.data}})
+      if (action.buildId === state.buildId) {
+        console.log(state.buildLogfiles)
+        state.buildLogfiles = update(
+          state.buildLogfiles, {$merge: {[action.file]: action.data}})
+        console.log(state.buildLogfiles)
+      }
+      return update(state, {$merge: {isFetching: false}})
     case LOGFILE_FETCH_FAIL:
-      return update(state, {$merge: {isFetching: false,
-                                     url: null,
-                                     data: null}})
+      return update(state, {$merge: {isFetching: false}})
     default:
       return state
   }

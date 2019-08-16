@@ -50,11 +50,11 @@ class LogFile extends React.Component {
   }
 
   render () {
-    const { build, data, severity } = this.props
+    const { data, severity } = this.props
     return (
       <React.Fragment>
         <Panel>
-          <Panel.Heading>Build result {build.uuid}</Panel.Heading>
+          <Panel.Heading>Logfile name goes here</Panel.Heading>
           <Panel.Body>
             <Link to="?">All</Link>&nbsp;
             <Link to="?severity=1">Debug</Link>&nbsp;

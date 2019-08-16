@@ -114,7 +114,7 @@ class LogFilePage extends Refreshable {
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
-        {remoteData.data && <LogFile build={build} data={remoteData.data} severity={severity}/>}
+        {remoteData && <LogFile build={build} data={remoteData.data} severity={severity}/>}
       </React.Fragment>
     )
   }

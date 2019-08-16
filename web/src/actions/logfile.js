@@ -20,9 +20,9 @@ export const LOGFILE_FETCH_REQUEST = 'LOGFILE_FETCH_REQUEST'
 export const LOGFILE_FETCH_SUCCESS = 'LOGFILE_FETCH_SUCCESS'
 export const LOGFILE_FETCH_FAIL = 'LOGFILE_FETCH_FAIL'
 
-export const requestLogfile = (url) => ({
+export const requestLogfile = (buildId) => ({
   type: LOGFILE_FETCH_REQUEST,
-  url: url,
+  buildId: buildId,
 })
 
 const SYSLOGDATE = '\\w+\\s+\\d+\\s+\\d{2}:\\d{2}:\\d{2}((\\.|\\,)\\d{3,6})?'
@@ -42,7 +42,7 @@ const severityMap = {
 const OSLO_LOGMATCH = new RegExp(`^(${DATEFMT})(( \\d+)? (${STATUSFMT}).*)`)
 const SYSTEMD_LOGMATCH = new RegExp(`^(${SYSLOGDATE})( (\\S+) \\S+\\[\\d+\\]\\: (${STATUSFMT})?.*)`)
 
-const receiveLogfile = (data) => {
+const receiveLogfile = (buildId, file, data) => {
 
   const out = data.split(/\r?\n/).map((line, idx) => {
     let m = null
@@ -67,11 +67,15 @@ const receiveLogfile = (data) => {
   return {
     type: LOGFILE_FETCH_SUCCESS,
     data: out,
+    buildId: buildId,
+    file: file,
     receivedAt: Date.now()
   }
 }
 
 const failedLogfile = (error, url) => {
+  console.log(error)
+  console.log(url)
   error.url = url
   return {
     type: LOGFILE_FETCH_FAIL,
@@ -83,17 +87,21 @@ const fetchLogfile = (buildId, file, state, force) => dispatch => {
   const build = state.build.builds[buildId]
   const item = build.manifest.index['/' + file]
 
-  if (!item)
+  if (!item) {
     dispatch(failedLogfile(null))
+  }
   const url = build.log_url + file
 
-  if (!force && state.logfile.url === url) {
+  if (!force &&
+      state.logfile.buildId === buildId &&
+      file in state.logfile.buildLogfiles) {
     return Promise.resolve()
   }
-  dispatch(requestLogfile())
+
+  dispatch(requestLogfile(buildId, file))
   if (item.mimetype === 'text/plain') {
     return Axios.get(url, {transformResponse: []})
-      .then(response => dispatch(receiveLogfile(response.data)))
+      .then(response => dispatch(receiveLogfile(buildId, file, response.data)))
       .catch(error => dispatch(failedLogfile(error, url)))
   }
   dispatch(failedLogfile(null))

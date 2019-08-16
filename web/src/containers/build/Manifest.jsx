@@ -17,14 +17,13 @@ import PropTypes from 'prop-types'
 import {
   TreeView,
 } from 'patternfly-react'
-import { Link } from 'react-router-dom'
 
-const renderTree = (tenant, build, path, obj) => {
+const renderTree = (select, tenant, build, path, obj) => {
   const node = {}
   let name = obj.name
 
   if ('children' in obj && obj.children) {
-    node.nodes = obj.children.map(n => renderTree(tenant, build, path+obj.name+'/', n))
+    node.nodes = obj.children.map(n => renderTree(select, tenant, build, path+obj.name+'/', n))
   }
   if (obj.mimetype === 'application/directory') {
     name = obj.name + '/'
@@ -36,10 +35,14 @@ const renderTree = (tenant, build, path, obj) => {
   if (log_url.endsWith('/')) {
     log_url = log_url.slice(0, -1)
   }
+
   if (obj.mimetype === 'text/plain') {
     node.text = (
       <span>
-        <Link to={tenant.linkPrefix + '/build/' + build.uuid + '/log' + path + name}>{obj.name}</Link>
+        <span onClick={() => {select(
+        build.uuid,
+        (path+name).slice(1),
+          false)}}> {obj.name} </span>
         &nbsp;&nbsp;
         (<a href={log_url + path + name}>raw</a>
         &nbsp;<span className="fa fa-external-link"/>)
@@ -58,13 +61,14 @@ const renderTree = (tenant, build, path, obj) => {
 class Manifest extends React.Component {
   static propTypes = {
     tenant: PropTypes.object.isRequired,
-    build: PropTypes.object.isRequired
+    build: PropTypes.object.isRequired,
+    select: PropTypes.object
   }
 
   render() {
-    const { tenant, build } = this.props
+    const { tenant, build, select } = this.props
 
-    const nodes = build.manifest.tree.map(n => renderTree(tenant, build, '/', n))
+    const nodes = build.manifest.tree.map(n => renderTree(select, tenant, build, '/', n))
 
     return (
       <React.Fragment>
