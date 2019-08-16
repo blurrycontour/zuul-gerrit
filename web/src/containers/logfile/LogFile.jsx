@@ -18,6 +18,15 @@ import { connect } from 'react-redux'
 import { Panel } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
+
+function updateSelection (event) {
+  const lines = window.location.hash.substring(1).split('-').map(Number)
+  const lineClicked = Number(event.currentTarget.innerText)
+  console.log("current selection is", lines, "line clicked", lineClicked)
+  window.location.hash = "#" + lineClicked
+}
+
+
 class LogFile extends React.Component {
   static propTypes = {
     build: PropTypes.object,
@@ -49,11 +58,9 @@ class LogFile extends React.Component {
             <tbody>
               {data.map((line) => (
                 ((!severity || (line.severity >= severity)) &&
-                 <tr key={line.index}>
-                   <td className="line-number">
-                     <a name={line.index} href={'#'+(line.index)}>
-                       {line.index}
-                     </a>
+                 <tr key={line.index} className={'ln-' + line.index}>
+                   <td className="line-number" onClick={updateSelection}>
+                     {line.index}
                    </td>
                    <td>
                      <span className={'zuul-log-sev-'+(line.severity||0)}>
