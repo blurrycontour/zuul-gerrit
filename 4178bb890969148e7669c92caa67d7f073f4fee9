@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_b54a3124",
+        "filename": "web/src/pages/LogFile.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-16T01:54:10Z",
+      "side": 1,
+      "message": "With firefox 68, after clicking on a timestamp and pressing \u003center\u003e on the url bar, the timestamp still goes under the top menu. not sure why though.\n\nAlso, there is ReactHeight being used in the JobVariant component that maybe can help figure out the height of the top menu.\n\nPerhaps we could add an extra 60 px to the scroll distance?",
+      "revId": "4178bb890969148e7669c92caa67d7f073f4fee9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
