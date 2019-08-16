@@ -1,0 +1,10 @@
+Code-Review+2: Monty Taylor <mordred@inaugust.com>
+Workflow+1: Monty Taylor <mordred@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 16 Aug 2019 17:13:41 +0000
+Reviewed-on: https://review.opendev.org/676849
+Project: zuul/zuul
+Branch: refs/heads/master
