@@ -16,6 +16,24 @@
       "revId": "36b90cca13d4b97b8f47ebeaf8158ba53e86f9a9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_01cdfd5b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-16T15:05:26Z",
+      "side": 1,
+      "message": "This happened with 3.10.1. Here is the logs right before the exception:\n\n  2019-08-15 21:17:13,605 DEBUG zuul.Scheduler: [e: 2c9f4a3ce6dc47a28d1adaee5be34551] Change \u003cChange 0x7f100c454048 openstack/nova 576299,44\u003e has been updated, clearing dependent change caches\n  2019-08-15 21:17:13,606 DEBUG zuul.GerritConnection: [e: 2c9f4a3ce6dc47a28d1adaee5be34551] Scheduling event from opendev.org: \u003cGerritTriggerEvent patchset-created opendev.org/openstack/nova master 576299,44\u003e\n  2019-08-15 21:17:13,644 DEBUG zuul.ConfigLoader: Created layout id e95fadb30fa14ca6934d8d047cb79a29\n  2019-08-15 21:17:13,792 ERROR zuul.Pipeline.rdoproject.org.openstack-check: Error in dynamic layout",
+      "parentUuid": "7faddb67_c1fa85b8",
+      "revId": "36b90cca13d4b97b8f47ebeaf8158ba53e86f9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
