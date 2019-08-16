@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_b5731180",
+        "filename": "web/src/index.css",
+        "patchSetId": 3
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-16T01:57:20Z",
+      "side": 1,
+      "message": "perhaps a grayish would help better separate the numbers from timestamp?",
+      "revId": "7429c269e78fc117ef7acdf1b6faf0e271973e59",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
