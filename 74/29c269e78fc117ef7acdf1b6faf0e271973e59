@@ -1,0 +1,12 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 16 Aug 2019 16:53:36 +0000
+Reviewed-on: https://review.opendev.org/676830
+Project: zuul/zuul
+Branch: refs/heads/master
