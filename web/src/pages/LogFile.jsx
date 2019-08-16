@@ -46,6 +46,10 @@ class LogFilePage extends Refreshable {
     const line = this.props.location.hash.substring(1)
     if (line) {
       const element = document.getElementsByName(line)
+      if (element.length > 0) {
+        // Move up from a -> td -> tr
+        element[0].parentNode.parentNode.className += ' highlight'
+      }
       if (element.length) {
         const header = document.getElementsByClassName('navbar')
         if (header.length) {
