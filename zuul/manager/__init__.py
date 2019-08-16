@@ -494,8 +494,8 @@ class PipelineManager(object):
         relevant_errors = []
         for err in layout.loading_errors.errors:
             econtext = err.key.context
-            if ((err.key not in
-                 parent_layout.loading_errors.error_keys) or
+            if ((parent_layout and err.key not in
+                parent_layout.loading_errors.error_keys) or
                 (econtext.project == item.change.project.name and
                  econtext.branch == item.change.branch)):
                 relevant_errors.append(err)
