@@ -65,6 +65,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_04cd0b5c",
+        "filename": "doc/source/admin/examples/playbooks/wait-to-start.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-16T15:44:25Z",
+      "side": 1,
+      "message": "Line 14 below runs a second date as part of its output. I don\u0027t think we need the date on line 13 as a result.",
+      "parentUuid": "7faddb67_64dcff17",
+      "revId": "5a0f1cb7fcae412cb19ff9b818acd77d7827fa6e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_84a57bb7",
         "filename": "playbooks/quick-start/post.yaml",
         "patchSetId": 1
