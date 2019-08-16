@@ -198,7 +198,7 @@ export const fetchBuild = (tenant, buildId, state, force) => dispatch => {
     .catch(error => dispatch(failedBuild(error, tenant.apiPrefix)))
 }
 
-const fetchBuildOutput = (buildId, state, force) => dispatch => {
+export const fetchBuildOutput = (buildId, state, force) => dispatch => {
   const build = state.build.builds[buildId]
   const url = build.log_url.substr(0, build.log_url.lastIndexOf('/') + 1)
   if (!force && build.output) {
