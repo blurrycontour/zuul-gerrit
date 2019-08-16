@@ -73,7 +73,11 @@ export function didTaskFail(task) {
       }
     }
   }
-  return false
+  if (task.failed_when_result) {
+    return false
+  }
+  // No success result key means it failed with syntax error...
+  return true
 }
 
 export function hasInterestingKeys (obj, keys) {

@@ -15,11 +15,30 @@
 
 import * as buildAction from './build'
 
+const failTaskSyntaxError = {
+  hosts: {
+    'bridge.softwarefactory-project.io': {
+      'action': 'git',
+      'msg': 'The task includes an option with an undefined variable. ...'
+    }
+  },
+  task: {
+    duration: {
+      end: '2019-08-16T20:23:22.385295Z',
+      start: '2019-08-16T20:23:22.342506Z'
+    },
+    id: 'fa163e65-e34c-b926-dda1-000000000011',
+    name: 'Prepare git repository for sf-infra'
+  }
+}
+
 it('processes job-output properly', () => {
+  expect(buildAction.didTaskFail(failTaskSyntaxError.task)).toEqual(true)
   expect(buildAction.didTaskFail({failed: true})).toEqual(true)
   expect(buildAction.didTaskFail({failed_when_result: true})).toEqual(false)
   expect(buildAction.didTaskFail({failed_when_result: false})).toEqual(false)
   expect(buildAction.didTaskFail({failed: false, rc: 1})).toEqual(true)
+  expect(buildAction.didTaskFail({results: [{rc: 1}]})).toEqual(true)
   expect(buildAction.didTaskFail({results: [{rc: 1}]})).toEqual(true)
 
   expect(buildAction.hasInterestingKeys({rc: 42}, ['rc'])).toEqual(true)
