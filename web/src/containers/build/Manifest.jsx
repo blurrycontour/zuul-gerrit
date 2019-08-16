@@ -36,10 +36,13 @@ const renderTree = (tenant, build, path, obj) => {
   if (log_url.endsWith('/')) {
     log_url = log_url.slice(0, -1)
   }
+
   if (obj.mimetype === 'text/plain') {
     node.text = (
       <span>
-        <Link to={tenant.linkPrefix + '/build/' + build.uuid + '/log' + path + name}>{obj.name}</Link>
+        <Link to={tenant.linkPrefix + '/build/' + build.uuid + '/logs/' + (path+name).slice(1)}>
+          {obj.name}
+        </Link>
         &nbsp;&nbsp;
         (<a href={log_url + path + name}>raw</a>
         &nbsp;<span className="fa fa-external-link"/>)
@@ -58,7 +61,7 @@ const renderTree = (tenant, build, path, obj) => {
 class Manifest extends React.Component {
   static propTypes = {
     tenant: PropTypes.object.isRequired,
-    build: PropTypes.object.isRequired
+    build: PropTypes.object.isRequired,
   }
 
   render() {

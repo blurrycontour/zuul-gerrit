@@ -46,15 +46,16 @@ class LogFile extends React.Component {
     item: PropTypes.object,
     tenant: PropTypes.object,
     data: PropTypes.array,
+    filename: PropTypes.string,
     severity: PropTypes.string
   }
 
   render () {
-    const { build, data, severity } = this.props
+    const { data, severity, filename } = this.props
     return (
       <React.Fragment>
         <Panel>
-          <Panel.Heading>Build result {build.uuid}</Panel.Heading>
+          <Panel.Heading className="zuul-logfile-header">{filename}</Panel.Heading>
           <Panel.Body>
             <Link to="?">All</Link>&nbsp;
             <Link to="?severity=1">Debug</Link>&nbsp;
@@ -75,10 +76,8 @@ class LogFile extends React.Component {
                    <td className="line-number" onClick={updateSelection}>
                      {line.index}
                    </td>
-                   <td>
-                     <span className={'zuul-log-sev-'+(line.severity||0)}>
+                   <td className={'zuul-log-sev-'+(line.severity||0)}>
                        {line.text+'\n'}
-                     </span>
                    </td>
                  </tr>
                 )))}
