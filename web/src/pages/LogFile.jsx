@@ -29,6 +29,10 @@ class LogFilePage extends Refreshable {
     tenant: PropTypes.object,
   }
 
+  state = {
+    lines: []
+  }
+
   updateData = (force) => {
     this.props.dispatch(fetchLogfileIfNeeded(
       this.props.tenant,
@@ -42,15 +46,56 @@ class LogFilePage extends Refreshable {
     super.componentDidMount()
   }
 
+  saveSelection = (lines) => {
+    this.setState({lines: lines})
+  }
+
   componentDidUpdate () {
-    const line = this.props.location.hash.substring(1)
-    if (line) {
-      const element = document.getElementsByName(line)
-      if (element.length) {
-        const header = document.getElementsByClassName('navbar')
-        if (header.length) {
-          element[0].scrollIntoView()
-          window.scroll(0, window.scrollY - header[0].offsetHeight)
+    const lines = this.props.location.hash.substring(1).split('-').map(Number)
+    const getLine = (nr) => {
+      return document.getElementsByName(nr)[0].parentNode.parentNode
+    }
+    const dehighlight = (lines) => {
+      let end = lines[0] + 1
+      if (lines.length > 1) {
+        end = lines[1]
+      }
+      for (let idx = lines[0]; idx <= end; idx++) {
+        getLine(idx).classList.remove('highlight')
+      }
+    }
+    if (lines.length > 0) {
+      const element = document.getElementsByName(lines[0])
+      // Lines are loaded
+      if (element.length > 0) {
+        if (this.state.lines.length === 0) {
+          // Take note of the selected line
+          this.saveSelection(lines)
+        } else {
+          if (this.state.lines[0] !== lines[0] ||
+              this.state.lines[1] !== lines[1]) {
+            // Reset selection
+            dehighlight(this.state.lines)
+            this.saveSelection(lines)
+          } else {
+            // Add highlight to the selected line
+            const lineElem = getLine(lines[0])
+            lineElem.classList.add('highlight')
+
+            // Move line into view
+            const header = document.getElementsByClassName('navbar')
+            if (header.length) {
+              element[0].scrollIntoView()
+              window.scroll(0, window.scrollY - header[0].offsetHeight)
+            }
+
+            // Add highlight to the selection range
+            if (lines.length > 1 && lines[1] > lines[0]) {
+              for (let idx = lines[0]; idx <= lines[1]; idx++) {
+                getLine(idx).classList.add('highlight')
+              }
+            }
+          }
         }
       }
     }
