@@ -33,6 +33,7 @@ git_dir=/var/lib/zuul/git
 default_username=zuul
 trusted_ro_paths=/opt/zuul-scripts:/var/cache
 trusted_rw_paths=/opt/zuul-logs
+merge_jobs=true
 
 [web]
 listen_address=127.0.0.1
