@@ -98,7 +98,8 @@ class GerritEventConnector(threading.Thread):
             event.change_url = change.get('url')
             patchset = data.get('patchSet')
             if patchset:
-                event.patch_number = str(patchset.get('number'))
+                if patchset.get('number'):
+                    event.patch_number = str(patchset['number'])
                 event.ref = patchset.get('ref')
             event.approvals = data.get('approvals', [])
             event.comment = data.get('comment')
