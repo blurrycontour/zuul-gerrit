@@ -15,17 +15,21 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { parse } from 'query-string'
 
 import { fetchBuildIfNeeded } from '../actions/build'
+import { fetchLogfileIfNeeded } from '../actions/logfile'
 import Refreshable from '../containers/Refreshable'
 import Build from '../containers/build/Build'
 import Manifest from '../containers/build/Manifest'
+import LogFile from '../containers/logfile/LogFile'
 
 
 class BuildLogsPage extends Refreshable {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
+    logFile: PropTypes.object,
     tenant: PropTypes.object
   }
 
@@ -39,9 +43,20 @@ class BuildLogsPage extends Refreshable {
     super.componentDidMount()
   }
 
+  selectLogfile = (build, path) => {
+    console.log('fetch', path)
+    this.props.dispatch(fetchLogfileIfNeeded(
+      this.props.tenant,
+      build,
+      path,
+      false))
+  }
+
   render () {
-    const { remoteData } = this.props
+    const { remoteData, logFile } = this.props
     const build = remoteData.builds[this.props.match.params.buildId]
+    const severity = parse(this.props.location.search).severity
+    console.log('page props', this.props)
     return (
       <React.Fragment>
         <div style={{float: 'right'}}>
@@ -49,8 +64,9 @@ class BuildLogsPage extends Refreshable {
         </div>
         {build && build.manifest &&
          <Build build={build} active='logs'>
-           <Manifest tenant={this.props.tenant} build={build}/>
+           <Manifest select={this.selectLogfile} tenant={this.props.tenant} build={build}/>
          </Build>}
+        {logFile.data && <LogFile build={build} data={logFile.data} severity={severity}/>}
       </React.Fragment>
     )
   }
@@ -59,4 +75,5 @@ class BuildLogsPage extends Refreshable {
 export default connect(state => ({
   tenant: state.tenant,
   remoteData: state.build,
+  logFile: state.logfile,
 }))(BuildLogsPage)
