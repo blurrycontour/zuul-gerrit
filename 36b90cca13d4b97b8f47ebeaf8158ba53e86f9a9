@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_c1fa85b8",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 492,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-16T14:53:48Z",
+      "side": 1,
+      "message": "There should always be a parent layout -- can you supply any more information about how this error occurred?\n\nAlso, did this happen in \u003e3.10.0 (after commit 0fc385ebed38f8d49d275bf39403b723a462e649)?",
+      "revId": "36b90cca13d4b97b8f47ebeaf8158ba53e86f9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
