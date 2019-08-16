@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_48c5518d",
+        "filename": "web/src/actions/build.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-16T23:28:37Z",
+      "side": 1,
+      "message": "Here we check that failed_when_result is in task before accessing it and also we return false if !failed_when_result is true.\n\nBelow we don\u0027t check if it is set first and we return false when failed_when_result is true. Can we simplify this by replacing this condition with if failed_when_result in task\nor is there a bug in the condition below?",
+      "revId": "6d28b9634862e2c26e8d810668556fcb9a9d68cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
