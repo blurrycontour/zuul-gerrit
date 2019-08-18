@@ -541,11 +541,12 @@ class BitbucketConnection(BaseConnection):
         bslug = self.getBranchSlug(fromProj, pr.get('fromRef')
                                    .get('id'))
         pull.patchset = self.getBranchSha(fromProj, bslug)
-        b = pr.get('fromRef').get('id')
+        b = pr.get('toRef').get('id')
         if b.startswith('refs/heads/'):
             pull.branch = b[len('refs/heads/'):]
         else:
             pull.branch = b
+        pull.ref = pr.get('fromRef').get('id')
         pull.title = pr.get('title')
         pull.uri = '{}/project/{}/repos/{}/pull-requests/{}/overview'\
             .format(self.base_url, project, repo, id)
@@ -555,9 +556,6 @@ class BitbucketConnection(BaseConnection):
 
         pull.files = [file.get('path').get('toString')
                       for file in pri.get('values')]
-        pull._files = [{'path': file.get('path').get('toString'),
-                       'hash': file.get('contentId')}
-                       for file in pri.get('values')]
 
         pull.url = '{}/projects/{}/repos/{}/browse'.format(self.base_url,
                                                            project, repo)
