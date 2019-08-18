@@ -538,7 +538,11 @@ class BitbucketConnection(BaseConnection):
                                   .get('project').get('key'),
                                   pr.get('fromRef').get('repository')
                                   .get('slug'))
-        bslug = self.getBranchSlug(fromProj, pr.get('fromRef')
+        toProj = '{}/{}'.format(pr.get('toRef').get('repository')
+                                .get('project').get('key'),
+                                pr.get('toRef').get('repository')
+                                .get('slug'))
+        bslug = self.getBranchSlug(toProj, pr.get('toRef')
                                    .get('id'))
         pull.patchset = self.getBranchSha(fromProj, bslug)
         b = pr.get('fromRef').get('id')
