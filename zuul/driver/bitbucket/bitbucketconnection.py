@@ -541,7 +541,7 @@ class BitbucketConnection(BaseConnection):
         bslug = self.getBranchSlug(fromProj, pr.get('fromRef')
                                    .get('id'))
         pull.patchset = self.getBranchSha(fromProj, bslug)
-        b = pr.get('fromRef').get('id')
+        b = pr.get('toRef').get('id')
         if b.startswith('refs/heads/'):
             pull.branch = b[len('refs/heads/'):]
         else:
