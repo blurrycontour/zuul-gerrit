@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_5c8513ac",
+        "filename": "doc/source/admin/drivers/bitbucket.rst",
+        "patchSetId": 70
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 8334
+      },
+      "writtenOn": "2019-08-18T15:30:56Z",
+      "side": 1,
+      "message": "Can you mysql reporter here similar to https://zuul-ci.org/docs/zuul/admin/quick-start.html ?",
+      "revId": "7c410f8a407396d965a6db6ccb0d22d07577edf8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
