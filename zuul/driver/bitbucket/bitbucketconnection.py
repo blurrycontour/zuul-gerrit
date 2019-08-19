@@ -524,9 +524,9 @@ class BitbucketConnection(BaseConnection):
 
         pri = self.getPRInventory(project, repo, id)
 
-        project = self.getProject('{}/{}'.format(project, repo))
-        pull = PullRequest(project.name)
-        pull.project = project
+        proj = self.getProject('{}/{}'.format(project, repo))
+        pull = PullRequest(proj.name)
+        pull.project = proj
         pull.id = id
         pull.number = id
         pull.pr_version = pr.get('version')
@@ -559,8 +559,8 @@ class BitbucketConnection(BaseConnection):
                        'hash': file.get('contentId')}
                        for file in pri.get('values')]
 
-        pull.url = '{}/projects/{}/repos/{}/browse'.format(self.base_url,
-                                                           project, repo)
+        pull.url = '{}/project/{}/repos/{}/pull-requests/{}/overview'\
+            .format(self.base_url, project, repo, id)
 
         if cache:
             self.cachePR(pull)
