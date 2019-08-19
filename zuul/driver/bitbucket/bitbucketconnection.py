@@ -263,7 +263,7 @@ class BitbucketWatcher(threading.Thread):
                     tags = self.bitbucket_con.getProjectTags(p)
                     self._handleTags(project, tags)
 
-        except Exception as e:
+        except BaseException as e:
             self.log.error("Unexpected issue in _run loop: {}"
                            .format(str(e)), exc_info=True)
 
@@ -273,7 +273,7 @@ class BitbucketWatcher(threading.Thread):
             if not self.bitbucket_con.pause_watcher:
                 self._run()
             else:
-                self.log.debug("Watcher is paused")
+                self.log.debug("Bitbucket Watcher is paused")
             time.sleep(self.poll_delay)
 
     # core event loop, no unittest
@@ -559,8 +559,8 @@ class BitbucketConnection(BaseConnection):
                        'hash': file.get('contentId')}
                        for file in pri.get('values')]
 
-        pull.url = '{}/projects/{}/repos/{}/browse'.format(self.base_url,
-                                                           project, repo)
+        pull.uri = '{}/project/{}/repos/{}/pull-requests/{}/overview'\
+            .format(self.base_url, project, repo, id)
 
         if cache:
             self.cachePR(pull)
