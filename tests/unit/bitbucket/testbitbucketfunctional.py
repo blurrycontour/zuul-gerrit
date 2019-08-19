@@ -36,7 +36,7 @@ class TestBitbucketFunctional(ZuulTestCase):
         zuulvars = job.parameters['zuul']
         self.assertEqual(str(A.number), zuulvars['change'])
         self.assertEqual(str(A.head), zuulvars['patchset'])
-        self.assertEqual('foobar', zuulvars['branch'])
+        self.assertEqual('master', zuulvars['branch'])
         self.assertEqual(zuulvars["message"], initial_comment)
         self.assertEqual(2, len(self.history))
         self.assertEqual(1, len(A.comments))
