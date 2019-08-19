@@ -2786,9 +2786,9 @@ class FakeBitbucketPullRequest():
 
     def addCommit(self, files):
         self.lastUpdated = int(time.time() * 1000)
-        self._addCommitInPR(files)
+        self._addCommitInPR(files=files)
 
-    def _addCommitInPR(self, files=[], reset=False):
+    def _addCommitInPR(self, files=None, reset=False):
         repo = self._getRepo()
         ref = repo.references[self.getPRReference()]
         if reset:
@@ -2839,65 +2839,23 @@ class FakeBitbucketClient():
             prs = self.con.pull_requests.get('{}/{}'.format(project, repo),
                                              {}).values()
 
-            branches = [{
-                'id': 'refs/heads/{}'.format(pr.source_branch),
-                'displayId': pr.source_branch,
-                'type': 'BRANCH',
-                'latestCommit': pr.head,
-                'latestChangeSet': pr.head,
-                'isDefault': False,
-            } for pr in prs]
+            prorepo = '{}/{}'.format(project, repo)
 
-            if project == 'project' and repo == 'repo':
-                gr = git.Repo(os.path.join(self.con.cloneurl,
-                                           'project/repo'))
-                for head in gr.heads:
-                    if head.name == 'master':
-                        continue
-                    branches.append({
-                        "id": "refs/heads/{}".format(head.name),
-                        "displayId": head.name,
-                        "type": "BRANCH",
-                        "latestCommit": head.commit.hexsha,
-                        "latestChangeset": head.commit.hexsha,
-                        "isDefault": False
-                    })
-
+            branches = []
             gr = git.Repo(os.path.join(self.con.cloneurl,
-                                       '{}/{}'.format(project, repo)))
+                                       prorepo))
             for head in gr.heads:
-                sha = head.commit.hexsha
-                bname = head.name
-                if bname != 'master':
-                    continue
+                is_default = False
+                if head.name == 'master':
+                    is_default = True
                 branches.append({
-                    "id": "refs/heads/{}".format(bname),
-                    "displayId": bname,
+                    "id": "refs/heads/{}".format(head.name),
+                    "displayId": head.name,
                     "type": "BRANCH",
-                    "latestCommit": sha,
-                    "latestChangeset": sha,
-                    "isDefault": True
+                    "latestCommit": head.commit.hexsha,
+                    "latestChangeset": head.commit.hexsha,
+                    "isDefault": is_default
                 })
-
-            if project == 'org' and repo == 'common-config':
-
-                gr = git.Repo(os.path.join(self.con.cloneurl,
-                                           'org/common-config'))
-
-                for head in gr.heads:
-                    sha = head.commit.hexsha
-                    bname = head.name
-                    if bname == 'master':
-                        continue
-
-                    branches.append({
-                        "id": "refs/heads/{}".format(bname),
-                        "displayId": bname,
-                        "type": "BRANCH",
-                        "latestCommit": sha,
-                        "latestChangeset": sha,
-                        "isDefault": False
-                    })
 
             r = {
                 'size': 1,
