@@ -38,7 +38,6 @@ class BuildLogsPage extends Refreshable {
   }
 
   state = {
-    displayedFile: null,
     lines: [],
     initialScroll: false,
     initialLogfileHeaderScroll: true,
@@ -46,7 +45,6 @@ class BuildLogsPage extends Refreshable {
 
   updateData = (force) => {
     if (this.props.match.params.file) {
-      this.setState({displayedFile: this.props.match.params.file})
       this.props.dispatch(fetchLogfileIfNeeded(
         this.props.tenant,
         this.props.match.params.buildId,
@@ -105,7 +103,7 @@ class BuildLogsPage extends Refreshable {
     this.setState({initialLogFileHeaderScroll: val})
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate (prevProps, prevState) {
     if (this.props.match.params.file !== prevProps.match.params.file) {
       this.updateData()
       this.setScrollToLogFile(false)
@@ -114,8 +112,9 @@ class BuildLogsPage extends Refreshable {
       if (element.length) {
         const header = document.getElementsByClassName('navbar')
         if (header.length) {
+          console.log('scroll')
           element[0].scrollIntoView()
-          window.scroll(0, window.scrollY - header[0].offsetHeight - 8)
+          window.scroll(0, window.scrollY - header[0].offsetHeight - 80)
           this.setScrollToLogFile(true)
         }
       }
@@ -137,6 +136,7 @@ class BuildLogsPage extends Refreshable {
         this.highlightDidUpdate(lines)
       }
     }
+    console.log('update done')
   }
 
   renderSpinner () {
@@ -150,7 +150,9 @@ class BuildLogsPage extends Refreshable {
   render () {
     const { remoteData, logfile } = this.props
     const build = remoteData.builds[this.props.match.params.buildId]
+    const filename = this.props.match.params.file
     const severity = parse(this.props.location.search).severity
+    console.log('render', filename)
     return (
       <React.Fragment>
         <div style={{float: 'right'}}>
@@ -160,10 +162,12 @@ class BuildLogsPage extends Refreshable {
          <Build build={build} active='logs'>
            <Manifest tenant={this.props.tenant} build={build}/>
          </Build>}
-        {logfile.buildLogfiles[this.state.displayedFile] &&
-         <LogFile build={build}
-                  data={logfile.buildLogfiles[this.state.displayedFile]}
-                  filename={this.state.displayedFile}
+        {logfile.buildLogfiles[filename] &&
+         <LogFile
+           key={filename}
+           build={build}
+                  data={logfile.buildLogfiles[filename]}
+                  filename={filename}
                   severity={severity}/>}
       </React.Fragment>
     )
