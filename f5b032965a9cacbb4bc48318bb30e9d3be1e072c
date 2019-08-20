@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_001e2c6f",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-20T13:52:39Z",
+      "side": 1,
+      "message": "This is made obsolete by the next patch.",
+      "revId": "f5b032965a9cacbb4bc48318bb30e9d3be1e072c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
