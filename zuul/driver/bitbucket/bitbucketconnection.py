@@ -386,7 +386,7 @@ class BitbucketConnection(BaseConnection):
 
         self.pause_watcher = False
 
-        self.poll_delay = 60
+        self.poll_delay = 5
 
         self.poll_branches = True
         self.poll_tags = True

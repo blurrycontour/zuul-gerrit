@@ -108,7 +108,8 @@ class TestSchedulerZone(ZuulTestCase):
 
 
 class TestScheduler(ZuulTestCase):
-    tenant_config_file = 'config/single-tenant/main.yaml'
+    #tenant_config_file = 'config/single-tenant/main.yaml'
+    config_file = 'zuul-bitbucket-driver.conf'
 
     def test_jobs_executed(self):
         "Test that jobs are executed and a change is merged"
@@ -1088,28 +1089,50 @@ class TestScheduler(ZuulTestCase):
         a = source.getChange(event, refresh=True)
         self.assertTrue(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
+    @simple_layout('layouts/bitbucket-gate.yaml', driver='bitbucket')
     def test_project_merge_conflict(self):
         "Test that gate merge conflicts are handled properly"
 
+        initial_comment = "This is the\nPR description."
         self.gearman_server.hold_jobs_in_queue = True
-        A = self.fake_gerrit.addFakeChange('org/project',
-                                           'master', 'A',
-                                           files={'conflict': 'foo'})
-        B = self.fake_gerrit.addFakeChange('org/project',
-                                           'master', 'B',
-                                           files={'conflict': 'bar'})
-        C = self.fake_gerrit.addFakeChange('org/project',
-                                           'master', 'C')
-        A.addApproval('Code-Review', 2)
-        B.addApproval('Code-Review', 2)
-        C.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        #A = self.fake_gerrit.addFakeChange('org/project',
+        #                                   'master', 'A',
+        #                                   files={'conflict': 'foo'})
+        A = self.fake_bitbucket.openFakePullRequest(
+            'project/repo', 'A test', 'master', 'pr-a',
+            description=initial_comment)
+        A.addCommit(files={'conflict': 'foo'})
+        A.review()
+        self.fake_bitbucket.runWatcher()
         self.waitUntilSettled()
+        #B = self.fake_gerrit.addFakeChange('org/project',
+        #                                   'master', 'B',
+        #                                   files={'conflict': 'bar'})
+        B = self.fake_bitbucket.openFakePullRequest(
+            'project/repo', 'B test', 'master', 'pr-b',
+            description=initial_comment)
+        B.addCommit(files={'conflict': 'bar'})
+        B.review()
+        self.fake_bitbucket.runWatcher()
+        self.waitUntilSettled()
+        #C = self.fake_gerrit.addFakeChange('org/project',
+        #                                   'master', 'C')
+        C = self.fake_bitbucket.openFakePullRequest(
+            'project/repo', 'C test', 'master', 'pr-c',
+            description=initial_comment)
+        C.review()
+        self.fake_bitbucket.runWatcher()
+        self.waitUntilSettled()
+        #A.addApproval('Code-Review', 2)
+        #B.addApproval('Code-Review', 2)
+        #C.addApproval('Code-Review', 2)
+        #self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        #self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        #self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        #self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 1)
-        self.assertEqual(C.reported, 1)
+        #self.assertEqual(A.reported, 1)
+        #self.assertEqual(C.reported, 1)
 
         self.gearman_server.release('project-merge')
         self.waitUntilSettled()
@@ -1122,13 +1145,14 @@ class TestScheduler(ZuulTestCase):
         self.gearman_server.release()
         self.waitUntilSettled()
 
-        self.assertEqual(A.data['status'], 'MERGED')
-        self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(C.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
-        self.assertIn('Merge Failed', B.messages[-1])
-        self.assertEqual(C.reported, 2)
+        self.assertEqual(A.open, False)
+        self.assertEqual(B.open, True)
+        self.assertEqual(C.open, False)
+        #self.assertEqual(A.reported, 2)
+        self.assertIn('Merge Failed', B.comments[-1])
+        #self.assertEqual(C.reported, 2)
 
+        # This still needs to be updated for bitbucket, but we don't get this far
         self.assertHistory([
             dict(name='project-merge', result='SUCCESS', changes='1,1'),
             dict(name='project-test1', result='SUCCESS', changes='1,1'),
