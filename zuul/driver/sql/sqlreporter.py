@@ -61,6 +61,9 @@ class SQLReporter(BaseReporter):
                     # stats about builds. It doesn't understand how to store
                     # information about the change.
                     continue
+                # Ensure start_time is defined
+                if not build.start_time:
+                    build.start_time = time.time()
                 # Ensure end_time is defined
                 if not build.end_time:
                     build.end_time = time.time()
