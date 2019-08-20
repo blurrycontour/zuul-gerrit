@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_b3c77145",
+        "filename": "doc/source/user/howtos/test-jobs.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-20T16:15:02Z",
+      "side": 1,
+      "message": "Simply using the parent job as it is w/o overwriting the run playbook is also an option I think. And if pre/post tasks need to done in order to prepare the test env why not using the child pre-run and post-run ?",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 19
+      },
+      "revId": "17082c1ce88c886830f071412c3a3f6e0551245c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
