@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_3b427d3c",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-20T13:56:22Z",
+      "side": 1,
+      "message": "We call this system, where check jobs must be run to completion before gate \"clean check\".  It should not be necessary for most projects, but the OpenStack project wanted it (because the gate queue is so long that people could not be relied upon not to enqueue flaky changes).\n\nWe no longer use this in the Zuul tenant.  I think we should recommend our own configuration to new users, as the workflow where gate supercedes check is much nicer.  See our config at:\nhttps://opendev.org/zuul/project-config/src/branch/master/zuul.d/pipelines.yaml",
+      "revId": "02ca1c5dfdadaefc06c638ee3958326bbb6255b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_7f4c9ac7",
         "filename": "doc/source/admin/examples/zuul-config/zuul.d/gerrit-reference-pipelines.yaml",
         "patchSetId": 1
