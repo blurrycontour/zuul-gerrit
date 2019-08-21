@@ -2449,6 +2449,7 @@ class ExecutorServer(object):
             self.executor_jobs,
             worker_class=ExecutorExecuteWorker,
             worker_args=[self])
+        self.log_streamer_manager = None
 
     def _getMerger(self, root, cache_root, logger=None):
         return zuul.merger.merger.Merger(
@@ -2514,6 +2515,9 @@ class ExecutorServer(object):
         # Stop accepting new jobs
         self.merger_gearworker.gearman.setFunctions([])
         self.executor_gearworker.gearman.setFunctions([])
+        # Stop the log streamer management thread
+        if self.log_streamer_manager:
+            self.log_streamer_manager.stop()
         # Tell the executor worker to abort any jobs it just accepted,
         # and grab the list of currently running job workers.
         with self.run_lock:
