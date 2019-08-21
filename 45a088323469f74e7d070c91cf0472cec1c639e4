@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_25d6b6c4",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-21T22:13:08Z",
+      "side": 1,
+      "message": "Does this need to be a daemon thread?",
+      "revId": "45a088323469f74e7d070c91cf0472cec1c639e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_65e90e7d",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-21T22:13:08Z",
+      "side": 1,
+      "message": "Might want to make this\n\n  if pid \u003d\u003d self._log_streamer_pid\n\nSo that we are sure this is the child that died.",
+      "revId": "45a088323469f74e7d070c91cf0472cec1c639e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
