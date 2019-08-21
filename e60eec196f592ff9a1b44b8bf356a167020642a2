@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_f1cab617",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 686,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2019-08-21T07:05:42Z",
+      "side": 1,
+      "message": "four",
+      "range": {
+        "startLine": 686,
+        "startChar": 65,
+        "endLine": 686,
+        "endChar": 67
+      },
+      "revId": "e60eec196f592ff9a1b44b8bf356a167020642a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_b1d0bec9",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2019-08-21T07:05:42Z",
+      "side": 1,
+      "message": "four",
+      "range": {
+        "startLine": 687,
+        "startChar": 46,
+        "endLine": 687,
+        "endChar": 47
+      },
+      "revId": "e60eec196f592ff9a1b44b8bf356a167020642a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_114c32c6",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2019-08-21T07:05:42Z",
+      "side": 1,
+      "message": "better use \"Fox example\" here for clarity",
+      "range": {
+        "startLine": 687,
+        "startChar": 66,
+        "endLine": 687,
+        "endChar": 71
+      },
+      "revId": "e60eec196f592ff9a1b44b8bf356a167020642a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_3147eea5",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 688,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2019-08-21T07:05:42Z",
+      "side": 1,
+      "message": "two - and later \"10\"",
+      "range": {
+        "startLine": 688,
+        "startChar": 23,
+        "endLine": 688,
+        "endChar": 24
+      },
+      "revId": "e60eec196f592ff9a1b44b8bf356a167020642a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
