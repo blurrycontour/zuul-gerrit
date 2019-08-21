@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_85f0ca68",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-08-21T22:12:55Z",
+      "side": 1,
+      "message": "Adding suggestion here, based on IRC.\n\n  corvus | i\u0027m thinking we should maybe make that say \"job-name (2 retries)\"\n  corvus | or \"job-name (2nd attempt)\" \n\nAs I wasn\u0027t sure what the number between ( ) was",
+      "range": {
+        "startLine": 239,
+        "startChar": 30,
+        "endLine": 239,
+        "endChar": 49
+      },
+      "revId": "4fac5c41b962bd09ca1ebe353595bdf8c545e15c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
