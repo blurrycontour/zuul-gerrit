@@ -18,11 +18,59 @@ import logging
 import os
 import sys
 import signal
+import threading
+import time
 
 import zuul.cmd
 import zuul.executor.server
 
 from zuul.lib.config import get_default
+
+
+class LogStreamerManager(object):
+    def __init__(self, finger_port, job_dir):
+        self._log_streamer_pid = None
+        self.log = logging.getLogger("zuul.Executor.LogStreamerManager")
+        self.finger_port = finger_port
+        self.job_dir = job_dir
+
+    def start(self):
+        self.thread = threading.Thread(
+            target=self._run, name='log-streamer-manager', daemon=True,
+        )
+        self.thread.start()
+
+    def _run(self):
+        while True:
+            self._start_log_streamer()
+            while self._log_streamer_pid:
+                time.sleep(5)
+                pid, rc = os.waitpid(self._log_streamer_pid, os.WNOHANG)
+                if pid == self._log_streamer_pid:
+                    # TODO does this leak the control pipe?
+                    self._log_streamer_pid = None
+
+    def _start_log_streamer(self):
+        pipe_read, pipe_write = os.pipe()
+        child_pid = os.fork()
+        if child_pid == 0:
+            os.close(pipe_write)
+            import zuul.lib.log_streamer
+
+            self.log.info("Starting log streamer")
+            streamer = zuul.lib.log_streamer.LogStreamer(
+                '::', self.finger_port, self.job_dir
+            )
+
+            # Keep running until the parent dies:
+            pipe_read = os.fdopen(pipe_read)
+            pipe_read.read()
+            self.log.info("Stopping log streamer")
+            streamer.stop()
+            os._exit(0)
+        else:
+            os.close(pipe_read)
+            self._log_streamer_pid = child_pid
 
 
 class Executor(zuul.cmd.ZuulDaemonApp):
@@ -48,27 +96,6 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         self.executor.stop()
         self.executor.join()
         sys.exit(0)
-
-    def start_log_streamer(self):
-        pipe_read, pipe_write = os.pipe()
-        child_pid = os.fork()
-        if child_pid == 0:
-            os.close(pipe_write)
-            import zuul.lib.log_streamer
-
-            self.log.info("Starting log streamer")
-            streamer = zuul.lib.log_streamer.LogStreamer(
-                '::', self.finger_port, self.job_dir)
-
-            # Keep running until the parent dies:
-            pipe_read = os.fdopen(pipe_read)
-            pipe_read.read()
-            self.log.info("Stopping log streamer")
-            streamer.stop()
-            os._exit(0)
-        else:
-            os.close(pipe_read)
-            self.log_streamer_pid = child_pid
 
     def run(self):
         if self.args.command in zuul.executor.server.COMMANDS:
@@ -97,7 +124,10 @@ class Executor(zuul.cmd.ZuulDaemonApp):
                         zuul.executor.server.DEFAULT_FINGER_PORT)
         )
 
-        self.start_log_streamer()
+        self.log_streamer_manager = LogStreamerManager(
+            self.finger_port, self.job_dir
+        )
+        self.log_streamer_manager.start()
 
         ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, self.connections,
