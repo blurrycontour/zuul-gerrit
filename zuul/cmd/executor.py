@@ -18,11 +18,54 @@ import logging
 import os
 import sys
 import signal
+import threading
+import time
 
 import zuul.cmd
 import zuul.executor.server
 
 from zuul.lib.config import get_default
+
+
+class LogStreamerManager(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        super(LogStreamerManager, self).__init__(*args, **kwargs)
+        self.daemon = True
+        self._log_streamer_pid = None
+        self.log = logging.getLogger("zuul.Executor.LogStreamerManager")
+
+    def run(self):
+        self._start_log_streamer()
+        while True:
+            time.sleep(5)
+            pid, rc = os.waitpid(self._log_streamer_pid, os.WNOHANG)
+            if pid == self._log_streamer_pid:
+                # Exit and force system level service management to restart
+                # the service.
+                self.log.error("Log streaming proxy died. Stopping Executor.")
+                # TODO does this shutdown need to be more graceful?
+                os._exit(2)
+
+    def _start_log_streamer(self):
+        pipe_read, pipe_write = os.pipe()
+        child_pid = os.fork()
+        if child_pid == 0:
+            os.close(pipe_write)
+            import zuul.lib.log_streamer
+
+            self.log.info("Starting log streamer")
+            streamer = zuul.lib.log_streamer.LogStreamer(
+                '::', self.finger_port, self.job_dir)
+
+            # Keep running until the parent dies:
+            pipe_read = os.fdopen(pipe_read)
+            pipe_read.read()
+            self.log.info("Stopping log streamer")
+            streamer.stop()
+            os._exit(0)
+        else:
+            os.close(pipe_read)
+            self._log_streamer_pid = child_pid
 
 
 class Executor(zuul.cmd.ZuulDaemonApp):
@@ -48,27 +91,6 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         self.executor.stop()
         self.executor.join()
         sys.exit(0)
-
-    def start_log_streamer(self):
-        pipe_read, pipe_write = os.pipe()
-        child_pid = os.fork()
-        if child_pid == 0:
-            os.close(pipe_write)
-            import zuul.lib.log_streamer
-
-            self.log.info("Starting log streamer")
-            streamer = zuul.lib.log_streamer.LogStreamer(
-                '::', self.finger_port, self.job_dir)
-
-            # Keep running until the parent dies:
-            pipe_read = os.fdopen(pipe_read)
-            pipe_read.read()
-            self.log.info("Stopping log streamer")
-            streamer.stop()
-            os._exit(0)
-        else:
-            os.close(pipe_read)
-            self.log_streamer_pid = child_pid
 
     def run(self):
         if self.args.command in zuul.executor.server.COMMANDS:
@@ -97,7 +119,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
                         zuul.executor.server.DEFAULT_FINGER_PORT)
         )
 
-        self.start_log_streamer()
+        self.log_streamer_manager = LogStreamerManager()
+        self.log_streamer_manager.start()
 
         ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, self.connections,
