@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_b78ba41c",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 683,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-22T22:46:48Z",
+      "side": 1,
+      "message": "Nit the default value is:\n\n  cpu_count * load_multiplier above.\n\nAs a result you can manipulate this value via load_multiplier instead. However I think this new option will be easier for people to understand.",
+      "revId": "35e0bc9b6e496cab874b57b53c6d4a7e9d3f2518",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
