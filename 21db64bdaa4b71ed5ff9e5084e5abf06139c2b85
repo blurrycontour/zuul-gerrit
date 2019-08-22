@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_37f254e5",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-22T22:41:09Z",
+      "side": 1,
+      "message": "Does it make sense to keep the remote and have it default to origin? That may be useful to push code to multiple locations?\n\nAdditionally I think you can push to any ref so \"branch\" may not be the best parameter name here.",
+      "revId": "21db64bdaa4b71ed5ff9e5084e5abf06139c2b85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_171e380d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-22T22:41:09Z",
+      "side": 1,
+      "message": "I know one of the reasons why people want zuul to push changes back is to preserve commit ids between what was tested and what gets merged into the canonical repo.\n\nI don\u0027t think we can do a new merge if we want that behavior. That said because the mergers are distributed there is no guarantee that the merger that gets the push job will have previously merged the commit for testing.\n\nThat is a long winded way of saying I think we should consider how we might accomplish this functionality, but it probably isn\u0027t necessary for the first pass.",
+      "revId": "21db64bdaa4b71ed5ff9e5084e5abf06139c2b85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
