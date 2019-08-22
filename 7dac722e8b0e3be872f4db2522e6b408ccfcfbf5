@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_5a5617d1",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-22T23:56:09Z",
+      "side": 1,
+      "message": "This comment is no longer accurate.",
+      "revId": "7dac722e8b0e3be872f4db2522e6b408ccfcfbf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_5ab29708",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-22T23:56:09Z",
+      "side": 1,
+      "message": "The comment here mentions bytes however we have opened the file in text mode.\n\nIf we opened the file in byte mode we would be able to replace these two seeks with:\n\n  outfile.seek(-3, 2)\n\nHowever json supports utf8 so I guess opening in text mode is safest for that.",
+      "revId": "7dac722e8b0e3be872f4db2522e6b408ccfcfbf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
