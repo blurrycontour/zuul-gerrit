@@ -22,6 +22,30 @@
       "revId": "17082c1ce88c886830f071412c3a3f6e0551245c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_3ae6d4b1",
+        "filename": "doc/source/user/howtos/test-jobs.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-22T02:04:03Z",
+      "side": 1,
+      "message": "Child job pre/post are going to happen after the pre and before the post of the parent. It seems like the simplest usage for a test job is to do the test in run phase.",
+      "parentUuid": "7faddb67_b3c77145",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 19
+      },
+      "revId": "17082c1ce88c886830f071412c3a3f6e0551245c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
