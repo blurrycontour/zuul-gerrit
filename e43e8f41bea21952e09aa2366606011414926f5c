@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_c66562e4",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1462,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-08-22T09:08:13Z",
+      "side": 1,
+      "message": "I left the debug messages here in case this needs to be debugged again. Not sure if it\u0027s ok to have \"\\n\" here.",
+      "revId": "e43e8f41bea21952e09aa2366606011414926f5c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
