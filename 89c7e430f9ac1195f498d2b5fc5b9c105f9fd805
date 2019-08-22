@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_77b8cfe7",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-22T19:50:57Z",
+      "side": 1,
+      "message": "These vars need to be defined.",
+      "range": {
+        "startLine": 56,
+        "startChar": 22,
+        "endLine": 56,
+        "endChar": 52
+      },
+      "revId": "89c7e430f9ac1195f498d2b5fc5b9c105f9fd805",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
