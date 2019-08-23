@@ -232,7 +232,8 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
    .. attr:: log_config
 
-      Path to log config file for internal Gearman server.
+      Path to log config file for internal Gearman server. See
+      :ref:`logging` for additional information.
 
    .. attr:: ssl_ca
 
@@ -291,7 +292,8 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
    .. attr:: log_config
 
-      Path to log config file.
+      Path to log config file. See :ref:`logging` for additional
+      information.
 
    .. attr:: pidfile
       :default: /var/run/zuul/scheduler.pid
@@ -421,7 +423,8 @@ The following section of ``zuul.conf`` is used by the merger:
 
    .. attr:: log_config
 
-      Path to log config file for the merger process.
+      Path to log config file for the merger process. See
+      :ref:`logging` for additional information.
 
    .. attr:: pidfile
       :default: /var/run/zuul/merger.pid
@@ -552,7 +555,8 @@ The following sections of ``zuul.conf`` are used by the executor:
 
    .. attr:: log_config
 
-      Path to log config file for the executor process.
+      Path to log config file for the executor process. See
+      :ref:`logging` for additional information.
 
    .. attr:: pidfile
       :default: /var/run/zuul/executor.pid
@@ -801,7 +805,8 @@ sections of ``zuul.conf`` are used by the web server:
 
    .. attr:: log_config
 
-      Path to log config file for the web server process.
+      Path to log config file for the web server process. See
+      :ref:`logging` for additional information.
 
    .. attr:: pidfile
       :default: /var/run/zuul/web.pid
@@ -993,7 +998,8 @@ sections of ``zuul.conf`` are used by the web server:
 
    .. attr:: log_config
 
-      Path to log config file for the web server process.
+      Path to log config file for the web server process. See
+      :ref:`logging` for additional information.
 
 Finger Gateway
 --------------
@@ -1034,7 +1040,8 @@ sections of ``zuul.conf`` are used by the finger gateway:
 
    .. attr:: log_config
 
-      Path to log config file for the finger gateway process.
+      Path to log config file for the finger gateway process. See
+      :ref:`logging` for additional information.
 
    .. attr:: pidfile
       :default: /var/run/zuul/fingergw.pid
@@ -1061,3 +1068,19 @@ Operation
 
 To start the finger gateway, run ``zuul-fingergw``.  To stop it, kill the
 PID which was saved in the pidfile specified in the configuration.
+
+Logging
+-------
+
+Zuul components use the common Python ``logging`` module to perform
+service logging tasks. The path to optional logging configuration
+files is set with the ``log_config`` attributes described in various
+service-specific sections above. The logging configuration file
+format can be either:
+
+* the traditional ini python logging `configuration file format
+  <https://docs.python.org/3/library/logging.config.html#configuration-file-format>`_.
+
+* a `.yml` or `.yaml` suffixed file that will be parsed and loaded
+  as the newer `dictConfig format
+  <https://docs.python.org/3/library/logging.config.html#configuration-dictionary-schema>`_.
