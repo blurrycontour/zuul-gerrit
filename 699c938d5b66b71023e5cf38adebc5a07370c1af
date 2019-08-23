@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_8ab9927a",
+        "filename": "zuul/zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 620,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T14:36:31Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we at least log the exception here? I know that unlocking shouldn\u0027t fail, but if it does for some reason we have not trace in the logs.",
+      "revId": "699c938d5b66b71023e5cf38adebc5a07370c1af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
