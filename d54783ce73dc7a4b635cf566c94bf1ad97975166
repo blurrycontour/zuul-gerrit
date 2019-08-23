@@ -1,0 +1,159 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_14538b3b",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1783,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "If we want to log this we should make sure that the event id is attached to the log. Otherwise it\u0027s usefullness will be limited. To do this I would add an optional zuul_event_id member to this class (for reference see Build class) and annotate the logger accordingly.",
+      "revId": "d54783ce73dc7a4b635cf566c94bf1ad97975166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_541ee374",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1808,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "Regarding this log I\u0027m not sure if we should keep it as getDirectDependentJobs can be called very often and can potentially spam the log too much.",
+      "range": {
+        "startLine": 1802,
+        "startChar": 0,
+        "endLine": 1808,
+        "endChar": 62
+      },
+      "revId": "d54783ce73dc7a4b635cf566c94bf1ad97975166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_f42a6f8f",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1825,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "Same with this line.",
+      "range": {
+        "startLine": 1821,
+        "startChar": 0,
+        "endLine": 1825,
+        "endChar": 64
+      },
+      "revId": "d54783ce73dc7a4b635cf566c94bf1ad97975166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_cf00fc03",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2503,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "nit: yet",
+      "range": {
+        "startLine": 2503,
+        "startChar": 67,
+        "endLine": 2503,
+        "endChar": 70
+      },
+      "revId": "d54783ce73dc7a4b635cf566c94bf1ad97975166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_6fc8e8a7",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2510,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "There are more ways to signal a failed job like RETRY_LIMIT, POST_FAILURE. Think it would be safer to specifically name the results that are allowed for soft dependencies and work with this information later. As far as I can see the only state that would allow a soft dependency to run would be SKIPPED. Everything else is either failed or not finished yet.",
+      "range": {
+        "startLine": 2510,
+        "startChar": 38,
+        "endLine": 2510,
+        "endChar": 45
+      },
+      "revId": "d54783ce73dc7a4b635cf566c94bf1ad97975166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_0fc37459",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2602,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "This log will be emitted frequently for every item in every pipeline and thus can massively spam the logs. I think we should only log stuff here (and in findJobsToRun) when a state change happens.",
+      "range": {
+        "startLine": 2602,
+        "startChar": 24,
+        "endLine": 2602,
+        "endChar": 41
+      },
+      "revId": "d54783ce73dc7a4b635cf566c94bf1ad97975166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_af8b4015",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2634,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "This log line is mostly redundand to the line emitted in provisionNodes (Adding node request ... for job ...) which is emitted for every job in this list. I also think this could massively spam the logs with \u0027Found jobs to request []\u0027 if there are no jobs to request. The reason for this is that it\u0027s called regularly for every item in every pipeline during normal processing. So we should only log things here if we actually have to do stuff here.",
+      "range": {
+        "startLine": 2633,
+        "startChar": 0,
+        "endLine": 2634,
+        "endChar": 63
+      },
+      "revId": "d54783ce73dc7a4b635cf566c94bf1ad97975166",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
