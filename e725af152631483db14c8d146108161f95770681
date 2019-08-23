@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_a9002302",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2019-08-23T07:04:50Z",
+      "side": 1,
+      "message": "does this need to be sort of registered for the shutdown path (in executor/server.py)?  otherwise maybe this jumps in an kills the executor when it\u0027s shutting down?",
+      "revId": "e725af152631483db14c8d146108161f95770681",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
