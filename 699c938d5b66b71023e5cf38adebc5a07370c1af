@@ -16,6 +16,24 @@
       "revId": "699c938d5b66b71023e5cf38adebc5a07370c1af",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_05d4b3e8",
+        "filename": "zuul/zk.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 620,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-08-23T15:13:11Z",
+      "side": 1,
+      "message": "Been a while since I coded this now, but I think my intention was to avoid the noise of the unlock failing if the lock above was the reason for the exception. But I can think of a better way to handle that now.",
+      "parentUuid": "7faddb67_8ab9927a",
+      "revId": "699c938d5b66b71023e5cf38adebc5a07370c1af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
