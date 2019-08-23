@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_ed485d8b",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-23T18:06:22Z",
+      "side": 1,
+      "message": "The way the fork is done below that race should be avoided. The child log streamer process waits for the parent\u0027s pipe to close then shuts itself down. That should avoid this race. However, if we want belts and suspenders for this we can add a stop flag that the shutdown of the executor sets.",
+      "parentUuid": "7faddb67_544fc3bd",
+      "revId": "e725af152631483db14c8d146108161f95770681",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_74cd1f2f",
         "filename": "zuul/cmd/executor.py",
         "patchSetId": 2
