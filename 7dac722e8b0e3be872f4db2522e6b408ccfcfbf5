@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_fbbb420c",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-08-23T08:40:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_5a5617d1",
+      "revId": "7dac722e8b0e3be872f4db2522e6b408ccfcfbf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_5ab29708",
         "filename": "zuul/ansible/base/callback/zuul_json.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2019-08-22T23:56:09Z",
       "side": 1,
       "message": "The comment here mentions bytes however we have opened the file in text mode.\n\nIf we opened the file in byte mode we would be able to replace these two seeks with:\n\n  outfile.seek(-3, 2)\n\nHowever json supports utf8 so I guess opening in text mode is safest for that.",
+      "revId": "7dac722e8b0e3be872f4db2522e6b408ccfcfbf5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_5bbff6fb",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-08-23T08:40:46Z",
+      "side": 1,
+      "message": "Actually, I tried that, and you get:\n\nio.UnsupportedOperation: can\u0027t do nonzero end-relative seeks\n\nI don\u0027t think utf-8 multi-byte is relevant in this case because we\u0027re the ones writing the data and we know what it is. None of these characters are multi-byte, so we\u0027re in byte/char equiv land.",
+      "parentUuid": "7faddb67_5ab29708",
       "revId": "7dac722e8b0e3be872f4db2522e6b408ccfcfbf5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
