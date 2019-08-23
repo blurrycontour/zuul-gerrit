@@ -19,6 +19,75 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_3c0d6c8e",
+        "filename": "tests/fixtures/config/data-return/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "is this necessary?",
+      "range": {
+        "startLine": 87,
+        "startChar": 0,
+        "endLine": 88,
+        "endChar": 27
+      },
+      "revId": "4b4786236bcd3e386b41c832e91b5ae438e4dfa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_1c7f50df",
+        "filename": "tests/fixtures/config/data-return/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "debug leftover?",
+      "range": {
+        "startLine": 152,
+        "startChar": 0,
+        "endLine": 153,
+        "endChar": 27
+      },
+      "revId": "4b4786236bcd3e386b41c832e91b5ae438e4dfa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_bc6ddc2f",
+        "filename": "tests/fixtures/config/data-return/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T13:41:59Z",
+      "side": 1,
+      "message": "that should be removed probably",
+      "range": {
+        "startLine": 158,
+        "startChar": 14,
+        "endLine": 158,
+        "endChar": 30
+      },
+      "revId": "4b4786236bcd3e386b41c832e91b5ae438e4dfa8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_9ce02099",
         "filename": "zuul/model.py",
         "patchSetId": 1
