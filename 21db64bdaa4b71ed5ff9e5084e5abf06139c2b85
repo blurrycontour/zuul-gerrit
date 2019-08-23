@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_e3ecfabc",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2019-08-23T05:26:52Z",
+      "side": 1,
+      "message": "That sounds reasonable :), I will change it.",
+      "parentUuid": "7faddb67_37f254e5",
+      "revId": "21db64bdaa4b71ed5ff9e5084e5abf06139c2b85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_171e380d",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2019-08-22T22:41:09Z",
       "side": 1,
       "message": "I know one of the reasons why people want zuul to push changes back is to preserve commit ids between what was tested and what gets merged into the canonical repo.\n\nI don\u0027t think we can do a new merge if we want that behavior. That said because the mergers are distributed there is no guarantee that the merger that gets the push job will have previously merged the commit for testing.\n\nThat is a long winded way of saying I think we should consider how we might accomplish this functionality, but it probably isn\u0027t necessary for the first pass.",
+      "revId": "21db64bdaa4b71ed5ff9e5084e5abf06139c2b85",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_a307e281",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2019-08-23T05:26:52Z",
+      "side": 1,
+      "message": "I\u0027m not too familiar with this, but could we use the repo_state for that? In the beginning I wanted to use the mergeChanges() function directly as this should \"recreate\" the same merge if it was present once, right? But then I wasn\u0027t sure how to deal with the looping and repo_locks in that case as I think that the push should be done in one go with the merge. Otherwise there could be another job or repo interfering with that operation, or?",
+      "parentUuid": "7faddb67_171e380d",
       "revId": "21db64bdaa4b71ed5ff9e5084e5abf06139c2b85",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
