@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_8e020d72",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-08-23T06:32:09Z",
+      "side": 1,
+      "message": "What about just: job_name \u003d job_name + \u0027 (\u0027 + job.tries + \u0027. attempt)\u0027 to save the logic above?",
+      "range": {
+        "startLine": 245,
+        "startChar": 6,
+        "endLine": 245,
+        "endChar": 67
+      },
+      "revId": "d9cb56e39ae3ab3383e9f358a9d676be54ec4b9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
