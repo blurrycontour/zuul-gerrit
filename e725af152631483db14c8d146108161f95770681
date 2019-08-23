@@ -16,6 +16,47 @@
       "revId": "e725af152631483db14c8d146108161f95770681",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_544fc3bd",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T12:54:45Z",
+      "side": 1,
+      "message": "I agree that we should include stopping this into the shutdown procedure. Otherwise there could be a race where this kicks in and terminates the executor non-gracefully.",
+      "parentUuid": "7faddb67_a9002302",
+      "revId": "e725af152631483db14c8d146108161f95770681",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_74cd1f2f",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-23T12:54:45Z",
+      "side": 1,
+      "message": "I think we should try to gracefully stop the executor to give it a chance to abort all jobs. As a fallback we can still directly exit after a grace period.",
+      "range": {
+        "startLine": 53,
+        "startChar": 16,
+        "endLine": 53,
+        "endChar": 27
+      },
+      "revId": "e725af152631483db14c8d146108161f95770681",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
