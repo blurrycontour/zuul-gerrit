@@ -45,6 +45,7 @@ rsync
 curl
 gettext [platform:apk]
 unzip [platform:apk]
+unzip [platform:rpm]
 openssh-client [platform:debian platform:apk]
 openssh [platform:rpm]
 coreutils [platform:apk]
