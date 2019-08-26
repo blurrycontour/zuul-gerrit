@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_352d45fd",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-26T15:29:41Z",
+      "side": 1,
+      "message": "How about we move the setDebug line outside of this conditional, so that it can be set for foreground or background use?",
+      "revId": "393efbb832066c3a4031b26ab685e3c8089ef95a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
