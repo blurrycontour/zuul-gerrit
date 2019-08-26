@@ -34,6 +34,23 @@
       "revId": "393efbb832066c3a4031b26ab685e3c8089ef95a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_3301dd05",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-08-26T16:36:55Z",
+      "side": 1,
+      "message": "If it\u0027s set in the background daemon case, then the idea is for it to include DEBUG level logs in the log file managed by the logging module, right?",
+      "revId": "393efbb832066c3a4031b26ab685e3c8089ef95a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
