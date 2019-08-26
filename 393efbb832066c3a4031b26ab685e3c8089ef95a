@@ -16,6 +16,24 @@
       "revId": "393efbb832066c3a4031b26ab685e3c8089ef95a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_b5661555",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-26T15:33:42Z",
+      "side": 1,
+      "message": "It won\u0027t hurt to apply it to both but I\u0027m not sure it will be useful in the background case as daemonization will close the stdout file descriptor.",
+      "parentUuid": "7faddb67_352d45fd",
+      "revId": "393efbb832066c3a4031b26ab685e3c8089ef95a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
