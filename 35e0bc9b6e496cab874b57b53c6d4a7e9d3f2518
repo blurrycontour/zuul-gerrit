@@ -16,6 +16,24 @@
       "revId": "35e0bc9b6e496cab874b57b53c6d4a7e9d3f2518",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_5eeb4b11",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 683,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-08-26T07:17:41Z",
+      "side": 1,
+      "message": "the \"default value\" depends on the number of cpu cores as described below. This attribute has therefore a default value: `None` since it overrides the formula in case it is not `None`.",
+      "parentUuid": "7faddb67_b78ba41c",
+      "revId": "35e0bc9b6e496cab874b57b53c6d4a7e9d3f2518",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
