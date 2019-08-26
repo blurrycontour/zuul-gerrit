@@ -1,0 +1,11 @@
+Code-Review+1: Andreas Jaeger <jaegerandi@gmail.com>
+Code-Review+2: Ian Wienand <iwienand@redhat.com>
+Code-Review+1: Jan Kubovy <jan.kubovy@bmw.de>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 26 Aug 2019 16:58:29 +0000
+Reviewed-on: https://review.opendev.org/678433
+Project: zuul/zuul
+Branch: refs/heads/master
