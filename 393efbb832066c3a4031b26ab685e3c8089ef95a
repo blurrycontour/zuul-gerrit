@@ -51,6 +51,24 @@
       "revId": "393efbb832066c3a4031b26ab685e3c8089ef95a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_731515e5",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-26T16:54:31Z",
+      "side": 1,
+      "message": "Yup, corvus clarified this on #zuul.\n\nBasically change the log level regardless of where it is emitted to (and by default backgrounded process emits to log file).",
+      "parentUuid": "7faddb67_3301dd05",
+      "revId": "393efbb832066c3a4031b26ab685e3c8089ef95a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
