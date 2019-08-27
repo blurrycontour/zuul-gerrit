@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_3420e0f8",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2019-08-27T00:42:28Z",
+      "side": 1,
+      "message": "It feels a bit like we\u0027re mixing ideas here ... the log streaming process is sitting in a read() on the pipe to notice if the parent dies.  but here we\u0027re checking with a waitpid() and sleep...\n\nif the child didn\u0027t close pipe_write, and we just did pipe_write.read() here for the blocking?  when that returns, the same checks for a shutdown situation v unexpected can occur?",
+      "revId": "609923e14f2e632def21cd249bfb883aeb9ddb61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_9428b4ee",
+        "filename": "zuul/cmd/executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2019-08-27T00:42:28Z",
+      "side": 1,
+      "message": "I know this is working with what we have ... I hesitate to descend into bikeshedding but this now does seem like we\u0027ve replicated what the multiprocessing package provides?  with the shutdown changes here, it seems like with multiprocessing you could start the child and then just join() it, then once that join() returns check the shutdown flag and if it\u0027s not set, die (unexpected) or if it is, just ignore?",
+      "revId": "609923e14f2e632def21cd249bfb883aeb9ddb61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
