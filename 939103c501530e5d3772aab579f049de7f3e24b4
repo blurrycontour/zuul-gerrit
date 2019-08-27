@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_0bafaf7d",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-27T19:37:41Z",
+      "side": 1,
+      "message": "This terminology doesn\u0027t really match the github workflow. Github doesn\u0027t have +- Verified votes but rather \u0027\u003cpipeline\u003e status\u0027.",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_2bb2abe6",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-27T19:37:41Z",
+      "side": 1,
+      "message": "Not sure if it\u0027s really needed but we typically require that the pr is open here.",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_cbc8b757",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-27T19:37:41Z",
+      "side": 1,
+      "message": "Status requirements shouldn\u0027t generally be necessary as zuul evaluates the status branch protection rules.",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_ebc33338",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-27T19:37:41Z",
+      "side": 1,
+      "message": "I found it useful to react on all status events. This way it\u0027s very easy to combine zuul with other github apps like WIP bot:\n\n  - event: pull_request\n    action: status\n    status: .*:success\n\nConfiguring it this way makes zuul also reacting on other status bots (which might be required by the branch protection). Each positive status will trigger then the pipeline which then checks if all required status are fulfilled now (if not the change won\u0027t enter the gate anyway).",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
