@@ -479,6 +479,9 @@ class Repo(object):
                 # GitPython throws an error if a revision does not
                 # exist
                 return True
+        for ref in change_refs:
+            if ref in repo:
+                True
         return False
 
     def getFiles(self, files, dirs=[], branch=None, commit=None,
