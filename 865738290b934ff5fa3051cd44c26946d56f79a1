@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_021a3417",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-27T17:01:12Z",
+      "side": 1,
+      "message": "You can base autohold_by_request_id (see below) on this boilerplate code:\n\n- replace args with request_id\n- test the HTTP verbs for GET (autohold-info) and DELETE (autohold-delete)\n- keep the AuthN/Z part then add the actual logic after\n\nThe autohold-delete call should return HTTP 202 (accepted but not enacted yet) upon success since I assume this\u0027ll be handled asynchronously; this can be done with\n\ncherrypy.response.status \u003d \u0027202\u0027",
+      "range": {
+        "startLine": 355,
+        "startChar": 0,
+        "endLine": 379,
+        "endChar": 40
+      },
+      "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_7f63851a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-27T17:01:12Z",
+      "side": 1,
+      "message": "You can probably just append the request dictionary directly, unless there\u0027s more info than needed in it. It should include the request ID as well",
+      "range": {
+        "startLine": 425,
+        "startChar": 0,
+        "endLine": 432,
+        "endChar": 29
+      },
+      "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_827624a3",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1011,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-27T17:01:12Z",
+      "side": 1,
+      "message": "You can add\n\nroute_map.connect(\u0027api\u0027, \u0027/api/autohold/{request_id}\u0027,\n                          controller\u003dapi\u0027, action\u003d\u0027autohold_by_request_id\u0027)\n\nand then define autohold_by_request_id similarly to autohold above, but with the HTTP DELETE verb instead of POST.",
+      "range": {
+        "startLine": 1010,
+        "startChar": 0,
+        "endLine": 1011,
+        "endChar": 63
+      },
+      "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
