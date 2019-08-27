@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_c3a18caa",
+        "filename": "tests/fixtures/config/authorization/single-tenant/main.yaml",
+        "patchSetId": 35
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-27T09:34:41Z",
+      "side": 1,
+      "message": "In a previous patch of the chain, I opted for an XPath-like definition but now taking a few steps away from it I realize simply using YAML itself could be enough.\nOr this could be interpreted as \"the \u0027vehicle\u0027 field must EXACTLY be {\u0027car\u0027: \u0027ecto-1\u0027}\" vs \"match the \u0027vehicle.car\u0027 Xpath pattern, and it must be \u0027ecto-1\u0027\". But that\u0027s probably overthinking.\n\nI\u0027ll address this in a follow-up, we can weigh the pros and cons of each approach there.",
+      "parentUuid": "7faddb67_7d660658",
+      "range": {
+        "startLine": 19,
+        "startChar": 8,
+        "endLine": 19,
+        "endChar": 19
+      },
+      "revId": "2c7bb3999fc86132769a3a2e6afaaf4b5c0b9dac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ad5e9a42",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 35
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_830e348a",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-27T09:34:41Z",
+      "side": 1,
+      "message": "I\u0027ll rework this in the next patch. Looking back at this, I feel like actual authorization granting should be logged at higher level than going through a rule; the latter being actual debugging info to make sure the right rules are considered for a tenant.",
+      "parentUuid": "7faddb67_ad5e9a42",
+      "range": {
+        "startLine": 286,
+        "startChar": 45,
+        "endLine": 286,
+        "endChar": 57
+      },
+      "revId": "2c7bb3999fc86132769a3a2e6afaaf4b5c0b9dac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_fd63d63f",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 35
@@ -59,6 +107,30 @@
       "writtenOn": "2019-08-14T11:22:33Z",
       "side": 1,
       "message": "I don\u0027t think we should return html in a method that is otherwise returning json. From an API user perspective that\u0027s often unpleasant. I\u0027d rather see the error_description (or even the whole error) in a json body here, that way CLI tools can render it easily in text, and web tools can render it easily in html.",
+      "range": {
+        "startLine": 520,
+        "startChar": 12,
+        "endLine": 520,
+        "endChar": 54
+      },
+      "revId": "2c7bb3999fc86132769a3a2e6afaaf4b5c0b9dac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_036fa428",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-27T09:34:41Z",
+      "side": 1,
+      "message": "I based this on examples I saw in the RFCs for this kind of auth, but it\u0027s probably flexible. I\u0027ll switch to JSON",
+      "parentUuid": "7faddb67_fd63d63f",
       "range": {
         "startLine": 520,
         "startChar": 12,
