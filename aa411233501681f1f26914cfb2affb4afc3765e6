@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_9a353248",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-27T15:08:22Z",
+      "side": 1,
+      "message": "Maybe we need to check the refs here?",
+      "revId": "aa411233501681f1f26914cfb2affb4afc3765e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
