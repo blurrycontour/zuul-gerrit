@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_48629bdb",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-08-27T07:43:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_6e70ca09",
+      "range": {
+        "startLine": 189,
+        "startChar": 24,
+        "endLine": 189,
+        "endChar": 25
+      },
+      "revId": "d495f2f2af7ff47e95c94b290a95f5b38dd1833d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ae4fa2bc",
         "filename": "zuul/ansible/base/callback/zuul_json.py",
         "patchSetId": 4
@@ -36,6 +60,24 @@
       "writtenOn": "2019-08-26T18:21:25Z",
       "side": 1,
       "message": "outfile.tell() could also be replaced by a file_len procedure that does the seek_end and return tell()",
+      "revId": "d495f2f2af7ff47e95c94b290a95f5b38dd1833d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_e86027d2",
+        "filename": "zuul/ansible/base/callback/zuul_json.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-08-27T07:43:45Z",
+      "side": 1,
+      "message": "Yes, good call. Done in a followup.",
+      "parentUuid": "7faddb67_ae4fa2bc",
       "revId": "d495f2f2af7ff47e95c94b290a95f5b38dd1833d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
