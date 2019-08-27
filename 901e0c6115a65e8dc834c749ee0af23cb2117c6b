@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_d6c29e86",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2164,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-27T20:15:27Z",
+      "side": 1,
+      "message": "This looks exactly the same as in the json callback except that this is missing https://review.opendev.org/678740\n\nI\u0027d love to see this shared somehow but this is probably not easily shareable.",
+      "revId": "901e0c6115a65e8dc834c749ee0af23cb2117c6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
