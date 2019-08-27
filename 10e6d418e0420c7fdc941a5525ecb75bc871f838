@@ -16,6 +16,24 @@
       "revId": "10e6d418e0420c7fdc941a5525ecb75bc871f838",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_026f94fa",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-27T17:20:55Z",
+      "side": 1,
+      "message": "iiuc there is indeed 2 merges per change.",
+      "parentUuid": "7faddb67_0239d4cd",
+      "revId": "10e6d418e0420c7fdc941a5525ecb75bc871f838",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
