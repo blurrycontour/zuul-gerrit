@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_96bc2607",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-08-27T20:16:49Z",
+      "side": 1,
+      "message": "I\u0027d like to see us use \u0027gate\u0027 here, goes nicely with the idea of zuul.",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_cbc8b757",
         "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
         "patchSetId": 2
