@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_ab421b3a",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-27T19:21:29Z",
+      "side": 1,
+      "message": "As far as I know retried builds typically have the result None. So I think we could swap this and always default to RETRY if the result is None. That way we could drop the default_result parameter.",
+      "revId": "6ff2d36fc77ff7b136ee720594070ca81d0b3da4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
