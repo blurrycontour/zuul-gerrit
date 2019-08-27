@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_ab78dbc0",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 33
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-27T19:57:19Z",
+      "side": 1,
+      "message": "nit: supports",
+      "revId": "da23b7bec0ad8c0458424dab582880e8d7ac434f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_4b49278c",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-27T19:57:19Z",
+      "side": 1,
+      "message": "On the mqtt reporter we have:\n\n  buildset:\n    uuid: \u003cuuid\u003e\n    builds: []\n\nIs it possible to do the nesting here in the same way? If possible I think we should try to keep the reporting schemas as close together as possible.",
+      "revId": "da23b7bec0ad8c0458424dab582880e8d7ac434f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
