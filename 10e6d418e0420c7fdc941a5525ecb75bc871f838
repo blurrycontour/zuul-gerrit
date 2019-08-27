@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_0239d4cd",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-27T16:43:55Z",
+      "side": 1,
+      "message": "One thing that isn\u0027t entirely clear to me is if repo_state.items() will have all the new refs for a change against a new branch.\n\nIn our example case the new branch was called python3. I think what happens then is the change comes in, mergers merge it and we get a repo_state that includes refs/origin/master/python3 and refs/heads/python3. But the local repo doesn\u0027t have that so we update.\n\nHowever in reading the executor code we do the change merging after the repo update. Does that mean we actually do two merge passes for every proposed change? the first to sort out config then the second is on the executor and what will actually be tested?",
+      "revId": "10e6d418e0420c7fdc941a5525ecb75bc871f838",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
