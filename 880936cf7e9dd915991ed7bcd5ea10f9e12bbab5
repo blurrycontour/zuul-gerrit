@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_95418b0d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2081,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2019-08-27T10:05:13Z",
+      "side": 1,
+      "message": "not really recommended practice in python but I doubt we will ever aim to make zuul server run on systems that do not have UTF-8 :)",
+      "range": {
+        "startLine": 2081,
+        "startChar": 31,
+        "endLine": 2081,
+        "endChar": 46
+      },
+      "revId": "880936cf7e9dd915991ed7bcd5ea10f9e12bbab5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
