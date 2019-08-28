@@ -89,6 +89,10 @@ class BaseTestWeb(ZuulTestCase):
         return requests.post(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
 
+    def delete_url(self, url, *args, **kwargs):
+        return requests.delete(
+            urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
+
     def tearDown(self):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -746,6 +750,72 @@ class TestWeb(BaseTestWeb):
         resp = self.get_url("api/tenant/non-tenant/status")
         self.assertEqual(404, resp.status_code)
 
+    def test_autohold_info_404_on_invalid_id(self):
+        resp = self.get_url("api/autohold/12345")
+        self.assertEqual(404, resp.status_code)
+
+    def test_autohold_delete_404_on_invalid_id(self):
+        resp = self.delete_url("api/autohold/12345")
+        self.assertEqual(404, resp.status_code)
+
+    def test_autohold_info(self):
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.autohold('tenant-one', 'org/project', 'project-test2',
+                            "", "", "reason text", 1)
+        self.assertTrue(r)
+
+        # Use autohold-list API to retrieve request ID
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        request_id = autohold_requests[0]['id']
+
+        # Now try the autohold-info API
+        resp = self.get_url("api/autohold/%s" % request_id)
+        self.assertEqual(200, resp.status_code, resp.text)
+        request = resp.json()
+
+        self.assertEqual(request_id, request['id'])
+        self.assertEqual('tenant-one', request['tenant'])
+        self.assertIn('org/project', request['project'])
+        self.assertEqual('project-test2', request['job'])
+        self.assertEqual(".*", request['ref_filter'])
+        self.assertEqual(1, request['count'])
+        self.assertEqual("reason text", request['reason'])
+
+    def test_autohold_delete(self):
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.autohold('tenant-one', 'org/project', 'project-test2',
+                            "", "", "reason text", 1)
+        self.assertTrue(r)
+
+        # Use autohold-list API to retrieve request ID
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        request_id = autohold_requests[0]['id']
+
+        # now try the autohold-delete API
+        resp = self.delete_url("api/autohold/%s" % request_id)
+        self.assertEqual(204, resp.status_code, resp.text)
+
+        # autohold-list should be empty now
+        resp = self.get_url(
+            "api/tenant/tenant-one/autohold")
+        self.assertEqual(200, resp.status_code, resp.text)
+        autohold_requests = resp.json()
+        self.assertEqual([], autohold_requests)
+
     def test_autohold_list(self):
         """test listing autoholds through zuul-web"""
         client = zuul.rpcclient.RPCClient('127.0.0.1',
@@ -761,7 +831,6 @@ class TestWeb(BaseTestWeb):
 
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
-        # The single dict key should be a CSV string value
         ah_request = autohold_requests[0]
 
         self.assertEqual('tenant-one', ah_request['tenant'])
@@ -784,7 +853,6 @@ class TestWeb(BaseTestWeb):
 
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
-        # The single dict key should be a CSV string value
         ah_request = autohold_requests[0]
 
         self.assertEqual('tenant-one', ah_request['tenant'])
