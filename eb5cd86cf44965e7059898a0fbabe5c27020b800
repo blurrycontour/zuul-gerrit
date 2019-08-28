@@ -45,6 +45,30 @@
       "revId": "eb5cd86cf44965e7059898a0fbabe5c27020b800",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_46358ea7",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1081,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-08-28T13:48:37Z",
+      "side": 1,
+      "message": "edit: not needed to delete OR get info on a specific request ID",
+      "parentUuid": "7faddb67_46826e54",
+      "range": {
+        "startLine": 1081,
+        "startChar": 39,
+        "endLine": 1081,
+        "endChar": 54
+      },
+      "revId": "eb5cd86cf44965e7059898a0fbabe5c27020b800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
