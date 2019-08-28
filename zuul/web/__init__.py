@@ -352,6 +352,22 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def autohold_by_request_id(self, tenant, request_id):
+        """
+        Handle requests using autohold request ID.
+
+        The tenant parameter is not used since the autohold request ID is
+        unique across all tenants.
+        """
+        if cherrypy.request.method == 'GET':
+            return self._autohold_info(request_id)
+        elif cherrypy.request.method == 'DELETE':
+            return self._autohold_delete(request_id)
+        else:
+            raise cherrypy.HTTPError(405)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def autohold(self, tenant, project=None):
         # we don't use json_in because a payload is not mandatory with GET
         # Note: GET handling is redundant with autohold_list
@@ -409,6 +425,26 @@ class ZuulWebAPI(object):
                                          'Invalid request body')
         else:
             raise cherrypy.HTTPError(405)
+
+    def _autohold_info(self, request_id):
+        job = self.rpc.submitJob('zuul:autohold_info',
+                                 {'request_id': request_id})
+        if job.failure:
+            raise cherrypy.HTTPError(500, 'autohold-info failed')
+        else:
+            request = json.loads(job.data[0])
+            return {
+                'tenant': request['tenant'],
+                'project': request['project'],
+                'job': request['job'],
+                'ref_filter': request['ref_filter'],
+                'count': request['max_count'],
+                'reason': request['reason'],
+                'node_hold_expiration': request['node_expiration']
+            }
+
+    def _autohold_delete(request_id):
+        pass
 
     def _autohold_list(self, tenant, project=None):
         job = self.rpc.submitJob('zuul:autohold_list', {})
@@ -1037,6 +1073,8 @@ class ZuulWeb(object):
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/dequeue',
                 controller=api, action='dequeue')
+        route_map.connect('api', '/api/tenant/{tenant}/autohold/{request_id}',
+                          controller=api, action='autohold_by_request_id')
         route_map.connect('api', '/api/tenant/{tenant}/autohold',
                           controller=api, action='autohold_list')
         route_map.connect('api', '/api/tenant/{tenant}/projects',
