@@ -22,6 +22,29 @@
       "revId": "eb5cd86cf44965e7059898a0fbabe5c27020b800",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_46826e54",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1081,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-08-28T13:45:44Z",
+      "side": 1,
+      "message": "Since \u0027tenant\u0027 is not needed to delete a request, should this path be different?",
+      "range": {
+        "startLine": 1081,
+        "startChar": 39,
+        "endLine": 1081,
+        "endChar": 54
+      },
+      "revId": "eb5cd86cf44965e7059898a0fbabe5c27020b800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
