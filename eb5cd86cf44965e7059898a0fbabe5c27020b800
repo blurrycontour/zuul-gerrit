@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7faddb67_6c9c2bbf",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-28T15:09:18Z",
+      "side": 1,
+      "message": "TODO: insert boilerplate authentication/authorization code above",
+      "revId": "eb5cd86cf44965e7059898a0fbabe5c27020b800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_866146d6",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 2
@@ -13,6 +30,30 @@
       "writtenOn": "2019-08-28T13:44:14Z",
       "side": 1,
       "message": "Is this the correct thing to return on success?",
+      "range": {
+        "startLine": 474,
+        "startChar": 12,
+        "endLine": 474,
+        "endChar": 23
+      },
+      "revId": "eb5cd86cf44965e7059898a0fbabe5c27020b800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_c15de848",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 474,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-28T15:09:18Z",
+      "side": 1,
+      "message": "DELETE actions in REST APIs don\u0027t usually return anything on success (esp. if the delete is asynchronous); the HTTP status of the response is enough.\n\nInstead of returning True, do\n\n  cherrypy.response.status \u003d 204",
+      "parentUuid": "7faddb67_866146d6",
       "range": {
         "startLine": 474,
         "startChar": 12,
@@ -59,6 +100,30 @@
       "writtenOn": "2019-08-28T13:48:37Z",
       "side": 1,
       "message": "edit: not needed to delete OR get info on a specific request ID",
+      "parentUuid": "7faddb67_46826e54",
+      "range": {
+        "startLine": 1081,
+        "startChar": 39,
+        "endLine": 1081,
+        "endChar": 54
+      },
+      "revId": "eb5cd86cf44965e7059898a0fbabe5c27020b800",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_215ddc78",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1081,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-28T15:09:18Z",
+      "side": 1,
+      "message": "the path should just be \u0027/api/autohold/{request_id}\u0027\n\ncherrypy maps requests to this pattern, if there is a match anything in brackets will be passed as named args (here, request_id) to the action method",
       "parentUuid": "7faddb67_46826e54",
       "range": {
         "startLine": 1081,
