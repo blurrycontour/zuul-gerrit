@@ -95,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_8f1dcb78",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-29T11:40:28Z",
+      "side": 1,
+      "message": "It only checks the status part of branch protection rules, but not (yet) the review part. See https://review.opendev.org/644557 which is in review for the code review part.",
+      "parentUuid": "7faddb67_e9b6bff9",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 26
+      },
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_96bc2607",
         "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
         "patchSetId": 2
@@ -159,6 +183,24 @@
       "side": 1,
       "message": "Alright but it means that branch protection must be set to true (zuul default is false) and \"Require status checks to pass before merging\" is checked. Furthermore \"\u003ctenant\u003e/check\" status must be checked in the list. If not if the pr got the \u0027gate\u0027 tag and an approval it will enter the gate pipeline whatever the status of the check pipeline. I\u0027m fine with that but we should explain it.",
       "parentUuid": "7faddb67_cbc8b757",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_af11a75f",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-08-29T11:40:28Z",
+      "side": 1,
+      "message": "Yes, imho using branch protection for this should be the best practice we should embrace.",
+      "parentUuid": "7faddb67_a91a0715",
       "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
