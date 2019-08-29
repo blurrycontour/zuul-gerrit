@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_dab2a3e5",
+        "filename": "doc/source/admin/drivers/elasticsearch.rst",
+        "patchSetId": 33
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T12:41:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_ab78dbc0",
+      "revId": "da23b7bec0ad8c0458424dab582880e8d7ac434f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_4b49278c",
         "filename": "zuul/driver/elasticsearch/connection.py",
         "patchSetId": 33
@@ -30,6 +48,24 @@
       "writtenOn": "2019-08-27T19:57:19Z",
       "side": 1,
       "message": "On the mqtt reporter we have:\n\n  buildset:\n    uuid: \u003cuuid\u003e\n    builds: []\n\nIs it possible to do the nesting here in the same way? If possible I think we should try to keep the reporting schemas as close together as possible.",
+      "revId": "da23b7bec0ad8c0458424dab582880e8d7ac434f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_9a818ba3",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T12:41:55Z",
+      "side": 1,
+      "message": "Yes it is possible but it will bring complexity when querying the index or building analytic dashboard. I\u0027m not a EL expert but I develop some projects based on EL so I\u0027m quite familiar with the query and schema model. So AFAIK having array of objects (like builds here) will not be convenient if the user want, for instance, to retrieve failed build docs. Indeed the user will get the buildsets docs that match but w/o a way detect the build(s) from the builds array that match the query. Here is a clear explanation: https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html#_how_arrays_of_objects_are_flattened\n\nWe can then use the nested objects concept where builds in the array will be real lucene objects but it complexifies the query structure (query and sorting). If a user want to use kibana to query the index it is not going to be convenient as well. See for more info: https://www.elastic.co/guide/en/elasticsearch/reference/current/nested.html#nested-fields-array-objects\n\nSo to sum up, I\u0027m not for it as I feel a flat schema is far more handy.\n\nAny thoughts @Clark and @Waldemar ?",
+      "parentUuid": "7faddb67_4b49278c",
       "revId": "da23b7bec0ad8c0458424dab582880e8d7ac434f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
