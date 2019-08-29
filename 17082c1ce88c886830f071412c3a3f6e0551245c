@@ -46,6 +46,30 @@
       "revId": "17082c1ce88c886830f071412c3a3f6e0551245c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_4ccef65b",
+        "filename": "doc/source/user/howtos/test-jobs.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-29T19:22:24Z",
+      "side": 1,
+      "message": "Is there any concern that not running the run playbook as it would be run normally will invalidate this testing in some cases? I seem to recall ansible acting differently once you start nesting include_*\u0027s for example.\n\nGiven that I think I\u0027m with Fabien that using pre-run and post-run playbooks that won\u0027t override the parent but instead enhance them seems safer.",
+      "parentUuid": "7faddb67_3ae6d4b1",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 19
+      },
+      "revId": "17082c1ce88c886830f071412c3a3f6e0551245c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
