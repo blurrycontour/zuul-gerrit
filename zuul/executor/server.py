@@ -1339,6 +1339,7 @@ class AnsibleJob(object):
 
     def getHostList(self, args):
         hosts = []
+
         for node in args['nodes']:
             # NOTE(mordred): This assumes that the nodepool launcher
             # and the zuul executor both have similar network
