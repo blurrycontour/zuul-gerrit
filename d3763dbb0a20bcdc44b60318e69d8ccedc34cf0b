@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_9b7bca79",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-08-29T16:05:13Z",
+      "side": 1,
+      "message": "The reason we cannot unlabel here, is because we only want to unlabel if pull_request is changed. With below, zuul would unlabel \u0027gate\u0027 all all the triggers below like recheck / open / close.\n\nThe only way to handle it today I found, is a new pipeline. This is based on what spamaps is doing too.",
+      "revId": "d3763dbb0a20bcdc44b60318e69d8ccedc34cf0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
