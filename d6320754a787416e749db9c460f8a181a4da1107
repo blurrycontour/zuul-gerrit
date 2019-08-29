@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_55ec44ba",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T13:23:09Z",
+      "side": 1,
+      "message": "A link to https://help.github.com/en/articles/about-code-owners could be useful for the reviewer.",
+      "revId": "d6320754a787416e749db9c460f8a181a4da1107",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_75f7008e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T13:23:09Z",
+      "side": 1,
+      "message": "Is the API v4 also has this limitation https://developer.github.com/v4/object/pullrequestchangedfileconnection/ ?",
+      "revId": "d6320754a787416e749db9c460f8a181a4da1107",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
