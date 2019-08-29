@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_34466ec2",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T10:27:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_0bafaf7d",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_2bb2abe6",
         "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
         "patchSetId": 2
@@ -30,6 +48,47 @@
       "writtenOn": "2019-08-27T19:37:41Z",
       "side": 1,
       "message": "Not sure if it\u0027s really needed but we typically require that the pr is open here.",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_0988fb1f",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T10:27:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_2bb2abe6",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_e9b6bff9",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T10:27:11Z",
+      "side": 1,
+      "message": "@Tobias you said Zuul checks branch protection rules, then is this requirement really needed ? Within the branch protection rules \"Require pull request reviews before merging\" can be set and configured as well. I haven\u0027t tested btw, what do you think ?",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 45,
+        "endChar": 26
+      },
       "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +112,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_a98d2736",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T10:27:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_96bc2607",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_cbc8b757",
         "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
         "patchSetId": 2
@@ -70,6 +147,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_a91a0715",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T10:27:11Z",
+      "side": 1,
+      "message": "Alright but it means that branch protection must be set to true (zuul default is false) and \"Require status checks to pass before merging\" is checked. Furthermore \"\u003ctenant\u003e/check\" status must be checked in the list. If not if the pr got the \u0027gate\u0027 tag and an approval it will enter the gate pipeline whatever the status of the check pipeline. I\u0027m fine with that but we should explain it.",
+      "parentUuid": "7faddb67_cbc8b757",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_ebc33338",
         "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
         "patchSetId": 2
@@ -81,6 +176,24 @@
       "writtenOn": "2019-08-27T19:37:41Z",
       "side": 1,
       "message": "I found it useful to react on all status events. This way it\u0027s very easy to combine zuul with other github apps like WIP bot:\n\n  - event: pull_request\n    action: status\n    status: .*:success\n\nConfiguring it this way makes zuul also reacting on other status bots (which might be required by the branch protection). Each positive status will trigger then the pipeline which then checks if all required status are fulfilled now (if not the change won\u0027t enter the gate anyway).",
+      "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_8992ab57",
+        "filename": "doc/source/admin/examples/zuul-config/zuul.d/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-08-29T10:27:11Z",
+      "side": 1,
+      "message": "Alright it makes sense.",
+      "parentUuid": "7faddb67_ebc33338",
       "revId": "939103c501530e5d3772aab579f049de7f3e24b4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
