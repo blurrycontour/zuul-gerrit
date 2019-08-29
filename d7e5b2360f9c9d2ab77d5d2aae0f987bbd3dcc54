@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_df35a7a9",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-29T23:20:37Z",
+      "side": 1,
+      "message": "I know the full reconfigure works this way too, but any idea why we have the scheduler call the app to call the scheduler?",
+      "revId": "d7e5b2360f9c9d2ab77d5d2aae0f987bbd3dcc54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_bfaa2b81",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 774,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-29T23:20:37Z",
+      "side": 1,
+      "message": "The unparsed abide config has a known_tenants set() that tracks these names already. You can remove this comprehension and use that.",
+      "revId": "d7e5b2360f9c9d2ab77d5d2aae0f987bbd3dcc54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_9f93af4e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 790,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-29T23:20:37Z",
+      "side": 1,
+      "message": "During a normal full reconfigure we create a new abide without any tenants and start from there. In this case we are reusing self.abide which means if tenants are deleted I don\u0027t think we will remove them from the abide leaking them.\n\nI\u0027m not sure this is a major concern as tenants probably don\u0027t get removed often but if we are trying to optimize this  we may want to consider it?",
+      "range": {
+        "startLine": 790,
+        "startChar": 20,
+        "endLine": 790,
+        "endChar": 30
+      },
+      "revId": "d7e5b2360f9c9d2ab77d5d2aae0f987bbd3dcc54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
