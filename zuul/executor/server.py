@@ -1339,6 +1339,18 @@ class AnsibleJob(object):
 
     def getHostList(self, args):
         hosts = []
+
+        if not args['nodes']:
+            # If nodes is blank, that means an "executor only" job.
+            # This can be things like a promote pipeline where you're
+            # copying stuff around and don't need a node.  In this
+            # case, just put in the local connection.
+            hosts.append(dict(
+                name='localhost',
+                host_vars=dict(ansible_connection='local'),
+                host_keys=[]))
+            return hosts
+
         for node in args['nodes']:
             # NOTE(mordred): This assumes that the nodepool launcher
             # and the zuul executor both have similar network

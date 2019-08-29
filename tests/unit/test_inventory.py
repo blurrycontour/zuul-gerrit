@@ -122,6 +122,32 @@ class TestInventory(TestInventoryBase):
         self.executor_server.release()
         self.waitUntilSettled()
 
+    def test_executor_only_inventory(self):
+        inventory = self._get_build_inventory('executor-only-inventory')
+
+        all_nodes = ('localhost',)
+        self.assertIn('all', inventory)
+        self.assertIn('hosts', inventory['all'])
+        self.assertIn('vars', inventory['all'])
+
+        # should *only* have the localhost connection
+        self.assertEqual(1, len(inventory['all']['hosts']))
+        self.assertIn('localhost', inventory['all']['hosts'])
+        self.assertEqual(
+            inventory['all']['hosts']['localhost']['ansible_connection'],
+            'local')
+
+        self.assertIn('zuul', inventory['all']['vars'])
+        z_vars = inventory['all']['vars']['zuul']
+        self.assertIn('executor', z_vars)
+        self.assertIn('src_root', z_vars['executor'])
+        self.assertIn('job', z_vars)
+        self.assertEqual(z_vars['job'], 'executor-only-inventory')
+        self.assertEqual(z_vars['message'], 'QQ==')
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
     def test_group_inventory(self):
 
         inventory = self._get_build_inventory('group-inventory')
