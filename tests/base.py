@@ -1901,15 +1901,12 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     def getHostList(self, args):
         self.log.debug("hostlist")
         hosts = super(RecordingAnsibleJob, self).getHostList(args)
+        # above should never have returned no hosts
+        assert hosts
         for host in hosts:
             if not host['host_vars'].get('ansible_connection'):
                 host['host_vars']['ansible_connection'] = 'local'
-
-        if not hosts:
-            hosts.append(dict(
-                name='localhost',
-                host_vars=dict(ansible_connection='local'),
-                host_keys=[]))
+        self.log.debug("hosts: %s %s" % (hosts, not hosts))
         return hosts
 
     def pause(self):
