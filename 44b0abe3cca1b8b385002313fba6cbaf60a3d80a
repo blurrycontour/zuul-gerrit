@@ -16,6 +16,23 @@
       "revId": "44b0abe3cca1b8b385002313fba6cbaf60a3d80a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_f4fc560d",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-29T09:39:54Z",
+      "side": 1,
+      "message": "Should we have a test case for this one as well?  I suggest this because it\u0027s a *very* different url than what is used for the public site.",
+      "revId": "44b0abe3cca1b8b385002313fba6cbaf60a3d80a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
