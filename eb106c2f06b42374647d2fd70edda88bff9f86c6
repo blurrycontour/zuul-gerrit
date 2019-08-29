@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "7faddb67_96939c4e",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 3334,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-29T20:17:56Z",
+      "side": 1,
+      "message": "succeed",
+      "range": {
+        "startLine": 3334,
+        "startChar": 14,
+        "endLine": 3334,
+        "endChar": 18
+      },
+      "revId": "eb106c2f06b42374647d2fd70edda88bff9f86c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_a7322b5d",
         "filename": "zuul/cmd/scheduler.py",
         "patchSetId": 13
@@ -31,6 +54,41 @@
       "side": 1,
       "message": "I don\u0027t see where this gets generated into the docs automatically ;(\n\nBut yes, the help string is a good start - and if this indeed not done automatically, this is fine.",
       "parentUuid": "7faddb67_a7322b5d",
+      "revId": "eb106c2f06b42374647d2fd70edda88bff9f86c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_16c00c2b",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-29T20:17:56Z",
+      "side": 1,
+      "message": "We use the program-output directive to document the help output of the `zuul` command but I can\u0027t find that for the scheduler.",
+      "parentUuid": "7faddb67_1b1fdab7",
+      "revId": "eb106c2f06b42374647d2fd70edda88bff9f86c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_d6c5940b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 741,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-29T20:17:56Z",
+      "side": 1,
+      "message": "Is it worth noting why self._reconfigureTenant() and --check-config are exclusive of each other? Is it because we don\u0027t want to send statsd events when checking the config?",
       "revId": "eb106c2f06b42374647d2fd70edda88bff9f86c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
