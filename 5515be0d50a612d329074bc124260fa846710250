@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_8c814efe",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-08-29T19:16:36Z",
+      "side": 1,
+      "message": "Do we need to create the artifacts and provides for retried builds too? Or is the assumption that since the build was retried it won\u0027t have useful artifacts?",
+      "revId": "5515be0d50a612d329074bc124260fa846710250",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
