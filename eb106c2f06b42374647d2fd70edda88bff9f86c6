@@ -16,6 +16,24 @@
       "revId": "eb106c2f06b42374647d2fd70edda88bff9f86c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_1b1fdab7",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2019-08-29T16:23:24Z",
+      "side": 1,
+      "message": "I don\u0027t see where this gets generated into the docs automatically ;(\n\nBut yes, the help string is a good start - and if this indeed not done automatically, this is fine.",
+      "parentUuid": "7faddb67_a7322b5d",
+      "revId": "eb106c2f06b42374647d2fd70edda88bff9f86c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
