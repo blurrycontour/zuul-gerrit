@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_e9f31f08",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1306,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-29T08:58:48Z",
+      "side": 1,
+      "message": "NIT: I would add a test for autohold-delete there as well just to be on the side of caution",
+      "revId": "88b99ad4f5e8c6ad3913a27fe1130c88ae96b65d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_a9be87fd",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-08-29T08:58:48Z",
+      "side": 1,
+      "message": "This is going to change so that we return JSON rather than HTML, see https://review.opendev.org/#/c/641099/38/zuul/web/__init__.py\n\nIt\u0027d be best to change this directly here.",
+      "range": {
+        "startLine": 482,
+        "startChar": 12,
+        "endLine": 482,
+        "endChar": 54
+      },
+      "revId": "88b99ad4f5e8c6ad3913a27fe1130c88ae96b65d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
