@@ -823,7 +823,19 @@ Here is an example of two job definitions:
       reference for the syntax to use in that case.
 
       If a job has an empty or no nodeset definition, it will still
-      run and may be able to perform actions on the Zuul executor.
+      run and is able to perform limited actions within the Zuul
+      executor sandbox (e.g. copying files or triggering APIs).  A
+      common example is for use during a *promote* pipeline which can
+      save resources by directly publishing the results from testing
+      of a committed change.  For example, a review which updates
+      documentation source files would generally test validity by
+      creating a documentation tree.  When this change is committed,
+      the pre-built output can be copied in an executor-only job
+      directly to the publishing location, avoiding having to use a
+      node to rebuild the documentation for final publishing.  Note
+      executor-only jobs run with `implicit localhost
+      <https://docs.ansible.com/ansible/latest/inventory/implicit_localhost.html>`_;
+      some roles may need to take this into consideration.
 
    .. attr:: override-checkout
 
