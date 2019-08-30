@@ -70,6 +70,30 @@
       "revId": "17082c1ce88c886830f071412c3a3f6e0551245c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_6c13a402",
+        "filename": "doc/source/user/howtos/test-jobs.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-30T13:30:31Z",
+      "side": 1,
+      "message": "Agreed, though that\u0027s how zuul-jobs/zuul-tests.d/ jobs are currently written. It seems like using pre/post around the target job run may be more tricky than just writting a custom run that includes the roles to test in a controlled manner.",
+      "parentUuid": "7faddb67_4ccef65b",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 19
+      },
+      "revId": "17082c1ce88c886830f071412c3a3f6e0551245c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
