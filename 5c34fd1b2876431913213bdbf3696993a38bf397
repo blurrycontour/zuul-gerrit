@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_ec34744b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-30T13:53:36Z",
+      "side": 1,
+      "message": "We would like to run executor on remote slow network and we don\u0027t want them to perform global merge actions.",
+      "parentUuid": "7faddb67_36dd3241",
+      "revId": "5c34fd1b2876431913213bdbf3696993a38bf397",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_4470e3a4",
         "filename": "doc/source/admin/components.rst",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2019-08-16T15:33:37Z",
       "side": 1,
       "message": "We should probably add a bit more documentation around why this option can be toggled off and why for most cases leaving it on is preferable.",
+      "revId": "5c34fd1b2876431913213bdbf3696993a38bf397",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_6c1964cf",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-30T13:53:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_4470e3a4",
       "revId": "5c34fd1b2876431913213bdbf3696993a38bf397",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_0c61d039",
+        "filename": "etc/zuul.conf-sample",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-30T13:53:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_a45e7710",
+      "revId": "5c34fd1b2876431913213bdbf3696993a38bf397",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_645f1fe5",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2019-08-16T15:33:37Z",
       "side": 1,
       "message": "get_default calls https://docs.python.org/3/library/configparser.html#configparser.ConfigParser.getboolean if the default value is of boolean type. I think you should set the default to True instead of \"true\" and do that comparison instead.",
+      "revId": "5c34fd1b2876431913213bdbf3696993a38bf397",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_6cdc04e1",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2419,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-08-30T13:53:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7faddb67_645f1fe5",
       "revId": "5c34fd1b2876431913213bdbf3696993a38bf397",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
