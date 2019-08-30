@@ -16,6 +16,24 @@
       "revId": "5515be0d50a612d329074bc124260fa846710250",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_90515c65",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 28088
+      },
+      "writtenOn": "2019-08-30T06:18:23Z",
+      "side": 1,
+      "message": "I\u0027m assuming we don\u0027t have any useful artifacts because the build failed in a pre-run phase.",
+      "parentUuid": "7faddb67_8c814efe",
+      "revId": "5515be0d50a612d329074bc124260fa846710250",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
