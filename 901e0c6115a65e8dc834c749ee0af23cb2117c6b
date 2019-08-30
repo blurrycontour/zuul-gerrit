@@ -34,6 +34,23 @@
       "revId": "901e0c6115a65e8dc834c749ee0af23cb2117c6b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_a793f5a2",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2164,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-30T14:05:44Z",
+      "side": 1,
+      "message": "Can you make the same improvement (using SEEK_) here?\n\nCould we share this by importing the callback here?",
+      "revId": "901e0c6115a65e8dc834c749ee0af23cb2117c6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
