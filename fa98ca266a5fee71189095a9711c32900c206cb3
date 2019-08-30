@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7faddb67_d3f27b05",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-08-30T10:14:26Z",
+      "side": 1,
+      "message": "If we choose not to do this, we should probably adapt that role to account for that.  Those roles were created very quickly during the v2-\u003ev3 migration -- it\u0027s fine to declare this a role bug rather than a Zuul bug.",
+      "revId": "fa98ca266a5fee71189095a9711c32900c206cb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
