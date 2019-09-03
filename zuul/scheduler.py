@@ -1733,7 +1733,8 @@ class Scheduler(threading.Thread):
                     if nodeset:
                         self.nodepool.returnNodeSet(
                             nodeset, build=build, zuul_event_id=item.event)
-                build.result = 'CANCELED'
+                if build.result is None:
+                    build.result = 'CANCELED'
             else:
                 nodeset = buildset.getJobNodeSet(job_name)
                 if nodeset:
