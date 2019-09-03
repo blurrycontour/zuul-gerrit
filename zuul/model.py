@@ -476,10 +476,15 @@ class ChangeQueue(object):
         return True
 
     def isActionable(self, item):
-        if self.window:
-            return item in self.queue[:self.window]
-        else:
+        if not self.window:
             return True
+        # Ignore done items waiting for bundle dependencies to finish
+        num_waiting_items = len([
+            i for i in self.queue
+            if i.bundle and i.areAllJobsComplete()
+        ])
+        window = self.window + num_waiting_items
+        return item in self.queue[:window]
 
     def increaseWindowSize(self):
         if self.window:
@@ -2021,12 +2026,15 @@ class BuildSet(object):
         if not self.uuid:
             self.uuid = uuid4().hex
         if self.dependent_changes is None:
-            items = [self.item]
-            next_item = self.item.item_ahead
-            while next_item:
-                items.append(next_item)
-                next_item = next_item.item_ahead
+            items = []
+            if self.item.bundle:
+                items.extend(reversed(self.item.bundle.items))
+            else:
+                items.append(self.item)
+
+            items.extend(i for i in self.item.items_ahead if i not in items)
             items.reverse()
+
             self.dependent_changes = [i.change.toDict() for i in items]
             self.merger_items = [i.makeMergerItem() for i in items]
 
@@ -2149,6 +2157,11 @@ class QueueItem(object):
         self._old_job_graph = None  # Cached job graph of previous layout
         self._cached_sql_results = {}
         self.event = event  # The trigger event that lead to this queue item
+
+        # A bundle holds other queue items that have to be successful
+        # for the current queue item to succeed
+        self.bundle = None
+        self.dequeued_bundle_failing = False
 
     def annotateLogger(self, logger):
         """Return an annotated logger with the trigger event"""
@@ -2318,6 +2331,30 @@ class QueueItem(object):
                 return True
         return False
 
+    def isBundleFailing(self):
+        if self.bundle:
+            # We are only checking other items that share the same change
+            # queue, since we don't need to wait for changes in other change
+            # queues.
+            return self.bundle.failed_reporting or any(
+                i.hasAnyJobFailed() for i in self.bundle.items
+                if i.live and i.queue == self.queue)
+        return False
+
+    def didBundleFinish(self):
+        if self.bundle:
+            # We are only checking other items that share the same change
+            # queue, since we don't need to wait for changes in other change
+            # queues.
+            return all(i.areAllJobsComplete() for i in self.bundle.items if
+                       i.live and i.queue == self.queue)
+        return True
+
+    def didBundleStartReporting(self):
+        if self.bundle:
+            return self.bundle.started_reporting
+        return False
+
     def didMergerFail(self):
         return self.current_build_set.unable_to_merge
 
@@ -2332,6 +2369,21 @@ class QueueItem(object):
         includes_untrusted = False
         tenant = self.pipeline.tenant
         item = self
+
+        if item.bundle:
+            # Check all items in the bundle for config updates
+            for bundle_item in item.bundle.items:
+                if bundle_item.change.updatesConfig(tenant):
+                    trusted, project = tenant.getProject(
+                        bundle_item.change.project.canonical_name)
+                    if trusted:
+                        includes_trusted = True
+                    else:
+                        includes_untrusted = True
+                if includes_trusted and includes_untrusted:
+                    # We're done early
+                    return includes_trusted, includes_untrusted
+
         while item:
             if item.change.updatesConfig(tenant):
                 (trusted, project) = tenant.getProject(
@@ -2662,6 +2714,10 @@ class QueueItem(object):
         self.dequeued_needing_change = True
         self._setAllJobsSkipped()
 
+    def setDequeuedBundleFailing(self):
+        self.dequeued_bundle_failing = True
+        self._setMissingJobsSkipped()
+
     def setUnableToMerge(self):
         self.current_build_set.unable_to_merge = True
         self._setAllJobsSkipped()
@@ -2676,6 +2732,15 @@ class QueueItem(object):
 
     def _setAllJobsSkipped(self):
         for job in self.getJobs():
+            fakebuild = Build(job, None)
+            fakebuild.result = 'SKIPPED'
+            self.addBuild(fakebuild)
+
+    def _setMissingJobsSkipped(self):
+        for job in self.getJobs():
+            if job.name in self.current_build_set.builds:
+                # We already have a build for this job
+                continue
             fakebuild = Build(job, None)
             fakebuild.result = 'SKIPPED'
             self.addBuild(fakebuild)
@@ -2999,6 +3064,22 @@ class QueueItem(object):
         return False
 
 
+class Bundle:
+    """Identifies a collection of changes that must be treated as one unit."""
+
+    def __init__(self):
+        self.items = []
+        self.started_reporting = False
+        self.failed_reporting = False
+
+    def __repr__(self):
+        return '<Bundle 0x{:x} {}'.format(id(self), self.items)
+
+    def add_item(self, item):
+        if item not in self.items:
+            self.items.append(item)
+
+
 class Ref(object):
     """An existing state of a Project."""
 
@@ -3168,8 +3249,9 @@ class Change(Branch):
 
     @property
     def needs_changes(self):
+        commit_needs_changes = self.commit_needs_changes or []
         return (self.git_needs_changes + self.compat_needs_changes +
-                self.commit_needs_changes)
+                commit_needs_changes)
 
     @property
     def needed_by_changes(self):
@@ -3327,6 +3409,9 @@ class TenantProjectConfig(object):
         # The tenant's default setting of exclude_unprotected_branches will
         # be overridden by this one if not None.
         self.exclude_unprotected_branches = None
+        # The tenant's default setting of allow_circular_dependencies will
+        # be overridden by this one if not None.
+        self.allow_circular_dependencies = None
         self.parsed_branch_config = {}  # branch -> ParsedConfig
         # The list of paths to look for extra zuul config files
         self.extra_config_files = ()
@@ -4295,6 +4380,7 @@ class Tenant(object):
         self.max_nodes_per_job = 5
         self.max_job_timeout = 10800
         self.exclude_unprotected_branches = False
+        self.allow_circular_dependencies = False
         self.default_base_job = None
         self.report_build_page = False
         self.layout = None
@@ -4450,6 +4536,14 @@ class Tenant(object):
         else:
             exclude_unprotected = self.exclude_unprotected_branches
         return exclude_unprotected
+
+    def getAllowCircularDependencies(self, project):
+        # Evaluate if circular dependencies should be allowed. The first
+        # match wins. The order is project -> tenant (default is false).
+        project_config = self.project_configs.get(project.canonical_name)
+        if project_config.allow_circular_dependencies is not None:
+            return project_config.allow_circular_dependencies
+        return self.allow_circular_dependencies
 
     def addConfigProject(self, tpc):
         self.config_projects.append(tpc.project)
