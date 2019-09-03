@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import logging
 import textwrap
 import urllib
@@ -18,6 +19,7 @@ from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.tarjan import strongly_connected_components
 
 
 class DynamicChangeQueueContextManager(object):
@@ -192,14 +194,16 @@ class PipelineManager(object):
         return True
 
     def enqueueChangesAhead(self, change, event, quiet, ignore_requirements,
-                            change_queue, history=None):
+                            change_queue, history=None, dependency_graph=None):
         return True
 
     def enqueueChangesBehind(self, change, event, quiet, ignore_requirements,
-                             change_queue):
+                             change_queue, history=None,
+                             dependency_graph=None):
         return True
 
-    def checkForChangesNeededBy(self, change, change_queue, event):
+    def checkForChangesNeededBy(self, change, change_queue, event,
+                                dependency_graph=None):
         return True
 
     def getFailingDependentItems(self, item):
@@ -283,9 +287,17 @@ class PipelineManager(object):
 
     def addChange(self, change, event, quiet=False, enqueue_time=None,
                   ignore_requirements=False, live=True,
-                  change_queue=None, history=None):
+                  change_queue=None, history=None, dependency_graph=None):
         log = get_annotated_logger(self.log, event)
         log.debug("Considering adding change %s" % change)
+
+        history = history if history is not None else []
+        log.debug("History: %s", history)
+
+        # Ensure the dependency graph is created when the first change is
+        # process to allow cycle detection with the Tarjan algorithm
+        dependency_graph = dependency_graph or collections.OrderedDict()
+        log.debug("Dependency graph: %s", dependency_graph)
 
         # If we are adding a live change, check if it's a live item
         # anywhere in the pipeline.  Otherwise, we will perform the
@@ -319,22 +331,14 @@ class PipelineManager(object):
                           (change, change.project))
                 return False
 
-            if history and change in history:
-                log.debug("Dependency cycle detected for "
-                          "change %s in project %s" % (
-                              change, change.project))
-                item = model.QueueItem(self, change, event)
-                item.warning("Dependency cycle detected")
-                actions = self.pipeline.failure_actions
-                item.setReportedResult('FAILURE')
-                self.sendReport(actions, item)
-                return False
-
             if not self.enqueueChangesAhead(change, event, quiet,
                                             ignore_requirements,
-                                            change_queue, history=history):
+                                            change_queue, history=history,
+                                            dependency_graph=dependency_graph):
                 log.debug("Failed to enqueue changes ahead of %s" % change)
                 return False
+
+            log.debug("History after enqueuing changes ahead: %s", history)
 
             if self.isChangeAlreadyInQueue(change, change_queue):
                 log.debug("Change %s is already in queue, ignoring" % change)
@@ -343,6 +347,22 @@ class PipelineManager(object):
             log.info("Adding change %s to queue %s in %s" %
                      (change, change_queue, self.pipeline))
             item = change_queue.enqueueChange(change, event)
+
+            if hasattr(change, "needs_changes"):
+                cycle = self.cycleForChange(change, dependency_graph, event)
+                if cycle and not self.canProcessCycle(cycle,
+                                                      item.pipeline.tenant):
+                    log.info("Dequeing change %s since at least one project "
+                             "does not allow circular dependencies", change)
+                    self.dequeueItem(item)
+                    actions = self.pipeline.failure_actions
+                    ci = model.QueueItem(self, cycle[-1], event)
+                    ci.warning("Dependency cycle detected")
+                    ci.setReportedResult('FAILURE')
+                    self.sendReport(actions, ci)
+                    return False
+                self.updateBundle(item, change_queue, cycle)
+
             if enqueue_time:
                 item.enqueue_time = enqueue_time
             item.live = live
@@ -352,13 +372,56 @@ class PipelineManager(object):
                 self.reportEnqueue(item)
                 item.reported_enqueue = True
             self.enqueueChangesBehind(change, event, quiet,
-                                      ignore_requirements, change_queue)
+                                      ignore_requirements, change_queue,
+                                      history, dependency_graph)
             zuul_driver = self.sched.connections.drivers['zuul']
             tenant = self.pipeline.tenant
             zuul_driver.onChangeEnqueued(
                 tenant, item.change, self.pipeline, event)
             self.dequeueSupercededItems(item)
             return True
+
+    def cycleForChange(self, change, dependency_graph, event):
+        log = get_annotated_logger(self.log, event)
+        log.debug("Running Tarjan's algorithm on current dependencies: %s",
+                  dependency_graph)
+        sccs = [s for s in strongly_connected_components(dependency_graph)
+                if len(s) > 1]
+        log.debug("Strongly connected components (cyles): %s", sccs)
+        for scc in sccs:
+            if change in scc:
+                log.debug("Dependency cycle detected for "
+                          "change %s in project %s",
+                          change, change.project)
+                # Change can not be part of multiple cycles, so we can return
+                return scc
+
+    def canProcessCycle(self, cycle, tenant):
+        projects = [
+            c.project for c in cycle
+            if tenant.getProject(c.project.canonical_name)[1]
+        ]
+        return all(tenant.getAllowCircularDependencies(p) for p in projects)
+
+    def updateBundle(self, item, change_queue, cycle):
+        if not cycle:
+            return
+
+        log = get_annotated_logger(self.log, item.event)
+        item.bundle = model.Bundle()
+
+        # Try to find already enqueued items of this cycle, so we use
+        # the same bundle
+        for needed_change in (c for c in cycle if c is not item.change):
+            needed_item = self.getItemForChange(needed_change)
+            if not (needed_item and needed_item.live):
+                continue
+            # Use a common bundle for the cycle
+            item.bundle = needed_item.bundle
+            break
+
+        log.info("Adding cycle item %s to bundle %s", item, item.bundle)
+        item.bundle.add_item(item)
 
     def dequeueItem(self, item):
         log = get_annotated_logger(self.log, item.event)
@@ -484,7 +547,8 @@ class PipelineManager(object):
         old_build_set = item.current_build_set
         jobs_to_cancel = item.getJobs()
 
-        if prime and item.current_build_set.ref:
+        if (prime and item.current_build_set.ref and not
+                item.didBundleStartReporting()):
             item.resetAllBuilds()
 
         for job in jobs_to_cancel:
@@ -634,6 +698,11 @@ class PipelineManager(object):
             return None
 
     def _queueUpdatesConfig(self, item):
+        if item.bundle:
+            for bundle_item in item.bundle.items:
+                if bundle_item.change.updatesConfig(
+                        bundle_item.pipeline.tenant):
+                    return True
         while item:
             if item.change.updatesConfig(item.pipeline.tenant):
                 return True
@@ -817,7 +886,10 @@ class PipelineManager(object):
                      "it can no longer merge" % item.change)
             self.cancelJobs(item)
             self.dequeueItem(item)
-            item.setDequeuedNeedingChange()
+            if item.isBundleFailing():
+                item.setDequeuedBundleFailing()
+            else:
+                item.setDequeuedNeedingChange()
             if item.live:
                 try:
                     self.reportItem(item)
@@ -873,7 +945,15 @@ class PipelineManager(object):
             failing_reasons.append("is a non-live item with no items behind")
             self.dequeueItem(item)
             changed = dequeued = True
-        if ((not item_ahead) and item.areAllJobsComplete() and item.live):
+
+        can_report = not item_ahead and item.areAllJobsComplete() and item.live
+        if can_report and item.bundle:
+            can_report = can_report and (
+                item.isBundleFailing() or item.didBundleSucceed()
+            )
+            item.bundle.started_reporting = can_report
+
+        if can_report:
             try:
                 self.reportItem(item)
             except exceptions.MergeFailure:
@@ -883,6 +963,9 @@ class PipelineManager(object):
                              "item ahead, %s, failed to merge" %
                              (item_behind.change, item))
                     self.cancelJobs(item_behind)
+                if item.bundle and not item.isBundleFailing():
+                    item.bundle.failed_reporting = True
+                    self.reportProcessedBundleItems(item)
             self.dequeueItem(item)
             changed = dequeued = True
         elif not failing_reasons and item.live:
@@ -898,6 +981,19 @@ class PipelineManager(object):
                     self.sched.nodepool.reviseRequest(
                         node_request, priority)
         return (changed, nnfi)
+
+    def reportProcessedBundleItems(self, item):
+        """Report failure to already reported bundle items.
+
+        In case we encounter e.g. a merge failure when we already successfully
+        reported some items, we need to go back and report again.
+        """
+        reported_items = [i for i in item.bundle.items if i.reported]
+
+        actions = self.pipeline.failure_actions
+        for ri in reported_items:
+            ri.setReportedResult('FAILURE')
+            self.sendReport(actions, ri)
 
     def processQueue(self):
         # Do whatever needs to be done for each change in the queue
@@ -1058,7 +1154,7 @@ class PipelineManager(object):
             # _reportItem() returns True if it failed to report.
             item.reported = not self._reportItem(item)
         if self.changes_merge:
-            succeeded = item.didAllJobsSucceed()
+            succeeded = item.didAllJobsSucceed() and item.didBundleSucceed()
             merged = item.reported
             source = item.change.project.source
             if merged:
@@ -1121,9 +1217,11 @@ class PipelineManager(object):
             actions = self.pipeline.merge_failure_actions
             item.setReportedResult('CONFIG_ERROR')
         elif item.didMergerFail():
+            log.debug("merger failure")
             actions = self.pipeline.merge_failure_actions
             item.setReportedResult('MERGER_FAILURE')
         elif item.wasDequeuedNeedingChange():
+            log.debug("dequeued needing change")
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
         elif not item.getJobs():
@@ -1131,7 +1229,13 @@ class PipelineManager(object):
             log.debug("No jobs for change %s", item.change)
             actions = self.pipeline.no_jobs_actions
             item.setReportedResult('NO_JOBS')
-        elif item.didAllJobsSucceed():
+        elif item.isBundleFailing():
+            log.debug("bundle is failing")
+            actions = self.pipeline.failure_actions
+            item.setReportedResult("FAILURE")
+            if not item.didAllJobsSucceed():
+                self.pipeline._consecutive_failures += 1
+        elif item.didAllJobsSucceed() and item.didBundleSucceed():
             log.debug("success %s", self.pipeline.success_actions)
             actions = self.pipeline.success_actions
             item.setReportedResult('SUCCESS')
