@@ -220,6 +220,12 @@ configuration. Some examples of tenant definitions are:
             in-repo configuration for its own testing (which may not
             be relevant to other users of the project).
 
+         .. attr:: allow-circular-dependencies
+
+            Define if circular dependencies between changes are allowed.
+            Defaults to the tenant wide setting of
+            allow-circular-dependencies.
+
       .. attr:: <project-group>
 
          The items in the list are dictionaries with the following
@@ -329,6 +335,29 @@ configuration. Some examples of tenant definitions are:
       More information on tenant-scoped actions can be found in
       :ref:`tenant-scoped-rest-api`.
 
+   .. attr:: allow-circular-dependencies
+      :default: false
+
+      Define if Zuul is allowed to process circular dependencies between
+      changes. Circular dependencies must be allowed for all projects that
+      are part of a dependency cycle.
+
+      In case Zuul detects a dependency cycle it will make sure that every
+      change also includes all other changes that are part of the cycle.
+      However each change will still be a normal item in the queue with its own
+      jobs.
+
+      Changes with cross-repo circular dependencies are required to share the
+      same change queue for dependent pipelines. Reporting of success will be
+      postponed until all items in the cycle succeeded. In case of a failure in
+      any of those items the whole cycle will be dequeued.
+
+      An error message will be posted to all items of the cycle in case some
+      items fail to report (e.g. merge failure when some items were already
+      merged). In this case the target branch(es) might be in a broken state.
+
+      In general, circular dependencies are considered to be an antipattern but
+      can't be avoided in certain cases.
 
 .. _admin_rule_definition:
 
