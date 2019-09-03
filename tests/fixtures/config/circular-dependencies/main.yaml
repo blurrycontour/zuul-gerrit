@@ -1,0 +1,20 @@
+- tenant:
+    name: tenant-one
+    allow-circular-dependencies: true
+    source:
+      gerrit:
+        config-projects:
+          - common-config
+        untrusted-projects:
+          - org/project
+          - org/project1
+          - org/project2
+          - org/project3:
+              allow-circular-dependencies: false
+      github:
+        untrusted-projects:
+          - gh/project
+          - gh/project1
+          - gh/project2
+          - gh/project3:
+              allow-circular-dependencies: false
