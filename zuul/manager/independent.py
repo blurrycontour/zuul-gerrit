@@ -37,17 +37,18 @@ class IndependentPipelineManager(PipelineManager):
         return DynamicChangeQueueContextManager(change_queue)
 
     def enqueueChangesAhead(self, change, event, quiet, ignore_requirements,
-                            change_queue, history=None):
+                            change_queue, history=None, dependency_graph=None):
         log = get_annotated_logger(self.log, event)
 
+        history = history if history is not None else []
         if hasattr(change, 'number'):
-            history = history or []
-            history = history + [change]
+            history.append(change)
         else:
             # Don't enqueue dependencies ahead of a non-change ref.
             return True
 
-        ret = self.checkForChangesNeededBy(change, change_queue, event)
+        ret = self.checkForChangesNeededBy(change, change_queue, event,
+                                           dependency_graph=dependency_graph)
         if ret in [True, False]:
             return ret
         log.debug("  Changes %s must be merged ahead of %s" % (ret, change))
@@ -57,15 +58,17 @@ class IndependentPipelineManager(PipelineManager):
             # have jobs run.  Also, pipeline requirements are always
             # ignored (which is safe because the changes are not
             # live).
-            r = self.addChange(needed_change, event, quiet=True,
-                               ignore_requirements=True,
-                               live=False, change_queue=change_queue,
-                               history=history)
-            if not r:
-                return False
+            if needed_change not in history:
+                r = self.addChange(needed_change, event, quiet=True,
+                                   ignore_requirements=True, live=False,
+                                   change_queue=change_queue, history=history,
+                                   dependency_graph=dependency_graph)
+                if not r:
+                    return False
         return True
 
-    def checkForChangesNeededBy(self, change, change_queue, event):
+    def checkForChangesNeededBy(self, change, change_queue, event,
+                                dependency_graph=None):
         log = get_annotated_logger(self.log, event)
 
         if self.pipeline.ignore_dependencies:
@@ -89,6 +92,13 @@ class IndependentPipelineManager(PipelineManager):
             if needed_change.is_merged:
                 log.debug("  Needed change is merged")
                 continue
+
+            if dependency_graph is not None:
+                log.debug("  Adding change %s to dependency graph for "
+                          "change %s", needed_change, change)
+                node = dependency_graph.setdefault(change, [])
+                node.append(needed_change)
+
             if self.isChangeAlreadyInQueue(needed_change, change_queue):
                 log.debug("  Needed change is already ahead in the queue")
                 continue
