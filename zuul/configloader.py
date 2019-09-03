@@ -1368,6 +1368,7 @@ class QueueParser:
     def getSchema(self):
         queue = {vs.Required('name'): str,
                  'per-branch': bool,
+                 'allow-circular-dependencies': bool,
                  '_source_context': model.SourceContext,
                  '_start_mark': ZuulMark,
                  }
@@ -1375,7 +1376,11 @@ class QueueParser:
 
     def fromYaml(self, conf):
         self.schema(conf)
-        queue = model.Queue(conf['name'], conf.get('per-branch', False))
+        queue = model.Queue(
+            conf['name'],
+            conf.get('per-branch', False),
+            conf.get('allow-circular-dependencies', False),
+        )
         queue.source_context = conf.get('_source_context')
         queue.start_mark = conf.get('_start_mark')
         queue.freeze()
@@ -1479,6 +1484,7 @@ class TenantParser(object):
         'exclude-unprotected-branches': bool,
         'extra-config-paths': to_list(str),
         'load-branch': str,
+        'allow-circular-dependencies': bool,
     }}
 
     project = vs.Any(str, project_dict)
@@ -1519,6 +1525,7 @@ class TenantParser(object):
                   'allowed-reporters': to_list(str),
                   'allowed-labels': to_list(str),
                   'disallowed-labels': to_list(str),
+                  'allow-circular-dependencies': bool,
                   'default-parent': str,
                   'default-ansible-version': vs.Any(str, float),
                   'admin-rules': to_list(str),
