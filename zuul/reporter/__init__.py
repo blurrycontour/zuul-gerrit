@@ -158,6 +158,12 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     def _formatItemReportFailure(self, item, with_jobs=True):
         if item.dequeued_needing_change:
             msg = 'This change depends on a change that failed to merge.\n'
+        elif item.isBundleFailing():
+            msg = 'This change is part of a bundle that is failing.\n'
+            if with_jobs:
+                msg = '{}\n\n{}'.format(msg, self._formatItemReportJobs(item))
+            msg = "{}\n\n{}".format(
+                msg, self._formatItemReportOtherBundleItems(item))
         elif item.didMergerFail():
             msg = item.pipeline.merge_failure_message
         elif item.getConfigErrors():
@@ -189,6 +195,10 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             return self._formatItemReportFailure(item)
         else:
             return self._formatItemReport(item)
+
+    def _formatItemReportOtherBundleItems(self, item):
+        return "Related changes:\n{}".format("\n".join(
+            c.url for c in item.change.needs_changes if c is not item.change))
 
     def _getItemReportJobsFields(self, item):
         # Extract the report elements from an item
