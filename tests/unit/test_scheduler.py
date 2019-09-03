@@ -1145,7 +1145,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(F.reported, 2)
         self.assertEqual(G.reported, 2)
         self.assertEqual(self.history[6].changes,
-                         '1,1 2,1 3,1 4,1 5,1 6,1 7,1')
+                         '1,1 7,1 2,1 5,1 6,1 3,1 4,1')
 
     def test_source_cache(self):
         "Test that the source cache operates correctly"
