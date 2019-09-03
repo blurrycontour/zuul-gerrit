@@ -1417,6 +1417,7 @@ class TenantParser(object):
         'shadow': to_list(str),
         'exclude-unprotected-branches': bool,
         'extra-config-paths': to_list(str),
+        'allow-circular-dependencies': bool,
     }}
 
     project = vs.Any(str, project_dict)
@@ -1456,6 +1457,7 @@ class TenantParser(object):
                   'allowed-triggers': to_list(str),
                   'allowed-reporters': to_list(str),
                   'allowed-labels': to_list(str),
+                  'allow-circular-dependencies': bool,
                   'default-parent': str,
                   'default-ansible-version': vs.Any(str, float),
                   'admin-rules': to_list(str),
@@ -1478,6 +1480,9 @@ class TenantParser(object):
             tenant.authorization_rules = conf['admin-rules']
         if conf.get('report-build-page') is not None:
             tenant.report_build_page = conf['report-build-page']
+        if conf.get('allow-circular-dependencies') is not None:
+            tenant.allow_circular_dependencies = \
+                conf['allow-circular-dependencies']
         tenant.web_root = conf.get('web-root', self.scheduler.web_root)
         if tenant.web_root and not tenant.web_root.endswith('/'):
             tenant.web_root += '/'
@@ -1627,6 +1632,7 @@ class TenantParser(object):
             project_include = current_include
             shadow_projects = []
             project_exclude_unprotected_branches = None
+            project_allow_circular_dependencies = None
         else:
             project_name = list(conf.keys())[0]
             project = source.getProject(project_name)
@@ -1651,6 +1657,8 @@ class TenantParser(object):
                                             if not x.endswith('/')])
                 extra_config_dirs = tuple([x[:-1] for x in extra_config_paths
                                            if x.endswith('/')])
+            project_allow_circular_dependencies = conf[project_name].get(
+                'allow-circular-dependencies', None)
 
         tenant_project_config = model.TenantProjectConfig(project)
         tenant_project_config.load_classes = frozenset(project_include)
@@ -1659,6 +1667,8 @@ class TenantParser(object):
             project_exclude_unprotected_branches
         tenant_project_config.extra_config_files = extra_config_files
         tenant_project_config.extra_config_dirs = extra_config_dirs
+        tenant_project_config.allow_circular_dependencies = \
+            project_allow_circular_dependencies
 
         return tenant_project_config
 
