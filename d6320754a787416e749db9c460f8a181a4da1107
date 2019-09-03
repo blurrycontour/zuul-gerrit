@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "7faddb67_4b20eb49",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-09-03T12:34:22Z",
+      "side": 1,
+      "message": "Yes it does. I tried it out:\n\n- the field \"changedFiles\" on PullRequest gives the correct number of changed files in the PR even if it\u0027s more than 300 (see https://developer.github.com/enterprise/2.15/v4/object/pullrequest/#fields)\n- but the PullRequestChangedFileConnection gives only up to 300 files.",
+      "parentUuid": "7faddb67_75f7008e",
+      "revId": "d6320754a787416e749db9c460f8a181a4da1107",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7faddb67_232044b0",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 31
