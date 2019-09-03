@@ -493,10 +493,15 @@ class ChangeQueue(object):
         return True
 
     def isActionable(self, item):
-        if self.window:
-            return item in self.queue[:self.window]
-        else:
+        if not self.window:
             return True
+        # Ignore done items waiting for bundle dependencies to finish
+        num_waiting_items = len([
+            i for i in self.queue
+            if i.bundle and i.areAllJobsComplete()
+        ])
+        window = self.window + num_waiting_items
+        return item in self.queue[:window]
 
     def increaseWindowSize(self):
         if self.window:
@@ -2039,12 +2044,15 @@ class BuildSet(object):
         if not self.uuid:
             self.uuid = uuid4().hex
         if self.dependent_changes is None:
-            items = [self.item]
-            next_item = self.item.item_ahead
-            while next_item:
-                items.append(next_item)
-                next_item = next_item.item_ahead
+            items = []
+            if self.item.bundle:
+                items.extend(reversed(self.item.bundle.items))
+            else:
+                items.append(self.item)
+
+            items.extend(i for i in self.item.items_ahead if i not in items)
             items.reverse()
+
             self.dependent_changes = [i.change.toDict() for i in items]
             self.merger_items = [i.makeMergerItem() for i in items]
 
@@ -2167,6 +2175,11 @@ class QueueItem(object):
         self._old_job_graph = None  # Cached job graph of previous layout
         self._cached_sql_results = {}
         self.event = event  # The trigger event that lead to this queue item
+
+        # A bundle holds other queue items that have to be successful
+        # for the current queue item to succeed
+        self.bundle = None
+        self.dequeued_bundle_failing = False
 
     def annotateLogger(self, logger):
         """Return an annotated logger with the trigger event"""
@@ -2337,6 +2350,31 @@ class QueueItem(object):
                 return True
         return False
 
+    def isBundleFailing(self):
+        if self.bundle:
+            # We are only checking other items that share the same change
+            # queue, since we don't need to wait for changes in other change
+            # queues.
+            return self.bundle.failed_reporting or any(
+                i.hasAnyJobFailed() or i.didMergerFail()
+                for i in self.bundle.items
+                if i.live and i.queue == self.queue)
+        return False
+
+    def didBundleFinish(self):
+        if self.bundle:
+            # We are only checking other items that share the same change
+            # queue, since we don't need to wait for changes in other change
+            # queues.
+            return all(i.areAllJobsComplete() for i in self.bundle.items if
+                       i.live and i.queue == self.queue)
+        return True
+
+    def didBundleStartReporting(self):
+        if self.bundle:
+            return self.bundle.started_reporting
+        return False
+
     def didMergerFail(self):
         return self.current_build_set.unable_to_merge
 
@@ -2351,6 +2389,21 @@ class QueueItem(object):
         includes_untrusted = False
         tenant = self.pipeline.tenant
         item = self
+
+        if item.bundle:
+            # Check all items in the bundle for config updates
+            for bundle_item in item.bundle.items:
+                if bundle_item.change.updatesConfig(tenant):
+                    trusted, project = tenant.getProject(
+                        bundle_item.change.project.canonical_name)
+                    if trusted:
+                        includes_trusted = True
+                    else:
+                        includes_untrusted = True
+                if includes_trusted and includes_untrusted:
+                    # We're done early
+                    return includes_trusted, includes_untrusted
+
         while item:
             if item.change.updatesConfig(tenant):
                 (trusted, project) = tenant.getProject(
@@ -2700,6 +2753,10 @@ class QueueItem(object):
         self.dequeued_needing_change = True
         self._setAllJobsSkipped()
 
+    def setDequeuedBundleFailing(self):
+        self.dequeued_bundle_failing = True
+        self._setMissingJobsSkipped()
+
     def setUnableToMerge(self):
         self.current_build_set.unable_to_merge = True
         self._setAllJobsSkipped()
@@ -2714,6 +2771,15 @@ class QueueItem(object):
 
     def _setAllJobsSkipped(self):
         for job in self.getJobs():
+            fakebuild = Build(job, None)
+            fakebuild.result = 'SKIPPED'
+            self.addBuild(fakebuild)
+
+    def _setMissingJobsSkipped(self):
+        for job in self.getJobs():
+            if job.name in self.current_build_set.builds:
+                # We already have a build for this job
+                continue
             fakebuild = Build(job, None)
             fakebuild.result = 'SKIPPED'
             self.addBuild(fakebuild)
@@ -3047,6 +3113,25 @@ class QueueItem(object):
         return False
 
 
+class Bundle:
+    """Identifies a collection of changes that must be treated as one unit."""
+
+    def __init__(self):
+        self.items = []
+        self.started_reporting = False
+        self.failed_reporting = False
+
+    def __repr__(self):
+        return '<Bundle 0x{:x} {}'.format(id(self), self.items)
+
+    def add_item(self, item):
+        if item not in self.items:
+            self.items.append(item)
+
+    def updatesConfig(self, tenant):
+        return any(i.change.updatesConfig(tenant) for i in self.items)
+
+
 class Ref(object):
     """An existing state of a Project."""
 
@@ -3217,8 +3302,9 @@ class Change(Branch):
 
     @property
     def needs_changes(self):
+        commit_needs_changes = self.commit_needs_changes or []
         return (self.git_needs_changes + self.compat_needs_changes +
-                self.commit_needs_changes)
+                commit_needs_changes)
 
     @property
     def needed_by_changes(self):
@@ -3497,6 +3583,7 @@ class ProjectMetadata(object):
     def __init__(self):
         self.merge_mode = None
         self.default_branch = None
+        self.queue_name = None
 
 
 class ConfigItemNotListError(Exception):
@@ -3937,6 +4024,11 @@ class Layout(object):
         if (md.default_branch is None and
             project_config.default_branch is not None):
             md.default_branch = project_config.default_branch
+        if (
+            md.queue_name is None
+            and project_config.queue_name is not None
+        ):
+            md.queue_name = project_config.queue_name
 
     def getProjectConfigs(self, name):
         return self.project_configs.get(name, [])
@@ -4253,10 +4345,12 @@ class Semaphore(ConfigObject):
 
 
 class Queue(ConfigObject):
-    def __init__(self, name, per_branch=False):
+    def __init__(self, name, per_branch=False,
+                 allow_circular_dependencies=False):
         super().__init__()
         self.name = name
         self.per_branch = per_branch
+        self.allow_circular_dependencies = allow_circular_dependencies
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -4264,8 +4358,12 @@ class Queue(ConfigObject):
     def __eq__(self, other):
         if not isinstance(other, Queue):
             return False
-        return (self.name == other.name and
-                self.per_branch == other.per_branch)
+        return (
+            self.name == other.name and
+            self.per_branch == other.per_branch and
+            self.allow_circular_dependencies ==
+            other.allow_circular_dependencies
+        )
 
 
 class SemaphoreHandler(object):
