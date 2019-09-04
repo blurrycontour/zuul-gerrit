@@ -68,6 +68,23 @@
       "revId": "d6320754a787416e749db9c460f8a181a4da1107",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_a7274012",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 1659,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-09-04T08:12:57Z",
+      "side": 1,
+      "message": "Format args are missing (team_org, team_name?) for this log line",
+      "revId": "d6320754a787416e749db9c460f8a181a4da1107",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
