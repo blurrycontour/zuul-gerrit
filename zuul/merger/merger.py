@@ -332,7 +332,7 @@ class Repo(object):
         if refname not in repo.refs:
             return None
         ref = repo.refs[refname]
-        return ref.commit
+        return ref.commit.hexsha
 
     def getRefs(self, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
@@ -878,3 +878,9 @@ class Merger(object):
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
         return repo.getFilesChanges(branch, tosha, zuul_event_id=zuul_event_id)
+
+    def getCommitFromRef(self, connection_name, project_name, refname,
+                         zuul_event_id=None):
+        repo = self.getRepo(connection_name, project_name,
+                            zuul_event_id=zuul_event_id)
+        return repo.getCommitFromRef(refname, zuul_event_id=zuul_event_id)

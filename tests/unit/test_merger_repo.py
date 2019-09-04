@@ -241,6 +241,17 @@ class TestMergerRepo(ZuulTestCase):
 
         self.assertEqual(['README'], changed_files)
 
+    def test_get_commit_from_ref(self):
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        repo = git.Repo(parent_path)
+        self.create_branch('org/project1', 'feature')
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        commit = work_repo.getCommitFromRef('feature')
+
+        self.assertEqual(repo.refs['feature'].commit.hexsha, commit)
+
     def test_files_changes_master_fork_merges(self):
         """Regression test for getFilesChanges()
 
