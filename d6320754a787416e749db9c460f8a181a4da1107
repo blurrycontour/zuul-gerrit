@@ -85,6 +85,24 @@
       "revId": "d6320754a787416e749db9c460f8a181a4da1107",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7faddb67_38d3713a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 1659,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-09-04T10:56:09Z",
+      "side": 1,
+      "message": "Yes found that too. Caused me a bit headache last 2 days :) Fix will come soon.",
+      "parentUuid": "7faddb67_a7274012",
+      "revId": "d6320754a787416e749db9c460f8a181a4da1107",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
