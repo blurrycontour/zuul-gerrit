@@ -1126,6 +1126,19 @@ class FakePagureConnection(pagureconnection.PagureConnection):
         }
         return (name, data)
 
+    def getGitTagCreatedEvent(self, project, tag):
+        name = 'pg_push'
+        data = {
+            'msg': {
+                'project_fullname': project,
+                'tag': tag,
+            },
+            'msg_id': str(uuid.uuid4()),
+            'timestamp': 1427459070,
+            'topic': 'git.tag.creation',
+        }
+        return (name, data)
+
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
 
