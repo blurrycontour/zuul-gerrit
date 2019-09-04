@@ -12,7 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os
 import re
+import git
 import yaml
 import time
 import socket
@@ -242,6 +244,25 @@ class TestPagureDriver(ZuulTestCase):
              {'name': 'project-post-job2'},
             ], ordered=False
         )
+
+    @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
+    def test_tag_created(self):
+
+        event = self.fake_pagure.getGitTagCreatedEvent('org/project', '1.0')
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        repo.create_tag('1.0')
+        self.fake_pagure.emitEvent(event)
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(
+            'SUCCESS',
+            self.getJobFromHistory('project-tag-job').result)
+        job = self.getJobFromHistory('project-tag-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual('refs/tags/1.0', zuulvars['ref'])
+        self.assertEqual('tag', zuulvars['pipeline'])
+        self.assertEqual('project-tag-job', zuulvars['job'])
 
     @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
     def test_client_dequeue_change_pagure(self):
