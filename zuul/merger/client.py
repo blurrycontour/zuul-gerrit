@@ -176,6 +176,22 @@ class MergeClient(object):
                              precedence, event=event)
         return job
 
+    def getCommitFromRef(self, connection_name, project_name, refname,
+                         precedence=zuul.model.PRECEDENCE_HIGH,
+                         build_set=None, event=None):
+        if event is not None:
+            zuul_event_id = event.zuul_event_id
+        else:
+            zuul_event_id = None
+
+        data = dict(connection=connection_name,
+                    project=project_name,
+                    refname=refname,
+                    zuul_event_id=zuul_event_id)
+        job = self.submitJob('merger:getcommitfromref', data, build_set,
+                             precedence, event=event)
+        return job
+
     def onBuildCompleted(self, job):
         data = getJobData(job)
         zuul_event_id = data.get('zuul_event_id')
@@ -187,6 +203,7 @@ class MergeClient(object):
         files = data.get('files', {})
         repo_state = data.get('repo_state', {})
         job.files = files
+        job.commit = commit
         log.info("Merge %s complete, merged: %s, updated: %s, "
                  "commit: %s", job, merged, job.updated, commit)
         job.setComplete()

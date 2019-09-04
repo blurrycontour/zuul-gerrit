@@ -2421,6 +2421,7 @@ class ExecutorServer(object):
             'merger:cat': self.cat,
             'merger:refstate': self.refstate,
             'merger:fileschanges': self.fileschanges,
+            'merger:getcommitfromref': self.getcommitfromref
         }
         self.merger_gearworker = ZuulGearWorker(
             'Zuul Executor Merger',
@@ -2800,6 +2801,23 @@ class ExecutorServer(object):
                 args['tosha'], zuul_event_id=zuul_event_id)
         result = dict(updated=True,
                       files=files)
+        result['zuul_event_id'] = zuul_event_id
+        job.sendWorkComplete(json.dumps(result))
+
+    def getcommitfromref(self, job):
+        self.log.debug("Got getcommitfromref job: %s" % job.unique)
+        args = json.loads(job.arguments)
+        zuul_event_id = args.get('zuul_event_id')
+        task = self.update(args['connection'], args['project'])
+        task.wait()
+        lock = self.repo_locks.getRepoLock(
+            args['connection'], args['project'])
+        with lock:
+            commit = self.merger.getCommitFromRef(
+                args['connection'], args['project'],
+                args['refname'], zuul_event_id=zuul_event_id)
+        result = dict(updated=True,
+                      commit=commit)
         result['zuul_event_id'] = zuul_event_id
         job.sendWorkComplete(json.dumps(result))
 
