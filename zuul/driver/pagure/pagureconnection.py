@@ -199,7 +199,9 @@ class PagureEventConnector(threading.Thread):
             'pull-request.new': self._event_pull_request,
             'pull-request.flag.added': self._event_flag_added,
             'git.receive': self._event_ref_updated,
-            'git.tag.creation': self._event_tag_created
+            'git.tag.creation': self._event_tag_created,
+            'pull-request.initial_comment.edited':
+                self._event_issue_initial_comment
         }
 
     def stop(self):
@@ -263,6 +265,12 @@ class PagureEventConnector(threading.Thread):
             data = body['msg']
             event.type = 'pg_push'
         return event, data
+
+    def _event_issue_initial_comment(self, body):
+        """ Handles pull request initial comment change """
+        event, _ = self._event_base(body)
+        event.action = 'changed'
+        return event
 
     def _event_issue_comment(self, body):
         """ Handles pull request comments """
