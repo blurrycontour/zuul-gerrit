@@ -56,6 +56,7 @@ class GerritTrigger(BaseTrigger):
                 reject_approvals=to_list(
                     trigger.get('reject-approval')
                 ),
+                uuid=trigger.get('uuid'),
                 ignore_deletes=ignore_deletes
             )
             efilters.append(f)
@@ -80,7 +81,9 @@ def getSchema():
                                  'change-restored',
                                  'change-merged',
                                  'comment-added',
-                                 'ref-updated')),
+                                 'ref-updated',
+                                 'pending-check')),
+        'uuid': str,
         'comment_filter': scalar_or_list(str),
         'comment': scalar_or_list(str),
         'email_filter': scalar_or_list(str),

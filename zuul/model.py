@@ -2125,6 +2125,7 @@ class QueueItem(object):
         self.item_ahead = None
         self.items_behind = []
         self.enqueue_time = None
+        self.report_time = None
         self.dequeue_time = None
         self.reported = False
         self.reported_enqueue = False
@@ -2165,6 +2166,7 @@ class QueueItem(object):
         self.current_build_set.removeBuild(build)
 
     def setReportedResult(self, result):
+        self.report_time = time.time()
         self.current_build_set.result = result
 
     def debug(self, msg, indent=0):
@@ -2685,6 +2687,27 @@ class QueueItem(object):
             return (build.result, url)
         else:
             return self.formatProvisionalJobResult(job)
+
+    def formatStatusUrl(self):
+        if self.current_build_set.result:
+            # We have reported (or are reporting) and so we should
+            # send the buildset page url
+            if (self.pipeline.tenant.report_build_page and
+                self.pipeline.tenant.web_root):
+                pattern = urllib.parse.urljoin(self.pipeline.tenant.web_root,
+                                               'buildset/{buildset.uuid}')
+                return self.formatUrlPattern(pattern)
+        # We haven't reported yet (or we don't have a database), so
+        # the best we can do at the moment is send the status page
+        # url.  TODO: require a database, insert buildsets into it
+        # when they are created, and remove this case.
+        if self.pipeline.tenant.web_root:
+            pattern = urllib.parse.urljoin(
+                self.pipeline.tenant.web_root,
+                'status/change/{change.number},{change.patchset}')
+            return self.formatUrlPattern(pattern)
+        # Apparently we have no web site.
+        return None
 
     def formatProvisionalJobResult(self, job):
         build = self.current_build_set.getBuild(job.name)
