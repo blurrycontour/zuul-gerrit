@@ -47,7 +47,7 @@ class GerritEventConnector(threading.Thread):
     """Move events from Gerrit to the scheduler."""
 
     log = logging.getLogger("zuul.GerritEventConnector")
-    delay = 10.0
+    delay = 1.0 #XXX
 
     def __init__(self, connection):
         super(GerritEventConnector, self).__init__()
@@ -79,7 +79,9 @@ class GerritEventConnector(threading.Thread):
         event.zuul_event_id = str(uuid4().hex)
         log = get_annotated_logger(self.log, event)
 
+        print(data)
         event.type = data.get('type')
+        event.uuid = data.get('uuid')
         # This catches when a change is merged, as it could potentially
         # have merged layout info which will need to be read in.
         # Ideally this would be done with a refupdate event so as to catch
@@ -92,6 +94,7 @@ class GerritEventConnector(threading.Thread):
         change = data.get('change')
         event.project_hostname = self.connection.canonical_hostname
         if change:
+            print(change)
             event.project_name = change.get('project')
             event.branch = change.get('branch')
             event.change_number = str(change.get('number'))
@@ -131,6 +134,7 @@ class GerritEventConnector(threading.Thread):
             'ref-replication-scheduled': None,
             'topic-changed': 'changer',
             'project-created': None,  # Gerrit 2.14
+            'pending-check': None,  # Gerrit 3.0+
         }
         event.account = None
         if event.type in accountfield_from_type:
@@ -294,6 +298,59 @@ class GerritWatcher(threading.Thread):
         self._stopped = True
 
 
+class GerritPoller(threading.Thread):
+    # Poll gerrits without stream-events
+    log = logging.getLogger("gerrit.GerritPoller")
+    poll_timeout = 500
+
+    def __init__(self, gerrit_connection):
+        threading.Thread.__init__(self)
+        self.gerrit_connection = gerrit_connection
+        self._stopped = False
+
+        #import http.client as http_client
+        #http_client.HTTPConnection.debuglevel = 1
+
+    def _read(self, fd):
+        while True:
+            l = fd.readline()
+            data = json.loads(l)
+            self.log.debug("Received data from Gerrit event stream: \n%s" %
+                           pprint.pformat(data))
+            self.gerrit_connection.addEvent(data)
+            # Continue until all the lines received are consumed
+            if fd._pos == fd._realpos:
+                break
+
+    def _run(self):
+        try:
+            time.sleep(5)
+            changes = self.gerrit_connection.get('plugins/checks/checks.pending/?query=checker:zuul:check+(state:NOT_STARTED)')
+            for change in changes:
+                for uuid, check in change['pending_checks'].items():
+                    event = {'type': 'pending-check',
+                             'uuid': uuid,
+                             'change': {
+                                 'project': change['patch_set']['repository'],
+                                 'number': change['patch_set']['change_number'],
+                             },
+                             'patchSet': {
+                                 'number': change['patch_set']['patch_set_id'],
+                             }}
+                    self.gerrit_connection.addEvent(event)
+        except Exception:
+            self.log.exception("Exception on Gerrit poll with %s:",
+                               self.gerrit_connection.connection_name)
+
+    def run(self):
+        while not self._stopped:
+            self._run()
+
+    def stop(self):
+        self.log.debug("Stopping watcher")
+        self._stopped = True
+
+
 class GerritConnection(BaseConnection):
     driver_name = 'gerrit'
     log = logging.getLogger("zuul.GerritConnection")
@@ -325,6 +382,7 @@ class GerritConnection(BaseConnection):
         self.keyfile = self.connection_config.get('sshkey', None)
         self.keepalive = int(self.connection_config.get('keepalive', 60))
         self.watcher_thread = None
+        self.poller_thread = None
         self.event_queue = queue.Queue()
         self.client = None
 
@@ -374,6 +432,28 @@ class GerritConnection(BaseConnection):
 
     def url(self, path):
         return self.baseurl + '/a/' + path
+
+    def get(self, path):
+        url = self.url(path)
+        self.log.debug('GET: %s' % (url,))
+        r = self.session.get(
+            url,
+            verify=self.verify_ssl,
+            auth=self.auth, timeout=TIMEOUT,
+            headers={'User-Agent': self.user_agent})
+        self.log.debug('Received: %s %s' % (r.status_code, r.text,))
+        if r.status_code != 200:
+            raise Exception("Received response %s" % (r.status_code,))
+        ret = None
+        if r.text and len(r.text) > 4:
+            try:
+                ret = json.loads(r.text[4:])
+            except Exception:
+                self.log.exception(
+                    "Unable to parse result %s from post to %s" %
+                    (r.text, url))
+                raise
+        return ret
 
     def post(self, path, data):
         url = self.url(path)
@@ -1077,12 +1157,14 @@ class GerritConnection(BaseConnection):
 
     def onLoad(self):
         self.log.debug("Starting Gerrit Connection/Watchers")
-        self._start_watcher_thread()
+        #self._start_watcher_thread()
+        self._start_poller_thread()
         self._start_event_connector()
 
     def onStop(self):
         self.log.debug("Stopping Gerrit Connection/Watchers")
-        self._stop_watcher_thread()
+        #self._stop_watcher_thread()
+        self._stop_poller_thread()
         self._stop_event_connector()
 
     def _stop_watcher_thread(self):
@@ -1099,6 +1181,15 @@ class GerritConnection(BaseConnection):
             keyfile=self.keyfile,
             keepalive=self.keepalive)
         self.watcher_thread.start()
+
+    def _stop_poller_thread(self):
+        if self.poller_thread:
+            self.poller_thread.stop()
+            self.poller_thread.join()
+
+    def _start_poller_thread(self):
+        self.poller_thread = GerritPoller(self)
+        self.poller_thread.start()
 
     def _stop_event_connector(self):
         if self.gerrit_event_connector:
