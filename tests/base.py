@@ -191,6 +191,7 @@ class FakeGerritChange(object):
         self.fail_merge = False
         self.messages = []
         self.comments = []
+        self.checks = {}
         self.data = {
             'branch': branch,
             'comments': self.comments,
@@ -285,6 +286,29 @@ class FakeGerritChange(object):
         self.data['currentPatchSet'] = d
         self.patchsets.append(d)
         self.data['submitRecords'] = self.getSubmitRecords()
+        self.setCheck('zuul:check', reset=True)
+
+    def setCheck(self, checker, reset=False, **kw):
+        if reset:
+            self.checks[checker] = {'state': 'NOT_STARTED',
+                                    'created': str(datetime.datetime.now())}
+        chk = self.checks[checker]
+        chk['updated'] = str(datetime.datetime.now())
+        for (key, default) in [
+                ('repository', self.project),
+                ('change_number', self.number),
+                ('patch_set_id', self.latest_patchset),
+                ('checker_uuid', checker),
+                ('message', None),
+                ('url', None),
+                ('started', None),
+                ('finished', None),
+                ]:
+            val = kw.get(key, default)
+            if val is not None:
+                chk[key] = kw.get(key, default)
+            elif key in chk:
+                del chk[key]
 
     def addComment(self, filename, line, message, name, email, username,
                    comment_range=None):
@@ -393,6 +417,8 @@ class FakeGerritChange(object):
                     granted_on=None, message=''):
         if not granted_on:
             granted_on = time.time()
+        if category == 'Code-Review':
+            self.setCheck('zuul:gate', reset=True)
         approval = {
             'description': self.categories[category][0],
             'type': category,
@@ -521,6 +547,10 @@ class GerritWebServer(object):
             log = logging.getLogger("zuul.test.FakeGerritConnection")
             review_re = re.compile('/a/changes/(.*?)/revisions/(.*?)/review')
             submit_re = re.compile('/a/changes/(.*?)/submit')
+            pending_checks_re = re.compile(
+                '/a/plugins/checks/checks\.pending/\?query=checker:(.*?)\+\(state:(.*?)\)')
+            update_checks_re = re.compile(
+                '/a/changes/(.*)/revisions/(.*?)/checks/(.*)')
 
             def do_POST(self):
                 path = self.path
@@ -536,6 +566,19 @@ class GerritWebServer(object):
                 m = self.submit_re.match(path)
                 if m:
                     return self.submit(m.group(1), data)
+                m = self.update_checks_re.match(path)
+                if m:
+                    return self.update_checks(m.group(1), m.group(2), m.group(3), data)
+                self.send_response(500)
+                self.end_headers()
+
+            def do_GET(self):
+                path = self.path
+                self.log.debug("Got GET %s", path)
+
+                m = self.pending_checks_re.match(path)
+                if m:
+                    return self.get_pending_checks(m.group(1), m.group(2))
                 self.send_response(500)
                 self.end_headers()
 
@@ -555,7 +598,7 @@ class GerritWebServer(object):
                     return self._404()
 
                 message = data['message']
-                action = data['labels']
+                action = data.get('labels', {})
                 comments = data.get('comments', {})
                 fake_gerrit._test_handle_review(
                     int(change.data['number']), message, action, comments)
@@ -574,6 +617,49 @@ class GerritWebServer(object):
                 self.send_response(200)
                 self.end_headers()
 
+            def update_checks(self, change_id, revision, checker, data):
+                self.log.debug("Update checks %s %s %s", change_id, revision, checker)
+                change = self._get_change(change_id)
+                if not change:
+                    return self._404()
+
+                change.setCheck(checker, **data)
+                self.send_response(200)
+                # TODO: return the real data structure, but zuul
+                # ignores this now.
+                self.end_headers()
+
+            def get_pending_checks(self, checker, state):
+                self.log.debug("Get pending checks %s %s", checker, state)
+                ret = []
+                for c in fake_gerrit.changes.values():
+                    if checker not in c.checks:
+                        continue
+                    patchset_pending_checks = {}
+                    if c.checks[checker]['state'] == state:
+                        patchset_pending_checks[checker] = {
+                            'state': c.checks[checker]['state'],
+                        }
+                    if patchset_pending_checks:
+                        ret.append({
+                            'patch_set': {
+                                'repository': c.project,
+                                'change_number': c.number,
+                                'patch_set_id': c.latest_patchset,
+                            },
+                            'pending_checks': patchset_pending_checks,
+                        })
+                self.send_data(ret)
+
+            def send_data(self, data):
+                data = json.dumps(data).encode('utf-8')
+                data = b")]}'\n" + data
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Length', len(data))
+                self.end_headers()
+                self.wfile.write(data)
+
             def log_message(self, fmt, *args):
                 self.log.debug(fmt, *args)
 
@@ -589,6 +675,15 @@ class GerritWebServer(object):
         self.thread.join()
 
 
+class FakeGerritPoller(gerritconnection.GerritPoller):
+    poll_interval = 1
+
+    def _run(self, *args, **kw):
+        r = super(FakeGerritPoller, self)._run(*args, **kw)
+        self.gerrit_connection._poller_event.set()
+        return r
+
+
 class FakeGerritConnection(gerritconnection.GerritConnection):
     """A Fake Gerrit connection for use in tests.
 
@@ -598,9 +693,10 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
     """
 
     log = logging.getLogger("zuul.test.FakeGerritConnection")
+    poller_class = FakeGerritPoller
 
     def __init__(self, driver, connection_name, connection_config,
-                 changes_db=None, upstream_root=None):
+                 changes_db=None, upstream_root=None, poller_event=None):
 
         if connection_config.get('password'):
             self.web_server = GerritWebServer(self)
@@ -619,6 +715,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.changes = changes_db
         self.queries = []
         self.upstream_root = upstream_root
+        self._poller_event = poller_event
 
     def addFakeChange(self, project, branch, subject, status='NEW',
                       files=None, parent=None):
@@ -2929,6 +3026,7 @@ class ZuulTestCase(BaseTestCase):
             self.sched.trigger_event_queue,
             self.sched.management_event_queue
         ]
+        self.poller_events = {}
 
         self.configure_connections()
         self.sched.registerConnections(self.connections)
@@ -2992,9 +3090,11 @@ class ZuulTestCase(BaseTestCase):
 
         def getGerritConnection(driver, name, config):
             db = self.gerrit_changes_dbs.setdefault(config['server'], {})
+            event = self.poller_events.setdefault(name, threading.Event())
             con = FakeGerritConnection(driver, name, config,
                                        changes_db=db,
-                                       upstream_root=self.upstream_root)
+                                       upstream_root=self.upstream_root,
+                                       poller_event=event)
             if con.web_server:
                 self.addCleanup(con.web_server.stop)
 
@@ -3627,6 +3727,10 @@ class ZuulTestCase(BaseTestCase):
                 self.sched.run_handler_lock.release()
             self.executor_server.lock.release()
             self.sched.wake_event.wait(0.1)
+
+    def waitForPoll(self, poller, timeout=30):
+        self.poller_events[poller].clear()
+        self.poller_events[poller].wait(30)
 
     def logState(self):
         """ Log the current state of the system """

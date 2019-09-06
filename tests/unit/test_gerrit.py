@@ -17,7 +17,9 @@ import textwrap
 from unittest import mock
 
 import tests.base
-from tests.base import BaseTestCase, ZuulTestCase, AnsibleZuulTestCase
+from tests.base import (
+    BaseTestCase, ZuulTestCase, AnsibleZuulTestCase,
+    simple_layout)
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.gerrit.gerritconnection import GerritConnection
 
@@ -236,3 +238,16 @@ class TestFileComments(AnsibleZuulTestCase):
                       "A should have a validation error reported")
         self.assertIn('invalid file missingfile.txt', A.messages[0],
                       "A should have file error reported")
+
+
+class TestChecksApi(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+
+    @simple_layout('layouts/gerrit-checks.yaml')
+    def test_check_pipeline(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitForPoll('gerrit')
+        self.waitUntilSettled()
+
+        # XXX: add assertions
