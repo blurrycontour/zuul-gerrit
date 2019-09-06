@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_ad7a6f85",
+        "filename": "web/src/actions/build.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-06T19:03:52Z",
+      "side": 0,
+      "message": "Need to update web/src/actions/build.test.js to stop testing the heuristics too.",
+      "revId": "cfe6a7b985125325605ef192b2de5fe1986ef569",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
