@@ -1209,8 +1209,8 @@ class PipelineParser(object):
             'merge-failure-message', "Merge Failed.\n\nThis change or one "
             "of its cross-repo dependencies was unable to be "
             "automatically merged with the current state of its "
-            "repository. Please rebase the change and upload a new "
-            "patchset.")
+            "repository. Please ensure that the change merges cleanly "
+            "and meets all requirements.")
         pipeline.success_message = conf.get('success-message',
                                             "Build succeeded.")
         pipeline.footer_message = conf.get('footer-message', "")
