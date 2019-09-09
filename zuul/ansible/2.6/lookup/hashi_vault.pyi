@@ -1,0 +1,1 @@
+../../base/library/hashi_vault.pyi
