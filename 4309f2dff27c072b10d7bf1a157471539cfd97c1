@@ -22,6 +22,23 @@
       "revId": "4309f2dff27c072b10d7bf1a157471539cfd97c1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_ecb129e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 6488
+      },
+      "writtenOn": "2019-09-09T17:38:20Z",
+      "side": 1,
+      "message": "I believe that was the main reasoning behind using the Ansible Operator. So while there\u0027s only one thing in this list, it goes to the heart of the community\u0027s ability to engage, and I am concerned that this outweighs all the benefits above.",
+      "revId": "4309f2dff27c072b10d7bf1a157471539cfd97c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
