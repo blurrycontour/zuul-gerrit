@@ -12,8 +12,8 @@ and operate "A Zuul" in their Kubernetes and leave the details of how
 that works to the Operator.
 
 To that end, the Zuul Project should create and maintain a Kubernetes
-Operator for running Zuul. Given the close ties between Zuul and Ansible,
-we should use `Ansible Operator`_ to implement the Operator. Our existing
+Operator for running Zuul. Given the popularity of the framework,
+we should use `Operator SDK`_ to implement the Operator. Our existing
 community is already running Zuul in both Kubernetes and OpenShift, so
 we should ensure our Operator works in both. When we're happy with it,
 we should publish it to `OperatorHub`_.
@@ -21,7 +21,7 @@ we should publish it to `OperatorHub`_.
 That's the easy part. The remainder of the document is for hammering out
 some of the finer details.
 
-.. _Ansible Operator: https://github.com/operator-framework/operator-sdk/blob/master/doc/ansible/user-guide.md
+.. _Operator SDK: https://github.com/operator-framework/operator-sdk
 .. _OperatorHub: https://www.operatorhub.io/
 
 Custom Resource Definitions
