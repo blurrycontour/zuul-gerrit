@@ -137,6 +137,12 @@ the following options.
       the status, the status context, and the status itself in the
       format of ``status``.  For example, ``success`` or ``failure``.
 
+   .. attr:: tag
+
+      This is used for ``pg_pull_request``. It accepts a list of
+      strings and if one of them is part of the event tags metadata
+      then the trigger is matched.
+
    .. attr:: ref
 
       This is only used for ``pg_push`` events. This field is treated as
@@ -225,6 +231,11 @@ must have a score of *1*, a CI status *success* and not being already merged.
 
       A boolean value (``true`` or ``false``) that indicates whether
       the Pull Request must be open or closed in order to be enqueued.
+
+   .. attr:: tags
+
+      if present, the list of tags a Pull Request must have.
+
 
 Reference pipelines configuration
 ---------------------------------

@@ -827,6 +827,7 @@ class FakePagurePullRequest(object):
         self.comments = []
         self.flags = []
         self.files = {}
+        self.tags = []
         self.cached_merge_status = ''
         self.threshold_reached = False
         self.commit_stop = None
@@ -853,6 +854,7 @@ class FakePagurePullRequest(object):
                     'date_created': '0',
                     'initial_comment': self.initial_comment,
                     'id': self.number,
+                    'tags': self.tags,
                     'project': {
                         'fullname': self.project,
                     },
@@ -887,6 +889,13 @@ class FakePagurePullRequest(object):
         self.initial_comment = message
         self._updateTimeStamp()
         return self._getPullRequestEvent('pull-request.initial_comment.edited')
+
+    def getPullRequestTagAddedEvent(self, tags):
+        _tags = set(self.tags)
+        _tags.update(set(tags))
+        self.tags = list(_tags)
+        self._updateTimeStamp()
+        return self._getPullRequestEvent('pull-request.tag.added')
 
     def getPullRequestStatusSetEvent(self, status):
         self.addFlag(

@@ -201,7 +201,11 @@ class PagureEventConnector(threading.Thread):
             'git.receive': self._event_ref_updated,
             'git.tag.creation': self._event_tag_created,
             'pull-request.initial_comment.edited':
-                self._event_issue_initial_comment
+                self._event_pull_request_metadata_changed,
+            'pull-request.tag.added':
+                self._event_pull_request_metadata_changed,
+            'pull-request.tag.removed':
+                self._event_pull_request_metadata_changed
         }
 
     def stop(self):
@@ -255,6 +259,7 @@ class PagureEventConnector(threading.Thread):
             event.change_number = data.get('id')
             event.updated_at = data.get('date_created')
             event.branch = data.get('branch')
+            event.tags = data.get('tags', [])
             event.change_url = self.connection.getPullUrl(event.project_name,
                                                           event.change_number)
             event.ref = "refs/pull/%s/head" % event.change_number
@@ -266,8 +271,8 @@ class PagureEventConnector(threading.Thread):
             event.type = 'pg_push'
         return event, data
 
-    def _event_issue_initial_comment(self, body):
-        """ Handles pull request initial comment change """
+    def _event_pull_request_metadata_changed(self, body):
+        """ Handles pull request metadata change """
         event, _ = self._event_base(body)
         event.action = 'changed'
         return event
