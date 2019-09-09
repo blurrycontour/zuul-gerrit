@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_46513e36",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1004
+      },
+      "writtenOn": "2019-09-09T16:30:37Z",
+      "side": 1,
+      "message": "I should add that it also adds OpenAPI validation on the\nAPI layer which means our users are less likely to shoot\nthemselves in the foot with the wrong value :)",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 35
+      },
+      "revId": "4309f2dff27c072b10d7bf1a157471539cfd97c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
