@@ -1337,6 +1337,17 @@ class AnsibleJob(object):
                 "Could not decode json from {logfile}".format(
                     logfile=json_output))
 
+    def _normalize(s):
+        """ Trim it, or return None for emptyish strings.
+        """
+        if not s:
+            return
+        result = s.strip(' \r\n\\n')
+        if not result:
+            return
+        else
+            return result
+
     def getHostList(self, args):
         hosts = []
         for node in args['nodes']:
@@ -1349,7 +1360,7 @@ class AnsibleJob(object):
             # results in the wrong thing being in interface_ip
             # TODO(jeblair): Move this notice to the docs.
             for name in node['name']:
-                ip = node.get('interface_ip')
+                ip = self._normalize(node.get('interface_ip'))
                 port = node.get('connection_port', node.get('ssh_port', 22))
                 host_vars = args['host_vars'].get(name, {}).copy()
                 check_varnames(host_vars)
@@ -1364,9 +1375,10 @@ class AnsibleJob(object):
                         provider=node.get('provider'),
                         region=node.get('region'),
                         host_id=node.get('host_id'),
-                        interface_ip=node.get('interface_ip'),
-                        public_ipv4=node.get('public_ipv4'),
-                        private_ipv4=node.get('private_ipv4'),
+                        interface_ip=ip,
+                        public_ipv4=self._normalize(node.get('public_ipv4')),
+                        private_ipv4=self._normalize(
+                            node.get('private_ipv4')) or public_ipv4,
                         public_ipv6=node.get('public_ipv6'))))
 
                 host_vars.setdefault(
