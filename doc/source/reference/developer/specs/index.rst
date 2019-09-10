@@ -20,3 +20,4 @@ documentation instead.
    kubernetes-operator
    circular-dependencies
    scale-out-scheduler
+   zuul-runner
