@@ -9,6 +9,11 @@ a.refresh {
   text-decoration: none;
 }
 
+/* Force pre blocks to wrap to avoid horizontal scroll */
+pre {
+    white-space: pre-wrap;
+}
+
 /* Notification bell color */
 .fa-bell {
   color: orange;
