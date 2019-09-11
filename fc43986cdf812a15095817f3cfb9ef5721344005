@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_a42553c4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-11T16:44:49Z",
+      "side": 1,
+      "message": "This sentence doesn\u0027t make sense.",
+      "revId": "fc43986cdf812a15095817f3cfb9ef5721344005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_c4208fb3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-11T16:44:49Z",
+      "side": 1,
+      "message": "As we previously discussed, this is a matter of personal preference, and this commit message simply shares your opinon.\n\nRather than using words like \"bad\", try to explain what the problems of the current system are, how this is an improvement, and what users who rely on the current system can do if this change impacts their workflow.",
+      "revId": "fc43986cdf812a15095817f3cfb9ef5721344005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_642f5ba1",
+        "filename": "web/src/index.css",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-11T16:44:49Z",
+      "side": 1,
+      "message": "Are you looking at the console log output?  If so, why not make your change more narrowly apply to that so we don\u0027t risk changing unrelated things.",
+      "revId": "fc43986cdf812a15095817f3cfb9ef5721344005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
