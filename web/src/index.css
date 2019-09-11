@@ -9,6 +9,12 @@ a.refresh {
   text-decoration: none;
 }
 
+/* Force pre blocks to wrap to avoid horizontal scroll which
+can interfere with vertical scrolling, especially on trackpads. */
+pre.panel-body {
+    white-space: pre-wrap;
+}
+
 /* Notification bell color */
 .fa-bell {
   color: orange;
