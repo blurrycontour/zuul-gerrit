@@ -9,6 +9,13 @@ a.refresh {
   text-decoration: none;
 }
 
+/* Force pre blocks to wrap to avoid horizontal scroll which can interfere with
+vertical scrolling, especially on trackpads. Makes the log navigation behaves
+more like a terminal. */
+pre {
+    white-space: pre-wrap;
+}
+
 .time {
   white-space: nowrap;
 }
