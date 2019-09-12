@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_0a7d377e",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-12T14:13:18Z",
+      "side": 1,
+      "message": "We need to supply oldrev and newrev in this case (and also some others).  See https://zuul-ci.org/docs/zuul/user/jobs.html#tag-items",
+      "revId": "73b31e7453377b1b2b0b67cb283815bd5b3c2ed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
