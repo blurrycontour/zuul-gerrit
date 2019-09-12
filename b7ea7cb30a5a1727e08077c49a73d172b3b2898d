@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_aac983ac",
+        "filename": "doc/source/admin/drivers/pagure.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-12T14:17:41Z",
+      "side": 1,
+      "message": "\"actions\" was right, but this sentence could use an \"and\".",
+      "revId": "b7ea7cb30a5a1727e08077c49a73d172b3b2898d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_cace3fb3",
+        "filename": "doc/source/admin/drivers/pagure.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-12T14:17:41Z",
+      "side": 1,
+      "message": "\"actions\" was right.",
+      "revId": "b7ea7cb30a5a1727e08077c49a73d172b3b2898d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
