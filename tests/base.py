@@ -852,12 +852,8 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         if message:
             change.setReported()
 
-    def query(self, number, event=None):
-        if type(number) == int:
-            return self.queryChange(number, event=event)
-        raise Exception("Could not query %s %s" % (type(number, number)))
-
-    def queryChange(self, number, event=None):
+    def queryChangeSSH(self, number, event=None):
+        self.log.debug("Query change SSH: %s", number)
         change = self.changes.get(int(number))
         if change:
             return change.query()
@@ -886,9 +882,9 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
             l = [change.query() for change in self.changes.values()]
         return l
 
-    def simpleQuery(self, query, event=None):
+    def simpleQuerySSH(self, query, event=None):
         log = get_annotated_logger(self.log, event)
-        log.debug("simpleQuery: %s", query)
+        log.debug("simpleQuerySSH: %s", query)
         self.queries.append(query)
         results = []
         if query.startswith('(') and 'OR' in query:
