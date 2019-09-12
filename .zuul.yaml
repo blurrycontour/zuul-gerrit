@@ -177,7 +177,11 @@
     vars: *zuul_build_vars
 
 - project:
-    check:
+    check: # XXX
+      jobs:
+        - tox-py36:
+            timeout: 3600  # 60 minutes
+    experimental:
       jobs:
         - zuul-build-image
         - zuul-tox-docs
