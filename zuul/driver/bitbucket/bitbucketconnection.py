@@ -548,7 +548,7 @@ class BitbucketConnection(BaseConnection):
             pull.branch = b
         pull.ref = pr.get('fromRef').get('id')
         pull.title = pr.get('title')
-        pull.uri = '{}/project/{}/repos/{}/pull-requests/{}/overview'\
+        pull.uri = '{}/projects/{}/repos/{}/pull-requests/{}/overview'\
             .format(self.base_url, project, repo, id)
         pull.message = pr.get('description', '')
 
@@ -557,7 +557,7 @@ class BitbucketConnection(BaseConnection):
         pull.files = [file.get('path').get('toString')
                       for file in pri.get('values')]
 
-        pull.url = '{}/project/{}/repos/{}/pull-requests/{}/overview'\
+        pull.url = '{}/projects/{}/repos/{}/pull-requests/{}/overview'\
             .format(self.base_url, project, repo, id)
 
         if cache:
@@ -602,7 +602,7 @@ class BitbucketConnection(BaseConnection):
 
         return None
 
-    def canMerge(self, change, allow_needs):
+    def canMerge(self, change, allow_needs, event=None):
         bb_proj, repo = self._getProjectRepo(change.project.name)
         can_merge = self._getBitbucketClient().get(
             '/rest/api/1.0/projects/{}/repos/{}/pull-requests/{}/merge'

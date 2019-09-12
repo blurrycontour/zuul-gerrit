@@ -108,7 +108,7 @@ class BitbucketSource(BaseSource):
 
         return None
 
-    def canMerge(self, change, allow_needs):
+    def canMerge(self, change, allow_needs, event=None):
         return self.connection.canMerge(change, allow_needs)
 
     def isMerged(self, change, head):
