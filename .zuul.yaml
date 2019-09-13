@@ -188,7 +188,7 @@
               - playbooks/zuul-migrate/.*
             nodeset: ubuntu-xenial
             timeout: 3600  # 60 minutes
-        - tox-py36:
+        - tox-py37:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -233,7 +233,7 @@
               - playbooks/zuul-migrate/.*
             nodeset: ubuntu-xenial
             timeout: 3600  # 60 minutes
-        - tox-py36:
+        - tox-py37:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
