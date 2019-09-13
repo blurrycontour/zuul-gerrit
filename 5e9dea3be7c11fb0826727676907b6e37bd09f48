@@ -77,6 +77,29 @@
     },
     {
       "key": {
+        "uuid": "5faad753_4c91fc46",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-09-13T14:36:12Z",
+      "side": 1,
+      "message": "I would worry that if the compression\u0027s purpose it to fit certain limit size turning it off may cause some problems (in case of e.g. debugging). Therefore maybe a more broken up format, i.e., the one mentioned above may be a better approach.",
+      "range": {
+        "startLine": 170,
+        "startChar": 7,
+        "endLine": 171,
+        "endChar": 55
+      },
+      "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfdaf3ff_f55f836f",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 5
@@ -140,6 +163,47 @@
       "writtenOn": "2019-01-18T08:47:58Z",
       "side": 1,
       "message": "Ok, I\u0027m happy to remove the sql reporters from the pipeline config entirely. So we could define an sql connection as default in zuul.conf and make it possible to override it per tenant in the tenant config.",
+      "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_2c8600dd",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-09-13T14:36:12Z",
+      "side": 1,
+      "message": "Since the purpose of this is High-Availability shouldn\u0027t we think about some HA-Store. An SQL database feels a bit like a possible future bottleneck here when multiple, possibly many, schedulers will try to write there simultaneously.",
+      "parentUuid": "bfdaf3ff_d80cd342",
+      "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_ec546855",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-09-13T14:36:12Z",
+      "side": 1,
+      "message": "If the purpose of this is to know the times of last 10 successful builds wouldn\u0027t it be worth to think about storing  it in Zookeeper too. And by that limiting the complexity of both, code and deployment - less mandatory deployment nodes?",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 214,
+        "endChar": 35
+      },
       "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
