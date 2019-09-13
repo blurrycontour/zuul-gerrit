@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_33b0948a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-13T18:34:19Z",
+      "side": 1,
+      "message": "perhaps name this constant \"EXPIRED_HOLD_REQUEST_TTL\"?",
+      "range": {
+        "startLine": 273,
+        "startChar": 4,
+        "endLine": 273,
+        "endChar": 27
+      },
+      "revId": "8126f36029eda08bdba74f848157d0debc4e7a93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_f353dc37",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1299,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-13T18:34:19Z",
+      "side": 1,
+      "message": "nit: perhaps this procedure should be split in two? the name is a bit misleading.\nHow about?:\n\n  if holdRequestIsExpire():\n      deleteHoldRequest()",
+      "range": {
+        "startLine": 1299,
+        "startChar": 8,
+        "endLine": 1299,
+        "endChar": 29
+      },
+      "revId": "8126f36029eda08bdba74f848157d0debc4e7a93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
