@@ -2045,6 +2045,11 @@ class BuildSet(object):
         # required
         return self.nodesets.get(job_name)
 
+    def badgetJobNodeSetUsage(self):
+        # This is not type checked unless the method is annotated,
+        # or unless we use mypy --string
+        return self.getJobNodeset() + 1 + " toto "
+
     def removeJobNodeSet(self, job_name: str):
         if job_name not in self.nodesets:
             raise Exception("No job nodeset for %s" % (job_name))
