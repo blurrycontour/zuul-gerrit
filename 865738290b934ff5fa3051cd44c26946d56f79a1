@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "5faad753_b3956435",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-13T18:09:52Z",
+      "side": 1,
+      "message": "there is no such server attribute. Why not using the get_client() procedure?",
+      "range": {
+        "startLine": 447,
+        "startChar": 17,
+        "endLine": 447,
+        "endChar": 23
+      },
+      "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5faad753_f3151ce6",
         "filename": "zuul/scheduler.py",
         "patchSetId": 13
