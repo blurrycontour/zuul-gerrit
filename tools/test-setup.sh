@@ -7,9 +7,16 @@
 # This setup needs to be run as a user that can run sudo.
 TOOLSDIR=$(dirname $0)
 
+if test -f /etc/zookeeper/zoo_sample.cfg; then
+    sudo mv /etc/zookeeper/zoo_sample.cfg /etc/zookeeper/zoo.cfg
+    ZOO_CFG=/etc/zookeeper/zoo.cfg
+else
+    ZOO_CFG=/etc/zookeeper/conf/zoo.cfg
+fi
+
 # Config Zookeeper to run on tmpfs
 sudo service zookeeper stop
-DATADIR=$(sed -n -e 's/^dataDir=//p' /etc/zookeeper/conf/zoo.cfg)
+DATADIR=$(sed -n -e 's/^dataDir=//p' ${ZOO_CFG})
 sudo mount -t tmpfs -o nodev,nosuid,size=500M none $DATADIR
 
 # Be sure mysql and zookeeper are started.
