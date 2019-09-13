@@ -238,6 +238,11 @@
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
             timeout: 3600  # 60 minutes
+        - tox-py37:
+            irrelevant-files:
+              - zuul/cmd/migrate.py
+              - playbooks/zuul-migrate/.*
+            timeout: 3600  # 60 minutes
         - zuul-build-dashboard
         - nodejs-npm-run-lint:
             vars:
