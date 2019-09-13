@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "5faad753_b30c84a5",
+        "filename": "releasenotes/notes/autohold-revamp-047011cedd3c8da9.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-13T18:17:54Z",
+      "side": 1,
+      "message": "nit: perhaps starts mentioning that autohold request being stored persistently in ZooKeeper, autohold-delete is an extra effect",
+      "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5faad753_b3956435",
         "filename": "zuul/cmd/client.py",
         "patchSetId": 13
@@ -158,6 +175,29 @@
         "startChar": 0,
         "endLine": 1011,
         "endChar": 63
+      },
+      "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_f3ed1cb7",
+        "filename": "zuul/zk.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-13T18:17:54Z",
+      "side": 1,
+      "message": "the / could be dropped in this PS for consistency.",
+      "range": {
+        "startLine": 46,
+        "startChar": 44,
+        "endLine": 46,
+        "endChar": 45
       },
       "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
