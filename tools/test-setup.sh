@@ -7,6 +7,10 @@
 # This setup needs to be run as a user that can run sudo.
 TOOLSDIR=$(dirname $0)
 
+if test -f /etc/zookeeper/zoo_sample.cfg; then
+    sudo mv /etc/zookeeper/zoo_sample.cfg /etc/zookeeper/zoo.cfg
+fi
+
 # Config Zookeeper to run on tmpfs
 sudo service zookeeper stop
 DATADIR=$(sed -n -e 's/^dataDir=//p' /etc/zookeeper/conf/zoo.cfg)
