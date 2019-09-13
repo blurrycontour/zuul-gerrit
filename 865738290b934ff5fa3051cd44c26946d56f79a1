@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5faad753_73028c71",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-09-13T18:17:52Z",
+      "side": 1,
+      "message": "I think this was probably missed in the rebase against the admin changes from Matthieu.",
+      "parentUuid": "5faad753_b3956435",
+      "range": {
+        "startLine": 447,
+        "startChar": 17,
+        "endLine": 447,
+        "endChar": 23
+      },
+      "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5faad753_f3151ce6",
         "filename": "zuul/scheduler.py",
         "patchSetId": 13
@@ -36,6 +60,30 @@
       "writtenOn": "2019-09-13T18:02:24Z",
       "side": 1,
       "message": "This should be max_count",
+      "range": {
+        "startLine": 565,
+        "startChar": 16,
+        "endLine": 565,
+        "endChar": 21
+      },
+      "revId": "865738290b934ff5fa3051cd44c26946d56f79a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_d3c26034",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-09-13T18:17:52Z",
+      "side": 1,
+      "message": "Oh, that\u0027s a good spot.\n\nNow I\u0027m concerned about why our testing didn\u0027t catch this. That should have thrown an exception.",
+      "parentUuid": "5faad753_f3151ce6",
       "range": {
         "startLine": 565,
         "startChar": 16,
