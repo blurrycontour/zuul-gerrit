@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_530bd07b",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 4661,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-13T18:22:08Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be a List[List[str]] ? When holding multinode job with a count \u003e 1, then we have a flat list of held node where we don\u0027t know which one are part of the same buildset.",
+      "revId": "71b7c3dcafb698d3a3073ac88d69330f28a4a8af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
