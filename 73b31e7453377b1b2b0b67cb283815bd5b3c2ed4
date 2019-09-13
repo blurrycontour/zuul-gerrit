@@ -16,6 +16,24 @@
       "revId": "73b31e7453377b1b2b0b67cb283815bd5b3c2ed4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_22327b5f",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-09-13T19:57:46Z",
+      "side": 1,
+      "message": "Pagure does not send the newrev through the event so I had to add a merger/executor task to get a commit hash from a ref. Let me know if that\u0027s fine or not.",
+      "parentUuid": "5faad753_0a7d377e",
+      "revId": "73b31e7453377b1b2b0b67cb283815bd5b3c2ed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
