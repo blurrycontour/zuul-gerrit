@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_0e144b43",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-13T18:37:12Z",
+      "side": 1,
+      "message": "shouldn\u0027t this refer to node instead of request?",
+      "range": {
+        "startLine": 12,
+        "startChar": 51,
+        "endLine": 12,
+        "endChar": 58
+      },
+      "revId": "577b6f75df46eacaf185a4fdc111c143e7b486c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_330c1440",
+        "filename": "zuul/zk.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 593,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-13T18:37:12Z",
+      "side": 1,
+      "message": "couldn\u0027t this also check for node[\u0027state\u0027] \u003d\u003d \u0027used\u0027?",
+      "revId": "577b6f75df46eacaf185a4fdc111c143e7b486c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
