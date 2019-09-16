@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_f8d83980",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-16T16:55:07Z",
+      "side": 1,
+      "message": "I don\u0027t think this got done later in the stack.  Should this be part of this feature?  It seems that if we do, then we can say that the entire hold UX has moved into Zuul (so in no cases does anyone need to log into a nodepool machine and delete autoheld nodes).",
+      "revId": "716ac1f2e18394dcb47ac6e02e12313b6fdf18ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
