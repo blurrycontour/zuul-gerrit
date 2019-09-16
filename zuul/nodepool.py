@@ -192,7 +192,7 @@ class Nodepool(object):
                 node.hold_expiration = request.node_expiration
             self.sched.zk.storeNode(node)
 
-        request.nodes += [node.id for node in nodes]
+        request.nodes += [[node.id for node in nodes]]
         request.current_count += 1
 
         # Request has been used at least the maximum number of times so set
