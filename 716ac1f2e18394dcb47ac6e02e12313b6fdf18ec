@@ -16,6 +16,24 @@
       "revId": "716ac1f2e18394dcb47ac6e02e12313b6fdf18ec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_98c82575",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-09-16T17:03:54Z",
+      "side": 1,
+      "message": "Comment is just outdated. It is eventually done within the deleteHoldRequest() call itself, rather than here. See https://review.opendev.org/#/c/664060/14/zuul/zk.py",
+      "parentUuid": "3fa7e38b_f8d83980",
+      "revId": "716ac1f2e18394dcb47ac6e02e12313b6fdf18ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
