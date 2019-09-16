@@ -14,6 +14,8 @@ import json
 import logging
 import time
 
+from pathlib import Path
+
 from kazoo.client import KazooClient, KazooState
 from kazoo import exceptions as kze
 from kazoo.handlers.threading import KazooTimeoutError
@@ -41,10 +43,10 @@ class ZooKeeper(object):
 
     log = logging.getLogger("zuul.zk.ZooKeeper")
 
-    REQUEST_ROOT = '/nodepool/requests'
-    REQUEST_LOCK_ROOT = "/nodepool/requests-lock"
-    NODE_ROOT = '/nodepool/nodes'
-    HOLD_REQUEST_ROOT = '/zuul/hold-requests'
+    REQUEST_ROOT = Path('/nodepool/requests')
+    REQUEST_LOCK_ROOT = Path('/nodepool/requests-lock')
+    NODE_ROOT = Path('/nodepool/nodes')
+    HOLD_REQUEST_ROOT = Path('/zuul/hold-requests')
 
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
@@ -142,7 +144,7 @@ class ZooKeeper(object):
 
         if self.enable_cache:
             self._hold_request_tree = TreeCache(self.client,
-                                                self.HOLD_REQUEST_ROOT)
+                                                str(self.HOLD_REQUEST_ROOT))
             self._hold_request_tree.listen_fault(self.cacheFaultListener)
             self._hold_request_tree.listen(self.holdRequestCacheListener)
             self._hold_request_tree.start()
@@ -163,7 +165,7 @@ class ZooKeeper(object):
     def _holdRequestCacheListener(self, event):
         if hasattr(event.event_data, 'path'):
             # Ignore root node
-            path = event.event_data.path
+            path = Path(event.event_data.path)
             if path == self.HOLD_REQUEST_ROOT:
                 return
 
@@ -172,8 +174,8 @@ class ZooKeeper(object):
                                     TreeEvent.NODE_REMOVED):
             return
 
-        path = event.event_data.path
-        request_id = path.rsplit('/', 1)[1]
+        path = Path(event.event_data.path)
+        request_id = path.name
 
         if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED):
             # Requests with no data are invalid
@@ -246,11 +248,11 @@ class ZooKeeper(object):
         node_request.created_time = time.time()
         data = node_request.toDict()
 
-        path = '{}/{:0>3}-'.format(self.REQUEST_ROOT, node_request.priority)
-        path = self.client.create(path, self._dictToStr(data),
+        path = self.REQUEST_ROOT / '{:0>3}-'.format(node_request.priority)
+        path = self.client.create(str(path), self._dictToStr(data),
                                   makepath=True,
                                   sequence=True, ephemeral=True)
-        reqid = path.split("/")[-1]
+        reqid = Path(path).name
         node_request.id = reqid
 
         def callback(data, stat):
@@ -269,9 +271,9 @@ class ZooKeeper(object):
             contents of the request.
         '''
 
-        path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
+        path = self.REQUEST_ROOT / node_request.id
         try:
-            self.client.delete(path)
+            self.client.delete(str(path))
         except kze.NoNodeError:
             pass
 
@@ -283,8 +285,8 @@ class ZooKeeper(object):
 
         :returns: True if the request exists, False otherwise.
         '''
-        path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
-        if self.client.exists(path):
+        path = self.REQUEST_ROOT / node_request.id
+        if self.client.exists(str(path)):
             return True
         return False
 
@@ -297,8 +299,8 @@ class ZooKeeper(object):
         :param NodeRequest node_request: The request to update.
         '''
 
-        path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
-        self.client.set(path, self._dictToStr(node_request.toDict()))
+        path = self.REQUEST_ROOT / node_request.id
+        self.client.set(str(path), self._dictToStr(node_request.toDict()))
 
     def updateNodeRequest(self, node_request, data=None):
         '''Refresh an existing node request.
@@ -307,8 +309,8 @@ class ZooKeeper(object):
         :param dict data: The data to use; query ZK if absent.
         '''
         if data is None:
-            path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
-            data, stat = self.client.get(path)
+            path = self.REQUEST_ROOT / node_request.id
+            data, stat = self.client.get(str(path))
         data = self._strToDict(data)
         request_nodes = list(node_request.nodeset.getNodes())
         for i, nodeid in enumerate(data.get('nodes', [])):
@@ -325,8 +327,8 @@ class ZooKeeper(object):
         :param Node node: The node to update.
         '''
 
-        path = '%s/%s' % (self.NODE_ROOT, node.id)
-        self.client.set(path, self._dictToStr(node.toDict()))
+        path = self.NODE_ROOT / node.id
+        self.client.set(str(path), self._dictToStr(node.toDict()))
 
     def updateNode(self, node):
         '''Refresh an existing node.
@@ -334,8 +336,8 @@ class ZooKeeper(object):
         :param Node node: The node to update.
         '''
 
-        node_path = '%s/%s' % (self.NODE_ROOT, node.id)
-        node_data, node_stat = self.client.get(node_path)
+        node_path = self.NODE_ROOT / node.id
+        node_data, node_stat = self.client.get(str(node_path))
         node_data = self._strToDict(node_data)
         node.updateFromDict(node_data)
 
@@ -351,9 +353,9 @@ class ZooKeeper(object):
         :param Node node: The node which should be locked.
         '''
 
-        lock_path = '%s/%s/lock' % (self.NODE_ROOT, node.id)
+        lock_path = self.NODE_ROOT / node.id / "lock"
         try:
-            lock = Lock(self.client, lock_path)
+            lock = Lock(self.client, str(lock_path))
             have_lock = lock.acquire(blocking, timeout)
         except kze.LockTimeout:
             raise LockException(
@@ -398,9 +400,9 @@ class ZooKeeper(object):
             and could not get the lock, or a lock is already held.
         '''
 
-        path = "%s/%s" % (self.REQUEST_LOCK_ROOT, request.id)
+        path = self.REQUEST_LOCK_ROOT / request.id
         try:
-            lock = Lock(self.client, path)
+            lock = Lock(self.client, str(path))
             have_lock = lock.acquire(blocking, timeout)
         except kze.LockTimeout:
             raise LockException(
@@ -441,15 +443,15 @@ class ZooKeeper(object):
         '''
         identifier = " ".join(autohold_key)
         try:
-            nodes = self.client.get_children(self.NODE_ROOT)
+            nodes = self.client.get_children(str(self.NODE_ROOT))
         except kze.NoNodeError:
             return 0
 
         count = 0
         for nodeid in nodes:
-            node_path = '%s/%s' % (self.NODE_ROOT, nodeid)
+            node_path = self.NODE_ROOT / nodeid
             try:
-                node_data, node_stat = self.client.get(node_path)
+                node_data, node_stat = self.client.get(str(node_path))
             except kze.NoNodeError:
                 # Node got removed on us. Just ignore.
                 continue
@@ -544,14 +546,14 @@ class ZooKeeper(object):
         Get the current list of all hold requests.
         '''
         try:
-            return self.client.get_children(self.HOLD_REQUEST_ROOT)
+            return self.client.get_children(str(self.HOLD_REQUEST_ROOT))
         except kze.NoNodeError:
             return []
 
     def getHoldRequest(self, hold_request_id):
-        path = self.HOLD_REQUEST_ROOT + "/" + hold_request_id
+        path = self.HOLD_REQUEST_ROOT / hold_request_id
         try:
-            data, stat = self.client.get(path)
+            data, stat = self.client.get(str(path))
         except kze.NoNodeError:
             return None
         if not data:
@@ -574,14 +576,15 @@ class ZooKeeper(object):
         '''
         if hold_request.id is None:
             path = self.client.create(
-                self.HOLD_REQUEST_ROOT + "/",
+                # Ensure path has a trailing slash
+                str(self.HOLD_REQUEST_ROOT / ".")[:-1],
                 value=hold_request.serialize(),
                 sequence=True,
                 makepath=True)
             hold_request.id = path.split('/')[-1]
         else:
-            path = self.HOLD_REQUEST_ROOT + "/" + hold_request.id
-            self.client.set(path, hold_request.serialize())
+            path = self.HOLD_REQUEST_ROOT / hold_request.id
+            self.client.set(str(path), hold_request.serialize())
 
     def _markHeldNodesAsUsed(self, hold_request):
         '''
@@ -635,9 +638,9 @@ class ZooKeeper(object):
                           "not all nodes marked as USED.", hold_request.id)
             return
 
-        path = self.HOLD_REQUEST_ROOT + "/" + hold_request.id
+        path = self.HOLD_REQUEST_ROOT / hold_request.id
         try:
-            self.client.delete(path, recursive=True)
+            self.client.delete(str(path), recursive=True)
         except kze.NoNodeError:
             pass
 
@@ -654,9 +657,9 @@ class ZooKeeper(object):
             raise LockException(
                 "Hold request without an ID cannot be locked: %s" % request)
 
-        path = "%s/%s/lock" % (self.HOLD_REQUEST_ROOT, request.id)
+        path = self.HOLD_REQUEST_ROOT / request.id / "lock"
         try:
-            lock = Lock(self.client, path)
+            lock = Lock(self.client, str(path))
             have_lock = lock.acquire(blocking, timeout)
         except kze.LockTimeout:
             raise LockException(
