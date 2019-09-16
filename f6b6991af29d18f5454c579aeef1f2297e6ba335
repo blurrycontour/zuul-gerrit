@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_d968dfbb",
+        "filename": "zuul/zk.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-16T19:50:30Z",
+      "side": 1,
+      "message": "This is actually the default behavior of the kazoo TreeCache thus we shouldn\u0027t bother with doing that unless we are providing a better log message.",
+      "range": {
+        "startLine": 150,
+        "startChar": 0,
+        "endLine": 151,
+        "endChar": 29
+      },
+      "revId": "f6b6991af29d18f5454c579aeef1f2297e6ba335",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b9e2c32e",
+        "filename": "zuul/zk.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-16T19:50:30Z",
+      "side": 1,
+      "message": "The self._cached_hold_requests should probably be emptied too for safety.",
+      "revId": "f6b6991af29d18f5454c579aeef1f2297e6ba335",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
