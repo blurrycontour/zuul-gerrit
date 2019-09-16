@@ -34,6 +34,24 @@
       "revId": "73b31e7453377b1b2b0b67cb283815bd5b3c2ed4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_808b1066",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-09-16T10:52:51Z",
+      "side": 1,
+      "message": "It seems like an ok solution to me - but obviously interested in what Jim has to say. Can we ask the pagure folks to send the sha in their event in a future release? (I imagine they have it - it\u0027s a shame to have to do the merger job here - but also probably not the WORST thing given frequency)",
+      "parentUuid": "5faad753_22327b5f",
+      "revId": "73b31e7453377b1b2b0b67cb283815bd5b3c2ed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
