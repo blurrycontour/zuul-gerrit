@@ -84,3 +84,29 @@ Ansible might be used to orchestrate remote systems.  Ansible itself
 is run on the :ref:`executor <executor>` and acts remotely upon the test
 nodes supplied to a job.  This facilitates continuous delivery by making it
 possible to use the same Ansible playbooks in testing and production.
+
+Ansible and Python 3
+--------------------
+
+As noted above, the executor runs Ansible playbooks against the remote
+node(s) allocated for the job.  The ``ansible_python_interpreter``
+variable instructs Ansible as to the Python interpreter to use on the
+remote host.
+
+When Zuul is configured to use Ansible 2.5, 2.6 and 2.7,
+``ansible_python_interpreter`` is defaulted to Python 2
+(i.e. ``/usr/bin/python2``) as Ansible does by default.  For Ansible
+2.8 onwards we default to Ansible's inbuilt detection methods, which
+will use Python 3 on suitable hosts automatically (note this is slated
+to be the default behaviour of Ansible in 2.12).
+
+This can be overriden for all Ansible versions by setting
+``python-path`` for the nodes; see the `nodepool configuration
+documentation
+<https://zuul-ci.org/docs/nodepool/configuration.html>`__.
+
+Thus for modern Python 3-only by default hosts (such as Fedora,
+Bionic, or RHEL8 with it's special "system" Python version) no further
+configuration is needed with Ansible 2.8.  However, for earlier
+Ansible versions you may need to manually override the ``python-path``
+depending on your host configuration.

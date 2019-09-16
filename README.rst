@@ -66,7 +66,9 @@ Python Version Support
 
 Zuul v3 requires Python 3. It does not support Python 2.
 
-As Ansible is used for the execution of jobs, it's important to note that
-while Ansible does support Python 3, not all of Ansible's modules do. Zuul
-currently sets ``ansible_python_interpreter`` to python2 so that remote
-content will be executed with Python 2.
+As Ansible is used for the execution of jobs, it's important to note
+that while Ansible does support Python 3, there may be edge cases with
+support in various Ansible modules.  For more information see
+`Ansible's Python 3 support page
+<https://docs.ansible.com/ansible/latest/reference_appendices/python_3_support.html>`__.
+
