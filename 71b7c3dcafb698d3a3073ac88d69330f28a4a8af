@@ -16,6 +16,24 @@
       "revId": "71b7c3dcafb698d3a3073ac88d69330f28a4a8af",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_44364eb7",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 4661,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-09-16T14:49:02Z",
+      "side": 1,
+      "message": "Possible we could do that (see previous comments from Jim and myself in earlier patch sets). But I\u0027m leaving that for a future improvement someone could attack, since this pretty much just duplicates what we have now.",
+      "parentUuid": "5faad753_530bd07b",
+      "revId": "71b7c3dcafb698d3a3073ac88d69330f28a4a8af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
