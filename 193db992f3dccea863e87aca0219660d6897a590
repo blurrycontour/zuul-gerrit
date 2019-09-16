@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5faad753_9d8b7bc1",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-09-16T10:36:23Z",
+      "side": 1,
+      "message": "I started to list questions about the caveats, but then realized they were all the same question. I suppose this is caveats with the current state of the checks plugin, and are potentially all things we want to see addressed before we consider the checks api and zuul\u0027s support for it stable, yes?",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_7d8c7fd6",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-09-16T10:36:23Z",
+      "side": 1,
+      "message": "Do we have a story for this for non-ssh gerrits yet? I suppose that woudl be the webhooks plugin?",
+      "range": {
+        "startLine": 372,
+        "startChar": 41,
+        "endLine": 372,
+        "endChar": 57
+      },
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
