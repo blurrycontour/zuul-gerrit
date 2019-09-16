@@ -52,6 +52,24 @@
       "revId": "73b31e7453377b1b2b0b67cb283815bd5b3c2ed4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5faad753_712d88a6",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-09-16T13:48:38Z",
+      "side": 1,
+      "message": "Yes, sure so I\u0027ve opened https://pagure.io/pagure/issue/4610 and tried to propose a fix. If this patch is a no mergeable then I\u0027ll prefer to skip it from the patch chain and have other merged as they already received a +2.",
+      "parentUuid": "5faad753_808b1066",
+      "revId": "73b31e7453377b1b2b0b67cb283815bd5b3c2ed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
