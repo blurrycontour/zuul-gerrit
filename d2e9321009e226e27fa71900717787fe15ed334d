@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_00aca98a",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-17T17:04:21Z",
+      "side": 1,
+      "message": "Based on your comment on the previous patchset I expect you mean for this 0 to become a 16.",
+      "range": {
+        "startLine": 1023,
+        "startChar": 43,
+        "endLine": 1023,
+        "endChar": 44
+      },
+      "revId": "d2e9321009e226e27fa71900717787fe15ed334d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
