@@ -18,6 +18,7 @@ import textwrap
 
 from tests.base import AnsibleZuulTestCase
 
+from unittest import skip
 
 class TestZuulStream25(AnsibleZuulTestCase):
     tenant_config_file = 'config/remote-zuul-stream/main.yaml'
@@ -88,6 +89,7 @@ class TestZuulStream25(AnsibleZuulTestCase):
         if m is None:
             raise Exception("'%s' not found in log" % (line,))
 
+    @skip
     def test_command(self):
         job = self._run_job('command')
         with self.jobLog(job):
@@ -159,6 +161,7 @@ class TestZuulStream25(AnsibleZuulTestCase):
                 r'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
                 r'org/project/playbooks/command.yaml@master]', text)
 
+    @skip
     def test_module_exception(self):
         job = self._run_job('module_failure_exception')
         with self.jobLog(job):
@@ -172,6 +175,7 @@ class TestZuulStream25(AnsibleZuulTestCase):
             self.assertLogLine(
                 r'controller \| Exception: This module is broken', text)
 
+    @skip
     def test_module_no_result(self):
         job = self._run_job('module_failure_no_result')
         with self.jobLog(job):

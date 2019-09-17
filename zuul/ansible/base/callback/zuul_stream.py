@@ -144,7 +144,9 @@ class CallbackModule(default.CallbackModule):
                 continue
             msg = "%s\n" % log_id
             s.send(msg.encode("utf-8"))
+            self._log("[here]", job=False, executor=True)
             buff = s.recv(4096)
+            self._log("[done]" % buff, job=False, executor=True)
             buffering = True
             while buffering:
                 if b'\n' in buff:
@@ -305,7 +307,9 @@ class CallbackModule(default.CallbackModule):
                     'ansible_inventory_host', 'localhost')) in localhost_names:
                 is_localhost = True
 
+        self._log("[%s %s]" % (is_localhost, is_task), job=False, executor=True)
         if not is_localhost and is_task:
+            self._log("[here5]", job=False, executor=True)
             self._stop_streamers()
         if result._task.action in ('command', 'shell',
                                    'win_command', 'win_shell'):
@@ -320,7 +324,7 @@ class CallbackModule(default.CallbackModule):
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         result_dict = dict(result._result)
-
+        self._log("[here1]", job=False, executor=True)
         self._handle_exception(result_dict)
 
         if result_dict.get('msg') == 'All items completed':
@@ -365,7 +369,7 @@ class CallbackModule(default.CallbackModule):
         if (self._play.strategy == 'free'
                 and self._last_task_banner != result._task._uuid):
             self._print_task_banner(result._task)
-
+        self._log("[here3]", job=False, executor=True)
         result_dict = dict(result._result)
 
         self._clean_results(result_dict, result._task.action)
@@ -389,6 +393,7 @@ class CallbackModule(default.CallbackModule):
             return
 
         if not result._task.loop:
+            self._log("%s" % result._task_fields.get('ignore_errors'),  job=False, executor=True)
             self._process_result_for_localhost(result)
         else:
             self._items_done = False
