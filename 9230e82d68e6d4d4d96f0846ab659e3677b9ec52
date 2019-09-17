@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_dd1e7a6f",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-17T16:47:29Z",
+      "side": 1,
+      "message": "Default here is a boolean value but below we only check string values and an int.",
+      "range": {
+        "startLine": 447,
+        "startChar": 29,
+        "endLine": 447,
+        "endChar": 33
+      },
+      "revId": "9230e82d68e6d4d4d96f0846ab659e3677b9ec52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
