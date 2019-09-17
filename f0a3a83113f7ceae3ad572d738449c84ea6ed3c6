@@ -22,6 +22,30 @@
       "revId": "f0a3a83113f7ceae3ad572d738449c84ea6ed3c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_20fa0542",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-17T17:19:47Z",
+      "side": 1,
+      "message": "Or rather \"if node_hold_expiration is None:\"",
+      "parentUuid": "3fa7e38b_e0f4ed5d",
+      "range": {
+        "startLine": 567,
+        "startChar": 8,
+        "endLine": 567,
+        "endChar": 36
+      },
+      "revId": "f0a3a83113f7ceae3ad572d738449c84ea6ed3c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
