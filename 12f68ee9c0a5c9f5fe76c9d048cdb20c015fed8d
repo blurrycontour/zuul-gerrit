@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_7dd0a6ca",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-09-17T16:33:20Z",
+      "side": 1,
+      "message": "Not sure exactly what to put here since there is currently no autohold related data here, but if want you provide it, I can add it in another patchset.",
+      "parentUuid": "3fa7e38b_59bb8fe4",
+      "revId": "12f68ee9c0a5c9f5fe76c9d048cdb20c015fed8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_99efc7e8",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 10
@@ -30,6 +48,30 @@
       "writtenOn": "2019-09-16T19:56:34Z",
       "side": 1,
       "message": "This should probably be scoped per tenant as white-labeled interface won\u0027t be able to get/delete requested autohold.",
+      "range": {
+        "startLine": 1103,
+        "startChar": 34,
+        "endLine": 1103,
+        "endChar": 48
+      },
+      "revId": "12f68ee9c0a5c9f5fe76c9d048cdb20c015fed8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_1d4c12c6",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1103,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-09-17T16:33:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_99efc7e8",
       "range": {
         "startLine": 1103,
         "startChar": 34,
