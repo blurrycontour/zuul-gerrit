@@ -33,6 +33,24 @@
       "revId": "84f3a06f49c622d6de09056bc92215eb06ee1946",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_70a9aedd",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1027,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-09-17T14:34:03Z",
+      "side": 1,
+      "message": "That seems like a thing we could add in the future if we figure out that it\u0027s important to. :)",
+      "parentUuid": "3fa7e38b_303d76bb",
+      "revId": "84f3a06f49c622d6de09056bc92215eb06ee1946",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
