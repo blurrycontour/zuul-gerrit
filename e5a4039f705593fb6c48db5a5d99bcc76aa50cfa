@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_2a8509ae",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-17T13:38:07Z",
+      "side": 1,
+      "message": "Perhaps move that comment above newrev and mention that until this PR is merged the newrev will be None",
+      "range": {
+        "startLine": 310,
+        "startChar": 0,
+        "endLine": 311,
+        "endChar": 46
+      },
+      "revId": "e5a4039f705593fb6c48db5a5d99bcc76aa50cfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
