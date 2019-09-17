@@ -324,6 +324,23 @@
       "revId": "193db992f3dccea863e87aca0219660d6897a590",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_c0d1b159",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:55:10Z",
+      "side": 1,
+      "message": "I\u0027m not too worried about that -- AIUI, it\u0027s meant to be a fairly efficient query so high-frequency polling should be okay.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
