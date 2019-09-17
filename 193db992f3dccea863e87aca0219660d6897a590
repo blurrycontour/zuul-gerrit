@@ -19,6 +19,74 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_9deec286",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:35:17Z",
+      "side": 1,
+      "message": "Yes exactly.  I elaborated on future thoughts a bit.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_3d030e45",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:35:17Z",
+      "side": 1,
+      "message": "Obviously, we\u0027ll expand documentation when it\u0027s ready.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_5d004a35",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:35:17Z",
+      "side": 1,
+      "message": "Probably not a blocker for some systems, but certainly for a system with third-party CI\u0027s, especially less-than-completely-trusted ones.  No current effort to fix this; I think we should help with it once we get some of the other stuff out of the way.\n\nWearing my OpenDev hat -- this is a blocker for OpenDev third-party CI.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_fdfc963f",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:35:17Z",
+      "side": 1,
+      "message": "This is a blocker for OpenDev first-party CI.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5faad753_7d8c7fd6",
         "filename": "doc/source/admin/drivers/gerrit.rst",
         "patchSetId": 10
@@ -66,6 +134,40 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_1dfad241",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:35:17Z",
+      "side": 1,
+      "message": "Yeah, I think webhooks and not using the checks plugin is the most likely near-term option there.  This might be a good opportunity to revisit the idea of reviewed tags though.  If that happened, that could integrate with the checks plugin.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_bd94dee9",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:35:17Z",
+      "side": 1,
+      "message": "Spec in progress.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_9db6c2d9",
         "filename": "doc/source/admin/drivers/gerrit.rst",
         "patchSetId": 10
@@ -77,6 +179,40 @@
       "writtenOn": "2019-09-17T16:34:59Z",
       "side": 1,
       "message": "When I went looking for info on this new API I couldn\u0027t find the original spec doc which was way more helpful than the raw API docs for figuring out intended usage.\n\nMaybe we can find useful links like that and link from our docs?",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_dd999a1f",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:35:17Z",
+      "side": 1,
+      "message": "There\u0027s no hand-holding with setting up pipelines to do the right state transitions yet.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_7d9e6608",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:35:17Z",
+      "side": 1,
+      "message": "This is likely a permanent thing, so we\u0027ll probably keep a ..note:: with this in our docs as an FYI.",
       "revId": "193db992f3dccea863e87aca0219660d6897a590",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
