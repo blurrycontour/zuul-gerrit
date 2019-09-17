@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_c03691b5",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1022,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:56:57Z",
+      "side": 1,
+      "message": "Actually, all I really know is they are in the latest 2.15.  I assume they are in 2.15.0, but to be safe, why don\u0027t I set it to \u003e\u003d 2.15.16 for now?",
+      "revId": "84f3a06f49c622d6de09056bc92215eb06ee1946",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_f57cb721",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 3
