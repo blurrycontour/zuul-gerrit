@@ -39,6 +39,104 @@
       "revId": "193db992f3dccea863e87aca0219660d6897a590",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_5d7a8a24",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-17T16:34:59Z",
+      "side": 1,
+      "message": "Seems like this is a fairly big deficiency in the gerrit checks api. Maybe we can work with them to extend it to more than change refs?",
+      "parentUuid": "5faad753_7d8c7fd6",
+      "range": {
+        "startLine": 372,
+        "startChar": 41,
+        "endLine": 372,
+        "endChar": 57
+      },
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_9db6c2d9",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-17T16:34:59Z",
+      "side": 1,
+      "message": "When I went looking for info on this new API I couldn\u0027t find the original spec doc which was way more helpful than the raw API docs for figuring out intended usage.\n\nMaybe we can find useful links like that and link from our docs?",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_5dd7eac0",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-17T16:34:59Z",
+      "side": 1,
+      "message": "This use of plugin here is weird to me. The checker api is built into gerrit right? as is support for this in Zuul. Maybe this is more accurate:\n\n  enqueue:\n    gerrit:\n      checker_api:\n        stuff",
+      "range": {
+        "startLine": 458,
+        "startChar": 18,
+        "endLine": 458,
+        "endChar": 24
+      },
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_5d3b6a37",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-17T16:34:59Z",
+      "side": 1,
+      "message": "A test specifically for the no jobs case may be worthwhile since that is a new behavior we won\u0027t get coverage for elsewhere?",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_5d692a23",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-17T16:34:59Z",
+      "side": 1,
+      "message": "Thinking out loud here it might be better to poll continuously with a very small delay per action, but only check a checker at a time? This way we don\u0027t burst to the gerrit api every 30 seconds but instead have continuous load.\n\nThe downside with this is your effectively poll interval for a specific checker will increase based on the number of checkers there are.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
