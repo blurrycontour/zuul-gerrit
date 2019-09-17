@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    A new scheduler option, max_hold_age, is added to control how long nodes
+    held for an autohold request remain available. This defaults to 0, which
+    means the held nodes will not automatically expire.

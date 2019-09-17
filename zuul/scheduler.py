@@ -563,6 +563,10 @@ class Scheduler(threading.Thread):
         request.ref_filter = ref_filter
         request.reason = reason
         request.max_count = count
+
+        if not node_hold_expiration:
+            node_hold_expiration = get_default(self.config, 'scheduler',
+                                               'max_hold_age', 0)
         request.node_expiration = node_hold_expiration
 
         # No need to lock it since we are creating a new one.

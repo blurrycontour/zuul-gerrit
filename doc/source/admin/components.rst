@@ -329,6 +329,13 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       pipeline precedence, followed by relative priority, and finally
       the order in which they were submitted.
 
+   .. attr:: max_hold_age
+      :default: 0
+
+      Maximum number of seconds any nodes held for an autohold request
+      will remain available. A value of 0 disables this, and the nodes
+      will remain held until the autohold request is manually deleted.
+
 Operation
 ~~~~~~~~~
 
