@@ -96,7 +96,7 @@
       command: echo foo
       args:
         chdir: /remote-shelltask/somewhere/that/does/not/exist
-      failed_when: false
+      ignore_errors: yes
 
 - hosts: localhost
   tasks:
@@ -104,4 +104,4 @@
       command: echo foo
       args:
         chdir: /local-shelltask/somewhere/that/does/not/exist
-      failed_when: false
+      ignore_errors: yes
