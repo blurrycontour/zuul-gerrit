@@ -202,6 +202,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_dd50ba35",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:39:27Z",
+      "side": 1,
+      "message": "Can do.  It\u0027s an abandoned change; I\u0027ll dig it up.",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_7d9e6608",
         "filename": "doc/source/admin/drivers/gerrit.rst",
         "patchSetId": 10
@@ -242,6 +259,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_7d450670",
+        "filename": "doc/source/admin/drivers/gerrit.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:39:27Z",
+      "side": 1,
+      "message": "It\u0027s actually a plugin currently.  It might become a \"core\" plugin though, or maybe even be built-in.  Anyway, I think you\u0027re right; let\u0027s change it to \"checks_api\" (I think that\u0027s the best name).",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5d3b6a37",
         "filename": "tests/unit/test_gerrit.py",
         "patchSetId": 10
@@ -253,6 +287,23 @@
       "writtenOn": "2019-09-17T16:34:59Z",
       "side": 1,
       "message": "A test specifically for the no jobs case may be worthwhile since that is a new behavior we won\u0027t get coverage for elsewhere?",
+      "revId": "193db992f3dccea863e87aca0219660d6897a590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_9d4a427e",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:39:27Z",
+      "side": 1,
+      "message": "Good point.",
       "revId": "193db992f3dccea863e87aca0219660d6897a590",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
