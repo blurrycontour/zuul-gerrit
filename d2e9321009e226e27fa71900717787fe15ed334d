@@ -22,6 +22,30 @@
       "revId": "d2e9321009e226e27fa71900717787fe15ed334d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a0b6f5d8",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-09-17T17:05:12Z",
+      "side": 1,
+      "message": "Paladox clarified that this should go back to a 2.14 release even. So \u003e\u003d 2.15 should be safe.",
+      "parentUuid": "3fa7e38b_00aca98a",
+      "range": {
+        "startLine": 1023,
+        "startChar": 43,
+        "endLine": 1023,
+        "endChar": 44
+      },
+      "revId": "d2e9321009e226e27fa71900717787fe15ed334d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
