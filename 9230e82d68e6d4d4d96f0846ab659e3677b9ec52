@@ -22,6 +22,23 @@
       "revId": "9230e82d68e6d4d4d96f0846ab659e3677b9ec52",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_6066bdf0",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-17T16:48:23Z",
+      "side": 1,
+      "message": "Ack.",
+      "revId": "9230e82d68e6d4d4d96f0846ab659e3677b9ec52",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
