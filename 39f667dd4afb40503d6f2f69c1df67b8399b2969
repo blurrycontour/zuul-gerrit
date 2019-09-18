@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_032d8194",
+        "filename": "doc/source/user/concepts.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-18T14:28:16Z",
+      "side": 1,
+      "message": "I don\u0027t think this is the best place for this documentation.  This file is all about introducing basic concepts of Zuul.  It\u0027s for people who have never used Zuul before, and we need to tell them what gating is, and that Zuul uses something called Ansible to run jobs.  The section added is more configuration reference than introductory material.\n\nMy preference would actually be to omit this in Zuul docs and only document it in Nodepool.  Once all supported versions use \"auto\", that will make a lot of sense.  But now we are in a weird situation where there is still some logic dealing with this in Zuul, so it would be weird not to describe that in Zuul\u0027s docs somewhere.  So if we want to keep this in Zuul\u0027s docs too, then I\u0027d suggest putting it after this section:\n\nhttps://zuul-ci.org/docs/zuul/admin/components.html#executor",
+      "revId": "39f667dd4afb40503d6f2f69c1df67b8399b2969",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
