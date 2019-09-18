@@ -711,9 +711,12 @@ class GerritWebServer(object):
                 self.end_headers()
 
             def _get_change(self, change_id):
+                change_id = urllib.parse.unquote(change_id)
                 project, branch, change = change_id.split('~')
                 for c in fake_gerrit.changes.values():
-                    if c.data['id'] == change:
+                    if (c.data['id'] == change and
+                        c.data['branch'] == branch and
+                        c.data['project'] == project):
                         return c
 
             def review(self, change_id, revision, data):
