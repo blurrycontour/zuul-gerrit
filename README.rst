@@ -14,6 +14,15 @@ If you are looking for the Javascript testing tool named Zuul, it
 can be found here:
 https://github.com/defunctzombie/zuul
 
+What does Zuul do?
+------------------
+
+Zuul manages your continuous integration (CI) pipeline so that you
+never again merge broken code.
+
+It fully automates running tests defined by projects and guarantees
+that changes have always passed testing before being merged.
+
 Getting Help
 ------------
 

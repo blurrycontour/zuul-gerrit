@@ -56,5 +56,6 @@ of users.  We welcome your `support and contribution
 
    concepts
    gating
+   zen
 
 _`Nodepool`: https://zuul-ci.org/docs/nodepool/
