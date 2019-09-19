@@ -17,3 +17,8 @@ configure it to meet your needs.
    encryption
    tenant-scoped-rest-api
    github-checks-api
+
+.. toctree::
+   :maxdepth: 1
+
+   zen
