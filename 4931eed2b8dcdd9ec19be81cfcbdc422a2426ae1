@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_93120309",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-19T18:28:21Z",
+      "side": 1,
+      "message": "You can specify the request method in the route_map and drop this method.",
+      "revId": "4931eed2b8dcdd9ec19be81cfcbdc422a2426ae1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
