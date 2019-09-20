@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_34352347",
+        "filename": "zuul/lib/ansible-config.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-09-20T16:43:29Z",
+      "side": 0,
+      "message": "Should we deprecate this? Can add it to a followup change if desired.",
+      "revId": "cfe6a7b985125325605ef192b2de5fe1986ef569",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
