@@ -2857,7 +2857,6 @@ class FakeBitbucketClient():
                     "isDefault": is_default
                 })
 
-
             r = {
                 'size': 1,
                 'limit': 25,

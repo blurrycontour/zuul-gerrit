@@ -37,13 +37,17 @@ class BitbucketReporter(BaseReporter):
     def mergePull(self, item):
         for i in [1, 2, 3, 4]:
             try:
-                self.connection.mergePull(item.change.project.name,
-                                          item.change.id,
-                                          item.change.pr_version)
-                item.change.is_merged = True
+                cp = item.change.project
+                project, repo = self.connection._getProjectRepo(cp.name)
+                change = self.connection.buildPR(project, repo,
+                                                 item.change.id)
+                self.connection.mergePull(change.project.name,
+                                          change.id,
+                                          change.pr_version)
+                change.is_merged = True
                 self.log.debug('Successfully merged {}/{}'
-                               .format(item.change.project.name,
-                                       item.change.id))
+                               .format(change.project.name,
+                                       change.id))
                 return
             except BaseException:
                 self.log.exception(
