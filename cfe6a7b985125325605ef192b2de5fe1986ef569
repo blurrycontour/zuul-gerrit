@@ -16,6 +16,23 @@
       "revId": "cfe6a7b985125325605ef192b2de5fe1986ef569",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_4a127a0b",
+        "filename": "zuul/lib/ansible-config.conf",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-09-20T17:30:19Z",
+      "side": 0,
+      "message": "Thanks! Looks like you incorporated it into the latest patchset of I02a0e9703a61b3976cec559a1069b51616c3d447 now.",
+      "revId": "cfe6a7b985125325605ef192b2de5fe1986ef569",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
