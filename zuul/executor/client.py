@@ -385,7 +385,7 @@ class ExecutorClient(object):
             return False
 
         # TODOv3(jeblair): make a nicer way of recording build start.
-        if build.url is not None:
+        if build.__gearman_worker is not None:
             log.debug("Build has already started")
             self.cancelRunningBuild(build)
             log.debug("Canceled running build")
@@ -398,10 +398,16 @@ class ExecutorClient(object):
             log.debug("Removed build from queue")
             return False
 
+        # FIXME(tobiash): the build.url is only available after all repo
+        #  processing of the job so it is most likely not present if the build
+        #  just has started.
+        #  A solution for this could be to directly send the worker details
+        #  with a work status when the executor takes the job and afterwards
+        #  set the url.
         time.sleep(1)
 
         log.debug("Still unable to find build to cancel")
-        if build.url:
+        if build.__gearman_worker:
             log.debug("Build has just started")
             self.cancelRunningBuild(build)
             log.debug("Canceled running build")
