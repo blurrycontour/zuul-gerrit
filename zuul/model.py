@@ -1791,45 +1791,36 @@ class JobGraph(object):
     def getJobs(self):
         return list(self.jobs.values())  # Report in the order of layout cfg
 
-    def getDirectDependentJobs(self, parent_job, skip_soft=False):
+    def getDirectDependentJobs(self, parent_job):
         ret = set()
-        for dependent_name, parents in self._dependencies.items():
-            part = parent_job in parents \
-                and (not skip_soft or not parents[parent_job])
-            if part:
+        for dependent_name, parent_names in self._dependencies.items():
+            if parent_job in parent_names:
                 ret.add(dependent_name)
         return ret
 
-    def getDependentJobsRecursively(self, parent_job, skip_soft=False):
+    def getDependentJobsRecursively(self, parent_job):
         all_dependent_jobs = set()
         jobs_to_iterate = set([parent_job])
         while len(jobs_to_iterate) > 0:
             current_job = jobs_to_iterate.pop()
-            current_dependent_jobs = self.getDirectDependentJobs(current_job,
-                                                                 skip_soft)
+            current_dependent_jobs = self.getDirectDependentJobs(current_job)
             new_dependent_jobs = current_dependent_jobs - all_dependent_jobs
             jobs_to_iterate |= new_dependent_jobs
             all_dependent_jobs |= new_dependent_jobs
         return [self.jobs[name] for name in all_dependent_jobs]
 
-    def getParentJobsRecursively(self, dependent_job, layout=None,
-                                 skip_soft=False):
+    def getParentJobsRecursively(self, dependent_job, layout=None):
         return [self.jobs[name] for name in
                 self._getParentJobNamesRecursively(dependent_job,
-                                                   layout=layout,
-                                                   skip_soft=skip_soft)]
+                                                   layout=layout)]
 
     def _getParentJobNamesRecursively(self, dependent_job, soft=False,
-                                      layout=None, skip_soft=False):
+                                      layout=None):
         all_parent_jobs = set()
         jobs_to_iterate = set([(dependent_job, False)])
         while len(jobs_to_iterate) > 0:
             (current_job, current_soft) = jobs_to_iterate.pop()
             current_parent_jobs = self._dependencies.get(current_job)
-            if skip_soft:
-                hard_parent_jobs = \
-                    {d: s for d, s in current_parent_jobs.items() if not s}
-                current_parent_jobs = hard_parent_jobs
             if current_parent_jobs is None:
                 if soft or current_soft:
                     if layout:
@@ -2485,21 +2476,14 @@ class QueueItem(object):
             if self.item_ahead.isHoldingFollowingChanges():
                 return []
 
-        failed_job_names = set()  # Jobs that run and failed
-        ignored_job_names = set()  # Jobs that were skipped or canceled
-        unexecuted_job_names = set()  # Jobs that were not started yet
+        successful_job_names = set()
         jobs_not_started = set()
         for job in self.job_graph.getJobs():
             build = self.current_build_set.getBuild(job.name)
             if build:
                 if build.result == 'SUCCESS' or build.paused:
-                    pass
-                elif build.result == 'SKIPPED':
-                    ignored_job_names.add(job.name)
-                else:  # elif build.result in ('FAILURE', 'CANCELED', ...):
-                    failed_job_names.add(job.name)
+                    successful_job_names.add(job.name)
             else:
-                unexecuted_job_names.add(job.name)
                 jobs_not_started.add(job)
 
         # Attempt to run jobs in the order they appear in
@@ -2513,19 +2497,12 @@ class QueueItem(object):
             parent_builds_with_data = {}
             for parent_job in self.job_graph.getParentJobsRecursively(
                     job.name):
-                if parent_job.name in unexecuted_job_names \
-                        or parent_job.name in failed_job_names:
+                if parent_job.name not in successful_job_names:
                     all_parent_jobs_successful = False
                     break
                 parent_build = self.current_build_set.getBuild(parent_job.name)
                 if parent_build.result_data:
                     parent_builds_with_data[parent_job.name] = parent_build
-
-            for parent_job in self.job_graph.getParentJobsRecursively(
-                    job.name, skip_soft=True):
-                if parent_job.name in ignored_job_names:
-                    all_parent_jobs_successful = False
-                    break
 
             if all_parent_jobs_successful:
                 # Iterate in reverse order over all jobs of the graph (which is
@@ -2560,20 +2537,15 @@ class QueueItem(object):
             if self.item_ahead.isHoldingFollowingChanges():
                 return []
 
-        failed_job_names = set()       # Jobs that run and failed
-        ignored_job_names = set()      # Jobs that were skipped or canceled
-        unexecuted_job_names = set()   # Jobs that were not started yet
+        successful_job_names = set()
         jobs_not_requested = set()
         for job in self.job_graph.getJobs():
             build = build_set.getBuild(job.name)
             if build and (build.result == 'SUCCESS' or build.paused):
+                successful_job_names.add(job.name)
+            elif build and build.result in ('SKIPPED', 'FAILURE', 'CANCELED'):
                 pass
-            elif build and build.result == 'SKIPPED':
-                ignored_job_names.add(job.name)
-            elif build and build.result in ('FAILURE', 'CANCELED'):
-                failed_job_names.add(job.name)
             else:
-                unexecuted_job_names.add(job.name)
                 nodeset = build_set.getJobNodeSet(job.name)
                 if nodeset is None:
                     req = build_set.getJobNodeRequest(job.name)
@@ -2590,13 +2562,7 @@ class QueueItem(object):
             all_parent_jobs_successful = True
             for parent_job in self.job_graph.getParentJobsRecursively(
                     job.name):
-                if parent_job.name in unexecuted_job_names \
-                        or parent_job.name in failed_job_names:
-                    all_parent_jobs_successful = False
-                    break
-            for parent_job in self.job_graph.getParentJobsRecursively(
-                    job.name, skip_soft=True):
-                if parent_job.name in ignored_job_names:
+                if parent_job.name not in successful_job_names:
                     all_parent_jobs_successful = False
                     break
             if all_parent_jobs_successful:
@@ -2624,24 +2590,20 @@ class QueueItem(object):
             if not zuul_return:
                 # If zuul.child_jobs exists and is empty, user want to skip all
                 # child jobs.
-                to_skip = self.job_graph.getDependentJobsRecursively(
-                    build.job.name, skip_soft=True)
-                skipped += to_skip
+                skipped += self.job_graph.getDependentJobsRecursively(
+                    build.job.name)
             else:
                 # We have list of jobs to run.
                 intersect_jobs = dependent_jobs.intersection(zuul_return)
 
                 for skip in (dependent_jobs - intersect_jobs):
-                    s = self.job_graph.jobs.get(skip)
-                    skipped.append(s)
-                    to_skip = self.job_graph.getDependentJobsRecursively(
-                        skip, skip_soft=True)
-                    skipped += to_skip
+                    skipped.append(self.job_graph.jobs.get(skip))
+                    skipped += self.job_graph.getDependentJobsRecursively(
+                        skip)
 
         elif build.result != 'SUCCESS' and not build.paused:
-            to_skip = self.job_graph.getDependentJobsRecursively(
-                build.job.name, skip_soft=True)
-            skipped += to_skip
+            skipped += self.job_graph.getDependentJobsRecursively(
+                build.job.name)
 
         for job in skipped:
             child_build = self.current_build_set.getBuild(job.name)
