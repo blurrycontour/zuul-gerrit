@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_ec1bffc6",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 17
+      },
+      "lineNbr": 1201,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-09-25T11:55:55Z",
+      "side": 1,
+      "message": "I have a bit feeling this is too little as an explanation for the user. Just with comparing this with the commit message.\n\nAlso would it be possible to limit the behavior just for the case when a tag is created on HEAD of a branch? If I understand that correctly this is the \"standard\" use-case many are looking for?\n\nIf that\u0027s the case the implementation could be even more simple, correct?",
+      "range": {
+        "startLine": 1199,
+        "startChar": 6,
+        "endLine": 1201,
+        "endChar": 64
+      },
+      "revId": "999b94289be8737ffe07d5577c1ebce02c9c55a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
