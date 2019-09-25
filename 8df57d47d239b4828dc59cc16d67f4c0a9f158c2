@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_6d162958",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2170,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-25T14:03:00Z",
+      "side": 1,
+      "message": "why not using the iterate_timeout procedure?",
+      "revId": "8df57d47d239b4828dc59cc16d67f4c0a9f158c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_9f19487b",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-25T14:03:00Z",
+      "side": 1,
+      "message": "Perhaps create a build_worker variable similarly to the job one above so that the rest of the code doesn\u0027t reference a __ private attribute?",
+      "revId": "8df57d47d239b4828dc59cc16d67f4c0a9f158c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
