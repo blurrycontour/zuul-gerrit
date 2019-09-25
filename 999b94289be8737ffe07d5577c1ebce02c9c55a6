@@ -22,6 +22,23 @@
       "revId": "999b94289be8737ffe07d5577c1ebce02c9c55a6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_04b0a789",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 17
+      },
+      "lineNbr": 1201,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-09-25T19:59:48Z",
+      "side": 1,
+      "message": "That seems very prone to race conditions. A change can always merge to the branch while you\u0027re in the process of pushing the tag for what you thought was the HEAD but no longer is by the time Zuul receives the event.",
+      "revId": "999b94289be8737ffe07d5577c1ebce02c9c55a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
