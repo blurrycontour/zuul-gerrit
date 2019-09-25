@@ -69,6 +69,23 @@
       "revId": "8df57d47d239b4828dc59cc16d67f4c0a9f158c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_f5865bb9",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 484,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-09-25T15:38:37Z",
+      "side": 1,
+      "message": "iirc this is used to indicate the build has started and thus can be aborted. Why not naming this attribute started then? Or add a started property to the build object that check for the __gearman_worker",
+      "revId": "8df57d47d239b4828dc59cc16d67f4c0a9f158c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
