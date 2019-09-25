@@ -4819,7 +4819,7 @@ class ClaimRule(AuthZRule):
         self.claim = claim or 'sub'
         self.value = value
 
-    def __call__(self, claims):
+    def _match_jsonpath(self, claims):
         matches = [match.value
                    for match in jsonpath_rw.parse(self.claim).find(claims)]
         if len(matches) == 1:
@@ -4834,6 +4834,30 @@ class ClaimRule(AuthZRule):
         else:
             # TODO we should differentiate no match and 2+ matches
             return False
+
+    def _match_dict(self, claims):
+        def _compare(value, claim):
+            if isinstance(value, list):
+                if isinstance(claim, list):
+                    return set(claim) <= set(value)
+                else:
+                    return claim in value
+            elif isinstance(value, dict):
+                if not isinstance(claim, dict):
+                    return False
+                else:
+                    return all(_compare(value[x], claim.get(x, {}))
+                               for x in value.keys())
+            else:
+                return value == claim
+
+        return _compare(self.value, claims.get(self.claim, {}))
+
+    def __call__(self, claims):
+        if isinstance(self.value, dict):
+            return self._match_dict(claims)
+        else:
+            return self._match_jsonpath(claims)
 
     def __eq__(self, other):
         if not isinstance(other, ClaimRule):
