@@ -1490,7 +1490,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.sched.reconfigure(self.config)
         self.waitUntilSettled()
 
-        time.sleep(5)
+        time.sleep(1)
 
         authz = {'iss': 'zuul_operator',
                  'aud': 'zuul.example.com',
