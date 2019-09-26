@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_5472c37c",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1494,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-09-26T09:02:26Z",
+      "side": 1,
+      "message": "this is how it\u0027s done in test_scheduler for the RPC tests.",
+      "revId": "4fbc14c564626e710662522c89d39c05c0bbd11f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
