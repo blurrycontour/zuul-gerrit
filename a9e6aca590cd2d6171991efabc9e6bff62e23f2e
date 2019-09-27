@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_ad2f1a86",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-09-27T05:51:01Z",
+      "side": 1,
+      "message": "why not to raise a ValueError with a more precise message instead of the more generic Exception?",
+      "range": {
+        "startLine": 48,
+        "startChar": 18,
+        "endLine": 48,
+        "endChar": 27
+      },
+      "revId": "a9e6aca590cd2d6171991efabc9e6bff62e23f2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
