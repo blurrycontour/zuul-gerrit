@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_f5f6145d",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-09-30T14:39:58Z",
+      "side": 1,
+      "message": "Actually in Gerrit it\u0027s called a \"change\".  I acknowledge some people call it a \"review\", but in fact, a \"review\" is something you leave on a \"change\".  I\u0027m not pedantic enough to correct folks in conversation, but we should avoid saying the opposite in our docs.",
+      "revId": "93f6803bfcb7686b4e607d14cfd21124a8e58b20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
