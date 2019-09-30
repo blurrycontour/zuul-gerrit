@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_bb62d4ac",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-09-30T08:57:27Z",
+      "side": 1,
+      "message": "Maybe it would be better to report an error to all items in the cycle?",
+      "revId": "08a3966879208fed0382b331d720fe5618762efe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
