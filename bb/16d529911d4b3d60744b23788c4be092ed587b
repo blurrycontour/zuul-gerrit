@@ -1,0 +1,9 @@
+Code-Review+1: Jan Kubovy <jan.kubovy@bmw.de>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 30 Sep 2019 15:25:53 +0000
+Reviewed-on: https://review.opendev.org/684373
+Project: zuul/zuul
+Branch: refs/heads/master
