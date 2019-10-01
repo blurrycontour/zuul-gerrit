@@ -15,14 +15,32 @@
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
 
-class PullRequest(Change):
+class MergeRequest(Change):
     def __init__(self, project):
-        super(PullRequest, self).__init__(project)
+        super(MergeRequest, self).__init__(project)
 
 
 class GitlabTriggerEvent(TriggerEvent):
     def __init__(self):
         super(GitlabTriggerEvent, self).__init__()
+        self.trigger_name = 'gitlab'
+        self.title = None
+        self.action = None
+        self.change_number = None
+
+    def _repr(self):
+        r = [super(GitlabTriggerEvent, self)._repr()]
+        if self.state:
+            r.append("action:%s" % self.action)
+        r.append("project:%s" % self.canonical_project_name)
+        if self.change_number:
+            r.append("mr:%s" % self.change_number)
+        return ' '.join(r)
+
+    def isPatchsetCreated(self):
+        if self.type == 'gl_pull_request':
+            return self.action in ['opened', 'changed']
+        return False
 
 
 class GitlabEventFilter(EventFilter):
