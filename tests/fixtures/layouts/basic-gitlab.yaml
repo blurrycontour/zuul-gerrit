@@ -1,4 +1,18 @@
 - pipeline:
     name: check
     manager: independent
-    trigger: {}
+    trigger:
+      gitlab:
+        - event: gl_merge_request
+          action:
+            - opened
+
+- job:
+    name: project-test1
+    run: playbooks/project-test1.yaml
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - project-test1
