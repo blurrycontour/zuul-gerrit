@@ -90,6 +90,7 @@ class GerritChange(Change):
                         self.missing_labels.add(label['label'])
 
     def updateFromHTTP(self, data, connection):
+        self.url = data['url']
         urlparse = urllib.parse.urlparse(connection.baseurl)
         baseurl = "%s%s" % (urlparse.netloc, urlparse.path)
         baseurl = baseurl.rstrip('/')
@@ -99,7 +100,6 @@ class GerritChange(Change):
         self.project = connection.source.getProject(data['project'])
         self.id = data['change_id']
         self.branch = data['branch']
-        self.url = '%s/%s' % (baseurl, self.number)
         self.uris = [
             '%s/%s' % (baseurl, self.number),
             '%s/#/c/%s' % (baseurl, self.number),
