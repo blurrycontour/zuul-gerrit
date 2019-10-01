@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_5a0cda3a",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-10-01T21:56:16Z",
+      "side": 1,
+      "message": "I don\u0027t think the rest api has a \u0027url\u0027 entry.  I think we want to *almost* do what line 102 was doing.  We should concatenate connection.baseurl with self.number.  connection.baseurl should have the scheme.",
+      "revId": "13259da9a4a5a91a22f703882b2beb034be19d50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
