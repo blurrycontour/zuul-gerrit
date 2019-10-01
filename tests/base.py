@@ -1459,8 +1459,132 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         super(FakeGitlabConnection, self).__init__(driver, connection_name,
                                                    connection_config)
 
+    def openFakeMergeRequest(self, project, branch, subject, files=[],
+                             description=None):
+        self.mr_number += 1
+        merge_request = FakeGitlabMergeRequest(
+            self, self.mr_number, project, branch, subject, self.upstream_root,
+            files=files, description=description)
+        self.merge_requests.setdefault(
+            project, {})[str(self.mr_number)] = merge_request
+        return merge_request
+
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
+
+
+class GitlabChangeReference(git.Reference):
+    _common_path_default = "refs/merge-requests"
+    _points_to_commits_only = True
+
+
+class FakeGitlabMergeRequest(object):
+    log = logging.getLogger("zuul.test.FakeGitlabMergeRequest")
+
+    def __init__(self, gitlab, number, project, branch,
+                 subject, upstream_root, files=[], number_of_commits=1,
+                 description=None):
+        self.gitlab = gitlab
+        self.source = gitlab
+        self.number = number
+        self.project = project
+        self.branch = branch
+        self.subject = subject
+        self.upstream_root = upstream_root
+        self.number_of_commits = 0
+        self.status = 'Open'
+        self.description = description
+        self.uuid = uuid.uuid4().hex
+        self.comments = []
+        self.files = {}
+        self.labels = []
+        self.upstream_root = upstream_root
+        self.url = "https://%s/%s/merge_requests/%s" % (
+            self.gitlab.server, urllib.parse.quote_plus(
+                self.project), self.number)
+        self.is_merged = False
+        self.pr_ref = self._createPRRef()
+        self._addCommitInMR(files=files)
+        self._updateTimeStamp()
+
+    def _getRepo(self):
+        repo_path = os.path.join(self.upstream_root, self.project)
+        return git.Repo(repo_path)
+
+    def _createPRRef(self):
+        repo = self._getRepo()
+        return GitlabChangeReference.create(
+            repo, self.getPRReference(), 'refs/tags/init')
+
+    def _addCommitInMR(self, files=[], reset=False):
+        repo = self._getRepo()
+        ref = repo.references[self.getPRReference()]
+        if reset:
+            self.number_of_commits = 0
+            ref.set_object('refs/tags/init')
+        self.number_of_commits += 1
+        repo.head.reference = ref
+        repo.git.clean('-x', '-f', '-d')
+
+        if files:
+            self.files = files
+        else:
+            fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
+            self.files = {fn: "test %s %s\n" % (self.branch, self.number)}
+        msg = self.subject + '-' + str(self.number_of_commits)
+        for fn, content in self.files.items():
+            fn = os.path.join(repo.working_dir, fn)
+            with open(fn, 'w') as f:
+                f.write(content)
+            repo.index.add([fn])
+
+        self.commit_stop = repo.index.commit(msg).hexsha
+        if not self.commit_start:
+            self.commit_start = self.commit_stop
+
+        repo.create_head(self.getPRReference(), self.commit_stop, force=True)
+        self.pr_ref.set_commit(self.commit_stop)
+        repo.head.reference = 'master'
+        repo.git.clean('-x', '-f', '-d')
+        repo.heads['master'].checkout()
+
+    def _updateTimeStamp(self):
+        # TODO(fbo): not epoch
+        self.updated_at = str(int(time.time()))
+
+    # def _getPullRequestEvent(self, action, pull_data_field='pullrequest'):
+    #     name = 'pg_pull_request'
+    #     data = {
+    #         'msg': {
+    #             pull_data_field: {
+    #                 'branch': self.branch,
+    #                 'comments': self.comments,
+    #                 'commit_start': self.commit_start,
+    #                 'commit_stop': self.commit_stop,
+    #                 'date_created': '0',
+    #                 'tags': self.tags,
+    #                 'initial_comment': self.initial_comment,
+    #                 'id': self.number,
+    #                 'project': {
+    #                     'fullname': self.project,
+    #                 },
+    #                 'status': self.status,
+    #                 'subject': self.subject,
+    #                 'uid': self.uuid,
+    #             }
+    #         },
+    #         'msg_id': str(uuid.uuid4()),
+    #         'timestamp': 1427459070,
+    #         'topic': action
+    #     }
+    #     if action == 'pull-request.flag.added':
+    #         data['msg']['flag'] = self.flags[0]
+    #     if action == 'pull-request.tag.added':
+    #         data['msg']['tags'] = self.tags
+    #     return (name, data)
+
+    # def getPullRequestOpenedEvent(self):
+    #     return self._getPullRequestEvent('pull-request.new')
 
 
 class GithubChangeReference(git.Reference):

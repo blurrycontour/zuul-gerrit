@@ -59,7 +59,7 @@ class GitlabSource(BaseSource):
         raise NotImplementedError()
 
     def getCachedChanges(self):
-        raise NotImplementedError()
+        return self.connection._change_cache.values()
 
     def getProject(self, name):
         p = self.connection.getProject(name)
@@ -69,7 +69,7 @@ class GitlabSource(BaseSource):
         return p
 
     def getProjectBranches(self, project, tenant):
-        raise NotImplementedError()
+        return self.connection.getProjectBranches(project, tenant)
 
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
