@@ -730,7 +730,6 @@ class GithubConnection(BaseConnection):
         if verify_ssl.lower() == 'false':
             self.verify_ssl = False
 
-        self._github = None
         self.app_id = None
         self.app_key = None
         self.sched = None
@@ -844,16 +843,9 @@ class GithubConnection(BaseConnection):
     def _authenticateGithubAPI(self):
         config = self.connection_config
 
-        api_token = config.get('api_token')
-
         app_id = config.get('app_id')
         app_key = None
         app_key_file = config.get('app_key')
-
-        self._github = self._createGithubClient()
-
-        if api_token:
-            self._github.login(token=api_token)
 
         if app_key_file:
             try:
@@ -1019,10 +1011,11 @@ class GithubConnection(BaseConnection):
     def getGithubClient(self,
                         project=None,
                         zuul_event_id=None):
+        github = self._createGithubClient(zuul_event_id)
+
         # if you're authenticating for a project and you're an integration then
         # you need to use the installation specific token.
         if project and self.app_id:
-            github = self._createGithubClient(zuul_event_id)
             github.login(token=self._get_installation_key(project))
             github._zuul_project = project
             github._zuul_user_id = self.installation_map.get(project)
@@ -1030,7 +1023,12 @@ class GithubConnection(BaseConnection):
 
         # if we're using api_key authentication then this is already token
         # authenticated, if not then anonymous is the best we have.
-        return self._createGithubClient(zuul_event_id)
+        else:
+            api_token = self.connection_config.get('api_token')
+            if api_token:
+                github.login(token=api_token)
+
+        return github
 
     def maintainCache(self, relevant):
         remove = set()
