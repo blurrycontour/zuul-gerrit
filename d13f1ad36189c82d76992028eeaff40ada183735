@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_147ff5ab",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 42
+      },
+      "lineNbr": 537,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-10-03T18:48:04Z",
+      "side": 1,
+      "message": "Not quite sure of the purpose of this, but since you\u0027re adding autohold stuff, what about autohold_by_request_id and autohold_delete?",
+      "range": {
+        "startLine": 536,
+        "startChar": 0,
+        "endLine": 537,
+        "endChar": 61
+      },
+      "revId": "d13f1ad36189c82d76992028eeaff40ada183735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
