@@ -16,6 +16,24 @@
       "revId": "150f99c27669187b1232b200a19e0932b929806f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_6f2d2fa7",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-10-04T08:21:13Z",
+      "side": 0,
+      "message": "Thanks good catch !",
+      "parentUuid": "3fa7e38b_729e8155",
+      "revId": "150f99c27669187b1232b200a19e0932b929806f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
