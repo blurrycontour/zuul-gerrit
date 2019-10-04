@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_a10c9b42",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 43
+      },
+      "lineNbr": 543,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-10-04T09:25:55Z",
+      "side": 1,
+      "message": "On a side note what is the purpose of this? Shouldn\u0027t it also mention the HTTP verb? A few of these endpoints are not just GET.",
+      "range": {
+        "startLine": 508,
+        "startChar": 0,
+        "endLine": 543,
+        "endChar": 9
+      },
+      "revId": "37d9fe338fbb2f21ae9179b5481d71cbff9815ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
