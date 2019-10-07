@@ -12,7 +12,7 @@ projects from merging broken code.
 
 This tutorial is entirely self-contained and may safely be run on a
 workstation.  The only requirements are a network connection, the
-ability to run Docker containers, and at least 2GiB of RAM.
+ability to run containers, and at least 2GiB of RAM.
 
 This tutorial supplies a working Gerrit for code review, though the
 concepts you will learn apply equally to GitHub.
@@ -33,31 +33,24 @@ Before you start, ensure that some needed packages are installed.
 
    # Red Hat / CentOS:
 
-   sudo yum install epel-release
-   sudo yum update
-   sudo yum install docker docker-compose git python-pip
-   sudo pip install git-review
+   sudo yum install podman git python3
+   sudo python3 -m pip install git-review podman-compose
 
    # Fedora:
 
-   sudo dnf install docker docker-compose git git-review
+   sudo dnf install podman git python3
+   sudo python3 -m pip install git-review podman-compose
 
    # OpenSuse:
 
-   sudo zypper install docker docker-compose git
-   sudo python3 -m pip install git-review
+   sudo zypper install podman git python3
+   sudo python3 -m pip install git-review podman-compose
 
    # Ubuntu / Debian:
 
    sudo apt-get update
-   sudo apt-get install docker-compose docker.io git python3-pip
-   sudo python3 -m pip install git-review
-
-   # Start and Enable the docker service on Fedora / CentOS
-   # Red Hat / OpenSuse / Ubuntu / Debian:
-
-   sudo systemctl enable docker.service
-   sudo systemctl start docker.service
+   sudo apt-get install podman git python3-pip
+   sudo python3 -m pip install git-review podman-compose
 
 
 Clone the Zuul repository:
@@ -67,22 +60,22 @@ Clone the Zuul repository:
    git clone https://opendev.org/zuul/zuul
 
 Then cd into the directory containing this document, and run
-docker-compose in order to start Zuul, Nodepool and Gerrit.
+podman-compose in order to start Zuul, Nodepool and Gerrit.
 
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   sudo -E docker-compose -p zuul-tutorial up
+   podman-compose -p zuul-tutorial up
 
 For reference, the files in that directory are also `browsable on the web
 <https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples>`_.
 
 All of the services will be started with debug-level logging sent to
-the standard output of the terminal where docker-compose is running.
+the standard output of the terminal where podman-compose is running.
 You will see a considerable amount of information scroll by, including
 some errors.  Zuul will immediately attempt to connect to Gerrit and
 begin processing, even before Gerrit has fully initialized.  The
-docker composition includes scripts to configure Gerrit and create an
+podman composition includes scripts to configure Gerrit and create an
 account for Zuul.  Once this has all completed, the system should
 automatically connect, stabilize and become idle.  When this is
 complete, you will have the following services running:
