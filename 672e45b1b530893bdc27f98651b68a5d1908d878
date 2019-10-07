@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_141fc770",
+        "filename": "doc/source/admin/quick-start.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2019-10-07T19:18:13Z",
+      "side": 1,
+      "message": "why install from github and not pypi?",
+      "revId": "672e45b1b530893bdc27f98651b68a5d1908d878",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
