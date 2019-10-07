@@ -1,6 +1,6 @@
 FROM rastasheep/ubuntu-sshd
 
-RUN apt-get update \
+RUN apt-get -y update \
     && apt-get -y install \
         git \
         python-tox \
