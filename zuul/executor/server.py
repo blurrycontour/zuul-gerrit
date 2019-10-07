@@ -1737,7 +1737,8 @@ class AnsibleJob(object):
         kube_cfg['users'].append({
             'name': user_name,
             'user': {
-                'token': data['token'],
+                'token': base64.b64decode(
+                    data['token'].encode('utf-8')).decode('utf-8'),
             },
         })
 
