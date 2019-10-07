@@ -1,44 +1,44 @@
 # Stop the basic tutorial
-- name: Run docker-compose down
+- name: Run podman-compose down
   when: not local
   shell:
-    cmd: docker-compose -p zuul-tutorial stop
+    cmd: podman-compose -p zuul-tutorial stop
     chdir: src/opendev.org/zuul/zuul/doc/source/examples
 
-- name: Run docker-compose down
+- name: Run podman-compose down
   when: local
   shell:
-    cmd: docker-compose -p zuul-tutorial stop
+    cmd: podman-compose -p zuul-tutorial stop
     chdir: ../../doc/source/examples
 
 # Restart with the new config
-- name: Run docker-compose up
+- name: Run podman-compose up
   when: not local
   shell:
-    cmd: docker-compose -p zuul-tutorial up -d
+    cmd: podman-compose -p zuul-tutorial up -d
     chdir: src/opendev.org/zuul/zuul/doc/source/examples
   environment:
     ZUUL_TUTORIAL_CONFIG: "./tracing/etc_zuul/"
 
-- name: Run docker-compose up
+- name: Run podman-compose up
   when: local
   shell:
-    cmd: docker-compose -p zuul-tutorial up -d
+    cmd: podman-compose -p zuul-tutorial up -d
     chdir: ../../doc/source/examples
   environment:
     ZUUL_TUTORIAL_CONFIG: "./tracing/etc_zuul/"
 
 # Start Jaeger
-- name: Run docker-compose up
+- name: Run podman-compose up
   when: not local
   shell:
-    cmd: docker-compose -p zuul-tutorial-tracing up -d
+    cmd: podman-compose -p zuul-tutorial-tracing up -d
     chdir: src/opendev.org/zuul/zuul/doc/source/examples/tracing
 
-- name: Run docker-compose up
+- name: Run podman-compose up
   when: local
   shell:
-    cmd: docker-compose -p zuul-tutorial-tracing up -d
+    cmd: podman-compose -p zuul-tutorial-tracing up -d
     chdir: ../../doc/source/examples/tracing
 
 # Verify that Zuul runs with the new config

@@ -10,6 +10,12 @@ services:
       - CANONICAL_WEB_URL=http://localhost:8080/
     networks:
       - zuul
+    volumes:
+      - "gerrit-etc:/var/gerrit/etc"
+      - "gerrit-db:/var/gerrit/db"
+      - "gerrit-git:/var/gerrit/git"
+      - "gerrit-index:/var/gerrit/index"
+      - "gerrit-cache:/var/gerrit/cache"
   gerritconfig:
     image: quay.io/zuul-ci/zuul-executor
     environment:
@@ -24,6 +30,7 @@ services:
       - "./playbooks/:/var/playbooks/:z"
       - "certs:/var/certs:z"
       - "../../../tools/:/var/zuul-tools/:z"
+      - "lib-zuul-executor:/var/lib/zuul:z"
     # NOTE(pabelanger): Be sure to update this line each time we change the
     # default version of ansible for Zuul.
     command: "/usr/local/lib/zuul/ansible/6/bin/ansible-playbook /var/playbooks/setup.yaml"
@@ -36,6 +43,8 @@ services:
       - "./playbooks/:/var/playbooks/:z"
       - "certs:/var/certs:z"
       - "./zoo.cfg:/conf/zoo.cfg:z"
+      - "zk-data:/data"
+      - "zk-datalog:/datalog"
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zkServer.sh start-foreground'"
     networks:
       - zuul
@@ -48,11 +57,12 @@ services:
       MYSQL_PASSWORD: secret
       # Work around slow db startup when writing TZINFO data.
       MYSQL_INITDB_SKIP_TZINFO: 1
+    volumes:
+      - "lib-mysql:/var/lib/mysql"
     networks:
       - zuul
   scheduler:
     depends_on:
-      - gerritconfig
       - zk
       - mysql
     environment:
@@ -72,6 +82,7 @@ services:
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "certs:/var/certs:z"
+      - "lib-zuul-scheduler:/var/lib/zuul"
     networks:
       - zuul
   web:
@@ -90,6 +101,7 @@ services:
       - "${ZUUL_TUTORIAL_CONFIG:-./etc_zuul/}:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
       - "certs:/var/certs:z"
+      - "lib-zuul-web:/var/lib/zuul"
     networks:
       - zuul
   executor:
@@ -108,6 +120,7 @@ services:
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
       - "certs:/var/certs:z"
+      - "lib-zuul-executor:/var/lib/zuul:z"
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zuul-executor -f'"
     networks:
       - zuul
@@ -156,6 +169,17 @@ volumes:
   nodessh:
   logs:
   certs:
+  lib-zuul-scheduler:
+  lib-zuul-web:
+  lib-zuul-executor:
+  zk-data:
+  zk-datalog:
+  lib-mysql:
+  gerrit-etc:
+  gerrit-db:
+  gerrit-git:
+  gerrit-index:
+  gerrit-cache:
 
 networks:
   zuul:
