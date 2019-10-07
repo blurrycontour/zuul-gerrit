@@ -52,7 +52,6 @@ services:
       - zuul
   scheduler:
     depends_on:
-      - gerritconfig
       - zk
       - mysql
     environment:

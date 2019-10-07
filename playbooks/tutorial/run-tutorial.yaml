@@ -1,7 +1,17 @@
 - block:
     - name: Install git-review
-      command: python3 -m pip install git-review
+      command: python3 -m pip install git-review podman-compose
       become: true
+    - name: Create containers config dir
+      file:
+        path: /home/zuul/.config/containers
+        state: directory
+    - name: Force cgroup manager to cgroupfs for Ubuntu
+      copy:
+        content: |
+          [engine]
+          cgroup_manager = "cgroupfs"
+        dest: /home/zuul/.config/containers/containers.conf
   when: not local
 
 - name: Setup Tutorial Execution
