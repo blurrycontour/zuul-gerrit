@@ -1,15 +1,15 @@
-- name: Run docker-compose up
+- name: Run podman-compose up
   when: not local
   shell:
-    cmd: docker-compose up -d
+    cmd: podman-compose up -d
     chdir: src/opendev.org/zuul/zuul/doc/source/admin/examples
-- name: Run docker-compose up
+- name: Run podman-compose up
   when: local
   shell:
-    cmd: docker-compose up -d
+    cmd: podman-compose up -d
     chdir: ../../doc/source/admin/examples
 - name: Print list of images
-  command: docker image ls --all --digests --no-trunc
+  command: podman image ls --all --digests --no-trunc
 - name: Wait for Gerrit to start
   wait_for:
     host: localhost

@@ -3,18 +3,21 @@
     workspace: /tmp/quickstart-test
     local: false
   roles:
-    - name: install-docker
-      use_upstream_docker: false
     - use-buildset-registry
   tasks:
-    - name: Install docker-compose
-      package:
-        name:
-          - docker-compose
+    - name: Install podman
+      block:
+        - name: Add project atomic PPA
+          apt_repository:
+            repo: ppa:projectatomic/ppa
+          become: true
+        - name: Install packages
+          package:
+            name: podman
+          become: true
         state: present
-      become: true
-    - name: Install git-review
-      command: python3 -m pip install git-review
+    - name: Install git-review and podman-compose
+      command: python3 -m pip install git-review git+https://github.com/containers/podman-compose
       become: true
     - name: Create workspace directory
       file:

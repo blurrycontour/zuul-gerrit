@@ -4,10 +4,10 @@ set -eu
 
 cd $(dirname $0)
 
-MYSQL="docker exec zuul-test-mysql mysql  -u root -pinsecure_slave"
+MYSQL="podman exec zuul-test-mysql mysql  -u root -pinsecure_slave"
 
-docker-compose rm -sf
-docker-compose up -d
+podman rm -fa
+podman-compose up -d
 
 echo "Waiting for mysql"
 timeout 30 bash -c "until ${MYSQL} -e 'show databases'; do sleep 0.5; done"
