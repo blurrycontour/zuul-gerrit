@@ -727,7 +727,7 @@ class PagureConnection(BaseConnection):
                 change.branch = event.branch
             else:
                 change = Ref(project)
-
+                change.branch = event.ref.split('/')[-1]
             change.ref = event.ref
             change.oldrev = event.oldrev
             change.newrev = event.newrev
