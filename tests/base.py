@@ -2631,8 +2631,11 @@ class FakeNodepool(object):
                 'namespace': 'zuul-ci-abcdefg',
                 'host': 'localhost',
                 'skiptls': True,
-                'token': 'FakeToken',
-                'ca_crt': 'FakeCA',
+                # NOTE: 'token' and 'ca_crt' are base64 encoded values in
+                # Kubernetes Secrets.
+                # https://k8s.io/docs/concepts/configuration/secret/
+                'token': 'RmFrZVRva2Vu',
+                'ca_crt': 'RmFrZUNB',
                 'user': 'zuul-worker',
             }
             if 'fedora-pod' in node_type:
