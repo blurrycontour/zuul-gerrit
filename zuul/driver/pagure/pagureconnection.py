@@ -725,10 +725,10 @@ class PagureConnection(BaseConnection):
                 change.branch = event.ref[len('refs/heads/'):]
             else:
                 change = Ref(project)
+                change.branch = event.ref.split('/')[-1]
             change.ref = event.ref
             change.oldrev = event.oldrev
             change.newrev = event.newrev
-            change.branch = event.branch
             change.url = self.getGitwebUrl(project, sha=event.newrev)
 
             # Pagure does not send files details in the git-receive event.
