@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_ee647a4b",
+        "filename": "doc/source/admin/examples/node-Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T10:32:38Z",
+      "side": 1,
+      "message": "Are you sure that you want this and not the env variable DEBIAN_FRONTEND\u003dnoninteractive? I never saw a blocking apt-get update so far but often needed DEBIAN_FRONTEND when installing/upgrading some packages.",
+      "revId": "564e00c5c3c3f9952e1007efa96449772d75fe5d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
