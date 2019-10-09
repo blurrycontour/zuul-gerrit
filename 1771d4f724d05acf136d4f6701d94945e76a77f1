@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_8e34e64b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T10:25:52Z",
+      "side": 1,
+      "message": "Could you add a depends-on to the spec to prevent it from accidental merge before the spec?",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ae37624d",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T10:25:52Z",
+      "side": 1,
+      "message": "nit: includes",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_4e3eee29",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T10:25:52Z",
+      "side": 1,
+      "message": "the",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_6e396a3d",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T10:25:52Z",
+      "side": 1,
+      "message": "Is it on purpose to check this after enqueue?",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_0e48f6c9",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T10:25:52Z",
+      "side": 1,
+      "message": "Are there cases where the if clause is false?",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
