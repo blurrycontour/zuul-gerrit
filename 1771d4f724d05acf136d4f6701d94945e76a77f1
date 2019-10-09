@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_2e54d220",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-10-09T11:13:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_8e34e64b",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_ae37624d",
         "filename": "doc/source/admin/tenants.rst",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2019-10-09T10:25:52Z",
       "side": 1,
       "message": "nit: includes",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_6e5aca50",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-10-09T11:13:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_ae37624d",
       "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_0e59d658",
+        "filename": "doc/source/admin/tenants.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-10-09T11:13:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_4e3eee29",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_6e396a3d",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 6
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_b4cd70b8",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-10-09T11:13:45Z",
+      "side": 1,
+      "message": "No, I will move it up to check before enqueuing the change.",
+      "parentUuid": "3fa7e38b_6e396a3d",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_0e48f6c9",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 6
@@ -81,6 +153,24 @@
       "writtenOn": "2019-10-09T10:25:52Z",
       "side": 1,
       "message": "Are there cases where the if clause is false?",
+      "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_1451e4d9",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2019-10-09T11:13:45Z",
+      "side": 1,
+      "message": "getProject() can return (None, None) in some cases, so I figured it might be better to check.\n\nThis is also how it\u0027s done in scheduleMerge().\n\nNot sure though if this can ever be None here.",
+      "parentUuid": "3fa7e38b_0e48f6c9",
       "revId": "1771d4f724d05acf136d4f6701d94945e76a77f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
