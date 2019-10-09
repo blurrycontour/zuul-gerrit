@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_d41a6c7b",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T12:00:07Z",
+      "side": 1,
+      "message": "How would this process look like? Would the runner supply a template inventory or would it take a simple one from the user and enrich it with the zuul variables?",
+      "revId": "d27a22b333791a08be492a87a2ec78d4af062d61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_f41f6869",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T12:00:07Z",
+      "side": 1,
+      "message": "Running a standalone launcher is probably not possible for the majority of the normal users dueto lack of access to cloud resources.",
+      "revId": "d27a22b333791a08be492a87a2ec78d4af062d61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
