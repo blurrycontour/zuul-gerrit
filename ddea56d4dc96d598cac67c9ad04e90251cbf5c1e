@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_94cdd431",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-09T11:45:37Z",
+      "side": 1,
+      "message": "Technically it\u0027s not webhook auth but rather api token auth. Usually this would be treated as a nit but in this case this could lead to confusion because webhooks are validated using a different (and independent of auth method) secret. So I think this should be fixed in the commit message.",
+      "revId": "ddea56d4dc96d598cac67c9ad04e90251cbf5c1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
