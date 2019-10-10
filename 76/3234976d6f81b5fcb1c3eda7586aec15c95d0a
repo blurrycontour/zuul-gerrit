@@ -1,0 +1,13 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+2: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: Clint 'SpamapS' Byrum <clint@fewbar.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Code-Review+1: Jan Kubovy <jan.kubovy@bmw.de>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: Tobias Henkel <tobias.henkel@bmw.de>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 10 Oct 2019 05:28:32 +0000
+Reviewed-on: https://review.opendev.org/676826
+Project: zuul/zuul
+Branch: refs/heads/master
