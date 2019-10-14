@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_72333dac",
+        "filename": "zuul/web/static/.keep",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-14T18:42:43Z",
+      "side": 0,
+      "message": "unrelated file deletion",
+      "revId": "5fb5e849545c18f392ec2cc2acdc0f83df6a3637",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
