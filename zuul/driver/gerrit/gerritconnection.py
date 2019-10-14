@@ -875,6 +875,12 @@ class GerritConnection(BaseConnection):
         sha = refs.get(ref, '')
         return sha
 
+    @staticmethod
+    def caseInsensitiveLabelCheck(missing_labels, allow_needs):
+        case_insensitive_missing_labels = {missing_label.lower() for missing_label in missing_labels}
+        case_insensitive_allow_needs = {allow_need.lower() for allow_need in allow_needs}
+        return case_insensitive_missing_labels <= case_insensitive_allow_needs
+
     def canMerge(self, change, allow_needs, event=None):
         log = get_annotated_logger(self.log, event)
         if not change.number:
@@ -882,9 +888,7 @@ class GerritConnection(BaseConnection):
             # Good question.  It's probably ref-updated, which, ah,
             # means it's merged.
             return True
-        if change.missing_labels < set(allow_needs):
-            return True
-        return False
+        return caseInsensitiveLabelCheck(change.missing_labels, allow_needs)
 
     def getProjectOpenChanges(self, project: Project) -> List[GerritChange]:
         # This is a best-effort function in case Gerrit is unable to return
