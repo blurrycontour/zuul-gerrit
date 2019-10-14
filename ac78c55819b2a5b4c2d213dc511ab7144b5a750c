@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_ad5cfa18",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-14T19:27:17Z",
+      "side": 1,
+      "message": "nit: it took me a bit to figure out that this means the reversed list. How about making this easier to read by using reversed(self._ansible_roots)?",
+      "revId": "ac78c55819b2a5b4c2d213dc511ab7144b5a750c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
