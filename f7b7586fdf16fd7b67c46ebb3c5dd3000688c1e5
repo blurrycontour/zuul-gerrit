@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_cdb05646",
+        "filename": "tools/zuul-changes.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-14T19:28:29Z",
+      "side": 1,
+      "message": "We need to update the shebang to python3 as well.",
+      "revId": "f7b7586fdf16fd7b67c46ebb3c5dd3000688c1e5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
