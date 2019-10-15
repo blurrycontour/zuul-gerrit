@@ -123,6 +123,23 @@ class ConnectionRegistry(object):
             connection = driver.getConnection(con_name, con_config)
             connections[con_name] = connection
 
+        # For merger and reporter, which only needs source driver, skip
+        # checking for primary SQL connection.
+        if not source_only:
+            sql_connections = list(filter(
+                lambda c: isinstance(c.driver, zuul.driver.sql.SQLDriver),
+                connections.values()))
+            if len(sql_connections) == 1:
+                sql_connections[0].primary = True
+                primary_connections = sql_connections
+            else:
+                primary_connections = list(filter(lambda c: c.primary,
+                                                  sql_connections))
+
+            if len(primary_connections) != 1:
+                raise Exception("%s SQL connections with %s primary" % (
+                    len(sql_connections), len(primary_connections)))
+
         # If the [gerrit] or [smtp] sections still exist, load them in as a
         # connection named 'gerrit' or 'smtp' respectfully
 

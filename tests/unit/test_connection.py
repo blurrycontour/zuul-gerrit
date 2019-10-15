@@ -28,7 +28,7 @@ def _get_reporter_from_connection_name(reporters, connection_name):
             return r
 
 
-class TestConnections(ZuulTestCase):
+class TestConnections(ZuulDBTestCase):
     config_file = 'zuul-connections-same-gerrit.conf'
     tenant_config_file = 'config/zuul-connections-same-gerrit/main.yaml'
 
@@ -315,8 +315,7 @@ class TestConnectionsBadSQL(ZuulDBTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-
-class TestMultipleGerrits(ZuulTestCase):
+class TestMultipleGerrits(ZuulDBTestCase):
     config_file = 'zuul-connections-multiple-gerrits.conf'
     tenant_config_file = 'config/zuul-connections-multiple-gerrits/main.yaml'
 
@@ -405,7 +404,7 @@ class TestMultipleGerrits(ZuulTestCase):
         self.waitUntilSettled()
 
 
-class TestConnectionsMerger(ZuulTestCase):
+class TestConnectionsMerger(ZuulDBTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
 
@@ -423,7 +422,7 @@ class TestConnectionsMerger(ZuulTestCase):
         self.assertNotIn("zuul", self.connections.connections)
 
 
-class TestConnectionsCgit(ZuulTestCase):
+class TestConnectionsCgit(ZuulDBTestCase):
     config_file = 'zuul-connections-cgit.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
 
@@ -437,7 +436,7 @@ class TestConnectionsCgit(ZuulTestCase):
                          'https://cgit.example.com/cgit/foo/bar/commit/?id=1')
 
 
-class TestConnectionsGitweb(ZuulTestCase):
+class TestConnectionsGitweb(ZuulDBTestCase):
     config_file = 'zuul-connections-gitweb.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
 
@@ -452,7 +451,7 @@ class TestConnectionsGitweb(ZuulTestCase):
         self.assertEqual(url, url_should_be)
 
 
-class TestMQTTConnection(ZuulTestCase):
+class TestMQTTConnection(ZuulDBTestCase):
     config_file = 'zuul-mqtt-driver.conf'
     tenant_config_file = 'config/mqtt-driver/main.yaml'
 
