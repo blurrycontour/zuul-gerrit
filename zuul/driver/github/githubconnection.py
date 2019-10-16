@@ -1072,7 +1072,12 @@ class GithubConnection(BaseConnection):
             change.ref = event.ref
             change.oldrev = event.oldrev
             change.newrev = event.newrev
-            change.url = self.getGitwebUrl(project, sha=event.newrev)
+            # In case we have a tag, we build the url pointing to this
+            # tag/release on GitHub.
+            if change.tag:
+                change.url = self.getGitwebUrl(project, tag=change.tag)
+            else:
+                change.url = self.getGitwebUrl(project, sha=event.newrev)
             change.source_event = event
             if hasattr(event, 'commits'):
                 change.files = self.getPushedFileNames(event)
@@ -1278,10 +1283,12 @@ class GithubConnection(BaseConnection):
 
         return 'https://%s/%s' % (self.server, project.name)
 
-    def getGitwebUrl(self, project, sha=None):
+    def getGitwebUrl(self, project, sha=None, tag=None):
         url = 'https://%s/%s' % (self.server, project)
         if sha is not None:
             url += '/commit/%s' % sha
+        elif tag is not None:
+            url += '/releases/tag/%s' % tag
         return url
 
     def getProject(self, name):
