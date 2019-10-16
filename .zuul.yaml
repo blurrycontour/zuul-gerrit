@@ -122,21 +122,39 @@
         - context: .
           repository: zuul/zuul
           target: zuul
+          tags:
+            - latest
+            - "{{ zuul.project.checkout }}"
         - context: .
           repository: zuul/zuul-executor
           target: zuul-executor
+          tags:
+            - latest
+            - "{{ zuul.project.checkout }}"
         - context: .
           repository: zuul/zuul-fingergw
           target: zuul-fingergw
+          tags:
+            - latest
+            - "{{ zuul.project.checkout }}"
         - context: .
           repository: zuul/zuul-merger
           target: zuul-merger
+          tags:
+            - latest
+            - "{{ zuul.project.checkout }}"
         - context: .
           repository: zuul/zuul-scheduler
           target: zuul-scheduler
+          tags:
+            - latest
+            - "{{ zuul.project.checkout }}"
         - context: .
           repository: zuul/zuul-web
           target: zuul-web
+          tags:
+            - latest
+            - "{{ zuul.project.checkout }}"
 
 - job:
     name: zuul-upload-image
