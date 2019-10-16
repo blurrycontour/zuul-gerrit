@@ -122,21 +122,33 @@
         - context: .
           repository: zuul/zuul
           target: zuul
+          tags:
+            - "{{ zuul.tag | default('latest') }}"
         - context: .
           repository: zuul/zuul-executor
           target: zuul-executor
+          tags:
+            - "{{ zuul.tag | default('latest') }}"
         - context: .
           repository: zuul/zuul-fingergw
           target: zuul-fingergw
+          tags:
+            - "{{ zuul.tag | default('latest') }}"
         - context: .
           repository: zuul/zuul-merger
           target: zuul-merger
+          tags:
+            - "{{ zuul.tag | default('latest') }}"
         - context: .
           repository: zuul/zuul-scheduler
           target: zuul-scheduler
+          tags:
+            - "{{ zuul.tag | default('latest') }}"
         - context: .
           repository: zuul/zuul-web
           target: zuul-web
+          tags:
+            - "{{ zuul.tag | default('latest') }}"
 
 - job:
     name: zuul-upload-image
@@ -276,5 +288,6 @@
         - opendev-promote-javascript-content
     release:
       jobs:
+        - zuul-upload-image
         - zuul-release-python
         - zuul-publish-tox-docs
