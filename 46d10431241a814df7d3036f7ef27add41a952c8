@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_c7cc808c",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1156,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-17T14:05:32Z",
+      "side": 1,
+      "message": "Should this represent a non existing old commit? In this case it should be \u00270\u0027 * 40",
+      "revId": "46d10431241a814df7d3036f7ef27add41a952c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_e7c97c79",
+        "filename": "tests/unit/test_pagure_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-17T14:05:32Z",
+      "side": 1,
+      "message": "What\u0027s the reason for the sleep? We need to avoid sleeps in the tests to avoid test races that lead to random test failures. In case we need to wait for a condition there are two ways, wailtUntilSettled for waiting until all events in zuul are processed (including reconfig). In case you want to wait for a different condition use iterate_timeout.",
+      "revId": "46d10431241a814df7d3036f7ef27add41a952c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
