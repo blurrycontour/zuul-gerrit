@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_2711d405",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-10-17T13:59:42Z",
+      "side": 1,
+      "message": "nit: I\u0027d add a trailing comma here to reduce code churn when adding further events",
+      "revId": "6a34be0ac94562de4a146deff5fdb421782ee8bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
