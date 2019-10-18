@@ -580,6 +580,16 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(403)
         return user_authz
 
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def authenticators(self):
+        return {
+            'authenticators': [{
+                'client_id': auth.client_id,
+                'issuer_id': auth.issuer_id,
+            } for auth in self.zuulweb.authenticators]
+        }
+
     # TODO good candidate for caching
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -1127,6 +1137,8 @@ class ZuulWeb(object):
             # generic tenant/{tenant}/project/{project} route
             route_map.connect('api', '/api/user/authorizations',
                               controller=api, action='user_authorizations')
+            route_map.connect('api', '/api/authenticators',
+                              controller=api, action='authenticators')
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/autohold',

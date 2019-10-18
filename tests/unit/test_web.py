@@ -966,6 +966,23 @@ class TestWebSecrets(BaseTestWeb):
         self.assertEqual([secret], run[0]['secrets'])
 
 
+class TestAuthenticators(BaseTestWeb):
+    config_file = 'zuul-admin-web-no-override.conf'
+    tenant_config_file = 'config/authorization/single-tenant/main.yaml'
+
+    def test_list_authenticators(self):
+        auths = self.get_url("api/authenticators").json()
+        self.assertEqual(
+            auths, {
+                "authenticators": [
+                    {
+                        "issuer_id": "zuul_operator",
+                        "client_id": "zuul.example.com",
+                    }
+                ]
+            })
+
+
 class TestInfo(BaseTestWeb):
 
     def setUp(self):
