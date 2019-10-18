@@ -69,6 +69,24 @@
       "revId": "46d10431241a814df7d3036f7ef27add41a952c8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_793d21dc",
+        "filename": "tests/unit/test_pagure_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-10-18T10:04:01Z",
+      "side": 1,
+      "message": "https://review.opendev.org/689394/",
+      "parentUuid": "3fa7e38b_f6011e08",
+      "revId": "46d10431241a814df7d3036f7ef27add41a952c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
