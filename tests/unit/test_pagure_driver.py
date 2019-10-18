@@ -207,7 +207,6 @@ class TestPagureDriver(ZuulTestCase):
 
         self.waitUntilSettled()
         old = self.sched.tenant_last_reconfigured.get('tenant-one', 0)
-        time.sleep(1)
 
         zuul_yaml = [
             {'job': {
