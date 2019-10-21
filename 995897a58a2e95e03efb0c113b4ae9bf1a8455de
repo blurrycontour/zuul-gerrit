@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_3edf72d7",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-10-21T16:09:21Z",
+      "side": 1,
+      "message": "I believe this is still going to insert pipeline_change components into the tag, as it\u0027s expecting to be followed by promote.",
+      "revId": "995897a58a2e95e03efb0c113b4ae9bf1a8455de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
