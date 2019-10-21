@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_79c0a47d",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2170,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-10-21T16:34:24Z",
+      "side": 1,
+      "message": "But if something goes wrong and the test aborts before that happens, this could get stuck here forever.  hold_jobs_in_build uses a Condition which is set in teardown to make sure it gets cleaned up.  We could do the same here, but this isn\u0027t going to be used that much so it\u0027s probably okay to use iterate_timeout.  You can set a long timeout.",
+      "revId": "8df57d47d239b4828dc59cc16d67f4c0a9f158c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_9f19487b",
         "filename": "zuul/executor/client.py",
         "patchSetId": 4
