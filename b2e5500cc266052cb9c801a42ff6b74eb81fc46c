@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_d9488ab4",
+        "filename": "doc/source/admin/examples/playbooks/setup.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-10-23T21:07:26Z",
+      "side": 1,
+      "message": "I did not update this command since this is not used by Zuul (ie, not read by paramiko).  I also did not update the \"simulated user key\" that the test playbook creates for performing the user actions against Gerrit.  I made both of these choices since we don\u0027t make any assertions about the user\u0027s personal key (since we don\u0027t use it).",
+      "revId": "b2e5500cc266052cb9c801a42ff6b74eb81fc46c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
