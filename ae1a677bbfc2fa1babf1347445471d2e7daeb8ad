@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_f86227d9",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 948,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-10-23T15:48:18Z",
+      "side": 1,
+      "message": "Should we log a warning if checks_api is set and we are reporting via ssh? Something along the lines of \"Zuul would like to use the checks api but isn\u0027t configured for http reporting which is required for the checks api\".",
+      "revId": "ae1a677bbfc2fa1babf1347445471d2e7daeb8ad",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
