@@ -169,10 +169,12 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
         self.log.debug("Creating Zookeeper change cache")
         self._change_cache = GitChangeCache(self.sched.zk_client, self)
         self.log.debug("Starting Git Watcher")
+        super().onLoad()
         self._start_watcher_thread()
 
     def onStop(self):
         self.log.debug("Stopping Git Watcher")
+        super().onStop()
         self._stop_watcher_thread()
 
     def _stop_watcher_thread(self):

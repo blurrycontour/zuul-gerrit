@@ -14,9 +14,12 @@
 
 import abc
 import logging
+import queue
+import threading
 
 from typing import Dict, List, Optional
 
+from zuul.driver import ReporterInterface
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Project, Tenant
 
@@ -46,9 +49,29 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         # __init__ shouldn't make the actual connection in case this connection
         # isn't used in the layout.
         self.driver = driver
+        self.sched = None
         self.connection_name = connection_name
         self.connection_config = connection_config
         self.sched = None
+        self.report_queue = None
+        self._report_event_dispatcher = None
+        self._stopped = False
+
+    def _run_report_thread(self):
+        while True:
+            if self._stopped:
+                return
+            try:
+                event = self.report_queue.get()
+                if event is None:
+                    return
+
+                reporter, *args = event
+                reporter.doReport(*args)
+            except Exception:
+                self.log.exception('Error while reporting')
+            finally:
+                self.report_queue.task_done()
 
     def logEvent(self, event):
         log = get_annotated_logger(self.log, event.zuul_event_id)
@@ -66,13 +89,24 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
                         connection=self.connection_name,
                         event=event.type))
         except Exception:
-            self.log.exception("Exception reporting event stats")
+            log.exception("Exception reporting event stats")
 
     def onLoad(self):
-        pass
+        # We only need the reporter queue and thread if this driver supports
+        # reporting.
+        if isinstance(self.driver, ReporterInterface):
+            self.report_queue = queue.Queue()
+            self._report_event_dispatcher = threading.Thread(
+                name=self.__class__.__name__, target=self._run_report_thread,
+                daemon=True
+            )
+            self._report_event_dispatcher.start()
 
     def onStop(self):
-        pass
+        self._stopped = True
+        if self.report_queue:
+            self.report_queue.put(None)
+            self._report_event_dispatcher.join()
 
     def registerScheduler(self, sched) -> None:
         self.sched = sched

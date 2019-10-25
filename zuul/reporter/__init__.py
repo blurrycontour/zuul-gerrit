@@ -14,7 +14,9 @@
 
 import abc
 import logging
+
 from zuul.lib.config import get_default
+from zuul.lib.logutil import get_annotated_logger
 
 
 class BaseReporter(object, metaclass=abc.ABCMeta):
@@ -34,9 +36,50 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     def setAction(self, action):
         self._action = action
 
+    def canReport(self, item):
+        """Return if the reporter would act on an item."""
+        return True
+
     @abc.abstractmethod
     def report(self, item):
         """Send the compiled report message."""
+
+    def dispatchReport(self, item, report_uuid, report_state=None):
+        if self.canReport(item):
+            # As there might be more reporters configured per item, we put
+            # the whole function call as is in the queue. Otherwise, we
+            # would have to look up the unique reporters state each time.
+            self.connection.report_queue.put((self, item, report_uuid,
+                                              report_state))
+        else:
+            # No need to enqueue this item into the reporter queue and block
+            # on it.
+            if report_state is not None:
+                self.connection.sched.onReportCompleted(
+                    item, report_uuid, "SUCCESS")
+
+    def doReport(self, item, report_uuid, report_state=None):
+        """This encapsulates the workflow for an asynchronous reporter call"""
+
+        # If report_state is set, we will track the state. If it's None, we
+        # won't update the item's report state (e.g. for start and enqueue
+        # reporting). The result, on the other hand, will always be set, but
+        # ignored for start and enqueue reporting.
+        reporter_result = None
+        log = get_annotated_logger(self.log, item.event)
+        try:
+            ret = self.report(item)
+            if ret:
+                log.error("Reporting item %s received: %s", item, ret)
+            reporter_result = "FAILURE" if ret else "SUCCESS"
+        except Exception:
+            log.exception("Exception processing report item")
+            reporter_result = "ERROR"
+        finally:
+            # Notify the scheduler to set the wake_event for the main loop
+            if report_state is not None:
+                self.connection.sched.onReportCompleted(
+                    item, report_uuid, reporter_result)
 
     def getSubmitAllowNeeds(self):
         """Get a list of code review labels that are allowed to be
