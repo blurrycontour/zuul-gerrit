@@ -256,6 +256,36 @@ class SQLConnection(BaseConnection):
                 "The required module for the dburi dialect isn't available.")
             raise
 
+    def _run_report_thread(self):
+        # Overrides the _run_report_thread method from the BaseConnection class
+        # to adapt the report thread to call the SQL specific report methods.
+        # The SQL reporter was moved out of the pipeline actions, and works
+        # differently.
+        while True:
+            if self._stopped:
+                return
+            try:
+                event = self.report_queue.get()
+                if event is None:
+                    return
+
+                # TODO (felix): Use *args instead of data dictionary?
+                reporter, event_type, data = event
+                if event_type == "BUILDSET_START":
+                    reporter._reportBuildsetStart(data)
+                elif event_type == "BUILDSET_END":
+                    reporter._reportBuildsetEnd(data)
+                elif event_type == "BUILD_START":
+                    reporter._reportBuildStart(data)
+                elif event_type == "BUILD_END":
+                    reporter._reportBuildEnd(data)
+                else:
+                    raise Exception(f"Unknown SQL reporter event {event_type}")
+            except Exception:
+                self.log.exception('Error while reporting')
+            finally:
+                self.report_queue.task_done()
+
     def getSession(self):
         return DatabaseSession(self)
 
@@ -284,6 +314,7 @@ class SQLConnection(BaseConnection):
                 alembic.command.upgrade(config, 'head', tag=tag)
 
     def onLoad(self):
+        super().onLoad()
         while True:
             try:
                 self._migrate()
@@ -413,6 +444,7 @@ class SQLConnection(BaseConnection):
 
     def onStop(self):
         self.log.debug("Stopping SQL connection %s" % self.connection_name)
+        super().onStop()
         self.engine.dispose()
 
     def getBuilds(self, *args, **kw):

@@ -8806,6 +8806,84 @@ class TestReportBuildPage(ZuulTestCase):
         self.assertIn('python27 https://', A.messages[0])
 
 
+class TestAsyncReporting(ZuulTestCase):
+    config_file = 'zuul-connections-gerrit-and-github.conf'
+    tenant_config_file = 'config/async-reporting/main.yaml'
+
+    def test_reconfig_during_report(self):
+        """
+        Test that reconfigurations during in progress reports don't cause
+        gate resets.
+        """
+
+        # self.executor_server.hold_jobs_in_build = True
+        self.fake_github.hold_reports = True
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        B = self.fake_github.openFakePullRequest('org/project', 'master', 'B')
+        C = self.fake_github.openFakePullRequest('org/project', 'master', 'C')
+        self.fake_github.emitEvent(A.addLabel('merge'))
+        self.fake_github.emitEvent(B.addLabel('merge'))
+        self.fake_github.emitEvent(C.addLabel('merge'))
+        self.waitUntilSettled()
+
+        # Trigger reconfig that runs during a running repor
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        # Now release the report and let the gate proceed.
+        self.fake_github.hold_reports = False
+        self.fake_github.release_reports()
+        self.waitUntilSettled()
+
+        # All changes should be merged and there are exactly three builds
+        # expected.
+        self.assertTrue(A.is_merged)
+        self.assertTrue(B.is_merged)
+        self.assertTrue(C.is_merged)
+        self.assertHistory([
+            dict(name='project-test', result='SUCCESS'),
+            dict(name='project-test', result='SUCCESS'),
+            dict(name='project-test', result='SUCCESS'),
+        ], ordered=False)
+
+    def test_merged_event_during_report(self):
+        """
+        Test that receiving a change merged event during a pending report does
+        not cause a gate reset.
+        """
+
+        # self.executor_server.hold_jobs_in_build = True
+        self.fake_github.hold_reports = True
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        B = self.fake_github.openFakePullRequest('org/project', 'master', 'B')
+        C = self.fake_github.openFakePullRequest('org/project', 'master', 'C')
+        self.fake_github.emitEvent(A.addLabel('merge'))
+        self.fake_github.emitEvent(B.addLabel('merge'))
+        self.fake_github.emitEvent(C.addLabel('merge'))
+        self.waitUntilSettled()
+
+        # Now the first merge reporting is in progress so trigger
+        # the merged event we'd receive if this takes longer.
+        A.setMerged('Merged')
+        self.fake_github.emitEvent(A.getPullRequestClosedEvent())
+        self.waitUntilSettled()
+
+        # Now release the report and let the gate proceed.
+        self.fake_github.hold_reports = False
+        self.fake_github.release_reports()
+        self.waitUntilSettled()
+
+        # All changes should be merged and there are exactly three builds
+        # expected.
+        self.assertTrue(A.is_merged)
+        self.assertTrue(B.is_merged)
+        self.assertTrue(C.is_merged)
+        self.assertHistory([
+            dict(name='project-test', result='SUCCESS'),
+            dict(name='project-test', result='SUCCESS'),
+            dict(name='project-test', result='SUCCESS'),
+        ], ordered=False)
+
+
 class TestSchedulerSmartReconfiguration(ZuulTestCase):
     tenant_config_file = 'config/multi-tenant/main.yaml'
 

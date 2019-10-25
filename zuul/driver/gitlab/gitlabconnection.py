@@ -429,6 +429,7 @@ class GitlabConnection(CachedBranchConnection):
 
     def onLoad(self):
         self.log.info('Starting Gitlab connection: %s', self.connection_name)
+        super().onLoad()
         self.log.info('Creating Zookeeper event queue')
         self.event_queue = ConnectionEventQueue(
             self.sched.zk_client, self.connection_name
@@ -437,6 +438,7 @@ class GitlabConnection(CachedBranchConnection):
         self._start_event_connector()
 
     def onStop(self):
+        super().onStop()
         if hasattr(self, 'gitlab_event_connector'):
             self._stop_event_connector()
 
