@@ -8496,6 +8496,48 @@ class TestReportBuildPage(ZuulTestCase):
         self.assertIn('python27 finger://', A.messages[0])
 
 
+class TestAsyncReporting(ZuulTestCase):
+    tenant_config_file = 'config/async-reporting/main.yaml'
+
+    def test_parallel_changes(self):
+        "Test that changes are tested in parallel and merged in series"
+
+        # self.executor_server.hold_jobs_in_build = True
+        self.fake_gerrit.hold_reviews = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Trigger reconfig that runs during a running repor
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        self.fake_gerrit.hold_reviews = False
+        self.fake_gerrit.release_reviews()
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(C.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 2)
+        self.assertEqual(C.reported, 2)
+
+        self.assertHistory([
+            dict(name='project-test', result='SUCCESS', changes='1,1'),
+            dict(name='project-test', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test', result='SUCCESS', changes='1,1 2,1 3,1'),
+        ], ordered=False)
+
+
 class TestSchedulerSmartReconfiguration(ZuulTestCase):
     tenant_config_file = 'config/multi-tenant/main.yaml'
 

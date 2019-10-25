@@ -2183,7 +2183,7 @@ class QueueItem(object):
         self.enqueue_time = None
         self.report_time = None
         self.dequeue_time = None
-        self.reported = False
+        self.report_state = None
         self.reported_enqueue = False
         self.reported_start = False
         self.quiet = False
@@ -2232,6 +2232,28 @@ class QueueItem(object):
     def setReportedResult(self, result):
         self.report_time = time.time()
         self.current_build_set.result = result
+
+    def setReportState(self, report_uuid, state):
+        self.report_state[report_uuid] = state
+
+    def getOverallReportState(self):
+        """Aggregate the states of all reporters to an overall report state"""
+
+        # Report state isn't initialized at all (typical case for start or
+        # enqueue reporting)
+        if not self.report_state:
+            return
+
+        if any(i == "PENDING" for i in self.report_state.values()):
+            return "PENDING"
+
+        if any(i == "ERROR" for i in self.report_state.values()):
+            return "ERROR"
+
+        if any(i == "FAILURE" for i in self.report_state.values()):
+            return "FAILURE"
+
+        return "SUCCESS"
 
     def debug(self, msg, indent=0):
         if (not self.project_pipeline_config or
