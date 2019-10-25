@@ -13,6 +13,8 @@
 # under the License.
 
 import abc
+import queue
+import threading
 
 from zuul.lib.logutil import get_annotated_logger
 
@@ -42,6 +44,21 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         self.driver = driver
         self.connection_name = connection_name
         self.connection_config = connection_config
+        self.report_queue = queue.Queue()
+        self._report_event_dispatcher = threading.Thread(
+            name=self.__class__.__name__, target=self._run_report_thread,
+            daemon=True
+        )
+        self._stopped = False
+
+    def _run_report_thread(self):
+        while True:
+            if self._stopped:
+                return
+            event = self.report_queue.get()
+            if event is None:
+                return
+            event()
 
     def logEvent(self, event):
         log = get_annotated_logger(self.log, event.zuul_event_id)
@@ -62,10 +79,12 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
             self.log.exception("Exception reporting event stats")
 
     def onLoad(self):
-        pass
+        self._report_event_dispatcher.start()
 
     def onStop(self):
-        pass
+        self._stopped = True
+        self.report_queue.put(None)
+        self._report_event_dispatcher.join()
 
     def registerScheduler(self, sched):
         self.sched = sched
