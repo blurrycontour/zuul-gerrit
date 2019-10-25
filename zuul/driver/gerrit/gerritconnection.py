@@ -1500,6 +1500,7 @@ class GerritConnection(BaseConnection):
 
     def onLoad(self):
         self.log.debug("Starting Gerrit Connection/Watchers")
+        super().onLoad()
         try:
             if self.session:
                 self._getRemoteVersion()
@@ -1519,6 +1520,7 @@ class GerritConnection(BaseConnection):
 
     def onStop(self):
         self.log.debug("Stopping Gerrit Connection/Watchers")
+        super().onStop()
         self._stop_watcher_thread()
         self._stop_poller_thread()
         self._stop_ref_watcher_thread()
