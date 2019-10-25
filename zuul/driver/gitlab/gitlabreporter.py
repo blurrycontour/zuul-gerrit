@@ -34,13 +34,19 @@ class GitlabReporter(BaseReporter):
         self._approval = self.config.get('approval', None)
         self._merge = self.config.get('merge', False)
 
-    def report(self, item):
-        """Report on an event."""
+    def canReport(self, item):
         if not isinstance(item.change.project.source, GitlabSource):
-            return
+            return False
 
         if item.change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
+            return False
+
+        return True
+
+    def report(self, item):
+        """Report on an event."""
+        if not self.canReport(item):
             return
 
         if hasattr(item.change, 'number'):
