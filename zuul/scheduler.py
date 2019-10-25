@@ -27,6 +27,7 @@ import threading
 import time
 import traceback
 import urllib
+from concurrent.futures.thread import ThreadPoolExecutor
 
 from zuul import configloader
 from zuul import model
@@ -261,6 +262,15 @@ class NodesProvisionedEvent(ResultEvent):
         self.request_id = request.id
 
 
+class ReportCompletedEvent(ResultEvent):
+    """A reporter has completed"""
+
+    def __init__(self, item, report_uuid, reporter_result):
+        self.item = item
+        self.report_uuid = report_uuid
+        self.reporter_result = reporter_result
+
+
 class Scheduler(threading.Thread):
     """The engine of Zuul.
 
@@ -284,6 +294,7 @@ class Scheduler(threading.Thread):
 
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
+    _threadpool_class = ThreadPoolExecutor
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
@@ -315,6 +326,10 @@ class Scheduler(threading.Thread):
         self.stats_thread = threading.Thread(target=self.runStats)
         self.stats_thread.daemon = True
         self.stats_stop = threading.Event()
+
+        self.generic_threadpool = self._threadpool_class(
+            max_workers=4, thread_name_prefix='generic_threadpool')
+
         # TODO(jeblair): fix this
         # Despite triggers being part of the pipeline, there is one trigger set
         # per scheduler. The pipeline handles the trigger filters but since
@@ -378,6 +393,7 @@ class Scheduler(threading.Thread):
         self._stopped = True
         self.stats_stop.set()
         self.stopConnections()
+        self.generic_threadpool.shutdown()
         self.wake_event.set()
         self.stats_thread.join()
         self.rpc.stop()
@@ -565,6 +581,11 @@ class Scheduler(threading.Thread):
 
     def onNodesProvisioned(self, req):
         event = NodesProvisionedEvent(req)
+        self.result_event_queue.put(event)
+        self.wake_event.set()
+
+    def onReportCompleted(self, item, report_uuid, reporter_result):
+        event = ReportCompletedEvent(item, report_uuid, reporter_result)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
@@ -1411,6 +1432,8 @@ class Scheduler(threading.Thread):
                 self._doFilesChangesCompletedEvent(event)
             elif isinstance(event, NodesProvisionedEvent):
                 self._doNodesProvisionedEvent(event)
+            elif isinstance(event, ReportCompletedEvent):
+                self._doReportCompletedEvent(event)
             else:
                 self.log.error("Unable to handle event %s" % event)
         finally:
@@ -1676,6 +1699,10 @@ class Scheduler(threading.Thread):
                                             zuul_event_id=request.event_id)
             return
         pipeline.manager.onNodesProvisioned(event)
+
+    def _doReportCompletedEvent(self, event):
+        pipeline = event.item.pipeline
+        pipeline.manager.onReportCompleted(event)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants

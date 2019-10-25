@@ -14,6 +14,7 @@
 # under the License.
 
 import configparser
+from concurrent.futures.thread import ThreadPoolExecutor
 from configparser import ConfigParser
 from contextlib import contextmanager
 import copy
@@ -2770,6 +2771,26 @@ class RecordingMergeClient(zuul.merger.client.MergeClient):
             name, data, build_set, precedence, event=event)
 
 
+class RecordingThreadPoolExecutor(ThreadPoolExecutor):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.history = []
+
+    def submit(self, fn, *args, **kwargs):
+        job = super().submit(fn, *args, **kwargs)
+        self.history.append(job)
+        return job
+
+
+class RecordingScheduler(zuul.scheduler.Scheduler):
+
+    _threadpool_class = RecordingThreadPoolExecutor
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
 class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     """An Ansible executor to be used in tests.
 
@@ -3616,7 +3637,7 @@ class SchedulerTestApp:
         self.config = config
         self.zk_config = zk_config
 
-        self.sched = zuul.scheduler.Scheduler(self.config)
+        self.sched = RecordingScheduler(self.config)
         self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
@@ -4564,6 +4585,13 @@ class ZuulTestCase(BaseTestCase):
         for event_queue in self.additional_event_queues:
             event_queue.join()
 
+    def __areAllReportsComplete(self, matcher) -> bool:
+        for app in self.scheds.filter(matcher):
+            for job in app.sched.generic_threadpool.history:
+                if not job.done():
+                    return False
+        return True
+
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
         start = time.time()
@@ -4601,6 +4629,7 @@ class ZuulTestCase(BaseTestCase):
                     self.__haveAllBuildsReported(matcher) and
                     self.__areAllBuildsWaiting(matcher) and
                     self.__areAllNodeRequestsComplete(matcher) and
+                    self.__areAllReportsComplete(matcher) and
                     all(self.__eventQueuesEmpty(matcher))):
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
