@@ -64,6 +64,7 @@ class MQTTConnection(BaseConnection):
 
     def onLoad(self):
         self.log.debug("Starting MQTT Connection")
+        super().onLoad()
         try:
             self.client.connect(
                 self.connection_config.get('server', 'localhost'),
@@ -77,6 +78,7 @@ class MQTTConnection(BaseConnection):
 
     def onStop(self):
         self.log.debug("Stopping MQTT Connection")
+        super().onStop()
         self.client.loop_stop()
         self.client.disconnect()
         self.connected = False
