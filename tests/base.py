@@ -3904,6 +3904,14 @@ class ZuulTestCase(BaseTestCase):
         for event_queue in self.event_queues:
             event_queue.join()
 
+    def areAllReporterQueuesEmpty(self):
+        connections = self.connections.connections.values()
+        return all(con.report_queue.empty() for con in connections)
+
+    def reporterQueuesJoin(self):
+        for connection in self.connections.connections.values():
+            connection.report_queue.join()
+
     def waitUntilSettled(self, msg=""):
         self.log.debug("Waiting until settled... (%s)", msg)
         start = time.time()
@@ -3931,12 +3939,29 @@ class ZuulTestCase(BaseTestCase):
                 # Join ensures that the queue is empty _and_ events have been
                 # processed
                 self.eventQueuesJoin()
+                # As the reporting is now asynchronous, we need another run of
+                # the scheduler main loop to pick up the reporting result and
+                # dequeue the item. Otherwise the tests end up in non-empty
+                # pipeline queues.
+                # To ensure this, we must wait for the event queue to finish
+                # processing and afterwards acquire the scheduler lock so the
+                # scheduler stops processing items.
+                # While holding the scheduler lock we wait for the reporter
+                # queues to finish and afterwards let the scheduler continue.
+                # As the reporter puts an event in the scheduler's
+                # result_event_queue to synchronize the report events in the
+                # scheduler main loop, the next iteration of the
+                # waitUntilSettled() loop will wait for (join) the event queues
+                # a second time to finish.
                 self.sched.run_handler_lock.acquire()
+                self.reporterQueuesJoin()
                 if (self.areAllMergeJobsWaiting() and
                     self.haveAllBuildsReported() and
                     self.areAllBuildsWaiting() and
                     self.areAllNodeRequestsComplete() and
-                    all(self.eventQueuesEmpty())):
+                    all(self.eventQueuesEmpty()) and
+                    self.areAllReporterQueuesEmpty()):
+
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
                     # when locked the run handler and checked that the
