@@ -63,6 +63,7 @@ from zuul.model import (
     NodesProvisionedEvent,
     PromoteEvent,
     ReconfigureEvent,
+    ReportCompletedEvent,
     TenantReconfigureEvent,
     TimeDataBase,
     UnparsedAbideConfig,
@@ -172,6 +173,12 @@ class Scheduler(threading.Thread):
         # TODO (swestphahl): Remove after we've refactored reconfigurations
         # to be performed on the tenant level.
         self.reconfigure_event_queue = NamedQueue("ReconfigureEventQueue")
+        # NOTE (felix): Re-introduce the local result event queue for the async
+        # reporting results. This feels like the simplest solution and as this
+        # is only a staging patch, there is no need to make the
+        # ReportCompletedEvents events serializable and put them in ZK.
+        self.result_event_queue = NamedQueue("ResultEventQueue")
+
         self.event_watcher = EventWatcher(
             self.zk_client, self.wake_event.set
         )
@@ -598,6 +605,11 @@ class Scheduler(threading.Thread):
         pipeline_name = req.pipeline_name
         event = NodesProvisionedEvent(req.id, req.job_name, req.build_set_uuid)
         self.pipeline_result_events[tenant_name][pipeline_name].put(event)
+
+    def onReportCompleted(self, item, report_uuid, reporter_result):
+        event = ReportCompletedEvent(item, report_uuid, reporter_result)
+        self.result_event_queue.put(event)
+        self.wake_event.set()
 
     def reconfigureTenant(self, tenant, project, event):
         self.log.debug("Submitting tenant reconfiguration event for "
@@ -1352,6 +1364,9 @@ class Scheduler(threading.Thread):
                 if not self._stopped:
                     self.process_reconfigure_queue()
 
+                if not self._stopped:
+                    self.process_result_queue()
+
                 # Process tenant management events separate from other events
                 # as they might reload the tenant.
                 for tenant in self.abide.tenants.values():
@@ -1659,6 +1674,18 @@ class Scheduler(threading.Thread):
                     pipeline.name
                 ].ack(event)
 
+    def process_result_queue(self):
+        while not self.result_event_queue.empty() and not self._stopped:
+            self.log.debug("Fetching result event")
+            event = self.result_event_queue.get()
+            try:
+                if isinstance(event, ReportCompletedEvent):
+                    self._doReportCompletedEvent(event)
+                else:
+                    self.log.error("Unable to handle event %s", event)
+            finally:
+                self.result_event_queue.task_done()
+
     def _process_result_event(self, event, pipeline):
         if isinstance(event, BuildStartedEvent):
             self._doBuildStartedEvent(event)
@@ -1907,6 +1934,10 @@ class Scheduler(threading.Thread):
             return
 
         pipeline.manager.onNodesProvisioned(request, build_set)
+
+    def _doReportCompletedEvent(self, event):
+        pipeline = event.item.pipeline
+        pipeline.manager.onReportCompleted(event)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
