@@ -62,12 +62,16 @@ class MQTTReporter(BaseReporter):
             if build:
                 # Report build data if available
                 (result, web_url) = item.formatJobResult(job)
-                job_informations.update({
-                    'uuid': build.uuid,
-                    'start_time': build.start_time,
-                    'end_time': build.end_time,
-                    'execute_time': build.execute_time,
-                    'log_url': build.log_url,
+                # With async reporting, the build might have been started in
+                # the meantime, thus we have to evaluate if a result is already
+                # available.
+                if result:
+                    job_informations.update({
+                        'uuid': build.uuid,
+                        'start_time': build.start_time,
+                        'end_time': build.end_time,
+                        'execute_time': build.execute_time,
+                        'log_url': build.log_url,
                     'web_url': web_url,
                     'result': result,
                     'dependencies': [j.name for j in job.dependencies],
@@ -89,7 +93,6 @@ class MQTTReporter(BaseReporter):
                     }
                     message['buildset']['retry_builds'].append(
                         retry_build_information)
-
             message['buildset']['builds'].append(job_informations)
         topic = None
         try:
