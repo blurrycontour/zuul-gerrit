@@ -935,6 +935,12 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self._poller_event = poller_event
         self._ref_watcher_event = ref_watcher_event
 
+        # Needed to delay reviews in test.
+        self.hold_reviews = False
+        self.wait_review_condition = threading.Condition()
+        self.waiting_review = False
+
+
     def addFakeChecker(self, **kw):
         self.fake_checkers.append(kw)
 
@@ -1008,8 +1014,25 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
+    def _wait_review(self):
+        self.wait_review_condition.acquire()
+        self.waiting_review = True
+        self.log.debug("Review waiting")
+        self.wait_review_condition.wait()
+        self.wait_review_condition.release()
+
+    def release_reviews(self):
+        """Release this build."""
+        self.wait_review_condition.acquire()
+        self.wait_review_condition.notify()
+        self.waiting_review = False
+        self.log.debug("Review released")
+        self.wait_review_condition.release()
+
     def review(self, item, message, submit, labels, checks_api, file_comments,
                zuul_event_id=None):
+        if self.hold_reviews:
+            self._wait_review()
         if self.web_server:
             return super(FakeGerritConnection, self).review(
                 item, message, submit, labels, checks_api, file_comments,
@@ -4564,6 +4587,27 @@ class ZuulTestCase(BaseTestCase):
         for event_queue in self.additional_event_queues:
             event_queue.join()
 
+    def __areAllReporterQueuesEmpty(self, matcher)\
+            -> Generator[bool, None, None]:
+        for app in self.scheds.filter(matcher):
+            connections = app.sched.connections.connections.values()
+            yield all(
+                con.report_queue.empty()
+                for con in connections
+                if con.report_queue
+                # ignore reviews that are hold
+                if hasattr(con, 'hold_reviews') and not con.hold_reviews
+            )
+
+    def __reporterQueuesJoin(self, matcher) -> None:
+        for app in self.scheds.filter(matcher):
+            for connection in app.sched.connections.connections.values():
+                if connection.report_queue:
+                    if hasattr(connection, 'hold_reviews') \
+                            and connection.hold_reviews:
+                        continue
+                    connection.report_queue.join()
+
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
         start = time.time()
@@ -4595,13 +4639,29 @@ class ZuulTestCase(BaseTestCase):
                 # Join ensures that the queue is empty _and_ events have been
                 # processed
                 self.__eventQueuesJoin(matcher)
+                # As the reporting is asynchronous, we need another run of
+                # the scheduler main loop to pick up the reporting result and
+                # dequeue the item. Otherwise the tests end up in non-empty
+                # pipeline queues.
+                # To ensure this, we must wait for the event queue to finish
+                # processing and afterwards acquire the scheduler lock so the
+                # scheduler stops processing items.
+                # While holding the scheduler lock we wait for the reporter
+                # queues to finish and afterwards let the scheduler continue.
+                # As the reporter puts an event in the scheduler's
+                # result_event_queue to synchronize the report events in the
+                # scheduler main loop, the next iteration of the
+                # waitUntilSettled() loop will wait for (join) the event queues
+                # a second time to finish.
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.acquire())
+                self.__reporterQueuesJoin(matcher)
                 if (self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported(matcher) and
                     self.__areAllBuildsWaiting(matcher) and
                     self.__areAllNodeRequestsComplete(matcher) and
-                    all(self.__eventQueuesEmpty(matcher))):
+                    all(self.__eventQueuesEmpty(matcher)) and
+                    all(self.__areAllReporterQueuesEmpty(matcher))):
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
                     # when locked the run handler and checked that the
