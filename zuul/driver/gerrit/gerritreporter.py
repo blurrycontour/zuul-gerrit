@@ -35,26 +35,33 @@ class GerritReporter(BaseReporter):
         self._checks_api = action.pop('checks-api', None)
         self._labels = action
 
-    def report(self, item):
-        """Send a message to gerrit."""
-        log = get_annotated_logger(self.log, item.event)
-
+    def canReport(self, item):
         # If the source is no GerritSource we cannot report anything here.
         if not isinstance(item.change.project.source, GerritSource):
-            return
+            return False
 
         # We can only report changes, not plain branches
         if not isinstance(item.change, Change):
-            return
+            return False
 
         # For supporting several Gerrit connections we also must filter by
         # the canonical hostname.
         if item.change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
+            log = get_annotated_logger(self.log, item.event)
             log.debug("Not reporting %s as this Gerrit reporter "
                       "is for %s and the change is from %s",
                       item, self.connection.canonical_hostname,
                       item.change.project.source.connection.canonical_hostname)
+            return False
+
+        return True
+
+    def report(self, item):
+        """Send a message to gerrit."""
+        log = get_annotated_logger(self.log, item.event)
+
+        if not self.canReport(item):
             return
 
         comments = self.getFileComments(item)
