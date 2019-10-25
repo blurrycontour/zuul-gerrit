@@ -1200,6 +1200,7 @@ class GithubConnection(CachedBranchConnection):
 
     def onLoad(self):
         self.log.info('Starting GitHub connection: %s', self.connection_name)
+        super().onLoad()
         self._github_client_manager.initialize()
         self.log.debug('Creating Zookeeper event queue')
         self.event_queue = ConnectionEventQueue(
@@ -1209,6 +1210,7 @@ class GithubConnection(CachedBranchConnection):
         self._start_event_connector()
 
     def onStop(self):
+        super().onStop()
         # TODO(jeblair): remove this check which is here only so that
         # zuul-web can call connections.stop to shut down the sql
         # connection.
@@ -1987,6 +1989,12 @@ class GithubConnection(CachedBranchConnection):
 
         # Track a list of failed check run operations to report back to Github
         errors = []
+
+        if status == 'in_progress' and completed:
+            # The buildset is already completed but status is in_progress.
+            # No need to create the check run since this will be done by the
+            # final result which will happen shortly after.
+            return check_run_id, errors
 
         if not self._github_client_manager.usesAppAuthentication:
             # We don't try to update check runs, if we aren't authenticated as

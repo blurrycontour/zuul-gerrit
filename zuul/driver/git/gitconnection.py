@@ -157,10 +157,12 @@ class GitConnection(BaseConnection):
 
     def onLoad(self):
         self.log.debug("Starting Git Watcher")
+        super().onLoad()
         self._start_watcher_thread()
 
     def onStop(self):
         self.log.debug("Stopping Git Watcher")
+        super().onStop()
         self._stop_watcher_thread()
 
     def _stop_watcher_thread(self):
