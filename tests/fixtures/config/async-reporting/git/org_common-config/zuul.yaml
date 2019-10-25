@@ -1,0 +1,30 @@
+- pipeline:
+    name: gate
+    description: Gatekeeping
+    manager: dependent
+    trigger:
+      github:
+        - event: pull_request
+          action: labeled
+          label: merge
+    success:
+      github:
+        merge: true
+        unlabel: merge
+    failure:
+      github:
+        unlabel: merge
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: project-test
+    run: playbooks/project-test.yaml
+
+- project:
+    name: org/project
+    gate:
+      jobs:
+        - project-test

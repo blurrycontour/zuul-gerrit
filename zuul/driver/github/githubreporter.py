@@ -55,16 +55,22 @@ class GithubReporter(BaseReporter):
             self._unlabels = [self._unlabels]
         self.context = "{}/{}".format(pipeline.tenant.name, pipeline.name)
 
-    def report(self, item):
-        """Report on an event."""
+    def canReport(self, item):
         # If the source is not GithubSource we cannot report anything here.
         if not isinstance(item.change.project.source, GithubSource):
-            return
+            return False
 
         # For supporting several Github connections we also must filter by
         # the canonical hostname.
         if item.change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
+            return False
+
+        return True
+
+    def report(self, item):
+        """Report on an event."""
+        if not self.canReport(item):
             return
 
         # order is important for github branch protection.
