@@ -260,6 +260,15 @@ class NodesProvisionedEvent(ResultEvent):
         self.request_id = request.id
 
 
+class ReportCompletedEvent(ResultEvent):
+    """A reporter has completed"""
+
+    def __init__(self, item, reporter_id, reporter_result):
+        self.item = item
+        self.reporter_id = reporter_id
+        self.reporter_result = reporter_result
+
+
 class Scheduler(threading.Thread):
     """The engine of Zuul.
 
@@ -535,6 +544,11 @@ class Scheduler(threading.Thread):
 
     def onNodesProvisioned(self, req):
         event = NodesProvisionedEvent(req)
+        self.result_event_queue.put(event)
+        self.wake_event.set()
+
+    def onReportCompleted(self, item, reporter_id, reporter_result):
+        event = ReportCompletedEvent(item, reporter_id, reporter_result)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
@@ -1376,6 +1390,8 @@ class Scheduler(threading.Thread):
                 self._doFilesChangesCompletedEvent(event)
             elif isinstance(event, NodesProvisionedEvent):
                 self._doNodesProvisionedEvent(event)
+            elif isinstance(event, ReportCompletedEvent):
+                self._doReportCompletedEvent(event)
             else:
                 self.log.error("Unable to handle event %s" % event)
         finally:
@@ -1636,6 +1652,10 @@ class Scheduler(threading.Thread):
                                             zuul_event_id=request.event_id)
             return
         pipeline.manager.onNodesProvisioned(event)
+
+    def _doReportCompletedEvent(self, event):
+        pipeline = event.item.pipeline
+        pipeline.manager.onReportCompleted(event)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
