@@ -496,6 +496,7 @@ class PagureConnection(ZKChangeCacheMixin, BaseConnection):
 
     def onLoad(self):
         self.log.info('Starting Pagure connection: %s', self.connection_name)
+        super().onLoad()
         self.log.info('Creating Zookeeper event queue')
         self.event_queue = ConnectionEventQueue(
             self.sched.zk_client, self.connection_name
@@ -515,6 +516,7 @@ class PagureConnection(ZKChangeCacheMixin, BaseConnection):
             self.pagure_event_connector.join()
 
     def onStop(self):
+        super().onStop()
         if hasattr(self, 'pagure_event_connector'):
             self._stop_event_connector()
 

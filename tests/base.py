@@ -1242,6 +1242,10 @@ class FakeElasticsearchConnection(elconnection.ElasticsearchConnection):
     log = logging.getLogger("zuul.test.FakeElasticsearchConnection")
 
     def __init__(self, driver, connection_name, connection_config):
+        # Note: This intentionally skips the init of the super class since
+        # that tries to connect to the non existing elasticsearch.
+        super(elconnection.ElasticsearchConnection, self).__init__(
+            driver, connection_name, connection_config)
         self.driver = driver
         self.connection_name = connection_name
         self.source_it = None
@@ -2905,6 +2909,26 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.git_url_with_auth = git_url_with_auth
         self.rpcclient = rpcclient
 
+        # Needed to delay reviews in test.
+        self.hold_reports = False
+        self.wait_reports_condition = threading.Condition()
+        self.waiting_report = False
+
+    def _wait_report(self):
+        self.wait_reports_condition.acquire()
+        self.waiting_report = True
+        self.log.debug("Review waiting")
+        self.wait_reports_condition.wait()
+        self.wait_reports_condition.release()
+
+    def release_reports(self):
+        """Release this build."""
+        self.wait_reports_condition.acquire()
+        self.wait_reports_condition.notify()
+        self.waiting_report = False
+        self.log.debug("Review released")
+        self.wait_reports_condition.release()
+
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
 
@@ -3008,6 +3032,13 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.github_data.reports.append((project, pr_number, 'unlabel', label))
         pull_request = self.pull_requests[pr_number]
         pull_request.removeLabel(label)
+
+    def mergePull(self, project, pr_number, commit_message='', sha=None,
+                  method='merge', zuul_event_id=None):
+        if self.hold_reports:
+            self._wait_report()
+        return super().mergePull(project, pr_number, commit_message, sha,
+                                 method, zuul_event_id)
 
 
 class BuildHistory(object):
@@ -3240,10 +3271,10 @@ class FakeSqlConnection(sqlconnection.SQLConnection):
         self.session = FakeOrmSessionFactory
 
     def onLoad(self):
-        pass
+        super(sqlconnection.SQLConnection, self).onLoad()
 
     def onStop(self):
-        pass
+        super(sqlconnection.SQLConnection, self).onStop()
 
     def getSession(self):
         return FakeZuulDatabaseSession(self)
@@ -4488,6 +4519,7 @@ class SchedulerTestApp:
         # management events.
         self.event_queues = [
             self.sched.reconfigure_event_queue,
+            self.sched.result_event_queue,
         ]
 
     def start(self, validate_tenants=None):
@@ -5508,6 +5540,27 @@ class ZuulTestCase(BaseTestCase):
                 return False
         return True
 
+    def __areAllReporterQueuesEmpty(self, matcher)\
+            -> Generator[bool, None, None]:
+        for app in self.scheds.filter(matcher):
+            connections = app.sched.connections.connections.values()
+            yield all(
+                con.report_queue.empty()
+                for con in connections
+                if con.report_queue
+                # ignore reports that are hold
+                if hasattr(con, 'hold_reports') and not con.hold_reports
+            )
+
+    def __reporterQueuesJoin(self, matcher) -> None:
+        for app in self.scheds.filter(matcher):
+            for connection in app.sched.connections.connections.values():
+                if connection.report_queue:
+                    if hasattr(connection, 'hold_reports') \
+                            and connection.hold_reports:
+                        continue
+                    connection.report_queue.join()
+
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
         start = time.time()
@@ -5537,16 +5590,32 @@ class ZuulTestCase(BaseTestCase):
                 # Join ensures that the queue is empty _and_ events have been
                 # processed
                 self.__eventQueuesJoin(matcher)
+                # As the reporting is asynchronous, we need another run of
+                # the scheduler main loop to pick up the reporting result and
+                # dequeue the item. Otherwise the tests end up in non-empty
+                # pipeline queues.
+                # To ensure this, we must wait for the event queue to finish
+                # processing and afterwards acquire the scheduler lock so the
+                # scheduler stops processing items.
+                # While holding the scheduler lock we wait for the reporter
+                # queues to finish and afterwards let the scheduler continue.
+                # As the reporter puts an event in the scheduler's
+                # result_event_queue to synchronize the report events in the
+                # scheduler main loop, the next iteration of the
+                # waitUntilSettled() loop will wait for (join) the event queues
+                # a second time to finish.
                 for sched in map(lambda app: app.sched,
                                  self.scheds.filter(matcher)):
                     sched.run_handler_lock.acquire()
+                self.__reporterQueuesJoin(matcher)
                 if (self.__areAllSchedulersPrimed(matcher) and
                     self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported() and
                     self.__areAllBuildsWaiting() and
                     self.__areAllNodeRequestsComplete(matcher) and
                     self.__areZooKeeperEventQueuesEmpty(matcher) and
-                    all(self.__eventQueuesEmpty(matcher))):
+                    all(self.__eventQueuesEmpty(matcher)) and
+                    all(self.__areAllReporterQueuesEmpty(matcher))):
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
                     # when locked the run handler and checked that the

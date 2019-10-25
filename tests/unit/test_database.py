@@ -32,6 +32,7 @@ class TestMysqlDatabase(BaseTestCase):
         driver = SQLDriver()
         self.connection = driver.getConnection('database', config)
         self.connection.onLoad()
+        self.addCleanup(self.connection.onStop)
 
     def compareMysql(self, alembic_text, sqlalchemy_text):
         alembic_lines = alembic_text.split('\n')
@@ -70,6 +71,7 @@ class TestMysqlDatabase(BaseTestCase):
             connection.exec_driver_sql("set foreign_key_checks=1")
 
         self.connection.force_migrations = True
+        self.connection.onStop()
         self.connection.onLoad()
         with self.connection.engine.begin() as connection:
             for table in connection.exec_driver_sql("show tables"):
@@ -155,6 +157,7 @@ class TestPostgresqlDatabase(BaseTestCase):
                 connection.exec_driver_sql(f"drop table {table} cascade")
 
         self.connection.force_migrations = True
+        self.connection.onStop()
         self.connection.onLoad()
 
         alembic_out = subprocess.check_output(
