@@ -62,6 +62,7 @@ from zuul.model import (
     NodesProvisionedEvent,
     PromoteEvent,
     ReconfigureEvent,
+    ReportCompletedEvent,
     TenantReconfigureEvent,
     TimeDataBase,
     UnparsedAbideConfig,
@@ -589,6 +590,11 @@ class Scheduler(threading.Thread):
 
     def onNodesProvisioned(self, req):
         event = NodesProvisionedEvent(req)
+        self.result_event_queue.put(event)
+        self.wake_event.set()
+
+    def onReportCompleted(self, item, report_uuid, reporter_result):
+        event = ReportCompletedEvent(item, report_uuid, reporter_result)
         self.result_event_queue.put(event)
         self.wake_event.set()
 
@@ -1627,6 +1633,8 @@ class Scheduler(threading.Thread):
             try:
                 if isinstance(event, NodesProvisionedEvent):
                     self._doNodesProvisionedEvent(event)
+                elif isinstance(event, ReportCompletedEvent):
+                    self._doReportCompletedEvent(event)
                 else:
                     self.log.error("Unable to handle event %s", event)
             finally:
@@ -1879,6 +1887,10 @@ class Scheduler(threading.Thread):
             return
 
         pipeline.manager.onNodesProvisioned(event, build_set)
+
+    def _doReportCompletedEvent(self, event):
+        pipeline = event.item.pipeline
+        pipeline.manager.onReportCompleted(event)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
