@@ -1219,6 +1219,7 @@ class GithubConnection(BaseConnection):
         return d
 
     def onLoad(self):
+        super().onLoad()
         self.log.info('Starting GitHub connection: %s' % self.connection_name)
         self.gearman_worker = GithubGearmanWorker(self)
         self._github_client_manager.initialize()
@@ -1228,6 +1229,7 @@ class GithubConnection(BaseConnection):
         self.gearman_worker.start()
 
     def onStop(self):
+        super().onStop()
         # TODO(jeblair): remove this check which is here only so that
         # zuul-web can call connections.stop to shut down the sql
         # connection.
