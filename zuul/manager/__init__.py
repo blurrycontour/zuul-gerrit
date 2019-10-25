@@ -14,6 +14,7 @@ import logging
 import textwrap
 import urllib
 from abc import ABCMeta, abstractmethod
+from uuid import uuid4
 
 from zuul import exceptions
 from zuul import model
@@ -163,7 +164,7 @@ class PipelineManager(metaclass=ABCMeta):
         if not self.pipeline._disabled:
             self.log.info("Reporting enqueue, action %s item %s" %
                           (self.pipeline.enqueue_actions, item))
-            ret = self.sendReport(self.pipeline.enqueue_actions, item)
+            ret = self.scheduleReport(self.pipeline.enqueue_actions, item)
             if ret:
                 self.log.error("Reporting item enqueued %s received: %s" %
                                (item, ret))
@@ -172,7 +173,7 @@ class PipelineManager(metaclass=ABCMeta):
         if not self.pipeline._disabled:
             self.log.info("Reporting start, action %s item %s" %
                           (self.pipeline.start_actions, item))
-            ret = self.sendReport(self.pipeline.start_actions, item)
+            ret = self.scheduleReport(self.pipeline.start_actions, item)
             if ret:
                 self.log.error("Reporting item start %s received: %s" %
                                (item, ret))
@@ -184,31 +185,31 @@ class PipelineManager(metaclass=ABCMeta):
                 self.pipeline.dequeue_actions,
                 item,
             )
-            ret = self.sendReport(self.pipeline.dequeue_actions, item)
+            ret = self.scheduleReport(self.pipeline.dequeue_actions, item)
             if ret:
                 self.log.error(
                     "Reporting item dequeue %s received: %s", item, ret
                 )
 
-    def sendReport(self, action_reporters, item, message=None):
+    # TODO Rename to scheduleReport?
+    def scheduleReport(self, action_reporters, item, message=None,
+                       report_state=None):
         """Sends the built message off to configured reporters.
 
         Takes the action_reporters, item, message and extra options and
         sends them to the pluggable reporters.
         """
         log = get_annotated_logger(self.log, item.event)
-        report_errors = []
-        if len(action_reporters) > 0:
+        log.debug("Scheduling report for item %s with result %s",
+                  item, item.current_build_set.result)
+        if action_reporters:
             for reporter in action_reporters:
-                try:
-                    ret = reporter.report(item)
-                    if ret:
-                        report_errors.append(ret)
-                except Exception as e:
-                    item.setReportedResult('ERROR')
-                    log.exception("Exception while reporting")
-                    report_errors.append(str(e))
-        return report_errors
+                # Without report_state this is fire and forget
+                report_uuid = None
+                if report_state is not None:
+                    report_uuid = uuid4().hex
+                    report_state[report_uuid] = "PENDING"
+                reporter.dispatchReport(item, report_uuid, report_state)
 
     def isChangeReadyToBeEnqueued(self, change, event):
         return True
@@ -924,13 +925,22 @@ class PipelineManager(metaclass=ABCMeta):
         if not build_set.ref:
             build_set.setConfiguration()
 
+        item_ahead = item.item_ahead
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
-        if (item.item_ahead and item.item_ahead.current_build_set and
-            item.item_ahead.current_build_set.config_errors):
+        if (item_ahead and item_ahead.current_build_set and
+            item_ahead.current_build_set.config_errors):
             msg = "This change depends on a change "\
                   "with an invalid configuration.\n"
             item.setConfigError(msg)
+            return False
+
+        # If the report/merge for the item ahead is still pending, don't
+        # prepare this item. Otherwise, the assumption "... the first merges
+        # before the second starts" would be wrong in the following test case
+        # and it would fail:
+        # tests.unit.test_v3.TestProvidesRequires.test_provides_requires_shared_queue_fast
+        if item_ahead and item_ahead.getOverallReportState() == "PENDING":
             return False
 
         # The next section starts between 0 and 2 remote merger
@@ -1048,7 +1058,17 @@ class PipelineManager(metaclass=ABCMeta):
                 hasattr(item_ahead.change, 'is_merged') and
                 item_ahead.change.is_merged):
                 item_ahead_merged = True
-            if (item_ahead != nnfi and not item_ahead_merged):
+
+            # We cannot ensure that the merge_state is directly set on the item
+            # ahead. Thus, we must also check if the report of the item ahead
+            # is still pending and only evaluate its merged_state if the report
+            # is done.
+            item_ahead_reported = True
+            if item_ahead and item_ahead.getOverallReportState() == "PENDING":
+                item_ahead_reported = False
+
+            if (item_ahead != nnfi and not item_ahead_merged
+                    and item_ahead_reported):
                 # Our current base is different than what we expected,
                 # and it's not because our current base merged.  Something
                 # ahead must have failed.
@@ -1111,8 +1131,11 @@ class PipelineManager(metaclass=ABCMeta):
             item.bundle.started_reporting = can_report
 
         if can_report:
+            dequeue = False
             try:
-                self.reportItem(item)
+                # We must check in here if reporting has finished before we can
+                # dequeue the item.
+                dequeue = self.reportItem(item)
             except exceptions.MergeFailure:
                 failing_reasons.append("it did not merge")
                 for item_behind in item.items_behind:
@@ -1125,9 +1148,11 @@ class PipelineManager(metaclass=ABCMeta):
                 if (item.bundle and not (
                         item.isBundleFailing() or item.cannotMergeBundle())):
                     item.bundle.failed_reporting = True
+                    # TODO: Handle async
                     self.reportProcessedBundleItems(item)
-            self.dequeueItem(item)
-            changed = dequeued = True
+            if dequeue:
+                self.dequeueItem(item)
+                changed = dequeued = True
         elif not failing_reasons and item.live:
             nnfi = item
         item.current_build_set.failing_reasons = failing_reasons
@@ -1320,14 +1345,38 @@ class PipelineManager(metaclass=ABCMeta):
                  "with nodes %s",
                  request, request.job, build_set.item, request.nodeset)
 
+    def onReportCompleted(self, event):
+        item = event.item
+        report_uuid = event.report_uuid
+        reporter_result = event.reporter_result
+
+        log = get_annotated_logger(self.log, item.event)
+
+        if report_uuid:
+            item.setReportState(report_uuid, reporter_result)
+            item.setReportedResult(reporter_result)
+
+        log.info("Report of item %s completed for report %s with result %s",
+                 item, report_uuid, reporter_result)
+
     def reportItem(self, item):
         log = get_annotated_logger(self.log, item.event)
-        if not item.reported:
-            # _reportItem() returns True if it failed to report.
-            item.reported = not self._reportItem(item)
+
+        # Only report the item if it wasn't processed yet
+        if item.getOverallReportState() is None:
+            self._reportItem(item)
+
+        # _reportItem() -> sendReport() will set the state to PENDING, thus we
+        # need to check this afterwards, so we don't accidentally check the
+        # merge state and dequeue the item before the actual report/merge is
+        # finished.
+        if item.getOverallReportState() == "PENDING":
+            return
+
+        # Only if the overall repo state is complete (SUCCESS/FAILURE)
         if self.changes_merge:
             succeeded = item.didAllJobsSucceed() and not item.isBundleFailing()
-            merged = item.reported
+            merged = item.getOverallReportState() == "SUCCESS"
             source = item.change.project.source
             if merged:
                 merged = source.isMerged(item.change, item.change.branch)
@@ -1359,10 +1408,17 @@ class PipelineManager(metaclass=ABCMeta):
                 tenant = self.pipeline.tenant
                 zuul_driver.onChangeMerged(tenant, item.change, source)
 
+        # This is the indicator for the pipeline manager to dequeue the item
+        # (only if all reporters have finished)
+        if item.getOverallReportState() is None:
+            # In here, overall report state could only be None if no reporters
+            # are defined and thus we want to dequeue the item directly.
+            return True
+        return item.getOverallReportState() != "PENDING"
+
     def _reportItem(self, item):
         log = get_annotated_logger(self.log, item.event)
         log.debug("Reporting change %s", item.change)
-        ret = True  # Means error as returned by trigger.report
 
         # In the case of failure, we may not hove completed an initial
         # merge which would get the layout for this item, so in order
@@ -1371,6 +1427,9 @@ class PipelineManager(metaclass=ABCMeta):
         # fall back to the current static layout as a best
         # approximation.
         layout = (item.layout or self.pipeline.tenant.layout)
+
+        # Initialize the report state on the item to keep track on it
+        item.report_state = {}
 
         project_in_pipeline = True
         ppc = None
@@ -1430,11 +1489,11 @@ class PipelineManager(metaclass=ABCMeta):
             self.pipeline._consecutive_failures >= self.pipeline.disable_at):
             self.pipeline._disabled = True
         if actions:
-            log.info("Reporting item %s, actions: %s", item, actions)
-            ret = self.sendReport(actions, item)
-            if ret:
-                log.error("Reporting item %s received: %s", item, ret)
-        return ret
+            self.scheduleReport(
+                actions,
+                item,
+                report_state=item.report_state,
+            )
 
     def reportStats(self, item):
         if not self.sched.statsd:
