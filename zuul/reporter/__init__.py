@@ -14,6 +14,7 @@
 
 import abc
 import logging
+
 from zuul.lib.config import get_default
 
 
@@ -37,6 +38,40 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def report(self, item):
         """Send the compiled report message."""
+
+    def dispatch_report(self, item, report_state=None):
+        # As there might be more reporters configured per item, we put
+        # the whole function call as is in the queue. Otherwise, we
+        # would have to look up the unique reporters state each time.
+        self.connection.report_queue.put(
+            lambda: self.do_report(item, report_state))
+
+    def do_report(self, item, report_state=None):
+        """This encapsulates the workflow for an asynchronous reporter call"""
+
+        # If report_state is set, we will track the state. If it's None, we
+        # won't update the item's report state (e.g. for start and enqueue
+        # reporting). The result, on the other hand, will always be set, but
+        # ignored for start and enqueue reporting.
+        reporter_result = None
+        try:
+            ret = self.report(item)
+            if ret:
+                self.log.error("Reporting item %s received: %s", item, ret)
+            reporter_result = "FAILURE" if ret else "SUCCESS"
+        except Exception:
+            self.log.exception("Exception processing report item")
+            reporter_result = "ERROR"
+        finally:
+            # Notify the scheduler to set the wake_event for the main loop
+            if report_state is not None:
+                self.connection.sched.onReportCompleted(
+                    item, id(self), reporter_result)
+            self.connection.report_queue.task_done()
+
+    def stop(self):
+        self._stopped = True
+        self.report_queue.put(None)
 
     def getSubmitAllowNeeds(self):
         """Get a list of code review labels that are allowed to be
