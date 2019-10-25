@@ -428,6 +428,7 @@ class GitlabConnection(CachedBranchConnection):
 
     def onLoad(self):
         self.log.info('Starting Gitlab connection: %s' % self.connection_name)
+        super().onLoad()
         self.gearman_worker = GitlabGearmanWorker(self)
         self.log.info('Starting event connector')
         self._start_event_connector()
@@ -435,6 +436,7 @@ class GitlabConnection(CachedBranchConnection):
         self.gearman_worker.start()
 
     def onStop(self):
+        super().onStop()
         if hasattr(self, 'gearman_worker'):
             self.gearman_worker.stop()
             self._stop_event_connector()
