@@ -244,6 +244,7 @@ class SQLConnection(BaseConnection):
             alembic.command.upgrade(config, 'head', tag=tag)
 
     def onLoad(self):
+        super().onLoad()
         try:
             self._migrate()
             self.tables_established = True
@@ -363,6 +364,7 @@ class SQLConnection(BaseConnection):
 
     def onStop(self):
         self.log.debug("Stopping SQL connection %s" % self.connection_name)
+        super().onStop()
         self.engine.dispose()
 
     def getBuilds(self, *args, **kw):
