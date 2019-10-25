@@ -27,9 +27,6 @@
     failure:
       gerrit:
         Verified: -2
-    start:
-      gerrit:
-        Verified: 0
     precedence: high
 
 - pipeline:
