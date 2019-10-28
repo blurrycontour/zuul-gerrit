@@ -33,6 +33,24 @@
       "revId": "d27a22b333791a08be492a87a2ec78d4af062d61",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_e3523767",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1955
+      },
+      "writtenOn": "2019-10-28T16:55:26Z",
+      "side": 1,
+      "message": "That should not be a blocker, access to cloud resources is something we can safely assume developer have, one way or the other, it could even be for free: https://aws.amazon.com/blogs/opensource/aws-promotional-credits-open-source-projects/",
+      "parentUuid": "3fa7e38b_f41f6869",
+      "revId": "d27a22b333791a08be492a87a2ec78d4af062d61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
