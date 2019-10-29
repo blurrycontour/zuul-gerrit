@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_357073a4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-10-29T14:55:48Z",
+      "side": 1,
+      "message": "Shouldn\u0027t need both \u0027object\u0027 and the metaclass here. And as of python 3.4, this can simply be:\n\n    from abc import ABC\n    class Parser(ABC):",
+      "range": {
+        "startLine": 439,
+        "startChar": 13,
+        "endLine": 439,
+        "endChar": 42
+      },
+      "revId": "da579c012f6f94544a1d62bd95fa01ed61ee7477",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_f5465b21",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2019-10-29T14:55:48Z",
+      "side": 1,
+      "message": "For consistency with the other calls to super, how about just:\n\n    super().__init__(pcontext)",
+      "range": {
+        "startLine": 481,
+        "startChar": 8,
+        "endLine": 481,
+        "endChar": 53
+      },
+      "revId": "da579c012f6f94544a1d62bd95fa01ed61ee7477",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
