@@ -751,6 +751,12 @@ The following sections of ``zuul.conf`` are used by the executor:
       where it cannot determine its hostname correctly this can be overridden
       here.
 
+   .. attr:: paused_on_start
+      :default: false
+
+      Whether the executor should start in a paused mode. Such executor will not
+      accept tasks until it is unpaused.
+
    .. attr:: zone
       :default: None
 
@@ -761,7 +767,7 @@ The following sections of ``zuul.conf`` are used by the executor:
       could be configured to use private ip addresses.
 
       To enable this in nodepool, you'll use the node-attributes setting in a
-      provider pool. For example:
+      provider pool. For example:q
 
       .. code-block:: yaml
 
