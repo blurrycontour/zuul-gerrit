@@ -1412,6 +1412,11 @@ class AnsibleJob(object):
                         if self.winrm_read_timeout is not None:
                             host_vars['ansible_winrm_read_timeout_sec'] = \
                                 self.winrm_read_timeout
+                    elif connection_type == "kubectl":
+                        host_vars['ansible_kubectl_namespace'] = \
+                            node['kubectl_namespace']
+                        host_vars['ansible_kubectl_context'] = \
+                            node['kubectl_context']
 
                 host_keys = []
                 for key in node.get('host_keys', []):
@@ -1719,7 +1724,10 @@ class AnsibleJob(object):
                 'current-context': None,
             }
         # Add cluster
-        cluster_name = urlsplit(data['host']).netloc.replace('.', '-')
+        cluster_name = "%s/%s" % (
+            data['namespace'],
+            urlsplit(data['host']).netloc.replace('.', '-')
+        )
         cluster = {
             'server': data['host'],
         }
