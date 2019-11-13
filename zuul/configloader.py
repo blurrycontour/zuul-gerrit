@@ -929,13 +929,22 @@ class JobParser(object):
 
 
 class ProjectTemplateParser(object):
+    blacklisted_pipeline_names = [
+        'name',
+        'description',
+        'vars',
+        'templates',
+        'merge-mode',
+        'default-branch',
+        '_source_context',
+        '_start_mark',
+    ]
+
     def __init__(self, pcontext):
         self.log = logging.getLogger("zuul.ProjectTemplateParser")
         self.pcontext = pcontext
         self.schema = self.getSchema()
-        self.not_pipelines = ['name', 'description', 'templates',
-                              'merge-mode', 'default-branch', 'vars',
-                              '_source_context', '_start_mark']
+        self.not_pipelines = ProjectTemplateParser.blacklisted_pipeline_names
 
     def getSchema(self):
         job = {str: vs.Any(str, JobParser.job_attributes)}
@@ -948,6 +957,7 @@ class ProjectTemplateParser(object):
             'jobs': job_list
         }
 
+        # Update the ProjectTemplateParser.blacklisted_pipeline_names on change
         project = {
             'name': str,
             'description': str,
@@ -1032,6 +1042,7 @@ class ProjectParser(object):
             'jobs': job_list
         }
 
+        # Update the ProjectTemplateParser.blacklisted_pipeline_names on change
         project = {
             'name': str,
             'description': str,
@@ -1198,6 +1209,9 @@ class PipelineParser(object):
 
     def fromYaml(self, conf):
         self.schema(conf)
+        if conf['name'] in ProjectTemplateParser.blacklisted_pipeline_names:
+            raise Exception(
+                "Pipeline named %s are not allowed" % conf['name'])
         pipeline = model.Pipeline(conf['name'], self.pcontext.tenant)
         pipeline.source_context = conf['_source_context']
         pipeline.start_mark = conf['_start_mark']
