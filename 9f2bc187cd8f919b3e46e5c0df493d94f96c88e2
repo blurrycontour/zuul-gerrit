@@ -22,6 +22,30 @@
       "revId": "9f2bc187cd8f919b3e46e5c0df493d94f96c88e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_1e6fe8fa",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2019-11-13T15:38:09Z",
+      "side": 1,
+      "message": "Not a bad idea but IMHO outside the scope of this change.",
+      "parentUuid": "3fa7e38b_9b4c4a9e",
+      "range": {
+        "startLine": 32,
+        "startChar": 42,
+        "endLine": 32,
+        "endChar": 45
+      },
+      "revId": "9f2bc187cd8f919b3e46e5c0df493d94f96c88e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
