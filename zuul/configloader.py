@@ -1128,6 +1128,14 @@ class PipelineParser(object):
         'disabled': 'disabled_actions',
     }
 
+    blacklisted_names = (
+        'name',
+        'description',
+        'vars',
+        '_source_context',
+        '_start_mark'
+    )
+
     def __init__(self, pcontext):
         self.log = logging.getLogger("zuul.PipelineParser")
         self.pcontext = pcontext
@@ -1198,6 +1206,9 @@ class PipelineParser(object):
 
     def fromYaml(self, conf):
         self.schema(conf)
+        if conf['name'] in PipelineParser.blacklisted_names:
+            raise Exception(
+                "Pipeline named %s are not allowed" % conf['name'])
         pipeline = model.Pipeline(conf['name'], self.pcontext.tenant)
         pipeline.source_context = conf['_source_context']
         pipeline.start_mark = conf['_start_mark']
