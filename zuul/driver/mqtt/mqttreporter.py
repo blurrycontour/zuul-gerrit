@@ -49,6 +49,7 @@ class MQTTReporter(BaseReporter):
                 'uuid': item.current_build_set.uuid,
                 'builds': [],
                 'retry_builds': [],
+                'reset_builds': [],
             },
             'zuul_event_id': item.event.zuul_event_id,
         }
@@ -70,6 +71,7 @@ class MQTTReporter(BaseReporter):
                     'result': result,
                     'dependencies': [j.name for j in job.dependencies],
                 })
+
                 # Report build data of retried builds if available
                 retry_builds = item.current_build_set.getRetryBuildsForJob(
                     job.name)
@@ -87,6 +89,22 @@ class MQTTReporter(BaseReporter):
                     }
                     message['buildset']['retry_builds'].append(
                         retry_build_information)
+
+                # Report reset build data if available
+                reset_builds = item.getResetBuildsForJob(job.name)
+                for build in reset_builds:
+                    (result, url) = item.formatJobResult(job, build)
+                    reset_build_information = {
+                        'job_name': job.name,
+                        'uuid': build.uuid,
+                        'start_time': build.start_time,
+                        'end_time': build.end_time,
+                        'execute_time': build.execute_time,
+                        'log_url': url,
+                        'result': result,
+                    }
+                    message['buildset']['reset_builds'].append(
+                        reset_build_information)
 
             message['buildset']['builds'].append(job_informations)
         topic = None
