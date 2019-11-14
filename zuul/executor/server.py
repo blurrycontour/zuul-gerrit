@@ -706,7 +706,7 @@ class AnsibleJob(object):
         self.arguments = json.loads(job.arguments)
         self.zuul_event_id = self.arguments.get('zuul_event_id')
         # Record ansible version being used for the cleanup phase
-        self.ansible_version = self.arguments.get('ansible_version')
+        self.ansible_version = self.arguments.get('zuul_ansible_version')
         self.log = get_annotated_logger(
             logger, self.zuul_event_id, build=job.unique)
         self.executor_server = executor_server
