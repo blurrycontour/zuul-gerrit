@@ -264,6 +264,100 @@ class TestSQLConnection(ZuulDBTestCase):
         check_results('resultsdb_mysql')
         check_results('resultsdb_postgresql')
 
+    def test_sql_results_reset_builds(self):
+        # Check the results
+        def check_results(connection_name):
+            # Grab the sa tables
+            tenant = self.sched.abide.tenants.get('tenant-one')
+            reporter = _get_reporter_from_connection_name(
+                tenant.layout.pipelines['gate'].success_actions,
+                connection_name
+            )
+
+            conn = self.connections.connections[
+                connection_name].engine.connect()
+
+            result = conn.execute(
+                sa.sql.select([reporter.connection.zuul_buildset_table]))
+
+            buildsets = result.fetchall()
+            # We have two FakeChanges, so we should get two buildset entries
+            self.assertEqual(2, len(buildsets))
+            buildset0 = buildsets[0]
+            buildset1 = buildsets[1]
+
+            buildset0_builds = conn.execute(
+                sa.sql.select([reporter.connection.zuul_build_table]).where(
+                    reporter.connection.zuul_build_table.c.buildset_id ==
+                    buildset0['id']
+                )
+            ).fetchall()
+
+            buildset1_builds = conn.execute(
+                sa.sql.select([reporter.connection.zuul_build_table]).where(
+                    reporter.connection.zuul_build_table.c.buildset_id ==
+                    buildset1['id']
+                )
+            ).fetchall()
+
+            # Checking the first buildset result is only here for convenience.
+            # In this test, we are more interested in the second result which
+            # should contain the gate reset for change B.
+            self.assertEqual(3, len(buildset0_builds))
+            self.assertEqual('project-merge', buildset0_builds[0]['job_name'])
+            self.assertEqual('SUCCESS', buildset0_builds[0]['result'])
+            self.assertEqual('project-test1', buildset0_builds[1]['job_name'])
+            self.assertEqual('FAILURE', buildset0_builds[1]['result'])
+            self.assertEqual('project-test2', buildset0_builds[2]['job_name'])
+            self.assertEqual('SUCCESS', buildset0_builds[2]['result'])
+
+            # The second buildset should contain 6 builds: 3 from the first run
+            # which are CANCELED due to the gate reset and 3 from the second
+            # (SUCCESS) run.
+            self.assertEqual(6, len(buildset1_builds))
+            self.assertEqual('project-merge', buildset1_builds[0]['job_name'])
+            self.assertEqual('CANCELED', buildset1_builds[0]['result'])
+            self.assertEqual('project-merge', buildset1_builds[1]['job_name'])
+            self.assertEqual('SUCCESS', buildset1_builds[1]['result'])
+
+            self.assertEqual('project-test1', buildset1_builds[2]['job_name'])
+            self.assertEqual('CANCELED', buildset1_builds[2]['result'])
+            self.assertEqual('project-test1', buildset1_builds[3]['job_name'])
+            self.assertEqual('SUCCESS', buildset1_builds[3]['result'])
+
+            self.assertEqual('project-test2', buildset1_builds[4]['job_name'])
+            self.assertEqual('CANCELED', buildset1_builds[4]['result'])
+            self.assertEqual('project-test2', buildset1_builds[5]['job_name'])
+            self.assertEqual('SUCCESS', buildset1_builds[5]['result'])
+
+            # To ensure that those are really different builds, each entry
+            # should have a different build uuid. Thus, we should get a set
+            # with 6 unique build uuids.
+            self.assertEqual(
+                6, len(set([b['uuid'] for b in buildset1_builds]))
+            )
+
+        self.executor_server.hold_jobs_in_build = True
+
+        # Add reset result (via gate reset)
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        # Cause a gate reset for change B
+        self.executor_server.failJob('project-test1', A)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.orderedRelease()
+        self.waitUntilSettled()
+
+        check_results('resultsdb_mysql')
+        check_results('resultsdb_postgresql')
+
     def test_multiple_sql_connections(self):
         "Test putting results in different databases"
         # Add a successful result
@@ -555,3 +649,56 @@ class TestMQTTConnection(ZuulTestCase):
 
         self.assertIn("topic component 'bad' is invalid", A.messages[0],
                       "A should report a syntax error")
+
+    def test_mqtt_reporter_reset_builds(self):
+        "Test that reset builds are reported via the MQTT reporter"
+
+        # Cause a gate reset for B
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.executor_server.failJob('dependent-test', A)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.orderedRelease()
+        self.waitUntilSettled()
+
+        success_event = self.mqtt_messages.pop()
+        mqtt_payload = success_event['msg']
+
+        self.assertEquals(mqtt_payload['project'], 'org/project')
+        self.assertEquals(mqtt_payload['branch'], 'master')
+
+        # Check if build and corresponding reset build are different entities
+        builds = mqtt_payload['buildset']['builds']
+        reset_builds = mqtt_payload['buildset']['reset_builds']
+
+        test_job = [b for b in builds if b['job_name'] == 'test'][0]
+        reset_test_job = [
+            b for b in reset_builds if b['job_name'] == 'test'
+        ][0]
+
+        dependent_test_job = [
+            b for b in builds if b['job_name'] == 'dependent-test'
+        ][0]
+
+        reset_dependent_test_job = [
+            b for b in reset_builds if b['job_name'] == 'dependent-test'
+        ][0]
+
+        self.assertEquals(test_job['result'], 'SUCCESS')
+        self.assertEquals(test_job['dependencies'], [])
+        self.assertEquals(reset_test_job['result'], 'CANCELED')
+        self.assertNotEquals(test_job['uuid'], reset_test_job['uuid'])
+
+        self.assertEquals(dependent_test_job['result'], 'SUCCESS')
+        self.assertEquals(dependent_test_job['dependencies'], ['test'])
+        self.assertEquals(reset_dependent_test_job['result'], 'CANCELED')
+        self.assertNotEquals(
+            dependent_test_job['uuid'], reset_dependent_test_job['uuid']
+        )
