@@ -94,11 +94,18 @@ class SQLReporter(BaseReporter):
                     # information about the change.
                     continue
 
+                log.debug("FS: Creating build entry for build: %s", build)
                 retry_builds = item.current_build_set.getRetryBuildsForJob(
                     job.name)
                 for retry_build in retry_builds:
                     db_build = self.createBuildEntry(item, job, db_buildset,
                                                      retry_build)
+
+                reset_builds = item.getResetBuildsForJob(job.name)
+                for reset_build in reset_builds:
+                    log.debug("FS: Creating build entry for reset build: %s", reset_build)
+                    db_build = self.createBuildEntry(item, job, db_buildset,
+                                                     reset_build)
 
                 db_build = self.createBuildEntry(item, job, db_buildset, build)
 
