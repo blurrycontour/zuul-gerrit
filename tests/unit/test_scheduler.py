@@ -530,6 +530,79 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
 
+    def test_store_gate_resets(self):
+        "Test that a gate reset is stored on the queue item"
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.executor_server.failJob('project-test1', A)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Execute A/project-merge
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        # Execute B/project-merge
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        # Release project-test1 for A which will fail. This will
+        # abort both running B jobs and reexecute project-merge for B.
+        self.builds[0].release()
+        self.waitUntilSettled()
+
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        items = tenant.layout.pipelines['gate'].getAllItems()
+
+        self.orderedRelease()
+
+        current_builds = items[1].current_build_set.builds.values()
+        reset_builds = []
+        for rb_list in items[1].reset_builds.values():
+            reset_builds.extend(rb_list)
+        self.assertEquals(3, len(reset_builds))
+        self.assertTrue(
+            all(rb.result == 'CANCELED' for rb in reset_builds)
+        )
+
+        # Assert that build and reset build have different uuids
+        test1 = [b for b in current_builds if b.job.name == 'project-test1'][0]
+        test2 = [b for b in current_builds if b.job.name == 'project-test2'][0]
+
+        reset_test1 = [
+            b for b in reset_builds if b.job.name == 'project-test1'
+        ][0]
+        reset_test2 = [
+            b for b in reset_builds if b.job.name == 'project-test2'
+        ][0]
+
+        self.assertNotEquals(test1.uuid, reset_test1.uuid)
+        self.assertNotEquals(test2.uuid, reset_test2.uuid)
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test1', result='FAILURE', changes='1,1'),
+            dict(name='project-test1', result='ABORTED', changes='1,1 2,1'),
+            dict(name='project-test2', result='ABORTED', changes='1,1 2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 2)
+
     def test_independent_queues(self):
         "Test that changes end up in the right queues"
 
@@ -4698,6 +4771,16 @@ class TestScheduler(ZuulTestCase):
 
         self.executor_server.release('.*-merge')
         self.waitUntilSettled()
+
+        # As the gate was reset, we should have one reset build set for B
+        # with 3 builds
+        items = tenant.layout.pipelines['gate'].getAllItems()
+        reset_builds = items[0].reset_builds
+        self.assertEqual(len(reset_builds), 3)
+        for rb_list in reset_builds.values():
+            self.assertTrue(all(
+                b.result == 'CANCELED' for b in rb_list
+            ))
 
         # Only B's test jobs are queued because window is still 1.
         self.assertEqual(len(self.builds), 2)

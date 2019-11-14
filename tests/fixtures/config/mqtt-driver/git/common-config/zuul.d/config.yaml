@@ -18,6 +18,29 @@
       mqtt:
         topic: "{tenant}/zuul_buildset/{pipeline}/{project}/{branch}"
 
+- pipeline:
+    name: gate
+    manager: dependent
+    trigger:
+      gerrit:
+        - event: comment-added
+          approval:
+            - Approved: 1
+    start:
+      mqtt:
+        topic: "{tenant}/zuul_start/{pipeline}/{project}/{branch}"
+    success:
+      gerrit:
+        Verified: 2
+        submit: true
+      mqtt:
+        topic: "{tenant}/zuul_buildset/{pipeline}/{project}/{branch}"
+    failure:
+      gerrit:
+        Verified: -2
+      mqtt:
+        topic: "{tenant}/zuul_buildset/{pipeline}/{project}/{branch}"
+
 - job:
     name: base
     parent: null
@@ -33,6 +56,12 @@
 - project:
     name: org/project
     check:
+      jobs:
+        - test
+        - dependent-test:
+            dependencies:
+              - test
+    gate:
       jobs:
         - test
         - dependent-test:
