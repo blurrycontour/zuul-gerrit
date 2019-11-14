@@ -1173,6 +1173,12 @@ class GithubConnection(BaseConnection):
                 proj = pr.get('base').get('repo').get('full_name')
                 sha = pr.get('head').get('sha')
                 key = (proj, num, sha)
+
+                trusted, project = tenant.getProject(proj)
+                # ignore projects zuul doesn't know about
+                if not project:
+                    continue
+
                 if key in keys:
                     continue
                 self.log.debug("Found PR %s/%s needs %s/%s" %
