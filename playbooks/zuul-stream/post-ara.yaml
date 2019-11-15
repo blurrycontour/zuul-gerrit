@@ -2,10 +2,16 @@
   tasks:
 
     - name: Generate ARA html
-      command: /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ara generate html ara-output
+      command: /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ara-manage generate ara-output
+      ignore_errors: yes
+      register: ara_command
 
-    - name: Compress ARA html
-      command: gzip --recursive --best ara-output
+    - name: Print out ara_command results
+      debug:
+        var: ara_command
+
+#    - name: Compress ARA html
+#      command: gzip --recursive --best ara-output
 
     - name: Fetch ARA files
       synchronize:
