@@ -1,10 +1,5 @@
 - hosts: controller
   tasks:
-
-    - name: Set python_path fact
-      set_fact:
-        python_path: "/usr/local/lib/python3.5/dist-packages"
-
     - name: Run ansible that should succeed
       command: >
         /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ansible-playbook
@@ -12,8 +7,6 @@
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
-        ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
-        PYTHONPATH: "{{ python_path }}"
 
     - name: Run ansible playbook that should fail
       command: >
@@ -24,8 +17,6 @@
       environment:
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
-        ARA_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
-        PYTHONPATH: "{{ python_path }}"
 
     - name: Validate output - setupvar
       shell: |
