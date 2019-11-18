@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_e6aa45d0",
+        "filename": "doc/source/admin/installation.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-11-18T22:28:26Z",
+      "side": 1,
+      "message": "This sentence is redundant with the previous paragraph and could be omitted.  The following ref is a good addition.",
+      "revId": "ac78c55819b2a5b4c2d213dc511ab7144b5a750c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_ad5cfa18",
         "filename": "zuul/lib/ansible.py",
         "patchSetId": 3
