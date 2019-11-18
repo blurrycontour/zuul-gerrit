@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_a6a44da4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 947,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-11-18T22:43:36Z",
+      "side": 1,
+      "message": "It seems weird to have two variables with the same value.  Why not just use one or the other in all places?",
+      "revId": "3bb3d31a96e3014190d989c4ada3f598f3b84d8a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
