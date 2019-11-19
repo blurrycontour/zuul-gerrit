@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_22035b0e",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 981,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-11-19T18:13:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_1f0eb83c",
+      "revId": "202579a3da400cc8e8a4f1c1fbeb9748ede64d33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_81fd7bb3",
         "filename": "zuul/configloader.py",
         "patchSetId": 4
@@ -100,6 +118,24 @@
       "writtenOn": "2019-11-19T18:10:54Z",
       "side": 1,
       "message": "-1: The word \"pipelines\" should be plural in the error message.\n\nThe call side wraps this in a context manager that turns all exceptions into ConfigurationSyntaxErrors.  It would be slightly better if this were handled by voluptuous, in that it could point to the exact line (as it is, it will point to the entire pipeline definition for the error).  See below for a pointer.",
+      "revId": "202579a3da400cc8e8a4f1c1fbeb9748ede64d33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_622633bd",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1213,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-11-19T18:13:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_3f137467",
       "revId": "202579a3da400cc8e8a4f1c1fbeb9748ede64d33",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
