@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_82ca4f17",
+        "filename": "doc/source/user/howtos/default-project-configuration.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2019-11-19T19:00:06Z",
+      "side": 1,
+      "message": "submit –\u003e submits?",
+      "revId": "2bd8b0d2694ddd3a2878894fdcc22cbf0141d628",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
