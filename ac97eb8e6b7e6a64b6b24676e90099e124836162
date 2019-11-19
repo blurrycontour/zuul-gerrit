@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_d85a811c",
+        "filename": "tools/reenqueue.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2019-11-19T08:27:47Z",
+      "side": 1,
+      "message": "What about not suggesting \"sudo\", I don\u0027t think it is needed.",
+      "range": {
+        "startLine": 18,
+        "startChar": 5,
+        "endLine": 18,
+        "endChar": 9
+      },
+      "revId": "ac97eb8e6b7e6a64b6b24676e90099e124836162",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
