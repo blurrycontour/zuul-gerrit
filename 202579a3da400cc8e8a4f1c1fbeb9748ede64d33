@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_81fd7bb3",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 982,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-19T00:14:42Z",
+      "side": 1,
+      "message": "For consistency with the error below should we raise an error here too? That will give the user something concrete to fix when Zuul doesn\u0027t act the way they expect instead of not applying project templates mysteriously.",
+      "revId": "202579a3da400cc8e8a4f1c1fbeb9748ede64d33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_415f83e4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1213,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-19T00:14:42Z",
+      "side": 1,
+      "message": "Should this raise ConfigurationSyntaxError?",
+      "revId": "202579a3da400cc8e8a4f1c1fbeb9748ede64d33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
