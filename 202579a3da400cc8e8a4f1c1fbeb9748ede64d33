@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_1cea5073",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 982,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-11-19T03:10:17Z",
+      "side": 1,
+      "message": "the problem should happen earlier as a blacklisted_pipeline_names triggers a voluptuous error if it\u0027s set to a non pipeline_contents.",
+      "parentUuid": "3fa7e38b_81fd7bb3",
+      "revId": "202579a3da400cc8e8a4f1c1fbeb9748ede64d33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_415f83e4",
         "filename": "zuul/configloader.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2019-11-19T00:14:42Z",
       "side": 1,
       "message": "Should this raise ConfigurationSyntaxError?",
+      "revId": "202579a3da400cc8e8a4f1c1fbeb9748ede64d33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_7cf82449",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1213,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-11-19T03:10:17Z",
+      "side": 1,
+      "message": "This seems consistent with the other raw Exception raised by the other objects.",
+      "parentUuid": "3fa7e38b_415f83e4",
       "revId": "202579a3da400cc8e8a4f1c1fbeb9748ede64d33",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
