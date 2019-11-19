@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_df6a6019",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-11-19T17:58:01Z",
+      "side": 1,
+      "message": "Thank you for the suggestion, next PS uses that.",
+      "parentUuid": "5f7c97a3_910526c4",
+      "revId": "ff798cfd32da012d4274f194008acc6ed3ffdc38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_310c52eb",
         "filename": "doc/source/user/howtos/minimal-template.rst",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_3f0db48e",
+        "filename": "doc/source/user/howtos/minimal-template.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-11-19T17:58:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_310c52eb",
+      "revId": "ff798cfd32da012d4274f194008acc6ed3ffdc38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f7c97a3_510f8edf",
         "filename": "doc/source/user/howtos/minimal-template.rst",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2018-06-19T08:50:46Z",
       "side": 1,
       "message": "This description shouldn\u0027t be openstack specific.",
+      "revId": "ff798cfd32da012d4274f194008acc6ed3ffdc38",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_df25800b",
+        "filename": "doc/source/user/howtos/minimal-template.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-11-19T17:58:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f7c97a3_510f8edf",
       "revId": "ff798cfd32da012d4274f194008acc6ed3ffdc38",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
