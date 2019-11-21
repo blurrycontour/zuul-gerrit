@@ -4095,6 +4095,32 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(r, True)
 
+    def test_client_enqueue_change_no_trigger(self):
+        """Test that the RPC client can enqueue a change without an explicit
+           trigger"""
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        A.addApproval('Approved', 1)
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.enqueue(tenant='tenant-one',
+                           pipeline='gate',
+                           project='org/project',
+                           trigger='None',
+                           change='1,1')
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-merge').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(r, True)
+
     @simple_layout('layouts/three-projects.yaml')
     def test_client_enqueue_change_wrong_project(self):
         "Test that an enqueue fails if a change doesn't belong to the project"
