@@ -4070,8 +4070,9 @@ class TestScheduler(ZuulTestCase):
         self.worker.release('.*')
         self.waitUntilSettled()
 
-    def test_client_enqueue_change(self):
-        "Test that the RPC client can enqueue a change"
+    def test_client_enqueue_change_with_trigger(self):
+        """Test that the RPC client can enqueue a change with the deprecated
+           trigger argument"""
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         A.addApproval('Approved', 1)
@@ -4083,6 +4084,32 @@ class TestScheduler(ZuulTestCase):
                            pipeline='gate',
                            project='org/project',
                            trigger='gerrit',
+                           change='1,1')
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-merge').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(r, True)
+
+    def test_client_enqueue_change_no_trigger(self):
+        """Test that the RPC client can enqueue a change without an explicit
+           trigger"""
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        A.addApproval('Approved', 1)
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.enqueue(tenant='tenant-one',
+                           pipeline='gate',
+                           project='org/project',
+                           trigger=None,
                            change='1,1')
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
@@ -4115,7 +4142,7 @@ class TestScheduler(ZuulTestCase):
             r = client.enqueue(tenant='tenant-one',
                                pipeline='gate',
                                project='org/project1',
-                               trigger='gerrit',
+                               trigger=None,
                                change='2,1')
             self.assertEqual(r, False)
         self.waitUntilSettled()
@@ -4136,7 +4163,7 @@ class TestScheduler(ZuulTestCase):
             tenant='tenant-one',
             pipeline='post',
             project='org/project',
-            trigger='gerrit',
+            trigger=None,
             ref='master',
             oldrev='90f173846e3af9154517b88543ffbd1691f31366',
             newrev=A_commit)
@@ -4166,7 +4193,7 @@ class TestScheduler(ZuulTestCase):
             tenant='tenant-one',
             pipeline='post',
             project='org/project',
-            trigger='gerrit',
+            trigger=None,
             ref='master',
             oldrev='90f173846e3af9154517b88543ffbd1691f31366',
             newrev=A_commit)
@@ -4182,7 +4209,7 @@ class TestScheduler(ZuulTestCase):
             tenant='tenant-one',
             pipeline='post',
             project='org/project1',
-            trigger='gerrit',
+            trigger=None,
             ref='master',
             oldrev='90f173846e3af9154517b88543ffbd1691f31366',
             newrev=B_commit)
@@ -4376,7 +4403,7 @@ class TestScheduler(ZuulTestCase):
             r = client.enqueue(tenant='tenant-foo',
                                pipeline='gate',
                                project='org/project',
-                               trigger='gerrit',
+                               trigger=None,
                                change='1,1')
             self.assertEqual(r, False)
 
@@ -4385,7 +4412,7 @@ class TestScheduler(ZuulTestCase):
             r = client.enqueue(tenant='tenant-one',
                                pipeline='gate',
                                project='project-does-not-exist',
-                               trigger='gerrit',
+                               trigger=None,
                                change='1,1')
             self.assertEqual(r, False)
 
@@ -4394,16 +4421,7 @@ class TestScheduler(ZuulTestCase):
             r = client.enqueue(tenant='tenant-one',
                                pipeline='pipeline-does-not-exist',
                                project='org/project',
-                               trigger='gerrit',
-                               change='1,1')
-            self.assertEqual(r, False)
-
-        with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
-                                         "Invalid trigger"):
-            r = client.enqueue(tenant='tenant-one',
-                               pipeline='gate',
-                               project='org/project',
-                               trigger='trigger-does-not-exist',
+                               trigger=None,
                                change='1,1')
             self.assertEqual(r, False)
 
@@ -4412,7 +4430,7 @@ class TestScheduler(ZuulTestCase):
             r = client.enqueue(tenant='tenant-one',
                                pipeline='gate',
                                project='org/project',
-                               trigger='gerrit',
+                               trigger=None,
                                change='1,1')
             self.assertEqual(r, False)
 
@@ -4431,7 +4449,7 @@ class TestScheduler(ZuulTestCase):
                 tenant='tenant-one',
                 pipeline='post',
                 project='org/project',
-                trigger='gerrit',
+                trigger=None,
                 ref='master',
                 oldrev='90f173846e3af9154517b88543ffbd1691f31366',
                 newrev='10054041')
@@ -4442,7 +4460,7 @@ class TestScheduler(ZuulTestCase):
                 tenant='tenant-one',
                 pipeline='post',
                 project='org/project',
-                trigger='gerrit',
+                trigger=None,
                 ref='master',
                 oldrev='10054041',
                 newrev='90f173846e3af9154517b88543ffbd1691f31366')
@@ -4453,7 +4471,7 @@ class TestScheduler(ZuulTestCase):
                 tenant='tenant-one',
                 pipeline='post',
                 project='org/project',
-                trigger='gerrit',
+                trigger=None,
                 ref='master',
                 oldrev='90f173846e3af9154517b88543ffbd1691f31366',
                 newrev='notbase16')
@@ -4464,7 +4482,7 @@ class TestScheduler(ZuulTestCase):
                 tenant='tenant-one',
                 pipeline='post',
                 project='org/project',
-                trigger='gerrit',
+                trigger=None,
                 ref='master',
                 oldrev='notbase16',
                 newrev='90f173846e3af9154517b88543ffbd1691f31366')
@@ -6175,7 +6193,7 @@ class TestAmbiguousProjectNames(ZuulTestCase):
         r = client.enqueue(tenant='tenant-one',
                            pipeline='check',
                            project='review.example.com/org/project',
-                           trigger='gerrit',
+                           trigger=None,
                            change='1,1')
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('project-merge').result,
