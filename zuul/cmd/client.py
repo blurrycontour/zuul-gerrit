@@ -223,7 +223,7 @@ class Client(zuul.cmd.ZuulApp):
         cmd_enqueue.add_argument('--tenant', help='tenant name',
                                  required=True)
         cmd_enqueue.add_argument('--trigger', help='trigger name',
-                                 required=True)
+                                 required=False, default=None)
         cmd_enqueue.add_argument('--pipeline', help='pipeline name',
                                  required=True)
         cmd_enqueue.add_argument('--project', help='project name',
@@ -244,7 +244,7 @@ class Client(zuul.cmd.ZuulApp):
         cmd_enqueue.add_argument('--tenant', help='tenant name',
                                  required=True)
         cmd_enqueue.add_argument('--trigger', help='trigger name',
-                                 required=True)
+                                 required=False, default=None)
         cmd_enqueue.add_argument('--pipeline', help='pipeline name',
                                  required=True)
         cmd_enqueue.add_argument('--project', help='project name',
