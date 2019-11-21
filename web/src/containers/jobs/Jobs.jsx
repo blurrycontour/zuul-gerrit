@@ -63,13 +63,9 @@ class JobsList extends React.Component {
       if (!visited[job.name]) {
         // Collect parents
         let parents = []
-        if (job.variants) {
-          for (let jobVariant of job.variants) {
-            if (jobVariant.parent &&
-                parents.indexOf(jobVariant.parent) === -1) {
-              parents.push(jobVariant.parent)
-            }
-          }
+        if (job.variants && job.variants.length > 0 && job.variants[0].parent) {
+          // We only collect the first parent
+          parents.push(job.variants[0].parent)
         }
         visited[job.name] = {
           text: (
