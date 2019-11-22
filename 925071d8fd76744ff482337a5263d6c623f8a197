@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_26f9f6c3",
+        "filename": "web/src/containers/jobs/Jobs.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-11-22T18:16:16Z",
+      "side": 1,
+      "message": "I\u0027m not sure the \u0027branched\u0027 note avoids confusion (it may even cause confusion because it can show up without branches being involved).",
+      "revId": "925071d8fd76744ff482337a5263d6c623f8a197",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
