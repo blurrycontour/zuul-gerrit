@@ -37,6 +37,9 @@ services:
       MYSQL_DATABASE: zuul
       MYSQL_USER: zuul
       MYSQL_PASSWORD: secret
+      # Work around slow db startup when writing TZINFO data.
+      MYSQL_INITDB_SKIP_TZINFO: 1
+    command: "mysqld --log_warnings=9"
   scheduler:
     depends_on:
       - gerritconfig

@@ -107,6 +107,56 @@
     required-projects:
       - zuul/zuul
 
+- job:
+    name: zuul-quick-start-0
+    parent: zuul-quick-start
+    description: "Run this the 0th time"
+
+- job:
+    name: zuul-quick-start-1
+    parent: zuul-quick-start
+    description: "Run this the 1th time"
+
+- job:
+    name: zuul-quick-start-2
+    parent: zuul-quick-start
+    description: "Run this the 2th time"
+
+- job:
+    name: zuul-quick-start-3
+    parent: zuul-quick-start
+    description: "Run this the 3th time"
+
+- job:
+    name: zuul-quick-start-4
+    parent: zuul-quick-start
+    description: "Run this the 4th time"
+
+- job:
+    name: zuul-quick-start-5
+    parent: zuul-quick-start
+    description: "Run this the 5th time"
+
+- job:
+    name: zuul-quick-start-6
+    parent: zuul-quick-start
+    description: "Run this the 6th time"
+
+- job:
+    name: zuul-quick-start-7
+    parent: zuul-quick-start
+    description: "Run this the 7th time"
+
+- job:
+    name: zuul-quick-start-8
+    parent: zuul-quick-start
+    description: "Run this the 8th time"
+
+- job:
+    name: zuul-quick-start-9
+    parent: zuul-quick-start
+    description: "Run this the 9th time"
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -192,49 +242,26 @@
     check:
       jobs:
         - zuul-build-image
-        - zuul-tox-docs
-        - tox-pep8
-        - tox-py35:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
-            timeout: 3600  # 60 minutes
-        - tox-py37:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            timeout: 3600  # 60 minutes
-            nodeset: ubuntu-bionic
-        - zuul-build-dashboard
-        - zuul-build-dashboard-multi-tenant
-        - nodejs-npm-run-lint:
-            vars:
-              node_version: 10
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-npm-run-test:
-            vars:
-              node_version: 10
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.5
-        - zuul-stream-functional-2.6
-        - zuul-stream-functional-2.7
-        - zuul-stream-functional-2.8
-        - zuul-tox-remote:
-            timeout: 2700  # 45 minutes
-        - zuul-quick-start:
+        - zuul-quick-start-0:
             dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
-        - zuul-build-python-release
-        - build-javascript-content-tarball:
-            vars:
-              node_version: 10
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-              create_tarball_directory: build
+        - zuul-quick-start-1:
+            dependencies: zuul-build-image
+        - zuul-quick-start-2:
+            dependencies: zuul-build-image
+        - zuul-quick-start-3:
+            dependencies: zuul-build-image
+        - zuul-quick-start-4:
+            dependencies: zuul-build-image
+        - zuul-quick-start-5:
+            dependencies: zuul-build-image
+        - zuul-quick-start-6:
+            dependencies: zuul-build-image
+        - zuul-quick-start-7:
+            dependencies: zuul-build-image
+        - zuul-quick-start-8:
+            dependencies: zuul-build-image
+        - zuul-quick-start-9:
+            dependencies: zuul-build-image
     gate:
       jobs:
         - zuul-upload-image
