@@ -37,6 +37,7 @@ services:
       MYSQL_DATABASE: zuul
       MYSQL_USER: zuul
       MYSQL_PASSWORD: secret
+    command: "mysqld --log_warnings=9"
   scheduler:
     depends_on:
       - gerritconfig
