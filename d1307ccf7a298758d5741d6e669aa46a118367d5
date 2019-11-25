@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_0fe158fc",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-25T21:15:27Z",
+      "side": 1,
+      "message": "I don\u0027t have the answer for this, but I think it would be good to update the help info here so that we better understand why triggers were included in the first place.\n\nThey don\u0027t seem to be used for anything (and don\u0027t end up in job inventories), but maybe there are plans to make use of this somehow? If there is no plan for using this info maybe help should include a deprecation notice and the flag will be removed. If there is a plan we can expand on that here and maybe not make it optional depending on the plan?",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_cf6340aa",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-25T21:15:27Z",
+      "side": 1,
+      "message": "Can this be a break? (not a -1 as it was previously a continue).",
+      "range": {
+        "startLine": 197,
+        "startChar": 28,
+        "endLine": 197,
+        "endChar": 36
+      },
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
