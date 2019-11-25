@@ -1426,7 +1426,7 @@ class FakePagureConnection(pagureconnection.PagureConnection):
         secret = 'fake_webhook_token-%s' % project
         if use_zuulweb:
             payload = json.dumps(payload).encode('utf-8')
-            signature, _ = pagureconnection._sign_request(payload, secret)
+            signature = pagureconnection._sign_request(payload, secret)
             headers = {'x-pagure-signature': signature,
                        'x-pagure-project': project}
             return requests.post(

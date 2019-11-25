@@ -64,6 +64,17 @@ The supported options in ``zuul.conf`` connections are:
 
       Path to the Pagure Git repositories. Used to clone.
 
+   .. attr:: source_whitelist
+      :default: ''
+
+      A comma separated list of source ip adresses from which webhook
+      calls are whitelisted. If the source is not whitelisted, then
+      call payload's signature is verified using the project webhook
+      token. An admin access to the project is required by Zuul to read
+      the token. White listing a source of hook calls allows Zuul to
+      react to events without any authorizations.
+
+
 Trigger Configuration
 ---------------------
 Pagure webhook events can be configured as triggers.

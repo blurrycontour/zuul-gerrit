@@ -97,7 +97,7 @@ TOKEN_VALIDITY = 60 * 24 * 3600
 def _sign_request(body, secret):
     signature = hmac.new(
         secret.encode('utf-8'), body, hashlib.sha1).hexdigest()
-    return signature, body
+    return signature
 
 
 class PagureGearmanWorker(object):
@@ -586,6 +586,8 @@ class PagureConnection(BaseConnection):
             'baseurl', 'https://%s' % self.server).rstrip('/')
         self.cloneurl = self.connection_config.get(
             'cloneurl', self.baseurl).rstrip('/')
+        self.source_whitelist = self.connection_config.get(
+            'source_whitelist', '').split(',')
         self.connectors = {}
         self.source = driver.getSource(self)
         self.event_queue = queue.Queue()
@@ -940,7 +942,7 @@ class PagureWebController(BaseWebController):
             raise cherrypy.HTTPError(
                 401, 'no webhook token for %s.' % project)
 
-        signature, payload = _sign_request(body, token)
+        signature = _sign_request(body, token)
 
         if not hmac.compare_digest(str(signature), str(request_signature)):
             self.log.debug(
@@ -951,7 +953,11 @@ class PagureWebController(BaseWebController):
                 'Request signature does not match calculated payload '
                 'signature. Check that secret is correct.')
 
-        return payload
+    def _source_whitelisted(self, remote_ip, forwarded_ip):
+        if remote_ip and remote_ip in self.connection.source_whitelist:
+            return True
+        if forwarded_ip and forwarded_ip in self.connection.source_whitelist:
+            return True
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -961,8 +967,15 @@ class PagureWebController(BaseWebController):
         for key, value in cherrypy.request.headers.items():
             headers[key.lower()] = value
         body = cherrypy.request.body.read()
-        payload = self._validate_signature(body, headers)
-        json_payload = json.loads(payload.decode('utf-8'))
+        if not self._source_whitelisted(
+                getattr(cherrypy.request.remote, 'ip'),
+                headers.get('x-forwarded-for')):
+            self._validate_signature(body, headers)
+        else:
+            self.log.debug('Payload source is whitelisted in %s' % (
+                self.connection.source_whitelist
+            ))
+        json_payload = json.loads(body.decode('utf-8'))
 
         job = self.zuul_web.rpc.submitJob(
             'pagure:%s:payload' % self.connection.connection_name,
