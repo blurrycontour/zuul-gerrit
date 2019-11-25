@@ -230,7 +230,8 @@ the following options.
       .. value:: status
 
          Status set on commit. The syntax is ``user:status:value``.
-         This also can be a regular expression.
+         This also can be a regular expression that supports
+         only restricted syntax, see :ref:`<regex>` for more information.
 
       A :value:`pipeline.trigger.<github
       source>.event.pull_request_review` event will have associated
