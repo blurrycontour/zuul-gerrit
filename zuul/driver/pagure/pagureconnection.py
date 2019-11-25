@@ -404,7 +404,9 @@ class PagureAPIClient():
         self.base_url = '%s/api/0/' % baseurl
         self.api_token = api_token
         self.project = project
-        self.headers = {'Authorization': 'token %s' % self.api_token}
+        self.headers = {}
+        if self.api_token:
+            self.headers['Authorization'] = 'token %s' % self.api_token
         self.token_exp_date = token_exp_date
 
     def _manage_error(self, data, code, url, verb):
@@ -647,7 +649,12 @@ class PagureConnection(BaseConnection):
                 "Fetching project %s webhook_token from API" % project)
             return self._refresh_project_connectors(project)['webhook_token']
 
-    def get_project_api_client(self, project):
+    def get_project_noauth_api_client(self, project):
+        return PagureAPIClient(self.baseurl, None, project)
+
+    def get_project_api_client(self, project, auth=True):
+        if not auth:
+            return self.get_project_noauth_api_client(project)
         api_client = self.connectors.get(
             project, {}).get('api_client', None)
         if api_client:
@@ -700,7 +707,7 @@ class PagureConnection(BaseConnection):
         if branches is not None:
             return branches
 
-        pagure = self.get_project_api_client(project.name)
+        pagure = self.get_project_api_client(project.name, auth=False)
         branches = pagure.get_project_branches()
         self.project_branch_cache[project.name] = branches
 
@@ -775,13 +782,13 @@ class PagureConnection(BaseConnection):
         return change
 
     def _hasRequiredStatusChecks(self, change):
-        pagure = self.get_project_api_client(change.project.name)
+        pagure = self.get_project_api_client(change.project.name, auth=False)
         flag = pagure.get_pr_flags(change.number, last=True)
         return True if flag.get('status', '') == 'success' else False
 
     def canMerge(self, change, allow_needs, event=None):
         log = get_annotated_logger(self.log, event)
-        pagure = self.get_project_api_client(change.project.name)
+        pagure = self.get_project_api_client(change.project.name, auth=False)
         pr = pagure.get_pr(change.number)
 
         mergeable = False
@@ -808,7 +815,7 @@ class PagureConnection(BaseConnection):
         return can_merge
 
     def getPull(self, project_name, number):
-        pagure = self.get_project_api_client(project_name)
+        pagure = self.get_project_api_client(project_name, auth=False)
         pr = pagure.get_pr(number)
         diffstats = pagure.get_pr_diffstats(number)
         pr['files'] = diffstats.keys()
@@ -886,7 +893,7 @@ class PagureConnection(BaseConnection):
         time.sleep(1)
 
     def getCommitStatus(self, project, number):
-        pagure = self.get_project_api_client(project)
+        pagure = self.get_project_api_client(project, auth=False)
         flag = pagure.get_pr_flags(number, last=True)
         self.log.info(
             "Got pull-request CI status for PR %s on %s status: %s" % (
