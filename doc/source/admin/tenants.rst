@@ -295,7 +295,8 @@ configuration. Some examples of tenant definitions are:
 
       The list of labels regexp a tenant can use in job's nodeset. When set,
       this setting can be used to restrict what labels a tenant can use.
-      Without this setting, the tenant can use any labels.
+      Without this setting, the tenant can use any labels. Regular expression
+      supports only restricted syntax, see :ref:`<regex>` for more information.
 
    .. attr:: report-build-page
       :default: false
