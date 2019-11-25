@@ -950,21 +950,22 @@ class TestPagureProjectConnector(ZuulTestCase):
     @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
     def test_connectors(self):
 
-        project_api_token_exp_date = self.fake_pagure.connectors[
-            'org/project']['api_client'].token_exp_date
+        # At bootstrap no connectors must have been created
+        # Zuul only needs to read projects branches, this
+        # does not require any authentication
+        self.assertNotIn(
+            'org/project', self.fake_pagure.connectors)
 
         A = self.fake_pagure.openFakePullRequest(
             'org/project', 'master', 'A')
         self.fake_pagure.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(
-            project_api_token_exp_date,
-            self.fake_pagure.connectors[
-                'org/project']['api_client'].token_exp_date)
+        project_api_token_exp_date = self.fake_pagure.connectors[
+            'org/project']['api_client'].token_exp_date
 
         # Now force a POST error with EINVALIDTOK code and check
-        # The connector has been refreshed
+        # The connector is going to be refreshed
         self.fake_pagure.connectors[
             'org/project']['api_client'].return_post_error = {
                 'error': 'Invalid or expired token',

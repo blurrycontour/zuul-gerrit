@@ -1405,6 +1405,11 @@ class FakePagureConnection(pagureconnection.PagureConnection):
         self.cloneurl = self.upstream_root
         self.connectors = {}
 
+    def get_project_noauth_api_client(self, project):
+        return FakePagureAPIClient(
+            self.baseurl, None, project,
+            pull_requests_db=self.pull_requests)
+
     def _refresh_project_connectors(self, project):
         connector = self.connectors.setdefault(
             project, {'api_client': None, 'webhook_token': None})
