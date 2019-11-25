@@ -1403,7 +1403,8 @@ pipeline.
       This can also be a regex. In this case the regex must start with ``^``
       and match the full project name following the same rule as name without
       regex. If not given it is implicitly derived from the project where this
-      is defined.
+      is defined. Regular expression supports only restricted syntax,
+      see :ref:`regex` for more information.
 
    .. attr:: templates
 
@@ -1864,3 +1865,17 @@ pragma directives may not be set and then unset within the same file.
       :term:`config-project` project (which normally would not use
       implied branches), you must set `implied-branch-matchers` as
       well.
+
+.. _regex:
+
+Regular expressions
+-------------------
+
+Zuul uses both standard Python ``re`` module as well Google RE2 library
+(via ``fb-re2`` binding) for regular expressions parsing. Due to security
+considerations RE2 supports `restricted syntax`__.
+If parameter description doesn't explicitly specify then ``re`` module is
+used, which means full Python `regular expression syntax`__  is supported.
+
+.. __: https://github.com/google/re2/wiki/Syntax
+.. __: https://docs.python.org/3/library/re.html

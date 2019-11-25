@@ -165,6 +165,8 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
       (e.g., ``refs/tags/foo``).  Zuul matches this value exactly
       against what Gerrit provides.  This field is treated as a
       regular expression, and multiple refs may be listed.
+      Only restricted regular expression syntax is supported, see
+      :ref:`regex` for more information.
 
    .. attr:: ignore-deletes
       :default: true
