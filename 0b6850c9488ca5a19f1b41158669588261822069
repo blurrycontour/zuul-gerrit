@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_add5ace7",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1020,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-25T23:56:51Z",
+      "side": 1,
+      "message": "I think this may introduce a race. getJobData() always looks at the last entry of the gearman Job\u0027s data list. The gear lib simply appends each WORK_DATA packet that it receives to this list.\n\nWhat this means is if the executor client receives the previous WORK_DATA with worker_hostname in it then receives this WORK_DATA with url in it before processing the first WORK_DATA response the client will only see the url work data and not see the worker_hostname data. It will then fail in Worker.updateFromData().\n\nTo address this I think we can simply continue to provide the old data here as well then the most recent WORK_DATA entry will include as much info as possible.",
+      "revId": "0b6850c9488ca5a19f1b41158669588261822069",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
