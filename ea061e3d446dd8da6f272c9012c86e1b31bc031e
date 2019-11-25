@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_6f2a4ce7",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 4842,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-25T21:28:39Z",
+      "side": 1,
+      "message": "This comparison means that an empty list will match. I think that is a bug because it we would return a true comparison for [something, stuff] and []",
+      "range": {
+        "startLine": 4842,
+        "startChar": 38,
+        "endLine": 4842,
+        "endChar": 40
+      },
+      "revId": "ea061e3d446dd8da6f272c9012c86e1b31bc031e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
