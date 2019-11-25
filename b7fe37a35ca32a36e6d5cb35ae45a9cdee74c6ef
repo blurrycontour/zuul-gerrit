@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_edce4481",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-25T23:39:57Z",
+      "side": 1,
+      "message": "In OpenStack land we have often asserted the opposite particularly if a CI system wishes to vote on a project (as that tends to set off more alarms when you get a -1).",
+      "revId": "b7fe37a35ca32a36e6d5cb35ae45a9cdee74c6ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_6dbb34e4",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 954,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-25T23:39:57Z",
+      "side": 1,
+      "message": "Should this error mention that you can whitelist sources now as well?",
+      "revId": "b7fe37a35ca32a36e6d5cb35ae45a9cdee74c6ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
