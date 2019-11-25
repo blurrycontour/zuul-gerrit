@@ -1403,7 +1403,8 @@ pipeline.
       This can also be a regex. In this case the regex must start with ``^``
       and match the full project name following the same rule as name without
       regex. If not given it is implicitly derived from the project where this
-      is defined.
+      is defined. Regex parsing is implemented via Google RE2 library that
+      has `restricted syntax <https://github.com/google/re2/wiki/Syntax>`_.
 
    .. attr:: templates
 
