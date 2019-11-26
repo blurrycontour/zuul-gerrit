@@ -19,6 +19,20 @@ must at least have the ``Modify an existing project`` access.
 Furthermore Project owner must set the web hook target url in project settings
 such as: ``http://<zuul-web>/zuul/api/connection/<conn-name>/payload``
 
+The user's API token configured in with zuul.conf must have the following
+ACL rights:
+
+- Merge a pull-request (optional, only for gating)
+- Flag a pull-request
+- Comment on a pull-request
+
+Each project to be integrated with Zuul needs at least:
+
+- Web hook target set to: 
+  http://<zuul-web>/zuul/api/connection/<conn-name>/payload
+- Notify on pull-request flag
+- Pull requests
+
 Connection Configuration
 ------------------------
 
@@ -63,6 +77,17 @@ The supported options in ``zuul.conf`` connections are:
       :default: https://{baseurl}
 
       Path to the Pagure Git repositories. Used to clone.
+
+   .. attr:: source_whitelist
+      :default: ''
+
+      A comma separated list of source ip adresses from which webhook
+      calls are whitelisted. If the source is not whitelisted, then
+      call payload's signature is verified using the project webhook
+      token. An admin access to the project is required by Zuul to read
+      the token. White listing a source of hook calls allows Zuul to
+      react to events without any authorizations.
+
 
 Trigger Configuration
 ---------------------
