@@ -34,6 +34,24 @@
       "revId": "cd3ea418ffc7368e390ede7444895e7857592974",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_7a48b661",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1407,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2019-11-26T20:59:36Z",
+      "side": 1,
+      "message": "Where to place such common section? As a top level chapter in User Guide? Actually regex are also mentioned in Administrators guide.",
+      "parentUuid": "3fa7e38b_0d6400e4",
+      "revId": "cd3ea418ffc7368e390ede7444895e7857592974",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
