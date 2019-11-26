@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_732eaa43",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-11-26T14:11:37Z",
+      "side": 1,
+      "message": "I don\u0027t know the exact history but I assume the idea was to mimic a real event, which always has a trigger by definition.  It turns out providing the project, pipeline \u0026 change info is enough for zuul to enqueue an event.\n\nShould we instead define a default \"manual\" or \"admin\" trigger that covers CLI/GUI events to be consistent with other triggers?",
+      "parentUuid": "3fa7e38b_0fe158fc",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_cf6340aa",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 2
@@ -30,6 +48,30 @@
       "writtenOn": "2019-11-25T21:15:27Z",
       "side": 1,
       "message": "Can this be a break? (not a -1 as it was previously a continue).",
+      "range": {
+        "startLine": 197,
+        "startChar": 28,
+        "endLine": 197,
+        "endChar": 36
+      },
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_33283232",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-11-26T14:11:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_cf6340aa",
       "range": {
         "startLine": 197,
         "startChar": 28,
