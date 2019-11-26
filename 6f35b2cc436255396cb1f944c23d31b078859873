@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_4d443873",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1163,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-26T00:39:55Z",
+      "side": 1,
+      "message": "Does this mean that we treat any cross referenced PR as a depends on even if there is no Depends-On flag? Seems that we only search for the url of this change in other changes. I think that may contribute to the issue you are seeing in that it is too greedy in its match.\n\nMaybe we can relax the check below if we add an explicit check for depends-on?",
+      "revId": "6f35b2cc436255396cb1f944c23d31b078859873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_8d4eb093",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1177,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-11-26T00:39:55Z",
+      "side": 1,
+      "message": "This value should be subpath/project which getProject supports fine. However, should we be using the fully qualified canonical name here including the github url as well? That way if a project with the same name is somehow in the same tenant from two different sources we avoid conflicts?\n\nTo do that I think you can replace proj here with url less the scheme? It could also be that I am overthinking this.",
+      "range": {
+        "startLine": 1177,
+        "startChar": 53,
+        "endLine": 1177,
+        "endChar": 57
+      },
+      "revId": "6f35b2cc436255396cb1f944c23d31b078859873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
