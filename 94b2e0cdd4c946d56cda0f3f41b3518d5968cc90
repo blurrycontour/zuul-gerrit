@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_ca1c8716",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-11-26T11:21:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_8ff2286e",
+      "revId": "94b2e0cdd4c946d56cda0f3f41b3518d5968cc90",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_af4364af",
         "filename": "zuul/driver/auth/jwt.py",
         "patchSetId": 32
@@ -30,6 +48,24 @@
       "writtenOn": "2019-11-25T21:41:25Z",
       "side": 1,
       "message": "Do we need to allow for clock skew and possibly allow for small variance here?\n\nI\u0027m just thinking if a client has some skew from zuul and creates a new token then uses it immediately it is possible that things go quickly enough, even with minor skew, that this check will fail.",
+      "revId": "94b2e0cdd4c946d56cda0f3f41b3518d5968cc90",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_0a237f5a",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-11-26T11:21:36Z",
+      "side": 1,
+      "message": "I don\u0027t mind accounting for clock skew, how much leeway should we authorize?",
+      "parentUuid": "3fa7e38b_af4364af",
       "revId": "94b2e0cdd4c946d56cda0f3f41b3518d5968cc90",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
