@@ -602,6 +602,7 @@ class JobParser(object):
                       'nodeset': vs.Any(dict, str),
                       'timeout': int,
                       'post-timeout': int,
+                      'cleanup-timeout': int,
                       'attempts': int,
                       'pre-run': to_list(str),
                       'post-run': to_list(str),
@@ -638,6 +639,7 @@ class JobParser(object):
         'protected',
         'timeout',
         'post-timeout',
+        'cleanup-timeout',
         'workspace',
         'voting',
         'hold-following-changes',
@@ -733,6 +735,11 @@ class JobParser(object):
         if (conf.get('post-timeout') and
             self.pcontext.tenant.max_job_timeout != -1 and
             int(conf['post-timeout']) > self.pcontext.tenant.max_job_timeout):
+            raise MaxTimeoutError(job, self.pcontext.tenant)
+
+        if (conf.get('cleanup-timeout') and
+            self.pcontext.tenant.max_job_timeout != -1 and
+            int(conf['cleanup-timeout']) > self.pcontext.tenant.max_job_timeout):
             raise MaxTimeoutError(job, self.pcontext.tenant)
 
         if 'post-review' in conf:

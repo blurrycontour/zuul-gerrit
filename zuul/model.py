@@ -1179,6 +1179,7 @@ class Job(ConfigObject):
             parent=None,
             timeout=None,
             post_timeout=None,
+            cleanup_timeout=300,
             variables={},
             extra_variables={},
             host_variables={},

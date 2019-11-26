@@ -922,6 +922,12 @@ Here is an example of two job definitions:
       In the event of the pre-run or run playbooks timing out we want to
       do our best to copy the job logs in the post-run playbooks.
 
+   .. attr:: cleanup-timeout
+      :default: 300
+
+      The time in seconds that each cleanup playbook should be allowed to run
+      before it is automatically aborted and failure is reported.
+
    .. attr:: attempts
       :default: 3
 

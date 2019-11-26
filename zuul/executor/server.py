@@ -1298,9 +1298,6 @@ class AnsibleJob(object):
         if not self.jobdir.cleanup_playbooks:
             return
 
-        # TODO: make this configurable
-        cleanup_timeout = 300
-
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write("{now} | Running Ansible cleanup...\n".format(
                 now=datetime.datetime.now()
@@ -1309,7 +1306,7 @@ class AnsibleJob(object):
         self.cleanup_started = True
         for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
             self.runAnsiblePlaybook(
-                playbook, cleanup_timeout, self.ansible_version,
+                playbook, self.cleanup_timeout, self.ansible_version,
                 success=success, phase='cleanup', index=index)
 
     def _logFinalPlaybookError(self):
@@ -1506,6 +1503,7 @@ class AnsibleJob(object):
         for playbook in args['cleanup_playbooks']:
             jobdir_playbook = self.jobdir.addCleanupPlaybook()
             self.preparePlaybook(jobdir_playbook, playbook, args)
+        self.cleanup_timeout = args['cleanup_timeout']
 
     def preparePlaybook(self, jobdir_playbook, playbook, args):
         # Check out the playbook repo if needed and set the path to
