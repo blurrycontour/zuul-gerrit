@@ -19,6 +19,20 @@ must at least have the ``Modify an existing project`` access.
 Furthermore Project owner must set the web hook target url in project settings
 such as: ``http://<zuul-web>/zuul/api/connection/<conn-name>/payload``
 
+The user's API token configured in with zuul.conf must have the following
+ACL rights:
+
+- Merge a pull-request (optional, only for gating)
+- Flag a pull-request
+- Comment on a pull-request
+
+Each project to be integrated with Zuul needs at least:
+
+- Web hook target set to: 
+  http://<zuul-web>/zuul/api/connection/<conn-name>/payload
+- Notify on pull-request flag
+- Pull requests
+
 Connection Configuration
 ------------------------
 
