@@ -1907,6 +1907,30 @@ class AnsibleJob(object):
                 "-o UserKnownHostsFile=%s" % self.jobdir.known_hosts
             config.write('ssh_args = %s\n' % ssh_args)
 
+            if self.ara_callbacks:
+                # TODO: Temporary default config for ara 1.x, figure out where to store the config
+                # https://ara.readthedocs.io/en/latest/ara-plugin-configuration.html
+                self.ara_config = dict(
+                    api_client='offline',
+                    api_server='http://127.0.0.1:8000',
+                    api_username=None,
+                    api_password=None,
+                    api_insecure=False,
+                    api_timeout=15,
+                    # Lists as strings in ini format
+                    ignored_facts="'[\"ansible_env\"]'",
+                    ignored_arguments="'[\"extra_vars\"]'"
+                )
+                config.write('[ara]\n')
+                config.write('api_client = %s' % self.ara_config['api_client'])
+                config.write('api_server = %s' % self.ara_config['api_server'])
+                config.write('api_username = %s' % self.ara_config['api_username'])
+                config.write('api_password = %s' % self.ara_config['api_password'])
+                config.write('api_insecure = %s' % self.ara_config['api_insecure'])
+                config.write('api_timeout = %s' % self.ara_config['api_timeout'])
+                config.write('ignored_facts = %s' % self.ara_config['ignored_facts'])
+                config.write('ignored_arguments = %s' % self.ara_config['ignored_arguments'])
+
     def _ansibleTimeout(self, msg):
         self.log.warning(msg)
         self.abortRunningProc()
@@ -1932,8 +1956,6 @@ class AnsibleJob(object):
         config_file = playbook.ansible_config
         env_copy = os.environ.copy()
         env_copy.update(self.ssh_agent.env)
-        if self.ara_callbacks:
-            env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
         if self.executor_server.log_console_port != DEFAULT_STREAM_PORT:
