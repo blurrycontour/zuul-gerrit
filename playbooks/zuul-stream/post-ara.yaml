@@ -1,14 +1,21 @@
 - hosts: controller
   tasks:
+    - name: Ensure ara-report directory exists
+      file:
+        path: "{{ ansible_user_dir }}/ara-report"
+        state: directory
 
     - name: Generate ARA html
-      command: /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ara generate html ara-output
+      command: /usr/lib/zuul/ansible/{{ zuul_ansible_version }}/bin/ara-manage generate {{ ansible_user_dir }}/ara-report
 
-    - name: Compress ARA html
-      command: gzip --recursive --best ara-output
+    - name: Retrieve database
+      command: cp {{ ansible_user_dir }}/.ara/server/ansible.sqlite {{ ansible_user_dir }}/ara-report/
+
+#    - name: Compress ARA html
+#      command: gzip --recursive --best ara-output
 
     - name: Fetch ARA files
       synchronize:
-        src: "{{ ansible_user_dir }}/ara-output"
+        src: "{{ ansible_user_dir }}/ara-report"
         dest: "{{ zuul.executor.log_root }}/stream-files"
         mode: pull
