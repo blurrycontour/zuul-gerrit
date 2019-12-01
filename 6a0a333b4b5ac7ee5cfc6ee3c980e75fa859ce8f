@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_8f02e171",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 1874,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2019-12-01T23:31:12Z",
+      "side": 1,
+      "message": "I think this is only the case because of backward compatibility concerns. Perhaps it would be better to only mention the restricted re2 syntax support?",
+      "range": {
+        "startLine": 1874,
+        "startChar": 0,
+        "endLine": 1874,
+        "endChar": 39
+      },
+      "revId": "6a0a333b4b5ac7ee5cfc6ee3c980e75fa859ce8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
