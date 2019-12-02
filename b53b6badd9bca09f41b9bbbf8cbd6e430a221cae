@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_fb46b3a7",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-12-02T11:42:56Z",
+      "side": 0,
+      "message": "Is that needed? Maybe I overlooked something, but it looks to me that we could keep this and simplify the logic in matches.",
+      "revId": "b53b6badd9bca09f41b9bbbf8cbd6e430a221cae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
