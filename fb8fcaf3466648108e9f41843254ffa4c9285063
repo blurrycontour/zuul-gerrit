@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_67d4614c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-12-02T17:04:10Z",
+      "side": 1,
+      "message": "For future reference, feel free to use more than 50 chars on lines\nbeyond the first one.  :)  (Not a minus one.)",
+      "revId": "fb8fcaf3466648108e9f41843254ffa4c9285063",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_07e32d36",
+        "filename": "doc/source/admin/drivers/pagure.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-12-02T17:04:10Z",
+      "side": 1,
+      "message": "This paragraph says that the source whitelist is optional, but I don\u0027t see any code for that.\n\nI\u0027m really uncomfortable with source whitelisting.  It\u0027s not at all secure, and it\u0027s fragile.  I might be convinced that it\u0027s an okay option to have for debugging or something, but I don\u0027t think we can recommend it for production.  I\u0027d rather we not have it at all.  Other similar systems manage to have cryptogrophic verification without this.\n\nUltimately what\u0027s needed is for Pagure to supply a token along with every webhook that it sets up that allows recipients of that webhook to verify the validity of supplied data.  Is there something like that?  If not, would the Pagure maintainers be open to adding it?",
+      "revId": "fb8fcaf3466648108e9f41843254ffa4c9285063",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
