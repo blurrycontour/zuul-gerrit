@@ -798,8 +798,15 @@ class GerritConnection(BaseConnection):
         for (dep_num, dep_ps) in data.needed_by:
             log.debug("Updating %s: Getting git-needed change %s,%s",
                       change, dep_num, dep_ps)
-            dep = self._getChange(dep_num, dep_ps, history=history,
-                                  event=event)
+            try:
+                dep = self._getChange(dep_num, dep_ps, history=history,
+                                      event=event)
+            except Exception:
+                # This most likely happens if the git-needed change is a draft
+                # that is not accessible to zuul.
+                log.exception('Failed to get git-needed change %s,%s',
+                              dep_num, dep_ps)
+                continue
             if (dep.open and dep.is_current_patchset and
                 dep not in needed_by_changes):
                 git_needed_by_changes.append(dep)
