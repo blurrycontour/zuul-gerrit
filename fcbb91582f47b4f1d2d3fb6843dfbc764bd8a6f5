@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_ca418a38",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 598,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2019-12-03T16:19:14Z",
+      "side": 1,
+      "message": "Does this actually do anything ?\nBecause zuul_vars isn\u0027t used afterwards, only all_vars just below.",
+      "range": {
+        "startLine": 598,
+        "startChar": 12,
+        "endLine": 598,
+        "endChar": 21
+      },
+      "revId": "fcbb91582f47b4f1d2d3fb6843dfbc764bd8a6f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
