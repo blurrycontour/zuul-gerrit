@@ -4830,6 +4830,73 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(queue.window_floor, 1)
         self.assertEqual(C.data['status'], 'MERGED')
 
+    @simple_layout('layouts/rate-limit-reconfigure.yaml')
+    def test_queue_rate_limiting_reconfigure(self):
+        "Test that changes survive a reconfigure when no longer in window"
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
+
+        self.executor_server.failJob('project-test1', B)
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+        D.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(D.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 4)
+        self.assertEqual(self.builds[0].name, 'project-merge')
+        self.assertEqual(self.builds[1].name, 'project-merge')
+        self.assertEqual(self.builds[2].name, 'project-merge')
+        self.assertEqual(self.builds[3].name, 'project-merge')
+
+        self.orderedRelease(4)
+
+        self.assertEqual(len(self.builds), 8)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test2')
+        self.assertEqual(self.builds[2].name, 'project-test1')
+        self.assertEqual(self.builds[3].name, 'project-test2')
+        self.assertEqual(self.builds[4].name, 'project-test1')
+        self.assertEqual(self.builds[5].name, 'project-test2')
+        self.assertEqual(self.builds[6].name, 'project-test1')
+        self.assertEqual(self.builds[7].name, 'project-test2')
+
+        self.builds[2].release()
+        self.builds[3].release()
+        self.waitUntilSettled()
+
+        self.executor_server.release('project-merge')
+        self.builds[0].release()
+        self.builds[1].release()
+        self.waitUntilSettled()
+
+        self.executor_server.failJob('project-test1', D)
+        self.builds[2].release()
+        self.waitUntilSettled()
+
+        tenant = self.sched.abide.tenants.get('tenant-one')
+        queue = tenant.layout.pipelines['gate'].queues[0]
+
+        self.assertEqual(queue.window, 1)
+
+        self.commitConfigUpdate('org/common-config',
+                                'layouts/rate-limit-reconfigure2.yaml')
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 3)
+        self.executor_server.release('project-.*')
+        self.waitUntilSettled()
+
     @simple_layout('layouts/reconfigure-window.yaml')
     def test_reconfigure_window_shrink(self):
         # Test the active window shrinking during reconfiguration
@@ -4917,8 +4984,8 @@ class TestScheduler(ZuulTestCase):
         queue = tenant.layout.pipelines['gate'].queues[0]
         self.assertEqual(queue.window, 1)
         self.waitUntilSettled()
-        # B's builds have been canceled now
-        self.assertEqual(len(self.builds), 2)
+        # B's builds should not be canceled
+        self.assertEqual(len(self.builds), 4)
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -4928,9 +4995,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='job1', result='SUCCESS', changes='1,1'),
-            dict(name='job1', result='ABORTED', changes='1,1 2,1'),
             dict(name='job2', result='SUCCESS', changes='1,1'),
-            dict(name='job2', result='ABORTED', changes='1,1 2,1'),
             dict(name='job1', result='SUCCESS', changes='1,1 2,1'),
             dict(name='job2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
