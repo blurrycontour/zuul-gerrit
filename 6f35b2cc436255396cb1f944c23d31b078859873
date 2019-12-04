@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_fc167b58",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1163,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-12-04T19:25:52Z",
+      "side": 1,
+      "message": "Yes, looks like, but while maybe reducing the error cases refining the search won\u0027t solve the underlying problem. So I think we could refine it but that would be a separate change.",
+      "parentUuid": "3fa7e38b_4d443873",
+      "revId": "6f35b2cc436255396cb1f944c23d31b078859873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_8d4eb093",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 2
@@ -36,6 +54,24 @@
         "endLine": 1177,
         "endChar": 57
       },
+      "revId": "6f35b2cc436255396cb1f944c23d31b078859873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_17e9f017",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1177,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-12-04T19:25:52Z",
+      "side": 1,
+      "message": "good catch, we should use the canonical name here, but not from the url but from self.canonical_hostname. You can construct a Project object here using proj and self.source and let the Project object calculate the canonical name.",
+      "parentUuid": "",
       "revId": "6f35b2cc436255396cb1f944c23d31b078859873",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
