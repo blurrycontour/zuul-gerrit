@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_1c2ef741",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 35
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-12-04T18:22:22Z",
+      "side": 1,
+      "message": "I wonder if we should support skew at all. What is the intended use of this? If clocks are out of sync because of broken clock sync the skew won\u0027t be constant.",
+      "revId": "c4a20d5be0df247d0b255583229ccb802444a639",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
