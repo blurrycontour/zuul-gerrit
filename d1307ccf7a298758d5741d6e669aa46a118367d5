@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_bccd6331",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-12-04T18:57:13Z",
+      "side": 1,
+      "message": "In the past there were already some discussions about making jobs aware of the trigger. All of them were rejected because zuul is meant to be a git driven system where it doesn\u0027t matter how a job was triggered. Judging from this design philosophy the trigger won\u0027t be used in future as well and if that changes the enqueue could hard code a \u0027manual\u0027 trigger inside zuul.\n\nNevertheless I think we should deprecate (and just ignore) the trigger argument.",
+      "parentUuid": "",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_cf6340aa",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 2
