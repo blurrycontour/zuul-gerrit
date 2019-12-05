@@ -73,6 +73,41 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_ce3f3784",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-12-05T16:08:02Z",
+      "side": 1,
+      "message": "Given tobiash response I think we should update the help message to be something like:\n\n  help\u003d\"Deprecated and ignored. Kept only for backward compatbility.\"",
+      "parentUuid": "3fa7e38b_6ec3aa3a",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_0e630fb3",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-12-05T16:08:02Z",
+      "side": 1,
+      "message": "Then we can remove this block entirely.",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_cf6340aa",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 2
@@ -114,6 +149,23 @@
         "endLine": 197,
         "endChar": 36
       },
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ae53dbdd",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-12-05T16:08:02Z",
+      "side": 1,
+      "message": "And this block.",
       "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
