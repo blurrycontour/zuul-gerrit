@@ -91,6 +91,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_ee5f9372",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-05T16:44:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_ce3f3784",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_0e630fb3",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 2
@@ -102,6 +120,24 @@
       "writtenOn": "2019-12-05T16:08:02Z",
       "side": 1,
       "message": "Then we can remove this block entirely.",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ceb6578a",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-05T16:44:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_0e630fb3",
       "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -166,6 +202,24 @@
       "writtenOn": "2019-12-05T16:08:02Z",
       "side": 1,
       "message": "And this block.",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_6eaf232b",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-05T16:44:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_ae53dbdd",
       "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
