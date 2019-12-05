@@ -16,6 +16,24 @@
       "revId": "c4a20d5be0df247d0b255583229ccb802444a639",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ae83e202",
+        "filename": "doc/source/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 35
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-05T09:20:04Z",
+      "side": 1,
+      "message": "The JWT RFC says implementations *may* account for clock skew: https://tools.ietf.org/html/rfc7519#section-4.1.4\n\nMy personal opinion is that it\u0027s better to fix clock sync rather than set the leeway here, but we should allow people to do it if they have no other way to account for time discrepancies.",
+      "parentUuid": "3fa7e38b_1c2ef741",
+      "revId": "c4a20d5be0df247d0b255583229ccb802444a639",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
