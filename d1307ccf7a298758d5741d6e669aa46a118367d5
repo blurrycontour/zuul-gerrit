@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_6ec3aa3a",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-05T09:24:33Z",
+      "side": 1,
+      "message": "Do I need to document that in the help message?",
+      "parentUuid": "3fa7e38b_bccd6331",
+      "revId": "d1307ccf7a298758d5741d6e669aa46a118367d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_cf6340aa",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 2
