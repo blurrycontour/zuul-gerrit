@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_687b9b28",
+        "filename": "zuul/driver/sql/alembic/versions/5f183546b39c_add_event_id_column.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-12-05T14:55:39Z",
+      "side": 1,
+      "message": "Should be nullable here as well.",
+      "revId": "9c382827c5ea411f24214104262566cd4dfeaa43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
