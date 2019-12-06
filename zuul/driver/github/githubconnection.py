@@ -1159,7 +1159,9 @@ class GithubConnection(BaseConnection):
                     installation_projects.add(project_name)
 
         keys = set()
-        pattern = ' OR '.join(change.uris)
+        # TODO: Max of 5 OR operators can be used per query and
+        # query can be max of 256 characters long
+        pattern = ' OR '.join(['"Depends-On: %s"' % x for x in change.uris])
         query = '%s type:pr is:open in:body' % pattern
         # Repeat the search for each installation id (project)
         for installation_project in installation_projects:
