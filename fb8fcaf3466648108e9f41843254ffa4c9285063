@@ -33,6 +33,24 @@
       "revId": "fb8fcaf3466648108e9f41843254ffa4c9285063",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b8d0daf5",
+        "filename": "doc/source/admin/drivers/pagure.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2019-12-09T11:01:00Z",
+      "side": 1,
+      "message": "Thanks for the review, yes that\u0027s a mistake from a copy/paste from a previous abandoned patch.\n\nOk, yes, having only the whitelist system will be flawed. I will bring back the token fetching from the API and keep both solutions. If a webhook source is not part of the whitelist then zuul-web will try to fetch the webhook token and verify the signature. I\u0027ll advice in the doc that the whitelist system is only for debugging purpose and should not be used in production.\n\nI want to keep both because today, on Pagure, to fetch the webhook token (generated randomly/by project server side), the API client needs to be a collaborator with *admin* right level to the project. This is clearly a blocker IMO (and the issue have been raise the Fedora community) thus in the meantime I\u0027ve opened an RFE https://pagure.io/pagure/issue/4680.",
+      "parentUuid": "3fa7e38b_07e32d36",
+      "revId": "fb8fcaf3466648108e9f41843254ffa4c9285063",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
