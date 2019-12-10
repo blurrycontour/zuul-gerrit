@@ -201,7 +201,8 @@
       jobs:
         - zuul-build-image
         - zuul-tox-docs
-        - tox-pep8
+        - tox-pep8:
+            ansible-version: 2.9
         - tox-py35:
             irrelevant-files:
               - zuul/cmd/migrate.py
