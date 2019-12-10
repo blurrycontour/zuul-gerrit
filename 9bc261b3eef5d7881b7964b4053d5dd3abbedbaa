@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_d01b1419",
+        "filename": "doc/source/admin/examples/docker-compose.yaml",
+        "patchSetId": 13
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2019-12-10T16:23:28Z",
+      "side": 1,
+      "message": "This should be 2.8 and should be updated in the 2.8 patch. I don\u0027t think we need to respin 2.8 - but let\u0027s go ahead and update this to be correct?",
+      "range": {
+        "startLine": 32,
+        "startChar": 44,
+        "endLine": 32,
+        "endChar": 45
+      },
+      "revId": "9bc261b3eef5d7881b7964b4053d5dd3abbedbaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
