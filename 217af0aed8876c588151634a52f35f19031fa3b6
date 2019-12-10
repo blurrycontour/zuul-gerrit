@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_e3c9a978",
+        "filename": "releasenotes/notes/ansible-2.8-default-version-43754b72b3dd2897.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2019-12-10T20:13:37Z",
+      "side": 1,
+      "message": "Did you mean \"different version of python THAN prior to this release\"?",
+      "revId": "217af0aed8876c588151634a52f35f19031fa3b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
