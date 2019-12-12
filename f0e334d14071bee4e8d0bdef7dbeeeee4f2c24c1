@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_6754c5c6",
+        "filename": "web/src/config.js",
+        "patchSetId": 30
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-12-12T15:26:48Z",
+      "side": 1,
+      "message": "There are some other functionality which queries the /info endpoint to get settings like those. Then this could be configured in the zuul-web service.",
+      "parentUuid": "3fa7e38b_b5fd066e",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 60
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_f52cde01",
         "filename": "web/src/loginButton.jsx",
         "patchSetId": 30
