@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_75ca2e46",
+        "filename": "web/src/actions/auth.js",
+        "patchSetId": 30
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-12T15:02:49Z",
+      "side": 1,
+      "message": "I don\u0027t think any of this is actually used at all anywhere.",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 1
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b5fd066e",
+        "filename": "web/src/config.js",
+        "patchSetId": 30
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-12T15:02:49Z",
+      "side": 1,
+      "message": "While the current approach \"just works\", it requires a deployer to modify this file before building the react app.\n\nIt\u0027d be better to have these settings live somewhere else. Any suggestions?",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 1,
+        "endChar": 60
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_f52cde01",
+        "filename": "web/src/loginButton.jsx",
+        "patchSetId": 30
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-12T15:02:49Z",
+      "side": 1,
+      "message": "could use better styling",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 17
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_553db229",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 30
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-12T15:02:49Z",
+      "side": 1,
+      "message": "this code is repeated in many files. Refactoring would be good, maybe later.",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 3
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_d51202b4",
+        "filename": "web/src/pages/Buildsets.jsx",
+        "patchSetId": 30
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-12T15:02:49Z",
+      "side": 1,
+      "message": "duplicate code",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 3
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b50bc679",
+        "filename": "web/src/pages/auth/Callback.jsx",
+        "patchSetId": 30
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-12T15:02:49Z",
+      "side": 1,
+      "message": "could be improved by getting the previous page in navigation history?",
+      "range": {
+        "startLine": 17,
+        "startChar": 6,
+        "endLine": 17,
+        "endChar": 34
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_55261218",
+        "filename": "web/src/pages/auth/Callback.jsx",
+        "patchSetId": 30
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-12T15:02:49Z",
+      "side": 1,
+      "message": "same",
+      "range": {
+        "startLine": 22,
+        "startChar": 5,
+        "endLine": 22,
+        "endChar": 34
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_d5776207",
+        "filename": "web/src/reducers/auth.js",
+        "patchSetId": 30
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2019-12-12T15:02:49Z",
+      "side": 1,
+      "message": "not sure if used at all, and possibly redundant with what exists in redux-oidc",
+      "range": {
+        "startLine": 1,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 1
+      },
+      "revId": "f0e334d14071bee4e8d0bdef7dbeeeee4f2c24c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
