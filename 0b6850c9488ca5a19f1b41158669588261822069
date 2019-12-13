@@ -16,6 +16,24 @@
       "revId": "0b6850c9488ca5a19f1b41158669588261822069",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_47fada76",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1020,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2019-12-13T11:53:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_add5ace7",
+      "revId": "0b6850c9488ca5a19f1b41158669588261822069",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
