@@ -134,13 +134,14 @@ class GitlabEventConnector(threading.Thread):
         self._stopped = False
         self.event_handler_mapping = {
             'merge_request': self._event_merge_request,
+            'note': self._event_note,
         }
 
     def stop(self):
         self._stopped = True
         self.connection.addEvent(None)
 
-    def _event_merge_request(self, body):
+    def _event_base(self, body):
         event = GitlabTriggerEvent()
         attrs = body['object_attributes']
         event.title = attrs['title']
@@ -155,10 +156,21 @@ class GitlabEventConnector(threading.Thread):
                                                       event.change_number)
         event.ref = "refs/merge-requests/%s/head" % event.change_number
         event.patch_number = attrs['last_commit']['id']
+        return event
+
+    def _event_merge_request(self, body):
+        event = self._event_base(body)
         if event.created_at == event.updated_at:
             event.action = 'opened'
         else:
             event.action = 'changed'
+        event.type = 'gl_merge_request'
+        return event
+
+    def _event_note(self, body):
+        event = self._event_base(body)
+        event.comment = body['object_attributes']['note']
+        event.action = 'comment'
         event.type = 'gl_merge_request'
         return event
 

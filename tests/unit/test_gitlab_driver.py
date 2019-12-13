@@ -51,7 +51,7 @@ class TestGitlabWebhook(ZuulTestCase):
     def test_webhook(self):
         A = self.fake_gitlab.openFakeMergeRequest(
             'org/project', 'master', 'A')
-        self.fake_gitlab.emitEvent(A.getMergeRequestEvent(),
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent(),
                                    use_zuulweb=False,
                                    project='org/project')
         self.waitUntilSettled()
@@ -63,7 +63,7 @@ class TestGitlabWebhook(ZuulTestCase):
     def test_webhook_via_zuulweb(self):
         A = self.fake_gitlab.openFakeMergeRequest(
             'org/project', 'master', 'A')
-        self.fake_gitlab.emitEvent(A.getMergeRequestEvent(),
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent(),
                                    use_zuulweb=True,
                                    project='org/project')
         self.waitUntilSettled()
@@ -82,7 +82,7 @@ class TestGitlabDriver(ZuulTestCase):
         A = self.fake_gitlab.openFakeMergeRequest(
             'org/project', 'master', 'A', description=description)
         self.fake_gitlab.emitEvent(
-            A.getMergeRequestEvent(), project='org/project')
+            A.getMergeRequestOpenedEvent(), project='org/project')
         self.waitUntilSettled()
 
         self.assertEqual('SUCCESS',
@@ -109,3 +109,21 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertThat(
             A.notes[1]['body'],
             MatchesRegex(r'.*project-test2.*SUCCESS.*', re.DOTALL))
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_pull_request_commented(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
+        self.fake_gitlab.emitEvent(
+            A.getMergeRequestCommentedEvent('I like that change'))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
+        self.fake_gitlab.emitEvent(
+            A.getMergeRequestCommentedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(4, len(self.history))
