@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_ea4611a8",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2019-12-16T15:10:57Z",
+      "side": 1,
+      "message": "Reconfiguration :)",
+      "range": {
+        "startLine": 359,
+        "startChar": 0,
+        "endLine": 359,
+        "endChar": 14
+      },
+      "revId": "4b532d1a0a5656bc081fa56c7f0c8ef477b6b89b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_8af99d1d",
         "filename": "doc/source/admin/components.rst",
         "patchSetId": 12
