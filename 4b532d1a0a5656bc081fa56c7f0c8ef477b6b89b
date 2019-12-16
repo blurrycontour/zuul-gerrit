@@ -45,6 +45,23 @@
       "revId": "4b532d1a0a5656bc081fa56c7f0c8ef477b6b89b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_650d728e",
+        "filename": "doc/source/admin/components.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-12-16T15:37:10Z",
+      "side": 1,
+      "message": "Full-reconfigure still keeps the queue contents in memory, but it clears the caches and so could be used to recover from errors.",
+      "revId": "4b532d1a0a5656bc081fa56c7f0c8ef477b6b89b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
