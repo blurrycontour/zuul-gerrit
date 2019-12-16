@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_d662d715",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-12-16T21:04:31Z",
+      "side": 1,
+      "message": "It might make more sense to actually have a RETRY state returned by the executor.  Then this could happen automatically for all drivers.",
+      "revId": "a7fd2d8636537577899004d5c23c12e704d4c805",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
