@@ -784,7 +784,7 @@ Returning the log url
 ~~~~~~~~~~~~~~~~~~~~~
 
 To set the log URL for a build, use *zuul_return* to set the
-**zuul.log_url** value.  For example:
+:var:`zuul.log_url` value.  For example:
 
 .. code-block:: yaml
 
@@ -804,7 +804,7 @@ Zuul and stored in the SQL database.  These will then be available via
 the web interface and subsequent jobs.
 
 To provide artifact URLs for a build, use *zuul_return* to set keys
-under the **zuul.artifacts** dictionary.  For example:
+under the :var:`zuul.artifacts` dictionary.  For example:
 
 .. code-block:: yaml
 
@@ -821,12 +821,12 @@ under the **zuul.artifacts** dictionary.  For example:
                 url: build/docs/
 
 If the value of **url** is a relative URL, it will be combined with
-the **zuul.log_url** value if set to create an absolute URL.  The
+the :var:`zuul.log_url` value if set to create an absolute URL.  The
 **metadata** key is optional; if it is provided, it must be a
 dictionary; its keys and values may be anything.
 
 If *zuul_return* is invoked multiple times (e.g., via multiple
-playbooks), then the elements of **zuul.artifacts** from each
+playbooks), then the elements of :var:`zuul.artifacts` from each
 invocation will be appended.
 
 Skipping child jobs
@@ -855,7 +855,7 @@ Leaving file comments
 ~~~~~~~~~~~~~~~~~~~~~
 
 To instruct the reporters to leave line comments on files in the
-change, set the **zuul.file_comments** value.  For example:
+change, set the :var:`zuul.file_comments` value.  For example:
 
 .. code-block:: yaml
 
@@ -886,7 +886,7 @@ to the corresponding lines in the original change as written (they may
 differ due to other changes which may have merged since the change was
 written).  If this produces erroneous results for a job, the behavior
 may be disabled by setting the
-**zuul.disable_file_comment_line_mapping** variable to ``true`` in
+:var:`zuul.disable_file_comment_line_mapping` variable to ``true`` in
 *zuul_return*.
 
 Pausing the job
@@ -896,7 +896,7 @@ A job can be paused after the run phase. In this case the child jobs can start
 and the parent job stays paused until all child jobs are finished. This for
 example can be useful to start a docker registry in a parent job that will be
 used by the child job. To indicate that the job should be paused use
-*zuul_return* to set the **zuul.pause** value. You still can at the same time
+*zuul_return* to set the :var:`zuul.pause` value. You still can at the same time
 supply any arbitrary data to the child jobs. For example:
 
 .. code-block:: yaml
@@ -917,23 +917,22 @@ Build Status
 A job build may have the following status:
 
 **SUCCESS**
-  nominal job execution
+  Nominal job execution.
 
 **FAILURE**
-  job executed correctly, but exited with a failure
+  Job executed correctly, but exited with a failure.
 
 **RETRY_LIMIT**
-  the ``pre-run`` playbook failed more than the maximum number of
+  The ``pre-run`` playbook failed more than the maximum number of
   retry ``attempts``.
 
 **POST_FAILURE**
-  the ``post-run`` playbook failed.
+  The ``post-run`` playbook failed.
 
 **SKIPPED**
-  one of the build dependencies failed and this job was not executed.
+  One of the build dependencies failed and this job was not executed.
 
 **NODE_FAILURE**
-  the test instance provider was unable to fullfill the nodeset
-  request.  Note: this can happen if the Nodepool quota is exceeding
-  the provider capacity, resulting in ``ERROR server creation: "No valid
-  host found"``.
+  The test instance provider was unable to fullfill the nodeset request.
+  This can happen if Nodepool is unable to provide the requested node(s)
+  for the request.
