@@ -4372,15 +4372,6 @@ class ZuulTestCase(BaseTestCase):
         self.log.debug(
             'tenant_config_file = {}'.format(self.tenant_config_file))
 
-        def _restoreTenantConfig():
-            self.log.debug(
-                'restoring tenant_config_file = {}'.format(
-                    orig_tenant_config_file))
-            os.unlink(self.tenant_config_file)
-            self.tenant_config_file = orig_tenant_config_file
-            self.config['scheduler']['tenant_config'] = orig_tenant_config_file
-        self.addCleanup(_restoreTenantConfig)
-
     def addEvent(self, connection, event):
         """Inject a Fake (Gerrit) event.
 

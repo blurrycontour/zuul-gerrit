@@ -289,6 +289,13 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       config from. This attribute is exclusive with
       :attr:`scheduler.tenant_config`.
 
+   .. attr:: auto_reconfig_mode
+      :default: none
+
+      The type of auto reconfiguration mode to use, ``none`` disables this,
+      ``smart`` runs a smart reconfiguration on changes of the tenant config
+      file and ``full`` runs a full reconfiguration.
+
    .. attr:: default_ansible_version
 
       Default ansible version to use for jobs that doesn't specify a version.

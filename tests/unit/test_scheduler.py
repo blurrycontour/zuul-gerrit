@@ -15,6 +15,7 @@
 import gc
 import json
 import textwrap
+import tempfile
 
 import os
 import shutil
@@ -8168,3 +8169,75 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
     def test_smart_reconfiguration_command_socket(self):
         "Test that live reconfiguration works using command socket"
         self._test_smart_reconfiguration(command_socket=True)
+
+
+class TestSchedulerAutoConfiguration(ZuulTestCase):
+    tenant_config_file = 'config/multi-tenant/main.yaml'
+
+    def setUp(self):
+        super(TestSchedulerAutoConfiguration, self).setUp()
+        # NOTE(mnaser): We use newTenantConfig which creates a temporary file
+        #               for the config so we don't touch the original files.
+        self.log.debug("New tenant config")
+        self.newTenantConfig('config/multi-tenant/main-reconfig.yaml')
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+
+    def _test_update_config(self, data):
+        self.log.debug("Update tenant config %s", self.tenant_config_file)
+        old_time = self.sched.tenant_last_reconfigured.get('tenant-four', 0)
+        with open(self.tenant_config_file, "a") as fd:
+            fd.write(data)
+        for _ in iterate_timeout(30, 'reconfiguration'):
+            new_time = self.sched.tenant_last_reconfigured.get('tenant-four', 0)
+            if new_time != old_time:
+                break
+        self.assertNotEqual(old_time, new_time)
+
+    def _test_replace_config(self, data):
+        self.log.debug("Update tenant config %s", self.tenant_config_file)
+        old_time = self.sched.tenant_last_reconfigured.get('tenant-four', 0)
+
+        with tempfile.NamedTemporaryFile(delete=False, mode='w') as out:
+            with open(self.tenant_config_file) as fd:
+                out.write(fd.read())
+                out.write(data)
+            new_name = out.name
+        self.log.debug("Move %s to %s", out.name, self.tenant_config_file)
+        os.rename(out.name, self.tenant_config_file)
+        for _ in iterate_timeout(5, 'reconfiguration'):
+            new_time = self.sched.tenant_last_reconfigured.get('tenant-four', 0)
+            if new_time != old_time:
+                break
+        self.assertNotEqual(old_time, new_time)
+
+
+class TestSchedulerAutoConfigurationNone(TestSchedulerAutoConfiguration):
+    config_file = 'zuul-auto-config-none.conf'
+
+    def test_auto_reconfig(self):
+        with testtools.ExpectedException(
+                Exception,
+                'Timeout waiting for reconfiguration'):
+            self._test_update_config("\n")
+
+
+class TestSchedulerAutoConfigurationSmart(TestSchedulerAutoConfiguration):
+    config_file = 'zuul-auto-config-smart.conf'
+    foo = 0
+
+    def test_auto_reconfig(self):
+        self._test_update_config("          - org/project2\n")
+
+    def test_auto_reconfig_update(self):
+        self._test_replace_config("          - org/project2\n")
+
+
+class TestSchedulerAutoConfigurationFull(TestSchedulerAutoConfiguration):
+    config_file = 'zuul-auto-config-full.conf'
+
+    def test_auto_reconfig(self):
+        self._test_update_config("\n")
+
+    def test_auto_reconfig_update(self):
+        self._test_replace_config("\n")
