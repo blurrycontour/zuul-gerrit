@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_e57fd0b9",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8207,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-12-20T23:43:36Z",
+      "side": 1,
+      "message": "If the test fails between this line and line 8202 then we will leak this file.\n\nMaybe add a cleanup that tests if the file is present and deletes it?",
+      "revId": "0f5ffd0c55bfed38f2099e64e5598b0cadc8b8ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_459104f7",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8228,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-12-20T23:43:36Z",
+      "side": 1,
+      "message": "Can this be removed?",
+      "range": {
+        "startLine": 8228,
+        "startChar": 4,
+        "endLine": 8228,
+        "endChar": 11
+      },
+      "revId": "0f5ffd0c55bfed38f2099e64e5598b0cadc8b8ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_65bd2066",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 613,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2019-12-20T23:43:36Z",
+      "side": 1,
+      "message": "I think there is a small race here where we:\n\n  1) Send event to reconfigure\n  2) Reconfigure\n  3) event.wait() above returns\n  4) Remove our watch\n  5) Config is updated\n  6) Add our watch\n  7) Return without enqueuing a new event for events at step 5\n\nReading the C manpage it should add new watches or update an existing watch. I think that means we can make the order here:\n\n  3) event.wait() above returns\n  4) Check if watch mode has changed\n  5) If mode is not None then inotify.add_watch()\n     Else inotify.rm_watch()\n\nThen we only ever remove the watch when we are no longer interested in the file.",
+      "revId": "0f5ffd0c55bfed38f2099e64e5598b0cadc8b8ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
