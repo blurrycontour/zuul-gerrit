@@ -4361,7 +4361,6 @@ class ZuulTestCase(BaseTestCase):
             config file.
         """
         source_path = os.path.join(FIXTURE_DIR, source_name)
-        orig_tenant_config_file = self.tenant_config_file
         with tempfile.NamedTemporaryFile(
             delete=False, mode='wb') as new_tenant_config:
             self.tenant_config_file = new_tenant_config.name
@@ -4371,15 +4370,6 @@ class ZuulTestCase(BaseTestCase):
         self.setupAllProjectKeys()
         self.log.debug(
             'tenant_config_file = {}'.format(self.tenant_config_file))
-
-        def _restoreTenantConfig():
-            self.log.debug(
-                'restoring tenant_config_file = {}'.format(
-                    orig_tenant_config_file))
-            os.unlink(self.tenant_config_file)
-            self.tenant_config_file = orig_tenant_config_file
-            self.config['scheduler']['tenant_config'] = orig_tenant_config_file
-        self.addCleanup(_restoreTenantConfig)
 
     def addEvent(self, connection, event):
         """Inject a Fake (Gerrit) event.

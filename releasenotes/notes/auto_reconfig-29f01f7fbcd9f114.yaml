@@ -1,0 +1,5 @@
+features:
+  - |
+    The :attr:`scheduler.auto_reconfig_mode` setting has been added.  If
+    enabled, the scheduler will automatically perform a reconfiguration if
+    the tenant config file is updated on disk.
