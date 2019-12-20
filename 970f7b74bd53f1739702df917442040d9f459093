@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_4524a4b2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2019-12-20T21:51:57Z",
+      "side": 1,
+      "message": "also, this should be MODIFY_CLOSE not MODIFY, otherwise we might reconfig on an update in progress.",
+      "revId": "970f7b74bd53f1739702df917442040d9f459093",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
