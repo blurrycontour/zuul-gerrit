@@ -353,8 +353,9 @@ class Scheduler(threading.Thread):
             web_root = urllib.parse.urljoin(web_root, 't/{tenant.name}/')
         self.web_root = web_root
 
-        self.auto_reconfig_mode = get_default(
-            self.config, 'scheduler', 'auto_reconfig_mode', 'none')
+        self.inotify = INotify()
+        self.auto_reconfig_watch = None
+        self.auto_reconfig_mode = None
 
         default_ansible_version = get_default(
             self.config, 'scheduler', 'default_ansible_version', None)
@@ -371,13 +372,10 @@ class Scheduler(threading.Thread):
         self.command_thread.daemon = True
         self.command_thread.start()
 
-        if self.auto_reconfig_mode != 'none':
-            tenant_config, _ = self._checkTenantSourceConf(self.config)
-            self.auto_reconfig_path = tenant_config
-
-            self.auto_reconfig_thread = \
-                threading.Thread(target=self.autoReloadConfig)
-            self.auto_reconfig_thread.start()
+        self.auto_reconfig_thread = threading.Thread(
+            target=self.autoReloadConfig)
+        self.auto_reconfig_thread.daemon = True
+        self.auto_reconfig_thread.start()
 
         self.rpc.start()
         self.stats_thread.start()
@@ -396,13 +394,15 @@ class Scheduler(threading.Thread):
         self.command_thread.join()
 
     def autoReloadConfig(self):
-        smart = (self.auto_reconfig_mode == 'smart')
-
-        inotify = INotify()
-        inotify.add_watch(self.auto_reconfig_path, inotify_flags.MODIFY)
-
-        for _ in inotify.read():
-            self.reconfigure(self.config, smart=smart)
+        while True:
+            for event in self.inotify.read():
+                self.log.info("Inotify triggered, %s %s",
+                              repr(event),
+                              inotify_flags.from_mask(event.mask))
+            # We can also get IGNORE events when removing a watch.
+            if event.mask & inotify_flags.MODIFY:
+                smart = (self.auto_reconfig_mode == 'smart')
+                self.reconfigure(self.config, smart=smart)
 
     def runCommand(self):
         while self._command_running:
@@ -594,6 +594,26 @@ class Scheduler(threading.Thread):
         self.wake_event.set()
         self.log.debug("Waiting for reconfiguration")
         event.wait()
+
+        # Clear the watch if previously set
+        if self.auto_reconfig_watch:
+            self.log.debug("Clearing previously set inotify watch")
+            self.inotify.rm_watch(self.auto_reconfig_watch)
+            self.auto_reconfig_watch = None
+
+        # Check to see if the mode has changed
+        self.auto_reconfig_mode = get_default(
+            self.config, 'scheduler', 'auto_reconfig_mode', 'none')
+
+        self.log.debug("Auto reconfig set to %s", self.auto_reconfig_mode)
+        # If auto-reconfig is set, set the watch:
+        if (self.auto_reconfig_mode != 'none'):
+            tenant_config, _ = self._checkTenantSourceConf(self.config)
+            self.log.debug("Setting inotify watch for %s", tenant_config)
+            self.auto_reconfig_watch = self.inotify.add_watch(
+                tenant_config, inotify_flags.MODIFY)
+            # TODO: watch directory to see "MOVED_TO" events for atomic renames
+
         self.log.debug("Reconfiguration complete")
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
@@ -1337,7 +1357,7 @@ class Scheduler(threading.Thread):
         try:
             if isinstance(event, ReconfigureEvent):
                 self._doReconfigureEvent(event)
-            if isinstance(event, SmartReconfigureEvent):
+            elif isinstance(event, SmartReconfigureEvent):
                 self._doSmartReconfigureEvent(event)
             elif isinstance(event, TenantReconfigureEvent):
                 self._doTenantReconfigureEvent(event)

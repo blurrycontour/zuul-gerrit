@@ -8181,7 +8181,7 @@ class TestSchedulerAutoConfiguration(ZuulTestCase):
             fd.write("\n")
 
 
-class TestSchedulerAutoConfigurationNone(ZuulTestCase):
+class TestSchedulerAutoConfigurationNone(TestSchedulerAutoConfiguration):
     config_file = 'zuul-auto-config-none.conf'
 
     @mock.patch('zuul.scheduler.Scheduler.reconfigure')
@@ -8190,21 +8190,39 @@ class TestSchedulerAutoConfigurationNone(ZuulTestCase):
         mock_reconfigure.assert_not_called()
 
 
-class TestSchedulerAutoConfigurationSmart(ZuulTestCase):
+class TestSchedulerAutoConfigurationSmart(TestSchedulerAutoConfiguration):
     config_file = 'zuul-auto-config-smart.conf'
 
-    @mock.patch('zuul.scheduler.Scheduler.reconfigure')
-    def test_auto_reconfig(self, mock_reconfigure):
-        self._test_update_config()
-        mock_reconfigure.assert_called_once_with(self.sched.config,
-                                                 smart=True)
+    def test_auto_reconfig(self):
+        self.log.debug("New tenant config")
+        self.newTenantConfig('config/multi-tenant/main-reconfig.yaml')
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+        self.log.debug("Update tenant config %s", self.tenant_config_file)
+        old_time = self.sched.tenant_last_reconfigured.get('tenant-one', 0)
+        with open(self.tenant_config_file, "a") as fd:
+            fd.write("\n")
+        for _ in iterate_timeout(30, 'reconfiguration'):
+            new_time = self.sched.tenant_last_reconfigured.get('tenant-one', 0)
+            if new_time != old_time:
+                break
+        self.assertNotEqual(old_time, new_time)
 
 
-class TestSchedulerAutoConfigurationFull(ZuulTestCase):
+class TestSchedulerAutoConfigurationFull(TestSchedulerAutoConfiguration):
     config_file = 'zuul-auto-config-full.conf'
 
-    @mock.patch('zuul.scheduler.Scheduler.reconfigure')
-    def test_auto_reconfig(self, mock_reconfigure):
-        self._test_update_config()
-        mock_reconfigure.assert_called_once_with(self.sched.config,
-                                                 smart=False)
+    def test_auto_reconfig(self):
+        self.log.debug("New tenant config")
+        self.newTenantConfig('config/multi-tenant/main-reconfig.yaml')
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+        self.log.debug("Update tenant config %s", self.tenant_config_file)
+        old_time = self.sched.tenant_last_reconfigured.get('tenant-one', 0)
+        with open(self.tenant_config_file, "a") as fd:
+            fd.write("\n")
+        for _ in iterate_timeout(30, 'reconfiguration'):
+            new_time = self.sched.tenant_last_reconfigured.get('tenant-one', 0)
+            if new_time != old_time:
+                break
+        self.assertNotEqual(old_time, new_time)
