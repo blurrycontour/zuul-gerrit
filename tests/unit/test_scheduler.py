@@ -8168,3 +8168,43 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
     def test_smart_reconfiguration_command_socket(self):
         "Test that live reconfiguration works using command socket"
         self._test_smart_reconfiguration(command_socket=True)
+
+
+class TestSchedulerAutoConfiguration(ZuulTestCase):
+    tenant_config_file = 'config/multi-tenant/main.yaml'
+
+    def _test_update_config(self):
+        # NOTE(mnaser): We use newTenantConfig which creates a temporary file
+        #               for the config so we don't touch the original files.
+        self.newTenantConfig('config/multi-tenant/main-reconfig.yaml')
+        with open(self.tenant_config_file, "a") as fd:
+            fd.write("\n")
+
+
+class TestSchedulerAutoConfigurationNone(ZuulTestCase):
+    config_file = 'zuul-auto-config-none.conf'
+
+    @mock.patch('zuul.scheduler.Scheduler.reconfigure')
+    def test_auto_reconfig(self, mock_reconfigure):
+        self._test_update_config()
+        mock_reconfigure.assert_not_called()
+
+
+class TestSchedulerAutoConfigurationSmart(ZuulTestCase):
+    config_file = 'zuul-auto-config-smart.conf'
+
+    @mock.patch('zuul.scheduler.Scheduler.reconfigure')
+    def test_auto_reconfig(self, mock_reconfigure):
+        self._test_update_config()
+        mock_reconfigure.assert_called_once_with(self.sched.config,
+                                                 smart=True)
+
+
+class TestSchedulerAutoConfigurationFull(ZuulTestCase):
+    config_file = 'zuul-auto-config-full.conf'
+
+    @mock.patch('zuul.scheduler.Scheduler.reconfigure')
+    def test_auto_reconfig(self, mock_reconfigure):
+        self._test_update_config()
+        mock_reconfigure.assert_called_once_with(self.sched.config,
+                                                 smart=False)
