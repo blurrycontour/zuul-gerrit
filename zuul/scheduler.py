@@ -27,6 +27,9 @@ import threading
 import time
 import urllib
 
+from inotify_simple import INotify
+from inotify_simple import flags as inotify_flags
+
 from zuul import configloader
 from zuul import model
 from zuul import exceptions
@@ -350,6 +353,9 @@ class Scheduler(threading.Thread):
             web_root = urllib.parse.urljoin(web_root, 't/{tenant.name}/')
         self.web_root = web_root
 
+        self.auto_reconfig_mode = get_default(
+            self.config, 'scheduler', 'auto_reconfig_mode', 'none')
+
         default_ansible_version = get_default(
             self.config, 'scheduler', 'default_ansible_version', None)
         self.ansible_manager = AnsibleManager(
@@ -364,6 +370,14 @@ class Scheduler(threading.Thread):
                                                name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
+
+        if self.auto_reconfig_mode != 'none':
+            tenant_config, _ = self._checkTenantSourceConf(self.config)
+            self.auto_reconfig_path = tenant_config
+
+            self.auto_reconfig_thread = \
+                threading.Thread(target=self.autoReloadConfig)
+            self.auto_reconfig_thread.start()
 
         self.rpc.start()
         self.stats_thread.start()
@@ -380,6 +394,15 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
+
+    def autoReloadConfig(self):
+        smart = (self.auto_reconfig_mode == 'smart')
+
+        inotify = INotify()
+        inotify.add_watch(self.auto_reconfig_path, inotify_flags.MODIFY)
+
+        for _ in inotify.read():
+            self.reconfigure(self.config, smart=smart)
 
     def runCommand(self):
         while self._command_running:
