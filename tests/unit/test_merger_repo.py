@@ -76,6 +76,34 @@ class TestMergerRepo(ZuulTestCase):
             sub_repo.createRepoObject(None).remotes[0].url,
             message="Sub repository points to upstream project2")
 
+    def test_repo_reset(self):
+        """Test correct reset with conflicting branch names"""
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+
+        parent_repo = git.Repo(parent_path)
+        parent_repo.create_head("foobar")
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        # Checkout branch that will be deleted from the remote repo
+        work_repo.checkout("foobar")
+
+        # Delete remote branch and create a branch that conflicts with
+        # the branch checked out locally.
+        parent_repo.delete_head("foobar")
+        parent_repo.create_head("foobar/sub")
+
+        work_repo.reset()
+        work_repo.checkout("foobar/sub")
+
+        # Try the reverse conflict
+        parent_repo.delete_head("foobar/sub")
+        parent_repo.create_head("foobar")
+
+        work_repo.reset()
+        work_repo.checkout("foobar")
+
     def test_set_refs(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         remote_sha = self.create_commit('org/project1')
