@@ -272,35 +272,30 @@ class Repo(object):
         self.update(zuul_event_id=zuul_event_id, build=build)
         repo = self.createRepoObject(zuul_event_id, build=build)
         origin = repo.remotes.origin
-        seen = set()
-        head = None
-        stale_refs = origin.stale_refs
-        # Update our local heads to match the remote, and pick one to
-        # reset the repo to.  We don't delete anything at this point
-        # because we want to make sure the repo is in a state stable
-        # enough for git to operate.
+
+        # Reset the working directory to the default remote branch.
+        for ref in origin.refs:
+            if ref.remote_head != "HEAD":
+                continue
+            # Use the ref the remote HEAD is pointing to
+            head_ref = ref.ref
+            head = head_ref.remote_head
+            repo.create_head(head, head_ref, force=True)
+            log.debug("Reset to %s", head)
+            repo.head.reference = head
+
+        # Delete local heads that no longer exist on the remote end
+        remote_heads = {r.remote_head for r in origin.refs}
+        for ref in repo.heads:
+            if ref.name not in remote_heads:
+                log.debug("Delete stale local ref %s", ref)
+                repo.delete_head(ref, force=True)
+
+        # Update our local heads to match the remote
         for ref in origin.refs:
             if ref.remote_head == 'HEAD':
                 continue
-            if ref in stale_refs:
-                continue
             repo.create_head(ref.remote_head, ref, force=True)
-            seen.add(ref.remote_head)
-            if head is None:
-                head = ref.remote_head
-        log.debug("Reset to %s", head)
-        repo.head.reference = head
-        for ref in stale_refs:
-            log.debug("Delete stale ref %s", ref.remote_head)
-            # A stale ref means the upstream branch (e.g. foobar) was deleted
-            # so we need to delete both our local head (if existing) and the
-            # remote tracking head. Both repo.heads and ref.remote_head
-            # contain the pure branch name so they can be compared easily.
-            for head in repo.heads:
-                if head.name == ref.remote_head:
-                    repo.delete_head(ref.remote_head, force=True)
-                    break
-            git.refs.RemoteReference.delete(repo, ref, force=True)
 
     def prune(self, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
@@ -468,7 +463,7 @@ class Repo(object):
             # --tags' is all that is necessary.  See
             # https://github.com/git/git/blob/master/Documentation/RelNotes/1.9.0.txt#L18-L20
             self._git_fetch(repo, 'origin', zuul_event_id)
-        self._git_fetch(repo, 'origin', zuul_event_id, tags=True)
+        self._git_fetch(repo, 'origin', zuul_event_id, tags=True, prune=True)
 
     def isUpdateNeeded(self, repo_state, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
