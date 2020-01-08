@@ -14,8 +14,7 @@ Zuul, though advanced users may find it interesting.
    drivers
    triggers
    testing
-   docs
    ansible
    javascript
-   specs/index
+   docs
    releasenotes
