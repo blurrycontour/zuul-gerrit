@@ -8,7 +8,7 @@ services:
     ports:
       - "8080:8080"
       - "29418:29418"
-    command: |
+    entrypoint: >
       /bin/sh -c '\
         git config -f /var/gerrit/etc/gerrit.config gerrit.canonicalWebUrl http://localhost:8080/ && \
         git config -f /var/gerrit/etc/gerrit.config gerrit.ui POLYGERRIT && \
