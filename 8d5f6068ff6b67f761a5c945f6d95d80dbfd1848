@@ -22,6 +22,30 @@
       "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_15497ab6",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-09T16:06:36Z",
+      "side": 1,
+      "message": "Yes, it\u0027s implemented here: https://review.opendev.org/#/c/632064/18/zuul/cmd/runner.py",
+      "parentUuid": "3fa7e38b_f4bce4db",
+      "range": {
+        "startLine": 102,
+        "startChar": 4,
+        "endLine": 103,
+        "endChar": 68
+      },
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
