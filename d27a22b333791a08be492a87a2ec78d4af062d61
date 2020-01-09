@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_0faa71d2",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-09T16:06:36Z",
+      "side": 1,
+      "message": "I guess the runner would enrich the inventory as it already do with the nodepool nodeset.",
+      "parentUuid": "3fa7e38b_d41a6c7b",
+      "revId": "d27a22b333791a08be492a87a2ec78d4af062d61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_f41f6869",
         "filename": "doc/source/developer/specs/zuul-runner.rst",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "side": 1,
       "message": "That should not be a blocker, access to cloud resources is something we can safely assume developer have, one way or the other, it could even be for free: https://aws.amazon.com/blogs/opensource/aws-promotional-credits-open-source-projects/",
       "parentUuid": "3fa7e38b_f41f6869",
+      "revId": "d27a22b333791a08be492a87a2ec78d4af062d61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_8f7f4168",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-09T16:06:36Z",
+      "side": 1,
+      "message": "Ok next PS removes that part.",
+      "parentUuid": "3fa7e38b_e3523767",
       "revId": "d27a22b333791a08be492a87a2ec78d4af062d61",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
