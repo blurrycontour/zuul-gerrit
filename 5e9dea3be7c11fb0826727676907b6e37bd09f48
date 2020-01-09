@@ -210,6 +210,30 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_d573e2b2",
+        "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-09T15:31:58Z",
+      "side": 1,
+      "message": "We anyway store all builds in the db. However we should think about caching those times to not overload the db because of that.",
+      "parentUuid": "5faad753_ec546855",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 214,
+        "endChar": 35
+      },
+      "revId": "5e9dea3be7c11fb0826727676907b6e37bd09f48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bfdaf3ff_9556375c",
         "filename": "doc/source/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 5
