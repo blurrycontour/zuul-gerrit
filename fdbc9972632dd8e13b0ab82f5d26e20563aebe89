@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_87c8e1a6",
+        "filename": "doc/source/tutorials/index.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-09T16:30:13Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we collapse admin/user here?",
+      "revId": "fdbc9972632dd8e13b0ab82f5d26e20563aebe89",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
