@@ -4647,8 +4647,8 @@ class Capabilities(object):
     facilitate consumers knowing if functionality is available
     or not, keep track of distinct capability flags.
     """
-    def __init__(self, job_history=False):
-        self.job_history = job_history
+    def __init__(self, **kwargs):
+        self.dict = kwargs
 
     def __repr__(self):
         return '<Capabilities 0x%x %s>' % (id(self), self._renderFlags())
@@ -4662,7 +4662,7 @@ class Capabilities(object):
 
     def toDict(self):
         d = dict()
-        d['job_history'] = self.job_history
+        d = self.dict
         return d
 
 

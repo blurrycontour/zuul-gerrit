@@ -981,9 +981,7 @@ class TestInfo(BaseTestWeb):
         self.assertEqual(
             info, {
                 "info": {
-                    "capabilities": {
-                        "job_history": False
-                    },
+                    "capabilities": {},
                     "stats": {
                         "url": self.stats_url,
                         "prefix": self.stats_prefix,
@@ -999,9 +997,7 @@ class TestInfo(BaseTestWeb):
             info, {
                 "info": {
                     "tenant": "tenant-one",
-                    "capabilities": {
-                        "job_history": False
-                    },
+                    "capabilities": {},
                     "stats": {
                         "url": self.stats_url,
                         "prefix": self.stats_prefix,
