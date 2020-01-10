@@ -19,6 +19,7 @@ import time
 import jwt
 import requests
 import json
+from urllib.parse import urljoin
 
 from zuul import exceptions
 from zuul.driver import AuthenticatorInterface
@@ -164,19 +165,41 @@ class RS256Authenticator(JWTAuthenticator):
                           algorithms=self.algorithm)
 
 
-class RS256withJWKSAuthenticator(JWTAuthenticator):
-    """JWT authentication using the RS256 algorithm.
+class OpenIDConnectAuthenticator(JWTAuthenticator):
+    """JWT authentication using an OpenIDConnect provider.
 
-    Requires the URL of the certificates used by the Identity Provier. It can
-    be found usually under the key "jwks_uri" at the provider's
-    .well-known/openid-configuration URL."""
+    If the optional 'keys_url' parameter is not specified, the authenticator
+    will attempt to determine it via the well-known configuration URI as
+    described in
+    https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig"""  # noqa
 
+    # default algorithm, TOFO: should this be a config param?
     algorithm = 'RS256'
-    name = 'RS256withJWKS'
+    name = 'OpenIDConnect'
 
     def __init__(self, **conf):
-        super(RS256withJWKSAuthenticator, self).__init__(**conf)
+        super(OpenIDConnectAuthenticator, self).__init__(**conf)
         self.keys_url = conf.get('keys_url', None)
+        self.well_known = None
+        if self.keys_url is None:
+            well_known_uri = urljoin(self.issuer_id,
+                                     '/.well-known/openid-configuration')
+            try:
+                self.well_known = requests.get(well_known_uri).json()
+            except Exception as e:
+                msg = 'Could not fetch OpenID configuration at %s: %s'
+                logger.error(msg % (well_known_uri, e))
+                raise exceptions.JWKSException(
+                    realm=self.realm,
+                    msg='There was an error while fetching '
+                        'OpenID configuration, check logs for details')
+            self.keys_url = self.well_known.get('jwks_uri', None)
+        if self.keys_url is None:
+            msg = 'Invalid OpenID configuration: "jwks_uri" not found'
+            logger.error(msg)
+            raise exceptions.JWKSException(
+                realm=self.realm,
+                msg=msg)
 
     def _decode(self, rawToken):
         unverified_headers = jwt.get_unverified_header(rawToken)
@@ -193,14 +216,15 @@ class RS256withJWKSAuthenticator(JWTAuthenticator):
             raise exceptions.JWKSException(
                 realm=self.realm,
                 msg='There was an error while fetching '
-                    'keys for Identity Provider')
+                    'keys for Identity Provider, check logs for details')
         for key_dict in certs['keys']:
             if key_dict.get('kid') == key_id:
                 key = jwt.algorithms.RSAAlgorithm.from_jwk(
                     json.dumps(key_dict))
+                algorithm = key_dict.get('alg', None) or self.algorithm
                 return jwt.decode(rawToken, key, issuer=self.issuer_id,
                                   audience=self.audience,
-                                  algorithms=self.algorithm)
+                                  algorithms=algorithm)
         raise exceptions.JWKSException(
             self.realm,
             'Cannot verify token: public key %s '
@@ -210,9 +234,13 @@ class RS256withJWKSAuthenticator(JWTAuthenticator):
 AUTHENTICATORS = {
     'HS256': HS256Authenticator,
     'RS256': RS256Authenticator,
-    'RS256withJWKS': RS256withJWKSAuthenticator,
+    'RS256withJWKS': OpenIDConnectAuthenticator,
+    'OpenIDConnect': OpenIDConnectAuthenticator,
 }
 
 
 def get_authenticator_by_name(name):
+    if name == 'RS256withJWKS':
+        logger.info(
+            'Driver "%s" is deprecated, please use "OpenIDConnect" instead')
     return AUTHENTICATORS[name]
