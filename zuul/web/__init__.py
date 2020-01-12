@@ -920,7 +920,6 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def buildsets(self, tenant, project=None, pipeline=None, change=None,
                   branch=None, patchset=None, ref=None, newrev=None,
                   uuid=None, result=None, limit=50, skip=0):
@@ -931,10 +930,31 @@ class ZuulWebAPI(object):
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, result=result,
             limit=limit, offset=skip)
+        try:
+            mtype = cherrypy.tools.accept.callable(
+                ['application/json', 'image/svg+xml'])
+        except Exception:
+            # Fall back to application/json on unparseable type
+            mtype = 'application/json'
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return [self.buildsetToDict(b) for b in buildsets]
+        if mtype == 'image/svg+xml':
+            if not buildsets:
+                raise cherrypy.HTTPError(404, 'No buildset found')
+
+            if buildsets[0].result == 'SUCCESS':
+                file = 'passing.svg'
+            else:
+                file = 'failing.svg'
+            path = os.path.join(self.zuulweb.static_path, file)
+
+            return cherrypy.lib.static.serve_file(
+                path=path, content_type="image/svg+xml")
+
+        resp.headers['Content-Type'] = 'application/json'
+        return json.dumps([self.buildsetToDict(b) for b in buildsets]).encode(
+            'utf-8')
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
