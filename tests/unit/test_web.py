@@ -1098,25 +1098,71 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
-        self.assertEqual(2, len(buildsets))
-        project_bs = [x for x in buildsets if x["project"] == "org/project"][0]
+        accept_default = {}
+        accept_browser_api = {
+            'Accept': 'application/json, text/plain, */*',
+        }
+        accept_browser_standalone = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,'
+                      'image/webp,image/apng,*/*;q=0.8,'
+                      'application/signed-exchange;v=b3;q=0.9',
+        }
+        accept_image = {
+            'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
+        }
 
-        buildset = self.get_url(
-            "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
-        self.assertEqual(3, len(buildset["builds"]))
+        for headers in (accept_default, accept_browser_api,
+                        accept_browser_standalone):
+            buildsets = self.get_url("api/tenant/tenant-one/buildsets",
+                                     headers=headers)
+            buildsets = buildsets.json()
+            self.assertEqual(2, len(buildsets))
+            project_bs = [x for x in buildsets
+                          if x["project"] == "org/project"][0]
 
-        project_test1_build = [x for x in buildset["builds"]
-                               if x["job_name"] == "project-test1"][0]
-        self.assertEqual('SUCCESS', project_test1_build['result'])
+            buildset = self.get_url(
+                "api/tenant/tenant-one/buildset/%s" % project_bs['uuid'],
+                headers=headers).json()
+            self.assertEqual(3, len(buildset["builds"]))
 
-        project_test2_build = [x for x in buildset["builds"]
-                               if x["job_name"] == "project-test2"][0]
-        self.assertEqual('SUCCESS', project_test2_build['result'])
+            project_test1_build = [x for x in buildset["builds"]
+                                   if x["job_name"] == "project-test1"][0]
+            self.assertEqual('SUCCESS', project_test1_build['result'])
 
-        project_merge_build = [x for x in buildset["builds"]
-                               if x["job_name"] == "project-merge"][0]
-        self.assertEqual('SUCCESS', project_merge_build['result'])
+            project_test2_build = [x for x in buildset["builds"]
+                                   if x["job_name"] == "project-test2"][0]
+            self.assertEqual('SUCCESS', project_test2_build['result'])
+
+            project_merge_build = [x for x in buildset["builds"]
+                                   if x["job_name"] == "project-merge"][0]
+            self.assertEqual('SUCCESS', project_merge_build['result'])
+
+        # Now request badge for the buildsets
+        result = self.get_url("api/tenant/tenant-one/buildsets",
+                              headers=accept_image)
+        self.log.error(result.content)
+        result.raise_for_status()
+        self.assertTrue(result.text.startswith('<svg '))
+        self.assertIn('passing', result.text)
+
+        # Generate a failing record
+        self.executor_server.hold_jobs_in_build = True
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.executor_server.failJob('project-merge', C)
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # Request again badge for the buildsets
+        result = self.get_url("api/tenant/tenant-one/buildsets",
+                              headers=accept_image)
+        self.log.error(result.content)
+        result.raise_for_status()
+        self.assertTrue(result.text.startswith('<svg '))
+        self.assertIn('failing', result.text)
 
 
 class TestArtifacts(ZuulDBTestCase, BaseTestWeb, AnsibleZuulTestCase):

@@ -170,7 +170,10 @@ paths:
                 items:
                   $ref: '#/components/schemas/buildset'
                 type: array
-          description: Returns the list of builds
+          description: |
+            Returns the list of builds. If an image is requested via the accept
+            header a badge is returned that represents the result of the first
+            found buildset.
         '404':
           description: Tenant not found
       summary: List the executed builds
