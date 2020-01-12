@@ -1,0 +1,36 @@
+{
+    "title": "JSON/YAML schema for Zuul CI configuration files",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "additionalProperties": false,
+    "type": "array",
+    "items": {
+      "anyOf":[
+        { "$ref": "#/definitions/job",
+          "type": "object"
+          },
+          { "$ref": "#/definitions/project",
+            "type": "object",
+            "required": [
+              "project"
+            ]
+            }
+      ]
+    },
+    "definitions": {
+      "job": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required":[
+          "name"
+        ]
+      },
+      "project": {
+        "type": "object",
+        "additionalProperties": false
+      }
+    }
+  }

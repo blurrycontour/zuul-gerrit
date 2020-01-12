@@ -45,6 +45,22 @@ a :py:class:`~zuul.model.BuildSet`
 
 .. autoclass:: zuul.model.BuildSet
 
+Schema Validation
+~~~~~~~~~~~~~~~~~
+
+To ease editing Zuul CI configuration file we added experimental support for
+a Zuul JSON Schema. This should enable validation and auto-completion in
+code editors.
+
+For example on VSCode__ you can use the YAML__ extensios to use such a schema
+validation by adding the following to `settings.json`:
+
+```
+    "yaml.schemas": {
+        "zuul": "zuul.d/*.yaml",
+```
+
+
 Changes
 ~~~~~~~
 
@@ -76,3 +92,7 @@ Other Global Objects
 .. autoclass:: zuul.model.RepoFiles
 .. autoclass:: zuul.model.Worker
 .. autoclass:: zuul.model.TriggerEvent
+
+
+.. _YAML: https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml
+.. _VSCode: https://code.visualstudio.com/
