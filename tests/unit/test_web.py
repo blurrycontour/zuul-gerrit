@@ -966,7 +966,9 @@ class TestWebSecrets(BaseTestWeb):
         self.assertEqual([secret], run[0]['secrets'])
 
 
-class TestInfo(BaseTestWeb):
+class TestInfo(ZuulDBTestCase, BaseTestWeb):
+
+    config_file = 'zuul-sql-driver.conf'
 
     def setUp(self):
         super(TestInfo, self).setUp()
@@ -976,40 +978,66 @@ class TestInfo(BaseTestWeb):
         statsd_config = self.config_ini_data.get('statsd', {})
         self.stats_prefix = statsd_config.get('prefix')
 
+    def _expected_info(self):
+        return {
+            "info": {
+                "capabilities": {
+                    "job_history": True,
+                },
+                "stats": {
+                    "url": self.stats_url,
+                    "prefix": self.stats_prefix,
+                    "type": "graphite",
+                },
+                "websocket_url": self.websocket_url,
+            }
+        }
+
     def test_info(self):
         info = self.get_url("api/info").json()
         self.assertEqual(
-            info, {
-                "info": {
-                    "capabilities": {
-                        "job_history": False
-                    },
-                    "stats": {
-                        "url": self.stats_url,
-                        "prefix": self.stats_prefix,
-                        "type": "graphite",
-                    },
-                    "websocket_url": self.websocket_url,
-                }
-            })
+            info, self._expected_info())
 
     def test_tenant_info(self):
         info = self.get_url("api/tenant/tenant-one/info").json()
         self.assertEqual(
-            info, {
-                "info": {
-                    "tenant": "tenant-one",
-                    "capabilities": {
-                        "job_history": False
-                    },
-                    "stats": {
-                        "url": self.stats_url,
-                        "prefix": self.stats_prefix,
-                        "type": "graphite",
-                    },
-                    "websocket_url": self.websocket_url,
+            info, self._expected_info())
+
+
+class TestWebCapabilitiesInfo(TestInfo):
+
+    config_file = 'zuul-admin-web-oidc.conf'
+
+    def _expected_info(self):
+        info = super(TestWebCapabilitiesInfo, self)._expected_info()
+        if 'job_history' in info['info']['capabilities']:
+            del info['info']['capabilities']['job_history']
+        info['info']['capabilities']['auth'] = {
+            'realms': {
+                'myOIDC1': {
+                    'authority': 'http://oicd1',
+                    'client_id': 'zuul',
+                    'type': 'JWT',
+                    'scope': 'openid profile',
+                    'driver': 'OpenIDConnect',
+                },
+                'myOIDC2': {
+                    'authority': 'http://oidc2',
+                    'client_id': 'zuul',
+                    'type': 'JWT',
+                    'scope': 'openid profile email special-scope',
+                    'driver': 'OpenIDConnect',
+                },
+                'zuul.example.com': {
+                    'authority': 'zuul_operator',
+                    'client_id': 'zuul.example.com',
+                    'type': 'JWT',
+                    'driver': 'HS256',
                 }
-            })
+            },
+            'default_realm': 'zuul.example.com'
+        }
+        return info
 
 
 class TestTenantInfoConfigBroken(BaseTestWeb):

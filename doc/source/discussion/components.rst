@@ -1071,7 +1071,17 @@ OpenIDConnect
 
 Use a third-party Identity Provider implementing the OpenID Connect protocol.
 The issuer ID should be an URI, from which the "well-known" configuration URI
-of the Identity Provider can be inferred.
+of the Identity Provider can be inferred. This is intended to be used for
+authentication on Zuul's web user interface.
+
+.. attr:: scope
+   :default: openid profile
+
+   The scope(s) to use when requesting access to a user's details. This attribute
+   can be multivalued (values must be separated by a space). Most OpenID Connect
+   Identity Providers support the default scopes "openid profile". A full list
+   of supported scopes can be found in the well-known configuration of the
+   Identity Provider under the key "scopes_supported".
 
 .. attr:: keys_url
 
