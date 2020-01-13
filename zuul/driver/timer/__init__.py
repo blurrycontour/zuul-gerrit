@@ -61,7 +61,7 @@ class TimerDriver(Driver, TriggerInterface):
                     continue
                 for timespec in ef.timespecs:
                     parts = timespec.split()
-                    if len(parts) < 5 or len(parts) > 6:
+                    if len(parts) < 5 or len(parts) > 7:
                         self.log.error(
                             "Unable to parse time value '%s' "
                             "defined in pipeline %s" % (
@@ -73,8 +73,26 @@ class TimerDriver(Driver, TriggerInterface):
                         second = parts[5]
                     else:
                         second = None
-                    trigger = CronTrigger(day=dom, day_of_week=dow, hour=hour,
-                                          minute=minute, second=second)
+                    
+                    if len(parts) > 6:
+                        jitter = parts[6]
+                    else:
+                        jitter = None
+
+                    try:
+                        trigger = CronTrigger(day=dom, day_of_week=dow,
+                                              hour=hour, minute=minute,
+                                              second=second, jitter=jitter)
+                    except ValueError as e:
+                        self.log.exception(
+                            "Unable to create CronTrigger "
+                            "for value '%s' defined in "
+                            "pipeline %s: %s",
+                            timespec,
+                            pipeline.name,
+                            e)
+                        continue
+
 
                     job = self.apsched.add_job(
                         self._onTrigger, trigger=trigger,
