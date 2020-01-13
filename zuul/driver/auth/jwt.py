@@ -54,6 +54,16 @@ class JWTAuthenticator(AuthenticatorInterface):
         except ValueError:
             raise ValueError('"max_validity_time" must be a numerical value')
 
+    def get_capabilities(self):
+        return {
+            self.realm: {
+                'authority': self.issuer_id,
+                'client_id': self.audience,
+                'type': 'JWT',
+                'driver': getattr(self, 'name', 'N/A'),
+            }
+        }
+
     def _decode(self, rawToken):
         raise NotImplementedError
 
@@ -173,33 +183,68 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
     described in
     https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig"""  # noqa
 
-    # default algorithm, TOFO: should this be a config param?
+    # default algorithm, TODO: should this be a config param?
     algorithm = 'RS256'
     name = 'OpenIDConnect'
 
     def __init__(self, **conf):
         super(OpenIDConnectAuthenticator, self).__init__(**conf)
         self.keys_url = conf.get('keys_url', None)
-        self.well_known = None
-        if self.keys_url is None:
-            well_known_uri = urljoin(self.issuer_id,
-                                     '/.well-known/openid-configuration')
-            try:
-                self.well_known = requests.get(well_known_uri).json()
-            except Exception as e:
-                msg = 'Could not fetch OpenID configuration at %s: %s'
-                logger.error(msg % (well_known_uri, e))
-                raise exceptions.JWKSException(
-                    realm=self.realm,
-                    msg='There was an error while fetching '
-                        'OpenID configuration, check logs for details')
-            self.keys_url = self.well_known.get('jwks_uri', None)
-        if self.keys_url is None:
+        self.scope = conf.get('scope', 'openid profile')
+
+    def get_key(self, key_id):
+        keys_url = self.keys_url
+        if keys_url is None:
+            well_known = self.get_well_known_config()
+            keys_url = well_known.get('jwks_uri', None)
+        if keys_url is None:
             msg = 'Invalid OpenID configuration: "jwks_uri" not found'
             logger.error(msg)
             raise exceptions.JWKSException(
                 realm=self.realm,
                 msg=msg)
+        # TODO keys can probably be cached
+        try:
+            certs = requests.get(keys_url).json()
+        except Exception as e:
+            msg = 'Could not fetch Identity Provider keys at %s: %s'
+            logger.error(msg % (keys_url, e))
+            raise exceptions.JWKSException(
+                realm=self.realm,
+                msg='There was an error while fetching '
+                    'keys for Identity Provider, check logs for details')
+        for key_dict in certs['keys']:
+            if key_dict.get('kid') == key_id:
+                # TODO: theoretically two other types of keys are
+                # supported by the JWKS standard. We should raise an error
+                # in the unlikely case 'kty' is not RSA.
+                # (see https://tools.ietf.org/html/rfc7518#section-6.1)
+                key = jwt.algorithms.RSAAlgorithm.from_jwk(
+                    json.dumps(key_dict))
+                algorithm = key_dict.get('alg', None) or self.algorithm
+                return key, algorithm
+        raise exceptions.JWKSException(
+            self.realm,
+            'Cannot verify token: public key %s '
+            'not listed by Identity Provider' % key_id)
+
+    def get_well_known_config(self):
+        well_known_uri = urljoin(self.issuer_id,
+                                 '/.well-known/openid-configuration')
+        try:
+            return requests.get(well_known_uri).json()
+        except Exception as e:
+            msg = 'Could not fetch OpenID configuration at %s: %s'
+            logger.error(msg % (well_known_uri, e))
+            raise exceptions.JWKSException(
+                realm=self.realm,
+                msg='There was an error while fetching '
+                    'OpenID configuration, check logs for details')
+
+    def get_capabilities(self):
+        d = super(OpenIDConnectAuthenticator, self).get_capabilities()
+        d[self.realm]['scope'] = self.scope
+        return d
 
     def _decode(self, rawToken):
         unverified_headers = jwt.get_unverified_header(rawToken)
@@ -207,28 +252,10 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
         if key_id is None:
             raise exceptions.JWKSException(
                 self.realm, 'No key ID in token header')
-        # TODO keys can probably be cached
-        try:
-            certs = requests.get(self.keys_url).json()
-        except Exception as e:
-            msg = 'Could not fetch Identity Provider keys at %s: %s'
-            logger.error(msg % (self.keys_url, e))
-            raise exceptions.JWKSException(
-                realm=self.realm,
-                msg='There was an error while fetching '
-                    'keys for Identity Provider, check logs for details')
-        for key_dict in certs['keys']:
-            if key_dict.get('kid') == key_id:
-                key = jwt.algorithms.RSAAlgorithm.from_jwk(
-                    json.dumps(key_dict))
-                algorithm = key_dict.get('alg', None) or self.algorithm
-                return jwt.decode(rawToken, key, issuer=self.issuer_id,
-                                  audience=self.audience,
-                                  algorithms=algorithm)
-        raise exceptions.JWKSException(
-            self.realm,
-            'Cannot verify token: public key %s '
-            'not listed by Identity Provider' % key_id)
+        key, algorithm = self.get_key(key_id)
+        return jwt.decode(rawToken, key, issuer=self.issuer_id,
+                          audience=self.audience,
+                          algorithms=algorithm)
 
 
 AUTHENTICATORS = {
