@@ -72,6 +72,7 @@ import zuul.executor.client
 import zuul.lib.ansible
 import zuul.lib.connections
 import zuul.lib.auth
+import zuul.lib.capabilities
 import zuul.merger.client
 import zuul.merger.merger
 import zuul.merger.server
@@ -2893,7 +2894,9 @@ class ZuulWebFixture(fixtures.Fixture):
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(config)
         if info is None:
-            self.info = zuul.model.WebInfo()
+            caps = zuul.lib.capabilities.capabilities_registry.capabilities
+            capabilities = zuul.model.Capabilities(**caps)
+            self.info = zuul.model.WebInfo.fromConfig(config, capabilities)
         else:
             self.info = info
         self.zk_hosts = zk_hosts

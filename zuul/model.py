@@ -33,6 +33,7 @@ from zuul import change_matcher
 from zuul.lib.config import get_default
 from zuul.lib.artifacts import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.capabilities import capabilities_registry
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -4647,23 +4648,21 @@ class Capabilities(object):
     facilitate consumers knowing if functionality is available
     or not, keep track of distinct capability flags.
     """
-    def __init__(self, job_history=False):
-        self.job_history = job_history
+    def __init__(self, **kwargs):
+        self._capabilities = kwargs
 
     def __repr__(self):
         return '<Capabilities 0x%x %s>' % (id(self), self._renderFlags())
 
     def _renderFlags(self):
-        d = self.toDict()
-        return " ".join(['{k}={v}'.format(k=k, v=v) for (k, v) in d.items()])
+        return " ".join(['{k}={v}'.format(k=k, v=repr(v))
+                         for (k, v) in self._capabilities.items()])
 
     def copy(self):
         return Capabilities(**self.toDict())
 
     def toDict(self):
-        d = dict()
-        d['job_history'] = self.job_history
-        return d
+        return self._capabilities
 
 
 class WebInfo(object):
@@ -4692,8 +4691,12 @@ class WebInfo(object):
             websocket_url=self.websocket_url)
 
     @staticmethod
-    def fromConfig(config):
+    def fromConfig(config, capabilities=None):
+        caps = capabilities
+        if caps is None:
+            caps = Capabilities(**capabilities_registry.capabilities)
         return WebInfo(
+            capabilities=capabilities,
             stats_prefix=get_default(config, 'statsd', 'prefix'),
             stats_type=get_default(config, 'web', 'stats_type', 'graphite'),
             stats_url=get_default(config, 'web', 'stats_url', None),

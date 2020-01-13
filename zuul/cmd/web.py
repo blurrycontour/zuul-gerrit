@@ -23,6 +23,7 @@ import zuul.web
 import zuul.driver.sql
 import zuul.driver.github
 import zuul.lib.auth
+import zuul.lib.capabilities
 
 from zuul.lib.config import get_default
 
@@ -47,7 +48,10 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.web.stop()
 
     def _run(self):
-        info = zuul.model.WebInfo.fromConfig(self.config)
+
+        caps = zuul.lib.capabilities.capabilities_registry.capabilities
+        capabilities = zuul.model.Capabilities(**caps)
+        info = zuul.model.WebInfo.fromConfig(self.config, capabilities)
 
         params = dict()
 
@@ -112,6 +116,9 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(self.config)
 
+    def get_capabilities(self):
+        self.capabilities = zuul.lib.capabilities.capabilities_registry
+
     def run(self):
         if self.args.command in zuul.web.COMMANDS:
             self.send_command(self.args.command)
@@ -126,6 +133,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                                  zuul.driver.github.GithubDriver,
                                  zuul.driver.pagure.PagureDriver])
             self.configure_authenticators()
+            self.get_capabilities()
             self._run()
         except Exception:
             self.log.exception("Exception from WebServer:")
