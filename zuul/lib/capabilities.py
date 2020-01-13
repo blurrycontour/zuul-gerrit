@@ -1,0 +1,40 @@
+# Copyright 2020 OpenStack Foundation
+# Copyright 2020 Red Hat, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
+
+import logging
+
+
+"""Simple Capabilities registry, to be used by Zuul Web."""
+
+
+class CapabilitiesRegistry(object):
+
+    log = logging.getLogger("Zuul.CapabilitiesRegistry")
+
+    def __init__(self):
+        self.capabilities = {}
+
+    def register_capabilities(self, capability_name, capabilities):
+        is_set = self.capabilities.setdefault(capability_name, {})
+        if is_set == {}:
+            action = 'registered'
+        else:
+            action = 'updated'
+        self.capabilities[capability_name].update(capabilities)
+        self.logger.debug('Capabilities "%s" %s' % (capability_name, action))
+
+
+capabilities_registry = CapabilitiesRegistry()
