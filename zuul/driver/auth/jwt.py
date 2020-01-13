@@ -54,6 +54,16 @@ class JWTAuthenticator(AuthenticatorInterface):
         except ValueError:
             raise ValueError('"max_validity_time" must be a numerical value')
 
+    def get_capabilities(self):
+        return {
+            self.realm: {
+                'authority': self.issuer_id,
+                'client_id': self.audience,
+                'type': 'JWT',
+                'driver': getattr(self, 'name', 'N/A'),
+            }
+        }
+
     def _decode(self, rawToken):
         raise NotImplementedError
 
@@ -173,13 +183,14 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
     described in
     https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig"""  # noqa
 
-    # default algorithm, TOFO: should this be a config param?
+    # default algorithm, TODO: should this be a config param?
     algorithm = 'RS256'
     name = 'OpenIDConnect'
 
     def __init__(self, **conf):
         super(OpenIDConnectAuthenticator, self).__init__(**conf)
         self.keys_url = conf.get('keys_url', None)
+        self.scope = conf.get('scope', 'openid profile')
         self.well_known = None
         if self.keys_url is None:
             well_known_uri = urljoin(self.issuer_id,
@@ -201,6 +212,11 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
                 realm=self.realm,
                 msg=msg)
 
+    def get_capabilities(self):
+        d = super(OpenIDConnectAuthenticator, self).get_capabilities()
+        d[self.realm]['scope'] = self.scope
+        return d
+
     def _decode(self, rawToken):
         unverified_headers = jwt.get_unverified_header(rawToken)
         key_id = unverified_headers.get('kid', None)
@@ -219,6 +235,10 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
                     'keys for Identity Provider, check logs for details')
         for key_dict in certs['keys']:
             if key_dict.get('kid') == key_id:
+                # TODO: theoretically two other types of keys are
+                # supported by the JWKS standard. We should raise an error
+                # in the unlikely case 'kty' is not RSA.
+                # (see https://tools.ietf.org/html/rfc7518#section-6.1)
                 key = jwt.algorithms.RSAAlgorithm.from_jwk(
                     json.dumps(key_dict))
                 algorithm = key_dict.get('alg', None) or self.algorithm
