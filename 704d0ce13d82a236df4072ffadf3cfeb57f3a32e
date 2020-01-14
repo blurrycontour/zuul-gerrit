@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_eeb137e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-14T16:11:17Z",
+      "side": 1,
+      "message": "Maybe you could explain the rationale a bit more?  I can think of 2 reasons, but am unsure if these are what you\u0027re after:\n\n* It\u0027s a really long page.\n* Separate pages show up better in the TOC and make it easier to navigate.\n\nI\u0027m a little worried about splitting off the introductory material from each section.  Imagine a user discovers that they need to learn about a nodeset.  They might jump straight to https://storage.bhs.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_284/701977/1/check/zuul-tox-docs/284ca1a/docs/references/nodeset_def.html and miss https://storage.bhs.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_284/701977/1/check/zuul-tox-docs/284ca1a/docs/references/config.html#nodeset\n\nHow about we move the introductory material to the leaf-nodes as well (ie, so that docs/references/nodeset_def.html has everything about nodesets).  And then make references/config.html an index page.  It could just be a :toctree: list, or we could write a sentence or two about each object.",
+      "revId": "704d0ce13d82a236df4072ffadf3cfeb57f3a32e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
