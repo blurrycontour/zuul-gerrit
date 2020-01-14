@@ -93,6 +93,30 @@
       "revId": "c64020dbac7bfcece5986ba86276d0e5120b7b2f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_07c03b4a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1407,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-14T13:48:02Z",
+      "side": 1,
+      "message": "Good idea, that sounds useful.",
+      "parentUuid": "3fa7e38b_4cfada44",
+      "range": {
+        "startLine": 1407,
+        "startChar": 28,
+        "endLine": 1407,
+        "endChar": 68
+      },
+      "revId": "c64020dbac7bfcece5986ba86276d0e5120b7b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
