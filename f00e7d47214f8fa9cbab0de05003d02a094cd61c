@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_6269ddbe",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-14T14:15:29Z",
+      "side": 1,
+      "message": "nit: no need to format logger message, it\u0027s better to use: `(msg, well_known_uri, e)`",
+      "range": {
+        "startLine": 191,
+        "startChar": 29,
+        "endLine": 191,
+        "endChar": 54
+      },
+      "revId": "f00e7d47214f8fa9cbab0de05003d02a094cd61c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
