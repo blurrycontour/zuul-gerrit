@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_f1791dc6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1402,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-14T12:35:04Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be \u0027and\u0027?",
+      "range": {
+        "startLine": 1402,
+        "startChar": 36,
+        "endLine": 1402,
+        "endChar": 38
+      },
+      "revId": "c64020dbac7bfcece5986ba86276d0e5120b7b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
