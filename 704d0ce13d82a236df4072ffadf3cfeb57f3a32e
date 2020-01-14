@@ -16,6 +16,24 @@
       "revId": "704d0ce13d82a236df4072ffadf3cfeb57f3a32e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_4e3f2b22",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-01-14T16:16:39Z",
+      "side": 1,
+      "message": "Sure. This change is the biggest pet peeve that I had with the current docs and the main reason I wanted this reorg. I could never remember where the various definitions were for these items when I needed to reference them, so being able to quickly identify where they live is the main objective.\n\nI\u0027m fine with moving each item\u0027s intro material to the reference docs.",
+      "parentUuid": "3fa7e38b_eeb137e5",
+      "revId": "704d0ce13d82a236df4072ffadf3cfeb57f3a32e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
