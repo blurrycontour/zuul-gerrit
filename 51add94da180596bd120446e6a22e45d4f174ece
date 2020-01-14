@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_a274ae38",
+        "filename": "doc/source/admin/drivers/github.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2020-01-14T18:47:48Z",
+      "side": 1,
+      "message": "maybe worth to reference .github/workflows directory, I think that is the only location they live in.",
+      "range": {
+        "startLine": 93,
+        "startChar": 51,
+        "endLine": 94,
+        "endChar": 8
+      },
+      "revId": "51add94da180596bd120446e6a22e45d4f174ece",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
