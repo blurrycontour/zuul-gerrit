@@ -22,6 +22,30 @@
       "revId": "c64020dbac7bfcece5986ba86276d0e5120b7b2f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_8c269267",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 1402,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-14T12:58:46Z",
+      "side": 1,
+      "message": "no, if compat is already true we need to keep it true to disable use of auto plus set it to true if mitogen was requested.",
+      "parentUuid": "3fa7e38b_f1791dc6",
+      "range": {
+        "startLine": 1402,
+        "startChar": 36,
+        "endLine": 1402,
+        "endChar": 38
+      },
+      "revId": "c64020dbac7bfcece5986ba86276d0e5120b7b2f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
