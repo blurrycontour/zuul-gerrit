@@ -16,6 +16,24 @@
       "revId": "dcfefd39d5c06e04bd831b9b0ab61804df2375cc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_6e8ea734",
+        "filename": "doc/source/user/badges.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-14T16:08:45Z",
+      "side": 1,
+      "message": "Works for me too, the idea was to reuse the buildset endpoint because it basically just needs the same filters to be useful.",
+      "parentUuid": "3fa7e38b_6bd459bd",
+      "revId": "dcfefd39d5c06e04bd831b9b0ab61804df2375cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
