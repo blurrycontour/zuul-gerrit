@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_cb978d39",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-14T15:37:39Z",
+      "side": 1,
+      "message": "I think we need a note here, something like:\n\n (Note: this requires the gearman server and will distribute work to mergers.)",
+      "revId": "79723af41359fe75d11c1cf56bc298c94384c98d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
