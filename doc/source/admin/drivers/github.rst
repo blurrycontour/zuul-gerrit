@@ -89,6 +89,15 @@ Ping payload works (green tick and 200 response)
 Users can now install the application using its public page, e.g.:
 https://github.com/apps/my-org-zuul
 
+.. note::
+   GitHub Pull Requests that modify GitHub Actions workflow configuration
+   files cannot be merged by application credentials. These pull requests
+   must be merged by a normal user account. This means that Zuul will be
+   limited to posting test results and cannot merge these PRs automatically
+   when they pass testing.
+
+   GitHub Actions are still in Beta and this behavior may change.
+
 
 Connection Configuration
 ------------------------
