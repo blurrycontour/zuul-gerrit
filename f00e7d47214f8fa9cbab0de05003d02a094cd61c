@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_e2e94de4",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4651,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-14T14:22:10Z",
+      "side": 0,
+      "message": "even though this isn\u0027t set, it might be easier to not remove it in this patch since we may need it unless we make the db service a requirement.",
+      "range": {
+        "startLine": 4651,
+        "startChar": 13,
+        "endLine": 4651,
+        "endChar": 38
+      },
+      "revId": "f00e7d47214f8fa9cbab0de05003d02a094cd61c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
