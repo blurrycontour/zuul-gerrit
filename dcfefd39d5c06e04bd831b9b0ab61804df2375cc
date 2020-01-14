@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_6bd459bd",
+        "filename": "doc/source/user/badges.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-14T15:46:48Z",
+      "side": 1,
+      "message": "Why not make a new endpoint rather than overloading this via the accept header?\nMaybe something like this?\n/api/tenant/zuul/pipeline/post/badge?project\u003dzuul/zuul-website",
+      "revId": "dcfefd39d5c06e04bd831b9b0ab61804df2375cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
