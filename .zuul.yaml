@@ -187,24 +187,68 @@
     pre-run: playbooks/release/pre.yaml
     vars: *zuul_build_vars
 
+- job:
+    name: zuul-tox-py35-base
+    parent: tox-py35
+    post-run:
+      - playbooks/tox/post.yaml
+    nodeset: ubuntu-xenial
+    timeout: 3600  # 60 minutes
+
+- job:
+    name: zuul-tox-py35-1
+    parent: zuul-tox-py35-base
+    vars:
+      tox_extra_args: '-- --whitelist-file tests/unit/shard-1.txt'
+
+- job:
+    name: zuul-tox-py35-2
+    parent: zuul-tox-py35-base
+    vars:
+      tox_extra_args: '-- --whitelist-file tests/unit/shard-2.txt'
+
+- job:
+    name: zuul-tox-py37-base
+    parent: tox-py37
+    post-run:
+      - playbooks/tox/post.yaml
+    nodeset: ubuntu-bionic
+    timeout: 3600  # 60 minutes
+
+- job:
+    name: zuul-tox-py37-1
+    parent: zuul-tox-py37-base
+    vars:
+      tox_extra_args: '-- --whitelist-file tests/unit/shard-1.txt'
+
+- job:
+    name: zuul-tox-py37-2
+    parent: zuul-tox-py37-base
+    vars:
+      tox_extra_args: '-- --whitelist-file tests/unit/shard-2.txt'
+
 - project:
     check:
       jobs:
         - zuul-build-image
         - zuul-tox-docs
         - tox-pep8
-        - tox-py35:
+        - zuul-tox-py35-1:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
-            timeout: 3600  # 60 minutes
-        - tox-py37:
+        - zuul-tox-py35-2:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-            timeout: 3600  # 60 minutes
-            nodeset: ubuntu-bionic
+        - zuul-tox-py37-1:
+            irrelevant-files:
+              - zuul/cmd/migrate.py
+              - playbooks/zuul-migrate/.*
+        - zuul-tox-py37-2:
+            irrelevant-files:
+              - zuul/cmd/migrate.py
+              - playbooks/zuul-migrate/.*
         - zuul-build-dashboard
         - zuul-build-dashboard-multi-tenant
         - nodejs-npm-run-lint:
@@ -239,18 +283,22 @@
         - zuul-upload-image
         - zuul-tox-docs
         - tox-pep8
-        - tox-py35:
+        - zuul-tox-py35-1:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
-            timeout: 3600  # 60 minutes
-        - tox-py37:
+        - zuul-tox-py35-2:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-            timeout: 3600  # 60 minutes
-            nodeset: ubuntu-bionic
+        - zuul-tox-py37-1:
+            irrelevant-files:
+              - zuul/cmd/migrate.py
+              - playbooks/zuul-migrate/.*
+        - zuul-tox-py37-2:
+            irrelevant-files:
+              - zuul/cmd/migrate.py
+              - playbooks/zuul-migrate/.*
         - zuul-build-dashboard
         - nodejs-npm-run-lint:
             vars:

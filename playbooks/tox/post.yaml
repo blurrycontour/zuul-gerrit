@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - name: Validate shards are complete
+      validate_shards:
+        zuul_source: "{{ zuul.project.src_dir }}"
+
