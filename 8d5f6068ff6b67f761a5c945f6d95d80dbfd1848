@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_5598fd74",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2020-01-15T18:06:06Z",
+      "side": 1,
+      "message": "Although not mutually exclusive, I see two use different use cases with different scopes that could perhaps benefit from being described in the spec:\n\n1) Running a local build of a job that has already ran (i.e, it failed and I want to run it locally to see what happens under the hood)\n\n2) Being able to run any job from any Zuul instance, tenant, project or pipeline regardless if it has run or not\n\nAn example for #1 would be to point zuul-runner at a build URL where it would automatically discover the zuul API server, job, manifest, inventory and variables (from zuul-info logs) and then re-run the job against a user-specified inventory. \nSomething like:\n\n    zuul-runner rerun http://zuul.openstack.org/build/d8dcc3aa89a34c919f5e8e1979d8c3bc --inventory /foo/bar\n\n#2 requires a very flexible approach which is currently described in the spec but I think the main use case would be #1.",
+      "range": {
+        "startLine": 69,
+        "startChar": 0,
+        "endLine": 69,
+        "endChar": 15
+      },
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_f4bce4db",
         "filename": "doc/source/developer/specs/zuul-runner.rst",
         "patchSetId": 3
