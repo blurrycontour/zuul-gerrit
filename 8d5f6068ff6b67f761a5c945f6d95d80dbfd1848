@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_bb111bb1",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-16T08:33:54Z",
+      "side": 1,
+      "message": "query",
+      "range": {
+        "startLine": 41,
+        "startChar": 22,
+        "endLine": 41,
+        "endChar": 29
+      },
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5598fd74",
         "filename": "doc/source/developer/specs/zuul-runner.rst",
         "patchSetId": 3
