@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_1bf4ef87",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-16T08:01:01Z",
+      "side": 1,
+      "message": "The RS256withJWKS is deprecated but still usable, right?",
+      "range": {
+        "startLine": 169,
+        "startChar": 32,
+        "endLine": 169,
+        "endChar": 57
+      },
+      "revId": "f5798b491dad0f418e0f6d48ba0be74cc7e926f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_bb035b75",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-16T08:01:01Z",
+      "side": 1,
+      "message": "nit: TODO",
+      "range": {
+        "startLine": 176,
+        "startChar": 25,
+        "endLine": 176,
+        "endChar": 29
+      },
+      "revId": "f5798b491dad0f418e0f6d48ba0be74cc7e926f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
