@@ -3888,6 +3888,68 @@ class TestScheduler(ZuulTestCase):
                  ref='refs/heads/stable'),
         ], ordered=False)
 
+    def test_timer_with_jitter(self):
+        "Test that a periodic job with a jitter is triggered"
+        # This test can not use simple_layout because it must start
+        # with a configuration which does not include a
+        # timer-triggered job so that we have an opportunity to set
+        # the hold flag before the first job.
+        self.create_branch('org/project', 'stable')
+        self.executor_server.hold_jobs_in_build = True
+        self.commitConfigUpdate('common-config', 'layouts/timer-jitter.yaml')
+        self.sched.reconfigure(self.config)
+
+        # The pipeline triggers every second, so we should have seen
+        # several by now.
+        time.sleep(5)
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 2)
+
+        merge_count_project1 = 0
+        for job in self.gearman_server.jobs_history:
+            if job.name == b'merger:refstate':
+                args = job.arguments
+                if isinstance(args, bytes):
+                    args = args.decode('utf-8')
+                args = json.loads(args)
+                if args["items"][0]["project"] == "org/project1":
+                    merge_count_project1 += 1
+        self.assertEquals(merge_count_project1, 0,
+                          "project1 shouldn't have any refstate call")
+
+        self.executor_server.hold_jobs_in_build = False
+        # Stop queuing timer triggered jobs so that the assertions
+        # below don't race against more jobs being queued.
+        self.commitConfigUpdate('common-config', 'layouts/no-timer.yaml')
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+        # If APScheduler is in mid-event when we remove the job, we
+        # can end up with one more event firing, so give it an extra
+        # second to settle.
+        time.sleep(1)
+        self.waitUntilSettled()
+
+        # Ensure that the status json has the ref so we can render it in the
+        # web ui.
+        data = json.loads(self.sched.formatStatusJSON('tenant-one'))
+        pipeline = [x for x in data['pipelines'] if x['name'] == 'periodic'][0]
+        first = pipeline['change_queues'][0]['heads'][0][0]
+        second = pipeline['change_queues'][1]['heads'][0][0]
+        self.assertIn(first['ref'], ['refs/heads/master', 'refs/heads/stable'])
+        self.assertIn(second['ref'],
+                      ['refs/heads/master', 'refs/heads/stable'])
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-bitrot', result='SUCCESS',
+                 ref='refs/heads/master'),
+            dict(name='project-bitrot', result='SUCCESS',
+                 ref='refs/heads/stable'),
+        ], ordered=False)
+
     def test_idle(self):
         "Test that frequent periodic jobs work"
         # This test can not use simple_layout because it must start
