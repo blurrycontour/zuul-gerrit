@@ -16,6 +16,23 @@
       "revId": "1c186425e57886a2137b5098ec17fbf6430d15a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_01c1d630",
+        "filename": "doc/source/reference/index.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-16T20:01:32Z",
+      "side": 1,
+      "message": "I see the relation, but I\u0027d rather not break up the different config sections.  Maybe some strategic cross-references between job_def and jobs would help?",
+      "revId": "1c186425e57886a2137b5098ec17fbf6430d15a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
