@@ -33,6 +33,24 @@
       "revId": "1c186425e57886a2137b5098ec17fbf6430d15a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_24e420a8",
+        "filename": "doc/source/reference/index.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-01-16T21:21:29Z",
+      "side": 1,
+      "message": "I was thinking maybe \"Job Content\" could use a better name, because this was often the document I would go to when looking for the job YAML. Some of the contents seem better suited to separate HOWTO docs (e.g., \"Returning the log URL\", \"Skipping child jobs\", etc). But as for this change, lgtm.",
+      "parentUuid": "3fa7e38b_01c1d630",
+      "revId": "1c186425e57886a2137b5098ec17fbf6430d15a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
