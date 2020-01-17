@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_cf4e7c8f",
+        "filename": "web/public/zuul-schema.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-17T15:49:46Z",
+      "side": 1,
+      "message": "Would it be possible to generate this automatically from the voluptuous validation?  Otherwise, it is very likely to get out of sync.",
+      "revId": "2126306602cb412c3567470b3eb1547168701be2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
