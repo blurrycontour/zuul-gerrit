@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_ed07cb14",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-01-17T00:09:24Z",
+      "side": 1,
+      "message": "This method will automatically log the exception traceback for you. I believe that means we will double log it here.\n\nCan you remove the \u0027as e\u0027 above then drop the explicit inclusion of the traceback here?",
+      "range": {
+        "startLine": 82,
+        "startChar": 24,
+        "endLine": 82,
+        "endChar": 42
+      },
+      "revId": "df221b4eb69f6ac04df67ae29c2df1d776820d63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
