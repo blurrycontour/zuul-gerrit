@@ -22,6 +22,23 @@
       "revId": "e2422e2493901224f456b0d272de4c7faed48e14",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_4fafec7b",
+        "filename": "doc/source/reference/admins/connections.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-17T15:33:43Z",
+      "side": 1,
+      "message": "Good idea, though \"Drivers\" will appear as the next page link in the sidebar.",
+      "revId": "e2422e2493901224f456b0d272de4c7faed48e14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
