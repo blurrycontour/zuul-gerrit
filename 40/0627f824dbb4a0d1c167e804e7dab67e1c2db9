@@ -1,0 +1,9 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: David Shrewsbury <dshrewsb@redhat.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 17 Jan 2020 21:35:22 +0000
+Reviewed-on: https://review.opendev.org/702962
+Project: zuul/zuul
+Branch: refs/heads/master
