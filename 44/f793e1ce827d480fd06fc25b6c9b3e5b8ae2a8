@@ -1,0 +1,10 @@
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+1: Jan Kubovy <jan.kubovy@bmw.de>
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Workflow+1: Clark Boylan <cboylan@sapwetik.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 17 Jan 2020 00:56:41 +0000
+Reviewed-on: https://review.opendev.org/702127
+Project: zuul/zuul
+Branch: refs/heads/master
