@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_7045e443",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-17T17:15:55Z",
+      "side": 1,
+      "message": "Let\u0027s add a comment here why we\u0027re setting it to 2.",
+      "revId": "1a74a09458b089f0c832dfb3b452954d2177f3f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
