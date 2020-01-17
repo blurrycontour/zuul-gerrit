@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_ad86b35e",
+        "filename": "doc/source/reference/admins/connections.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-01-17T00:21:21Z",
+      "side": 1,
+      "message": "I would make this a link to the drivers page so that you can go from one page to the next without jumping through the index.",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 21,
+        "endChar": 7
+      },
+      "revId": "e2422e2493901224f456b0d272de4c7faed48e14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
