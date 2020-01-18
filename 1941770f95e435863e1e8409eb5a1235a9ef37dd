@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_7f684f87",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-18T00:39:31Z",
+      "side": 1,
+      "message": "Why not stick to only one worker and remove the risk entirely?",
+      "range": {
+        "startLine": 198,
+        "startChar": 50,
+        "endLine": 198,
+        "endChar": 65
+      },
+      "revId": "1941770f95e435863e1e8409eb5a1235a9ef37dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
