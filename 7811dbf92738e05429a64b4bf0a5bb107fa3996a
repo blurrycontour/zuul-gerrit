@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_256ba8f0",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-18T16:02:20Z",
+      "side": 1,
+      "message": "nit: python 3 allows to write this simpler:\n\n  super().setUp()",
+      "revId": "7811dbf92738e05429a64b4bf0a5bb107fa3996a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_857b7cbd",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-18T16:02:20Z",
+      "side": 1,
+      "message": "The gearman worker handling has been refactored and unified (and simplified) throughout the codebase in [1]. The github driver looks quite similar in that regard. You can look how this is implemented there.\n\n[1] https://review.opendev.org/664948",
+      "range": {
+        "startLine": 94,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 27
+      },
+      "revId": "7811dbf92738e05429a64b4bf0a5bb107fa3996a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_4547c47b",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-18T16:02:20Z",
+      "side": 1,
+      "message": "When using the gitlab driver at scale you might or might not want to think about parallelizing the event processing as in [1]. This is not meant for this change but just as an idea for the future in case you face event processing lags.\n\n[1] https://review.opendev.org/666982",
+      "revId": "7811dbf92738e05429a64b4bf0a5bb107fa3996a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
