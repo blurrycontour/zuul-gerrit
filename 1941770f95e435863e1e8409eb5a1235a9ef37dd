@@ -22,6 +22,24 @@
       "revId": "1941770f95e435863e1e8409eb5a1235a9ef37dd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_eac6bf41",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-18T07:43:47Z",
+      "side": 1,
+      "message": "Serially installing quite some ansible versiones takes significantly longer each time the tox venv is recreated. Using two workers is an attempt to minimize both those races and the time to setup the venvs. If we then still face the race I\u0027d suggest to separate the caches of pip so they cannot interfere with each other.",
+      "parentUuid": "3fa7e38b_7f684f87",
+      "revId": "1941770f95e435863e1e8409eb5a1235a9ef37dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
