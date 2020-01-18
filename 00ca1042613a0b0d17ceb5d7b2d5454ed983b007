@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_6a772f09",
+        "filename": ".zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-01-18T08:18:41Z",
+      "side": 1,
+      "message": "why not use --blacklist-file here and thus have a single file?",
+      "range": {
+        "startLine": 208,
+        "startChar": 27,
+        "endLine": 208,
+        "endChar": 37
+      },
+      "revId": "00ca1042613a0b0d17ceb5d7b2d5454ed983b007",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_0a7ebbe2",
+        "filename": ".zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-01-18T08:18:41Z",
+      "side": 1,
+      "message": "what about moving this into the base job?",
+      "range": {
+        "startLine": 296,
+        "startChar": 17,
+        "endLine": 297,
+        "endChar": 41
+      },
+      "revId": "00ca1042613a0b0d17ceb5d7b2d5454ed983b007",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
