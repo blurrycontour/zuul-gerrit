@@ -25,6 +25,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_8a714b10",
+        "filename": ".zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-18T08:29:47Z",
+      "side": 1,
+      "message": "yes that would make it simpler for two jobs while the proposed solution supports more jobs if needed in future. I\u0027m fine with either way.",
+      "parentUuid": "3fa7e38b_6a772f09",
+      "revId": "00ca1042613a0b0d17ceb5d7b2d5454ed983b007",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_0a7ebbe2",
         "filename": ".zuul.yaml",
         "patchSetId": 4
@@ -42,6 +60,24 @@
         "endLine": 297,
         "endChar": 41
       },
+      "revId": "00ca1042613a0b0d17ceb5d7b2d5454ed983b007",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ea623f41",
+        "filename": ".zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-18T08:29:47Z",
+      "side": 1,
+      "message": "good point, will do",
+      "parentUuid": "3fa7e38b_0a7ebbe2",
       "revId": "00ca1042613a0b0d17ceb5d7b2d5454ed983b007",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
