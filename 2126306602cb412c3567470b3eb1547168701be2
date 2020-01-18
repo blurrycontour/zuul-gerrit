@@ -16,6 +16,24 @@
       "revId": "2126306602cb412c3567470b3eb1547168701be2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_457fc468",
+        "filename": "web/public/zuul-schema.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-18T12:03:36Z",
+      "side": 1,
+      "message": "Looks like the voluptuous devs rejected this idea [1].\n\nThe alternative they proposed [2] however doesn\u0027t really seem to fit our use case as we only have a schema and not a full json data tree from which we could generate the schema. Generating using genson would likely get out of sync as well :(\n\nAn alternative might be to create our own tooling that generates this from the zuul source.\n\n[1] https://github.com/alecthomas/voluptuous/issues/181\n[2] https://pypi.org/project/genson/",
+      "parentUuid": "3fa7e38b_cf4e7c8f",
+      "revId": "2126306602cb412c3567470b3eb1547168701be2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
