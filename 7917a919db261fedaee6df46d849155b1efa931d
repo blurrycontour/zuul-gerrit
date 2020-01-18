@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_2512c862",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1589,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-18T16:15:36Z",
+      "side": 1,
+      "message": "nit because of test code: this could use the event id when logging",
+      "revId": "7917a919db261fedaee6df46d849155b1efa931d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
