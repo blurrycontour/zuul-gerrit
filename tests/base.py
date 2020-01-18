@@ -3743,16 +3743,22 @@ class ZuulTestCase(BaseTestCase):
         # Further the pydevd threads also need to be whitelisted so debugging
         # e.g. in PyCharm is possible without breaking shutdown.
         whitelist = ['watchdog',
+                     'pydevd.CheckAliveThread',
                      'pydevd.CommandThread',
                      'pydevd.Reader',
                      'pydevd.Writer',
                      'socketserver_Thread',
                      'GerritWebServer',
+                     'ptvsd.EventLoop',
+                     'ptvsd.Client',
+                     'ptvsd.SubprocessListener',
+                     'ptvsd.SubprocessNotifier',
                      ]
         # Ignore Kazoo TreeCache threads that start with "Thread-"
         threads = [t for t in threading.enumerate()
                    if t.name not in whitelist
-                   and not t.name.startswith("Thread-")]
+                   and not t.name.startswith("Thread-")
+                   and not t.name.startswith('Dummy-')]
         if len(threads) > 1:
             log_str = ""
             for thread_id, stack_frame in sys._current_frames().items():
