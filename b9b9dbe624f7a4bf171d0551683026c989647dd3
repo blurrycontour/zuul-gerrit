@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_2dbcee69",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3744,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-01-19T09:49:50Z",
+      "side": 1,
+      "message": "Two things (these are nit - we can do them later - but if you respin this, maybe consider?\n\na) super simple - add VSC to the comment\nb) maybe we should make a constant list (or a few) for each things like ptvsc and pydevd so we can document what each are. Something like:\n\n  PYCHARM_THEADS \u003d [\u0027pydevd.CheckAliveThread\u0027...]\n  VISUAL_STUDIO_CODE_THREADS \u003d [\u0027ptvsd.Client\u0027...]\n  whitelist \u003d [...] + PYCHARM_TREADS + VISUAL_STUDIO_CODE_THREADS\n\nOr something.",
+      "range": {
+        "startLine": 3744,
+        "startChar": 18,
+        "endLine": 3744,
+        "endChar": 25
+      },
+      "revId": "b9b9dbe624f7a4bf171d0551683026c989647dd3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
