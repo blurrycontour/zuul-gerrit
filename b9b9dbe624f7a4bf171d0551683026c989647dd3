@@ -22,6 +22,29 @@
       "revId": "b9b9dbe624f7a4bf171d0551683026c989647dd3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_0d47b27c",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3757,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-01-19T10:08:34Z",
+      "side": 1,
+      "message": "comment should mention Dummy as well",
+      "range": {
+        "startLine": 3757,
+        "startChar": 40,
+        "endLine": 3757,
+        "endChar": 66
+      },
+      "revId": "b9b9dbe624f7a4bf171d0551683026c989647dd3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
