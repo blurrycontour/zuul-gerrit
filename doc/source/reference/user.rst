@@ -1,3 +1,5 @@
+.. _references_user:
+
 User Reference
 ==============
 

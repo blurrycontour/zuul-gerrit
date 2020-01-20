@@ -1,3 +1,5 @@
+.. _howtos_user:
+
 User How-to Guides
 ==================
 

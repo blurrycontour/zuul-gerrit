@@ -1,3 +1,5 @@
+.. _tutorials_admin:
+
 Admin Tutorials
 ===============
 
