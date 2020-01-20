@@ -580,6 +580,15 @@ Here is an example of two job definitions:
          role, the role will be made available under this name.
          Ignored in the case of a contained role.
 
+      .. code-block:: yaml
+
+         - job:
+             name: myjob
+             roles:
+               - zuul: myorg/our-roles-project
+               - zuul: myorg/ansible-role-foo
+                 name: foo
+
    .. attr:: required-projects
 
       A list of other projects which are used by this job.  Any Zuul
