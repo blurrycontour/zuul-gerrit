@@ -13,45 +13,58 @@ If you are looking for the Javascript testing tool named Zuul, it
 can be found here:
 https://github.com/defunctzombie/zuul
 
-Documentation
--------------
+The Zuul documentation is organized into the following `sections<https://www.divio.com/en/blog/documentation/>`:
 
-Zuul Users
-**********
 
-.. toctree::
-   :maxdepth: 2
+Tutorials
+---------
+These guides help you get your hands dirty with working examples:
 
-   tutorials/user
-   howtos/user
-   reference/user
+* :ref:`tutorials_user`
+* :ref:`tutorials_admin`
 
-Zuul Admins
-***********
 
-.. toctree::
-   :maxdepth: 2
+Howtos
+------
 
-   tutorials/admin
-   howtos/admin
-   reference/admin
+These cookbooks teach you how to solve specific tasks:
 
-Digging Deeper
-**************
+* :ref:`howtos_user`
+* :ref:`howtos_admin`
 
-.. toctree::
-   :maxdepth: 2
 
-   discussion/index
+Discussions
+-----------
 
-.. toctree::
-   :maxdepth: 2
+These posts explain the context and motivation behind Zuul:
 
-   reference/index
+* :ref:`discussions`
+
+
+References
+----------
+
+These comprehensive resources cover details that other texts will gloss over:
+
+* :ref:`references`
+* :ref:`references_user`
+* :ref:`references_admin`
+
 
 Indices and tables
-------------------
+^^^^^^^^^^^^^^^^^^
 
 * :ref:`genindex`
 * :ref:`search`
 
+.. toctree::
+   :hidden:
+
+   tutorials/user
+   tutorials/admin
+   howtos/user
+   howtos/admin
+   discussion/index
+   reference/index
+   reference/user
+   reference/admin

@@ -1,3 +1,5 @@
+.. _howtos_admin:
+
 Admin How-to Guides
 ===================
 
