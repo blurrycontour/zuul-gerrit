@@ -1,3 +1,5 @@
+.. _references_admin:
+
 Admin Reference
 ===============
 

@@ -1,9 +1,13 @@
-Reference
-=========
+.. _references:
+
+References
+==========
 
 .. toctree::
    :maxdepth: 2
 
+   user
+   admin
    monitoring
    web
    developer/index
