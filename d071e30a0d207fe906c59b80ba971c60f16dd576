@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_bc51e30f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-01-20T15:10:54Z",
+      "side": 1,
+      "message": "According to `git tag --contains 9167b58128dbfe3ddcbab253166697348d8d364c` it wasn\u0027t fixed until 1.25.6.",
+      "revId": "d071e30a0d207fe906c59b80ba971c60f16dd576",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_1c4b575e",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-01-20T15:10:54Z",
+      "side": 1,
+      "message": "We can still support older versions so should !\u003d instead. We need to skip 1.25.4 and 1.25.5.",
+      "revId": "d071e30a0d207fe906c59b80ba971c60f16dd576",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
