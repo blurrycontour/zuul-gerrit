@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_b19c97be",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-01-21T15:50:12Z",
+      "side": 1,
+      "message": "I suggest to make this change in zuul-jobs instead; It\u0027s IMHO an oversight that it was done for pep8 but not linters.",
+      "range": {
+        "startLine": 195,
+        "startChar": 7,
+        "endLine": 197,
+        "endChar": 35
+      },
+      "revId": "b573a5d4d0f3ad65660c319b0df798453ec10108",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
