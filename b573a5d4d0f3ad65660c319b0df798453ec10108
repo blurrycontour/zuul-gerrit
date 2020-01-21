@@ -22,6 +22,30 @@
       "revId": "b573a5d4d0f3ad65660c319b0df798453ec10108",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ef80eaf8",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-21T17:39:40Z",
+      "side": 1,
+      "message": "That is what I thought originally, then I found that it might have side effects on other repositories that use the \u0027linters\u0027 environment.  But it is worth a shot indeed.",
+      "parentUuid": "3fa7e38b_b19c97be",
+      "range": {
+        "startLine": 195,
+        "startChar": 7,
+        "endLine": 197,
+        "endChar": 35
+      },
+      "revId": "b573a5d4d0f3ad65660c319b0df798453ec10108",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
