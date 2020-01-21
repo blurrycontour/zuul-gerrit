@@ -16,6 +16,7 @@
 import datetime
 import logging
 import os
+from unittest import mock
 
 import git
 import testtools
@@ -296,7 +297,9 @@ class TestMergerRepo(ZuulTestCase):
         self.assertEqual(sorted(['messy1.txt', 'messy2.txt']),
                          sorted(changed_files))
 
-    def test_repo_repr(self):
+    @mock.patch('zuul.merger.merger.Repo._ensure_cloned')
+    @mock.patch('zuul.merger.merger.Repo._git_set_remote_url')
+    def test_repo_repr(self, _, __):
         local_path = "/dev/null"
         repo = Repo("remote", local_path,
                     "none@example.org", "User Name", "0", "0")
