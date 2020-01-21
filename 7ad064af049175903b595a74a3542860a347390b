@@ -46,6 +46,30 @@
       "revId": "7ad064af049175903b595a74a3542860a347390b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_69c15d81",
+        "filename": "doc/source/index.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-21T13:36:22Z",
+      "side": 1,
+      "message": "IMHO over explanatory, the sentence is straight forward for me. I am ok with it if maintainers are too.",
+      "parentUuid": "3fa7e38b_236e242d",
+      "range": {
+        "startLine": 16,
+        "startChar": 71,
+        "endLine": 16,
+        "endChar": 115
+      },
+      "revId": "7ad064af049175903b595a74a3542860a347390b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
