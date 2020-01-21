@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_89adafe8",
+        "filename": "zuul/_setup_hook.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-01-21T21:32:13Z",
+      "side": 1,
+      "message": "This fails if the symlink already exists. I don\u0027t see anything removing the symlink so this may end up being a problem on multiple runs?",
+      "revId": "7ec070a134acb6dcdb350c25fb71a3c46d1779c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
