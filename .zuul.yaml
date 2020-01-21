@@ -194,6 +194,7 @@
         - zuul-tox-docs
         - tox-linters:
             vars:
+              tox_install_bindep: false
               test_setup_skip: true
         - tox-py35:
             irrelevant-files:
@@ -242,6 +243,7 @@
         - zuul-tox-docs
         - tox-linters:
             vars:
+              tox_install_bindep: false
               test_setup_skip: true
         - tox-py35:
             irrelevant-files:
