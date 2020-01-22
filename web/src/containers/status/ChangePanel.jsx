@@ -16,6 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import * as moment from 'moment'
 
 
 class ChangePanel extends React.Component {
@@ -198,7 +199,8 @@ class ChangePanel extends React.Component {
     }
 
     return (
-      <div className='progress zuul-job-result'>
+      <div className='progress zuul-job-result'
+            title={ 'estimated time remaining ' + moment.duration(remainingTime, 'seconds').humanize() }>
         <div className={'progress-bar ' + className}
           role='progressbar'
           aria-valuenow={progressPercent}
