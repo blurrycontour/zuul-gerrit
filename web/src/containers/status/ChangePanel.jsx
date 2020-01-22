@@ -198,7 +198,8 @@ class ChangePanel extends React.Component {
     }
 
     return (
-      <div className='progress zuul-job-result'>
+      <div className='progress zuul-job-result'
+            title={ "estimated time remaining" + remainingTime }>
         <div className={'progress-bar ' + className}
           role='progressbar'
           aria-valuenow={progressPercent}
