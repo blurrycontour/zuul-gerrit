@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_d00edf31",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-22T10:18:45Z",
+      "side": 1,
+      "message": "matche \u003e matcher",
+      "range": {
+        "startLine": 13,
+        "startChar": 20,
+        "endLine": 13,
+        "endChar": 27
+      },
+      "revId": "6353ba000c515ca0a3bc55e9e275606758881d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_f00bdb1e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-22T10:18:45Z",
+      "side": 1,
+      "message": "branchesr \u003e branches",
+      "range": {
+        "startLine": 13,
+        "startChar": 32,
+        "endLine": 13,
+        "endChar": 41
+      },
+      "revId": "6353ba000c515ca0a3bc55e9e275606758881d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_1076b793",
+        "filename": "tests/fixtures/config/branch-negative/git/org_project/.zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-22T10:18:45Z",
+      "side": 1,
+      "message": "That is much better indeed :]",
+      "revId": "6353ba000c515ca0a3bc55e9e275606758881d5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
