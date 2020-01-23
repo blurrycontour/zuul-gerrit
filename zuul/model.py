@@ -1906,6 +1906,13 @@ class Build(object):
     def pipeline(self):
         return self.build_set.item.pipeline
 
+    @property
+    def log_url(self):
+        log_url = self.result_data.get('zuul', {}).get('log_url')
+        if log_url and log_url[-1] != '/':
+            log_url = log_url + '/'
+        return log_url
+
     def getSafeAttributes(self):
         return Attributes(uuid=self.uuid,
                           result=self.result,
