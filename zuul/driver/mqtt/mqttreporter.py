@@ -60,13 +60,14 @@ class MQTTReporter(BaseReporter):
             build = item.current_build_set.getBuild(job.name)
             if build:
                 # Report build data if available
-                (result, url) = item.formatJobResult(job)
+                (result, web_url) = item.formatJobResult(job)
                 job_informations.update({
                     'uuid': build.uuid,
                     'start_time': build.start_time,
                     'end_time': build.end_time,
                     'execute_time': build.execute_time,
-                    'log_url': url,
+                    'log_url': build.log_url,
+                    'web_url': web_url,
                     'result': result,
                     'dependencies': [j.name for j in job.dependencies],
                 })
