@@ -56,6 +56,7 @@ class GithubTriggerEvent(TriggerEvent):
         self.unlabel = None
         self.action = None
         self.delivery = None
+        self.check_runs = None
 
     def isPatchsetCreated(self):
         if self.type == 'pull_request':
@@ -76,6 +77,8 @@ class GithubTriggerEvent(TriggerEvent):
             r.append('%s,%s' % (self.change_number, self.patch_number))
         if self.delivery:
             r.append('delivery: %s' % self.delivery)
+        if self.check_runs:
+            r.append('check_runs: %s' % self.check_runs)
         return ' '.join(r)
 
 
@@ -217,7 +220,7 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
     def __init__(self, trigger, types=[], branches=[], refs=[],
                  comments=[], actions=[], labels=[], unlabels=[],
                  states=[], statuses=[], required_statuses=[],
-                 ignore_deletes=True):
+                 check_runs=[], ignore_deletes=True):
 
         EventFilter.__init__(self, trigger)
 
@@ -237,6 +240,7 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
         self.states = states
         self.statuses = statuses
         self.required_statuses = required_statuses
+        self.check_runs = check_runs
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
@@ -254,6 +258,8 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
             ret += ' comments: %s' % ', '.join(self._comments)
         if self.actions:
             ret += ' actions: %s' % ', '.join(self.actions)
+        if self.check_runs:
+            ret += ' check_runs: %s' % ','.join(self.check_runs)
         if self.labels:
             ret += ' labels: %s' % ', '.join(self.labels)
         if self.unlabels:
@@ -319,6 +325,44 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
         if self.actions and not matches_action:
             return FalseWithReason("Actions %s doesn't match %s" % (
                 self.actions, event.action))
+
+        # TODO (felix): Could we look up the pipeline name automatically in
+        # here and directly match it to a requested check_run?
+        #
+        # Background:
+        # With the current implementation, one must always specify a check_run
+        # trigger in the pipeline configuration that matches the requested
+        # check_run. This could be done via wildcards or with an exact value
+        # e.g. like so:
+        # - event: check_run
+        #   action: requested
+        #   check: .*check.*
+        #
+        # IMHO it's dump to specify such a trigger, as the value must always
+        # match the value that comes with the Github event (which is the
+        # current pipeline's name in our case). In case the value is wrong,
+        # another pipeline might be executed which would then report a
+        # completely, different check_run and not the one the user requested
+        # via Github.
+        # If the value from the config doesn't match anything, nothing will
+        # be executed, which could lead to wrong expectations, as Github is
+        # always providing a visual feedback saying "check run requested" and
+        # automatically changes the check_suites's state to queued.
+
+        # check_runs are ORed
+        if self.check_runs:
+            check_run_found = False
+            if event.check_run == "":
+                # TODO (felix): Hack to make a check_suite requested event
+                # always trigger all related pipelines.
+                check_run_found = True
+            for check_run in self.check_runs:
+                if re2.fullmatch(check_run, event.check_run):
+                    check_run_found = True
+                    break
+            if not check_run_found:
+                return FalseWithReason("Check_runs %s doesn't match %s" % (
+                    self.check_runs, event.check_run))
 
         # labels are ORed
         if self.labels and event.label not in self.labels:
