@@ -151,6 +151,7 @@ class PipelineManager(object):
         return False
 
     def reportEnqueue(self, item):
+        # TODO Test if that works with the current implementation
         if not self.pipeline._disabled:
             self.log.info("Reporting enqueue, action %s item %s" %
                           (self.pipeline.enqueue_actions, item))

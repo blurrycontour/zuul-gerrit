@@ -59,6 +59,7 @@ To create a `GitHub application
 * Set permissions:
 
   * Repository administration: Read
+  * Checks: Read & Write
   * Repository contents: Read & Write (write to let zuul merge change)
   * Issues: Read & Write
   * Pull requests: Read & Write
@@ -66,6 +67,8 @@ To create a `GitHub application
 
 * Set events subscription:
 
+  * Check run
+  * Check suite
   * Commit comment
   * Create
   * Push
@@ -203,6 +206,8 @@ the following options.
 
       .. value:: push
 
+      .. value:: check_run
+
    .. attr:: action
 
       A :value:`pipeline.trigger.<github source>.event.pull_request`
@@ -253,6 +258,14 @@ the following options.
       .. value:: dismissed
 
          Pull request review removed.
+
+      A :value:`pipeline.trigger.<github source>.event.check_run`
+      event will have associated action(s) to trigger from. The
+      supported actions are:
+
+      .. value:: requested
+
+         A check_run is requested.
 
    .. attr:: branch
 
@@ -329,6 +342,12 @@ itself. Status name, description, and context is taken from the pipeline.
       String value for a link url to set in the github
       status. Defaults to the zuul server status_url, or the empty
       string if that is unset.
+
+   .. attr:: check
+
+      If the reporter should utilize github's checks API to set the commit
+      status, this must be set to ``in_progress``, ``success`` or ``failure``
+      (depending on which status the reporter should report).
 
    .. attr:: comment
       :default: true
