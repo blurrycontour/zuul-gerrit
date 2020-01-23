@@ -72,7 +72,7 @@ An MQTT report uses this schema:
 
       .. attr:: builds
 
-      The list of builds.
+         The list of builds.
 
          .. attr:: job_name
 
@@ -101,6 +101,12 @@ An MQTT report uses this schema:
          .. attr:: log_url
 
             The build log url (not present in start report).
+
+         .. attr:: web_url
+
+            The url to the build result page if :attr:`tenant.report-build-page`
+            is enabled. The build log url otherwise (not present in start
+            report).
 
          .. attr:: result
 
@@ -163,6 +169,7 @@ Here is an example of a success message:
         'start_time': 1524801179.8557224,
         'end_time': 1524801208.928095,
         'log_url': 'https://logs.example.com/logs/3/3/1/check/linters/16e3e55/',
+        'web_url': 'https://tenant.example.com/t/tenant-one/build/16e3e55aca984c6c9a50cc3c5b21bb83/',
         'result': 'SUCCESS',
         'dependencies': []
       }],
