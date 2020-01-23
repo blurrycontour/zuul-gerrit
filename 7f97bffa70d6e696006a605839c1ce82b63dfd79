@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_1351c831",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-01-23T18:41:21Z",
+      "side": 1,
+      "message": "I like to imagine that there\u0027s an inverse method called dehumanize().",
+      "revId": "7f97bffa70d6e696006a605839c1ce82b63dfd79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
