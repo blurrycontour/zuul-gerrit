@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_64f154de",
+        "filename": "Dockerfile",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-23T22:04:03Z",
+      "side": 0,
+      "message": "The current python-(builder|base) images are based on buster so changed that as well.",
+      "revId": "395c7080769e199d08477068e522377db781c178",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
