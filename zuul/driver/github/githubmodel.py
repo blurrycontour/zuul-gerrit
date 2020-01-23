@@ -56,6 +56,7 @@ class GithubTriggerEvent(TriggerEvent):
         self.unlabel = None
         self.action = None
         self.delivery = None
+        self.check_runs = None
 
     def isPatchsetCreated(self):
         if self.type == 'pull_request':
@@ -76,6 +77,8 @@ class GithubTriggerEvent(TriggerEvent):
             r.append('%s,%s' % (self.change_number, self.patch_number))
         if self.delivery:
             r.append('delivery: %s' % self.delivery)
+        if self.check_runs:
+            r.append('check_runs: %s' % self.check_runs)
         return ' '.join(r)
 
 
@@ -217,7 +220,7 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
     def __init__(self, trigger, types=[], branches=[], refs=[],
                  comments=[], actions=[], labels=[], unlabels=[],
                  states=[], statuses=[], required_statuses=[],
-                 ignore_deletes=True):
+                 check_runs=[], ignore_deletes=True):
 
         EventFilter.__init__(self, trigger)
 
@@ -237,6 +240,7 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
         self.states = states
         self.statuses = statuses
         self.required_statuses = required_statuses
+        self.check_runs = check_runs
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
@@ -254,6 +258,8 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
             ret += ' comments: %s' % ', '.join(self._comments)
         if self.actions:
             ret += ' actions: %s' % ', '.join(self.actions)
+        if self.check_runs:
+            ret += ' check_runs: %s' % ','.join(self.check_runs)
         if self.labels:
             ret += ' labels: %s' % ', '.join(self.labels)
         if self.unlabels:
@@ -319,6 +325,32 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
         if self.actions and not matches_action:
             return FalseWithReason("Actions %s doesn't match %s" % (
                 self.actions, event.action))
+
+        # TODO (felix): IMHO it's wrong to configure the check_run filters
+        # in the pipeline config as they are depending on the jobs/checks name
+        # and a pipeline should simply be triggered by a check_run with the
+        # same name (context in Github). Unfortunately, I didn't find a way
+        # to do that as we don't have any access to the pipeline in here.
+        # So, for now this is just checking if the value of the check_run
+        # in the pipeline config matches any of the check_runs requested
+        # by the trigger event via a simple "in" check.
+        # If a whole check-suite was rerequested by Github (meaning all
+        # contained check_runs should be re-run), the event will always match.
+        matches_check_runs = False
+        for check_run in self.check_runs:
+            # TODO (felix): Find a better check than 'in'. That's enough
+            # for testing purposes, but for production, the match should
+            # be as exact as possible. E.g. split the check-name
+            # (<app>/<check>) by "/" and validate the last part?
+            if event.check_runs is not None:
+                if (
+                    len(event.check_runs) == 0 or
+                    any(check_run in ecr for ecr in event.check_runs)
+                ):
+                    matches_check_runs = True
+        if self.check_runs and not matches_check_runs:
+            return FalseWithReason("Check runs %s doesn't match %s" % (
+                self.check_runs, event.check_runs))
 
         # labels are ORed
         if self.labels and event.label not in self.labels:
