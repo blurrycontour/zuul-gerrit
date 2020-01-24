@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_3f84bb5c",
+        "filename": "doc/source/discussion/index.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-24T16:52:02Z",
+      "side": 1,
+      "message": "Using the plural here is very strange.",
+      "revId": "7ad064af049175903b595a74a3542860a347390b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_d42cacb3",
         "filename": "doc/source/index.rst",
         "patchSetId": 3
@@ -67,6 +84,57 @@
         "endLine": 16,
         "endChar": 115
       },
+      "revId": "7ad064af049175903b595a74a3542860a347390b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_df76c792",
+        "filename": "doc/source/index.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-24T16:52:02Z",
+      "side": 1,
+      "message": "If you want to add the link, it would be more appropriate in the docs section of the developer docs.",
+      "revId": "7ad064af049175903b595a74a3542860a347390b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ff794380",
+        "filename": "doc/source/index.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-24T16:52:02Z",
+      "side": 1,
+      "message": "Posts?",
+      "revId": "7ad064af049175903b595a74a3542860a347390b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_9f94cf8d",
+        "filename": "doc/source/reference/index.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-24T16:52:02Z",
+      "side": 1,
+      "message": "Using the plural here is confusing.  As I wrote in my -1 on the last change that attempted to use the word \"references\", \"references\" in documentation typically means \"citations of other works\".  \"Reference\" is the appropriate word here.",
       "revId": "7ad064af049175903b595a74a3542860a347390b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
