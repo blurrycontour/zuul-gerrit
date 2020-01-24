@@ -39,6 +39,7 @@ which is described below.
       Executor -- Statsd
       Web -- Database
       Web -- Gearman
+      Web -- GitHub
       Web -- Zookeeper
       Web -- Executor
       Finger -- Gearman
@@ -49,7 +50,6 @@ which is described below.
       Scheduler -- Gerrit;
       Scheduler -- Zookeeper;
       Zookeeper -- Nodepool;
-      Scheduler -- GitHub;
       Scheduler -- Statsd;
    }
 
