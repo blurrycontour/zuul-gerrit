@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_05d97053",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-24T20:04:57Z",
+      "side": 1,
+      "message": "Nit: `Remaining Time: `  to match the panel heading tooltip. Or at least use Capitalization and separate label and data with a `:`",
+      "range": {
+        "startLine": 202,
+        "startChar": 14,
+        "endLine": 202,
+        "endChar": 42
+      },
+      "revId": "09b4b8a5b3003b97426a25f059641f0a58d33a8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
