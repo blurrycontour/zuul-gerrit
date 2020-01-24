@@ -18,6 +18,11 @@ import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import * as moment from 'moment'
 
+const SECOND = 1000
+const MINUTE = SECOND * 60
+const HOUR = MINUTE * 60
+const DAY = HOUR * 24
+
 
 class ChangePanel extends React.Component {
   static propTypes = {
@@ -193,13 +198,32 @@ class ChangePanel extends React.Component {
     let className
     let progressWidth = progressPercent
     let title = ''
+    let remaining = remainingTime
     if (Number.isNaN(progressPercent)) {
       progressWidth = 100
       progressPercent = 0
       className = 'progress-bar-striped progress-bar-animated'
     }
-    if (remainingTime !== null) {
-      title = 'estimated time remaining ' + moment.duration(remainingTime, 'milliseconds').humanize()
+    if (remaining !== null) {
+      title = 'estimated time remaining: '
+      if (remaining < 60) {
+        title = title + 'less than a minute'
+      } else {
+        days = Math.trunc(remaining/DAY)
+        remaining = Math.trunc(remaining%DAY)
+        hours = Math.trunc(remaining/HOUR)
+        remaining = Math.trunc(remaining%HOUR)
+        minutes = Math.trunc(remaining/MINUTE)
+        if (days > 0) {
+          title = title + days + ' days '
+        }
+        if (hours > 0) {
+          title = title + hours + ' hours '
+        }
+        if (minutes > 0) {
+          title = title + minutes + ' minutes '
+        }
+      }
     }
 
     return (
