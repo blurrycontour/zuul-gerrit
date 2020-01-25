@@ -1,6 +1,6 @@
 coverage>=3.6
 fixtures>=0.3.14
-stestr>=1.0.0 # Apache-2.0
+-e git+https://github.com/mtreinish/stestr.git@dynamic-schedule#egg=stestr
 testtools>=0.9.32
 PyMySQL
 psycopg2-binary
