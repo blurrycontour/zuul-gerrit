@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_715ca219",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-01-25T13:38:37Z",
+      "side": 1,
+      "message": "Can you be bit more specific about before/after behaviour? (example).\n\nI personally do not find too detailed representations of duration as adding value, displaying not more than two units of measure at a time seems a decent way to humanize a duration.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 36
+      },
+      "revId": "fd6323b83076c900e77c0ceb98a5d9fc303dc751",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
