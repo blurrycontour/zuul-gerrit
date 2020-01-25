@@ -126,6 +126,7 @@
 - job:
     name: zuul-build-image
     parent: opendev-build-docker-image
+    post-run: playbooks/post-test.yaml
     description: Build Docker images.
     allowed-projects: zuul/zuul
     vars: &zuul_image_vars
