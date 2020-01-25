@@ -2385,6 +2385,10 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
         """
         builds = self.running_builds[:]
+        if len(self.running_builds) == 0:
+            self.log.debug('No running builds to release')
+            return
+
         self.log.debug("Releasing build %s (%s)" % (regex,
                                                     len(self.running_builds)))
         for build in builds:
@@ -4263,6 +4267,10 @@ class ZuulTestCase(BaseTestCase):
         completed.
 
         """
+        if not self.history:
+            self.log.debug("Build history: no builds ran")
+            return
+
         self.log.debug("Build history:")
         for build in self.history:
             self.log.debug(build)
