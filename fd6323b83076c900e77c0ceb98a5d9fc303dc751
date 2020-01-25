@@ -22,6 +22,29 @@
       "revId": "fd6323b83076c900e77c0ceb98a5d9fc303dc751",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b1e3fa05",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 4162
+      },
+      "writtenOn": "2020-01-25T14:59:36Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be remaining/SECOND? As remaining here is in milliseconds still?",
+      "range": {
+        "startLine": 208,
+        "startChar": 10,
+        "endLine": 208,
+        "endChar": 19
+      },
+      "revId": "fd6323b83076c900e77c0ceb98a5d9fc303dc751",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
