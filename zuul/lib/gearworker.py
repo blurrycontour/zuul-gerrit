@@ -51,10 +51,10 @@ class ZuulGearWorker:
                                self.ssl_cert, self.ssl_ca,
                                keepalive=True, tcp_keepidle=60,
                                tcp_keepintvl=30, tcp_keepcnt=5)
-        self.log.debug('Waiting for server')
+        self.log.debug('Waiting for gearman')
         self.gearman.waitForServer()
 
-        self.log.debug('Registering')
+        self.log.debug('Registering %s jobs' % len(self.jobs))
         for job in self.jobs:
             self.gearman.registerFunction(job)
         self.thread.start()
