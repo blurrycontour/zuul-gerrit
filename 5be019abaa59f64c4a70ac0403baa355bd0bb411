@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_42e74cd8",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-01-27T17:06:59Z",
+      "side": 1,
+      "message": "Maybe update this to \u0027Zuul CLI Client\u0027 ?",
+      "revId": "5be019abaa59f64c4a70ac0403baa355bd0bb411",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
