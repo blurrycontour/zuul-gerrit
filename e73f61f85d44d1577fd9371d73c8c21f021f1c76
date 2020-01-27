@@ -22,6 +22,76 @@
       "revId": "e73f61f85d44d1577fd9371d73c8c21f021f1c76",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_281471e9",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2388,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-27T18:44:49Z",
+      "side": 1,
+      "message": "That comes from the switch to Gearman back in 2013 https://review.opendev.org/#/c/28696/\n\nI have completely missed copy, my bad ;)\n\nThere are a couple others in log statements. I guess I can update them as well and add a comment about the copy?",
+      "parentUuid": "3fa7e38b_02b874c4",
+      "range": {
+        "startLine": 2388,
+        "startChar": 15,
+        "endLine": 2388,
+        "endChar": 34
+      },
+      "revId": "e73f61f85d44d1577fd9371d73c8c21f021f1c76",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_e89df96b",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2393,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-27T18:44:49Z",
+      "side": 1,
+      "message": "one there",
+      "range": {
+        "startLine": 2393,
+        "startChar": 56,
+        "endLine": 2393,
+        "endChar": 75
+      },
+      "revId": "e73f61f85d44d1577fd9371d73c8c21f021f1c76",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_08a175a8",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2403,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-27T18:44:49Z",
+      "side": 1,
+      "message": "and a second one.",
+      "range": {
+        "startLine": 2403,
+        "startChar": 35,
+        "endLine": 2403,
+        "endChar": 54
+      },
+      "revId": "e73f61f85d44d1577fd9371d73c8c21f021f1c76",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
