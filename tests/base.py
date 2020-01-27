@@ -4028,7 +4028,12 @@ class ZuulTestCase(BaseTestCase):
                     return
                 self.sched.run_handler_lock.release()
             self.executor_server.lock.release()
-            self.sched.wake_event.wait(0.1)
+
+            if self.sched.wake_event.is_set():
+                # scheduler still has events to process
+                time.sleep(0.1)
+            else:
+                self.sched.wake_event.wait(0.1)
 
     def waitForPoll(self, poller, timeout=30):
         self.log.debug("Wait for poll on %s", poller)
