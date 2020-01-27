@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_02b874c4",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2388,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-01-27T17:04:00Z",
+      "side": 1,
+      "message": "Should this be builds? I believe a copy is made a line up to avoid races? If not then maybe put this block above the builds assignment.",
+      "range": {
+        "startLine": 2388,
+        "startChar": 15,
+        "endLine": 2388,
+        "endChar": 34
+      },
+      "revId": "e73f61f85d44d1577fd9371d73c8c21f021f1c76",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
