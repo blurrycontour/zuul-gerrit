@@ -4451,7 +4451,15 @@ class ZuulTestCase(BaseTestCase):
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.release())
             self.executor_server.lock.release()
-            self.scheds.execute(lambda app: app.sched.wake_event.wait(0.1))
+
+            if any(
+                map(lambda app: app.sched.wake_event.is_set(),
+                    self.scheds)
+            ):
+                # One of the schedulers still has events to process.
+                time.sleep(0.1)
+            else:
+                self.scheds.execute(lambda app: app.sched.wake_event.wait(0.1))
 
     def waitForPoll(self, poller, timeout=30):
         self.log.debug("Wait for poll on %s", poller)
