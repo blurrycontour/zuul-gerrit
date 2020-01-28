@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_7f7a1625",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2020-01-28T08:25:46Z",
+      "side": 1,
+      "message": "could \"build\" be used for pipelines as well, like \"any run of a pipeline\"? or is it called \"pipeline run\"?",
+      "range": {
+        "startLine": 28,
+        "startChar": 3,
+        "endLine": 28,
+        "endChar": 8
+      },
+      "revId": "a4cdf8bed913b13cec2689d65fa40766ec5dd7a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_3fc25e55",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2020-01-28T08:25:46Z",
+      "side": 1,
+      "message": "would it make sense to state the relation to pipeline here?",
+      "range": {
+        "startLine": 110,
+        "startChar": 3,
+        "endLine": 110,
+        "endChar": 6
+      },
+      "revId": "a4cdf8bed913b13cec2689d65fa40766ec5dd7a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_bfae4e9e",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 15362
+      },
+      "writtenOn": "2020-01-28T08:25:46Z",
+      "side": 1,
+      "message": "we all know what trigger means but could perhaps be listed/defined explicitly for the sake of completeness.",
+      "revId": "a4cdf8bed913b13cec2689d65fa40766ec5dd7a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
