@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_d548c28a",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-01-28T16:53:24Z",
+      "side": 1,
+      "message": "Fundamentally, a pipeline is a set of triggering, prioritizing, scheduling, and reporting rules. A project pipeline (which I\u0027m also adding an entry for) is the association of a pipeline with a set of jobs and related trigger filters and job dependencies for a particular project, effectively what to run (or avoid running) in a given pipeline. I\u0027ll try to better reflect some of that here, though the pipeline and project pipeline entries should contain the bulk of that explanation.",
+      "revId": "a4cdf8bed913b13cec2689d65fa40766ec5dd7a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_3fc25e55",
         "filename": "doc/source/reference/glossary.rst",
         "patchSetId": 1
@@ -48,6 +65,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_f54b7e82",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-01-28T16:53:24Z",
+      "side": 1,
+      "message": "Maybe, I\u0027ll see what I can come up with, though jobs on their own are basically anonymous and get associated with pipelines by listing them in project pipelines.",
+      "revId": "a4cdf8bed913b13cec2689d65fa40766ec5dd7a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_bfae4e9e",
         "filename": "doc/source/reference/glossary.rst",
         "patchSetId": 1
@@ -59,6 +93,23 @@
       "writtenOn": "2020-01-28T08:25:46Z",
       "side": 1,
       "message": "we all know what trigger means but could perhaps be listed/defined explicitly for the sake of completeness.",
+      "revId": "a4cdf8bed913b13cec2689d65fa40766ec5dd7a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_953ecae0",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-01-28T16:53:24Z",
+      "side": 1,
+      "message": "Thanks! I\u0027ll include an entry for that as well.",
       "revId": "a4cdf8bed913b13cec2689d65fa40766ec5dd7a2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
