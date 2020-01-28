@@ -1,0 +1,10 @@
+Code-Review+2: David Shrewsbury <dshrewsb@redhat.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+1: Tim Flink <tflink@fedoraproject.org>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 28 Jan 2020 09:48:38 +0000
+Reviewed-on: https://review.opendev.org/704222
+Project: zuul/zuul
+Branch: refs/heads/master
