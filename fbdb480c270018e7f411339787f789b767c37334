@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_64e7edd8",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1223,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-28T06:10:57Z",
+      "side": 1,
+      "message": "Maybe differentiate between success_message and neutral_message? Not sure but I am thinking, e.g., \"Build finished\"?",
+      "range": {
+        "startLine": 1223,
+        "startChar": 45,
+        "endLine": 1223,
+        "endChar": 61
+      },
+      "revId": "fbdb480c270018e7f411339787f789b767c37334",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
