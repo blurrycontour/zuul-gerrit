@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_844c4641",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-29T22:33:44Z",
+      "side": 1,
+      "message": "That may be something interesting to keep, being able to use executor without ssh key could be useful. Also we could use such option for the zuul-runner client.",
+      "range": {
+        "startLine": 21,
+        "startChar": 31,
+        "endLine": 21,
+        "endChar": 66
+      },
+      "revId": "e249c9ab49fb7bf01014f9835ed5db63671e13da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a4494230",
+        "filename": "zuul/driver/gerrit/gcloudauth.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-29T22:33:44Z",
+      "side": 1,
+      "message": "nit: missing new line",
+      "revId": "e249c9ab49fb7bf01014f9835ed5db63671e13da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
