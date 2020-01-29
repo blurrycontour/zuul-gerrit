@@ -128,6 +128,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_c30f9729",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-01-29T19:48:06Z",
+      "side": 1,
+      "message": "++",
+      "parentUuid": "3fa7e38b_28c9aa22",
+      "revId": "06b6eeb56c4c8debf30f50a36e7f8e072e1c48d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5a3c082c",
         "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 14
