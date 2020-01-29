@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_688b2216",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-29T19:17:24Z",
+      "side": 1,
+      "message": "0: I don\u0027t remember that, but would love it if it were the case.  If it doesn\u0027t exist, we can implement gertty-style queries.\n\nOverall, I think this section is fine as written.",
+      "revId": "06b6eeb56c4c8debf30f50a36e7f8e072e1c48d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_fad93427",
         "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 14
@@ -59,6 +76,40 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_888e9e23",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-29T19:17:24Z",
+      "side": 1,
+      "message": "0: It\u0027s probably worth noting that we would also have /nodesets/ etc for the other config object types.\n\nThis does mean there will be a small amount of additional processing needed to split the raw yaml into chunks corresponding to the config objects.  That shouldn\u0027t be too hard.",
+      "revId": "06b6eeb56c4c8debf30f50a36e7f8e072e1c48d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_2891aa45",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-29T19:17:24Z",
+      "side": 1,
+      "message": "-1: I missed the use case for multiple databases per tenant.  I think we should only have one sql connection per tenant.  I don\u0027t see the purpose of having more than one, and we\u0027ve already seen that having more than one is fairly complicated to deal with.\n\nIf someone has a use-case for more than one database/connection per tenant, let\u0027s describe it here so we know why we\u0027re supporting the extra complexity.  Otherwise, let\u0027s simplify this so that there is a single one per tenant (and it doesn\u0027t need to be specified if there is a global default).",
+      "revId": "06b6eeb56c4c8debf30f50a36e7f8e072e1c48d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5a3c082c",
         "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 14
@@ -70,6 +121,40 @@
       "writtenOn": "2020-01-28T10:05:25Z",
       "side": 1,
       "message": "I think it\u0027s out of scope for this spec - but fdegir has requested resumable executors before... he\u0027s got jobs that sometimes run for several days so an executor interruption is costly for him like a scheduler is for everyone. While I don\u0027t think we need to account for that in this spec - maybe it\u0027s worth noting that it could be a followup ... and executors over zookeeper are likely an important step towards being able to think about that.",
+      "revId": "06b6eeb56c4c8debf30f50a36e7f8e072e1c48d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_48942635",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-29T19:17:24Z",
+      "side": 1,
+      "message": "0/-1? We don\u0027t even really need an election, right?  We can just have all the schedulers fight for the lock.  (I guess that\u0027s a form of leader election?  Just a very simple one.)",
+      "revId": "06b6eeb56c4c8debf30f50a36e7f8e072e1c48d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_e89e3253",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-29T19:17:24Z",
+      "side": 1,
+      "message": "-1: I think the only time this would help is when we\u0027re waiting on merger jobs in a reconfiguration.  The rest of the time we will be CPU-bound with the GIL and therefore more threads will only hurt.  So we might want to plan on only having a single pipeline processer in a scheduler, but perhaps handle reconfigurations in a second thread.",
       "revId": "06b6eeb56c4c8debf30f50a36e7f8e072e1c48d8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
