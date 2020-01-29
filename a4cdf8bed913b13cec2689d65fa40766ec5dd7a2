@@ -82,6 +82,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_ac493c66",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-01-29T00:45:12Z",
+      "side": 1,
+      "message": "\"Dependencies\" has the wrong plurality here, but also is redundant with the term being defined. Maybe use a synonym like \"reliance\" instead.",
+      "revId": "a4cdf8bed913b13cec2689d65fa40766ec5dd7a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_bfae4e9e",
         "filename": "doc/source/reference/glossary.rst",
         "patchSetId": 1
