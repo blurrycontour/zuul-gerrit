@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_9cca4ba1",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-30T21:40:22Z",
+      "side": 1,
+      "message": "i think we need a `style\u003d{{ width: \u0027100px\u0027 }}` attribute here to force the next InfoItem to be aligned when multiple hosts with different name are used.  100px seems to work fine.",
+      "revId": "1a75d4047d2d3beb2493e4b522150146456e7de1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_3ca47705",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-30T21:40:22Z",
+      "side": 1,
+      "message": "nit: extra semi colons are not required.",
+      "range": {
+        "startLine": 211,
+        "startChar": 37,
+        "endLine": 211,
+        "endChar": 38
+      },
+      "revId": "1a75d4047d2d3beb2493e4b522150146456e7de1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
