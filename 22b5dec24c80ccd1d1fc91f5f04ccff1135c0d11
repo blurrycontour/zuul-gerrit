@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_bfa4e0a5",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-30T15:57:27Z",
+      "side": 1,
+      "message": "++ for #2.",
+      "parentUuid": "",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_648d7fd9",
         "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 15
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_1f8ad41d",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-30T15:57:27Z",
+      "side": 1,
+      "message": "Fine for me, I\u0027d like to get rid of it too. We initially kept this in the spec because I think there was some opposition about completely getting rid of gearman.",
+      "parentUuid": "",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_8492fbfa",
         "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 15
@@ -47,6 +83,24 @@
       "writtenOn": "2020-01-30T15:26:04Z",
       "side": 1,
       "message": "I\u0027m confused why this was moved to future work; isn\u0027t this very much in scope?  The gearman job is only held by one scheduler, so a scheduler restart would lose the connection to the build.",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_1fc5f45d",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-30T15:57:27Z",
+      "side": 1,
+      "message": "Actually I have no idea why I put this here as I can clearly remember a discussion about this on irc back then. we\u0027ll move this to the main part of the spec",
+      "parentUuid": "3fa7e38b_8492fbfa",
       "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
