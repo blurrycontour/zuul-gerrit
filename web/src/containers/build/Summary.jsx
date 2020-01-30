@@ -47,9 +47,15 @@ class Summary extends React.Component {
       if (column === 'job_name') {
         label = 'job'
         value = (
+          <React.Fragment>
           <Link to={this.props.tenant.linkPrefix + '/job/' + value}>
             {value}
           </Link>
+          <span/>
+          <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + value + '&project=' + build.project}>
+            (history)
+          </Link>
+          </React.Fragment>
         )
       }
       if (column === 'buildset') {
