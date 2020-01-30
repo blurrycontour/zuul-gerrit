@@ -32,7 +32,7 @@ from zuul import model
 from zuul import exceptions
 from zuul import version as zuul_version
 from zuul import rpclistener
-from zuul.lib import commandsocket
+from zuul.lib import commandsocket, tracing
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
@@ -325,6 +325,7 @@ class Scheduler(threading.Thread):
         self.management_event_queue = zuul.lib.queue.MergedQueue()
         self.abide = model.Abide()
         self.unparsed_abide = model.UnparsedAbideConfig()
+        self.tracer = tracing.get_tracer(self.log.name)
 
         if not testonly:
             time_dir = self._get_time_database_dir()

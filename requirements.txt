@@ -35,3 +35,5 @@ urllib3!=1.25.4,!=1.25.5  # https://github.com/urllib3/urllib3/pull/1684
 # requests. Remove the following line when this issue is resolved:
 # https://github.com/cherrypy/cheroot/issues/263
 cheroot<8.1.0
+-e git+https://github.com/open-telemetry/opentelemetry-python.git#egg=opentelemetry-api&subdirectory=opentelemetry-api
+-e git+https://github.com/open-telemetry/opentelemetry-python.git#egg=opentelemetry-sdk&subdirectory=opentelemetry-sdk
