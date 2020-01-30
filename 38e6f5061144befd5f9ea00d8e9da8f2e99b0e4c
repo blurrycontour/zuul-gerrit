@@ -16,6 +16,24 @@
       "revId": "38e6f5061144befd5f9ea00d8e9da8f2e99b0e4c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_abb02a43",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 8037,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-30T12:22:59Z",
+      "side": 1,
+      "message": "oops",
+      "parentUuid": "3fa7e38b_cb580627",
+      "revId": "38e6f5061144befd5f9ea00d8e9da8f2e99b0e4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
