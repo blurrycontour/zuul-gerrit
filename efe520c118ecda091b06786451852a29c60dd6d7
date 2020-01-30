@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_ed3f1d82",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-30T05:16:48Z",
+      "side": 1,
+      "message": "This got already set 3 lines above right?",
+      "range": {
+        "startLine": 481,
+        "startChar": 12,
+        "endLine": 481,
+        "endChar": 74
+      },
+      "revId": "efe520c118ecda091b06786451852a29c60dd6d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
