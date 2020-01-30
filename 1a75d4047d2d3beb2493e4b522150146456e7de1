@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_5c97f3eb",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-30T22:39:43Z",
+      "side": 1,
+      "message": "I went with a flex stanza to automagically align all the items. Based on https://github.com/patternfly/patternfly-react/issues/1393#issuecomment-515202640\n\nIt is quite amazing how CSS has evolved since last time I have touched it.",
+      "parentUuid": "3fa7e38b_9cca4ba1",
+      "revId": "1a75d4047d2d3beb2493e4b522150146456e7de1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_3ca47705",
         "filename": "web/src/containers/build/Console.jsx",
         "patchSetId": 1
@@ -30,6 +48,30 @@
       "writtenOn": "2020-01-30T21:40:22Z",
       "side": 1,
       "message": "nit: extra semi colons are not required.",
+      "range": {
+        "startLine": 211,
+        "startChar": 37,
+        "endLine": 211,
+        "endChar": 38
+      },
+      "revId": "1a75d4047d2d3beb2493e4b522150146456e7de1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_dc8a03bc",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-01-30T22:39:43Z",
+      "side": 1,
+      "message": "Done \\o/",
+      "parentUuid": "3fa7e38b_3ca47705",
       "range": {
         "startLine": 211,
         "startChar": 37,
