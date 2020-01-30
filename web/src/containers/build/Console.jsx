@@ -12,6 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
+import * as moment from 'moment'
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import ReactJson from 'react-json-view'
@@ -203,6 +204,15 @@ class HostTask extends React.Component {
           <Icon type='pf' name='container-node' />
           {hostname}
         </span>
+      </ListView.InfoItem>
+    )
+
+    let duration = moment(task.task.duration.end)
+      .from(task.task.duration.start)
+
+    ai.push(
+      <ListView.InfoItem key="task-duration">
+        <span className="task-duration">{duration}</span>
       </ListView.InfoItem>
     )
 
