@@ -146,6 +146,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_a7a14495",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2020-01-30T00:28:55Z",
+      "side": 1,
+      "message": "Originally the SQL reporter was just that - a reporter. Thus being able to choose where the results went (much like you can choose with the smtp reporter) was useful. For example, it was a way to get results out of zuul so that you could then do your own analysis. This might have been done by putting a job you were interested in in a pipeline just for this purpose (eg an `sql-pipeline`).\n\nObviously now zuul does a lot more with the information out of the reporter. So the question I think we should look at is even if it is considered a reporter. The \"primary database\" connection described here alludes to something slightly different to a reporter.\n\nSo a single SQL connection for a tenant I think is enough, and a requirement, to achieve what zuul needs to with the data. Specifically this is internal to zuul\u0027s needs and it is debatable if it should even be exposed as a reporter.\n\nThen there is an obvious regression and the question becomes if we should keep SQL reporters, and specifically ones that can use an alternative SQL connection/database.\n\nI think there is an argument to be made that this is still useful. However, I also think it can be separate from this spec and implemented as a standalone reporter at some point.\n\nBut to go further than that, it is likely that any argument or use case made in favour of a separate database can be implemented by other means. For example, by using cross-database views, or by writing a small script to pull out the parts you need from the master database into your analysis database etc.\n\nTherefore, I would suggest that only 1 connection is appropriate and necessary for this spec. I would also suggest investigating not exposing it as a reporter, but just an assumed function, as zuul has expectations about what is actually in the database.",
+      "parentUuid": "3fa7e38b_2891aa45",
+      "revId": "06b6eeb56c4c8debf30f50a36e7f8e072e1c48d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5a3c082c",
         "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 14
