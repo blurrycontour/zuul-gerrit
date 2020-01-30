@@ -37,6 +37,7 @@ from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
+from zuul.lib.tracing import get_tracer
 from zuul.lib import filecomments
 
 import gear
@@ -2402,6 +2403,7 @@ class ExecutorServer(object):
         )
         self.log_console_port = log_console_port
         self.repl = None
+        self.tracer = get_tracer(self.log.name)
 
         statsd_extra_keys = {'hostname': self.hostname}
         self.statsd = get_statsd(config, statsd_extra_keys)

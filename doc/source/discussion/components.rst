@@ -193,6 +193,35 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
 
       The ZooKeeper session timeout, in seconds.
 
+.. attr:: tracing <name>
+
+   .. attr:: exporter
+      :required:
+
+      The span exporter to use. This must be the full dotted path of the span
+      exporter class (e.g. ``zuul.lib.tracing.LogSpanExporter``).
+
+      In addition to the ``ConsoleSpanExporter``, that comes with the
+      `OpenTelemetry SDK`_, Zuul provides the
+      ``zuul.lib.tracing.LogSpanExporter``, that will output the spans via the
+      standard logging mechanism with a log level of debug.
+
+      Other exporters need to be installed separately by the administrator.
+
+   .. attr:: span_processor
+      :default: 'batch'
+
+      The span processor to use. Options are `'batch'`_ (default) and
+      `'simple'`_.
+
+   .. attr:: <exporter-argument>
+
+      Optional arguments passed to the span exporter on instance creation.
+
+.. _'batch': https://open-telemetry.github.io/opentelemetry-python/opentelemetry.sdk.trace.export.html#opentelemetry.sdk.trace.export.BatchExportSpanProcessor
+.. _'simple': https://open-telemetry.github.io/opentelemetry-python/opentelemetry.sdk.trace.export.html#opentelemetry.sdk.trace.export.SimpleExportSpanProcessor
+.. _ConsoleSpanExporter: https://open-telemetry.github.io/opentelemetry-python/opentelemetry.sdk.trace.export.html#opentelemetry.sdk.trace.export.ConsoleSpanExporter
+
 
 .. _scheduler:
 

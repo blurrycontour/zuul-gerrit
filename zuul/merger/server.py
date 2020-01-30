@@ -19,6 +19,7 @@ import threading
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
+from zuul.lib.tracing import get_tracer
 from zuul.merger import merger
 
 
@@ -30,6 +31,7 @@ class MergeServer(object):
 
     def __init__(self, config, connections={}):
         self.config = config
+        self.tracer = get_tracer(self.log.name)
 
         merge_root = get_default(self.config, 'merger', 'git_dir',
                                  '/var/lib/zuul/merger-git')

@@ -37,6 +37,7 @@ from zuul import exceptions
 import zuul.rpcclient
 import zuul.zk
 from zuul.lib import commandsocket
+from zuul.lib.tracing import get_tracer
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -1083,6 +1084,8 @@ class ZuulWeb(object):
         self.static_cache_expiry = static_cache_expiry
         self.info = info
         self.static_path = os.path.abspath(static_path or STATIC_DIR)
+        self.tracer = get_tracer(self.log.name)
+
         # instanciate handlers
         self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
                                             ssl_key, ssl_cert, ssl_ca)

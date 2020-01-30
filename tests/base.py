@@ -58,6 +58,7 @@ import testtools.content_type
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
+from opentelemetry.sdk.trace import TracerSource
 
 import tests.fakegithub
 import zuul.driver.gerrit.gerritsource as gerritsource
@@ -83,6 +84,7 @@ import zuul.configloader
 from zuul.exceptions import MergeFailure
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.tracing import configure_tracing
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__),
                            'fixtures')
@@ -3245,6 +3247,13 @@ class ZuulTestCase(BaseTestCase):
                 self.config.set(
                     'scheduler', cfg_attr,
                     os.path.join(FIXTURE_DIR, cfg_value))
+
+        tracer_source = TracerSource()
+        self.useFixture(fixtures.MonkeyPatch(
+            "opentelemetry.trace.tracer_source",
+            lambda: tracer_source
+        ))
+        configure_tracing(self.config, "zuul-test", tracer_source)
 
         self.config.set('scheduler', 'state_dir', self.state_root)
         self.config.set(

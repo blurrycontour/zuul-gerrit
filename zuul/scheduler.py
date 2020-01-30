@@ -38,6 +38,7 @@ from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
+from zuul.lib.tracing import get_tracer
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul.model import Build, HoldRequest, Tenant
@@ -325,6 +326,7 @@ class Scheduler(threading.Thread):
         self.management_event_queue = zuul.lib.queue.MergedQueue()
         self.abide = model.Abide()
         self.unparsed_abide = model.UnparsedAbideConfig()
+        self.tracer = get_tracer(self.log.name)
 
         if not testonly:
             time_dir = self._get_time_database_dir()
