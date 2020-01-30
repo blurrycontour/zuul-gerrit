@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_c4f2336a",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-30T15:26:04Z",
+      "side": 1,
+      "message": "I just realized a problem with this.  We now support different tenants reading different files, so we still need to store the unparsed config by files.  I see the following options:\n\n1) Add in a filename to the path (eg /zuul/config/\u003cproject\u003e/\u003cbranch\u003e/\u003cfilename\u003e/jobs/1)\n2) Add the filename and drop the object type (eg /zuul/config/\u003cproject\u003e/\u003cbranch\u003e/\u003cfilename\u003e/1), and just shard when the raw string data gets near 1MB.\n\nI lean slightly toward #2.  The downside is that in the case of a large file, a change in the 999th KB would require rewriting objects /1 and /2, because we\u0027re not breaking on a semantic boundary but rather mere byte boundaries.\n\nOn the other hand, most files are probably *much* smaller than that (openstack\u0027s projects.yaml is 137k), so we\u0027re unlikely to need to shard anyway since we\u0027re splitting by files.  This is probably easier to implement too, since it\u0027s close to the current cache system.",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_648d7fd9",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-30T15:26:04Z",
+      "side": 1,
+      "message": "Come to think of it, we should really move the mergers to ZK too -- we need to get rid of gearman in order to remove all spofs.  We should add one more section about that (it should be easy though, it\u0027s just a simple job queue).",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_8492fbfa",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-30T15:26:04Z",
+      "side": 1,
+      "message": "I\u0027m confused why this was moved to future work; isn\u0027t this very much in scope?  The gearman job is only held by one scheduler, so a scheduler restart would lose the connection to the build.",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
