@@ -39,6 +39,7 @@ pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 from zuul.ansible import logconfig
 import zuul.lib.connections
 from zuul.lib.config import get_default
+from zuul.lib.tracing import configure_tracing
 
 
 def stack_dump_handler(signum, frame):
@@ -200,6 +201,9 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
         # Early register the stack dump handler for all zuul apps. This makes
         # it possible to also gather stack dumps during startup hangs.
         signal.signal(signal.SIGUSR2, stack_dump_handler)
+
+        # Setup trace exporter(s)
+        configure_tracing(self.config, self.app_name)
 
         if self.args.nodaemon:
             self.run()

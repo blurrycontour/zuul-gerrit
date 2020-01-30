@@ -8,6 +8,22 @@ server=127.0.0.1
 [statsd]
 server=127.0.0.1
 
+[tracing log]
+exporter=zuul.lib.tracing.LogSpanExporter
+span_processor=simple
+
+[tracing jaeger]
+exporter=opentelemetry.ext.jaeger.JaegerSpanExporter
+span_processor=batch
+; exporter specific settings
+agent_host_name='localhost'
+agent_port=6831
+;collector_host_name=localhost
+;collector_port=14268
+;collector_endpoint=/api/traces?format=jaeger.thrift
+;username=xxxx
+;password=xxxx
+
 [zookeeper]
 hosts=127.0.0.1:2181
 
