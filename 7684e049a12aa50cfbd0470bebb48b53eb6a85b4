@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_4cbbba0f",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-31T15:50:27Z",
+      "side": 1,
+      "message": "I don\u0027t think we need (or want) to share this volume between the containers.",
+      "revId": "7684e049a12aa50cfbd0470bebb48b53eb6a85b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
