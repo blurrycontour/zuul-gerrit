@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_51983166",
+        "filename": "tools/uid_entrypoint.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-31T15:20:33Z",
+      "side": 1,
+      "message": "I think you\u0027re missing an extra \u003e here:\n\nhttps://zuul.opendev.org/t/zuul/build/2560c9f640e0472ebbf663c81bd401ad/log/container_logs/gerritconfig.log#1",
+      "revId": "32d46757e047eaa9d001057ee0333826d7e8ef88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
