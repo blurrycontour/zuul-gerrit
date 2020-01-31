@@ -41,6 +41,11 @@ RUN /output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
   && rm -rf /output
 VOLUME /var/lib/zuul
+RUN addgroup --gid 1000 zuul && \
+    adduser --system --uid 1000 --gid 1000 zuul && \
+    chown -R zuul:zuul \
+                       /home/zuul \
+                       /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
 
 FROM zuul as zuul-executor
