@@ -554,6 +554,46 @@ class TestAuthorizationRuleParser(ZuulTestCase):
         self.assertTrue(rule(claims))
 
 
+class TestAuthorizationRuleParserWithTemplating(ZuulTestCase):
+    tenant_config_file = 'config/tenant-parser/authorizations-templating.yaml'
+
+    def test_rules_are_loaded(self):
+        rules = self.sched.abide.admin_rules
+        self.assertTrue('tenant-admin' in rules, self.sched.abide)
+        self.assertTrue('tenant-admin-complex' in rules, self.sched.abide)
+
+    def test_tenant_substitution(self):
+        claims_1 = {'group': 'tenant-one-admin'}
+        claims_2 = {'group': 'tenant-two-admin'}
+        rules = self.sched.abide.admin_rules
+        self.assertTrue(rules['tenant-admin'](claims_1, 'tenant-one'))
+        self.assertTrue(rules['tenant-admin'](claims_2, 'tenant-two'))
+        self.assertTrue(not rules['tenant-admin'](claims_1, 'tenant-two'))
+        self.assertTrue(not rules['tenant-admin'](claims_2, 'tenant-one'))
+
+    def test_tenant_substitution_in_list(self):
+        claims_1 = {'group': ['tenant-one-admin', 'some-other-tenant']}
+        claims_2 = {'group': ['tenant-two-admin', 'some-other-tenant']}
+        rules = self.sched.abide.admin_rules
+        self.assertTrue(rules['tenant-admin'](claims_1, 'tenant-one'))
+        self.assertTrue(rules['tenant-admin'](claims_2, 'tenant-two'))
+        self.assertTrue(not rules['tenant-admin'](claims_1, 'tenant-two'))
+        self.assertTrue(not rules['tenant-admin'](claims_2, 'tenant-one'))
+
+    def test_tenant_substitution_in_dict(self):
+        claims_2 = {
+            'path': {
+                'to': {
+                    'group': 'tenant-two-admin'
+                }
+            }
+        }
+        rules = self.sched.abide.admin_rules
+        self.assertTrue(
+            not rules['tenant-admin-complex'](claims_2, 'tenant-one'))
+        self.assertTrue(rules['tenant-admin-complex'](claims_2, 'tenant-two'))
+
+
 class TestTenantExtra(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/extra.yaml'
 
