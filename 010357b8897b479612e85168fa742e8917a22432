@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_3381fda2",
+        "filename": "doc/source/reference/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-31T13:39:31Z",
+      "side": 1,
+      "message": "This should be just checks as we\u0027re reporting checks (same as with status).",
+      "range": {
+        "startLine": 346,
+        "startChar": 13,
+        "endLine": 346,
+        "endChar": 23
+      },
+      "revId": "010357b8897b479612e85168fa742e8917a22432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_33d33dd7",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1696,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-31T13:39:31Z",
+      "side": 1,
+      "message": "Checks api is exclusively for apps so this will break gating on all deployments that use api token auth.",
+      "revId": "010357b8897b479612e85168fa742e8917a22432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_13dac1e5",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1956,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-01-31T13:39:31Z",
+      "side": 1,
+      "message": "This must be guarded based on the auth method as the checks api is unavailable for non-apps.",
+      "range": {
+        "startLine": 1947,
+        "startChar": 0,
+        "endLine": 1956,
+        "endChar": 65
+      },
+      "revId": "010357b8897b479612e85168fa742e8917a22432",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
