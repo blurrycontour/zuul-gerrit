@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_5117d1f0",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-31T15:11:27Z",
+      "side": 1,
+      "message": "seems like it\u0027s not using \u0027moment-duration-format\u0027 here",
+      "range": {
+        "startLine": 210,
+        "startChar": 19,
+        "endLine": 211,
+        "endChar": 37
+      },
+      "revId": "f03ec287aa17f7f6841036d90e1518c7164745d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_31f1f5e0",
+        "filename": "web/src/index.css",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-31T15:11:27Z",
+      "side": 1,
+      "message": "that looks like magic :)",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 190,
+        "endChar": 18
+      },
+      "revId": "f03ec287aa17f7f6841036d90e1518c7164745d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
