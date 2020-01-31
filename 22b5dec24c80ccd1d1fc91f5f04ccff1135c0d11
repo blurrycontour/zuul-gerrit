@@ -37,6 +37,42 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_90e1ca34",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-31T05:50:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_bfa4e0a5",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b0e64649",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-31T05:50:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_c4f2336a",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_648d7fd9",
         "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 15
@@ -72,6 +108,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_50eb5210",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-31T05:50:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_648d7fd9",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_8492fbfa",
         "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
         "patchSetId": 15
@@ -101,6 +155,24 @@
       "side": 1,
       "message": "Actually I have no idea why I put this here as I can clearly remember a discussion about this on irc back then. we\u0027ll move this to the main part of the spec",
       "parentUuid": "3fa7e38b_8492fbfa",
+      "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_70f0cefd",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-01-31T05:50:39Z",
+      "side": 1,
+      "message": "I got the idea from a comment on last patch that we may do something later on. Probably just got confused.",
+      "parentUuid": "3fa7e38b_1fc5f45d",
       "revId": "22b5dec24c80ccd1d1fc91f5f04ccff1135c0d11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
