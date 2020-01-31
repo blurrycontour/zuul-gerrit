@@ -16,6 +16,24 @@
       "revId": "6efb6ef1eb0ad77af3c4ebeb63e97017998e8679",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_68769f43",
+        "filename": "Dockerfile",
+        "patchSetId": 10
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-31T19:16:10Z",
+      "side": 1,
+      "message": "Perhaps, iirc that wasn\u0027t working before, maybe now it\u0027s ok?",
+      "parentUuid": "3fa7e38b_082ccb47",
+      "revId": "6efb6ef1eb0ad77af3c4ebeb63e97017998e8679",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
