@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_c7030375",
+        "filename": "Dockerfile",
+        "patchSetId": 8
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-31T17:12:31Z",
+      "side": 1,
+      "message": "This is a vector for privilege escalation.",
+      "revId": "7684e049a12aa50cfbd0470bebb48b53eb6a85b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_4cbbba0f",
         "filename": "doc/source/examples/docker-compose.yaml",
         "patchSetId": 8
