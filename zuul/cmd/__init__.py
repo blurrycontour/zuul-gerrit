@@ -121,10 +121,7 @@ class ZuulApp(object):
         parser = self.createParser()
         self.args = parser.parse_args(args)
 
-        # The arguments debug and foreground both lead to nodaemon mode so
-        # set nodaemon if one of them is set.
-        if ((hasattr(self.args, 'debug') and self.args.debug) or
-                (hasattr(self.args, 'foreground') and self.args.foreground)):
+        if hasattr(self.args, 'foreground') and self.args.foreground:
             self.args.nodaemon = True
         else:
             self.args.nodaemon = False
@@ -174,11 +171,7 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
     def createParser(self):
         parser = super(ZuulDaemonApp, self).createParser()
         parser.add_argument('-d', dest='debug', action='store_true',
-                            help='do not run as a daemon with debug log. Note '
-                                 'that in future this will changed to only '
-                                 'request debug logging. If you want to keep '
-                                 'running the process in the foreground '
-                                 'migrate/add the -f switch.')
+                            help='enable debug log')
         parser.add_argument('-f', dest='foreground', action='store_true',
                             help='do not run as a daemon with info log')
         return parser
