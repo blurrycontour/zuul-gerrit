@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_082ccb47",
+        "filename": "Dockerfile",
+        "patchSetId": 10
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-01-31T19:05:22Z",
+      "side": 1,
+      "message": "Should we add a USER line here so that the \"zuul\" target runs as this user too?",
+      "revId": "6efb6ef1eb0ad77af3c4ebeb63e97017998e8679",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
