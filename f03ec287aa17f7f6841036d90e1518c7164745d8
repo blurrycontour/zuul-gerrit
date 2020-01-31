@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_c228d1ee",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-31T18:16:17Z",
+      "side": 1,
+      "message": "milliseconds might be too precise, especially where ansible is not exactly realtime :) Perhaps doing half second resolution would be enough? I don\u0027t mind either way.",
+      "parentUuid": "3fa7e38b_a22fd555",
+      "range": {
+        "startLine": 210,
+        "startChar": 19,
+        "endLine": 211,
+        "endChar": 37
+      },
+      "revId": "f03ec287aa17f7f6841036d90e1518c7164745d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_31f1f5e0",
         "filename": "web/src/index.css",
         "patchSetId": 2
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "My jaw dropped when I have read about `flex`. CSS has nicely improved!",
       "parentUuid": "3fa7e38b_31f1f5e0",
+      "range": {
+        "startLine": 188,
+        "startChar": 0,
+        "endLine": 190,
+        "endChar": 18
+      },
+      "revId": "f03ec287aa17f7f6841036d90e1518c7164745d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a20cb596",
+        "filename": "web/src/index.css",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-01-31T18:16:17Z",
+      "side": 1,
+      "message": "Though I read horror story about it :)",
+      "parentUuid": "3fa7e38b_c23451ae",
       "range": {
         "startLine": 188,
         "startChar": 0,
