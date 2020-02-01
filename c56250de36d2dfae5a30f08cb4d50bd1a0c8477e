@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_17d1422f",
+        "filename": "Dockerfile",
+        "patchSetId": 12
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-02-01T13:28:54Z",
+      "side": 1,
+      "message": "While at it, one might also want to instruct the entrypoint / command to be run as `zuul`?\n\n USER zuul\n\nElse the container still defaults to be running as root user:\n\n $ docker run --rm -it --entrypoint\u003did zuul\n uid\u003d0(root) gid\u003d0(root) groups\u003d0(root)\n\n\nNote that unless one has enabled user namespacing, the containerized process on the host stil has the UID 10001 which \"might\" bind to a real user.\n\nMaybe a better choice might be to use the nobody user (uid 65534) which has even less privileges :]\n\n\n0.02€",
+      "revId": "c56250de36d2dfae5a30f08cb4d50bd1a0c8477e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
