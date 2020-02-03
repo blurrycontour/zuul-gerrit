@@ -22,6 +22,23 @@
       "revId": "ca9fa4845d6c2a69eab06931c6115c8b9c293a1d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_6400f104",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-03T21:51:12Z",
+      "side": 1,
+      "message": "Indeed, \"\u003cfilename\u003e\" might be a value like \"zuul.d/jobs.yaml\".  So whatever we have to do to support that.  :)",
+      "revId": "ca9fa4845d6c2a69eab06931c6115c8b9c293a1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
