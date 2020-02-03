@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_43e939a9",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-02-03T10:03:01Z",
+      "side": 1,
+      "message": "I will change that to to \u003cpath-to-config\u003e since \u003cfilename\u003e is not enough here and may be misleading here.",
+      "range": {
+        "startLine": 173,
+        "startChar": 54,
+        "endLine": 173,
+        "endChar": 64
+      },
+      "revId": "ca9fa4845d6c2a69eab06931c6115c8b9c293a1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
