@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_f420124e",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 425,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-02-03T18:32:43Z",
+      "side": 1,
+      "message": "Use \u0027age\u0027 here?",
+      "range": {
+        "startLine": 425,
+        "startChar": 12,
+        "endLine": 425,
+        "endChar": 79
+      },
+      "revId": "d79447757defde6fc8fabd62cb757994c0d7a499",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
