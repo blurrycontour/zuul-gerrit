@@ -1,0 +1,9 @@
+Code-Review+2: David Shrewsbury <dshrewsb@redhat.com>
+Code-Review+2: Tristan Cacqueray <tdecacqu@redhat.com>
+Workflow+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 03 Feb 2020 23:00:44 +0000
+Reviewed-on: https://review.opendev.org/705313
+Project: zuul/zuul
+Branch: refs/heads/master
