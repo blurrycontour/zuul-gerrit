@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_97be7dff",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-03T22:14:42Z",
+      "side": 1,
+      "message": "nit: trailing whitespace",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b7bb790e",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-03T22:14:42Z",
+      "side": 1,
+      "message": "Changes",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 6
+      },
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_77b50119",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-03T22:14:42Z",
+      "side": 1,
+      "message": "one",
+      "range": {
+        "startLine": 47,
+        "startChar": 37,
+        "endLine": 47,
+        "endChar": 39
+      },
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_d73955a2",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-03T22:14:42Z",
+      "side": 1,
+      "message": "I\u0027d further mention that this is out of scope of this spec and could be considered as a later improvement if needed.",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
