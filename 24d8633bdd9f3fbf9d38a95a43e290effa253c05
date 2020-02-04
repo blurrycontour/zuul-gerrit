@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_4697ee38",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-04T15:52:44Z",
+      "side": 1,
+      "message": "We should add the standard header from the other specs about how this is not authoritative documentation.",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_6650ea0a",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
@@ -25,6 +42,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_e6a5baa1",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-04T15:52:44Z",
+      "side": 1,
+      "message": "Why should it be configured per-project?  Per-tenant seems enough to me.  Is there a use-case for multiple projects within a tenant having differing values for this?  I think that would make it confusing for users?  Though I guess you don\u0027t have to use that feature, and if you don\u0027t the tenant default would control?",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_97be7dff",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
@@ -36,6 +70,23 @@
       "writtenOn": "2020-02-03T22:14:42Z",
       "side": 1,
       "message": "nit: trailing whitespace",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_06a1f692",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-04T15:52:44Z",
+      "side": 1,
+      "message": "Apparently I guessed wrongly above.  Users probably will too.  Oh, and this is still in the tenant config, this isn\u0027t a project-level config.  In that case, why would you even have a tenant-level setting?",
       "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -117,6 +168,57 @@
       "side": 1,
       "message": "I think I actually like the restriction that circular deps need to share a queue. But definitely it\u0027s out of scope / future work if we want to change that.",
       "parentUuid": "3fa7e38b_d73955a2",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a6b102e6",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-04T15:52:44Z",
+      "side": 1,
+      "message": "This one is pretty hard to imagine, so I\u0027m fine not suggesting it as a follow-up.  :)",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_c6b43ed6",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-04T15:52:44Z",
+      "side": 1,
+      "message": "As mentioned on an earlier patchset, it need not be a force-push.  We could recover with a normal push of a revert.",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_66ab0a71",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-04T15:52:44Z",
+      "side": 1,
+      "message": "typo: its",
       "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
