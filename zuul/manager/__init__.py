@@ -18,6 +18,7 @@ from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import QueueItem
 
 
 class DynamicChangeQueueContextManager(object):
@@ -519,12 +520,13 @@ class PipelineManager(object):
                 relevant_errors.append(err)
         return relevant_errors
 
-    def _loadDynamicLayout(self, item):
+    def _loadDynamicLayout(self, item: QueueItem):
         # Load layout
         # Late import to break an import loop
         import zuul.configloader
         loader = zuul.configloader.ConfigLoader(
-            self.sched.connections, self.sched, None, None)
+            self.sched.connections, self.sched, None, None,
+            self.sched.zk, use_zk=True)
 
         self.log.debug("Loading dynamic layout")
 
