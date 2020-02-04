@@ -1417,6 +1417,7 @@ class TenantParser(object):
         'shadow': to_list(str),
         'exclude-unprotected-branches': bool,
         'extra-config-paths': to_list(str),
+        'branch-filter': str,
     }}
 
     project = vs.Any(str, project_dict)
@@ -1561,6 +1562,10 @@ class TenantParser(object):
         if 'master' in branches:
             branches.remove('master')
             branches = ['master'] + branches
+        if tpc.branch_filter is not None:
+            matcher = re.compile(tpc.branch_filter)
+            branches = [b for b in branches
+                        if matcher.match(b)]
         tpc.branches = branches
 
     def _loadProjectKeys(self, connection_name, project):
@@ -1627,6 +1632,7 @@ class TenantParser(object):
             project_include = current_include
             shadow_projects = []
             project_exclude_unprotected_branches = None
+            project_branch_filter = None
         else:
             project_name = list(conf.keys())[0]
             project = source.getProject(project_name)
@@ -1651,6 +1657,8 @@ class TenantParser(object):
                                             if not x.endswith('/')])
                 extra_config_dirs = tuple([x[:-1] for x in extra_config_paths
                                            if x.endswith('/')])
+            project_branch_filter = conf[project_name].get(
+                'branch-filter', None)
 
         tenant_project_config = model.TenantProjectConfig(project)
         tenant_project_config.load_classes = frozenset(project_include)
@@ -1659,6 +1667,7 @@ class TenantParser(object):
             project_exclude_unprotected_branches
         tenant_project_config.extra_config_files = extra_config_files
         tenant_project_config.extra_config_dirs = extra_config_dirs
+        tenant_project_config.branch_filter = project_branch_filter
 
         return tenant_project_config
 
