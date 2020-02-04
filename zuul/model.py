@@ -918,7 +918,7 @@ class SourceContext(ConfigObject):
     Jobs and playbooks reference this to keep track of where they
     originate."""
 
-    def __init__(self, project, branch, path, trusted):
+    def __init__(self, project: Project, branch: str, path: str, trusted: bool):
         super(SourceContext, self).__init__()
         self.project = project
         self.branch = branch

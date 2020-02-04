@@ -31,7 +31,13 @@ import zuul.manager.dependent
 import zuul.manager.independent
 import zuul.manager.supercedent
 from zuul.lib import encryption
+from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.keystorage import KeyStorage
+from zuul.merger.client import MergeClient
+from zuul.model import SourceContext
+from zuul.scheduler import Scheduler
+from zuul.zk import ZooKeeper
+from typing import Optional
 
 
 # Several forms accept either a single item or a list, this makes
@@ -219,7 +225,7 @@ def project_configuration_exceptions(context, accumulator):
 
 
 @contextmanager
-def early_configuration_exceptions(context):
+def early_configuration_exceptions(context: SourceContext):
     try:
         yield
     except ConfigurationSyntaxError:
@@ -1401,12 +1407,21 @@ class ParseContext(object):
 
 
 class TenantParser(object):
-    def __init__(self, connections, scheduler, merger, keystorage):
+    def __init__(self,
+                 connections: ConnectionRegistry,
+                 scheduler: Scheduler,
+                 merger: MergeClient,
+                 keystorage: KeyStorage,
+                 zk: Optional[ZooKeeper],
+                 use_zk: bool):
+
         self.log = logging.getLogger("zuul.TenantParser")
         self.connections = connections
         self.scheduler = scheduler
         self.merger = merger
         self.keystorage = keystorage
+        self.zk = zk
+        self.use_zk = use_zk
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret')
@@ -1774,7 +1789,7 @@ class TenantParser(object):
                     # project-branch (unless an "extra" file/dir).
                     if (conf_root not in tpc.extra_config_files and
                         conf_root not in tpc.extra_config_dirs):
-                        if (loaded and loaded != conf_root):
+                        if loaded and loaded != conf_root:
                             self.log.warning(
                                 "Multiple configuration files in %s" %
                                 (job.source_context,))
@@ -1786,8 +1801,22 @@ class TenantParser(object):
                     self.log.info(
                         "Loading configuration from %s" %
                         (source_context,))
+
+                    data = self.zk.loadConfig(job.source_context.project.name,
+                                              job.source_context.branch,
+                                              job.source_context.path) \
+                        if self.zk is not None and self.use_zk else None
+
+                    if data is None:  # Forced re-config or data not in ZK
+                        data = job.files[fn]
+                        if self.zk is not None:
+                            self.zk.saveConfig(job.source_context.project.name,
+                                               job.source_context.branch,
+                                               job.source_context.path,
+                                               data)
+
                     incdata = self.loadProjectYAML(
-                        job.files[fn], source_context, loading_errors)
+                        data, source_context, loading_errors)
                     branch_cache = abide.getUnparsedBranchCache(
                         source_context.project.canonical_name,
                         source_context.branch)
@@ -1824,7 +1853,7 @@ class TenantParser(object):
                     untrusted_projects_config.extend(unparsed_branch_config)
         return config_projects_config, untrusted_projects_config
 
-    def loadProjectYAML(self, data, source_context, loading_errors):
+    def loadProjectYAML(self, data, source_context: SourceContext, loading_errors):
         config = model.UnparsedConfig()
         try:
             with early_configuration_exceptions(source_context):
@@ -2103,7 +2132,14 @@ class TenantParser(object):
 class ConfigLoader(object):
     log = logging.getLogger("zuul.ConfigLoader")
 
-    def __init__(self, connections, scheduler, merger, key_dir):
+    def __init__(self,
+                 connections: ConnectionRegistry,
+                 scheduler: Scheduler,
+                 merger: Optional[MergeClient],
+                 key_dir: Optional[str],
+                 zk: Optional[ZooKeeper],
+                 use_zk:bool):
+
         self.connections = connections
         self.scheduler = scheduler
         self.merger = merger
@@ -2111,20 +2147,18 @@ class ConfigLoader(object):
             self.keystorage = KeyStorage(key_dir)
         else:
             self.keystorage = None
-        self.tenant_parser = TenantParser(connections, scheduler,
-                                          merger, self.keystorage)
+        self.tenant_parser = TenantParser(connections, scheduler, merger,
+                                          self.keystorage, zk, use_zk)
         self.admin_rule_parser = AuthorizationRuleParser()
 
-    def expandConfigPath(self, config_path):
+    def readConfig(self, config_path, from_script=False):
         if config_path:
             config_path = os.path.expanduser(config_path)
+
         if not os.path.exists(config_path):
             raise Exception("Unable to read tenant config file at %s" %
                             config_path)
-        return config_path
 
-    def readConfig(self, config_path, from_script=False):
-        config_path = self.expandConfigPath(config_path)
         if not from_script:
             with open(config_path) as config_file:
                 self.log.info("Loading configuration from %s" % (config_path,))

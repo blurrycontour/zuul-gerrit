@@ -19,6 +19,7 @@ from kazoo import exceptions as kze
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
+from kazoo.recipe.watchers import ChildrenWatch
 
 import zuul.model
 
@@ -700,6 +701,60 @@ class ZooKeeper(object):
                 "Request %s does not hold a lock" % request)
         request.lock.release()
         request.lock = None
+
+    # Scheduler part begins here
+
+    CONFIG_ROOT = "/zuul/config"
+    # Node content max size: keep ~100kB as a reserve form the 1MB limit
+    CONFIG_MAX_SIZE = 1024 * 1024 - 100 * 1024
+    _configListener = None
+
+    def _getConfigNodePath(self, project: str, branch: str, path: str):
+        if path.startswith("/"):
+            path = path[1:]
+        if path.endswith("/"):
+            path = path[:-1]
+        return "%s/%s/%s/%s" % (self.CONFIG_ROOT, project, branch, path)
+
+    def _configListenerWrapper(self, event):
+        try:
+            if self._configListener is not None:
+                self._configListener(event)
+        finally:
+            self._registerConfigListener()
+
+    def _registerConfigListener(self):
+        self.client.ensure_path(self.CONFIG_ROOT)
+        # TODO JK: Consider native watchers:
+        # https://kazoo.readthedocs.io/en/latest/basic_usage.html#watchers
+        self.client.get_children(self.CONFIG_ROOT,
+                                 watch=self._configListenerWrapper)
+
+    def setConfigListener(self, listener):
+        self._configListener = listener
+        self._registerConfigListener()
+
+    def loadConfig(self, project: str, branch: str, path: str):
+        config_path = self._getConfigNodePath(project, branch, path)
+        return "".join(
+            map(lambda c: self.client.get(c),
+                self.client.get_children(config_path))) \
+            if self.client.exists(config_path) else None
+
+
+    def saveConfig(self, project: str, branch: str, path: str, data):
+        current = self.loadConfig(project, branch, path)
+
+        if current != data:
+            transaction = self.client.transaction()
+            config_path = self._getConfigNodePath(project, branch, path)
+            self.client.delete(config_path, recursive=True)
+            self.client.ensure_path(config_path)
+            chunks = [data[i:i + self.CONFIG_MAX_SIZE] \
+                      for i in range(0, len(data), self.CONFIG_MAX_SIZE)]
+            for i, chunk in enumerate(chunks):
+                self.client.create("%s/%d" % (config_path, i), chunk)
+            transaction.commit()
 
 
 class Launcher():

@@ -50,21 +50,43 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         if self.args.command:
             self.args.nodaemon = True
 
-    def fullReconfigure(self):
+    def fullReconfigure(self, use_zk=False):
+        """
+        Trigger full reconfiguration. By default the configuration will be read
+        from files (use_zk=False). If ZooKeeper should be used as primary
+        config source set use_zk=True.
+
+        When use_zk=True but the data are not present in ZooKeeper this will
+        fallback to loading the configuration from files.
+
+        :param use_zk: Whether ZooKeeper should be used as a primary source.
+        """
+
         self.log.debug("Reconfiguration triggered")
         self.readConfig()
         self.setup_logging('scheduler', 'log_config')
         try:
-            self.sched.reconfigure(self.config)
+            self.sched.reconfigure(self.config, use_zk=use_zk)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
-    def smartReconfigure(self):
+    def smartReconfigure(self, use_zk=False):
+        """
+        Trigger smart reconfiguration. By default the configuration will be read
+        from files (use_zk=False). If ZooKeeper should be used as primary
+        config source set use_zk=True.
+
+        When use_zk=True but the data are not present in ZooKeeper this will
+        fallback to loading the configuration from files.
+
+        :param use_zk: Whether ZooKeeper should be used as a primary source.
+        """
+
         self.log.debug("Smart reconfiguration triggered")
         self.readConfig()
         self.setup_logging('scheduler', 'log_config')
         try:
-            self.sched.reconfigure(self.config, smart=True)
+            self.sched.reconfigure(self.config, smart=True, use_zk=use_zk)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
@@ -160,11 +182,15 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.sched.setNodepool(nodepool)
         self.sched.setZooKeeper(zookeeper)
 
+        # Smart reconfigure other instances when one reconfigures
+        zookeeper.setConfigListener(
+            lambda _: self.smartReconfigure(use_zk=True))
+
         self.log.info('Starting scheduler')
         try:
             self.sched.start()
             self.sched.registerConnections(self.connections)
-            self.sched.reconfigure(self.config)
+            self.sched.reconfigure(self.config, use_zk=True)
             self.sched.resume()
         except Exception:
             self.log.exception("Error starting Zuul:")
