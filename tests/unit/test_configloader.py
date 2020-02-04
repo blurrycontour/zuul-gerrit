@@ -401,11 +401,13 @@ class TestSplitConfig(ZuulTestCase):
 
         log_fixture._output.truncate(0)
         add_file("common-config", "zuul.yaml")
-        self.assertIn("Multiple configuration", log_fixture.output)
+        self.assertIn("Multiple configuration in common-config/zuul.d/",
+                      log_fixture.output)
 
         log_fixture._output.truncate(0)
         add_file("org/project1", ".zuul.yaml")
-        self.assertIn("Multiple configuration", log_fixture.output)
+        self.assertIn("Multiple configuration in org/project1/.zuul.d/",
+                      log_fixture.output)
 
 
 class TestConfigConflict(ZuulTestCase):
