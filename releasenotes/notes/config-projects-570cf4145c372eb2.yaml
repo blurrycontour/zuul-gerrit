@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    :attr:`tenant.config-projects` can now load config from a different branch
+    than ``master`` if there is exactly one branch.

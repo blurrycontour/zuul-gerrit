@@ -1799,8 +1799,11 @@ class TenantParser(object):
         untrusted_projects_config = model.UnparsedConfig()
 
         for project in tenant.config_projects:
+            branches = tenant.getProjectBranches(project)
+            # If we have one branch, take it, otherwise fall back to master
+            branch = branches[0] if len(branches) == 1 else 'master'
             branch_cache = abide.getUnparsedBranchCache(
-                project.canonical_name, 'master')
+                project.canonical_name, branch)
             tpc = tenant.project_configs[project.canonical_name]
             unparsed_branch_config = branch_cache.get(tpc)
 

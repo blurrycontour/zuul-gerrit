@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import shutil
 
 import fixtures
 import logging
@@ -328,6 +329,57 @@ class TestTenantExcludeAll(TenantParserTestCase):
         self.assertEquals(
             len(tenant_two.layout.loading_errors), 0,
             "No error should have been accumulated")
+
+
+class TestTenantConfigBranches(ZuulTestCase):
+    tenant_config_file = 'config/tenant-parser/simple.yaml'
+
+    def _validate_job(self, branch):
+        tenant_one = self.sched.abide.tenants.get('tenant-one')
+        jobs = tenant_one.layout.getJobs('common-config-job')
+        self.assertEquals(len(jobs), 1)
+        self.assertEquals(jobs[0].source_context.branch, branch)
+
+    def test_tenant_config_branches(self):
+        """
+        Tests that when specifying branches for a project only those branches
+        are parsed.
+        """
+        # Job must be defined in master
+        self._validate_job('master')
+
+        self.log.debug('Creating stable branch')
+        self.create_branch('common-config', 'stable')
+        self.sched.reconfigure(self.config)
+
+        # Job still must be defined in master
+        self._validate_job('master')
+
+        self.delete_branch('common-config', 'master', new_head='stable')
+
+        # TODO: This is a workaround due to a bug in GitPython when retrieving
+        #       the stale branches when the upstream repo has changed its
+        #       default branch. Remove this when there is a fix in GitPython.
+        repo = self.executor_server.merger.repos.get(
+            'review.example.com/common-config')
+        shutil.rmtree(repo.local_path)
+
+        self.sched.reconfigure(self.config)
+
+        # The branch stable is now the only branch so the job must be taken
+        # from stable.
+        self._validate_job('stable')
+
+        # Create another branch
+        self.create_branch('common-config', 'feat_x')
+        self.sched.reconfigure(self.config)
+
+        # Since there are now the branches stable and feat_x there are more
+        # than one branches and zuul should fall back to the non-existing
+        # branch master.
+        tenant_one = self.sched.abide.tenants.get('tenant-one')
+        jobs = tenant_one.layout.getJobs('common-config-job')
+        self.assertEquals(len(jobs), 0)
 
 
 class TestSplitConfig(ZuulTestCase):

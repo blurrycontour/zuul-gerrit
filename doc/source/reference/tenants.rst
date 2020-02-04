@@ -124,8 +124,8 @@ configuration. Some examples of tenant definitions are:
       <config-project>` in this tenant.  The jobs in a config project
       are trusted, which means they run with extra privileges, do not
       have their configuration dynamically loaded for proposed
-      changes, and Zuul config files are only searched for in the
-      ``master`` branch.
+      changes. If there is more than one branch Zuul config files
+      are only searched for in the ``master`` branch.
 
       The items in the list follow the same format described in
       **untrusted-projects**.

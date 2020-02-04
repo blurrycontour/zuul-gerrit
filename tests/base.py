@@ -3804,6 +3804,7 @@ class ZuulTestCase(BaseTestCase):
         repo = git.Repo(path)
         fn = os.path.join(path, commit_filename)
 
+        old_head = repo.head.reference
         branch_head = repo.create_head(branch)
         repo.head.reference = branch_head
         f = open(fn, 'a')
@@ -3812,14 +3813,14 @@ class ZuulTestCase(BaseTestCase):
         repo.index.add([fn])
         repo.index.commit('%s commit' % branch)
 
-        repo.head.reference = repo.heads['master']
+        repo.head.reference = old_head
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
 
-    def delete_branch(self, project, branch):
+    def delete_branch(self, project, branch, new_head='master'):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
-        repo.head.reference = repo.heads['master']
+        repo.head.reference = repo.heads[new_head]
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.delete_head(repo.heads[branch], force=True)
 
