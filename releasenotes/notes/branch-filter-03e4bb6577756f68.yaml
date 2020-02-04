@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    The tenant configuration now supports filtering branches from which
+    Zuul configuration is loaded.
+    See :attr:`tenant.untrusted-projects.projects.branch-filter`.
