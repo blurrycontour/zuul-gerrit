@@ -716,7 +716,7 @@ class Client(zuul.cmd.ZuulApp):
         self.configure_connections(source_only=True)
         sched.registerConnections(self.connections, load=False)
         loader = configloader.ConfigLoader(
-            sched.connections, sched, None, None)
+            sched.connections, sched, None, None, sched.zk, use_zk=False)
         tenant_config, script = sched._checkTenantSourceConf(self.config)
         unparsed_abide = loader.readConfig(tenant_config, from_script=script)
         try:

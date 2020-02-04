@@ -701,6 +701,77 @@ class ZooKeeper(object):
         request.lock.release()
         request.lock = None
 
+    # Scheduler part begins here
+
+    CONFIG_ROOT = "/zuul/config"
+    # Node content max size: keep ~100kB as a reserve form the 1MB limit
+    CONFIG_MAX_SIZE = 1024 * 1024 - 100 * 1024
+    _configListener = None
+
+    def _getConfigNodePath(self, project: str, branch: str, path: str):
+        if path.startswith("/"):
+            path = path[1:]
+        if path.endswith("/"):
+            path = path[:-1]
+
+        for p in [self.CONFIG_ROOT,
+                  "%s/%s" % (self.CONFIG_ROOT, project),
+                  "%s/%s/%s" % (self.CONFIG_ROOT, project, branch)]:
+            if not self.client.exists(p):
+                self.client.create(p, makepath=True)
+
+        # if not self.client.exists(self.CONFIG_ROOT):
+        #     self.client.create(self.CONFIG_ROOT, makepath=True)
+        # if not self.client.exists("%s/%s" % (self.CONFIG_ROOT, project)):
+        #     self.client.create("%s/%s" % (self.CONFIG_ROOT, project), makepath=True)
+        return "%s/%s/%s/%s" % (self.CONFIG_ROOT, project, branch, path)
+
+    def _configListenerWrapper(self, event):
+        try:
+            if self._configListener is not None:
+                self._configListener(event)
+        finally:
+            self._registerConfigListener()
+
+    def _registerConfigListener(self):
+        # TODO JK: Consider native watchers:
+        # https://kazoo.readthedocs.io/en/latest/basic_usage.html#watchers
+        self.client.get_children(self.CONFIG_ROOT,
+                                 watch=self._configListenerWrapper)
+
+    def _getConfigPartContent(self, child) -> str:
+        return self.client.get(child).decode(encoding='UTF-8')\
+            if self.client.exists(child) else ''
+
+    def setConfigListener(self, listener):
+        self._configListener = listener
+        self._registerConfigListener()
+
+    def loadConfig(self, project: str, branch: str, path: str):
+        node = self._getConfigNodePath(project, branch, path)
+        return "".join(
+            map(lambda c: self._getConfigPartContent(c),
+                self.client.get_children(node)))\
+            if self.client.exists(node) else None
+
+    def saveConfig(self, project: str, branch: str, path: str, data):
+        current = self.loadConfig(project, branch, path)
+        data = data.encode(encoding='UTF-8')
+
+        if current != data:
+            transaction = self.client.transaction()
+            node = self._getConfigNodePath(project, branch, path)
+            try:
+                self.client.delete(node, recursive=True)
+            except kze.NoNodeError:
+                pass
+            self.client.create(node, makepath=True)
+            chunks = [data[i:i + self.CONFIG_MAX_SIZE]
+                      for i in range(0, len(data), self.CONFIG_MAX_SIZE)]
+            for i, chunk in enumerate(chunks):
+                self.client.create("%s/%d" % (node, i), chunk)
+            transaction.commit()
+
 
 class Launcher():
     '''
