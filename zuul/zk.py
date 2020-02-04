@@ -9,6 +9,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from typing import Tuple
 
 import json
 import logging
@@ -21,6 +22,7 @@ from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
+from zuul.model import SourceContext
 
 
 class LockException(Exception):
@@ -700,6 +702,116 @@ class ZooKeeper(object):
                 "Request %s does not hold a lock" % request)
         request.lock.release()
         request.lock = None
+
+    # Scheduler part begins here
+
+    CONFIG_ROOT = "/zuul/config"
+    # Node content max size: keep ~100kB as a reserve form the 1MB limit
+    CONFIG_MAX_SIZE = 1024 * 1024 - 100 * 1024
+    _configListener = None
+
+    def _getConfigNodePath(self, context: SourceContext, file: str) -> str:
+        return "/".join(filter(lambda s: s != '',
+                               [self.CONFIG_ROOT, context.project.name,
+                                context.branch, context.path, file]))
+
+    def _getConfigLockNodePath(self, context: SourceContext) -> str:
+        return "/".join(filter(lambda s: s != '',
+                               [self.CONFIG_ROOT, context.project.name,
+                                context.branch]))
+
+    def _configListenerWrapper(self, event):
+        try:
+            if self._configListener is not None:
+                self._configListener(event)
+        finally:
+            self._registerConfigListener()
+
+    def _registerConfigListener(self):
+        # TODO JK: Consider native watchers:
+        # https://kazoo.readthedocs.io/en/latest/basic_usage.html#watchers
+        self.client.get_children(self.CONFIG_ROOT,
+                                 watch=self._configListenerWrapper)
+
+    def _getConfigPartContent(self, child) -> str:
+        return self.client.get(child).decode(encoding='UTF-8')\
+            if self.client.exists(child) else ''
+
+    def setConfigListener(self, listener):
+        self._configListener = listener
+        self._registerConfigListener()
+
+    def getVersion(self, context: SourceContext):
+        node = self._getConfigLockNodePath(context)
+        stat = self.client.exists(node)
+        return stat.version if stat is not None else -1
+
+    def incrementAndGetVersion(self, context: SourceContext) -> int:
+        node = self._getConfigLockNodePath(context)
+        stat = self.client.exists(node)
+        if stat is None:
+            self.client.create(node, makepath=True)
+            return 1
+        else:
+            self.client.set(node, b'', version=stat.version)
+            return stat.version + 1
+
+    def loadConfig(self, context: SourceContext, file: str) -> Tuple[str, int]:
+        """
+        Load unparsed config from zookeeper under
+        /zuul/config/&lt;project>/&lt;branch>/&lt;path-to-config>/&lt;shard>
+
+        :param context: Source context to provide project, branch and path
+        :param file: Filename
+        :return: The unparsed config an its version as a tuple or None.
+        """
+        with self.client.ReadLock(self._getConfigLockNodePath(context)):
+            node = self._getConfigNodePath(context, file)
+            return ("".join(
+                map(self._getConfigPartContent,
+                    self.client.get_children(node))),
+                    self.getVersion(context))\
+                if self.client.exists(node) else None
+
+    def saveConfig(self, context: SourceContext, file: str, data: str) -> int:
+        """
+        Saves unparsed configuration to zookeeper under
+        /zuul/config/&lt;project>/&lt;branch>/&lt;path-to-config>/&lt;shard>
+
+        An update only happens if the currently stored content differs from
+        the provided in `data` param.
+
+        :param context: Source context to provide project, branch and path
+        :param file: Filename
+        :param data: Uparsed configuration yaml
+        :return: New or updated version.
+        """
+        current = self.loadConfig(context, file)
+
+        if current != data:
+            data = data.encode(encoding='UTF-8')
+
+            with self.client.WriteLock(self._getConfigLockNodePath(context)):
+                node = self._getConfigNodePath(context, file)
+
+                self.client.ensure_path(node)
+                for child in self.client.get_children(node):
+                    try:
+                        self.log.debug("Deleting: %s/%s" % (node, child))
+                        self.client.delete("%s/%s" % (node, child),
+                                           recursive=True)
+                    except kze.NoNodeError:
+                        pass
+
+                chunks = [data[i:i + self.CONFIG_MAX_SIZE]
+                          for i in range(0, len(data), self.CONFIG_MAX_SIZE)]
+                for i, chunk in enumerate(chunks):
+                    self.log.debug("Creating: %s/%d" % (node, i))
+                    self.client.create("%s/%d" % (node, i), chunk)
+
+                return self.incrementAndGetVersion(context)
+        return self.getVersion(context)
+
 
 
 class Launcher():
