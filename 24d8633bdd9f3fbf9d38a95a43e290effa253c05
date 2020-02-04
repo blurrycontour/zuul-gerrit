@@ -93,6 +93,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_c133c8c2",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-04T16:33:40Z",
+      "side": 1,
+      "message": "The intention was setting the default on tenant level and allowing to override this on a per project level similar to exclude-unprotected branches. I guess that needs a little bit more words.",
+      "parentUuid": "3fa7e38b_06a1f692",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_b7bb790e",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
