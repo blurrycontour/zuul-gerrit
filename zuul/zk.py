@@ -9,6 +9,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from typing import Tuple
 
 import json
 import logging
@@ -700,6 +701,106 @@ class ZooKeeper(object):
                 "Request %s does not hold a lock" % request)
         request.lock.release()
         request.lock = None
+
+    # Scheduler part begins here
+
+    CONFIG_ROOT = "/zuul/config"
+    # Node content max size: keep ~100kB as a reserve form the 1MB limit
+    CONFIG_MAX_SIZE = 1024 * 1024 - 100 * 1024
+    _configListener = None
+
+    def _getConfigNodePath(self, *args: str) -> str:
+        return "/".join(filter(lambda s: s is not None and s != '',
+                               [self.CONFIG_ROOT] + list(args)))
+
+    def _getConfigPartContent(self, parent, child) -> str:
+        node = "%s/%s" % (parent, child)
+        return self.client.get(node)[0].decode(encoding='UTF-8')\
+            if self.client.exists(node) else ''
+
+    def getConfigVersion(self, project: str, branch: str) -> int:
+        node = self._getConfigNodePath(project, branch)
+        stat = self.client.exists(node)
+        return stat.version if stat is not None else -1
+
+    def incrementAndGetConfigVersion(self, project: str, branch: str) -> int:
+        node = self._getConfigNodePath(project, branch)
+        stat = self.client.exists(node)
+        if stat is None:
+            self.client.create(node, makepath=True)
+            return 1
+        else:
+            self.client.set(node, b'', version=stat.version)
+            return stat.version + 1
+
+    def loadConfig(self, project: str, branch: str, path: str, file: str)\
+            -> str:
+        """
+        Load unparsed config from zookeeper under
+        /zuul/config/&lt;project>/&lt;branch>/&lt;path-to-config>/&lt;shard>
+
+        :param project: Project name
+        :param branch: Branch
+        :param path: Path
+        :param file: Filename
+        :return: The unparsed config an its version as a tuple or None.
+        """
+        lock_node = self._getConfigNodePath(project, branch)
+        with self.client.ReadLock(lock_node):
+            node = self._getConfigNodePath(project, branch, path, file)
+            return "".join(
+                map(lambda c: self._getConfigPartContent(node, c),
+                    self.client.get_children(node)))\
+                if self.client.exists(node) else None
+
+    def saveConfig(self, project: str, branch: str, path: str, file: str,
+                   data: str) -> int:
+        """
+        Saves unparsed configuration to zookeeper under
+        /zuul/config/&lt;project>/&lt;branch>/&lt;path-to-config>/&lt;shard>
+
+        An update only happens if the currently stored content differs from
+        the provided in `data` param.
+
+        :param project: Project name
+        :param branch: Branch
+        :param path: Path
+        :param file: Filename
+        :param data: Unparsed configuration yaml
+        :return: New or updated version.
+        """
+        current = self.loadConfig(project, branch, path, file)
+
+        if current != data:
+            data = data.encode(encoding='UTF-8') if data is not None else None
+            lock_node = self._getConfigNodePath(project, branch)
+
+            with self.client.WriteLock(lock_node):
+                node = self._getConfigNodePath(project, branch, path, file)
+                exists = self.client.exists(node)
+
+                if exists:
+                    for child in self.client.get_children(node):
+                        try:
+                            self.log.debug("Deleting: %s/%s" % (node, child))
+                            self.client.delete("%s/%s" % (node, child),
+                                               recursive=True)
+                        except kze.NoNodeError:
+                            pass
+
+                if data is not None:
+                    self.client.ensure_path(node)
+                    chunks = [data[i:i + self.CONFIG_MAX_SIZE]
+                              for i in range(0, len(data), self.CONFIG_MAX_SIZE)]
+                    for i, chunk in enumerate(chunks):
+                        self.log.debug("Creating: %s/%d" % (node, i))
+                        self.client.create("%s/%d" % (node, i), chunk)
+                elif exists:
+                    self.client.delete(node)
+
+                return self.incrementAndGetConfigVersion(project, branch)
+        return self.getConfigVersion(project, branch)
+
 
 
 class Launcher():
