@@ -191,6 +191,11 @@ configuration. Some examples of tenant definitions are:
             processed. Defaults to the tenant wide setting of
             exclude-unprotected-branches.
 
+         .. attr:: branch-filter
+
+            Optional regular expression that can be used to filter the
+            branches from which zuul configuration is loaded.
+
          .. attr:: extra-config-paths
 
             Normally Zuul loads in-repo configuration from the first

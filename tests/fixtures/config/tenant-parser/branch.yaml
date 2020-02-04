@@ -1,0 +1,11 @@
+- tenant:
+    name: tenant-one
+    source:
+      gerrit:
+        config-projects:
+          - common-config:
+              branch-filter: stable
+        untrusted-projects:
+          - org/project1:
+              branch-filter: stable.*
+          - org/project2

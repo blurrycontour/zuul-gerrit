@@ -3341,6 +3341,8 @@ class TenantProjectConfig(object):
         self.extra_config_files = ()
         # The list of paths to look for extra zuul config dirs
         self.extra_config_dirs = ()
+        # The list of branches to load config from
+        self.branch_filter = None
 
 
 class ProjectPipelineConfig(ConfigObject):
