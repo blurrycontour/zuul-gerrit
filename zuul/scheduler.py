@@ -33,6 +33,8 @@ from typing import Dict
 
 from zuul.model import TriggerEvent
 
+from docutils.frontend import ConfigParser
+
 from zuul import configloader
 from zuul import model
 from zuul import exceptions
@@ -41,12 +43,15 @@ from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
+from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
+from zuul.merger.client import MergeClient
 from zuul.model import Build, HoldRequest, Tenant
+from zuul.zk import ZooKeeper
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure',
             'pause', 'resume', 'stop',
@@ -81,10 +86,12 @@ class ReconfigureEvent(ManagementEvent):
     the path specified in the configuration.
 
     :arg ConfigParser config: the new configuration
+    :arg bool use_zk: Use zookeeper as config source
     """
-    def __init__(self, config):
+    def __init__(self, config: ConfigParser, use_zk: bool=False):
         super(ReconfigureEvent, self).__init__()
         self.config = config
+        self.use_zk = use_zk
 
 
 class SmartReconfigureEvent(ManagementEvent):
@@ -92,10 +99,12 @@ class SmartReconfigureEvent(ManagementEvent):
     the path specified in the configuration.
 
     :arg ConfigParser config: the new configuration
+    :arg bool use_zk: Use zookeeper as config source
     """
-    def __init__(self, config, smart=False):
-        super().__init__()
+    def __init__(self, config: ConfigParser, use_zk: bool=False):
+        super(SmartReconfigureEvent, self).__init__()
         self.config = config
+        self.use_zk = use_zk
 
 
 class TenantReconfigureEvent(ManagementEvent):
@@ -418,9 +427,16 @@ class Scheduler(threading.Thread):
             except Exception:
                 self.log.exception("Exception while processing command")
 
-    def registerConnections(self, connections, load=True):
-        # load: whether or not to trigger the onLoad for the connection. This
-        # is useful for not doing a full load during layout validation.
+    def registerConnections(self, connections: ConnectionRegistry,
+                            load: bool=True) -> None:
+        """
+        Register connections.
+
+        :param connections: Connections to register
+        :param load: Whether or not to trigger the onLoad for the connection.
+               This is useful for not doing a full load during layout
+               validation.
+        """
         self.connections = connections
         self.connections.registerScheduler(self, load)
 
@@ -433,13 +449,13 @@ class Scheduler(threading.Thread):
     def setExecutor(self, executor):
         self.executor = executor
 
-    def setMerger(self, merger):
+    def setMerger(self, merger: MergeClient):
         self.merger = merger
 
     def setNodepool(self, nodepool):
         self.nodepool = nodepool
 
-    def setZooKeeper(self, zk):
+    def setZooKeeper(self, zk: ZooKeeper):
         self.zk = zk
 
     def runStats(self):
@@ -589,12 +605,26 @@ class Scheduler(threading.Thread):
         self.repl.stop()
         self.repl = None
 
-    def reconfigure(self, config, smart=False):
+    def reconfigure(self, config, smart=False, use_zk=False):
+        """
+        Trigger reconfiguration. By default the configuration will be read
+        from files (use_zk=False). If ZooKeeper should be used as primary
+        config source set use_zk=True.
+
+        When use_zk=True but the data are not present in ZooKeeper this will
+        fallback to loading the configuration from files.
+
+        :param config: Configuration
+        :param smart: If true, smart reconfiguration will be triggered.
+                      Otherwise, full reconfiguration will be triggered.
+        :param use_zk: Whether ZooKeeper should be used as a primary source.
+        """
+
         self.log.debug("Submitting reconfiguration event")
         if smart:
-            event = SmartReconfigureEvent(config)
+            event = SmartReconfigureEvent(config, use_zk)
         else:
-            event = ReconfigureEvent(config)
+            event = ReconfigureEvent(config, use_zk)
         self.management_event_queue.put(event)
         self.wake_event.set()
         self.log.debug("Waiting for reconfiguration")
@@ -827,7 +857,7 @@ class Scheduler(threading.Thread):
                 "is missing from the configuration.")
         return tenant_config, script
 
-    def _doReconfigureEvent(self, event):
+    def _doReconfigureEvent(self, event: ReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         self.layout_lock.acquire()
@@ -849,7 +879,7 @@ class Scheduler(threading.Thread):
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self._get_key_dir(), self.zk, use_zk=event.use_zk)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
@@ -865,7 +895,7 @@ class Scheduler(threading.Thread):
         self.log.info("Full reconfiguration complete (duration: %s seconds)",
                       duration)
 
-    def _doSmartReconfigureEvent(self, event):
+    def _doSmartReconfigureEvent(self, event: SmartReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         reconfigured_tenants = []
@@ -883,7 +913,7 @@ class Scheduler(threading.Thread):
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self._get_key_dir(), self.zk, use_zk=event.use_zk)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
@@ -894,11 +924,11 @@ class Scheduler(threading.Thread):
             tenant_names = {t for t in self.abide.tenants}
             tenant_names.update(self.unparsed_abide.known_tenants)
             for tenant_name in tenant_names:
-                old_tenant = [x for x in old_unparsed_abide.tenants
-                              if x['name'] == tenant_name]
-                new_tenant = [x for x in self.unparsed_abide.tenants
-                              if x['name'] == tenant_name]
-                if old_tenant == new_tenant:
+                old_tenants = [x for x in old_unparsed_abide.tenants
+                               if x['name'] == tenant_name]
+                new_tenants = [x for x in self.unparsed_abide.tenants
+                               if x['name'] == tenant_name]
+                if old_tenants == new_tenants:
                     continue
 
                 reconfigured_tenants.append(tenant_name)
@@ -919,7 +949,7 @@ class Scheduler(threading.Thread):
         self.log.info("Smart reconfiguration of tenants %s complete "
                       "(duration: %s seconds)", reconfigured_tenants, duration)
 
-    def _doTenantReconfigureEvent(self, event):
+    def _doTenantReconfigureEvent(self, event: TenantReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         self.layout_lock.acquire()
@@ -937,7 +967,7 @@ class Scheduler(threading.Thread):
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self._get_key_dir(), self.zk)
             abide = loader.reloadTenant(
                 self.abide, old_tenant, self.ansible_manager)
             tenant = abide.tenants[event.tenant_name]
@@ -1266,8 +1296,8 @@ class Scheduler(threading.Thread):
                                not self._paused):
                             pass
 
-            except Exception:
-                self.log.exception("Exception in run handler:")
+            except Exception as e:
+                self.log.exception("Exception in run handler:", e)
                 # There may still be more events to process
                 self.wake_event.set()
             finally:
@@ -1375,7 +1405,8 @@ class Scheduler(threading.Thread):
         except Exception:
             self.log.exception("Exception in management event:")
             event.exception(sys.exc_info())
-        self.management_event_queue.task_done()
+        finally:
+            self.management_event_queue.task_done()
 
     def process_result_queue(self):
         self.log.debug("Fetching result event")
