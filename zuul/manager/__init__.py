@@ -13,11 +13,13 @@
 import logging
 import textwrap
 import urllib
+from typing import Optional
 
 from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import QueueItem, Layout
 
 
 class DynamicChangeQueueContextManager(object):
@@ -519,14 +521,19 @@ class PipelineManager(object):
                 relevant_errors.append(err)
         return relevant_errors
 
-    def _loadDynamicLayout(self, item):
+    def _loadDynamicLayout(self, item: QueueItem) -> Optional[Layout]:
         # Load layout
         # Late import to break an import loop
         import zuul.configloader
         loader = zuul.configloader.ConfigLoader(
-            self.sched.connections, self.sched, None, None)
+            self.sched.connections, self.sched, None, None,
+            self.sched.zk, use_zk=True)
 
         self.log.debug("Loading dynamic layout")
+
+        # TODO JK: Check global layout in item.pipeline.tenant.layout
+        # item.pipeline.tenant.layout.zk_hash
+        # Reload global layout
 
         (trusted_updates, untrusted_updates) = item.includesConfigUpdates()
         build_set = item.current_build_set
@@ -771,7 +778,7 @@ class PipelineManager(object):
         # a change ahead, a newly generated layout for this change, or
         # None if there was an error that makes the layout unusable.
         # In the last case, it will have set the config_errors on this
-        # item, which may be picked up by the next itme.
+        # item, which may be picked up by the next item.
         if not item.layout:
             item.layout = self.getLayout(item)
         if not item.layout:
