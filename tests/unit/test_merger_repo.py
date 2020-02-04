@@ -296,6 +296,17 @@ class TestMergerRepo(ZuulTestCase):
         self.assertEqual(sorted(['messy1.txt', 'messy2.txt']),
                          sorted(changed_files))
 
+    def test_changing_head(self):
+        # Get repo and update for the first time.
+        merger = self.executor_server.merger
+        merger.updateRepo('gerrit', 'org/project1')
+
+        self.create_branch('org/project1', 'stable')
+        self.delete_branch('org/project1', 'master', new_head='stable')
+
+        repo = merger.getRepo('gerrit', 'org/project1')
+        repo.reset()
+
     def test_update_needed(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         repo = git.Repo(parent_path)
