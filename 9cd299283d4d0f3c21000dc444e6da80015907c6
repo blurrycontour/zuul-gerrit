@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_89a736bc",
+        "filename": "web/src/containers/build/Manifest.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-04T19:21:17Z",
+      "side": 1,
+      "message": "The linter job fails because of the semicolon in this line.",
+      "revId": "9cd299283d4d0f3c21000dc444e6da80015907c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
