@@ -9,7 +9,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 import json
 import logging
 import time
@@ -18,9 +17,12 @@ from kazoo.client import KazooClient, KazooState
 from kazoo import exceptions as kze
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.cache import TreeCache, TreeEvent
-from kazoo.recipe.lock import Lock
+from kazoo.recipe.lock import Lock, WriteLock
 
 import zuul.model
+from typing import Optional
+
+from zuul.model import Tenant
 
 
 class LockException(Exception):
@@ -700,6 +702,130 @@ class ZooKeeper(object):
                 "Request %s does not hold a lock" % request)
         request.lock.release()
         request.lock = None
+
+    # Scheduler part begins here
+
+    CONFIG_ROOT = "/zuul"
+    # Node content max size: keep ~100kB as a reserve form the 1MB limit
+    CONFIG_MAX_SIZE = 1024 * 1024 - 100 * 1024
+    _configListener = None
+
+    def _getZuulNodePath(self, *args: str) -> str:
+        return "/".join(filter(lambda s: s is not None and s != '',
+                               [self.CONFIG_ROOT] + list(args)))
+
+    def _getConfigPartContent(self, parent, child) -> str:
+        node = "%s/%s" % (parent, child)
+        return self.client.get(node)[0].decode(encoding='UTF-8')\
+            if self.client.exists(node) else ''
+
+    def getLayoutHash(self, tenant: Tenant) -> str:
+        """
+        Get tenant's layout version.
+
+        A layout version is a hash over all relevant files for the given
+        tenant.
+
+        :param tenant: Tentant
+        :return: Tenant's layout relevant files hash
+        """
+        lock_node = self._getZuulNodePath('layout', tenant.name)
+        with self.client.ReadLock(lock_node):
+            node = self._getZuulNodePath('layout', tenant.name)
+            return self.client.get(node)[0].decode(encoding='UTF-8')\
+                if self.client.exists(node) else None
+
+    def setLayoutHash(self, tenant: Tenant, hash: str) -> None:
+        lock_node = self._getZuulNodePath('layout', tenant.name)
+        with self.client.WriteLock(lock_node):
+            node = self._getZuulNodePath('layout', tenant.name)
+            stat = self.client.exists(node)
+            if stat is None:
+                self.client.create(node, hash.encode(encoding='UTF-8'),
+                                   makepath=True)
+            else:
+                self.client.set(node, hash.encode(encoding='UTF-8'),
+                                version=stat.version)
+
+    def getConfigReadLock(self) -> WriteLock:
+        lock_node = self._getZuulNodePath('config')
+        return self.client.WriteLock(lock_node)
+
+    def getConfigWriteLock(self) -> WriteLock:
+        lock_node = self._getZuulNodePath('config')
+        return self.client.WriteLock(lock_node)
+
+    def loadConfig(self, project: str, branch: str, path: str,
+                   use_lock: bool=True) -> Optional[str]:
+        """
+        Load unparsed config from zookeeper under
+        /zuul/config/&lt;project>/&lt;branch>/&lt;path-to-config>/&lt;shard>
+
+        :param project: Project name
+        :param branch: Branch
+        :param path: Path
+        :param use_lock: Whether the operation should be read-locked
+        :return: The unparsed config an its version as a tuple or None.
+        """
+        lock = self.getConfigReadLock() if use_lock else None
+        if lock is not None:
+            lock.acquire()
+        try:
+            node = self._getZuulNodePath('config', project, branch, path)
+            content = "".join(
+                map(lambda c: self._getConfigPartContent(node, c),
+                    self.client.get_children(node)))\
+                if self.client.exists(node) else None
+            return content
+        finally:
+            if lock is not None:
+                lock.release()
+
+    def saveConfig(self, project: str, branch: str, path: str,
+                   data: Optional[str]) -> None:
+        """
+        Saves unparsed configuration to zookeeper under
+        /zuul/config/&lt;project>/&lt;branch>/&lt;path-to-config>/&lt;shard>
+
+        An update only happens if the currently stored content differs from
+        the provided in `data` param.
+
+        This operation needs to be explicitly locked using lock from
+        `getConfigWriteLock`
+
+        :param project: Project name
+        :param branch: Branch
+        :param path: Path
+        :param data: Unparsed configuration yaml
+        """
+        current = self.loadConfig(project, branch, path, use_lock=False)
+
+        if current != data:
+            content = data.encode(encoding='UTF-8')\
+                if data is not None else None
+
+            node = self._getZuulNodePath('config', project, branch, path)
+            exists = self.client.exists(node)
+
+            if exists:
+                for child in self.client.get_children(node):
+                    try:
+                        self.log.debug("Deleting: %s/%s" % (node, child))
+                        self.client.delete("%s/%s" % (node, child),
+                                           recursive=True)
+                    except kze.NoNodeError:
+                        pass
+
+            if content is not None:
+                self.client.ensure_path(node)
+                chunks = [content[i:i + self.CONFIG_MAX_SIZE]
+                          for i in range(0, len(content),
+                                         self.CONFIG_MAX_SIZE)]
+                for i, chunk in enumerate(chunks):
+                    self.log.debug("Creating: %s/%d" % (node, i))
+                    self.client.create("%s/%d" % (node, i), chunk)
+            elif exists:
+                self.client.delete(node)
 
 
 class Launcher():
