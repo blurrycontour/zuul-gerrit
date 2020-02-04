@@ -31,7 +31,14 @@ import zuul.manager.dependent
 import zuul.manager.independent
 import zuul.manager.supercedent
 from zuul.lib import encryption
+from zuul.lib.ansible import AnsibleManager
+from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.keystorage import KeyStorage
+from zuul.merger.client import MergeClient
+from zuul.model import SourceContext, Tenant, Abide, LoadingErrors, Project, \
+    RepoFiles, ParsedConfig
+from zuul.zk import ZooKeeper
+from typing import Optional
 
 
 # Several forms accept either a single item or a list, this makes
@@ -219,7 +226,7 @@ def project_configuration_exceptions(context, accumulator):
 
 
 @contextmanager
-def early_configuration_exceptions(context):
+def early_configuration_exceptions(context: SourceContext):
     try:
         yield
     except ConfigurationSyntaxError:
@@ -1401,12 +1408,21 @@ class ParseContext(object):
 
 
 class TenantParser(object):
-    def __init__(self, connections, scheduler, merger, keystorage):
+    def __init__(self,
+                 connections: ConnectionRegistry,
+                 scheduler,  #: 'Scheduler'
+                 merger: MergeClient,
+                 keystorage: KeyStorage,
+                 zk: Optional[ZooKeeper],
+                 use_zk: bool):
+
         self.log = logging.getLogger("zuul.TenantParser")
         self.connections = connections
         self.scheduler = scheduler
         self.merger = merger
         self.keystorage = keystorage
+        self.zk = zk
+        self.use_zk = use_zk
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret')
@@ -1717,7 +1733,11 @@ class TenantParser(object):
 
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors):
+    def _cacheTenantYAML(self,
+                         abide: Abide,
+                         tenant: Tenant,
+                         loading_errors: LoadingErrors):
+
         jobs = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
@@ -1774,7 +1794,7 @@ class TenantParser(object):
                     # project-branch (unless an "extra" file/dir).
                     if (conf_root not in tpc.extra_config_files and
                         conf_root not in tpc.extra_config_dirs):
-                        if (loaded and loaded != conf_root):
+                        if loaded and loaded != conf_root:
                             self.log.warning(
                                 "Multiple configuration files in %s" %
                                 (job.source_context,))
@@ -1786,8 +1806,27 @@ class TenantParser(object):
                     self.log.info(
                         "Loading configuration from %s" %
                         (source_context,))
+
+                    data = self.zk.loadConfig(tenant.name,
+                                              job.source_context.project.name,
+                                              job.source_context.branch,
+                                              job.source_context.path, fn)\
+                        if self.zk is not None and self.use_zk else None
+
+                    # Forced re-config or data not in Zookeeper
+                    # TODO JK: Comparing Zookeeper with actual data makes
+                    #          the condition above obsolete
+                    if data != job.files[fn]:
+                        data = job.files[fn]
+                        if self.zk is not None:
+                            self.zk.saveConfig(tenant.name,
+                                               job.source_context.project.name,
+                                               job.source_context.branch,
+                                               job.source_context.path,
+                                               fn, data)
+
                     incdata = self.loadProjectYAML(
-                        job.files[fn], source_context, loading_errors)
+                        data, source_context, loading_errors)
                     branch_cache = abide.getUnparsedBranchCache(
                         source_context.project.canonical_name,
                         source_context.branch)
@@ -1824,7 +1863,11 @@ class TenantParser(object):
                     untrusted_projects_config.extend(unparsed_branch_config)
         return config_projects_config, untrusted_projects_config
 
-    def loadProjectYAML(self, data, source_context, loading_errors):
+    def loadProjectYAML(self,
+                        data,
+                        source_context: SourceContext,
+                        loading_errors: LoadingErrors):
+
         config = model.UnparsedConfig()
         try:
             with early_configuration_exceptions(source_context):
@@ -2089,6 +2132,8 @@ class TenantParser(object):
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
         layout = model.Layout(tenant)
+        layout.zk_version = self.zk.getConfigVersion(tenant.name)\
+            if self.zk is not None else None
         layout.loading_errors = loading_errors
         self.log.debug("Created layout id %s", layout.uuid)
 
@@ -2103,7 +2148,14 @@ class TenantParser(object):
 class ConfigLoader(object):
     log = logging.getLogger("zuul.ConfigLoader")
 
-    def __init__(self, connections, scheduler, merger, key_dir):
+    def __init__(self,
+                 connections: ConnectionRegistry,
+                 scheduler,  #: 'Scheduler'
+                 merger: Optional[MergeClient],
+                 key_dir: Optional[str],
+                 zk: Optional[ZooKeeper]=None,
+                 use_zk: bool=False):
+
         self.connections = connections
         self.scheduler = scheduler
         self.merger = merger
@@ -2111,11 +2163,12 @@ class ConfigLoader(object):
             self.keystorage = KeyStorage(key_dir)
         else:
             self.keystorage = None
-        self.tenant_parser = TenantParser(connections, scheduler,
-                                          merger, self.keystorage)
+        self.zk = zk
+        self.tenant_parser = TenantParser(connections, scheduler, merger,
+                                          self.keystorage, zk, use_zk)
         self.admin_rule_parser = AuthorizationRuleParser()
 
-    def expandConfigPath(self, config_path):
+    def expandConfigPath(self, config_path: str) -> str:
         if config_path:
             config_path = os.path.expanduser(config_path)
         if not os.path.exists(config_path):
@@ -2123,7 +2176,7 @@ class ConfigLoader(object):
                             config_path)
         return config_path
 
-    def readConfig(self, config_path, from_script=False):
+    def readConfig(self, config_path: str, from_script: bool=False):
         config_path = self.expandConfigPath(config_path)
         if not from_script:
             with open(config_path) as config_file:
@@ -2208,9 +2261,11 @@ class ConfigLoader(object):
                 self.log.warning(err.error)
         return new_abide
 
-    def _loadDynamicProjectData(self, config, project,
-                                files, trusted, tenant, loading_errors,
-                                ansible_manager):
+    def _loadDynamicProjectData(self, config: ParsedConfig, project: Project,
+                                files: RepoFiles, trusted: bool,
+                                tenant: Tenant, loading_errors: LoadingErrors,
+                                ansible_manager: AnsibleManager):
+
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
             branches = ['master']
@@ -2250,11 +2305,23 @@ class ConfigLoader(object):
                         fns4.append(fn)
             fns = (["zuul.yaml"] + sorted(fns1) + [".zuul.yaml"] +
                    sorted(fns2) + fns3 + sorted(fns4))
-            incdata = None
             loaded = None
             for fn in fns:
-                data = files.getFile(project.source.connection.connection_name,
-                                     project.name, branch, fn)
+                # TODO JK: Update on change
+                file_data = files.getFile(
+                    project.source.connection.connection_name, project.name,
+                    branch, fn)
+                data = self.zk.loadConfig(tenant.name, project.name, branch,
+                                          '', fn)\
+                    if self.zk is not None else None
+
+                # Update Zookeeper
+                if data != file_data:
+                    data = file_data
+                    if self.zk is not None:
+                        self.zk.saveConfig(tenant.name, project.name, branch,
+                                           '', fn, data)
+
                 if data:
                     source_context = model.SourceContext(project, branch,
                                                          fn, trusted)
@@ -2285,9 +2352,12 @@ class ConfigLoader(object):
                     config.extend(self.tenant_parser.parseConfig(
                         tenant, incdata, loading_errors, ansible_manager))
 
-    def createDynamicLayout(self, tenant, files, ansible_manager,
-                            include_config_projects=False,
-                            scheduler=None, connections=None):
+    def createDynamicLayout(self,
+                            tenant: Tenant,
+                            files: RepoFiles,
+                            ansible_manager: AnsibleManager,
+                            include_config_projects: bool=False):
+
         loading_errors = model.LoadingErrors()
         if include_config_projects:
             config = model.ParsedConfig()
@@ -2304,6 +2374,8 @@ class ConfigLoader(object):
                 ansible_manager)
 
         layout = model.Layout(tenant)
+        # Layout created, set current version
+        layout.zk_version = self.zk.getConfigVersion(tenant.name)
         layout.loading_errors = loading_errors
         self.log.debug("Created layout id %s", layout.uuid)
         if not include_config_projects:
