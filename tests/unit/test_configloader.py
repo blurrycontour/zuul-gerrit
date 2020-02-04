@@ -334,11 +334,14 @@ class TestTenantExcludeAll(TenantParserTestCase):
 class TestTenantConfigBranches(ZuulTestCase):
     tenant_config_file = 'config/tenant-parser/simple.yaml'
 
-    def _validate_job(self, branch):
+    def _validate_job(self, job, branches):
+        if isinstance(branches, str):
+            branches = [branches]
         tenant_one = self.sched.abide.tenants.get('tenant-one')
-        jobs = tenant_one.layout.getJobs('common-config-job')
-        self.assertEquals(len(jobs), 1)
-        self.assertEquals(jobs[0].source_context.branch, branch)
+        jobs = tenant_one.layout.getJobs(job)
+        self.assertEquals(len(jobs), len(branches))
+        for job in jobs:
+            self.assertIn(job.source_context.branch, branches)
 
     def test_tenant_config_branches(self):
         """
@@ -346,14 +349,15 @@ class TestTenantConfigBranches(ZuulTestCase):
         are parsed.
         """
         # Job must be defined in master
-        self._validate_job('master')
+        job_name = 'common-config-job'
+        self._validate_job(job_name, 'master')
 
         self.log.debug('Creating stable branch')
         self.create_branch('common-config', 'stable')
         self.sched.reconfigure(self.config)
 
         # Job still must be defined in master
-        self._validate_job('master')
+        self._validate_job(job_name, 'master')
 
         self.delete_branch('common-config', 'master', new_head='stable')
 
@@ -368,7 +372,7 @@ class TestTenantConfigBranches(ZuulTestCase):
 
         # The branch stable is now the only branch so the job must be taken
         # from stable.
-        self._validate_job('stable')
+        self._validate_job(job_name, 'stable')
 
         # Create another branch
         self.create_branch('common-config', 'feat_x')
@@ -380,6 +384,37 @@ class TestTenantConfigBranches(ZuulTestCase):
         tenant_one = self.sched.abide.tenants.get('tenant-one')
         jobs = tenant_one.layout.getJobs('common-config-job')
         self.assertEquals(len(jobs), 0)
+
+    def test_tenant_config_branch_filter(self):
+        """
+        Tests that when specifying branches for a project only those branches
+        are parsed.
+        """
+        # Job must be defined in master
+        common_job = 'common-config-job'
+        proj_job = 'project1-job'
+        self._validate_job(common_job, 'master')
+
+        self.log.debug('Creating branches')
+        self.create_branch('common-config', 'stable')
+        self.create_branch('common-config', 'feat_x')
+        self.create_branch('org/project1', 'stable/old')
+        self.create_branch('org/project1', 'stable/new')
+        self.create_branch('org/project1', 'feat_x')
+
+        self.sched.reconfigure(self.config)
+
+        # Job still must be defined in master
+        self._validate_job(common_job, 'master')
+        self._validate_job(proj_job, [
+            'master', 'stable/old', 'stable/new', 'feat_x'])
+
+        self.newTenantConfig('config/tenant-parser/branch.yaml')
+        self.sched.reconfigure(self.config)
+
+        # The tenant config now filters for the stable branch
+        self._validate_job(common_job, 'stable')
+        self._validate_job(proj_job, ['stable/old', 'stable/new'])
 
 
 class TestSplitConfig(ZuulTestCase):
