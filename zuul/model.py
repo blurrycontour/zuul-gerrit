@@ -918,7 +918,8 @@ class SourceContext(ConfigObject):
     Jobs and playbooks reference this to keep track of where they
     originate."""
 
-    def __init__(self, project, branch, path, trusted):
+    def __init__(self, project: Project, branch: str, path: str,
+                 trusted: bool):
         super(SourceContext, self).__init__()
         self.project = project
         self.branch = branch
@@ -3716,6 +3717,7 @@ class Layout(object):
 
     def __init__(self, tenant):
         self.uuid = uuid4().hex
+        self.zk_hash = None
         self.tenant = tenant
         self.project_configs = {}
         self.project_templates = {}
@@ -4346,6 +4348,11 @@ class Tenant(object):
         self.default_ansible_version = None
 
         self.authorization_rules = []
+        self.web_root = None
+        self.allowed_triggers = None
+        self.allowed_reporters = None
+        self.allowed_labels = None
+        self.disallowed_labels = None
 
     def _addProject(self, tpc):
         """Add a project to the project index
@@ -4561,7 +4568,8 @@ class Abide(object):
         project_branch_cache[branch] = UnparsedBranchCache()
         return project_branch_cache[branch]
 
-    def clearUnparsedBranchCache(self, canonical_project_name, branch=None):
+    def clearUnparsedBranchCache(self, canonical_project_name: str,
+                                 branch: str=None):
         if canonical_project_name in self.unparsed_project_branch_cache:
             project_branch_cache = \
                 self.unparsed_project_branch_cache[canonical_project_name]
