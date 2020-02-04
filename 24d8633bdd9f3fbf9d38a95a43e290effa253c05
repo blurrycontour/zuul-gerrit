@@ -111,6 +111,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_e1a4c44e",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-04T16:54:17Z",
+      "side": 1,
+      "message": "Ok the \"need to be enabled\" reads to me like: in order to enable it, you must explicitly set both the tenant and project settings to true.  I\u0027d suggest saying something like \"In addition, the tenant default may be overridden on a per-project basis\".  I agree that the exclude-unprotected-branches pattern makes sense here.",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_b7bb790e",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
