@@ -2140,6 +2140,7 @@ class QueueItem(object):
         self.change = change  # a ref
         self.dequeued_needing_change = False
         self.current_build_set = BuildSet(self)
+        self.reset_builds = {}  # Keep track on gate resets
         self.item_ahead = None
         self.items_behind = []
         self.enqueue_time = None
@@ -2171,6 +2172,11 @@ class QueueItem(object):
             id(self), self.change, pipeline)
 
     def resetAllBuilds(self):
+        # Before resetting the buildset, we store its current builds to keep
+        # track on gate resets. To not interfere with any active buildset,
+        # we store only the builds and not the buildset itself.
+        for b in self.current_build_set.builds.values():
+            self.addResetBuild(b)
         self.current_build_set = BuildSet(self)
         self.layout = None
         self.project_pipeline_config = None
@@ -2182,6 +2188,12 @@ class QueueItem(object):
 
     def addRetryBuild(self, build):
         self.current_build_set.addRetryBuild(build)
+
+    def addResetBuild(self, build):
+        self.reset_builds.setdefault(build.job.name, []).append(build)
+
+    def getResetBuildsForJob(self, job_name):
+        return self.reset_builds.get(job_name, [])
 
     def removeBuild(self, build):
         self.current_build_set.removeBuild(build)

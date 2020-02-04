@@ -111,6 +111,12 @@ class SQLReporter(BaseReporter):
                         item, job, db_buildset, retry_build, final=False
                     )
 
+                reset_builds = item.getResetBuildsForJob(job.name)
+                for reset_build in reset_builds:
+                    self.createBuildEntry(
+                        item, job, db_buildset, reset_build, final=False
+                    )
+
                 db_build = self.createBuildEntry(item, job, db_buildset, build)
 
                 for provides in job.provides:
