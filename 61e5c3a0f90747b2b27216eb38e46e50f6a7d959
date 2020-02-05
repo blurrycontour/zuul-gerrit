@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_39e0becb",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 764,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-05T17:03:02Z",
+      "side": 1,
+      "message": "I wonder if it makes sense to have this logic in a utility function as it is very similar to the one where they are enforced.",
+      "range": {
+        "startLine": 753,
+        "startChar": 0,
+        "endLine": 764,
+        "endChar": 33
+      },
+      "revId": "61e5c3a0f90747b2b27216eb38e46e50f6a7d959",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
