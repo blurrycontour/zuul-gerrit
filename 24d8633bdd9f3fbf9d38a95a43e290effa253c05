@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_843394c3",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-05T08:35:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_4697ee38",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_6650ea0a",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
@@ -30,6 +48,30 @@
       "writtenOn": "2020-02-04T15:34:28Z",
       "side": 1,
       "message": "nit: tenant",
+      "range": {
+        "startLine": 17,
+        "startChar": 68,
+        "endLine": 17,
+        "endChar": 69
+      },
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_243ae096",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-05T08:35:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_6650ea0a",
       "range": {
         "startLine": 17,
         "startChar": 68,
@@ -128,6 +170,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_e4c92852",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-05T08:35:49Z",
+      "side": 1,
+      "message": "IIRC the initial idea was, that you have to explicitly allow circular dependencies on the tenant AND project level. However, I think the current implementation that is similar to exclude-unprotected-branches makes more sense. Will fix.",
+      "parentUuid": "3fa7e38b_e1a4c44e",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_b7bb790e",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
@@ -151,6 +211,30 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_e4436811",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-05T08:35:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_b7bb790e",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 6
+      },
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_77b50119",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
@@ -162,6 +246,30 @@
       "writtenOn": "2020-02-03T22:14:42Z",
       "side": 1,
       "message": "one",
+      "range": {
+        "startLine": 47,
+        "startChar": 37,
+        "endLine": 47,
+        "endChar": 39
+      },
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_043fa484",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-05T08:35:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_77b50119",
       "range": {
         "startLine": 47,
         "startChar": 37,
@@ -226,6 +334,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_c46aec16",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-05T08:35:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_a6b102e6",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_c6b43ed6",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
@@ -243,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_845e3476",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-05T08:35:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_c6b43ed6",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_66ab0a71",
         "filename": "doc/source/developer/specs/circular-dependencies.rst",
         "patchSetId": 8
@@ -254,6 +398,24 @@
       "writtenOn": "2020-02-04T15:52:44Z",
       "side": 1,
       "message": "typo: its",
+      "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_c448ac2c",
+        "filename": "doc/source/developer/specs/circular-dependencies.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-05T08:35:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_66ab0a71",
       "revId": "24d8633bdd9f3fbf9d38a95a43e290effa253c05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
