@@ -14,6 +14,10 @@
 
 import logging
 
+from opentelemetry.trace import Span, SpanContext
+
+from zuul.lib import tracing
+
 
 def get_annotated_logger(logger, event, build=None):
     # Note(tobiash): When running with python 3.5 log adapters cannot be
@@ -26,6 +30,8 @@ def get_annotated_logger(logger, event, build=None):
     if event is not None:
         if hasattr(event, 'zuul_event_id'):
             extra['event_id'] = event.zuul_event_id
+        elif isinstance(event, (Span, SpanContext)):
+            extra['event_id'] = tracing.event_id_from_span(event)
         else:
             extra['event_id'] = event
 

@@ -17,6 +17,9 @@ import logging
 import re
 
 from opentelemetry import trace
+from opentelemetry.context.propagation.tracecontexthttptextformat import (
+    TraceContextHTTPTextFormat,
+)
 from opentelemetry.sdk.trace import TracerSource
 from opentelemetry.sdk.trace.export import (
     BatchExportSpanProcessor,
@@ -51,6 +54,33 @@ def _import_span_exporter(exporter_name):
 
 def get_tracer(name):
     return trace.tracer_source().get_tracer(name)
+
+
+def _set_in_dict(d, k, v):
+    d[k] = v
+
+
+def inject_trace_context(span, dictionary):
+    TraceContextHTTPTextFormat().inject(
+        span, _set_in_dict, dictionary
+    )
+
+
+def _get_from_dict(d, k):
+    return d.get(k, [])
+
+
+def extract_trace_context(dictionary):
+    return TraceContextHTTPTextFormat().extract(
+        _get_from_dict, dictionary
+    )
+
+
+def event_id_from_span(span):
+    context = span
+    if isinstance(span, trace.Span):
+        context = span.get_context()
+    return format(context.trace_id, "x")
 
 
 def configure_tracing(config, app_name, tracer_source=None):
