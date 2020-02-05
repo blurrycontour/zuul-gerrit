@@ -39,6 +39,24 @@
       "revId": "ca9fa4845d6c2a69eab06931c6115c8b9c293a1d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_9402d770",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-05T17:50:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_6400f104",
+      "revId": "ca9fa4845d6c2a69eab06931c6115c8b9c293a1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
