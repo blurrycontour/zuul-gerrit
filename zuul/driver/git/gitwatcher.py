@@ -130,7 +130,8 @@ class GitWatcher(threading.Thread):
                     self.callback(event)
                     self._event_count += 1
         except Exception as e:
-            self.log.debug("Unexpected issue in _run loop: %s" % str(e))
+            self.log.exception("Unexpected issue in _run loop:")
+            #self.log.debug("Unexpected issue in _run loop: %s" % str(e))
 
     def run(self):
         while not self._stopped:
