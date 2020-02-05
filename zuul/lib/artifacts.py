@@ -19,6 +19,7 @@ artifact = {
     'name': v.Required(str),
     'url': v.Required(str),
     'metadata': dict,
+    'index_links': v.Optional(bool),
 }
 
 zuul_data = {
