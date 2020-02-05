@@ -30,6 +30,7 @@ import itertools
 import jsonpath_rw
 
 from zuul import change_matcher
+from zuul.lib import tracing
 from zuul.lib.config import get_default
 from zuul.lib.artifacts import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
@@ -3251,8 +3252,19 @@ class TriggerEvent(object):
         # an admin command, etc):
         self.forced_pipeline = None
         # For logging
-        self.zuul_event_id = None
         self.timestamp = None
+        self.zuul_event_id = uuid4().hex
+        self._span = None
+
+    @property
+    def span(self):
+        return self._span
+
+    @span.setter
+    def span(self, value):
+        self._span = value
+        self._span.update_name(self.__class__.__name__)
+        self.zuul_event_id = tracing.event_id_from_span(self._span)
 
     @property
     def canonical_project_name(self):

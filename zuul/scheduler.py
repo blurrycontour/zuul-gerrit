@@ -1307,6 +1307,8 @@ class Scheduler(threading.Thread):
                     if pipeline.manager.eventMatches(event, change):
                         pipeline.manager.addChange(change, event)
         finally:
+            if event.span is not None:
+                event.span.end()
             self.trigger_event_queue.task_done()
 
     def process_management_queue(self):
