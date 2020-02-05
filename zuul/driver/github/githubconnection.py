@@ -35,11 +35,13 @@ import requests
 import github3
 import github3.exceptions
 from github3.session import AppInstallationTokenAuth
+from opentelemetry import trace
 
 from zuul.connection import BaseConnection
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib import tracing
 from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
@@ -266,6 +268,7 @@ class GithubGearmanWorker(object):
     def __init__(self, connection):
         self.config = connection.sched.config
         self.connection = connection
+        self.tracer = tracing.get_tracer(self.log.name)
 
         handler = "github:%s:payload" % self.connection.connection_name
         self.jobs = {
@@ -284,14 +287,20 @@ class GithubGearmanWorker(object):
         headers = args.get("headers")
         body = args.get("body")
 
-        delivery = headers.get('x-github-delivery')
-        log = get_annotated_logger(self.log, delivery)
+        parent_span = tracing.extract_trace_context(args)
+        span = self.tracer.start_span(
+            "GithubWebhookEvent",
+            parent=parent_span,
+            kind=trace.SpanKind.CONSUMER
+        )
+
+        log = get_annotated_logger(self.log, span)
         log.debug("Github Webhook Received")
 
         # TODO(jlk): Validate project in the request is a project we know
 
         try:
-            self.__dispatch_event(body, headers, log)
+            self.__dispatch_event(body, headers, span)
             output = {'return_code': 200}
         except Exception:
             output = {'return_code': 503}
@@ -299,7 +308,8 @@ class GithubGearmanWorker(object):
 
         job.sendWorkComplete(json.dumps(output))
 
-    def __dispatch_event(self, body, headers, log):
+    def __dispatch_event(self, body, headers, span):
+        log = get_annotated_logger(self.log, span)
         try:
             event = headers['x-github-event']
             log.debug("X-Github-Event: " + event)
@@ -309,7 +319,7 @@ class GithubGearmanWorker(object):
 
         delivery = headers.get('x-github-delivery')
         try:
-            self.connection.addEvent(body, event, delivery)
+            self.connection.addEvent(body, event, delivery, span)
         except Exception:
             message = 'Exception deserializing JSON body'
             log.exception(message)
@@ -327,9 +337,15 @@ class GithubEventProcessor(object):
     def __init__(self, connector, event_tuple):
         self.connector = connector
         self.connection = connector.connection
-        self.ts, self.body, self.event_type, self.delivery = event_tuple
+        (
+            self.ts,
+            self.body,
+            self.event_type,
+            self.delivery,
+            self.span,
+        ) = event_tuple
         logger = logging.getLogger("zuul.GithubEventProcessor")
-        self.zuul_event_id = self.delivery
+        self.zuul_event_id = tracing.event_id_from_span(self.span)
         self.log = get_annotated_logger(logger, self.zuul_event_id)
         self.event = None
 
@@ -381,12 +397,11 @@ class GithubEventProcessor(object):
             self.log.exception('Exception when handling event:')
 
         if event:
-
             # Note we limit parallel requests per installation id to avoid
             # triggering abuse detection.
             with self.connection.get_request_lock(installation_id):
                 event.delivery = self.delivery
-                event.zuul_event_id = self.delivery
+                event.span = self.span
                 event.timestamp = self.ts
                 project = self.connection.source.getProject(event.project_name)
                 if event.change_number:
@@ -418,6 +433,8 @@ class GithubEventProcessor(object):
 
             event.project_hostname = self.connection.canonical_hostname
             self.event = event
+        else:
+            self.span.end()
 
     def _event_push(self):
         base_repo = self.body.get('repository')
@@ -997,8 +1014,8 @@ class GithubConnection(BaseConnection):
             installation_id, threading.Semaphore(
                 value=self.max_threads_per_installation))
 
-    def addEvent(self, data, event=None, delivery=None):
-        return self.event_queue.put((time.time(), data, event, delivery))
+    def addEvent(self, data, event=None, delivery=None, span=None):
+        return self.event_queue.put((time.time(), data, event, delivery, span))
 
     def getEvent(self):
         return self.event_queue.get()
@@ -1805,6 +1822,7 @@ class GithubWebController(BaseWebController):
         self.connection = connection
         self.zuul_web = zuul_web
         self.token = self.connection.connection_config.get('webhook_token')
+        self.tracer = tracing.get_tracer(self.log.name)
 
     def _validate_signature(self, body, headers):
         try:
@@ -1828,32 +1846,40 @@ class GithubWebController(BaseWebController):
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def payload(self):
-        # Note(tobiash): We need to normalize the headers. Otherwise we will
-        # have trouble to get them from the dict afterwards.
-        # e.g.
-        # GitHub: sent: X-GitHub-Event received: X-GitHub-Event
-        # urllib: sent: X-GitHub-Event received: X-Github-Event
-        #
-        # We cannot easily solve this mismatch as every http processing lib
-        # modifies the header casing in its own way and by specification http
-        # headers are case insensitive so just lowercase all so we don't have
-        # to take care later.
-        # Note(corvus): Don't use cherrypy's json_in here so that we
-        # can validate the signature.
-        headers = dict()
-        for key, value in cherrypy.request.headers.items():
-            headers[key.lower()] = value
-        body = cherrypy.request.body.read()
-        self._validate_signature(body, headers)
-        # We cannot send the raw body through gearman, so it's easy to just
-        # encode it as json, after decoding it as utf-8
-        json_body = json.loads(body.decode('utf-8'))
+        with self.tracer.start_span(
+            "GithubWebhook", kind=trace.SpanKind.PRODUCER
+        ) as span:
+            # Note(tobiash): We need to normalize the headers. Otherwise we
+            # will have trouble to get them from the dict afterwards.
+            # e.g.
+            # GitHub: sent: X-GitHub-Event received: X-GitHub-Event
+            # urllib: sent: X-GitHub-Event received: X-Github-Event
+            #
+            # We cannot easily solve this mismatch as every http processing
+            # lib modifies the header casing in its own way and by
+            # specification http headers are case insensitive so just lowercase
+            # all so we don't have to take care later.
+            # Note(corvus): Don't use cherrypy's json_in here so that we
+            # can validate the signature.
+            headers = dict()
+            for key, value in cherrypy.request.headers.items():
+                headers[key.lower()] = value
+            body = cherrypy.request.body.read()
+            self._validate_signature(body, headers)
+            # We cannot send the raw body through gearman, so it's easy to just
+            # encode it as json, after decoding it as utf-8
+            json_body = json.loads(body.decode('utf-8'))
+            data = {'headers': headers, 'body': json_body}
 
-        job = self.zuul_web.rpc.submitJob(
-            'github:%s:payload' % self.connection.connection_name,
-            {'headers': headers, 'body': json_body})
+            span.set_attribute("github_event", headers.get("x-github-event"))
+            span.set_attribute("github_delivery",
+                               headers.get("x-github-delivery"))
+            tracing.inject_trace_context(span, data)
 
-        return json.loads(job.data[0])
+            job = self.zuul_web.rpc.submitJob(
+                'github:%s:payload' % self.connection.connection_name, data)
+
+            return json.loads(job.data[0])
 
 
 def _status_as_tuple(status):
