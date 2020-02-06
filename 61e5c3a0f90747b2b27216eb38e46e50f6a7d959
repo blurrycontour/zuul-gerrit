@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_298b7469",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 965,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-06T23:45:20Z",
+      "side": 1,
+      "message": "Nit, you could drop the sorted() call and use manually sort the list above. Would simplify the test a little.",
+      "revId": "61e5c3a0f90747b2b27216eb38e46e50f6a7d959",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a9ec4428",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 520,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-06T23:45:20Z",
+      "side": 1,
+      "message": "Nit, I think you can short circuit this with:\n\n  if allowed and disallowed_labels:\n\nFor the case where you don\u0027t match allowed.",
+      "revId": "61e5c3a0f90747b2b27216eb38e46e50f6a7d959",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_09cf98b2",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-06T23:45:20Z",
+      "side": 1,
+      "message": "See previous comment.",
+      "revId": "61e5c3a0f90747b2b27216eb38e46e50f6a7d959",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_39e0becb",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 3
