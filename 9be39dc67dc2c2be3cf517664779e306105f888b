@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_c96c20d1",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 886,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-06T23:35:19Z",
+      "side": 1,
+      "message": "See below comments; also, in tests, we don\u0027t automatically submit stream events, they have to be manually injected (so we have better control).  Since the new test doesn\u0027t call any \"addEvent\" methods, we can assume that shouldn\u0027t be happening here.",
+      "revId": "9be39dc67dc2c2be3cf517664779e306105f888b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_c953c014",
         "filename": "tests/unit/test_gerrit.py",
         "patchSetId": 2
