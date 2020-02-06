@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_c953c014",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-06T23:33:31Z",
+      "side": 1,
+      "message": "This points us to here:\n\nhttps://opendev.org/zuul/zuul/src/branch/master/tests/fixtures/zuul-gerrit-no-stream.conf#L26\n\nWhich says this gerrit doesn\u0027t have stream-events.",
+      "revId": "9be39dc67dc2c2be3cf517664779e306105f888b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_771e2476",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 2
@@ -36,6 +53,40 @@
         "endLine": 482,
         "endChar": 34
       },
+      "revId": "9be39dc67dc2c2be3cf517664779e306105f888b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_693accc5",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 482,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-06T23:33:31Z",
+      "side": 1,
+      "message": "Probably eventually.",
+      "revId": "9be39dc67dc2c2be3cf517664779e306105f888b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_8935c8d5",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1417,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-06T23:33:31Z",
+      "side": 1,
+      "message": "If it doesn\u0027t have stream events, it starts a ref watcher, which watches every project on the connection.  In the test setup, every project in a simple_layout() is added to the tenant config, and therefore to the connection.",
       "revId": "9be39dc67dc2c2be3cf517664779e306105f888b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
