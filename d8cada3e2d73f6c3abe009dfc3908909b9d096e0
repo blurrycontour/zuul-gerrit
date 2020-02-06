@@ -33,6 +33,40 @@
       "revId": "d8cada3e2d73f6c3abe009dfc3908909b9d096e0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_d00dad40",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1698,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-06T13:23:47Z",
+      "side": 1,
+      "message": "Current deployments probably need the documented additional access rights to access checks. So we need to prepare ourselves that this might fail with 401 and handle this gracefully. This is needed for a proper upgrade path as it\u0027s necessary to not just update the permissions of the app but the users of the app must acknowledge the new permissions.",
+      "revId": "d8cada3e2d73f6c3abe009dfc3908909b9d096e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ab3a06c2",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1814,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-06T13:23:47Z",
+      "side": 1,
+      "message": "We need to guard this as well against permission denied.",
+      "revId": "d8cada3e2d73f6c3abe009dfc3908909b9d096e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
