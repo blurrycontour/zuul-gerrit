@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_1c311ebc",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-02-06T15:54:49Z",
+      "side": 1,
+      "message": "Eek - they don\u0027t publish libraries to pypi? Ah - they do:\n\nhttps://github.com/open-telemetry/opentelemetry-python\n\nsays pip install of both should work.\n\nThat said - that also says the library is alpha. I\u0027m guessing this patch is about being proactive ... perhaps we should make this optional? So - don\u0027t depend on the libraries, put the imports behind a try/except and make the tracing class you made properly no-op if the libraries aren\u0027t installed? That way we can potentially support people who are interested in trying this before upstream thinks it\u0027s totally ready without making all the zuul deployers be impacted if open-telemetry changes their api in a way that breaks things?",
+      "revId": "9512286a006cd8a73c672161c9848d32e8a837a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
