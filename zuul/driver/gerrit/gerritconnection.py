@@ -33,15 +33,17 @@ import urllib
 import urllib.parse
 
 from typing import Dict, List
-from uuid import uuid4
 
 from zuul import version as zuul_version
 from zuul.connection import BaseConnection
 from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
+from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Tag, Branch, Project
+
+from opentelemetry import trace
 
 # HTTP timeout in seconds
 TIMEOUT = 30
@@ -124,6 +126,7 @@ class GerritEventConnector(threading.Thread):
         self.daemon = True
         self.connection = connection
         self._stopped = False
+        self.tracer = tracing.get_tracer(self.log.name)
 
     def stop(self):
         self._stopped = True
@@ -133,6 +136,8 @@ class GerritEventConnector(threading.Thread):
         ts, data = self.connection.getEvent()
         if self._stopped:
             return
+        span = self.tracer.start_span("GerritTriggerEvent",
+                                      kind=trace.SpanKind.CONSUMER)
         # Gerrit can produce inconsistent data immediately after an
         # event, So ensure that we do not deliver the event to Zuul
         # until at least a certain amount of time has passed.  Note
@@ -144,13 +149,13 @@ class GerritEventConnector(threading.Thread):
         event = GerritTriggerEvent()
         event.timestamp = ts
 
-        # Gerrit events don't have an event id that could be used to globally
-        # identify this event in the system so we have to generate one.
-        event.zuul_event_id = str(uuid4().hex)
+        event.span = span
         log = get_annotated_logger(self.log, event)
 
         event.type = data.get('type')
         event.uuid = data.get('uuid')
+        event.span.set_attribute('type', event.type)
+        event.span.set_attribute('uuid', event.uuid)
 
         # NOTE(mnaser): Certain plugins fire events which end up causing
         #               an unrecognized event log *and* a traceback if they
