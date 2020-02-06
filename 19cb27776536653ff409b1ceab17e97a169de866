@@ -39,6 +39,41 @@
       "revId": "19cb27776536653ff409b1ceab17e97a169de866",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_57d9a8ee",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-06T23:12:23Z",
+      "side": 1,
+      "message": "I think server means physical box to too many people. I would go with \"system\" or maybe \"compute context\".\n\nFWIW I prefer system because it is vague enough to not be attached to anything specific but specific enough people should grok what it means when coupled with executing ansible playbooks.",
+      "parentUuid": "3fa7e38b_d17fe8db",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_5744489f",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-06T23:12:23Z",
+      "side": 1,
+      "message": "Might want to add pipeline manager.",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
