@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_69a88cd9",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 886,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-06T23:37:15Z",
+      "side": 1,
+      "message": "For any followup reviewers. The bit of info I was missing is that self.connection.projects in the GitWatcher class is populated from the zuul tenant config projects list. We don\u0027t need to add any new config.",
+      "parentUuid": "3fa7e38b_c96c20d1",
+      "revId": "9be39dc67dc2c2be3cf517664779e306105f888b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_c953c014",
         "filename": "tests/unit/test_gerrit.py",
         "patchSetId": 2
