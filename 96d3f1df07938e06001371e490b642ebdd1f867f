@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_a93a0494",
+        "filename": "zuul/lib/re2util.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-06T23:48:16Z",
+      "side": 1,
+      "message": "See comment on parent change. I believe you can short circuit here by changing this to:\n\n  if allowed and disallowed_patterns:\n\nThat reduces the number of regex evaluations we have to do which is probably not a major savings but worth something.",
+      "revId": "96d3f1df07938e06001371e490b642ebdd1f867f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
