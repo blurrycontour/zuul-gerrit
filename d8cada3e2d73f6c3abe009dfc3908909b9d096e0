@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_102265a7",
+        "filename": "tests/fixtures/layouts/requirements-github.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-02-06T12:20:03Z",
+      "side": 1,
+      "message": "That\u0027s currently the only place ( that I\u0027m aware of) where the checks API is kind of mixed with the status API. I though about adding a new \"check\" requirement, but the GithubCommonFilter.matchesStatuses() method which evaluates this status is checked in various places. So, adding an equivalent for the checks API might make everything much more complex. If you OK with the rest, we could find a solution for that in a follow-up change.",
+      "revId": "d8cada3e2d73f6c3abe009dfc3908909b9d096e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_d0504d0c",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-02-06T12:20:03Z",
+      "side": 1,
+      "message": "That\u0027s kind of a stupid test, but as the GithubReporter currently doesn\u0027t return anything (which would identify an error), I don\u0027t have any idea on how to check that the report failed because of missing app authentication. This test shows at least that the reporter and/or zuul doesn\u0027t crash on this :-)",
+      "revId": "d8cada3e2d73f6c3abe009dfc3908909b9d096e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
