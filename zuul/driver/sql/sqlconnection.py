@@ -274,7 +274,7 @@ class SQLConnection(BaseConnection):
             newrev = sa.Column(sa.String(255))
             ref_url = sa.Column(sa.String(255))
             result = sa.Column(sa.String(255))
-            message = sa.Column(sa.TEXT())
+            message = sa.Column(sa.MEDIUMTEXT())
             tenant = sa.Column(sa.String(255))
             event_id = sa.Column(sa.String(255), nullable=True)
 
