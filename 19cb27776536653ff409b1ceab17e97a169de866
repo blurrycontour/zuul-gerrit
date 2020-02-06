@@ -60,6 +60,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_09d0f829",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-06T23:52:23Z",
+      "side": 1,
+      "message": "Or \"resource\".  That\u0027s actually the word we use in the executor when we\u0027re talking about a k8s construct.",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5744489f",
         "filename": "doc/source/reference/glossary.rst",
         "patchSetId": 3
@@ -71,6 +88,40 @@
       "writtenOn": "2020-02-06T23:12:23Z",
       "side": 1,
       "message": "Might want to add pipeline manager.",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a9d68425",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-06T23:52:23Z",
+      "side": 1,
+      "message": "The user-facing aspects use the hostname.  The admin-facing aspects are usually connection name.\n\nYou could say \"combination of their connection and repository name\".\n\nMaybe the most correct would be \"combination of their connection name or hostname and repository name\".\n\nOr less ambiguous \"identifed by their connection or hostname, combined with their repository\", complete with a \"Maine comma\" for further disambiguation.",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_c9d98055",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-06T23:52:23Z",
+      "side": 1,
+      "message": "\"named anonymous\" sounds weird.  Probably just \"named\"?",
       "revId": "19cb27776536653ff409b1ceab17e97a169de866",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
