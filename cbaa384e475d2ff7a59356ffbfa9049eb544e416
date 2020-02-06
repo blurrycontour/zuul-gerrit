@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_f78e94d5",
+        "filename": "zuul/driver/git/gitwatcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-06T23:18:53Z",
+      "side": 1,
+      "message": "Nit, this comment seems like it applies to line 142. If you need a new patchset maybe move it?",
+      "revId": "cbaa384e475d2ff7a59356ffbfa9049eb544e416",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
