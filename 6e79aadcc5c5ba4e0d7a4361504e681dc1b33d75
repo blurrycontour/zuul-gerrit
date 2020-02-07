@@ -16,6 +16,24 @@
       "revId": "6e79aadcc5c5ba4e0d7a4361504e681dc1b33d75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_73ee31b7",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-02-07T12:00:04Z",
+      "side": 1,
+      "message": "Good point! To be honest I haven\u0027t thought about this so far, but it will become necessary when we add a filter/checkbox to the UI. And for sure it would be helpful to have that feature for the API itself. I will improve that in a follow-up change.",
+      "parentUuid": "3fa7e38b_4916f0a3",
+      "revId": "6e79aadcc5c5ba4e0d7a4361504e681dc1b33d75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
