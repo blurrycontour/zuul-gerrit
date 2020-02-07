@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_4916f0a3",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-07T00:16:57Z",
+      "side": 1,
+      "message": "It might be nice to be able to query final and not final jobs at the same time. Maybe make the final web parameter ternary:\ntrue, false, both then update the filter here as appropriate.",
+      "revId": "6e79aadcc5c5ba4e0d7a4361504e681dc1b33d75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
