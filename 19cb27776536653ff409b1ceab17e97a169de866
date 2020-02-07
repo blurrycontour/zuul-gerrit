@@ -77,6 +77,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_73cf1126",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-02-07T12:12:56Z",
+      "side": 1,
+      "message": "Or even \"environment\", but \"resource\" is just as abstract.",
+      "parentUuid": "3fa7e38b_09d0f829",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5744489f",
         "filename": "doc/source/reference/glossary.rst",
         "patchSetId": 3
