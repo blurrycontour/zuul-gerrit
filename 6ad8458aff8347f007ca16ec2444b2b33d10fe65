@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_77a61a10",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2568,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-07T14:36:22Z",
+      "side": 1,
+      "message": "could test call the start method with `skip_multiprocessing_set_start_method` toggle to avoid that exception handler? It seems like this could hide another failure effect.",
+      "revId": "6ad8458aff8347f007ca16ec2444b2b33d10fe65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
