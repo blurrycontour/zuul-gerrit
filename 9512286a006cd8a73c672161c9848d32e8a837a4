@@ -16,6 +16,24 @@
       "revId": "9512286a006cd8a73c672161c9848d32e8a837a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_c2ae357f",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-07T07:22:33Z",
+      "side": 1,
+      "message": "Yes, the whole opentelemetry project is still in alpha. There were quite some API changes since the last 0.3.0 release and I figured that it would make sense to already use the 0.4.0 API.\n\nThis is anyways still WIP and just for getting a feel for how that could be integrate into Zuul.\n\nWe might also be able to influence the implementation of the opentelemetry Python lib, in case we see a use-case that can\u0027t be covered with the current set of APIs. Their main use-case is tracing of web services and Zuul is a little different :)",
+      "parentUuid": "3fa7e38b_1c311ebc",
+      "revId": "9512286a006cd8a73c672161c9848d32e8a837a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
