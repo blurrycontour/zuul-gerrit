@@ -16,6 +16,23 @@
       "revId": "96d3f1df07938e06001371e490b642ebdd1f867f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_49a11092",
+        "filename": "zuul/lib/re2util.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-07T00:01:06Z",
+      "side": 1,
+      "message": "Done.",
+      "revId": "96d3f1df07938e06001371e490b642ebdd1f867f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
