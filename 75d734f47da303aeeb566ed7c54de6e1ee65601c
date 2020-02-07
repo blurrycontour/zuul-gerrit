@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_977956fb",
+        "filename": "doc/source/reference/tenants.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 455,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-07T14:56:04Z",
+      "side": 1,
+      "message": "Why %TENANT% and not {tenant}?  There are many other templated strings in Zuul (not only in Ansible, but in Zuul itself, eg, success-url, and they all use python3 style substitution syntax.",
+      "revId": "75d734f47da303aeeb566ed7c54de6e1ee65601c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b77ed2df",
+        "filename": "doc/source/reference/tenants.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-07T14:56:04Z",
+      "side": 1,
+      "message": "Stray } ?",
+      "revId": "75d734f47da303aeeb566ed7c54de6e1ee65601c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_57675e53",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4831,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-07T14:56:04Z",
+      "side": 1,
+      "message": "And if you use the {} syntax, you can just use a python string.format() call here.",
+      "revId": "75d734f47da303aeeb566ed7c54de6e1ee65601c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
