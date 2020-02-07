@@ -2065,7 +2065,6 @@ class FakeBuild(object):
         self.name = self.parameters['job']
         self.wait_condition = threading.Condition()
         self.waiting = False
-        self.paused = False
         self.aborted = False
         self.requeue = False
         self.created = time.time()
@@ -2278,17 +2277,6 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
             if not host['host_vars'].get('ansible_connection'):
                 host['host_vars']['ansible_connection'] = 'local'
         return hosts
-
-    def pause(self):
-        build = self.executor_server.job_builds[self.job.unique]
-        build.paused = True
-        super().pause()
-
-    def resume(self):
-        build = self.executor_server.job_builds.get(self.job.unique)
-        if build:
-            build.paused = False
-        super().resume()
 
     def _send_aborted(self):
         self.recordResult('ABORTED')
