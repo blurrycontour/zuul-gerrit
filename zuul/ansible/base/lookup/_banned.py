@@ -13,13 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-from ansible.errors import AnsibleError
-from ansible.plugins.lookup import LookupBase
+from zuul.ansible import paths
+template_mod = paths._import_ansible_lookup_plugin("template")
 
 
-class LookupModule(LookupBase):
+class LookupModule(template_mod.LookupModule):
 
-    def run(self, *args, **kwargs):
-        raise AnsibleError(
-            "Use of lookup modules that perform local actions on the executor"
-            " is forbidden.")
+    def run(self, terms, variables=None, **kwargs):
+        for term in terms:
+            lookupfile = self.find_file_in_search_path(
+                variables, 'templates', term)
+            paths._fail_if_unsafe(lookupfile, allow_trusted=True)
+        return super(LookupModule, self).run(terms, variables, **kwargs)
