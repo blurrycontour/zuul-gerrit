@@ -116,3 +116,15 @@ class ActionModule(normal.ActionModule):
                 " Only {allowed_schemes} are allowed".format(
                     scheme=scheme,
                     allowed_schemes=ALLOWED_URL_SCHEMES))
+
+    def handle_k8s(self):
+        '''Allow k8s module on localhost if it doesn't touch unsafe files.
+
+        The :ansible:module:`k8s` can be used from the executor to modify
+        k8s resources.  It has one option which can read content from
+        a local file.  Make sure if that is used, that it is in the work
+        dir.
+        '''
+        src = self._task.args.get('src')
+        if src:
+            paths._fail_if_unsafe(src)
