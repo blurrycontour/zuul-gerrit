@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_2c8cb737",
+        "filename": "zuul/ansible/base/lookup/_banned.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-10T20:15:09Z",
+      "side": 1,
+      "message": "I guess you wanted to edit the file \u0027template.py\u0027 (it is currently a symlink to _banned.py)? Editing the _banned.py will modify all lookup plugins that are banned in an unexpected way.",
+      "revId": "df3591e11b9df1c77841d7cea3efb077834da69a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
