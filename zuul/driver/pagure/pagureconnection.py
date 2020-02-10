@@ -26,13 +26,14 @@ import traceback
 import voluptuous as v
 
 import gear
+from opentelemetry import trace
 
 from zuul.connection import BaseConnection
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.lib.config import get_default
 from zuul.model import Ref, Branch, Tag
-from zuul.lib import dependson
+from zuul.lib import dependson, tracing
 
 from zuul.driver.pagure.paguremodel import PagureTriggerEvent, PullRequest
 
@@ -108,6 +109,7 @@ class PagureGearmanWorker(object):
         self.jobs = {
             handler: self.handle_payload,
         }
+        self.tracer = tracing.get_tracer(self.log.name)
 
     def _run(self):
         while self._running:
@@ -131,29 +133,37 @@ class PagureGearmanWorker(object):
                 self.log.exception("Exception while getting job")
 
     def handle_payload(self, args):
+        parent_span = tracing.extract_trace_context(args)
+        span = self.tracer.start_span(
+            "PagureWebhookEvent",
+            parent=parent_span,
+            kind=trace.SpanKind.CONSUMER
+        )
+        log = get_annotated_logger(self.log, span)
         payload = args["payload"]
 
-        self.log.info(
+        log.info(
             "Pagure Webhook Received (id: %(msg_id)s, topic: %(topic)s)" % (
                 payload))
 
         try:
-            self.__dispatch_event(payload)
+            self.__dispatch_event(payload, span)
             output = {'return_code': 200}
         except Exception:
             output = {'return_code': 503}
-            self.log.exception("Exception handling Pagure event:")
+            log.exception("Exception handling Pagure event:")
 
         return output
 
-    def __dispatch_event(self, payload):
+    def __dispatch_event(self, payload, span):
+        log = get_annotated_logger(self.log, span)
         event = payload['topic']
         try:
-            self.log.info("Dispatching event %s" % event)
-            self.connection.addEvent(payload, event)
+            log.info("Dispatching event %s" % event)
+            self.connection.addEvent(payload, event, span)
         except Exception as err:
             message = 'Exception dispatching event: %s' % str(err)
-            self.log.exception(message)
+            log.exception(message)
             raise Exception(message)
 
     def start(self):
@@ -192,6 +202,7 @@ class PagureEventConnector(threading.Thread):
         self.daemon = True
         self.connection = connection
         self._stopped = False
+        self.tracer = tracing.get_tracer(self.log.name)
         self.metadata_notif = re.compile(
             r"^\*\*Metadata Update", re.MULTILINE)
         self.event_handler_mapping = {
@@ -214,29 +225,32 @@ class PagureEventConnector(threading.Thread):
         self.connection.addEvent(None)
 
     def _handleEvent(self):
-        ts, json_body, event_type = self.connection.getEvent()
+        ts, json_body, event_type, span = self.connection.getEvent()
         if self._stopped:
             return
 
-        self.log.info("Received event: %s" % str(event_type))
+        log = get_annotated_logger(self.log, span)
+
+        log.info("Received event: %s" % str(event_type))
         # self.log.debug("Event payload: %s " % json_body)
 
         if event_type not in self.event_handler_mapping:
             message = "Unhandled X-Pagure-Event: %s" % event_type
-            self.log.info(message)
+            log.info(message)
             return
 
         if event_type in self.event_handler_mapping:
-            self.log.debug("Handling event: %s" % event_type)
+            log.debug("Handling event: %s" % event_type)
 
         try:
             event = self.event_handler_mapping[event_type](json_body)
         except Exception:
-            self.log.exception(
+            log.exception(
                 'Exception when handling event: %s' % event_type)
             event = None
 
         if event:
+            event.span = span
             event.timestamp = ts
             if event.change_number:
                 project = self.connection.source.getProject(event.project_name)
@@ -249,9 +263,12 @@ class PagureEventConnector(threading.Thread):
             event.project_hostname = self.connection.canonical_hostname
             self.connection.logEvent(event)
             self.connection.sched.addEvent(event)
+        else:
+            span.end()
 
     def _event_base(self, body, pull_data_field='pullrequest'):
         event = PagureTriggerEvent()
+        event.span = self.tracer.start_span("PagureTriggerEvent")
 
         if pull_data_field in body['msg']:
             data = body['msg'][pull_data_field]
@@ -614,8 +631,8 @@ class PagureConnection(BaseConnection):
             self.gearman_worker.stop()
             self._stop_event_connector()
 
-    def addEvent(self, data, event=None):
-        return self.event_queue.put((time.time(), data, event))
+    def addEvent(self, data, event=None, span=None):
+        return self.event_queue.put((time.time(), data, event, span))
 
     def getEvent(self):
         return self.event_queue.get()
@@ -927,6 +944,7 @@ class PagureWebController(BaseWebController):
     def __init__(self, zuul_web, connection):
         self.connection = connection
         self.zuul_web = zuul_web
+        self.tracer = tracing.get_tracer(self.log.name)
 
     def _validate_signature(self, body, headers):
         try:
@@ -957,18 +975,24 @@ class PagureWebController(BaseWebController):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def payload(self):
         # https://docs.pagure.org/pagure/usage/using_webhooks.html
-        headers = dict()
-        for key, value in cherrypy.request.headers.items():
-            headers[key.lower()] = value
-        body = cherrypy.request.body.read()
-        payload = self._validate_signature(body, headers)
-        json_payload = json.loads(payload.decode('utf-8'))
+        with self.tracer.start_span(
+            "PagureWebhook", kind=trace.SpanKind.PRODUCER
+        ) as span:
+            headers = dict()
+            for key, value in cherrypy.request.headers.items():
+                headers[key.lower()] = value
+            body = cherrypy.request.body.read()
+            payload = self._validate_signature(body, headers)
+            json_payload = json.loads(payload.decode('utf-8'))
+            data = {'payload': json_payload}
 
-        job = self.zuul_web.rpc.submitJob(
-            'pagure:%s:payload' % self.connection.connection_name,
-            {'payload': json_payload})
+            span.set_attribute("pagure-topic", headers.get("x-pagure-topic"))
+            tracing.inject_trace_context(span, data)
 
-        return json.loads(job.data[0])
+            job = self.zuul_web.rpc.submitJob(
+                'pagure:%s:payload' % self.connection.connection_name, data)
+
+            return json.loads(job.data[0])
 
 
 def getSchema():
