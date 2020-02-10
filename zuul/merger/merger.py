@@ -266,11 +266,10 @@ class Repo(object):
         repo.git.update_environment(**self.env)
         return repo
 
-    def reset(self, zuul_event_id=None, build=None):
-        log = get_annotated_logger(self.log, zuul_event_id, build=build)
-        log.debug("Resetting repository %s", self.local_path)
-        self.update(zuul_event_id=zuul_event_id, build=build)
-        repo = self.createRepoObject(zuul_event_id, build=build)
+    @staticmethod
+    def _reset(local_path, log=None):
+        messages = []
+        repo = git.Repo(local_path)
         origin = repo.remotes.origin
         seen = set()
         head = None
@@ -288,10 +287,16 @@ class Repo(object):
             seen.add(ref.remote_head)
             if head is None:
                 head = ref.remote_head
-        log.debug("Reset to %s", head)
+        if log:
+            log.debug("Reset to %s", head)
+        else:
+            messages.append("Reset to %s" % head)
         repo.head.reference = head
         for ref in stale_refs:
-            log.debug("Delete stale ref %s", ref.remote_head)
+            if log:
+                log.debug("Delete stale ref %s", ref.remote_head)
+            else:
+                messages.append("Delete stale ref %s" % ref.remote_head)
             # A stale ref means the upstream branch (e.g. foobar) was deleted
             # so we need to delete both our local head (if existing) and the
             # remote tracking head. Both repo.heads and ref.remote_head
@@ -301,6 +306,21 @@ class Repo(object):
                     repo.delete_head(ref.remote_head, force=True)
                     break
             git.refs.RemoteReference.delete(repo, ref, force=True)
+        return messages
+
+    def reset(self, zuul_event_id=None, build=None, process_worker=None):
+        log = get_annotated_logger(self.log, zuul_event_id, build=build)
+        log.debug("Resetting repository %s", self.local_path)
+        self.update(zuul_event_id=zuul_event_id, build=build)
+        self.createRepoObject(zuul_event_id, build=build)
+
+        if process_worker is None:
+            self._reset(self.local_path, log)
+        else:
+            job = process_worker.submit(Repo._reset, self.local_path)
+            messages = job.result()
+            for message in messages:
+                log.debug(message)
 
     def prune(self, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
@@ -655,7 +675,7 @@ class Merger(object):
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
                    zuul_event_id=None,
-                   build=None):
+                   build=None, process_worker=None):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
@@ -669,7 +689,8 @@ class Merger(object):
             else:
                 log.info("Updating local repository %s/%s",
                          connection_name, project_name)
-                repo.reset(zuul_event_id=zuul_event_id, build=build)
+                repo.reset(zuul_event_id=zuul_event_id, build=build,
+                           process_worker=process_worker)
         except Exception:
             log.exception("Unable to update %s/%s",
                           connection_name, project_name)
@@ -859,7 +880,8 @@ class Merger(object):
             ret_recent[k] = v.hexsha
         return commit.hexsha, read_files, repo_state, ret_recent, orig_commit
 
-    def setRepoState(self, items, repo_state, zuul_event_id=None):
+    def setRepoState(self, items, repo_state, zuul_event_id=None,
+                     process_worker=None):
         # Sets the repo state for the items
         seen = set()
         for item in items:
@@ -870,7 +892,8 @@ class Merger(object):
             if key in seen:
                 continue
 
-            repo.reset()
+            repo.reset(zuul_event_id=zuul_event_id,
+                       process_worker=process_worker)
             self._restoreRepoState(item['connection'], item['project'], repo,
                                    repo_state, zuul_event_id)
 
