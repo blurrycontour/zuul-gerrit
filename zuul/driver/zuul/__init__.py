@@ -19,6 +19,7 @@ from uuid import uuid4
 from zuul.driver import Driver, TriggerInterface
 from zuul.driver.zuul.zuulmodel import ZuulTriggerEvent
 from zuul.driver.zuul import zuultrigger
+from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
 
 PARENT_CHANGE_ENQUEUED = 'parent-change-enqueued'
@@ -32,6 +33,7 @@ class ZuulDriver(Driver, TriggerInterface):
     def __init__(self):
         self.parent_change_enqueued_events = {}
         self.project_change_merged_events = {}
+        self.tracer = tracing.get_tracer(self.log.name)
 
     def registerScheduler(self, scheduler):
         self.sched = scheduler
@@ -84,6 +86,7 @@ class ZuulDriver(Driver, TriggerInterface):
 
     def _createProjectChangeMergedEvent(self, change):
         event = ZuulTriggerEvent()
+        event.span = self.tracer.start_span("ZuulTriggerEvent")
         event.type = PROJECT_CHANGE_MERGED
         event.trigger_name = self.name
         event.project_hostname = change.project.canonical_hostname
