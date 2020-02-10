@@ -16,6 +16,23 @@
       "revId": "3626ec773e60602757286e054e4fe4d7fbb0ae50",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_7bd7c7f5",
+        "filename": "zuul/ansible/base/action/normal.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-10T17:49:11Z",
+      "side": 1,
+      "message": "I\u0027d also protect the following paramers to avoid the possibility of information leaking in case a bodus path is given:\n* ca_cert\n* client_cert\n* client_key\n* kubeconfig",
+      "revId": "3626ec773e60602757286e054e4fe4d7fbb0ae50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
