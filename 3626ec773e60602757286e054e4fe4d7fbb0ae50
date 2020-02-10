@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_fb77373b",
+        "filename": "zuul/ansible/base/action/normal.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-10T17:47:16Z",
+      "side": 1,
+      "message": "perhaps we could whitelist the known safe attributes to prevent issue if new versions change that?",
+      "revId": "3626ec773e60602757286e054e4fe4d7fbb0ae50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
