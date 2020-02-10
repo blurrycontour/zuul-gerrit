@@ -23,6 +23,7 @@ import threading
 from zuul.connection import BaseConnection
 from zuul.driver.git.gitmodel import GitTriggerEvent, EMPTY_GIT_REF
 from zuul.model import Ref, Branch
+from zuul.lib import tracing
 
 
 class GitWatcher(threading.Thread):
@@ -36,6 +37,7 @@ class GitWatcher(threading.Thread):
         self.poll_delay = poll_delay
         self._stopped = False
         self.projects_refs = self.git_connection.projects_refs
+        self.tracer = tracing.get_tracer(self.log.name)
         # This is used by the test framework
         self._event_count = 0
 
@@ -79,6 +81,7 @@ class GitWatcher(threading.Thread):
         events = []
         for pevent in partial_events:
             event = GitTriggerEvent()
+            event.span = self.tracer.start_span("GitTriggerEvent")
             event.type = 'ref-updated'
             event.timestamp = time.time()
             event.project_hostname = self.git_connection.canonical_hostname
