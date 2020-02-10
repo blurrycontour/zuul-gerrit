@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_7b4d9191",
+        "filename": "web/src/containers/build/Summary.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-02-10T11:08:10Z",
+      "side": 1,
+      "message": "nitpick: could use an extra level of indentation inside the \u003cReact.Fragment\u003e block.",
+      "revId": "7b81e5e3a5096bb6bfdd0c9c5b78796ad398d4f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
