@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_7f2d6c43",
+        "filename": "Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-11T01:15:10Z",
+      "side": 1,
+      "message": "nit: this can be simplified using `--strip-components\u003d3 -C /usr/local/bin`",
+      "range": {
+        "startLine": 38,
+        "startChar": 5,
+        "endLine": 40,
+        "endChar": 29
+      },
+      "revId": "b374954aa42bffd6a813857b05d386ca0a8de1db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
