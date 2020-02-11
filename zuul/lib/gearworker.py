@@ -55,9 +55,16 @@ class ZuulGearWorker:
         self.gearman.waitForServer()
 
         self.log.debug('Registering')
+        self.register()
+        self.thread.start()
+
+    def register(self):
         for job in self.jobs:
             self.gearman.registerFunction(job)
-        self.thread.start()
+
+    def unregister(self):
+        for job in self.jobs:
+            self.gearman.unRegisterFunction(job)
 
     def stop(self):
         self._running = False

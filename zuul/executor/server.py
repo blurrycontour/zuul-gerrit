@@ -2679,9 +2679,11 @@ class ExecutorServer(object):
 
     def pause(self):
         self.pause_sensor.pause = True
+        self.merger_gearworker.unregister()
 
     def unpause(self):
         self.pause_sensor.pause = False
+        self.merger_gearworker.register()
 
     def graceful(self):
         # TODOv3: implement
