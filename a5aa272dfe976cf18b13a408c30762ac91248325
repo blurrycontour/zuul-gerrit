@@ -94,6 +94,30 @@
       "revId": "a5aa272dfe976cf18b13a408c30762ac91248325",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_fe45d39c",
+        "filename": "doc/source/reference/developer/specs/kubernetes-operator.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-11T16:25:04Z",
+      "side": 1,
+      "message": "Alright, I proposed that in https://review.opendev.org/707190 and implementation in https://review.opendev.org/707193",
+      "parentUuid": "3fa7e38b_907a8e24",
+      "range": {
+        "startLine": 369,
+        "startChar": 4,
+        "endLine": 369,
+        "endChar": 15
+      },
+      "revId": "a5aa272dfe976cf18b13a408c30762ac91248325",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
