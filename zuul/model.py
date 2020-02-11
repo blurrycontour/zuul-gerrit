@@ -4734,6 +4734,7 @@ class HoldRequest(object):
         self.ref_filter = None
         self.reason = None
         self.node_expiration = None
+        self.build_results = None
         # When max_count == current_count, hold request can no longer be used.
         self.max_count = 1
         self.current_count = 0
@@ -4768,6 +4769,7 @@ class HoldRequest(object):
         obj.current_count = data.get('current_count')
         obj.reason = data.get('reason')
         obj.node_expiration = data.get('node_expiration')
+        obj.build_results = data.get('build_results')
         obj.nodes = data.get('nodes', [])
         return obj
 
@@ -4786,6 +4788,7 @@ class HoldRequest(object):
         d['current_count'] = self.current_count
         d['reason'] = self.reason
         d['node_expiration'] = self.node_expiration
+        d['build_results'] = self.build_results
         d['nodes'] = self.nodes
         return d
 
@@ -4802,6 +4805,7 @@ class HoldRequest(object):
         self.current_count = d.get('current_count', 0)
         self.reason = d.get('reason')
         self.node_expiration = d.get('node_expiration')
+        self.build_results = d.get('build_results')
 
     def serialize(self):
         '''

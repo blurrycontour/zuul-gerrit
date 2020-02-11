@@ -189,6 +189,14 @@ class Client(zuul.cmd.ZuulApp):
                                   required=False, default='')
         cmd_autohold.add_argument('--ref', help='git ref to hold nodes for',
                                   required=False, default='')
+        default_build_results = ('FAILURE,RETRY_LIMIT,POST_FAILURE,'
+                                 'TIMED_OUT')
+        cmd_autohold.add_argument('--build-results',
+                                  help='comma separated list of build'
+                                  'results on which to autohold the nodes'
+                                  'default={}'.format(default_build_results),
+                                  required=False,
+                                  default=default_build_results)
         cmd_autohold.add_argument('--reason', help='reason for the hold',
                                   required=True)
         cmd_autohold.add_argument('--count',
@@ -432,6 +440,7 @@ class Client(zuul.cmd.ZuulApp):
 
         node_hold_expiration = self.args.node_hold_expiration
         client = self.get_client()
+        build_results = self.args.build_results.split(',')
         r = client.autohold(
             tenant=self.args.tenant,
             project=self.args.project,
@@ -440,7 +449,8 @@ class Client(zuul.cmd.ZuulApp):
             ref=self.args.ref,
             reason=self.args.reason,
             count=self.args.count,
-            node_hold_expiration=node_hold_expiration)
+            node_hold_expiration=node_hold_expiration,
+            build_results=build_results)
         return r
 
     def autohold_delete(self):
@@ -480,7 +490,7 @@ class Client(zuul.cmd.ZuulApp):
         table = prettytable.PrettyTable(
             field_names=[
                 'ID', 'Tenant', 'Project', 'Job', 'Ref Filter',
-                'Max Count', 'Reason'
+                'Max Count', 'Reason', 'Results'
             ])
 
         for request in autohold_requests:
@@ -492,6 +502,7 @@ class Client(zuul.cmd.ZuulApp):
                 request['ref_filter'],
                 request['max_count'],
                 request['reason'],
+                request['build_results']
             ])
 
         print(table)

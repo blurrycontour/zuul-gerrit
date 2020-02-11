@@ -577,7 +577,7 @@ class Scheduler(threading.Thread):
         # TODOv3(jeblair): reconfigure time should be per-tenant
 
     def autohold(self, tenant_name, project_name, job_name, ref_filter,
-                 reason, count, node_hold_expiration):
+                 reason, count, node_hold_expiration, build_results):
         key = (tenant_name, project_name, job_name, ref_filter)
         self.log.debug("Autohold requested for %s", key)
 
@@ -588,6 +588,10 @@ class Scheduler(threading.Thread):
         request.ref_filter = ref_filter
         request.reason = reason
         request.max_count = count
+        if not build_results:
+            build_results = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE",
+                             "TIMED_OUT"]
+        request.build_results = build_results
 
         max_hold = get_default(
             self.config, 'scheduler', 'max_hold_expiration', 0)
@@ -1506,13 +1510,10 @@ class Scheduler(threading.Thread):
         return autohold
 
     def _processAutohold(self, build):
-        # We explicitly only want to hold nodes for jobs if they have
-        # failed / retry_limit / post_failure and have an autohold request.
-        hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
-        if build.result not in hold_list:
+        request = self._getAutoholdRequest(build)
+        if request.build_results and build.result not in request.build_results:
             return
 
-        request = self._getAutoholdRequest(build)
         self.log.debug("Got autohold %s", request)
         if request is not None:
             self.nodepool.holdNodeSet(build.nodeset, request, build)
