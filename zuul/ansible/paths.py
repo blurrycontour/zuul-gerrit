@@ -98,6 +98,8 @@ def _fail_dict(path, prefix='Accessing files from'):
 
 
 def _fail_if_unsafe(path, allow_trusted=False):
+    if path is None:
+        return
     if not _is_safe_path(path, allow_trusted):
         msg_dict = _fail_dict(path)
         raise AnsibleError(msg_dict['msg'])
