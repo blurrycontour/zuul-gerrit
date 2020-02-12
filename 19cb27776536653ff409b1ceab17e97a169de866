@@ -95,6 +95,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_99f06462",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-02-12T18:13:58Z",
+      "side": 1,
+      "message": "I\u0027ll try \"remote system resource\" for improved clarity and parity with the rest of our documentation.",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5744489f",
         "filename": "doc/source/reference/glossary.rst",
         "patchSetId": 3
@@ -106,6 +123,23 @@
       "writtenOn": "2020-02-06T23:12:23Z",
       "side": 1,
       "message": "Might want to add pipeline manager.",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_399130f8",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-02-12T18:13:58Z",
+      "side": 1,
+      "message": "Will do.",
       "revId": "19cb27776536653ff409b1ceab17e97a169de866",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -129,6 +163,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_59942ce7",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-02-12T18:13:58Z",
+      "side": 1,
+      "message": "Sounds great, going with your recommended wording in this case.",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_c9d98055",
         "filename": "doc/source/reference/glossary.rst",
         "patchSetId": 3
@@ -140,6 +191,23 @@
       "writtenOn": "2020-02-06T23:52:23Z",
       "side": 1,
       "message": "\"named anonymous\" sounds weird.  Probably just \"named\"?",
+      "revId": "19cb27776536653ff409b1ceab17e97a169de866",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_f99638ee",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-02-12T18:13:58Z",
+      "side": 1,
+      "message": "Yes, that is rather contradictory. I think I wanted to say that it\u0027s an independent list for convenient reuse.",
       "revId": "19cb27776536653ff409b1ceab17e97a169de866",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
