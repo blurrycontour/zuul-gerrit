@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_d2231105",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-12T21:05:05Z",
+      "side": 1,
+      "message": "Container build says \u0027curl not found\u0027 it\u0027s probably installed by either install-js-tools or bindep.",
+      "revId": "ebc2c5c312123d896c6e10012ab5f606280470d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
