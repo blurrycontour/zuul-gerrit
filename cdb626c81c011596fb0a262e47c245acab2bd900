@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_1ac69016",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2402,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-02-13T17:22:38Z",
+      "side": 1,
+      "message": "Could we have job \u003cjob name\u003e requires ... instead ?",
+      "range": {
+        "startLine": 2402,
+        "startChar": 21,
+        "endLine": 2402,
+        "endChar": 29
+      },
+      "revId": "cdb626c81c011596fb0a262e47c245acab2bd900",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
