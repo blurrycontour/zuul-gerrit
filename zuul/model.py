@@ -2399,8 +2399,12 @@ class QueueItem(object):
                 provides = [x.name for x in build.provides]
                 requirement = list(requirements.intersection(set(provides)))
                 raise RequirementsError(
-                    "Requirements %s not met by build %s" % (
-                        requirement, build.uuid))
+                    'This job requires artifact "%s" provided by build %s '
+                    '(triggered by change %s on project %s), but build %s '
+                    'failed with result "%s"' % (
+                        requirement, build.uuid,
+                        build.buildset.change, build.buildset.project,
+                        build.uuid, build.result))
             else:
                 for a in build.artifacts:
                     artifact = {'name': a.name,
