@@ -31,6 +31,7 @@ import traceback
 from concurrent.futures.process import ProcessPoolExecutor
 
 import git
+from opentelemetry import trace
 from urllib.parse import urlsplit
 
 from zuul.lib.ansible import AnsibleManager
@@ -39,7 +40,7 @@ from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
-from zuul.lib import filecomments
+from zuul.lib import filecomments, tracing
 
 import gear
 
@@ -2385,6 +2386,7 @@ class ExecutorServer(object):
         self.config = config
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
+        self.tracer = tracing.get_tracer(self.log.name)
         # TODOv3(mordred): make the executor name more unique --
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
@@ -2933,13 +2935,17 @@ class ExecutorServer(object):
     def merge(self, job):
         self.log.debug("Got merge job: %s" % job.unique)
         args = json.loads(job.arguments)
+        parent_span = tracing.extract_trace_context(args)
         zuul_event_id = args.get('zuul_event_id')
-        ret = self.merger.mergeChanges(args['items'], args.get('files'),
-                                       args.get('dirs', []),
-                                       args.get('repo_state'),
-                                       branches=args.get('branches'),
-                                       repo_locks=self.repo_locks,
-                                       zuul_event_id=zuul_event_id)
+
+        with self.tracer.start_span("merge", parent=parent_span,
+                                    kind=trace.SpanKind.CONSUMER):
+            ret = self.merger.mergeChanges(args['items'], args.get('files'),
+                                           args.get('dirs', []),
+                                           args.get('repo_state'),
+                                           branches=args.get('branches'),
+                                           repo_locks=self.repo_locks,
+                                           zuul_event_id=zuul_event_id)
         result = dict(merged=(ret is not None))
         if ret is None:
             result['commit'] = result['files'] = result['repo_state'] = None

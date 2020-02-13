@@ -16,7 +16,9 @@ import json
 import logging
 import threading
 
-from zuul.lib import commandsocket
+from opentelemetry import trace
+
+from zuul.lib import commandsocket, tracing
 from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
@@ -30,6 +32,7 @@ class MergeServer(object):
 
     def __init__(self, config, connections={}):
         self.config = config
+        self.tracing = tracing.get_tracer(self.log.name)
 
         merge_root = get_default(self.config, 'merger', 'git_dir',
                                  '/var/lib/zuul/merger-git')
@@ -97,12 +100,15 @@ class MergeServer(object):
     def merge(self, job):
         self.log.debug("Got merge job: %s" % job.unique)
         args = json.loads(job.arguments)
+        parent_span = tracing.extract_trace_context(args)
         zuul_event_id = args.get('zuul_event_id')
-        ret = self.merger.mergeChanges(
-            args['items'], args.get('files'),
-            args.get('dirs'), args.get('repo_state'),
-            branches=args.get('branches'),
-            zuul_event_id=zuul_event_id)
+        with self.tracer.start_span("merge", parent=parent_span,
+                                    kind=trace.SpanKind.CONSUMER):
+            ret = self.merger.mergeChanges(
+                args['items'], args.get('files'),
+                args.get('dirs'), args.get('repo_state'),
+                branches=args.get('branches'),
+                zuul_event_id=zuul_event_id)
         result = dict(merged=(ret is not None))
         if ret is None:
             result['commit'] = result['files'] = result['repo_state'] = None
