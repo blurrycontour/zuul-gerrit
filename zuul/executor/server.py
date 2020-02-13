@@ -24,6 +24,7 @@ import signal
 import shlex
 import socket
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -2109,17 +2110,19 @@ class AnsibleJob(object):
                 line = line[:1024].rstrip()
                 ansible_log.debug("Ansible output: %s" % (line,))
             self.log.debug("Ansible output terminated")
-            cpu_times = self.proc.cpu_times()
-            self.log.debug("Ansible cpu times: user=%.2f, system=%.2f, "
-                           "children_user=%.2f, "
-                           "children_system=%.2f" %
-                           (cpu_times.user, cpu_times.system,
-                            cpu_times.children_user,
-                            cpu_times.children_system))
-            self.cpu_times['user'] += cpu_times.user
-            self.cpu_times['system'] += cpu_times.system
-            self.cpu_times['children_user'] += cpu_times.children_user
-            self.cpu_times['children_system'] += cpu_times.children_system
+            # Gathering cpu times doesn't work on MacOS
+            if sys.platform != 'darwin':
+                cpu_times = self.proc.cpu_times()
+                self.log.debug("Ansible cpu times: user=%.2f, system=%.2f, "
+                               "children_user=%.2f, "
+                               "children_system=%.2f" %
+                               (cpu_times.user, cpu_times.system,
+                                cpu_times.children_user,
+                                cpu_times.children_system))
+                self.cpu_times['user'] += cpu_times.user
+                self.cpu_times['system'] += cpu_times.system
+                self.cpu_times['children_user'] += cpu_times.children_user
+                self.cpu_times['children_system'] += cpu_times.children_system
             ret = self.proc.wait()
             self.log.debug("Ansible exit code: %s" % (ret,))
         finally:
