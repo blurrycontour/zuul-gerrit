@@ -15,34 +15,155 @@
 import json
 import logging
 import threading
+from abc import ABCMeta
 
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
-
+from zuul.merger.merger import nullcontext
 
 COMMANDS = ['stop', 'pause', 'unpause']
 
 
-class MergeServer(object):
-    log = logging.getLogger("zuul.MergeServer")
+class BaseRepoLocks(metaclass=ABCMeta):
 
-    def __init__(self, config, connections={}):
+    def getRepoLock(self, connection_name, project_name):
+        return nullcontext()
+
+
+class RepoLocks(BaseRepoLocks):
+
+    def __init__(self):
+        self.locks = {}
+
+    def getRepoLock(self, connection_name, project_name):
+        key = '%s:%s' % (connection_name, project_name)
+        self.locks.setdefault(key, threading.Lock())
+        return self.locks[key]
+
+
+class BaseMergeServer(metaclass=ABCMeta):
+    log = logging.getLogger("zuul.BaseMergeServer")
+
+    _repo_locks_class = BaseRepoLocks
+
+    def __init__(self, config, component, connections=None):
+        self.connections = connections or {}
+        self.merge_email = get_default(config, 'merger', 'git_user_email')
+        self.merge_name = get_default(config, 'merger', 'git_user_name')
+        self.merge_speed_limit = get_default(
+            config, 'merger', 'git_http_low_speed_limit', '1000')
+        self.merge_speed_time = get_default(
+            config, 'merger', 'git_http_low_speed_time', '30')
+        self.git_timeout = get_default(config, 'merger', 'git_timeout', 300)
+
+        self.merge_root = get_default(config, component, 'git_dir',
+                                      '/var/lib/zuul/{}-git'.format(component))
+
+        # This merger and its git repos are used to maintain
+        # up-to-date copies of all the repos that are used by jobs, as
+        # well as to support the merger:cat functon to supply
+        # configuration information to Zuul when it starts.
+        self.merger = self._getMerger(self.merge_root, None)
+
         self.config = config
 
-        merge_root = get_default(self.config, 'merger', 'git_dir',
-                                 '/var/lib/zuul/merger-git')
-        merge_email = get_default(self.config, 'merger', 'git_user_email')
-        merge_name = get_default(self.config, 'merger', 'git_user_name')
-        speed_limit = get_default(
-            config, 'merger', 'git_http_low_speed_limit', '1000')
-        speed_time = get_default(
-            config, 'merger', 'git_http_low_speed_time', '30')
-        git_timeout = get_default(config, 'merger', 'git_timeout', 300)
-        self.merger = merger.Merger(
-            merge_root, connections, merge_email, merge_name, speed_limit,
-            speed_time, git_timeout=git_timeout)
+        # Repo locking is needed on the executor
+        self.repo_locks = self._repo_locks_class()
+
+    def _getMerger(self, root, cache_root, logger=None):
+        return merger.Merger(
+            root, self.connections, self.merge_email, self.merge_name,
+            self.merge_speed_limit, self.merge_speed_time, cache_root, logger,
+            execution_context=True, git_timeout=self.git_timeout)
+
+    def _repoLock(self, connection_name, project_name):
+        # The merger does not need locking so return a null lock.
+        return nullcontext()
+
+    def _update(self, connection_name, project_name, zuul_event_id=None):
+        self.merger.updateRepo(connection_name, project_name,
+                               zuul_event_id=zuul_event_id)
+
+    def cat(self, job):
+        self.log.debug("Got cat job: %s" % job.unique)
+        args = json.loads(job.arguments)
+
+        connection_name = args['connection']
+        project_name = args['project']
+        self._update(connection_name, project_name)
+
+        lock = self.repo_locks.getRepoLock(connection_name, project_name)
+        with lock:
+            files = self.merger.getFiles(connection_name, project_name,
+                                         args['branch'], args['files'],
+                                         args.get('dirs'))
+        result = dict(updated=True,
+                      files=files)
+        job.sendWorkComplete(json.dumps(result))
+
+    def merge(self, job):
+        self.log.debug("Got merge job: %s" % job.unique)
+        args = json.loads(job.arguments)
+        zuul_event_id = args.get('zuul_event_id')
+
+        ret = self.merger.mergeChanges(
+            args['items'], args.get('files'),
+            args.get('dirs', []),
+            args.get('repo_state'),
+            branches=args.get('branches'),
+            repo_locks=self.repo_locks,
+            zuul_event_id=zuul_event_id)
+
+        result = dict(merged=(ret is not None))
+        if ret is None:
+            result['commit'] = result['files'] = result['repo_state'] = None
+        else:
+            (result['commit'], result['files'], result['repo_state'],
+             recent, orig_commit) = ret
+        result['zuul_event_id'] = zuul_event_id
+        job.sendWorkComplete(json.dumps(result))
+
+    def refstate(self, job):
+        self.log.debug("Got refstate job: %s" % job.unique)
+        args = json.loads(job.arguments)
+        zuul_event_id = args.get('zuul_event_id')
+        success, repo_state = self.merger.getRepoState(
+            args['items'], branches=args.get('branches'),
+            repo_locks=self.repo_locks)
+        result = dict(updated=success,
+                      repo_state=repo_state)
+        result['zuul_event_id'] = zuul_event_id
+        job.sendWorkComplete(json.dumps(result))
+
+    def fileschanges(self, job):
+        self.log.debug("Got fileschanges job: %s" % job.unique)
+        args = json.loads(job.arguments)
+        zuul_event_id = args.get('zuul_event_id')
+
+        connection_name = args['connection']
+        project_name = args['project']
+        self._update(connection_name, project_name,
+                     zuul_event_id=zuul_event_id)
+
+        lock = self.repo_locks.getRepoLock(connection_name,project_name)
+        with lock:
+            files = self.merger.getFilesChanges(
+                connection_name, project_name, args['branch'], args['tosha'],
+                zuul_event_id=zuul_event_id)
+        result = dict(updated=True,
+                      files=files)
+        result['zuul_event_id'] = zuul_event_id
+        job.sendWorkComplete(json.dumps(result))
+
+
+class MergeServer(BaseMergeServer):
+    log = logging.getLogger("zuul.MergeServer")
+
+    def __init__(self, config, connections=None):
+        super().__init__(config, 'merger', connections)
+
         self.command_map = dict(
             stop=self.stop,
             pause=self.pause,
@@ -104,57 +225,3 @@ class MergeServer(object):
                     self.command_map[command]()
             except Exception:
                 self.log.exception("Exception while processing command")
-
-    def merge(self, job):
-        self.log.debug("Got merge job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
-        ret = self.merger.mergeChanges(
-            args['items'], args.get('files'),
-            args.get('dirs'), args.get('repo_state'),
-            branches=args.get('branches'),
-            zuul_event_id=zuul_event_id)
-        result = dict(merged=(ret is not None))
-        if ret is None:
-            result['commit'] = result['files'] = result['repo_state'] = None
-        else:
-            (result['commit'], result['files'], result['repo_state'],
-             recent, orig_commit) = ret
-        result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
-
-    def refstate(self, job):
-        self.log.debug("Got refstate job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
-        success, repo_state = self.merger.getRepoState(
-            args['items'], branches=args.get('branches'))
-        result = dict(updated=success,
-                      repo_state=repo_state)
-        result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
-
-    def cat(self, job):
-        self.log.debug("Got cat job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        self.merger.updateRepo(args['connection'], args['project'])
-        files = self.merger.getFiles(args['connection'], args['project'],
-                                     args['branch'], args['files'],
-                                     args.get('dirs'))
-        result = dict(updated=True,
-                      files=files)
-        job.sendWorkComplete(json.dumps(result))
-
-    def fileschanges(self, job):
-        self.log.debug("Got fileschanges job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
-        self.merger.updateRepo(args['connection'], args['project'],
-                               zuul_event_id=zuul_event_id)
-        files = self.merger.getFilesChanges(
-            args['connection'], args['project'], args['branch'], args['tosha'],
-            zuul_event_id=zuul_event_id)
-        result = dict(updated=True,
-                      files=files)
-        result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))

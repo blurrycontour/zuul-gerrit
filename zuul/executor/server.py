@@ -52,6 +52,7 @@ from zuul.executor.sensors.pause import PauseSensor
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
+from zuul.merger.server import BaseMergeServer, RepoLocks
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -83,17 +84,6 @@ class RoleNotFoundError(ExecutorError):
 
 class PluginFoundError(ExecutorError):
     pass
-
-
-class RepoLocks:
-
-    def __init__(self):
-        self.locks = {}
-
-    def getRepoLock(self, connection_name, project_name):
-        key = '%s:%s' % (connection_name, project_name)
-        self.locks.setdefault(key, threading.Lock())
-        return self.locks[key]
 
 
 class DiskAccountant(object):
@@ -2374,15 +2364,17 @@ class ExecutorExecuteWorker(gear.TextWorker):
         return super(ExecutorExecuteWorker, self).handleNoop(packet)
 
 
-class ExecutorServer(object):
+class ExecutorServer(BaseMergeServer):
     log = logging.getLogger("zuul.ExecutorServer")
     _ansible_manager_class = AnsibleManager
     _job_class = AnsibleJob
+    _repo_locks_class = RepoLocks
 
-    def __init__(self, config, connections={}, jobdir_root=None,
+    def __init__(self, config, connections=None, jobdir_root=None,
                  keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT,
                  log_console_port=DEFAULT_STREAM_PORT):
-        self.config = config
+        super().__init__(config, 'executor', connections)
+
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
         # TODOv3(mordred): make the executor name more unique --
@@ -2390,7 +2382,6 @@ class ExecutorServer(object):
         self.hostname = get_default(self.config, 'executor', 'hostname',
                                     socket.getfqdn())
         self.log_streaming_port = log_streaming_port
-        self.repo_locks = RepoLocks()
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
         self.verbose = False
@@ -2411,8 +2402,6 @@ class ExecutorServer(object):
 
         statsd_extra_keys = {'hostname': self.hostname}
         self.statsd = get_statsd(config, statsd_extra_keys)
-        self.merge_root = get_default(self.config, 'executor', 'git_dir',
-                                      '/var/lib/zuul/executor-git')
         self.default_username = get_default(self.config, 'executor',
                                             'default_username', 'zuul')
         self.disk_limit_per_job = int(get_default(self.config, 'executor',
@@ -2420,13 +2409,6 @@ class ExecutorServer(object):
         self.setup_timeout = int(get_default(self.config, 'executor',
                                              'ansible_setup_timeout', 60))
         self.zone = get_default(self.config, 'executor', 'zone')
-        self.merge_email = get_default(self.config, 'merger', 'git_user_email')
-        self.merge_name = get_default(self.config, 'merger', 'git_user_name')
-        self.merge_speed_limit = get_default(
-            config, 'merger', 'git_http_low_speed_limit', '1000')
-        self.merge_speed_time = get_default(
-            config, 'merger', 'git_http_low_speed_time', '30')
-        self.git_timeout = get_default(config, 'merger', 'git_timeout', 300)
 
         # TODO(tobiash): Take cgroups into account
         self.update_workers = multiprocessing.cpu_count()
@@ -2437,12 +2419,6 @@ class ExecutorServer(object):
         self.accepting_work = False
         self.execution_wrapper = connections.drivers[execution_wrapper_name]
 
-        self.connections = connections
-        # This merger and its git repos are used to maintain
-        # up-to-date copies of all the repos that are used by jobs, as
-        # well as to support the merger:cat functon to supply
-        # configuration information to Zuul when it starts.
-        self.merger = self._getMerger(self.merge_root, None)
         self.update_queue = DeduplicateQueue()
 
         command_socket = get_default(
@@ -2549,11 +2525,8 @@ class ExecutorServer(object):
         # Used to offload expensive operations to different processes
         self.process_worker = None
 
-    def _getMerger(self, root, cache_root, logger=None):
-        return zuul.merger.merger.Merger(
-            root, self.connections, self.merge_email, self.merge_name,
-            self.merge_speed_limit, self.merge_speed_time, cache_root, logger,
-            execution_context=True, git_timeout=self.git_timeout)
+    def _repoLock(self, connection_name, project_name):
+        return self.repo_locks.getRepoLock(connection_name, project_name)
 
     def start(self):
         self._running = True
@@ -2781,6 +2754,14 @@ class ExecutorServer(object):
         task = self.update_queue.put(task)
         return task
 
+    def _update(self, connection_name, project_name, zuul_event_id=None):
+        """
+        The executor overrides _update so it can do the update asynchronously.
+        """
+        task = self.update(connection_name, project_name,
+                           zuul_event_id=zuul_event_id)
+        task.wait()
+
     def executeJob(self, job):
         args = json.loads(job.arguments)
         zuul_event_id = args.get('zuul_event_id')
@@ -2888,67 +2869,3 @@ class ExecutorServer(object):
             job_worker.stop(reason)
         except Exception:
             log.exception("Exception sending stop command to worker:")
-
-    def cat(self, job):
-        self.log.debug("Got cat job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        task = self.update(args['connection'], args['project'])
-        task.wait()
-        lock = self.repo_locks.getRepoLock(
-            task.connection_name, task.project_name)
-        with lock:
-            files = self.merger.getFiles(args['connection'], args['project'],
-                                         args['branch'], args['files'],
-                                         args.get('dirs', []))
-        result = dict(updated=True,
-                      files=files)
-        job.sendWorkComplete(json.dumps(result))
-
-    def fileschanges(self, job):
-        self.log.debug("Got fileschanges job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
-        task = self.update(args['connection'], args['project'])
-        task.wait()
-        lock = self.repo_locks.getRepoLock(
-            args['connection'], args['project'])
-        with lock:
-            files = self.merger.getFilesChanges(
-                args['connection'], args['project'],
-                args['branch'],
-                args['tosha'], zuul_event_id=zuul_event_id)
-        result = dict(updated=True,
-                      files=files)
-        result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
-
-    def refstate(self, job):
-        self.log.debug("Got refstate job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
-        success, repo_state = self.merger.getRepoState(
-            args['items'], branches=args.get('branches'),
-            repo_locks=self.repo_locks)
-        result = dict(updated=success,
-                      repo_state=repo_state)
-        result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
-
-    def merge(self, job):
-        self.log.debug("Got merge job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
-        ret = self.merger.mergeChanges(args['items'], args.get('files'),
-                                       args.get('dirs', []),
-                                       args.get('repo_state'),
-                                       branches=args.get('branches'),
-                                       repo_locks=self.repo_locks,
-                                       zuul_event_id=zuul_event_id)
-        result = dict(merged=(ret is not None))
-        if ret is None:
-            result['commit'] = result['files'] = result['repo_state'] = None
-        else:
-            (result['commit'], result['files'], result['repo_state'],
-             recent, orig_commit) = ret
-        result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
