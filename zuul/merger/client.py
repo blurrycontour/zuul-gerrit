@@ -18,8 +18,10 @@ import threading
 from uuid import uuid4
 
 import gear
+from opentelemetry import trace
 
 import zuul.model
+from zuul.lib import tracing
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 
@@ -58,7 +60,7 @@ class MergeGearmanClient(gear.Client):
         self.__merge_client.onBuildCompleted(job)
 
 
-class MergeJob(gear.TextJob):
+class MergeJob(gear.TextJob, tracing.TracableMixin):
     def __init__(self, *args, **kw):
         super(MergeJob, self).__init__(*args, **kw)
         self.__event = threading.Event()
@@ -76,6 +78,7 @@ class MergeClient(object):
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
+        self.tracer = tracing.get_tracer(self.log.name)
         server = self.config.get('gearman', 'server')
         port = get_default(self.config, 'gearman', 'port', 4730)
         ssl_key = get_default(self.config, 'gearman', 'ssl_key')
@@ -101,13 +104,21 @@ class MergeClient(object):
         return False
 
     def submitJob(self, name, data, build_set,
-                  precedence=zuul.model.PRECEDENCE_NORMAL, event=None):
+                  precedence=zuul.model.PRECEDENCE_NORMAL,
+                  event=None, span=None):
         log = get_annotated_logger(self.log, event)
         uuid = str(uuid4().hex)
+        job_span = self.tracer.start_span(
+            "MergeJob",
+            parent=span,
+            kind=trace.SpanKind.CLIENT
+        )
+        tracing.inject_trace_context(job_span, data)
         job = MergeJob(name,
                        json.dumps(data),
                        unique=uuid)
         job.build_set = build_set
+        job.span = job_span
         log.debug("Submitting job %s with data %s", job, data)
         self.jobs.add(job)
         self.gearman.submitJob(job, precedence=precedence,
@@ -116,7 +127,7 @@ class MergeClient(object):
 
     def mergeChanges(self, items, build_set, files=None, dirs=None,
                      repo_state=None, precedence=zuul.model.PRECEDENCE_NORMAL,
-                     branches=None, event=None):
+                     branches=None, event=None, span=None):
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
@@ -128,11 +139,11 @@ class MergeClient(object):
                     branches=branches,
                     zuul_event_id=zuul_event_id)
         self.submitJob('merger:merge', data, build_set, precedence,
-                       event=event)
+                       event=event, span=span)
 
     def getRepoState(self, items, build_set,
                      precedence=zuul.model.PRECEDENCE_NORMAL,
-                     branches=None, event=None):
+                     branches=None, event=None, span=None):
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
@@ -141,10 +152,10 @@ class MergeClient(object):
         data = dict(items=items, branches=branches,
                     zuul_event_id=zuul_event_id)
         self.submitJob('merger:refstate', data, build_set, precedence,
-                       event=event)
+                       event=event, span=span)
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[],
-                 precedence=zuul.model.PRECEDENCE_HIGH, event=None):
+                 precedence=zuul.model.PRECEDENCE_HIGH, event=None, span=None):
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
@@ -156,12 +167,13 @@ class MergeClient(object):
                     files=files,
                     dirs=dirs,
                     zuul_event_id=zuul_event_id)
-        job = self.submitJob('merger:cat', data, None, precedence, event=event)
+        job = self.submitJob('merger:cat', data, None, precedence,
+                             event=event, span=span)
         return job
 
     def getFilesChanges(self, connection_name, project_name, branch,
                         tosha=None, precedence=zuul.model.PRECEDENCE_HIGH,
-                        build_set=None, event=None):
+                        build_set=None, event=None, span=None):
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
@@ -173,7 +185,7 @@ class MergeClient(object):
                     tosha=tosha,
                     zuul_event_id=zuul_event_id)
         job = self.submitJob('merger:fileschanges', data, build_set,
-                             precedence, event=event)
+                             precedence, event=event, span=span)
         return job
 
     def onBuildCompleted(self, job):
@@ -198,6 +210,7 @@ class MergeClient(object):
                                             merged, job.updated, commit, files,
                                             repo_state)
 
+        job.end_span()
         # The test suite expects the job to be removed from the
         # internal account after the wake flag is set.
         self.jobs.remove(job)

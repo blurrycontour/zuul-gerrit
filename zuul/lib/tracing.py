@@ -137,3 +137,21 @@ def configure_tracing(config, app_name, tracer_source=None):
 
         span_exporter = SpanExporter(**exporter_config)
         tracer_source.add_span_processor(SpanProcessor(span_exporter))
+
+
+class TracableMixin:
+    @property
+    def span(self):
+        return getattr(self, "_span", None)
+
+    @span.setter
+    def span(self, span):
+        self._span = span
+        self._span.update_name(self.__class__.__name__)
+
+    def start_span(self, tracer, **kwargs):
+        self.span = tracer.start_span(**kwargs)
+
+    def end_span(self):
+        if self.span:
+            self.span.end()

@@ -700,12 +700,14 @@ class PipelineManager(object):
                                            item.current_build_set, files, dirs,
                                            precedence=self.pipeline.precedence,
                                            event=item.event,
+                                           span=item.span,
                                            branches=branches)
         else:
             self.sched.merger.getRepoState(build_set.merger_items,
                                            item.current_build_set,
                                            precedence=self.pipeline.precedence,
                                            event=item.event,
+                                           span=item.span,
                                            branches=branches)
         return False
 
@@ -718,7 +720,7 @@ class PipelineManager(object):
         self.sched.merger.getFilesChanges(
             item.change.project.connection_name, item.change.project.name,
             item.change.ref, item.change.branch, build_set=build_set,
-            event=item.event)
+            event=item.event, span=item.span)
         return False
 
     def prepareItem(self, item):
