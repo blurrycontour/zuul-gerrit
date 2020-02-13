@@ -418,6 +418,7 @@ class ChangeQueue(object):
         self.window_decrease_type = window_decrease_type
         self.window_decrease_factor = window_decrease_factor
         self.dynamic = dynamic
+        self.tracer = tracing.get_tracer("zuul.ChangeQueue")
 
     def __repr__(self):
         return '<ChangeQueue %s: %s>' % (self.pipeline.name, self.name)
@@ -439,6 +440,7 @@ class ChangeQueue(object):
         return item
 
     def enqueueItem(self, item):
+        item.span = self.tracer.start_span("QueueItem", parent=item.event.span)
         item.pipeline = self.pipeline
         item.queue = self
         if self.queue:
@@ -458,6 +460,8 @@ class ChangeQueue(object):
         item.item_ahead = None
         item.items_behind = []
         item.dequeue_time = time.time()
+        if item.span:
+            item.span.end()
 
     def moveItem(self, item, item_ahead):
         if item.item_ahead == item_ahead:
@@ -2151,6 +2155,7 @@ class QueueItem(object):
         self._old_job_graph = None  # Cached job graph of previous layout
         self._cached_sql_results = {}
         self.event = event  # The trigger event that lead to this queue item
+        self.span = None
 
     def annotateLogger(self, logger):
         """Return an annotated logger with the trigger event"""
