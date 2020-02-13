@@ -16,6 +16,24 @@
       "revId": "ebc2c5c312123d896c6e10012ab5f606280470d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_4989ac6d",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-02-13T15:19:50Z",
+      "side": 1,
+      "message": "Well, that removes the point of this.\n\nWe could add curl to the python-builder image - it\u0027s a pretty normal thing to want in such an image? I\u0027ve pushed up https://review.opendev.org/707668 - but we could also just abandon this since it is just an optimization for local repetitive builds.",
+      "parentUuid": "3fa7e38b_d2231105",
+      "revId": "ebc2c5c312123d896c6e10012ab5f606280470d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
