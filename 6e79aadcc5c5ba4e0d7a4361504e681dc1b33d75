@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_826d4402",
+        "filename": "zuul/driver/sql/alembic/versions/269691d2220e_add_build_final_column.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-02-13T09:13:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_52bac170",
+      "revId": "6e79aadcc5c5ba4e0d7a4361504e681dc1b33d75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_4916f0a3",
         "filename": "zuul/driver/sql/sqlconnection.py",
         "patchSetId": 18
