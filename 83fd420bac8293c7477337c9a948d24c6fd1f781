@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_7d1c5464",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2408,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-02-14T09:31:08Z",
+      "side": 1,
+      "message": "or\n\n\"Job XXX requires artifact YYY provided by build abcd from depends-on change ZZZ on project XYZ, but that build failed with result ...\"",
+      "range": {
+        "startLine": 2403,
+        "startChar": 0,
+        "endLine": 2408,
+        "endChar": 50
+      },
+      "revId": "83fd420bac8293c7477337c9a948d24c6fd1f781",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
