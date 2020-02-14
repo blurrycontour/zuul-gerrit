@@ -95,7 +95,8 @@ class TimerDriver(Driver, TriggerInterface):
 
                     job = self.apsched.add_job(
                         self._onTrigger, trigger=trigger,
-                        args=(tenant, pipeline.name, timespec,))
+                        args=(tenant, pipeline.name, timespec,),
+                        misfire_grace_time=30)
                     jobs.append(job)
 
     def _onTrigger(self, tenant, pipeline_name, timespec):
