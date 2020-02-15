@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_2c56a52c",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 10731
+      },
+      "writtenOn": "2020-02-15T07:03:20Z",
+      "side": 1,
+      "message": "Would it be possible to add a tooltip with the change subject on the change number link?",
+      "revId": "3dded2796ad9ea61a2d364731615053db4d5bac7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
