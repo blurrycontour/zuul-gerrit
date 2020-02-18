@@ -63,6 +63,30 @@
       "revId": "575bb58848583df891548fd39c1cbdfd4ea48eef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_3da9ce25",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1211,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-02-18T13:09:15Z",
+      "side": 1,
+      "message": "Given that this is related to load, I feel it makes sense to let operators scale this up or down with just a config change + restart rather than it being hard coded.",
+      "parentUuid": "3fa7e38b_9d58028a",
+      "range": {
+        "startLine": 1211,
+        "startChar": 16,
+        "endLine": 1211,
+        "endChar": 46
+      },
+      "revId": "575bb58848583df891548fd39c1cbdfd4ea48eef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
