@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_cb0a2d77",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-02-18T19:58:54Z",
+      "side": 1,
+      "message": "I\u0027ve reworded the last bit in the next revision.",
+      "revId": "6e4d06e10fc00d1c54efdcd38b2e8c34dc5e0eec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_a8649721",
         "filename": "doc/source/reference/glossary.rst",
         "patchSetId": 4
