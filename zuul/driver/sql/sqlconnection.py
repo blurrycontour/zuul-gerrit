@@ -199,7 +199,9 @@ class SQLConnection(BaseConnection):
             self.engine = sa.create_engine(
                 self.dburi,
                 poolclass=sqlalchemy.pool.QueuePool,
-                pool_recycle=self.connection_config.get('pool_recycle', 1))
+                pool_recycle=self.connection_config.get('pool_recycle', 1),
+                pool_size=50,
+            )
 
             # If we want the objects returned from query() to be
             # usable outside of the session, we need to expunge them

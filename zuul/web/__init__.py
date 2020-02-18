@@ -1208,6 +1208,7 @@ class ZuulWeb(object):
                 'environment': 'production',
                 'server.socket_host': listen_address,
                 'server.socket_port': int(listen_port),
+                'server.thread_pool': int(50),
             },
         })
 
