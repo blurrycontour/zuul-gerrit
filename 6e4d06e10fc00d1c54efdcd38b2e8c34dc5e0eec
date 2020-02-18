@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_08604b0c",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-18T19:01:36Z",
+      "side": 1,
+      "message": "nit: ... or pull request summary.\n\n(For Github the commit message is ignored)",
+      "revId": "6e4d06e10fc00d1c54efdcd38b2e8c34dc5e0eec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a8649721",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-18T19:01:36Z",
+      "side": 1,
+      "message": "I like this the most :)",
+      "revId": "6e4d06e10fc00d1c54efdcd38b2e8c34dc5e0eec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
