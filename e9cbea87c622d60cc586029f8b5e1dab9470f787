@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_aeafbf2b",
+        "filename": "doc/source/reference/tenants.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-18T21:06:26Z",
+      "side": 1,
+      "message": "I know this seems nitpicky, but this could have significant UX impact.  Take a look at the pipeline.start-message templating available.  Here\u0027s the implementation:\n\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L2694\n\nBased on the pattern there, I\u0027d expect to be able to use \"{tenant.name}\" (note lower case) as a substitution.  Unless there\u0027s a good reason to do otherwise, let\u0027s use the same format and case (and even the same methods like https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L4476 ) to promote consistency.",
+      "revId": "e9cbea87c622d60cc586029f8b5e1dab9470f787",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_ceb47b84",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 4836,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-18T21:06:26Z",
+      "side": 1,
+      "message": "Here, use the getSafeAttributes method as in:\n  https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L4476",
+      "revId": "e9cbea87c622d60cc586029f8b5e1dab9470f787",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
