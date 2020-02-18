@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_60a31dff",
+        "filename": "doc/source/reference/drivers/url.rst",
+        "patchSetId": 19
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-02-18T13:33:02Z",
+      "side": 1,
+      "message": "\"differs\"\n\"then the event\"",
+      "revId": "bee62d611e68d52c4444c1ed89824364c8184bd4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a0c835a7",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-02-18T13:33:02Z",
+      "side": 1,
+      "message": "NIT \"url\" as a name might be too generic, how about \"urlwatch\" or something else?",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 30,
+        "endChar": 22
+      },
+      "revId": "bee62d611e68d52c4444c1ed89824364c8184bd4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
