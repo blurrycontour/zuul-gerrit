@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_3d754e35",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1211,
+      "author": {
+        "id": 22720
+      },
+      "writtenOn": "2020-02-18T12:46:21Z",
+      "side": 1,
+      "message": "No need to cast int to int",
+      "revId": "575bb58848583df891548fd39c1cbdfd4ea48eef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
