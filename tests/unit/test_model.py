@@ -82,7 +82,7 @@ class TestJob(BaseTestCase):
             'parent': None,
             'irrelevant-files': [
                 '^docs/.*$'
-            ]})
+            ]})[0]
         return job
 
     def test_change_matches_returns_false_for_matched_skip_if(self):
@@ -167,7 +167,7 @@ class TestJob(BaseTestCase):
             'name': 'base',
             'parent': None,
             'timeout': 30,
-        })
+        })[0]
         self.layout.addJob(base)
         python27 = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
@@ -175,7 +175,7 @@ class TestJob(BaseTestCase):
             'name': 'python27',
             'parent': 'base',
             'timeout': 40,
-        })
+        })[0]
         self.layout.addJob(python27)
         python27diablo = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
@@ -185,7 +185,7 @@ class TestJob(BaseTestCase):
                 'stable/diablo'
             ],
             'timeout': 50,
-        })
+        })[0]
         self.layout.addJob(python27diablo)
 
         project_config = self.pcontext.project_parser.fromYaml({
@@ -239,7 +239,7 @@ class TestJob(BaseTestCase):
             'name': 'base',
             'parent': None,
             'timeout': 30,
-        })
+        })[0]
         self.layout.addJob(base)
         python27 = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
@@ -248,7 +248,7 @@ class TestJob(BaseTestCase):
             'parent': 'base',
             'timeout': 40,
             'irrelevant-files': ['^ignored-file$'],
-        })
+        })[0]
         self.layout.addJob(python27)
 
         project_config = self.pcontext.project_parser.fromYaml({
@@ -287,7 +287,7 @@ class TestJob(BaseTestCase):
             '_start_mark': self.start_mark,
             'parent': None,
             'name': 'base',
-        })
+        })[0]
         self.layout.addJob(base)
 
         other_project = model.Project('other_project', self.source)
@@ -299,7 +299,7 @@ class TestJob(BaseTestCase):
             '_source_context': other_context,
             '_start_mark': self.start_mark,
             'name': 'base',
-        })
+        })[0]
         with testtools.ExpectedException(
                 Exception,
                 "Job base in other_project is not permitted "
@@ -314,7 +314,7 @@ class TestJob(BaseTestCase):
             'name': 'job',
             'parent': None,
             'post-review': True
-        })
+        })[0]
 
         self.layout.addJob(job)
 
@@ -341,6 +341,55 @@ class TestJob(BaseTestCase):
                 Exception,
                 "Pre-review pipeline gate does not allow post-review job"):
             item.freezeJobGraph()
+
+    def test_job_matrix(self):
+        jobs = self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'job-{py37,py38}-{linux,windows}',
+            'parent': None,
+            'matrix': {
+                "py37": {
+                    "vars": {
+                        "python_version": "python3.7",
+                    },
+                },
+                "py38": {
+                    "vars": {
+                        "python_version": "python3.8",
+                    },
+                },
+                "windows": {
+                    "parent": "base-windows"
+                },
+            },
+        })
+        self.assertEqual(len(jobs), 4)
+
+        jobs_dict = {j.name: j for j in jobs}
+        self.assertEqual(
+            jobs_dict["job-py37-linux"].variables["python_version"],
+            "python3.7"
+        )
+        self.assertEqual(
+            jobs_dict["job-py37-windows"].variables["python_version"],
+            "python3.7"
+        )
+        self.assertEqual(
+            jobs_dict["job-py38-linux"].variables["python_version"],
+            "python3.8"
+        )
+        self.assertEqual(
+            jobs_dict["job-py38-windows"].variables["python_version"],
+            "python3.8"
+        )
+
+        self.assertEqual(
+            jobs_dict["job-py38-windows"].parent, "base-windows"
+        )
+        self.assertEqual(
+            jobs_dict["job-py38-linux"].parent, model.Job.BASE_JOB_MARKER
+        )
 
 
 class TestJobTimeData(BaseTestCase):

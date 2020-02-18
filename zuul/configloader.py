@@ -567,6 +567,9 @@ class SecretParser(object):
         return s
 
 
+MatrixJob = collections.namedtuple("MatrixJob", ["name", "axes"])
+
+
 class JobParser(object):
     ANSIBLE_ROLE_RE = re.compile(r'^(ansible[-_.+]*)*(role[-_.+]*)*')
 
@@ -640,8 +643,9 @@ class JobParser(object):
     }
 
     job_name = {vs.Required('name'): str}
+    job_matrix = {'matrix': {str: job_attributes}}
 
-    job = dict(collections.ChainMap(job_name, job_attributes))
+    job = dict(collections.ChainMap(job_name, job_matrix, job_attributes))
 
     schema = vs.Schema(job)
 
@@ -668,6 +672,20 @@ class JobParser(object):
         self.log = logging.getLogger("zuul.JobParser")
         self.pcontext = pcontext
 
+    @classmethod
+    def _split_axis(cls, token):
+        if re.match(r"\{([^}]+)\}", token):
+            return [a.strip() for a in re.sub(r"\{|\}", "", token).split(",")]
+
+    @classmethod
+    def _expand_name(cls, name):
+        tokens = re.split(r"((?:\{[^}]+\})+)", name)
+        axes = [cls._split_axis(t) for t in tokens]
+        job_axes = list(itertools.product(*(a for a in axes if a)))
+        parts = [a or [t] for a, t in zip(axes, tokens)]
+        return [MatrixJob("".join(n), a) for n, a in
+                zip(itertools.product(*parts), job_axes)]
+
     def fromYaml(self, conf, project_pipeline=False, name=None,
                  validate=True):
         if validate:
@@ -676,12 +694,20 @@ class JobParser(object):
         if name is None:
             name = conf['name']
 
+        return [self._jobFromYaml(conf, project_pipeline, validate, j)
+                for j in self._expand_name(name)]
+
+    def _jobFromYaml(self, conf, project_pipeline, validate, matrix_job):
+        matrix_config = conf.get("matrix", {})
+        axis_config = [matrix_config.get(a, {}) for a in matrix_job.axes]
+        conf = collections.ChainMap(*axis_config, conf)
+
         # NB: The default detection system in the Job class requires
         # that we always assign values directly rather than modifying
         # them (e.g., "job.run = ..." rather than
         # "job.run.append(...)").
 
-        job = model.Job(name)
+        job = model.Job(matrix_job.name)
         job.description = conf.get('description')
         job.source_context = conf['_source_context']
         job.start_mark = conf['_start_mark']
@@ -1023,9 +1049,11 @@ class ProjectTemplateParser(object):
             attrs['_source_context'] = source_context
             attrs['_start_mark'] = start_mark
 
-            job_list.addJob(self.pcontext.job_parser.fromYaml(
+            for job in self.pcontext.job_parser.fromYaml(
                 attrs, project_pipeline=True,
-                name=jobname, validate=False))
+                name=jobname, validate=False
+            ):
+                job_list.addJob(job)
 
 
 class ProjectParser(object):
@@ -1914,7 +1942,7 @@ class TenantParser(object):
                 continue
             with configuration_exceptions('job',
                                           config_job, loading_errors):
-                parsed_config.jobs.append(
+                parsed_config.jobs.extend(
                     pcontext.job_parser.fromYaml(config_job))
 
         for config_semaphore in unparsed_config.semaphores:
