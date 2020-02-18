@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_1c25e9ad",
+        "filename": ".zuul.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-18T22:01:52Z",
+      "side": 1,
+      "message": "maybe add a \"| default(\u0027\u0027)\" here to correct the problem where this is evaluated on the executor and {{nodepool}} is not defined?",
+      "revId": "90065cf708e7a99fa2325e36f9e151b9f2e70e45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
