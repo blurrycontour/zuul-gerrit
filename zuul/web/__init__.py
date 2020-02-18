@@ -1078,6 +1078,7 @@ class ZuulWeb(object):
                  zk_hosts=None,
                  authenticators=None,
                  command_socket=None,
+                 thread_pool_size=50,
                  ):
         self.start_time = time.time()
         self.listen_address = listen_address
@@ -1208,6 +1209,7 @@ class ZuulWeb(object):
                 'environment': 'production',
                 'server.socket_host': listen_address,
                 'server.socket_port': int(listen_port),
+                'server.thread_pool': int(thread_pool_size),
             },
         })
 

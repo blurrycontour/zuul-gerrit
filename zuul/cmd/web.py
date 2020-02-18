@@ -62,6 +62,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['static_path'] = get_default(self.config,
                                             'web', 'static_path',
                                             None)
+        params['thread_pool_size'] = get_default(self.config, 'web',
+                                                 'thread_pool_size', 50)
         params['gear_server'] = get_default(self.config, 'gearman', 'server')
         params['gear_port'] = get_default(self.config, 'gearman', 'port', 4730)
         params['ssl_key'] = get_default(self.config, 'gearman', 'ssl_key')
