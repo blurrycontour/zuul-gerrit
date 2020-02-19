@@ -91,6 +91,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_7a65f3af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-19T13:45:41Z",
+      "side": 1,
+      "message": "Yes, or even:\n\n  - job:\n      name: {foo,bar}\n      matrix:\n        foo:\n          vars:\n            list: [42]\n            nested:\n              value: 1\n        bar:\n          vars:\n            list: [43]\n            nested:\n              other: value",
+      "parentUuid": "3fa7e38b_9a86af5f",
+      "revId": "9999ba5904c76f0de08ea27acd493bab2e36d9e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_b97ffcdc",
         "filename": "tests/unit/test_model.py",
         "patchSetId": 1
