@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_125b8d23",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-19T06:22:12Z",
+      "side": 1,
+      "message": "Not sure if we want to merge it like this with a magic value of 30s.\n\nI was thinking about setting the misfire_grace_time to None so that the trigger time is not checked at all: https://github.com/agronholm/apscheduler/blob/7e78cad90ce080825c46de8967d9573e9fc86353/apscheduler/executors/base.py#L114",
+      "revId": "50a80eb7bf321a70f0232fd2964fb677c8916218",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
