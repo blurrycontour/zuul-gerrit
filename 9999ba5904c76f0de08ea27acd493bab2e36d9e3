@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_1a3e3f8a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-19T13:43:26Z",
+      "side": 1,
+      "message": "... and yes, we probably have to merge e.g. the vars so we have the same behavior as with normal job inheritance. Thanks for the input!",
+      "parentUuid": "3fa7e38b_9a86af5f",
+      "revId": "9999ba5904c76f0de08ea27acd493bab2e36d9e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_b97ffcdc",
         "filename": "tests/unit/test_model.py",
         "patchSetId": 1
