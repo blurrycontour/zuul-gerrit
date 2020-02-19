@@ -179,6 +179,42 @@ class TestProtected(ZuulTestCase):
             "which is defined in review.example.com/org/project is protected "
             "and cannot be inherited from other projects.", A.messages[0])
 
+    def test_secret_without_playbooks_and_without_pass_to_parent(self):
+        # job that uses a secret with no playbooks defined means the secrets
+        # are never used.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: base-job
+                run: playbooks/run.yaml
+
+            - job:
+                name: secret-from-base-job
+                parent: base-job
+                secret:
+                  - name: foo
+                    secret: bar
+                    pass-to-parent: false
+
+            - project:
+                check:
+                  jobs:
+                    - secret-from-base-job
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
+        self.assertIn(
+            "A job with no playbooks defined and a secret without "
+            "pass-to-parent set to true will result in the secret being "
+            "unused.", A.messages[0])
+
 
 class TestAbstract(ZuulTestCase):
     tenant_config_file = 'config/abstract/main.yaml'
