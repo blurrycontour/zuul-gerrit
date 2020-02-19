@@ -12,7 +12,6 @@ configure it to meet your needs.
    :maxdepth: 2
 
    concepts
-   components
    gating
    encryption
    tenant-scoped-rest-api
