@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_84dbad78",
+        "filename": "web/src/api.js",
+        "patchSetId": 21
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-19T21:18:22Z",
+      "side": 1,
+      "message": "This causes the current web UI to break when applied to a non-upgraded zuul-web service.  We try to avoid that by making sure the web ui is backwards compatible back to at least the previous released version, since it\u0027s difficult to upgrade both at the same time.\n\nPerhaps we should just have the default be to show all builds, and then add an optional filter to restrict to final builds?  Not only would that be easier here, but maybe it\u0027s better to expose retried builds in the list so they gain visibility?",
+      "revId": "bcd39128652045bcc1e77029ada7be310020914e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
