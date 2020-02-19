@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_342f8a58",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-19T18:21:35Z",
+      "side": 1,
+      "message": "Rather than using a FakeTenant object, use the real one:\n\n  self.sched.abide.tenants.get(\u0027tenant-one\u0027)\n\nThat way we\u0027re covering more real code and we don\u0027t need to keep test fakes in sync.",
+      "revId": "548f679fdd646ff7b2fb1d604f5a44b01164a976",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
