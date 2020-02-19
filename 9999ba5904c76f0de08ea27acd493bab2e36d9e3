@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_9a86af5f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-19T13:39:53Z",
+      "side": 1,
+      "message": "I think what we need to define is how those \u0027matrix\u0027 attributes will behave in case there is a collision of some sort.\n\nE.g. what happens in case of a job like:\n\n    - job:\n\tname: {foo,bar}-{x,y}\n\tmatrix:\n\t  foo:\n\t    parent: foo\n\t  bar:\n\t    parent: bar\n\t  x:\n\t    parent: foo\n\t  y:\n\t    parent: bar\n\nMaybe that\u0027s what you meant?",
+      "parentUuid": "3fa7e38b_9453e56e",
+      "revId": "9999ba5904c76f0de08ea27acd493bab2e36d9e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_b97ffcdc",
         "filename": "tests/unit/test_model.py",
         "patchSetId": 1
