@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_144055a3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-19T13:13:41Z",
+      "side": 1,
+      "message": "There is no merging. Those matrix attributes will shadow what\u0027s defined on the job itself. But since we are expanding this to distinct jobs during config loading they will behave the same as if defined separately.\n\nE.g. fully expanded the jobs look like:\n\n\t- job:\n\t    name: tox-py37-linux\n\t    parent: base\n\t    vars:\n\t      python_version: python3.7\n\n\t- job:\n\t    name: tox-py37-windows\n\t    parent: base-windows\n\t    vars:\n\t      python_version: python3.7\n\n\t- job:\n\t    name: tox-py38-linux\n\t    parent: base\n\t    vars:\n\t      python_version: python3.8\n\n\t- job:\n\t    name: tox-py38-windows\n\t    parent: base-windows\n\t    vars:\n\t      python_version: python3.8",
+      "parentUuid": "3fa7e38b_1442953d",
+      "revId": "9999ba5904c76f0de08ea27acd493bab2e36d9e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_b97ffcdc",
         "filename": "tests/unit/test_model.py",
         "patchSetId": 1
@@ -30,6 +48,30 @@
       "writtenOn": "2020-02-19T12:39:15Z",
       "side": 1,
       "message": "what\u0027s the expected behavior for the `linux` part, is it implicitly linux because of the default parent? I worry this can be abused (e.g. job changing behavior because of their name), and perhaps un-declared part in the matrix should raise an exception.",
+      "range": {
+        "startLine": 349,
+        "startChar": 38,
+        "endLine": 349,
+        "endChar": 43
+      },
+      "revId": "9999ba5904c76f0de08ea27acd493bab2e36d9e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_f48b3913",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-02-19T13:13:41Z",
+      "side": 1,
+      "message": "The \u0027linux\u0027 part just doesn\u0027t have any overrides (and I think that\u0027s a legit use-case). Not quite sure what you have in mind regarding abuse of this feature. Worst thing that can happen is that there is another job variant (e.g. when there is already a job \"job-py37-linux\").",
+      "parentUuid": "3fa7e38b_b97ffcdc",
       "range": {
         "startLine": 349,
         "startChar": 38,
