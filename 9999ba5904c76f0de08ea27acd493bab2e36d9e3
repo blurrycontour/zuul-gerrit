@@ -102,6 +102,30 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_9432050e",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-19T13:30:44Z",
+      "side": 1,
+      "message": "I meant, user might be tempted to just define an empty matrix \u0027job-{arch1,arch2}-{version1,version2,...}\u0027 and do the switch logic in the job playbook, e.g. \u0027{% if \u0027arch1\u0027 in zuul.job %}\u0027",
+      "parentUuid": "3fa7e38b_f48b3913",
+      "range": {
+        "startLine": 349,
+        "startChar": 38,
+        "endLine": 349,
+        "endChar": 43
+      },
+      "revId": "9999ba5904c76f0de08ea27acd493bab2e36d9e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_1989706f",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
