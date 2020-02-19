@@ -165,6 +165,16 @@ class ProjectNotPermittedError(Exception):
         super(ProjectNotPermittedError, self).__init__(message)
 
 
+class UnaccessibleSecretError(Exception):
+    def __init__(self):
+        message = textwrap.dedent("""\
+        A job with no playbooks defined and a secret without
+        pass-to-parent set to true will result in the secret
+        being unused.""")
+        message = textwrap.fill(message)
+        super(UnaccessibleSecretError, self).__init__(message)
+
+
 class YAMLDuplicateKeyError(ConfigurationSyntaxError):
     def __init__(self, key, node, context, start_mark):
         intro = textwrap.fill(textwrap.dedent("""\
@@ -709,6 +719,12 @@ class JobParser(object):
                         "Base jobs must be defined in config projects")
                 job.parent = job.BASE_JOB_MARKER
 
+        # Gather a list of all the playbooks so that we can check if
+        # the user is referencing any secrets without any playbooks.
+        playbooks = []
+        for stage in ('pre-run', 'run', 'post-run', 'cleanup-run'):
+            playbooks += as_list(conf.get(stage))
+
         # Secrets are part of the playbook context so we must establish
         # them earlier than playbooks.
         secrets = []
@@ -721,6 +737,13 @@ class JobParser(object):
                 secret_name = secret_config['secret']
                 secret_alias = secret_config['name']
                 secret_ptp = secret_config.get('pass-to-parent', False)
+
+            # NOTE(mnaser): If a job has secrets defined without the
+            #               pass-to-parent set and no playbooks, these
+            #               secrets are never used so let's warn the user.
+            if len(playbooks) == 0:
+                raise UnaccessibleSecretError()
+
             secret_use = model.SecretUse(secret_name, secret_alias)
             secret_use.pass_to_parent = secret_ptp
             secrets.append(secret_use)
