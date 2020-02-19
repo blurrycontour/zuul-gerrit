@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_fdad5da4",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-19T14:46:32Z",
+      "side": 1,
+      "message": "nit about typing, does mypy check method without return type? iiuc this is missing a `-\u003e None`",
+      "revId": "e157d2ead331b0991d8e2e31ef314593b1b53dba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_7dd2cd00",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1759,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-19T14:46:32Z",
+      "side": 1,
+      "message": "Maybe adds `-\u003e str` here",
+      "revId": "e157d2ead331b0991d8e2e31ef314593b1b53dba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_bdf1259a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1958,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-19T14:46:32Z",
+      "side": 1,
+      "message": "shouldn\u0027t an exception be raised if _cacheTenantYAML is called without the self.zk attribute defined?",
+      "range": {
+        "startLine": 1958,
+        "startChar": 12,
+        "endLine": 1958,
+        "endChar": 35
+      },
+      "revId": "e157d2ead331b0991d8e2e31ef314593b1b53dba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
