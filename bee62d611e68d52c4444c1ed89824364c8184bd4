@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_c8c9c8ae",
+        "filename": "doc/source/reference/drivers/url.rst",
+        "patchSetId": 19
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-02-19T09:32:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_60a31dff",
+      "revId": "bee62d611e68d52c4444c1ed89824364c8184bd4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_a0c835a7",
         "filename": "zuul/lib/connections.py",
         "patchSetId": 19
