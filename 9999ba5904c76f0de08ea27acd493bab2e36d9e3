@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "3fa7e38b_b97ffcdc",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-19T12:39:15Z",
+      "side": 1,
+      "message": "what\u0027s the expected behavior for the `linux` part, is it implicitly linux because of the default parent? I worry this can be abused (e.g. job changing behavior because of their name), and perhaps un-declared part in the matrix should raise an exception.",
+      "range": {
+        "startLine": 349,
+        "startChar": 38,
+        "endLine": 349,
+        "endChar": 43
+      },
+      "revId": "9999ba5904c76f0de08ea27acd493bab2e36d9e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_1989706f",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
