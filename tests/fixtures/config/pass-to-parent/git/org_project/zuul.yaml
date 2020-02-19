@@ -33,6 +33,7 @@
 
 - job:
     name: no-pass
+    run: playbooks/run.yaml
     parent: parent-job
     secrets:
       name: secret

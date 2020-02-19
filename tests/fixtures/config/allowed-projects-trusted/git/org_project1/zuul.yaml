@@ -4,6 +4,7 @@
 
 - job:
     name: test-project1
+    run: playbooks/run.yaml
     secrets: project1_secret
 
 - project:

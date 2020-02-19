@@ -773,6 +773,7 @@ class TestAllowedProjects(ZuulTestCase):
             - job:
                 name: test-project2b
                 parent: restricted-job
+                run: playbooks/run.yaml
                 secrets: project2_secret
                 allowed-projects:
                   - org/project1
@@ -4602,6 +4603,46 @@ class TestSecretPassToParent(ZuulTestCase):
             dict(name='trusted-under-trusted',
                  result='SUCCESS', changes='2,1'),
         ])
+
+    def test_secret_ptp_without_playbook(self):
+        # job that uses a secret with no playbooks defined means the secrets
+        # are never used.
+        in_repo_conf = textwrap.dedent(
+            """
+            - secret:
+                name: secret-data
+                data:
+                  password: 1234
+
+            - job:
+                name: base-job
+                run: playbooks/run.yaml
+
+            - job:
+                name: secret-from-base-job
+                parent: base-job
+                secrets:
+                  - name: foo
+                    secret: bar
+                    pass-to-parent: false
+
+            - project:
+                check:
+                  jobs:
+                    - secret-from-base-job
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
+        self.assertIn(
+            "A job with no playbooks defined and a secret without "
+            "pass-to-parent", A.messages[0])
 
 
 class TestSecretLeaks(AnsibleZuulTestCase):
