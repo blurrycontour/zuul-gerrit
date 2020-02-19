@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_3d5bf561",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2018,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-19T15:00:28Z",
+      "side": 1,
+      "message": "This sounds like a good change.",
+      "revId": "fe3b5e3bae70b0591a19cc8992484790411d2a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
