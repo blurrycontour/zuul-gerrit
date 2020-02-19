@@ -78,12 +78,14 @@ class CallbackModule(CallbackBase):
         trusted = extra_vars.get('zuul_execution_trusted')
         trusted = True if trusted == "True" else False
         branch = extra_vars.get('zuul_execution_branch')
+        secrets = extra_vars.get('zuul_execution_secrets')
 
         self.playbook['playbook'] = playbook
         self.playbook['phase'] = phase
         self.playbook['index'] = index
         self.playbook['trusted'] = trusted
         self.playbook['branch'] = branch
+        self.playbook['secrets'] = secrets
 
     def _new_play(self, play):
         return {

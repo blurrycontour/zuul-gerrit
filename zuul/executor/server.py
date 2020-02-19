@@ -324,9 +324,11 @@ class JobDirPlaybook(object):
         self.ansible_config = os.path.join(self.root, 'ansible.cfg')
         self.project_link = os.path.join(self.root, 'project')
         self.secrets_root = os.path.join(self.root, 'secrets')
+        self.execution_vars = os.path.join(self.root, 'execution_vars.yaml')
         os.makedirs(self.secrets_root)
         self.secrets = os.path.join(self.secrets_root, 'secrets.yaml')
         self.secrets_content = None
+        self.secrets_list = []
 
     def addRole(self):
         count = len(self.roles)
@@ -334,6 +336,16 @@ class JobDirPlaybook(object):
         os.makedirs(root)
         self.roles.append(root)
         return root
+
+    def setExecutionVars(self, execution_vars):
+        """
+        Write variables describing this playbook execution.  These are not
+        user facing, but rather are used by the Zuul callback
+        plugins.
+
+        """
+        with open(self.execution_vars, 'w') as f:
+            json.dump(execution_vars, f)
 
 
 class JobDir(object):
@@ -1612,6 +1624,7 @@ class AnsibleJob(object):
             check_varnames(secrets)
             jobdir_playbook.secrets_content = yaml.safe_dump(
                 secrets, default_flow_style=False)
+            jobdir_playbook.secrets_list = list(playbook['secrets'].keys())
 
         self.writeAnsibleConfig(jobdir_playbook)
 
@@ -2308,31 +2321,34 @@ class AnsibleJob(object):
         else:
             verbose = '-v'
 
+        execution_vars = {
+            'zuul_execution_trusted': playbook.trusted,
+            'zuul_execution_canonical_name_and_path':
+            playbook.canonical_name_and_path,
+            'zuul_execution_branch': playbook.branch,
+        }
+        if phase:
+            execution_vars['zuul_execution_phase'] = phase
+
+        if index is not None:
+            execution_vars['zuul_execution_phase_index'] = index
+
         cmd = [self.executor_server.ansible_manager.getAnsibleCommand(
             ansible_version), verbose, playbook.path]
         if playbook.secrets_content:
             cmd.extend(['-e', '@' + playbook.secrets])
+            execution_vars['zuul_execution_secrets'] = playbook.secrets_list
 
         cmd.extend(['-e', '@' + self.jobdir.extra_vars])
 
         if success is not None:
             cmd.extend(['-e', 'zuul_success=%s' % str(bool(success))])
 
-        if phase:
-            cmd.extend(['-e', 'zuul_execution_phase=%s' % phase])
-
-        if index is not None:
-            cmd.extend(['-e', 'zuul_execution_phase_index=%s' % index])
-
-        cmd.extend(['-e', 'zuul_execution_trusted=%s' % str(playbook.trusted)])
-        cmd.extend([
-            '-e',
-            'zuul_execution_canonical_name_and_path=%s'
-            % playbook.canonical_name_and_path])
-        cmd.extend(['-e', 'zuul_execution_branch=%s' % str(playbook.branch)])
-
         if self.executor_variables_file is not None:
             cmd.extend(['-e@%s' % self.executor_variables_file])
+
+        playbook.setExecutionVars(execution_vars)
+        cmd.extend(['-e', '@' + playbook.execution_vars])
 
         self.emitPlaybookBanner(playbook, 'START', phase)
 
