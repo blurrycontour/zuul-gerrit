@@ -16,6 +16,23 @@
       "revId": "bcd39128652045bcc1e77029ada7be310020914e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_c43f6582",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-19T21:21:56Z",
+      "side": 1,
+      "message": "I also just realized we\u0027ve been focusing on two different areas of the API.  You\u0027ve been most concerned about the /api/builds endpoint, and I\u0027ve been thinking of the buildsets endpoint.  We should probably handle both.  This is where I think we should either add a \u0027retry_builds\u0027 (or \u0027retried_builds\u0027) for parity with the mqtt reporter.  Or we could leave this as-is and return all the builds, just with the final flag included and set to false.  But if we do that, we should probably do the same for the mqtt reporter.",
+      "revId": "bcd39128652045bcc1e77029ada7be310020914e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
