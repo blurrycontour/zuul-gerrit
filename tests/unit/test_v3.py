@@ -2317,6 +2317,48 @@ class TestInRepoConfig(ZuulTestCase):
                       A.messages[0], "A should have debug info")
 
 
+class TestRepoState(AnsibleZuulTestCase):
+    tenant_config_file = 'config/repo-state/main.yaml'
+
+    def test_repo_state(self):
+        # Test that the repo state is restored globally for the whole buildset
+        # including projects not in the dependency chain.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Approved', 1)
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
+        self.waitUntilSettled()
+
+        # The build test1 is running, test2 waiting for test1.
+        self.assertEqual(len(self.builds), 1)
+
+        # Now merge a change to the playbook out of band. This will break test2
+        # if it updates common-config to latest master. However due to the
+        # buildset-global repo state test2 must not be broken afterwards.
+        playbook = textwrap.dedent(
+            """
+            - hosts: localhost
+              tasks:
+                - name: fail
+                  fail:
+                    msg: foobar
+            """)
+
+        file_dict = {'playbooks/test2.yaml': playbook}
+        B = self.fake_gerrit.addFakeChange('common-config', 'master', 'A',
+                                           files=file_dict)
+        self.log.info('Merge test change on common-config')
+        B.setMerged()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='test1', result='SUCCESS', changes='1,1'),
+            dict(name='test2', result='SUCCESS', changes='1,1'),
+        ])
+
+
 class TestNonLiveMerges(ZuulTestCase):
 
     config_file = 'zuul-connections-gerrit-and-github.conf'

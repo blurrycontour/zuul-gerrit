@@ -19,6 +19,7 @@ from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import QueueItem
 
 
 class DynamicChangeQueueContextManager(object):
@@ -747,7 +748,19 @@ class PipelineManager(metaclass=ABCMeta):
             event=item.event)
         return False
 
-    def prepareItem(self, item):
+    def scheduleRepoState(self, item: QueueItem) -> bool:
+        log = item.annotateLogger(self.log)
+        log.info('Scheduling repo state for item %s', item)
+
+        jobs = item.job_graph.getJobs()
+        for job in jobs:
+            log.debug('Processing job %s', job.name)
+            projects = job.getAffectedProjects()
+            log.info('Needed projects: %s', projects)
+
+        pass
+
+    def prepareItem(self, item: QueueItem) -> bool:
         build_set = item.current_build_set
         tenant = item.pipeline.tenant
         # We always need to set the configuration of the item if it
@@ -828,6 +841,15 @@ class PipelineManager(metaclass=ABCMeta):
                 item.setConfigError("Unable to freeze job graph: %s" %
                                     (str(e)))
                 return False
+
+        # At this point we know all frozen jobs and their repos so update the
+        # repo state with all missing repos.
+        if build_set.repo_state_state == build_set.NEW:
+            self.scheduleRepoState(item)
+            return False
+        if build_set.repo_state_state == build_set.PENDING:
+            return False
+
         return True
 
     def _processOneItem(self, item, nnfi):

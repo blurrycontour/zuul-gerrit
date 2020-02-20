@@ -924,7 +924,7 @@ class Merger(object):
             self._restoreRepoState(item['connection'], item['project'], repo,
                                    repo_state, zuul_event_id)
 
-    def getRepoState(self, items, branches=None, repo_locks=None):
+    def getRepoState(self, items, repo_locks, branches=None):
         # Gets the repo state for items.  Generally this will be
         # called in any non-change pipeline.  We will return the repo
         # state for each item, but manipulated with any information in
@@ -936,13 +936,9 @@ class Merger(object):
         # A list of branch names the last item appears in.
         item_in_branches = []
         for item in items:
-            # If we're in the executor context we have the repo_locks object
-            # and perform per repo locking.
-            if repo_locks is not None:
-                lock = repo_locks.getRepoLock(
-                    item['connection'], item['project'])
-            else:
-                lock = nullcontext()
+            # If we're in the executor context we need to lock the repo.
+            # If not repo_locks will give us a fake lock.
+            lock = repo_locks.getRepoLock(item['connection'], item['project'])
             with lock:
                 repo = self.getRepo(item['connection'], item['project'])
                 key = (item['connection'], item['project'], item['branch'])

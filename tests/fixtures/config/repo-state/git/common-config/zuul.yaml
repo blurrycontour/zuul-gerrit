@@ -1,0 +1,35 @@
+- pipeline:
+    name: gate
+    manager: dependent
+    trigger:
+      gerrit:
+        - event: comment-added
+          approval:
+            - Code-Review: 2
+    success:
+      gerrit:
+        Verified: 2
+        submit: true
+    failure:
+      gerrit:
+        Verified: -2
+    start:
+      gerrit:
+        Verified: 0
+    precedence: high
+
+- job:
+    name: base
+    pre-run:
+      - playbooks/pre.yaml
+    roles:
+      - zuul: org/roles
+    parent: null
+
+- job:
+    name: test1
+    run: playbooks/test1.yaml
+
+- job:
+    name: test2
+    run: playbooks/test2.yaml
