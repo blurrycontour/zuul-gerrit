@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_4647f5a5",
+        "filename": "tests/unit/test_cross_crd.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-02-20T08:51:56Z",
+      "side": 1,
+      "message": "There would be also an option to get rid of the `self.sched` completely and use here `self.sched_factory[0].sched` instead.\n\nIs this worth it? Now it may be confusing since the default scheduler can be accessed using both `self.sched` and `self.sched_factory[0].sched`.",
+      "revId": "75afed756c7dde64919f3fe3ff62e1a2d2f80554",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
