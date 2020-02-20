@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "3fa7e38b_278669b9",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-20T20:56:27Z",
+      "side": 1,
+      "message": "You can change this to a gender-neutral form (and shorten it too!) with \"...shall require the user to provide copies of...\".",
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_5598fd74",
         "filename": "doc/source/developer/specs/zuul-runner.rst",
         "patchSetId": 3
@@ -42,6 +59,23 @@
         "endLine": 69,
         "endChar": 15
       },
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_c7b6758d",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-20T20:56:27Z",
+      "side": 1,
+      "message": "I think it\u0027s worth describing both use cases in the spec.",
       "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -89,6 +123,23 @@
         "endLine": 103,
         "endChar": 68
       },
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_e7b9317b",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-20T20:56:27Z",
+      "side": 1,
+      "message": "The nodes argument doesn\u0027t appear above -- are you replacing that with a user-supplied inventory file?  If so, that\u0027s missing too.",
       "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
