@@ -268,12 +268,17 @@ class ZuulWebAPI(object):
         if 'pipeline' in body and (
             ('change' in body and 'ref' not in body) or
             ('change' not in body and 'ref' in body)):
-            job = self.rpc.submitJob('zuul:dequeue',
-                                     {'tenant': tenant,
-                                      'pipeline': body['pipeline'],
-                                      'project': project,
-                                      'change': body.get('change', None),
-                                      'ref': body.get('ref', None)})
+            job = self.rpc.submitJob(
+                'zuul:dequeue',
+                {
+                    'tenant': tenant,
+                    'pipeline': body['pipeline'],
+                    'project': project,
+                    'change': body.get('change', None),
+                    'ref': body.get('ref', None),
+                    'buildset_id': body.get('buildset_id', None),
+                }
+            )
             result = not job.failure
             resp = cherrypy.response
             resp.headers['Access-Control-Allow-Origin'] = '*'

@@ -4455,6 +4455,86 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
 
+    def test_client_dequeue_buildset(self):
+        "Test that the RPC client can dequeue a buildset by its uuid"
+
+        client = zuul.rpcclient.RPCClient(
+            "127.0.0.1", self.gearman_server.port
+        )
+        self.addCleanup(client.shutdown)
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        A.addApproval("Code-Review", 2)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Look up the buildset ID of the running build, so we can dequeue it
+        running_build = self.executor_server.running_builds[0]
+        buildset_id = running_build.parameters["zuul"]["buildset"]
+
+        client.dequeue(
+            tenant=None,
+            pipeline=None,
+            project=None,
+            buildset_id=buildset_id,
+        )
+        self.waitUntilSettled()
+
+        tenant = self.sched.abide.tenants.get("tenant-one")
+        check_pipeline = tenant.layout.pipelines["check"]
+        self.assertEqual(len(check_pipeline.getAllItems()), 0)
+        self.assertEqual(self.countJobResults(self.history, "ABORTED"), 1)
+
+    def test_client_dequeue_buildset_tenant(self):
+        "Test that the RPC client can dequeue a buildset by uuid and tenant"
+
+        client = zuul.rpcclient.RPCClient(
+            "127.0.0.1", self.gearman_server.port
+        )
+        self.addCleanup(client.shutdown)
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        A.addApproval("Code-Review", 2)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Look up the buildset ID of the running build, so we can dequeue it
+        running_build = self.executor_server.running_builds[0]
+        buildset_id = running_build.parameters["zuul"]["buildset"]
+
+        client.dequeue(
+            tenant="tenant-one",
+            pipeline=None,
+            project=None,
+            buildset_id=buildset_id,
+        )
+        self.waitUntilSettled()
+
+        tenant = self.sched.abide.tenants.get("tenant-one")
+        check_pipeline = tenant.layout.pipelines["check"]
+        self.assertEqual(len(check_pipeline.getAllItems()), 0)
+        self.assertEqual(self.countJobResults(self.history, "ABORTED"), 1)
+
+    def test_client_dequeue_buildset_invalid_tenant(self):
+        "RPC client fails to dequeue a buildset for an invalid tenant"
+
+        client = zuul.rpcclient.RPCClient(
+            "127.0.0.1", self.gearman_server.port
+        )
+        self.addCleanup(client.shutdown)
+
+        with testtools.ExpectedException(
+            zuul.rpcclient.RPCFailure, "Unknown tenant invalid-tenant"
+        ):
+            client.dequeue(
+                tenant="invalid-tenant",
+                pipeline=None,
+                project=None,
+                buildset_id="does not matter in this case",
+            )
+
     def test_client_enqueue_negative(self):
         "Test that the RPC client returns errors"
         client = zuul.rpcclient.RPCClient('127.0.0.1',

@@ -140,14 +140,19 @@ class PromoteEvent(ManagementEvent):
 class DequeueEvent(ManagementEvent):
     """Dequeue a change from a pipeline
 
+    In case a buildset_id is provided as parameter, all other parameters except
+    the tenant_name are ignored.
+
     :arg str tenant_name: the name of the tenant
     :arg str pipeline_name: the name of the pipeline
     :arg str project_name: the name of the project
     :arg str change: optional, the change to dequeue
     :arg str ref: optional, the ref to look for
+    :arg str buildset_id: optional, the buildset to dequeue
     """
 
-    def __init__(self, tenant_name, pipeline_name, project_name, change, ref):
+    def __init__(self, tenant_name, pipeline_name, project_name, change, ref,
+                 buildset_id):
         super(DequeueEvent, self).__init__()
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
@@ -161,6 +166,7 @@ class DequeueEvent(ManagementEvent):
         # set to mock values
         self.oldrev = '0000000000000000000000000000000000000000'
         self.newrev = '0000000000000000000000000000000000000000'
+        self.buildset_id = buildset_id
 
 
 class EnqueueEvent(ManagementEvent):
@@ -675,9 +681,11 @@ class Scheduler(threading.Thread):
         event.wait()
         self.log.debug("Promotion complete")
 
-    def dequeue(self, tenant_name, pipeline_name, project_name, change, ref):
+    def dequeue(self, tenant_name, pipeline_name, project_name, change, ref,
+                buildset_id):
         event = DequeueEvent(
-            tenant_name, pipeline_name, project_name, change, ref)
+            tenant_name, pipeline_name, project_name, change, ref, buildset_id
+        )
         self.management_event_queue.put(event)
         self.wake_event.set()
         self.log.debug("Waiting for dequeue")
@@ -1122,9 +1130,15 @@ class Scheduler(threading.Thread):
                 ignore_requirements=True)
 
     def _doDequeueEvent(self, event):
+        # In case a buildset ID is provided, we try to dequeue this item
+        # directly.
+        if event.buildset_id is not None:
+            return self._dequeueBuildset(event.tenant_name, event.buildset_id)
+
         tenant = self.abide.tenants.get(event.tenant_name)
         if tenant is None:
             raise ValueError('Unknown tenant %s' % event.tenant_name)
+
         pipeline = tenant.layout.pipelines.get(event.pipeline_name)
         if pipeline is None:
             raise ValueError('Unknown pipeline %s' % event.pipeline_name)
@@ -1163,6 +1177,55 @@ class Scheduler(threading.Thread):
         self.log.debug("Event %s for change %s was directly assigned "
                        "to pipeline %s" % (event, change, self))
         pipeline.manager.addChange(change, event, ignore_requirements=True)
+
+    def _dequeueBuildset(self, tenant_name, buildset_id):
+        # Check the input tenant for None before looking it up to avoid
+        # searching all tenants in case the lookup returned None.
+        if tenant_name is not None:
+            tenant = self.abide.tenants.get(tenant_name)
+            if tenant is None:
+                raise ValueError("Unknown tenant {}".format(tenant_name))
+            dequeued = self._dequeueBuildsetInTenant(tenant, buildset_id)
+            if not dequeued:
+                # If we could not finy any item by that id, print a warning
+                # TODO (felix): Could we return some error to the caller?
+                self.log.warning(
+                    "Could not find a current buildset with id %s in "
+                    "tenant %s",
+                    buildset_id, tenant.name,
+                )
+            return dequeued
+        else:
+            dequeued = False
+            # If no tenant name is provided, we will search all tenants for
+            # the specific buildset.
+            for tenant in self.abide.tenants.values():
+                dequeued = self._dequeueBuildsetInTenant(tenant, buildset_id)
+                if dequeued:
+                    break
+            if not dequeued:
+                # If we could not find any item by that id, print a warning
+                # TODO (felix): Could we return some error to the caller?
+                self.log.warning(
+                    "Could not find a current buildset with id %s in "
+                    "any tenant",
+                    buildset_id,
+                )
+            return dequeued
+
+    def _dequeueBuildsetInTenant(self, tenant, buildset_id):
+        for pipeline in tenant.layout.pipelines.values():
+            for pipeline_queue in pipeline.queues:
+                for item in pipeline_queue.queue:
+                    if item.current_build_set.uuid == buildset_id:
+                        self.log.debug(
+                            "Dequeing buildset with id %s from "
+                            "pipeline %s",
+                            buildset_id, pipeline,
+                        )
+                        pipeline.manager.removeItem(item)
+                        return True
+        return False
 
     def _areAllBuildsComplete(self):
         self.log.debug("Checking if all builds are complete")

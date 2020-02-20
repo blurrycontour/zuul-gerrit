@@ -121,16 +121,24 @@ class ZuulRESTClient(object):
         self._check_status(req)
         return req.json()
 
-    def dequeue(self, tenant, pipeline, project, change=None, ref=None):
+    def dequeue(self, tenant, pipeline, project, change=None, ref=None,
+                buildset_id=None):
         if not self.auth_token:
             raise Exception('Auth Token required')
-        args = {"pipeline": pipeline}
-        if change and not ref:
-            args['change'] = change
-        elif ref and not change:
-            args['ref'] = ref
-        else:
-            raise Exception('need change OR ref')
+
+        l = [x for x in (change, ref, buildset_id) if x]
+        if len(l) != 1:
+            raise Exception(
+                "Exactly one of 'change', 'ref' or 'buildset_id' must be set."
+            )
+
+        args = {
+            "pipeline": pipeline,
+            "change": change,
+            "ref": ref,
+            "buildset_id": buildset_id,
+        }
+
         url = urllib.parse.urljoin(
             self.base_url,
             'tenant/%s/project/%s/dequeue' % (tenant, project))
@@ -259,18 +267,27 @@ class Client(zuul.cmd.ZuulApp):
             '--newrev', help='new revision', default=None)
         cmd_enqueue.set_defaults(func=self.enqueue_ref)
 
-        cmd_dequeue = subparsers.add_parser('dequeue',
-                                            help='dequeue a buildset by its '
-                                                 'change or ref')
+        cmd_dequeue = subparsers.add_parser(
+            'dequeue', help='dequeue a buildset by its change, ref or id',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent(
+                """
+                Dequeue a buildset by its change, ref or id. In case a buildset
+                id is provided, all other parameters will be ignored.
+                """
+            ),
+        )
         cmd_dequeue.add_argument('--tenant', help='tenant name',
-                                 required=True)
+                                 default=None)
         cmd_dequeue.add_argument('--pipeline', help='pipeline name',
-                                 required=True)
+                                 default=None)
         cmd_dequeue.add_argument('--project', help='project name',
-                                 required=True)
+                                 default=None)
         cmd_dequeue.add_argument('--change', help='change id',
                                  default=None)
         cmd_dequeue.add_argument('--ref', help='ref name',
+                                 default=None)
+        cmd_dequeue.add_argument("--buildset", help="buildset id",
                                  default=None)
         cmd_dequeue.set_defaults(func=self.dequeue)
 
