@@ -164,7 +164,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         try:
             self.sched.start()
             self.sched.registerConnections(self.connections)
-            self.sched.reconfigure(self.config)
+            self.sched_factory.execute(
+                lambda sched: sched.reconfigure(self.config))
             self.sched.resume()
         except Exception:
             self.log.exception("Error starting Zuul:")

@@ -384,7 +384,8 @@ class TestBranchDeletion(ZuulTestCase):
         self.waitUntilSettled()
 
         self.delete_branch('org/project', 'stable/queens')
-        self.sched.reconfigure(self.config)
+        self.sched_factory.execute(
+            lambda sched: sched.reconfigure(self.config))
         self.waitUntilSettled()
 
         in_repo_conf = textwrap.dedent(
@@ -945,7 +946,8 @@ class TestInRepoConfig(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
-        self.sched.reconfigure(self.config)
+        self.sched_factory.execute(
+            lambda sched: sched.reconfigure(self.config))
         self.waitUntilSettled()
 
         gc.collect()
@@ -3430,7 +3432,8 @@ class TestRoleBranches(RoleTestCase):
                               'parent-job-pre', 'parent-master-role')
         self._addRole('project1', 'master', 'master-role', parent=p)
 
-        self.sched.reconfigure(self.config)
+        self.sched_factory.execute(
+            lambda sched: sched.reconfigure(self.config))
         # Push a change to project2 which will run 3 jobs which
         # inherit from project1.
         self.executor_server.hold_jobs_in_build = True

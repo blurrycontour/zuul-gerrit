@@ -346,7 +346,8 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.sched.reconfigure(self.config)
+        self.sched_factory.execute(
+            lambda sched: sched.reconfigure(self.config))
 
         # Make sure the items still share a change queue, and the
         # first one is not live.
@@ -795,7 +796,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
         self.fake_github.emitEvent(A.getPullRequestEditedEvent())
         self.waitUntilSettled()
 
-        self.sched.reconfigure(self.config)
+        self.sched_factory.execute(
+            lambda sched: sched.reconfigure(self.config))
 
         # Make sure the items still share a change queue, and the
         # first one is not live.

@@ -1489,7 +1489,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.create_branch('org/project', 'stable')
         self.executor_server.hold_jobs_in_build = True
         self.commitConfigUpdate('common-config', 'layouts/timer.yaml')
-        self.sched.reconfigure(self.config)
+        self.sched_factory.execute(
+            lambda sched: sched.reconfigure(self.config))
         self.waitUntilSettled()
 
         for _ in iterate_timeout(30, 'Wait for a build on hold'):
@@ -1522,7 +1523,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
 
         self.commitConfigUpdate('common-config',
                                 'layouts/no-timer.yaml')
-        self.sched.reconfigure(self.config)
+        self.sched_factory.execute(
+            lambda sched: sched.reconfigure(self.config))
         self.waitUntilSettled()
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
