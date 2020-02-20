@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 import os
 import re
 from testtools.matchers import MatchesRegex, StartsWith
@@ -1620,6 +1621,29 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
             check_run["output"]["summary"],
             MatchesRegex(r'.*Starting checks-api-reporting jobs.*', re.DOTALL)
         )
+        # The external id should be a json-string containing all relevant
+        # information to uniquely identify this change.
+        self.assertEqual(
+            json.dumps(
+                {
+                    "tenant": "tenant-one",
+                    "pipeline": "checks-api-reporting",
+                    "queue": "org/project3",
+                    "change": 1
+                }
+            ),
+            check_run["external_id"],
+        )
+        # A running check run should provide a custom abort action
+        self.assertEqual(1, len(check_run["actions"]))
+        self.assertEqual(
+            {
+                "identifier": "abort",
+                "description": "Abort this check run",
+                "label": "Abort",
+            },
+            check_run["actions"][0],
+        )
 
         # TODO (felix): How can we test if the details_url was set correctly?
         # How can the details_url be configured on the test case?
@@ -1641,6 +1665,8 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
             MatchesRegex(r'.*Build succeeded.*', re.DOTALL)
         )
         self.assertIsNotNone(check_run["completed_at"])
+        # A completed check run should not provide any custom actions
+        self.assertEqual(0, len(check_run["actions"]))
 
     @simple_layout("layouts/reporting-github.yaml", driver="github")
     def test_update_non_existing_check_run(self):
@@ -1679,6 +1705,8 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
             MatchesRegex(r'.*Build succeeded.*', re.DOTALL)
         )
         self.assertIsNotNone(check_run["completed_at"])
+        # A completed check run should not provide any custom actions
+        self.assertEqual(0, len(check_run["actions"]))
 
     @simple_layout("layouts/reporting-github.yaml", driver="github")
     def test_update_check_run_missing_permissions(self):

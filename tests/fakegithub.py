@@ -66,12 +66,17 @@ class FakeStatus(object):
 
 class FakeCheckRun(object):
     def __init__(self, name, details_url, output, status, conclusion,
-                 completed_at, app):
+                 completed_at, external_id, actions, app):
+        if actions is None:
+            actions = []
+
         self.name = name
         self.details_url = details_url
         self.output = output
         self.conclusion = conclusion
         self.completed_at = completed_at
+        self.external_id = external_id
+        self.actions = actions
         self.app = app
 
         # Github automatically sets the status to "completed" if a conclusion
@@ -89,16 +94,30 @@ class FakeCheckRun(object):
             "details_url": self.details_url,
             "conclusion": self.conclusion,
             "completed_at": self.completed_at,
+            "external_id": self.external_id,
+            "actions": self.actions,
             "app": {
                 "slug": self.app,
             },
         }
 
-    def update(self, conclusion, completed_at, output, details_url):
+    def update(self, conclusion, completed_at, output, details_url,
+               external_id, actions=None):
         self.conclusion = conclusion
         self.completed_at = completed_at
         self.output = output
         self.details_url = details_url
+        self.external_id = external_id
+
+        # Github behaves a little unexpected here:
+        # If no actions are provided for an update, the existing actions will
+        # be deleted (Github behaviour).
+        # TODO (felix): Maybe we should still set the actions explititly to
+        # None in our production code to avoid conflicts in case this behaviour
+        # changes on github side.
+        if actions is None:
+            actions = []
+        self.actions = actions
 
         # As we are only calling the update method when a build is completed,
         # we can always set the status to "completed".
@@ -134,9 +153,17 @@ class FakeCommit(object):
         self._statuses.insert(0, status)
 
     def set_check_run(self, name, details_url, output, status, conclusion,
-                      completed_at, app):
+                      completed_at, external_id, actions, app):
         check_run = FakeCheckRun(
-            name, details_url, output, status, conclusion, completed_at, app
+            name,
+            details_url,
+            output,
+            status,
+            conclusion,
+            completed_at,
+            external_id,
+            actions,
+            app,
         )
         # Always insert a check_run to the front of the list to represent the
         # last check_run provided for a commit.
@@ -238,7 +265,7 @@ class FakeRepository(object):
 
     def create_check_run(self, head_sha, name, details_url=None, output=None,
                          status=None, conclusion=None, completed_at=None,
-                         app="zuul"):
+                         external_id=None, actions=None, app="zuul"):
 
         # Raise the appropriate github3 exception in case we don't have
         # permission to access the checks API
@@ -254,7 +281,16 @@ class FakeRepository(object):
             commit = FakeCommit(head_sha)
             self._commits[head_sha] = commit
         commit.set_check_run(
-            name, details_url, output, status, conclusion, completed_at, app)
+            name,
+            details_url,
+            output,
+            status,
+            conclusion,
+            completed_at,
+            external_id,
+            actions,
+            app,
+        )
 
     def commit(self, sha):
 
