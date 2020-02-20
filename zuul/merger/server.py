@@ -165,8 +165,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         zuul_event_id = args.get('zuul_event_id')
         success, repo_state, item_in_branches = \
             self.merger.getRepoState(
-                args['items'], branches=args.get('branches'),
-                repo_locks=self.repo_locks)
+                args['items'], self.repo_locks, branches=args.get('branches'))
         result = dict(updated=success,
                       repo_state=repo_state,
                       item_in_branches=item_in_branches)
