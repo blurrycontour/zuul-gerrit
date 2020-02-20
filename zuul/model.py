@@ -18,6 +18,8 @@ import copy
 import json
 import logging
 import os
+from itertools import chain
+
 import re2
 import struct
 import time
@@ -1699,6 +1701,31 @@ class Job(ConfigObject):
 
         return True
 
+    def _projectsFromPlaybooks(self, playbooks):
+        for playbook in playbooks:
+            # noop job does not have source_context
+            if playbook.source_context:
+                yield playbook.source_context.project.canonical_name
+            for role in playbook.roles:
+                if role.implicit:
+                    continue
+                yield role.project_canonical_name
+
+    def getAffectedProjects(self, tenant):
+        """
+        Gets all projects that are required to run this job. This includes
+        required_projects, referenced playbooks, roles and dependent changes.
+        """
+        project_canonical_names = set()
+        project_canonical_names.update(self.required_projects.keys())
+        project_canonical_names.update(self._projectsFromPlaybooks(
+            chain(self.pre_run, [self.run[0]], self.post_run, self.cleanup_run)))
+
+        projects = list()
+        for project_canonical_name in project_canonical_names:
+            projects.append(tenant.getProject(project_canonical_name)[1])
+        return projects
+
 
 class JobProject(ConfigObject):
     """ A reference to a project from a job. """
@@ -2014,6 +2041,7 @@ class BuildSet(object):
             self.files_state = self.COMPLETE
         else:
             self.files_state = self.NEW
+        self.repo_state_state = self.NEW
 
     @property
     def ref(self):

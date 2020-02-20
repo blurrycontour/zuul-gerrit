@@ -2317,6 +2317,120 @@ class TestInRepoConfig(ZuulTestCase):
                       A.messages[0], "A should have debug info")
 
 
+class TestGlobalRepoState(AnsibleZuulTestCase):
+    tenant_config_file = 'config/global-repo-state/main.yaml'
+
+    def test_inherited_playbooks(self):
+        # Test that the repo state is restored globally for the whole buildset
+        # including inherited projects not in the dependency chain.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Approved', 1)
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
+        self.waitUntilSettled()
+
+        # The build test1 is running, test2 waiting for test1.
+        self.assertEqual(len(self.builds), 1)
+
+        # Now merge a change to the playbook out of band. This will break test2
+        # if it updates common-config to latest master. However due to the
+        # buildset-global repo state test2 must not be broken afterwards.
+        playbook = textwrap.dedent(
+            """
+            - hosts: localhost
+              tasks:
+                - name: fail
+                  fail:
+                    msg: foobar
+            """)
+
+        file_dict = {'playbooks/test2.yaml': playbook}
+        B = self.fake_gerrit.addFakeChange('common-config', 'master', 'A',
+                                           files=file_dict)
+        self.log.info('Merge test change on common-config')
+        B.setMerged()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='test1', result='SUCCESS', changes='1,1'),
+            dict(name='test2', result='SUCCESS', changes='1,1'),
+        ])
+
+    def test_required_projects(self):
+        # Test that the repo state is restored globally for the whole buildset
+        # including required projects not in the dependency chain.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/requiringproject', 'master', 'A')
+        A.addApproval('Approved', 1)
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
+        self.waitUntilSettled()
+
+        # The build require-test1 is running, require-test2 waiting for require-test1.
+        self.assertEqual(len(self.builds), 1)
+
+        # Now merge a change to the test script out of band. This will break required-test2
+        # if it updates requiredproject to latest master. However, due to the
+        # buildset-global repo state, required-test2 must not be broken afterwards.
+        runscript = textwrap.dedent(
+            """
+            #!/bin/bash
+            exit 1
+            """)
+
+        file_dict = {'script.sh': runscript}
+        B = self.fake_gerrit.addFakeChange('org/requiredproject', 'master', 'A',
+                                           files=file_dict)
+        self.log.info('Merge test change on common-config')
+        B.setMerged()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='require-test1', result='SUCCESS', changes='1,1'),
+            dict(name='require-test2', result='SUCCESS', changes='1,1'),
+        ])
+
+    def test_dependent_project(self):
+        # Test that the repo state is restored globally for the whole buildset
+        # including dependent projects.
+        self.executor_server.hold_jobs_in_build = True
+        B = self.fake_gerrit.addFakeChange('org/requiredproject', 'master', 'B')
+        A = self.fake_gerrit.addFakeChange('org/dependentproject', 'master', 'A')
+        A.setDependsOn(B, 1)
+        A.addApproval('Approved', 1)
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
+        self.waitUntilSettled()
+
+        # The build dependent-test1 is running, dependent-test2 waiting for dependent-test1.
+        self.assertEqual(len(self.builds), 1)
+
+        # Now merge a change to the test script out of band. This will break dependent-test2
+        # if it updates requiredproject to latest master. However, due to the
+        # buildset-global repo state, dependent-test2 must not be broken afterwards.
+        runscript = textwrap.dedent(
+            """
+            #!/bin/bash
+            exit 1
+            """)
+
+        file_dict = {'script.sh': runscript}
+        C = self.fake_gerrit.addFakeChange('org/requiredproject', 'master', 'C',
+                                           files=file_dict)
+        self.log.info('Merge test change on common-config')
+        C.setMerged()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='dependent-test1', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='dependent-test2', result='SUCCESS', changes='1,1 2,1'),
+        ])
+
+
 class TestNonLiveMerges(ZuulTestCase):
 
     config_file = 'zuul-connections-gerrit-and-github.conf'
