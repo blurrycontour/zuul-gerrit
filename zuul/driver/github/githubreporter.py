@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 import logging
 import voluptuous as v
 import time
@@ -234,6 +235,21 @@ class GithubReporter(BaseReporter):
         # Check for inline comments that can be reported via checks API
         file_comments = self.getFileComments(item)
 
+        # Github allows an external id to be added to a check run. We can use
+        # this to identify the check run in any custom actions we define.
+        # To uniquely identify the corresponding buildset in zuul, we need
+        # tenant, pipeline and change. The buildset's uuid cannot be used
+        # safely, as it might change e.g. during a gate reset. Fore more
+        # information, please see Jim's comment on
+        # https://review.opendev.org/#/c/666258/7
+        external_id = json.dumps(
+            {
+                "tenant": item.pipeline.tenant.name,
+                "pipeline": item.pipeline.name,
+                "change": item.change.number,
+            }
+        )
+
         return self.connection.updateCheck(
             project,
             pr_number,
@@ -244,6 +260,7 @@ class GithubReporter(BaseReporter):
             details_url,
             message,
             file_comments,
+            external_id,
             zuul_event_id=item.event,
         )
 

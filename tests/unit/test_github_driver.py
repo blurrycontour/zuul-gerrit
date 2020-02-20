@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 import os
 import re
 from testtools.matchers import MatchesRegex, Not, StartsWith
@@ -1796,6 +1797,28 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
             check_run["output"]["summary"],
             MatchesRegex(r'.*Starting checks-api-reporting jobs.*', re.DOTALL)
         )
+        # The external id should be a json-string containing all relevant
+        # information to uniquely identify this change.
+        self.assertEqual(
+            json.dumps(
+                {
+                    "tenant": "tenant-one",
+                    "pipeline": "checks-api-reporting",
+                    "change": 1
+                }
+            ),
+            check_run["external_id"],
+        )
+        # A running check run should provide a custom abort action
+        self.assertEqual(1, len(check_run["actions"]))
+        self.assertEqual(
+            {
+                "identifier": "abort",
+                "description": "Abort this check run",
+                "label": "Abort",
+            },
+            check_run["actions"][0],
+        )
 
         # TODO (felix): How can we test if the details_url was set correctly?
         # How can the details_url be configured on the test case?
@@ -1817,6 +1840,8 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
             MatchesRegex(r'.*Build succeeded.*', re.DOTALL)
         )
         self.assertIsNotNone(check_run["completed_at"])
+        # A completed check run should not provide any custom actions
+        self.assertEqual(0, len(check_run["actions"]))
 
         # Tell gate to merge to test checks requirements
         self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
@@ -1915,6 +1940,8 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
             MatchesRegex(r'.*Build succeeded.*', re.DOTALL)
         )
         self.assertIsNotNone(check_run["completed_at"])
+        # A completed check run should not provide any custom actions
+        self.assertEqual(0, len(check_run["actions"]))
 
     @simple_layout("layouts/reporting-github.yaml", driver="github")
     def test_update_check_run_missing_permissions(self):
@@ -1949,6 +1976,54 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
         self.assertEqual(2, len(A.comments))
         self.assertIn(expected_warning, A.comments[0])
         self.assertIn(expected_warning, A.comments[1])
+
+    @simple_layout("layouts/reporting-github.yaml", driver="github")
+    def test_abort_check_run(self):
+        "Test that we can dequeue a change by aborting the related check run"
+        project = "org/project3"
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_github.openFakePullRequest(project, "master", "A")
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # We should have a pending check for the head sha that provides an
+        # abort action.
+        check_runs = self.fake_github.getCommitChecks(project, A.head_sha)
+
+        self.assertEqual(1, len(check_runs))
+        check_run = check_runs[0]
+        self.assertEqual("tenant-one/checks-api-reporting", check_run["name"])
+        self.assertEqual("in_progress", check_run["status"])
+        self.assertEqual(1, len(check_run["actions"]))
+        self.assertEqual("abort", check_run["actions"][0]["identifier"])
+
+        # Simulate a click on the "Abort" button in Github by faking a webhook
+        # event with our custom abort action.
+        # Handling this event should dequeue the related change
+        self.fake_github.emitEvent(A.getCheckRunAbortEvent(check_run))
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        check_pipeline = tenant.layout.pipelines["check"]
+        self.assertEqual(0, len(check_pipeline.getAllItems()))
+        self.assertEqual(1, self.countJobResults(self.history, "ABORTED"))
+
+        # The buildset was already dequeued, so there shouldn't be anything to
+        # release.
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # As of now, we are not able to report a dequeued change/buildset.
+        # Thus, the check run won't be updated at all and will stay in state
+        # "in_progress".
+        check_runs = self.fake_github.getCommitChecks(project, A.head_sha)
+        self.assertEqual(1, len(check_runs))
+        aborted_check_run = check_runs[0]
+
+        # The check run should not have been touched
+        self.assertEqual(check_run, aborted_check_run)
 
 
 class TestCheckRunAnnotations(ZuulGithubAppTestCase, AnsibleZuulTestCase):

@@ -2215,6 +2215,31 @@ class FakeGithubPullRequest(object):
         }
         return (name, data)
 
+    def getCheckRunAbortEvent(self, check_run):
+        # A check run aborted event can only be created from a FakeCheckRun as
+        # we need some information like external_id which is "calculated"
+        # during the creation of the check run.
+        name = "check_run"
+        data = {
+            "action": "requested_action",
+            "requested_action": {
+                "identifier": "abort",
+            },
+            "check_run": {
+                "head_sha": self.head_sha,
+                "name": check_run["name"],
+                "app": {
+                    "slug": check_run["app"]
+                },
+                "external_id": check_run["external_id"],
+            },
+            "repository": {
+                "full_name": self.project,
+            },
+        }
+
+        return (name, data)
+
     def setMerged(self, commit_message):
         self.is_merged = True
         self.merge_message = commit_message
