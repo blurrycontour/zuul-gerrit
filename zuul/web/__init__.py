@@ -265,22 +265,31 @@ class ZuulWebAPI(object):
                    tenant, project))
 
         body = cherrypy.request.json
-        if 'pipeline' in body and (
-            ('change' in body and 'ref' not in body) or
-            ('change' not in body and 'ref' in body)):
-            job = self.rpc.submitJob('zuul:dequeue',
-                                     {'tenant': tenant,
-                                      'pipeline': body['pipeline'],
-                                      'project': project,
-                                      'change': body.get('change', None),
-                                      'ref': body.get('ref', None)})
-            result = not job.failure
-            resp = cherrypy.response
-            resp.headers['Access-Control-Allow-Origin'] = '*'
-            return result
-        else:
-            raise cherrypy.HTTPError(400,
-                                     'Invalid request body')
+
+        # Exactly one of change, ref or buildset_id must be set
+        l = [x for x in ("change", "ref", "buildset_id") if x in body]
+        if len(l) != 1:
+            raise cherrypy.HTTPError(400, "Invalid request body")
+
+        # Pipeline must be set for ref and change
+        if not any(x for x in ["pipeline", "buildset_id"] if x in body):
+            raise cherrypy.HTTPError(400, "Invalid request body")
+
+        job = self.rpc.submitJob(
+            'zuul:dequeue',
+            {
+                'tenant': tenant,
+                'pipeline': body.get('pipeline', None),
+                'project': project,
+                'change': body.get('change', None),
+                'ref': body.get('ref', None),
+                'buildset_id': body.get('buildset_id', None),
+            }
+        )
+        result = not job.failure
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return result
 
     @cherrypy.expose
     @cherrypy.tools.json_in()

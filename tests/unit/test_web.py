@@ -1529,6 +1529,61 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.waitUntilSettled()
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
 
+    def test_dequeue_buildset(self):
+        """Test that the admin web interface can dequeue a buildset"""
+        start_builds = len(self.builds)
+
+        self.create_branch("org/project", "stable")
+        self.executor_server.hold_jobs_in_build = True
+        self.commitConfigUpdate("common-config", "layouts/timer.yaml")
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, "Wait for a build on hold"):
+            if len(self.builds) > start_builds:
+                break
+        self.waitUntilSettled()
+
+        # Look up the buildset ID of the latest build, so we can dequeue it
+        buildset_id = self.builds[-1].parameters["zuul"]["buildset"]
+
+        authz = {
+            "iss": "zuul_operator",
+            "aud": "zuul.example.com",
+            "sub": "testuser",
+            "zuul": {
+                "admin": ["tenant-one"]
+            },
+            "exp": time.time() + 3600
+        }
+        token = jwt.encode(
+            authz, key="NoDanaOnlyZuul", algorithm="HS256"
+        ).decode("utf-8")
+        path = "api/tenant/%(tenant)s/project/%(project)s/dequeue"
+        dequeue_args = {
+            "tenant": "tenant-one",
+            "project": "org/project",
+        }
+        change = {"buildset_id": buildset_id}
+        req = self.post_url(
+            path % dequeue_args,
+            headers={"Authorization": "Bearer %s" % token},
+            json=change
+        )
+        # The JSON returned is the same as the client's output
+        self.assertEqual(200, req.status_code, req.text)
+        data = req.json()
+        self.assertEqual(True, data)
+        self.waitUntilSettled()
+
+        self.commitConfigUpdate("common-config", "layouts/no-timer.yaml")
+        self.sched.reconfigure(self.config)
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(self.countJobResults(self.history, "ABORTED"), 1)
+
 
 class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
     config_file = 'zuul-admin-web-no-override.conf'
