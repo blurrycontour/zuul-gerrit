@@ -40,7 +40,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
-from zuul.model import Build, HoldRequest, Tenant
+from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
 
@@ -454,7 +454,13 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.executors.jobs_queued', execute_queue)
 
     def addEvent(self, event):
-        self.trigger_event_queue.put(event)
+        # Check the event type and put it in the corresponding queue
+        if isinstance(event, TriggerEvent):
+            self.trigger_event_queue.put(event)
+        if isinstance(event, ManagementEvent):
+            self.management_event_queue.put(event)
+        if isinstance(event, ResultEvent):
+            self.result_event_queue.put(event)
         self.wake_event.set()
 
     def onBuildStarted(self, build):

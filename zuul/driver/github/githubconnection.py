@@ -566,7 +566,7 @@ class GithubEventProcessor(object):
         # sent by Github whenever a change is pushed. But as we are already
         # listening to push events, this would result in two trigger events
         # for the same Github event.
-        if action not in ["rerequested", "completed"]:
+        if action not in ["rerequested", "completed", "requested_action"]:
             return
 
         # The head_sha identifies the commit the check_run is requested for
@@ -592,17 +592,61 @@ class GithubEventProcessor(object):
             )
             return
 
-        # Build a trigger event for the check_run request
+        # In case a "requested_action" event was triggered, we must first
+        # evaluate the contained action (identifier), to build the right
+        # trigger event that will e.g. abort/dequeue a buildset.
+        if action == "requested_action":
+            # Look up the action's identifier from the payload
+            identifier = self.body.get("requested_action", {}).get(
+                "identifier"
+            )
+
+            # currently we only support "abort" identifier
+            if identifier != "abort":
+                return
+
+            # In case of an abort (which is currently the only supported
+            # action), we will call the appropriate method on the scheduler
+            # directly.
+            return self._dequeue_check_run(check_run, project)
+
+        # If no requested_action was supplied, we build a trigger event for the
+        # check run request
         event = self._pull_request_to_event(pr_body)
         event.type = "check_run"
+
         # Simplify rerequested action to requested
         if action == "rerequested":
             action = "requested"
         event.action = action
 
-        check_run = "%s:%s:%s" % _check_as_tuple(self.body["check_run"])
-        event.check_run = check_run
+        check_run_tuple = "%s:%s:%s" % _check_as_tuple(check_run)
+        event.check_run = check_run_tuple
         return event
+
+    def _dequeue_check_run(self, check_run, project):
+        # Extract necessary values from the check's external id to dequeue
+        # the corresponding change in Zuul
+        dequeue_attrs = json.loads(check_run["external_id"])
+        # The dequeue operations needs the change in format
+        # <pr_number>,<commit_sha>
+        change = "{},{}".format(dequeue_attrs["change"], check_run["head_sha"])
+
+        # Instead of a trigger event, we directly dequeue the change by calling
+        # the appropriate method on the scheduler.
+        try:
+            self.connection.sched.dequeue(
+                dequeue_attrs["tenant"],
+                dequeue_attrs["pipeline"],
+                project,
+                change,
+                ref=None,
+            )
+        except Exception as e:
+            self.log.error(
+                "Failed to dequeue change %s in project %s: %s",
+                change, project, str(e),
+            )
 
     def _issue_to_pull_request(self, body):
         number = body.get('issue').get('number')
@@ -1835,7 +1879,8 @@ class GithubConnection(BaseConnection):
         log.debug("Removed label %s from %s#%s", label, proj, pr_number)
 
     def updateCheck(self, project, pr_number, sha, status, completed, context,
-                    details_url, message, file_comments, zuul_event_id=None):
+                    details_url, message, file_comments, external_id,
+                    zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         github = self.getGithubClient(project, zuul_event_id=zuul_event_id)
         owner, proj = project.split("/")
@@ -1914,6 +1959,7 @@ class GithubConnection(BaseConnection):
                         completed_at=completed_at,
                         output=output,
                         details_url=details_url,
+                        external_id=external_id,
                     )
                 except github3.exceptions.GitHubException as exc:
                     # TODO (felix): Should we retry the check_run creation?
@@ -1941,6 +1987,7 @@ class GithubConnection(BaseConnection):
                         completed_at=completed_at,
                         output=output,
                         details_url=details_url,
+                        external_id=external_id,
                     )
                 except github3.exceptions.GitHubException as exc:
                     log.error(
@@ -1955,6 +2002,18 @@ class GithubConnection(BaseConnection):
                     )
 
         else:
+            actions = [
+                {
+                    "label": "Abort",
+                    "description": "Abort this check run",
+                    # Usually Github wants us to provide an identifier for our
+                    # system here, so we can identify this action. But as zuul
+                    # is already identifying this event based on the check run
+                    # this shouldn't be necessary.
+                    "identifier": "abort",
+                }
+            ]
+
             # Report the start of a check run
             try:
                 check_run = repository.create_check_run(
@@ -1963,6 +2022,8 @@ class GithubConnection(BaseConnection):
                     status=status,
                     output=output,
                     details_url=details_url,
+                    external_id=external_id,
+                    actions=actions,
                 )
             except github3.exceptions.GitHubException as exc:
                 # TODO (felix): Should we retry the check run creation?
