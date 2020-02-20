@@ -1,12 +1,12 @@
 - nodeset:
-    name: zuul-functional-temp-master
+    name: zuul-functional
     nodes:
       - name: controller
-        label: ubuntu-xenial
+        label: ubuntu-bionic
       - name: node1
-        label: ubuntu-xenial
+        label: ubuntu-bionic
       - name: node2
-        label: ubuntu-xenial
+        label: ubuntu-bionic
     groups:
       - name: node
         nodes:
@@ -16,7 +16,7 @@
 - job:
     name: zuul-stream-functional
     parent: multinode
-    nodeset: zuul-functional-temp-master
+    nodeset: zuul-functional
     pre-run: playbooks/zuul-stream/pre.yaml
     run: playbooks/zuul-stream/functional.yaml
     post-run:
