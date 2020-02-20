@@ -1,0 +1,12 @@
+---
+features:
+  - |
+    Changes can now be dequeued via the Github checks API. If a github
+    reporter is configured to use the checks API, all running checks will
+    provide a custom "Abort" action.
+
+    Please note that Zuul doesn't provide a dequeue reporting by now, and thus
+    aborted check runs will get "lost in space". Meaning, the dequeue event
+    won't update the check run and it will stay in state "in progress". You
+    could configure your Github driver to trigger on PR comments and use those
+    to trigger a recheck/regate/... to re-run the stuck check run.
