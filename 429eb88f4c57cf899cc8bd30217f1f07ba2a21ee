@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_8fcde4ba",
+        "filename": "tests/fixtures/config/pass-to-parent/git/org_project/zuul.yaml",
+        "patchSetId": 8
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1004
+      },
+      "writtenOn": "2020-02-21T19:37:51Z",
+      "side": 1,
+      "message": "by adding this, the unit test fails because now it doesn\u0027t use the parent-supplied secret, but used the secret that\u0027s provided to the job in here..\n\nif i remove this, i get an invalid config, because a playbook with secrets that have and pass-to-parent set to false will just never make sense..\n\nreference:\nhttps://ad793cc4ef661bc84354-a22e2178400a1d74c0dfc0d0570ba9cf.ssl.cf5.rackcdn.com/708731/8/check/tox-py37/e3057dc/testr_results.html",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 27
+      },
+      "revId": "429eb88f4c57cf899cc8bd30217f1f07ba2a21ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
