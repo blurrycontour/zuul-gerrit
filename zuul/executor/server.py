@@ -28,6 +28,7 @@ import tempfile
 import threading
 import time
 import traceback
+import re
 from concurrent.futures.process import ProcessPoolExecutor
 
 import git
@@ -311,6 +312,55 @@ class SshAgent(object):
         return result
 
 
+class KubeFwd(object):
+    def __init__(self, zuul_event_id, build, kubeconfig, context,
+                 namespace, pod):
+        self.port = None
+        self.fwd = None
+        self.log = get_annotated_logger(
+            logging.getLogger("zuul.ExecutorServer"),
+            zuul_event_id, build=build)
+        self.kubeconfig = kubeconfig
+        self.context = context
+        self.namespace = namespace
+        self.pod = pod
+
+    def start(self):
+        if self.fwd:
+            return
+        self.log.info("starting forward")
+        with open('/dev/null', 'r+') as devnull:
+            fwd = subprocess.Popen(
+                ['kubectl', '--kubeconfig=%s' % self.kubeconfig,
+                 '--context=%s' % self.context,
+                 '-n', self.namespace,
+                 'port-forward',
+                 '--address', '127.0.0.1',
+                 'pod/%s' % self.pod, ':19885'],
+                 close_fds=True,
+                 stdout=subprocess.PIPE,
+                 stderr=subprocess.STDOUT,
+                 stdin=devnull)
+        line = fwd.stdout.readline().decode('utf8')
+        self.log.info(line)
+        m = re.match('^Forwarding from 127.0.0.1:(\d+) -> 19885', line)
+        if m:
+            self.port = m.group(1)
+        else:
+            try:
+                self.fwd.kill()
+            except:
+                pass
+            raise Exception("Unable to start kubectl port forward")
+        self.fwd = fwd
+        self.log.info('Started Kubectl port forward on port {}'.format(self.port))
+
+    def stop(self):
+        if self.fwd:
+            self.fwd.kill()
+            self.fwd.wait()
+
+
 class JobDirPlaybook(object):
     def __init__(self, root):
         self.root = root
@@ -369,6 +419,8 @@ class JobDir(object):
         #   work (mounted in bwrap read-write)
         #     .ssh
         #       known_hosts
+        #     .kube
+        #       config
         #     src
         #       <git.example.com>
         #         <project>
@@ -403,6 +455,9 @@ class JobDir(object):
         os.makedirs(self.untrusted_root)
         ssh_dir = os.path.join(self.work_root, '.ssh')
         os.mkdir(ssh_dir, 0o700)
+        kube_dir = os.path.join(self.work_root, ".kube")
+        os.makedirs(kube_dir)
+        self.kubeconfig = os.path.join(kube_dir, "config")
         # Create ansible cache directory
         self.ansible_cache_root = os.path.join(self.root, '.ansible')
         self.fact_cache = os.path.join(self.ansible_cache_root, 'fact-cache')
@@ -758,7 +813,7 @@ class AnsibleJob(object):
             'winrm_read_timeout_sec')
         self.ssh_agent = SshAgent(zuul_event_id=self.zuul_event_id,
                                   build=self.job.unique)
-
+        self.port_forwards = []
         self.executor_variables_file = None
 
         self.cpu_times = {'user': 0, 'system': 0,
@@ -867,6 +922,11 @@ class AnsibleJob(object):
                     self.ssh_agent.stop()
                 except Exception:
                     self.log.exception("Error stopping SSH agent:")
+            for fwd in self.port_forwards:
+                try:
+                    fwd.stop()
+                except Exception:
+                    self.log.exception("Error stopping port forward:")
             try:
                 self.executor_server.finishJob(self.job.unique)
             except Exception:
@@ -1774,12 +1834,11 @@ class AnsibleJob(object):
         self.log.debug("Adding role path %s", role_path)
         jobdir_playbook.roles_path.append(role_path)
 
-    def prepareKubeConfig(self, data):
-        kube_cfg_path = os.path.join(self.jobdir.work_root, ".kube", "config")
+    def prepareKubeConfig(self, jobdir, data):
+        kube_cfg_path = jobdir.kubeconfig
         if os.path.exists(kube_cfg_path):
             kube_cfg = yaml.safe_load(open(kube_cfg_path))
         else:
-            os.makedirs(os.path.dirname(kube_cfg_path), exist_ok=True)
             kube_cfg = {
                 'apiVersion': 'v1',
                 'kind': 'Config',
@@ -1848,7 +1907,7 @@ class AnsibleJob(object):
                 # TODO: decrypt resource data using scheduler key
                 data = node['connection_port']
                 # Setup kube/config file
-                self.prepareKubeConfig(data)
+                self.prepareKubeConfig(self.jobdir, data)
                 # Convert connection_port in kubectl connection parameters
                 node['connection_port'] = None
                 node['kubectl_namespace'] = data['namespace']
@@ -1865,6 +1924,17 @@ class AnsibleJob(object):
                     # Add the real pod name to the resources_var
                     all_vars['zuul']['resources'][
                         node['name'][0]]['pod'] = data['pod']
+                    fwd = KubeFwd(zuul_event_id=self.zuul_event_id,
+                                  build=self.job.unique,
+                                  kubeconfig=self.jobdir.kubeconfig,
+                                  context=data['context_name'],
+                                  namespace=data['namespace'],
+                                  pod=data['pod'])
+                    fwd.start()
+                    self.port_forwards.append(fwd)
+                    all_vars['zuul']['resources'][
+                        node['name'][0]]['stream_port'] = fwd.port
+
         # Remove resource node from nodes list
         for node in resources_nodes:
             args['nodes'].remove(node)
