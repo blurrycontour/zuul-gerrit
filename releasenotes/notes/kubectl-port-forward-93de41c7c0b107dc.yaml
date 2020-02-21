@@ -1,0 +1,10 @@
+---
+upgrade:
+  - |
+    Kubectl and socat must now be installed on Zuul executors if using
+    Kubernetes or OpenShift `pod` resources from Nodepool.
+fixes:
+  - |
+    Previously, no output from shell or command tasks on pods was placed
+    in the job output; that has been corrected and streaming output is
+    now available.
