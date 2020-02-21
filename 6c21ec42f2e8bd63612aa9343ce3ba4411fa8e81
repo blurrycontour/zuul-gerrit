@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_858dcbdb",
+        "filename": "tests/unit/test_ansible.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-21T15:10:50Z",
+      "side": 1,
+      "message": "This probably doesn\u0027t need to be an Ansible test case; I think we can drop it to just a ZuulTestCase and not lose anything (it may have been one of the earliest test cases to actually run ansible but now we have lots that do, and really need to, so we don\u0027t need to prove it with this one any more).  We should double check that the playbooks aren\u0027t doing anything interesting.",
+      "revId": "6c21ec42f2e8bd63612aa9343ce3ba4411fa8e81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_a59007f4",
+        "filename": "tests/unit/test_ansible.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-21T15:10:50Z",
+      "side": 1,
+      "message": "I don\u0027t know what job contamination is.  We should do a git blame on the original lines and figure out what this was doing and add a comment.  As a result, it\u0027s not clear if this should be an Ansible test case or not.",
+      "revId": "6c21ec42f2e8bd63612aa9343ce3ba4411fa8e81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_4597d3eb",
+        "filename": "tests/unit/test_ansible.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-21T15:10:50Z",
+      "side": 1,
+      "message": "I don\u0027t think this needs to be an Ansible test case.  We should double check that the playbooks aren\u0027t doing anything interesting.",
+      "revId": "6c21ec42f2e8bd63612aa9343ce3ba4411fa8e81",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
