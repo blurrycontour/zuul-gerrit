@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_70a5e49f",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-21T23:21:19Z",
+      "side": 1,
+      "message": "state and hold_job are properties of living nodeset objects attached to a job. They don\u0027t really make sense when asking for config objects so I think we should filter them out.",
+      "revId": "52657971bc8be2ecdae23534cae79f18858fe43f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
