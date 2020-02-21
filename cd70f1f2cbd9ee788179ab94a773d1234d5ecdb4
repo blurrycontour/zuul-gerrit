@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_33e220d5",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-02-21T14:03:07Z",
+      "side": 1,
+      "message": "This has a misplaced modifier, read by me (and I expect many) as \"do not (run as a daemon with debug log)\" rather than \"(do not run as a daemon) [and] (with debug log)\" so could confuse users. Maybe rewording to this would help: \"run in foreground with debug log\"",
+      "revId": "cd70f1f2cbd9ee788179ab94a773d1234d5ecdb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_d3c86c4f",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-02-21T14:03:07Z",
+      "side": 1,
+      "message": "I have a similar concern here to the one noted in the -d option above.",
+      "revId": "cd70f1f2cbd9ee788179ab94a773d1234d5ecdb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
