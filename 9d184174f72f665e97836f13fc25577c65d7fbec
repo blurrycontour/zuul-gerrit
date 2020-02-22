@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_a31dbabe",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2753,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-22T21:40:33Z",
+      "side": 1,
+      "message": "I thought deleting would force the garbage collector, which perhaps can be beneficial before setting up a new worker.",
+      "parentUuid": "1fa4df85_a3fe1aac",
+      "revId": "9d184174f72f665e97836f13fc25577c65d7fbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_e30e5231",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
