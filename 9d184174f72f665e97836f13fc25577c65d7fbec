@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_a3fe1aac",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2753,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-22T19:57:30Z",
+      "side": 1,
+      "message": "We\u0027re setting a new one anyway so this will be collected by the garbage collector.",
+      "parentUuid": "1fa4df85_c311d655",
+      "revId": "9d184174f72f665e97836f13fc25577c65d7fbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_e30e5231",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2020-02-22T17:56:37Z",
       "side": 1,
       "message": "is this being auto-retried without sending `ABORTED` ?",
+      "revId": "9d184174f72f665e97836f13fc25577c65d7fbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_633262aa",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2789,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-22T19:57:30Z",
+      "side": 1,
+      "message": "we cannot send aborted here so we\u0027d need to take more effort reporting this back. However this only happens on something like oom so we want to at least ensure that we recover from this. I think we could improve this in general in a followup.",
+      "parentUuid": "1fa4df85_e30e5231",
       "revId": "9d184174f72f665e97836f13fc25577c65d7fbec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
