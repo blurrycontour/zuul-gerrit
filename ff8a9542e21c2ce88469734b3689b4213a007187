@@ -22,6 +22,57 @@
       "revId": "ff8a9542e21c2ce88469734b3689b4213a007187",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_b30b6621",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-22T00:26:11Z",
+      "side": 1,
+      "message": "I think we should really only have one log line from this, and that\u0027s the last one (on line 356).  The others I meant to remove after getting the subprocess working.",
+      "revId": "ff8a9542e21c2ce88469734b3689b4213a007187",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_d306221a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-22T00:26:11Z",
+      "side": 1,
+      "message": "This log line is poorly formatted, and is not necessary.",
+      "revId": "ff8a9542e21c2ce88469734b3689b4213a007187",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_7315ee3d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-22T00:26:11Z",
+      "side": 1,
+      "message": "This log line should be altered or removed.",
+      "revId": "ff8a9542e21c2ce88469734b3689b4213a007187",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
