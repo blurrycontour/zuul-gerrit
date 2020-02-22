@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3fa7e38b_907420cf",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-22T00:20:59Z",
+      "side": 1,
+      "message": "Nit, it would be good to have a KubeFwd specific logger. That way it is clear what the context of the log lines is.",
+      "range": {
+        "startLine": 321,
+        "startChar": 36,
+        "endLine": 321,
+        "endChar": 50
+      },
+      "revId": "ff8a9542e21c2ce88469734b3689b4213a007187",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
