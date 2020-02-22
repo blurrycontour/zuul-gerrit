@@ -22,6 +22,30 @@
       "revId": "ce83b1fc828aa01e0403ea919f320e87fd885ee4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3fa7e38b_99868bb7",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-22T17:04:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_2b89c823",
+      "range": {
+        "startLine": 176,
+        "startChar": 56,
+        "endLine": 176,
+        "endChar": 70
+      },
+      "revId": "ce83b1fc828aa01e0403ea919f320e87fd885ee4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
