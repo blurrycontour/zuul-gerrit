@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_4cc67319",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2753,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-23T18:19:44Z",
+      "side": 1,
+      "message": "The new worker is independent from the old one and there might be in-flight tasks that are in progress too by the old one. So in fact we don\u0027t want to kill it immediately. And if shutdown doesn\u0027t work (no idea if this ever can happen) then we just shouldn\u0027t care about it and go on.",
+      "parentUuid": "1fa4df85_a31dbabe",
+      "revId": "9d184174f72f665e97836f13fc25577c65d7fbec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_e30e5231",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
