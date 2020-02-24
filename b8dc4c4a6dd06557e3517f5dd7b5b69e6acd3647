@@ -82,6 +82,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_64b6d6dc",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-24T21:38:28Z",
+      "side": 1,
+      "message": "I don\u0027t understand, L345 does not uses `self.fwd`.",
+      "parentUuid": "1fa4df85_a9cb471c",
+      "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_fb17c5ec",
         "filename": "zuul/executor/server.py",
         "patchSetId": 2
