@@ -3511,6 +3511,12 @@ class SchedulerTestManager:
     def __iter__(self):
         return iter(self.instances)
 
+    @property
+    def first(self) -> SchedulerTestApp:
+        if len(self.instances) == 0:
+            raise Exception("No scheduler!")
+        return self.instances[0]
+
     def filter(self, matcher=None) -> Iterable[SchedulerTestApp]:
         fcn = None  # type: Optional[Callable[[int, SchedulerTestApp], bool]]
         if type(matcher) == list:
@@ -3717,7 +3723,6 @@ class ZuulTestCase(BaseTestCase):
         self.scheds = SchedulerTestManager()
         sched_app = self.scheds.create(
             self.log, self.config, self.zk_config, self.connections)
-        self.sched = sched_app.sched
         self.event_queues = sched_app.event_queues + self.event_queues
 
         if hasattr(self, 'fake_github'):
@@ -4113,7 +4118,7 @@ class ZuulTestCase(BaseTestCase):
         self.assertNodepoolState()
         self.assertNoGeneratedKeys()
         ipm = zuul.manager.independent.IndependentPipelineManager
-        for tenant in self.sched.abide.tenants.values():
+        for tenant in self.scheds.first.sched.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 if isinstance(pipeline.manager, ipm):
                     self.assertEqual(len(pipeline.queues), 0)
@@ -4432,7 +4437,7 @@ class ZuulTestCase(BaseTestCase):
             self.log.info("Completed build: %s" % build)
         for build in self.builds:
             self.log.info("Running build: %s" % build)
-        for tenant in self.sched.abide.tenants.values():
+        for tenant in self.scheds.first.sched.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 for pipeline_queue in pipeline.queues:
                     if len(pipeline_queue.queue) != 0:
@@ -4476,7 +4481,7 @@ class ZuulTestCase(BaseTestCase):
 
     def assertEmptyQueues(self):
         # Make sure there are no orphaned jobs
-        for tenant in self.sched.abide.tenants.values():
+        for tenant in self.scheds.first.sched.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 for pipeline_queue in pipeline.queues:
                     if len(pipeline_queue.queue) != 0:
