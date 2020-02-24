@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_5b5939fc",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-24T18:21:32Z",
+      "side": 1,
+      "message": "the comment could be updated too.",
+      "range": {
+        "startLine": 271,
+        "startChar": 20,
+        "endLine": 271,
+        "endChar": 65
+      },
+      "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_9bd25134",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-24T18:21:32Z",
+      "side": 1,
+      "message": "it seems like this will also raises an attribute error, None does not have a kill function.",
+      "range": {
+        "startLine": 351,
+        "startChar": 16,
+        "endLine": 351,
+        "endChar": 21
+      },
+      "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_fb17c5ec",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-24T18:21:32Z",
+      "side": 1,
+      "message": "not sure what happens if this get garbage collected, but shouldn\u0027t the object also implements a __del__ function?",
+      "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
