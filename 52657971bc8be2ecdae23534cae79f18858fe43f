@@ -16,6 +16,24 @@
       "revId": "52657971bc8be2ecdae23534cae79f18858fe43f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_7130db08",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-02-24T16:03:54Z",
+      "side": 1,
+      "message": "Should we filter this down to just \u0027name\u0027 and \u0027label\u0027 then? Not sure any of the other attributes hold much value.",
+      "parentUuid": "3fa7e38b_70a5e49f",
+      "revId": "52657971bc8be2ecdae23534cae79f18858fe43f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
