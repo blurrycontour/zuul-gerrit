@@ -100,6 +100,23 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_445b9a86",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-24T21:51:20Z",
+      "side": 1,
+      "message": "Oooh.  Fixed.",
+      "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_fb17c5ec",
         "filename": "zuul/executor/server.py",
         "patchSetId": 2
