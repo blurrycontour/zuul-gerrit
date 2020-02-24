@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_89c68b16",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-24T20:48:20Z",
+      "side": 1,
+      "message": "Done.",
+      "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_9bd25134",
         "filename": "zuul/executor/server.py",
         "patchSetId": 2
@@ -48,6 +65,23 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_a9cb471c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-24T20:48:20Z",
+      "side": 1,
+      "message": "If self.fwd is None, then line 345 would have raised that exception.  That\u0027s fine.  When this method raises an exception, the job fails.  I think that\u0027s the correct response (the executor is broken).\n\nThe main point here is just to raise an exception in the case that we *did* run kubectl but we *did not* get a port.",
+      "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_fb17c5ec",
         "filename": "zuul/executor/server.py",
         "patchSetId": 2
@@ -59,6 +93,23 @@
       "writtenOn": "2020-02-24T18:21:32Z",
       "side": 1,
       "message": "not sure what happens if this get garbage collected, but shouldn\u0027t the object also implements a __del__ function?",
+      "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_49d093ca",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-24T20:48:20Z",
+      "side": 1,
+      "message": "This is modeled on SshAgent above, which does not have one.  Adding one would probably be an improvement to both, however, I think the code is solid enough that there is no code path that does not call stop().",
       "revId": "b8dc4c4a6dd06557e3517f5dd7b5b69e6acd3647",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
