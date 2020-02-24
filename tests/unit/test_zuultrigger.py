@@ -69,11 +69,11 @@ class TestZuulTriggerParentChangeEnqueued(ZuulTestCase):
             nonlocal zuultrigger_event_count
             if isinstance(args[0], ZuulTriggerEvent):
                 zuultrigger_event_count += 1
-            self.sched.trigger_event_queue.put_orig(*args, **kwargs)
+            self.scheds.first.trigger_event_queue.put_orig(*args, **kwargs)
 
-        self.sched.trigger_event_queue.put_orig = \
-            self.sched.trigger_event_queue.put
-        self.sched.trigger_event_queue.put = counting_put
+        self.scheds.first.trigger_event_queue.put_orig = \
+            self.scheds.first.trigger_event_queue.put
+        self.scheds.first.trigger_event_queue.put = counting_put
 
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         C.addApproval('Verified', -1)
@@ -150,11 +150,12 @@ class TestZuulTriggerParentChangeEnqueuedGithub(ZuulGithubAppTestCase):
             nonlocal zuultrigger_event_count
             if isinstance(args[0], ZuulTriggerEvent):
                 zuultrigger_event_count += 1
-            self.sched.trigger_event_queue.put_orig(*args, **kwargs)
+            self.scheds.first.trigger_event_queue\
+                .put_orig(*args, **kwargs)
 
-        self.sched.trigger_event_queue.put_orig = \
-            self.sched.trigger_event_queue.put
-        self.sched.trigger_event_queue.put = counting_put
+        self.scheds.first.trigger_event_queue.put_orig = \
+            self.scheds.first.trigger_event_queue.put
+        self.scheds.first.trigger_event_queue.put = counting_put
 
         C = self.fake_github.openFakePullRequest('org/project', 'master', 'C')
         C.addLabel('for-check')  # should go to check
