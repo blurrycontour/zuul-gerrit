@@ -3497,6 +3497,16 @@ class SchedulerTestAppFactory:
     def __iter__(self):
         return iter(self.instances)
 
+    @property
+    def first(self) -> Scheduler:
+        return self.firstApp.sched
+
+    @property
+    def firstApp(self) -> SchedulerTestApp:
+        if len(self.instances) == 0:
+            raise Exception("No scheduler!")
+        return self.instances[0]
+
     def execute(self, function: Callable[[Scheduler], None],
                 matcher: Optional[Callable[[int, Scheduler], bool]] = None):
         for index, instance in enumerate(self.instances):
@@ -3702,7 +3712,6 @@ class ZuulTestCase(BaseTestCase):
         self.sched_factory = SchedulerTestAppFactory()
         sched_app = self.sched_factory.create(
             self.log, self.config, self.zk_config, self.connections)
-        self.sched = sched_app.sched
         self.event_queues = sched_app.event_queues + self.event_queues
 
         if hasattr(self, 'fake_github'):
@@ -4098,7 +4107,7 @@ class ZuulTestCase(BaseTestCase):
         self.assertNodepoolState()
         self.assertNoGeneratedKeys()
         ipm = zuul.manager.independent.IndependentPipelineManager
-        for tenant in self.sched.abide.tenants.values():
+        for tenant in self.sched_factory.first.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 if isinstance(pipeline.manager, ipm):
                     self.assertEqual(len(pipeline.queues), 0)
@@ -4418,7 +4427,7 @@ class ZuulTestCase(BaseTestCase):
             self.log.info("Completed build: %s" % build)
         for build in self.builds:
             self.log.info("Running build: %s" % build)
-        for tenant in self.sched.abide.tenants.values():
+        for tenant in self.sched_factory.first.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 for pipeline_queue in pipeline.queues:
                     if len(pipeline_queue.queue) != 0:
@@ -4462,7 +4471,7 @@ class ZuulTestCase(BaseTestCase):
 
     def assertEmptyQueues(self):
         # Make sure there are no orphaned jobs
-        for tenant in self.sched.abide.tenants.values():
+        for tenant in self.sched_factory.first.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 for pipeline_queue in pipeline.queues:
                     if len(pipeline_queue.queue) != 0:
