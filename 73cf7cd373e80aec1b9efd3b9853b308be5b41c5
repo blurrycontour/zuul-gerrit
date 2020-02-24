@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_1b40a135",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 31659
+      },
+      "writtenOn": "2020-02-24T18:11:16Z",
+      "side": 1,
+      "message": "If possible, it would be nice to get the repository in the state it was in the tagged commit.\n\nThen it doesn\u0027t matter which branch is matched, in regards to which job-variant to use. As long as the jobs definitions are parsed from that commit.",
+      "range": {
+        "startLine": 710,
+        "startChar": 8,
+        "endLine": 710,
+        "endChar": 20
+      },
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
