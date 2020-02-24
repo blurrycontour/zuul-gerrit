@@ -39,6 +39,30 @@
       "revId": "999b94289be8737ffe07d5577c1ebce02c9c55a6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_15739282",
+        "filename": "doc/source/user/config.rst",
+        "patchSetId": 17
+      },
+      "lineNbr": 1201,
+      "author": {
+        "id": 31659
+      },
+      "writtenOn": "2020-02-24T16:30:09Z",
+      "side": 1,
+      "message": "Limiting to only HEAD would not work in the case where the tag contains metadata.\nFor instance, if you need to re-release for another firmware (this applies to our project). Same when a new firmware is delivered after the software is tagged. Then there will likely be new commits on top of it.",
+      "parentUuid": "3fa7e38b_ec1bffc6",
+      "range": {
+        "startLine": 1199,
+        "startChar": 6,
+        "endLine": 1201,
+        "endChar": 64
+      },
+      "revId": "999b94289be8737ffe07d5577c1ebce02c9c55a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
