@@ -199,9 +199,122 @@ class FakeRepository(ObjectType):
         return parent._commits.get(expression)
 
 
+class FakeRepositoryEdge(ObjectType):
+    permission = String()
+    node = Field(FakeRepository)
+
+    def resolve_permission(parent, info):
+        permission_map = {
+            'pull': 'READ',
+            'push': 'WRITE',
+            'admin': 'ADMIN',
+        }
+        return permission_map[parent[0].permission]
+
+    def resolve_node(parent, info):
+        return parent[1]
+
+
+class FakeTeamRepositories(ObjectType):
+    total_count = Int()
+    page_info = Field(FakePageInfo)
+    edges = List(FakeRepositoryEdge)
+
+    def resolve_total_count(parent, info):
+        return len(parent)
+
+    def resolve_page_info(parent, info):
+        return parent
+
+    def resolve_edges(parent, info):
+        return parent
+
+
+class FakeTeamMember(ObjectType):
+    login = String()
+
+    def resolve_login(parent, info):
+        return parent.login
+
+
+class FakeTeamMembers(ObjectType):
+    total_count = Int()
+    page_info = Field(FakePageInfo)
+    nodes = List(FakeTeamMember)
+
+    def resolve_page_info(parent, info):
+        return parent
+
+    def resolve_nodes(parent, info):
+        return parent.members()
+
+
+class FakeTeam(ObjectType):
+    slug = String()
+    repositories = Field(FakeTeamRepositories, query=String(), first=Int())
+    members = Field(FakeTeamMembers, first=Int())
+
+    def resolve_slug(parent, info):
+        return parent.slug
+
+    def resolve_repositories(parent, info, query, first):
+        slug = parent.slug
+        repos = [(team, repo)
+                 for repo in info.context._data.repos.values()
+                 for team in repo._teams
+                 if team.slug == slug
+                 if query in repo.name]
+        return repos
+
+    def resolve_members(parent, info, first):
+        return parent
+
+
+class FakeTeamEdge(ObjectType):
+    node = Field(FakeTeam)
+
+    def resolve_node(parent, info):
+        return parent
+
+
+class FakeTeams(ObjectType):
+    total_count = Int()
+    page_info = Field(FakePageInfo)
+    edges = List(FakeTeamEdge)
+
+    def resolve_total_count(parent, info):
+        return len(parent)
+
+    def resolve_page_info(parent, info):
+        return parent
+
+    def resolve_edges(parent, info):
+        return parent
+
+
+class FakeGithubOrg(ObjectType):
+    teams = Field(FakeTeams, query=String(), first=Int())
+    team = Field(FakeTeam, slug=String())
+
+    def resolve_teams(parent, info, query, first):
+        teams = [team for team in parent.fake_teams if query in team.slug]
+        return teams
+
+    def resolve_team(parent, info, slug):
+        teams = [team for team in parent.fake_teams if slug == team.slug]
+        if teams:
+            return teams[0]
+        else:
+            return None
+
+
 class FakeGithubQuery(ObjectType):
+    organization = Field(FakeGithubOrg, login=String(required=True))
     repository = Field(FakeRepository, owner=String(required=True),
                        name=String(required=True))
+
+    def resolve_organization(root, info, login):
+        return info.context._data.organizations.get(login)
 
     def resolve_repository(root, info, owner, name):
         return info.context._data.repos.get((owner, name))
