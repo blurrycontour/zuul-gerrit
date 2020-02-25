@@ -3719,7 +3719,6 @@ class ZuulTestCase(BaseTestCase):
                 self.fake_github.github_event_connector._event_forward_queue)
 
         self.merge_server = None
-        self.nodepool = sched_app.sched.nodepool
         self.zk = sched_app.sched.zk
 
         # Cleanups are run in reverse order
@@ -4329,8 +4328,9 @@ class ZuulTestCase(BaseTestCase):
     def areAllNodeRequestsComplete(self):
         if self.fake_nodepool.paused:
             return True
-        if self.nodepool.requests:
-            return False
+        for app in self.scheds:
+            if app.sched.nodepool.requests:
+                return False
         return True
 
     def areAllMergeJobsWaiting(self):
