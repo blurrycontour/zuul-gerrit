@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_e61e376f",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-25T21:30:00Z",
+      "side": 1,
+      "message": "One thing that has created some confusion with nodepool node request priorities is that they are sorted alphanumerically and not by integer value.\n\nI think we should be consistent in the priority system we use here to avoid further confusion.",
+      "revId": "5a52bac6459821dd8656b79d6d7680e317a18fa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_691e980d",
+        "filename": "doc/source/reference/developer/specs/scale-out-scheduler.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-25T21:30:00Z",
+      "side": 1,
+      "message": "When we get to the point where this has been implemented we should try to remember to document the behavior. I think this has the possibility of changing current expected behavior for existing users and helping them understand why jobs are scheduled in some order will help them. At the very least it will help me field questions when they come up :)",
+      "revId": "5a52bac6459821dd8656b79d6d7680e317a18fa2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
