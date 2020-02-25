@@ -22,6 +22,23 @@
       "revId": "b25a8f0c0849b5d4f565e12e48d17193012abb11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_21675e50",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1954,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-25T17:10:56Z",
+      "side": 1,
+      "message": "Yes, it fails the job completely.  I think that\u0027s appropriate (I think I would consider the executor broken in that case).",
+      "revId": "b25a8f0c0849b5d4f565e12e48d17193012abb11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
