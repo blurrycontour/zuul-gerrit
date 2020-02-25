@@ -32,6 +32,7 @@ import re
 from logging import Logger
 from queue import Queue
 from typing import Callable, Optional, Any, Iterable, Generator, List
+from typing import Optional
 
 import requests
 import select
@@ -2038,6 +2039,7 @@ class FakeGithubPullRequest(object):
         msg = self.subject + '-' + str(self.number_of_commits)
         for fn, content in self.files.items():
             fn = os.path.join(repo.working_dir, fn)
+            os.makedirs(os.path.dirname(fn), exist_ok=True)
             with open(fn, 'w') as f:
                 f.write(content)
             repo.index.add([fn])
@@ -2330,6 +2332,19 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.github_data.reports.append((project, pr_number, 'unlabel', label))
         pull_request = self.pull_requests[pr_number]
         pull_request.removeLabel(label)
+
+    def _fetchFileFromGithub(self,
+                             project_name: str,
+                             branch: str,
+                             path: str,
+                             event) -> Optional[bytes]:
+        repo = self.getGitUrl(project_name)
+        file_path = os.path.join(repo, path)
+        try:
+            with open(file_path, 'rb') as file:
+                return file.read()
+        except OSError:
+            return None
 
 
 class BuildHistory(object):
