@@ -3465,7 +3465,8 @@ class SchedulerTestApp:
 
         self.sched.start()
         executor_client.gearman.waitForServer()
-        self.sched.reconfigure(self.config)
+        if not self.sched._paused:
+            self.sched.reconfigure(self.config)
         self.sched.wakeUp()
 
     def fullReconfigure(self):
@@ -4378,8 +4379,9 @@ class ZuulTestCase(BaseTestCase):
 
     def __eventQueuesJoin(self, matcher) -> None:
         for app in self.scheds.filter(matcher):
-            for event_queue in app.event_queues:
-                event_queue.join()
+            if not app.sched._paused:
+                for event_queue in app.event_queues:
+                    event_queue.join()
         for event_queue in self.additional_event_queues:
             event_queue.join()
 
