@@ -3736,7 +3736,6 @@ class ZuulTestCase(BaseTestCase):
                 self.fake_github.github_event_connector._event_forward_queue)
 
         self.merge_server = None
-        self.zk = sched_app.sched.zk
 
         # Cleanups are run in reverse order
         self.addCleanup(self.assertCleanShutdown)
@@ -4144,7 +4143,7 @@ class ZuulTestCase(BaseTestCase):
         self.rpcclient.shutdown()
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
-        self.zk.disconnect()
+        self.scheds.execute(lambda sched: sched.zk.disconnect())
         self.printHistory()
         # We whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.
