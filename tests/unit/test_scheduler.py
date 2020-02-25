@@ -164,9 +164,9 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         self.assertTrue(r)
 
         # There should be a record in ZooKeeper
-        request_list = self.zk.getHoldRequests()
+        request_list = self.scheds.first.sched.zk.getHoldRequests()
         self.assertEqual(1, len(request_list))
-        request = self.zk.getHoldRequest(request_list[0])
+        request = self.scheds.first.sched.zk.getHoldRequest(request_list[0])
         self.assertIsNotNone(request)
         self.assertEqual('tenant-one', request.tenant)
         self.assertEqual('review.example.com/org/project', request.project)
@@ -194,9 +194,9 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         self.assertTrue(r)
 
         # There should be a record in ZooKeeper
-        request_list = self.zk.getHoldRequests()
+        request_list = self.scheds.first.sched.zk.getHoldRequests()
         self.assertEqual(1, len(request_list))
-        request = self.zk.getHoldRequest(request_list[0])
+        request = self.scheds.first.sched.zk.getHoldRequest(request_list[0])
         self.assertIsNotNone(request)
         self.assertEqual('tenant-one', request.tenant)
         self.assertEqual('review.example.com/org/project', request.project)
@@ -225,9 +225,9 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         self.assertTrue(r)
 
         # There should be a record in ZooKeeper
-        request_list = self.zk.getHoldRequests()
+        request_list = self.scheds.first.sched.zk.getHoldRequests()
         self.assertEqual(1, len(request_list))
-        request = self.zk.getHoldRequest(request_list[0])
+        request = self.scheds.first.sched.zk.getHoldRequest(request_list[0])
         self.assertIsNotNone(request)
         self.assertEqual('tenant-one', request.tenant)
         self.assertEqual('review.example.com/org/project', request.project)
@@ -1736,9 +1736,9 @@ class TestScheduler(ZuulTestCase):
         self.assertTrue(r)
 
         # There should be a record in ZooKeeper
-        request_list = self.zk.getHoldRequests()
+        request_list = self.scheds.first.sched.zk.getHoldRequests()
         self.assertEqual(1, len(request_list))
-        request = self.zk.getHoldRequest(request_list[0])
+        request = self.scheds.first.sched.zk.getHoldRequest(request_list[0])
         self.assertIsNotNone(request)
         self.assertEqual('tenant-one', request.tenant)
         self.assertEqual('review.example.com/org/project', request.project)
@@ -1797,7 +1797,7 @@ class TestScheduler(ZuulTestCase):
 
         # The hold request current_count should have incremented
         # and we should have recorded the held node ID.
-        request2 = self.zk.getHoldRequest(request.id)
+        request2 = self.scheds.first.sched.zk.getHoldRequest(request.id)
         self.assertEqual(request.current_count + 1, request2.current_count)
         self.assertEqual(1, len(request2.nodes))
         self.assertEqual(1, len(request2.nodes[0]["nodes"]))
@@ -1819,11 +1819,11 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(held_nodes, 1)
 
         # request current_count should not have changed
-        request3 = self.zk.getHoldRequest(request2.id)
+        request3 = self.scheds.first.sched.zk.getHoldRequest(request2.id)
         self.assertEqual(request2.current_count, request3.current_count)
 
         # Deleting hold request should set held nodes to used
-        self.zk.deleteHoldRequest(request3)
+        self.scheds.first.sched.zk.deleteHoldRequest(request3)
         node_states = [n['state'] for n in self.fake_nodepool.getNodes()]
         self.assertEqual(3, len(node_states))
         self.assertEqual([zuul.model.STATE_USED] * 3, node_states)
@@ -1843,9 +1843,9 @@ class TestScheduler(ZuulTestCase):
         self.assertTrue(r)
 
         # There should be a record in ZooKeeper
-        request_list = self.zk.getHoldRequests()
+        request_list = self.scheds.first.sched.zk.getHoldRequests()
         self.assertEqual(1, len(request_list))
-        request = self.zk.getHoldRequest(request_list[0])
+        request = self.scheds.first.sched.zk.getHoldRequest(request_list[0])
         self.assertIsNotNone(request)
 
         request = client.autohold_info(request.id)
@@ -1867,14 +1867,14 @@ class TestScheduler(ZuulTestCase):
         self.assertTrue(r)
 
         # There should be a record in ZooKeeper
-        request_list = self.zk.getHoldRequests()
+        request_list = self.scheds.first.sched.zk.getHoldRequests()
         self.assertEqual(1, len(request_list))
-        request = self.zk.getHoldRequest(request_list[0])
+        request = self.scheds.first.sched.zk.getHoldRequest(request_list[0])
         self.assertIsNotNone(request)
 
         # Delete and verify no more requests
         self.assertTrue(client.autohold_delete(request.id))
-        request_list = self.zk.getHoldRequests()
+        request_list = self.scheds.first.sched.zk.getHoldRequests()
         self.assertEqual([], request_list)
 
     def _test_autohold_scoped(self, change_obj, change, ref):
@@ -5734,8 +5734,8 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        self.zk.client.stop()
-        self.zk.client.start()
+        self.scheds.execute(lambda app: app.sched.zk.client.stop())
+        self.scheds.execute(lambda app: app.sched.zk.client.start())
         self.fake_nodepool.unpause()
         self.waitUntilSettled()
 
@@ -5770,8 +5770,8 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # The request is fulfilled, but the scheduler hasn't processed
         # it yet.  Reconnect ZK.
-        self.zk.client.stop()
-        self.zk.client.start()
+        self.scheds.execute(lambda app: app.sched.zk.client.stop())
+        self.scheds.execute(lambda app: app.sched.zk.client.start())
 
         # Allow the scheduler to continue and process the (now
         # out-of-date) notification that nodes are ready.
