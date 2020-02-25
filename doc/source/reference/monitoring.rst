@@ -26,6 +26,20 @@ Metrics
 
 These metrics are emitted by the Zuul :ref:`scheduler`:
 
+.. stat:: zuul.cache.<cache>
+   :type: counter
+
+   Zuul will report usage of cache queries.
+   The following caches are currently supported: githubteams
+
+   .. stat:: zuul.cache.<cache>.hit
+
+   Number of hits of a cache.
+
+   .. stat:: zuul.cache.<cache>.miss
+
+   Number of misses of a cache.
+
 .. stat:: zuul.event.<driver>.<type>
    :type: counter
 
