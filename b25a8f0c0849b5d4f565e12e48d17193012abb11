@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_a124ae0e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1954,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-02-25T17:08:47Z",
+      "side": 1,
+      "message": "If we\u0027re unable to successfully start the fwd and an exception is raised, do we want to totally bail out or try to continue? I ask because I\u0027m failing to see any exception handling for that case here or higher up the call stack, so I\u0027m guessing this would do the former.",
+      "range": {
+        "startLine": 1954,
+        "startChar": 20,
+        "endLine": 1954,
+        "endChar": 31
+      },
+      "revId": "b25a8f0c0849b5d4f565e12e48d17193012abb11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
