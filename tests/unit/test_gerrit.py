@@ -345,7 +345,7 @@ class TestChecksApi(ZuulTestCase):
         self.fake_gerrit.addFakeChecker(uuid='zuul_check:abcd',
                                         repository='org/project',
                                         status='ENABLED')
-        self.sched.reconfigure(self.config)
+        self.scheds.execute(lambda sched: sched.reconfigure(self.config))
         self.waitUntilSettled()
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
