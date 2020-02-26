@@ -63,6 +63,8 @@ import testtools.content_type
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
+
+from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.lib.connections import ConnectionRegistry
 from psutil import Popen
 
@@ -2122,26 +2124,13 @@ class FakeGithubPullRequest(object):
         repo.heads[self.branch].commit = repo.commit(self.head_sha)
 
 
-class FakeGithubConnection(githubconnection.GithubConnection):
-    log = logging.getLogger("zuul.test.FakeGithubConnection")
+class FakeGithubClientManager(GithubClientManager):
 
-    def __init__(self, driver, connection_name, connection_config, rpcclient,
-                 changes_db=None, upstream_root=None, git_url_with_auth=False):
-        super(FakeGithubConnection, self).__init__(driver, connection_name,
-                                                   connection_config)
-        self.connection_name = connection_name
-        self.pr_number = 0
-        self.pull_requests = changes_db
-        self.statuses = {}
-        self.upstream_root = upstream_root
-        self.merge_failure = False
-        self.merge_not_allowed_count = 0
-        self.reports = []
-        self.github_data = tests.fakegithub.FakeGithubData(changes_db)
-        self.recorded_clients = []
-        self.git_url_with_auth = git_url_with_auth
-        self.rpcclient = rpcclient
+    def __init__(self, connection_config):
+        super().__init__(connection_config)
         self.record_clients = False
+        self.recorded_clients = []
+        self.github_data = None
 
     def getGithubClient(self,
                         project=None,
@@ -2173,6 +2162,30 @@ class FakeGithubConnection(githubconnection.GithubConnection):
                 inst_id = latest_inst_id
                 orgs[repo[0]] = inst_id
             self.installation_map['/'.join(repo)] = inst_id
+
+
+class FakeGithubConnection(githubconnection.GithubConnection):
+    log = logging.getLogger("zuul.test.FakeGithubConnection")
+    client_manager_class = FakeGithubClientManager
+
+    def __init__(self, driver, connection_name, connection_config, rpcclient,
+                 changes_db=None, upstream_root=None, git_url_with_auth=False):
+        super(FakeGithubConnection, self).__init__(driver, connection_name,
+                                                   connection_config)
+        self.connection_name = connection_name
+        self.pr_number = 0
+        self.pull_requests = changes_db
+        self.statuses = {}
+        self.upstream_root = upstream_root
+        self.merge_failure = False
+        self.merge_not_allowed_count = 0
+        self.reports = []
+
+        self.github_data = tests.fakegithub.FakeGithubData(changes_db)
+        self._github_client_manager.github_data = self.github_data
+
+        self.git_url_with_auth = git_url_with_auth
+        self.rpcclient = rpcclient
 
     def setZuulWebPort(self, port):
         self.zuul_web_port = port

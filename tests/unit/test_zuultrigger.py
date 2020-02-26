@@ -173,8 +173,9 @@ class TestZuulTriggerParentChangeEnqueuedGithub(ZuulGithubAppTestCase):
 
         # After starting recording installation containing org2/project
         # should not be contacted
-        inst_id_to_check = self.fake_github.installation_map['org2/project']
-        inst_clients = [x for x in self.fake_github.recorded_clients
+        gh_manager = self.fake_github._github_client_manager
+        inst_id_to_check = gh_manager.installation_map['org2/project']
+        inst_clients = [x for x in gh_manager.recorded_clients
                         if x._inst_id == inst_id_to_check]
         self.assertEqual(len(inst_clients), 0)
 

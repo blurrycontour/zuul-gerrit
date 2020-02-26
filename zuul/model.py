@@ -4362,6 +4362,15 @@ class Tenant(object):
 
         self.authorization_rules = []
 
+    @property
+    def all_projects(self):
+        """
+        Return a generator for all projects of the tenant.
+        """
+        for hostname_dict in self.projects.values():
+            for project in hostname_dict.values():
+                yield project
+
     def _addProject(self, tpc):
         """Add a project to the project index
 
