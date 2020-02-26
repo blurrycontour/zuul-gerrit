@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_987d4e1e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-02-26T16:23:26Z",
+      "side": 1,
+      "message": "these are so cute",
+      "range": {
+        "startLine": 52,
+        "startChar": 48,
+        "endLine": 52,
+        "endChar": 55
+      },
+      "revId": "eee91c75e0fddd214bfc8ec8f0bb5c68eebe99a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_98a22e9a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1521,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-02-26T16:23:26Z",
+      "side": 1,
+      "message": "If you respin for some other reason, there is a comment above the previous append_accept_header but not this one - but they\u0027re grouped. I\u0027d either add a similar comment - or remove the one that\u0027s there. Obviously there is no reason to redo this just for that.",
+      "revId": "eee91c75e0fddd214bfc8ec8f0bb5c68eebe99a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
