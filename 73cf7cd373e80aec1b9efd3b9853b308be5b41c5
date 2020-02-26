@@ -22,6 +22,23 @@
       "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_5fd02af8",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-26T00:19:33Z",
+      "side": 1,
+      "message": "I believe that will be the case, though it\u0027s still going to apply the branch matchers.  Imagine a case where a job is defined in-repo on the master branch only and has two variants, one that matches \"master\" and one that matches \"stable\".  In that case, we still need to figure out which one to run for our tag, but the configuration of those 2 variants will be determined by the state of the repo in the tag.",
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
