@@ -30,7 +30,8 @@ import queue
 import random
 import re
 from logging import Logger
-from typing import Callable, Optional, Any
+from queue import Queue
+from typing import Callable, Optional, Any, List
 
 import requests
 import select
@@ -3711,7 +3712,7 @@ class ZuulTestCase(BaseTestCase):
         gerritsource.GerritSource.replication_retry_interval = 0.5
         gerritconnection.GerritEventConnector.delay = 0.0
 
-        self.event_queues = []
+        self.additional_event_queues = []
         self.poller_events = {}
         self.configure_connections()
 
@@ -3727,12 +3728,11 @@ class ZuulTestCase(BaseTestCase):
         self.builds = self.executor_server.running_builds
 
         self.scheds = SchedulerTestManager()
-        sched_app = self.scheds.create(
+        self.scheds.create(
             self.log, self.config, self.zk_config, self.connections)
-        self.event_queues = sched_app.event_queues + self.event_queues
 
         if hasattr(self, 'fake_github'):
-            self.event_queues.append(
+            self.additional_event_queues.append(
                 self.fake_github.github_event_connector._event_forward_queue)
 
         self.merge_server = None
@@ -3741,6 +3741,12 @@ class ZuulTestCase(BaseTestCase):
         self.addCleanup(self.assertCleanShutdown)
         self.addCleanup(self.shutdown)
         self.addCleanup(self.assertFinalState)
+
+    @property
+    def event_queues(self) -> List[Queue]:
+        sched_queues = map(lambda app: app.event_queues, self.scheds)
+        return [item for sublist in sched_queues for item in sublist] +\
+            self.additional_event_queues
 
     def configure_connections(self, source_only=False):
         # Set up gerrit related fakes
@@ -3764,7 +3770,7 @@ class ZuulTestCase(BaseTestCase):
             if con.web_server:
                 self.addCleanup(con.web_server.stop)
 
-            self.event_queues.append(con.event_queue)
+            self.additional_event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
             return con
 
@@ -3803,7 +3809,7 @@ class ZuulTestCase(BaseTestCase):
                 changes_db=db,
                 upstream_root=self.upstream_root,
                 git_url_with_auth=self.git_url_with_auth)
-            self.event_queues.append(con.event_queue)
+            self.additional_event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
             registerGithubProjects(con)
             return con
@@ -3820,7 +3826,7 @@ class ZuulTestCase(BaseTestCase):
                 self.rpcclient,
                 changes_db=db,
                 upstream_root=self.upstream_root)
-            self.event_queues.append(con.event_queue)
+            self.additional_event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
             return con
 
@@ -3836,7 +3842,7 @@ class ZuulTestCase(BaseTestCase):
                 self.rpcclient,
                 changes_db=db,
                 upstream_root=self.upstream_root)
-            self.event_queues.append(con.event_queue)
+            self.additional_event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
             return con
 
@@ -4376,7 +4382,10 @@ class ZuulTestCase(BaseTestCase):
             yield event_queue.empty()
 
     def eventQueuesJoin(self):
-        for event_queue in self.event_queues:
+        for app in self.scheds:
+            for event_queue in app.event_queues:
+                event_queue.join()
+        for event_queue in self.additional_event_queues:
             event_queue.join()
 
     def waitUntilSettled(self, msg=""):
