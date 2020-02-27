@@ -16,6 +16,24 @@
       "revId": "c50998c6a256ce29d54b5bedb1c4da34497537ee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_c81a067c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2359,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-02-27T17:15:40Z",
+      "side": 1,
+      "message": "oops indeed, in my local test i used playbook at first, but switched to jobdir for efficiency, but i ran with both attributes set.",
+      "parentUuid": "1fa4df85_085a5e4e",
+      "revId": "c50998c6a256ce29d54b5bedb1c4da34497537ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
