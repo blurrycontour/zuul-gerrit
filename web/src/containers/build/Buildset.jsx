@@ -15,10 +15,8 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import { Panel } from 'react-bootstrap'
-import * as moment from 'moment'
-
+import ExpandableBuildsTable from '../build/BuildTable'
 
 class Buildset extends React.Component {
   static propTypes = {
@@ -37,6 +35,16 @@ class Buildset extends React.Component {
       'job', 'result', 'voting', 'duration'
     ]
 
+    buildset.builds.forEach(build => {
+
+      // Look up any retry builds for this build
+      let retry_builds = buildset.retry_builds.filter((retry_build) => {
+        return retry_build.job_name === build.job_name
+      })
+      build.retries = retry_builds
+      buildRows.push(build)
+    })
+
     myColumns.forEach(column => {
       let label = column
       let value = buildset[column]
@@ -53,27 +61,6 @@ class Buildset extends React.Component {
       if (value) {
         rows.push({key: label, value: value})
       }
-    })
-
-    buildset.builds.forEach(build => {
-      const row = []
-      buildColumns.forEach(column => {
-        if (column === 'job') {
-          row.push(build.job_name)
-        } else if (column === 'duration') {
-          row.push(moment.duration(build.duration, 'seconds').humanize())
-        } else if (column === 'voting') {
-          row.push(build.voting ? 'true' : 'false')
-        } else if (column === 'result') {
-          row.push(<Link
-                     to={this.props.tenant.linkPrefix + '/build/' + build.uuid}>
-                     {build.result}
-                   </Link>)
-        } else {
-          row.push(build[column])
-        }
-      })
-      buildRows.push(row)
     })
 
     return (
@@ -96,24 +83,7 @@ class Buildset extends React.Component {
         <Panel>
           <Panel.Heading>Builds</Panel.Heading>
           <Panel.Body>
-            <table className="table table-striped table-bordered">
-              <thead>
-                <tr>
-                  {buildColumns.map(item => (
-                    <td key={item}>{item}</td>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {buildset.builds.map((item, idx) => (
-                  <tr key={idx} className={item.result === 'SUCCESS' ? 'success': 'warning'}>
-                    {buildRows[idx].map((item, idx) => (
-                      <td key={idx}>{item}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <ExpandableBuildsTable data={buildRows} cols={buildColumns} tenant={this.props.tenant} />
           </Panel.Body>
         </Panel>
 
