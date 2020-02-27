@@ -39,6 +39,24 @@
       "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_68f51283",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 31659
+      },
+      "writtenOn": "2020-02-27T16:51:18Z",
+      "side": 1,
+      "message": "Hmm. Are we talking about the same thing?\n\nI ment the job as it was defined on the tag itself (assuming the job is defined in the project with the tag). Even if the same commit exists on different branches, the branches should be identical at that commit.\n\nWhen we run check and gate we want to do that on the head of the branch, but a tag we want exactly as it was, without any new features or fixes.",
+      "parentUuid": "1fa4df85_5fd02af8",
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
