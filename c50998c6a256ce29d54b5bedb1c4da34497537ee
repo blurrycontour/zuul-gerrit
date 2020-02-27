@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_085a5e4e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2359,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-02-27T17:13:07Z",
+      "side": 1,
+      "message": "self.jobdir.ansible_vars_blacklist",
+      "revId": "c50998c6a256ce29d54b5bedb1c4da34497537ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
