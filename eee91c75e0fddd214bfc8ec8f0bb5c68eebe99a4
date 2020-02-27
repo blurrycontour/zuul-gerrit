@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_fa178d44",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1521,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-27T14:28:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fa4df85_98a22e9a",
+      "revId": "eee91c75e0fddd214bfc8ec8f0bb5c68eebe99a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_bf4fc790",
         "filename": "zuul/driver/github/graphql/canmerge.graphql",
         "patchSetId": 3
@@ -53,6 +71,24 @@
       "writtenOn": "2020-02-27T07:36:06Z",
       "side": 1,
       "message": "Other than the documentation and all examples in the world state this is NOT necessarily the head commit of the pr. The reason for this is that the commit ordering is not topological but based on authored date. Thus on pull requests with commits that are reordered this yields a wrong result.\n\nThere is a way though to directly get a commit from a repository which will be used in the next ps.",
+      "revId": "eee91c75e0fddd214bfc8ec8f0bb5c68eebe99a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_ba2b5580",
+        "filename": "zuul/driver/github/graphql/canmerge.graphql",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-27T14:28:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fa4df85_bf4fc790",
       "revId": "eee91c75e0fddd214bfc8ec8f0bb5c68eebe99a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
