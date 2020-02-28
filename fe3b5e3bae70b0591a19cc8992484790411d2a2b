@@ -16,6 +16,24 @@
       "revId": "fe3b5e3bae70b0591a19cc8992484790411d2a2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_89840660",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2018,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-02-28T12:33:16Z",
+      "side": 1,
+      "message": "This will be done in a followup.",
+      "parentUuid": "3fa7e38b_3d5bf561",
+      "revId": "fe3b5e3bae70b0591a19cc8992484790411d2a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
