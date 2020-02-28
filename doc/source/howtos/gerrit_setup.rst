@@ -21,7 +21,34 @@ installation, must have SSH access to gerrit, and have the
 `stream-events <https://gerrit-review.googlesource.com/Documentation/access-control.html#global_capabilities>`_
 ACL enabled.
 
-.. TODO: Instructions to create the ssh key used here
+Check if you have `ssh key <https://www.ssh.com/ssh/keygen/>`_  by:
+
+.. code-block:: shell
+
+   cat ~/.ssh/id_rsa.pub
+
+If you lack one you can create it by:
+
+.. TODO: rethink key generation and naming in order to match best sec practices
+.. code-block:: shell
+
+   ssh-keygen -N '' -t rsa
+
+and pressing `Enter`.
+
+You might decide to create and use for `zuul` separate key with different name,
+but it might require additional adjustments later. Addition can be done by:
+
+.. code-block:: shell
+
+   ssh-keygen -f ~/.ssh/<different name> -N '' -t rsa
+
+Store ssh key location into a variable:
+
+.. code-block:: shell
+
+   export PRIVKEY=~/.ssh/id_rsa
+   export PUBKEY =~/.ssh/id_rsa.pub
 
 As the admin user, create the ``zuul`` user, and import an SSH key for
 ``zuul``:
@@ -39,6 +66,9 @@ The ``zuul`` user should now be able to stream events:
 .. code-block:: shell
 
    ssh -p 29418 zuul@localhost gerrit stream-events
+   # Or if ssh key is not id_rsa
+   ssh -i $PRIVKEY -p 29418 zuul@localhost gerrit stream-events
+
 
 Configure Gerrit
 ----------------
@@ -50,8 +80,6 @@ hosted in your Gerrit.  This is done with the use of Gerrit
 You may need to add the proper label permissions to the ``All-Projects``
 project, which defines ACLs that all other projects will inherit.
 
-.. TODO: Instructions to create a Verified label?
-
 Visting `Projects` -> `List` -> `All-Projects` -> `Access` in your
 Gerrit lets you see the current access permissions. In the
 ``Reference: refs/heads/*`` section, you will need to add a permisson
@@ -61,6 +89,67 @@ added the ``zuul`` user to this group when we created it).
 .. note:: The label you configure here must match the label referenced in
           your Zuul pipeline definitions. We've chosen the Code-Review label
           here as an example.
+
+Alternatively you might want to add `Verified` label that is used in
+`Quick-Start
+<https://zuul-ci.org/docs/zuul/tutorials/quick-start.html>`_
+guide.
+
+To do so you need to edit `All-Project` as an admin user.
+
+Start by login as admin and go to
+`ADMINISTRATOR(top right corner of the screen)` -> `Settings` -> `SSH Keys`
+Paste your public ssh key into `New SSH Key` and press `ADD NEW SSH KEY`.
+
+.. note:: To use same `zuul` ssh key simply copy the output of `cat $PUBKEY`.
+    For security purposes this is not recommended as
+    the Zuul user shouldn't be a Gerrit admin.
+
+Obtain a copy of  `All-Project` git repo:
+
+.. code-block:: shell
+
+    mkdir All-Projects
+    cd All-Projects
+    git init
+    git remote add origin ssh://admin@localhost:29418/All-Projects
+    git fetch origin refs/meta/config:refs/remotes/origin/meta/config
+    git checkout meta/config
+
+.. note:: By putting GIT_SSH_COMMAND='ssh -i ~/.ssh/$PRIVKEY'
+   before each git command you can utilize key that is distinct from ~/.ssh/id_rsa
+
+Use your favorite text editor and open `project.config`.
+First you have to define label `Verified` by adding in the end of the file:
+
+.. code-block:: shell
+
+    [label "Verified"]
+            function = MaxWithBlock
+            value = -2 Fails
+            value = -1 Doesn't seem to work
+            value =  0 No score
+            value = +1 Works for me
+            value = +2 Verified
+            copyAllScoresIfNoCodeChange = true
+
+Add label `Verified` to `refs/head`
+Finding section `[access "refs/heads/*"]` in same file and add line before
+start of the next section
+
+.. code-block:: shell
+
+    label-Verified = -2..+2 group Registered Users
+
+.. note:: Here `Registered Users` is a zuul user group added before.
+
+Finish by uploading changes to `gerrit`:
+
+.. code-block:: shell
+
+    git commit -a -m "Added label - Verified"
+    git push origin meta/config:meta/config
+
 
 Create a New Project
 --------------------
