@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_cb5e6e11",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-28T18:44:36Z",
+      "side": 1,
+      "message": "Typically you\u0027ll want to format commit messages with a blank line between the title line and the body. A bunch of tools assume this formatting.",
+      "revId": "d09b1ec1dcb4bbcb30d3d14e21fe00a377914a1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_4ba83eda",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-28T18:44:36Z",
+      "side": 1,
+      "message": "Because the docs assume rsa below I think we should add -t rsa to this command. I think there was rumor of openssh\u0027s defaults changing in the near future.",
+      "revId": "d09b1ec1dcb4bbcb30d3d14e21fe00a377914a1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_ebaecae5",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-28T18:44:36Z",
+      "side": 1,
+      "message": "Add -t rsa to this command too.",
+      "revId": "d09b1ec1dcb4bbcb30d3d14e21fe00a377914a1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_0baa46d1",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-28T18:44:36Z",
+      "side": 1,
+      "message": "I think we should discourage this. Maybe:\n\n  For security purposes this is not recommended as the Zuul user shouldn\u0027t be a Gerrit admin.",
+      "revId": "d09b1ec1dcb4bbcb30d3d14e21fe00a377914a1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_6b841a5f",
+        "filename": "doc/source/howtos/mysql_install.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-02-28T18:44:36Z",
+      "side": 1,
+      "message": "You might want to include the mysql client connection string that starts the database connection. That way users new to mysql/mariadb know the context for the sql statements.",
+      "revId": "d09b1ec1dcb4bbcb30d3d14e21fe00a377914a1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
