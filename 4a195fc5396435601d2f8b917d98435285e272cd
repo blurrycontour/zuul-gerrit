@@ -1,0 +1,251 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_6bddfa12",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "\"have a RSA ssh\"",
+      "range": {
+        "startLine": 24,
+        "startChar": 13,
+        "endLine": 24,
+        "endChar": 21
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_4bea7eac",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "If you lack one,...",
+      "range": {
+        "startLine": 30,
+        "startChar": 15,
+        "endLine": 30,
+        "endChar": 36
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_abda1214",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "a separate key with a different name",
+      "range": {
+        "startLine": 39,
+        "startChar": 45,
+        "endLine": 39,
+        "endChar": 46
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_6b065a89",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "The addition...",
+      "range": {
+        "startLine": 40,
+        "startChar": 51,
+        "endLine": 40,
+        "endChar": 59
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_4b035e74",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "remove space, otherwise this is invalid bash syntax",
+      "range": {
+        "startLine": 51,
+        "startChar": 16,
+        "endLine": 51,
+        "endChar": 17
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_abf3f29d",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "remove extra end-of-line whitespace",
+      "range": {
+        "startLine": 105,
+        "startChar": 52,
+        "endLine": 105,
+        "endChar": 53
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_8b2e36f8",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "a key",
+      "range": {
+        "startLine": 120,
+        "startChar": 41,
+        "endLine": 120,
+        "endChar": 45
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_4b383e3c",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "add \":\" at end",
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_8b1716a4",
+        "filename": "doc/source/howtos/mysql_install.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "underline with exact same number of \"\u003d\" as the heading",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 13
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_0b3a4633",
+        "filename": "doc/source/howtos/mysql_install.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "remove extra whitespace, those show up as red rectangles in gerrit",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 4
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_eb27aa11",
+        "filename": "doc/source/howtos/mysql_install.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-28T19:25:52Z",
+      "side": 1,
+      "message": "Create the user `zuul`, create the database `zuul`, grant the user `zuul` all privileges on the `zuul` database.",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 29,
+        "endChar": 97
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
