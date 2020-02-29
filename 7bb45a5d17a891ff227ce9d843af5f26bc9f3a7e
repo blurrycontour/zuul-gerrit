@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_295e25e6",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-29T15:42:26Z",
+      "side": 1,
+      "message": "this is not shell according to sphinx - and I agree.",
+      "range": {
+        "startLine": 125,
+        "startChar": 14,
+        "endLine": 125,
+        "endChar": 21
+      },
+      "revId": "7bb45a5d17a891ff227ce9d843af5f26bc9f3a7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_c974316b",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-02-29T15:42:26Z",
+      "side": 1,
+      "message": "indent them all the same, no extra indent needed for the items.",
+      "range": {
+        "startLine": 127,
+        "startChar": 4,
+        "endLine": 134,
+        "endChar": 46
+      },
+      "revId": "7bb45a5d17a891ff227ce9d843af5f26bc9f3a7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
