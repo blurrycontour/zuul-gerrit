@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_0bc7a647",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 31654
+      },
+      "writtenOn": "2020-02-29T17:01:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fa4df85_cb5e6e11",
+      "revId": "d09b1ec1dcb4bbcb30d3d14e21fe00a377914a1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_4ba83eda",
         "filename": "doc/source/howtos/gerrit_setup.rst",
         "patchSetId": 1
