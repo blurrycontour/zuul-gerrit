@@ -203,6 +203,30 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_9ec18d31",
+        "filename": "doc/source/howtos/mysql_install.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 31654
+      },
+      "writtenOn": "2020-02-29T17:01:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fa4df85_8b1716a4",
+      "range": {
+        "startLine": 3,
+        "startChar": 0,
+        "endLine": 4,
+        "endChar": 13
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_0b3a4633",
         "filename": "doc/source/howtos/mysql_install.rst",
         "patchSetId": 2
@@ -226,6 +250,30 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_1eb6fdda",
+        "filename": "doc/source/howtos/mysql_install.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 31654
+      },
+      "writtenOn": "2020-02-29T17:01:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fa4df85_0b3a4633",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 26,
+        "endChar": 4
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_eb27aa11",
         "filename": "doc/source/howtos/mysql_install.rst",
         "patchSetId": 2
@@ -237,6 +285,30 @@
       "writtenOn": "2020-02-28T19:25:52Z",
       "side": 1,
       "message": "Create the user `zuul`, create the database `zuul`, grant the user `zuul` all privileges on the `zuul` database.",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 29,
+        "endChar": 97
+      },
+      "revId": "4a195fc5396435601d2f8b917d98435285e272cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_7ec6114b",
+        "filename": "doc/source/howtos/mysql_install.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 31654
+      },
+      "writtenOn": "2020-02-29T17:01:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fa4df85_eb27aa11",
       "range": {
         "startLine": 29,
         "startChar": 1,
