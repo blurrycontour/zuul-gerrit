@@ -1,0 +1,15 @@
+- hosts: all
+  pre_tasks:
+    - name: Fix importlib-resources
+      shell: |
+        set -euo pipefail
+
+        if command -v pip; then
+          PIP=pip
+        elif command -v pip3; then
+          PIP=pip3
+        fi
+
+        $PIP install --user --upgrade importlib-resources==1.0.2
+      args:
+        executable: /bin/bash
