@@ -17,7 +17,7 @@ babel>=1.0
 netaddr
 kazoo
 sqlalchemy
-alembic
+alembic<1.4.1
 cryptography>=1.6
 cachecontrol
 cachetools
