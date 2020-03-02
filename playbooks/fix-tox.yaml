@@ -1,0 +1,7 @@
+- hosts: all
+  pre_tasks:
+    - name: Fix importlib-resources
+      shell: |
+        pip3 install --user --upgrade importlib-resources==1.0.2
+      args:
+        executable: /bin/bash
