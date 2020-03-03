@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Pipelines now provide a :attr:`pipeline.abort` reporter action so that
+    reporters may run whenever an item is aborted. "Aborted" means any item
+    that is dequeued but wasn't a success or failure.
