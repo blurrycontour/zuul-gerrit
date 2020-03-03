@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_72faa1bd",
+        "filename": "tests/unit/test_reporting.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-03-03T14:27:03Z",
+      "side": 1,
+      "message": "As I couldn\u0027t find any appropriate place for \"general\" reporter tests (not specific to e.g. gerrit/github/pagure/...)  I created this file. I only found a few that are mixed up in the TestScheduler() class, but I didn\u0027t want to add any more to this. If you don\u0027t like that, I could also put them somewhere else, but I think that there might be more use cases coming which could also be put in here.",
+      "revId": "a704b06938c3d52a6b65f4ecd559ce1f1deecbe2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
