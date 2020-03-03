@@ -168,6 +168,19 @@ class PipelineManager(object):
                 self.log.error("Reporting item start %s received: %s" %
                                (item, ret))
 
+    def reportCancel(self, item):
+        if not self.pipeline._disabled:
+            self.log.info(
+                "Reporting cancel, action %s item%s",
+                self.pipeline.cancel_actions,
+                item,
+            )
+            ret = self.sendReport(self.pipeline.cancel_actions, item)
+            if ret:
+                self.log.error(
+                    "Reporting item cancel %s received: %s", item, ret
+                )
+
     def sendReport(self, action_reporters, item, message=None):
         """Sends the built message off to configured reporters.
 
@@ -370,6 +383,10 @@ class PipelineManager(object):
         log = get_annotated_logger(self.log, item.event)
         log.debug("Removing change %s from queue", item.change)
         item.queue.dequeueItem(item)
+        # In case a item is dequeued that doesn't have a result yet
+        # (success/failed/...) we report it as canceled.
+        if not item.current_build_set.result and item.live:
+            self.reportCancel(item)
 
     def removeItem(self, item):
         log = get_annotated_logger(self.log, item.event)

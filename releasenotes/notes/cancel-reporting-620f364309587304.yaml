@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Pipelines now provide a :attr:`pipeline.cancel` reporter action so that
+    reporters may run whenever an item is canceled. "Canceled" means any item
+    that is dequeued but wasn't a success or failure.
