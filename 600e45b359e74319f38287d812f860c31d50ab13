@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_5fc0ce2a",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1463,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-03-03T13:51:19Z",
+      "side": 1,
+      "message": "I think this completely changes the logic of this method (as documented above) and will probably break other use cases.\n\nHow about not mixing self.variables and self.parent_data INTO self.variables, but keeping them separate?\n\nThe problem as I see it is, that we are accumulating all the parent data of previous runs.",
+      "revId": "600e45b359e74319f38287d812f860c31d50ab13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
