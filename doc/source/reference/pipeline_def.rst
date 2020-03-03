@@ -191,6 +191,11 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       The introductory text in reports when an item is dequeued
       without running any jobs.  Empty by default.
 
+   .. attr:: abort-message
+      :default: Build aborted.
+
+      The introductory test in reports when an item is aborted.
+
    .. attr:: footer-message
 
       Supplies additional information after test results.  Useful for
@@ -325,6 +330,12 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
 
       These reporters describe what Zuul should do when a pipeline is
       disabled.  See ``disable-after-consecutive-failures``.
+
+   .. attr:: abort
+
+      These reporters describe what Zuul should do if an item is
+      aborted. "Aborted" means any item that is dequeued but wasn't a
+      success or failure.
 
    The following options can be used to alter Zuul's behavior to
    mitigate situations in which jobs are failing frequently (perhaps
