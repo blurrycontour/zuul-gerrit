@@ -49,6 +49,15 @@
       - playbooks/paused-data-return-child-jobs.yaml
 
 - job:
+    name: paused-data-return-vars
+    run:
+      - playbooks/paused-data-return-vars.yaml
+
+- job:
+    name: print-data-return-vars
+    run: playbooks/print-data-return-vars.yaml
+
+- job:
     name: data-return-a
     run: playbooks/data-return-a.yaml
 
@@ -93,8 +102,8 @@
     name: org/project
     check:
       jobs:
-        - data-return
         - data-return-relative
+        - data-return
         - child:
             dependencies:
               - data-return
@@ -164,6 +173,14 @@
             dependencies:
               - paused-data-return-child-jobs
 
+- project:
+    name: org/project7
+    check:
+      jobs:
+        - paused-data-return-vars
+        - print-data-return-vars:
+            dependencies:
+              - paused-data-return-vars
 
 - project:
     name: org/project-soft
@@ -185,4 +202,3 @@
                 soft: true
               - name: data-return-c
                 soft: true
-

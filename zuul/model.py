@@ -1460,7 +1460,7 @@ class Job(ConfigObject):
         if 'zuul' in v:
             del v['zuul']
         self.parent_data = v
-        self.variables = Job._deepUpdate(self.parent_data, self.variables)
+        self.variables = Job._deepUpdate(self.variables, self.parent_data)
 
         artifact_data = self.artifact_data or []
         artifacts = get_artifacts_from_result_data(other_vars)

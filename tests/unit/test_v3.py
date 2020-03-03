@@ -3757,6 +3757,63 @@ class TestDataReturn(AnsibleZuulTestCase):
                  result='SUCCESS', changes='1,1'),
         ])
 
+    def test_data_return_child_from_retried_paused_job(self):
+        """
+        Tests that the data returned to the child job is overwritten if the
+        paused job is lost and gets retried (e.g.: executor restart or node
+        unreachable).
+        """
+
+        def _get_file(path):
+            with open(path) as f:
+                return f.read()
+
+        self.wait_timeout = 120
+        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.keep_jobdir = True
+
+        A = self.fake_gerrit.addFakeChange('org/project7', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled("patchset uploaded")
+
+        self.executor_server.release('paused-data-return-vars')
+        self.waitUntilSettled("till job is paused")
+
+        for _ in iterate_timeout(60, 'waiting for paused job'):
+            if len(self.builds) == 2:
+                break
+
+        paused_job = self.builds[0]
+        self.assertTrue(paused_job.paused)
+
+        # zuul_return data is set correct
+        j = json.loads(_get_file(paused_job.jobdir.result_data_file))
+        self.assertEqual(j["build_id"], paused_job.uuid)
+
+        # Stop the job worker to simulate an executor restart
+        for job_worker in self.executor_server.job_workers.values():
+            if job_worker.job.unique == paused_job.uuid:
+                job_worker.stop()
+        self.waitUntilSettled("stop job worker")
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release('print-data-return-vars')
+        self.waitUntilSettled("all jobs are done")
+
+        # First build of paused job (gets retired)
+        first_build = self.history[0]
+        # Second build of the paused job (the retried one)
+        retried_build = self.history[3]
+        # The successful child job (second build)
+        print_build = self.history[2]
+
+        # zuul_return data is set correct to new build id
+        j = json.loads(_get_file(retried_build.jobdir.result_data_file))
+        self.assertEqual(j["build_id"], retried_build.uuid)
+
+        self.assertNotIn(first_build.uuid, _get_file(print_build.jobdir.job_output_file))
+        self.assertIn(retried_build.uuid, _get_file(print_build.jobdir.job_output_file))
+
 
 class TestDiskAccounting(AnsibleZuulTestCase):
     config_file = 'zuul-disk-accounting.conf'
