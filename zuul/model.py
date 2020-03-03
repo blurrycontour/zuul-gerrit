@@ -260,6 +260,7 @@ class Pipeline(object):
         self.footer_message = None
         self.enqueue_message = None
         self.start_message = None
+        self.abort_message = None
         self.post_review = False
         self.dequeue_on_new_patchset = True
         self.ignore_dependencies = False
@@ -275,6 +276,7 @@ class Pipeline(object):
         self.merge_failure_actions = []
         self.no_jobs_actions = []
         self.disabled_actions = []
+        self.abort_actions = []
         self.disable_at = None
         self._consecutive_failures = 0
         self._disabled = False
@@ -294,7 +296,8 @@ class Pipeline(object):
             self.failure_actions +
             self.merge_failure_actions +
             self.no_jobs_actions +
-            self.disabled_actions
+            self.disabled_actions +
+            self.abort_actions
         )
 
     def __repr__(self):
