@@ -248,7 +248,7 @@ class ExecutorClient(object):
             params['ssh_keys'].append(dict(
                 name='%s project key' % item.change.project.canonical_name,
                 key=item.change.project.private_ssh_key))
-        params['vars'] = job.variables
+        params['vars'] = job.combined_variables
         params['extra_vars'] = job.extra_variables
         params['host_vars'] = job.host_variables
         params['group_vars'] = job.group_variables
