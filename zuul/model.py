@@ -1231,6 +1231,14 @@ class Job(ConfigObject):
 
         self.name = name
 
+    @property
+    def combined_variables(self):
+        """
+        Combines the data that has been returned by parent jobs with the
+        job variables where job variables have priority over parent data.
+        """
+        return Job._deepUpdate(self.parent_data or {}, self.variables)
+
     def toDict(self, tenant):
         '''
         Convert a Job object's attributes to a dictionary.
@@ -1449,9 +1457,9 @@ class Job(ConfigObject):
                 self.group_variables, other_group_vars)
 
     def updateParentData(self, other_build):
-        # Update variables, but give the current values priority (used
-        # for job return data which is lower precedence than defined
-        # job vars).
+        # Update variables, but give the new values priority. If more than one
+        # parent job returns the same variable, the value from the later job
+        # in the job graph will take precedence.
         other_vars = other_build.result_data
         v = self.parent_data or {}
         v = Job._deepUpdate(v, other_vars)
@@ -1460,7 +1468,6 @@ class Job(ConfigObject):
         if 'zuul' in v:
             del v['zuul']
         self.parent_data = v
-        self.variables = Job._deepUpdate(self.parent_data, self.variables)
 
         artifact_data = self.artifact_data or []
         artifacts = get_artifacts_from_result_data(other_vars)
@@ -2541,11 +2548,12 @@ class QueueItem(object):
                     break
 
             if all_parent_jobs_successful:
-                # Iterate in reverse order over all jobs of the graph (which is
+                # Iterate over all jobs of the graph (which is
                 # in sorted config order) and apply parent data of the jobs we
                 # already found.
                 if len(parent_builds_with_data) > 0:
-                    for parent_job in reversed(self.job_graph.getJobs()):
+                    job.parent_data = {}
+                    for parent_job in self.job_graph.getJobs():
                         parent_build = parent_builds_with_data.get(
                             parent_job.name)
                         if parent_build:
