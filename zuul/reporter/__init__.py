@@ -123,7 +123,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             'failure': self._formatItemReportFailure,
             'merge-failure': self._formatItemReportMergeFailure,
             'no-jobs': self._formatItemReportNoJobs,
-            'disabled': self._formatItemReportDisabled
+            'disabled': self._formatItemReportDisabled,
+            'cancel': self._formatItemReportCancel,
         }
         return format_methods[self._action]
 
@@ -207,6 +208,12 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             return self._formatItemReportFailure(item)
         else:
             return self._formatItemReport(item)
+
+    def _formatItemReportCancel(self, item, with_jobs=True):
+        msg = item.pipeline.cancel_message
+        if with_jobs:
+            msg += '\n\n' + self._formatItemReportJobs(item)
+        return msg
 
     def _getItemReportJobsFields(self, item):
         # Extract the report elements from an item
