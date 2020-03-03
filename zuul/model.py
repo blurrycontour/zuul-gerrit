@@ -1231,6 +1231,10 @@ class Job(ConfigObject):
 
         self.name = name
 
+    @property
+    def combined_variables(self):
+        return Job._deepUpdate(self.parent_data or {}, self.variables)
+
     def toDict(self, tenant):
         '''
         Convert a Job object's attributes to a dictionary.
@@ -1454,13 +1458,12 @@ class Job(ConfigObject):
         # job vars).
         other_vars = other_build.result_data
         v = self.parent_data or {}
-        v = Job._deepUpdate(v, other_vars)
+        v = Job._deepUpdate(other_vars, v)
         # To avoid running afoul of checks that jobs don't set zuul
         # variables, remove them from parent data here.
         if 'zuul' in v:
             del v['zuul']
         self.parent_data = v
-        self.variables = Job._deepUpdate(self.parent_data, self.variables)
 
         artifact_data = self.artifact_data or []
         artifacts = get_artifacts_from_result_data(other_vars)
@@ -2545,6 +2548,7 @@ class QueueItem(object):
                 # in sorted config order) and apply parent data of the jobs we
                 # already found.
                 if len(parent_builds_with_data) > 0:
+                    job.parent_data = {}
                     for parent_job in reversed(self.job_graph.getJobs()):
                         parent_build = parent_builds_with_data.get(
                             parent_job.name)
