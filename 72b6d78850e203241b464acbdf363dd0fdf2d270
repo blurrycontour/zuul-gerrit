@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_ab2e4d8f",
+        "filename": "tests/unit/test_multi_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-04T17:36:49Z",
+      "side": 1,
+      "message": "Are you sure this is right?",
+      "revId": "72b6d78850e203241b464acbdf363dd0fdf2d270",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_4b1f995a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-04T17:36:49Z",
+      "side": 1,
+      "message": "What\u0027s the use case for an admin to set paused_on_start?",
+      "revId": "72b6d78850e203241b464acbdf363dd0fdf2d270",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
