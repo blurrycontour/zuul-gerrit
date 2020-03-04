@@ -16,6 +16,23 @@
       "revId": "a704b06938c3d52a6b65f4ecd559ce1f1deecbe2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_11e55ddc",
+        "filename": "tests/unit/test_reporting.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-03-04T08:38:34Z",
+      "side": 1,
+      "message": "nit: I think in some of the tests you could do\n\n    self.executor_server.hold_jobs_in_build \u003d False\n    self.executor_server.release()\n    self.waitUntilSettled()\n\nearlier, instead of releasing one-by-one. It looks like you are mainly interested/asserting on the end state.",
+      "revId": "a704b06938c3d52a6b65f4ecd559ce1f1deecbe2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
