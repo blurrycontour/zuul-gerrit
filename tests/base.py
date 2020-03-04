@@ -3525,6 +3525,16 @@ class SchedulerTestManager:
         for instance in self.filter(matcher):
             function(instance)
 
+    def __getattr__(self, name):
+        v = self.__dict__.get(name)
+        if v is not None:
+            return v
+        class proxy:
+            def __call__(innerself, *args, **kw):
+                for i in self.instances:
+                    getattr(i.sched, name)(*args, **kw)
+        return proxy()
+
 
 class ZuulTestCase(BaseTestCase):
     """A test case with a functioning Zuul.
@@ -4129,8 +4139,8 @@ class ZuulTestCase(BaseTestCase):
             self.merge_server.join()
         self.executor_server.stop()
         self.executor_server.join()
-        self.scheds.execute(lambda app: app.sched.stop())
-        self.scheds.execute(lambda app: app.sched.join())
+        self.scheds.stop()
+        self.scheds.join()
         self.statsd.stop()
         self.statsd.join()
         self.rpcclient.shutdown()
