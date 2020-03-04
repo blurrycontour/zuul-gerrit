@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_77d35c61",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2545,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-03-04T14:47:05Z",
+      "side": 1,
+      "message": "Why do we change the order here? If I understand the comment correctly, the `reverse()`was on purpose.",
+      "revId": "09e123ceab8ad11216fc6f7a2c843a55724a95e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
