@@ -16,6 +16,24 @@
       "revId": "09e123ceab8ad11216fc6f7a2c843a55724a95e6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_f7d18cfc",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2545,
+      "author": {
+        "id": 28088
+      },
+      "writtenOn": "2020-03-04T15:07:17Z",
+      "side": 1,
+      "message": "The problem is, if we have 2 jobs A and B and we reverse the order, then the return values of B (which run later) are overwritten with those of A.\n\nPreviously, the self.variables were never updated, only merged.",
+      "parentUuid": "1fa4df85_77d35c61",
+      "revId": "09e123ceab8ad11216fc6f7a2c843a55724a95e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
