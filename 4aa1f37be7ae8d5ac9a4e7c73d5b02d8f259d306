@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_00de606c",
+        "filename": "tests/base.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3526,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-04T16:55:32Z",
+      "side": 1,
+      "message": "What about implementing this with a catch-all getter with a __call__ method?  Then we could write:\n\n  self.scheds.reconfigure(self.config)\n\nI\u0027m guessing that\u0027s because of the filter, but I don\u0027t see that used yet.  Even if it is important, we can always keep this method for that case.",
+      "revId": "4aa1f37be7ae8d5ac9a4e7c73d5b02d8f259d306",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
