@@ -33,6 +33,24 @@
       "revId": "72b6d78850e203241b464acbdf363dd0fdf2d270",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_8c4da79b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-03-04T21:00:10Z",
+      "side": 1,
+      "message": "Afaik that\u0027s for the tests as long as the scheduler is not really cooperative so we can start multiple schedulers and run them in a controlled way one after the other (until they are cooperative we should keep them from loading the config at the same time). So I think that\u0027s needed for the followup change.",
+      "parentUuid": "1fa4df85_4b1f995a",
+      "revId": "72b6d78850e203241b464acbdf363dd0fdf2d270",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
