@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_2a7b2e7b",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1457,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-03-05T08:11:48Z",
+      "side": 1,
+      "message": "I think because of this line here we are still keeping stale data around (from previous call to updateParentData()). If I\u0027m not mistaken we can always re-construct the parent data from the parent builds. So I see no need to mix in the previous parent_data. This way you should also be able can to keep the below reverse() logic.",
+      "revId": "5ad60342583a64b4724e7acc66d85c51a271ba33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
