@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_0c052d14",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3782,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-03-05T12:21:21Z",
+      "side": 1,
+      "message": "nit: maybe put a comment here explain why we need to iterate_timeout here and the waitUntilSettled() is not enough.",
+      "revId": "75cd31b304a7d391ed04bded8066b5195c223a75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_4f3d57c2",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3801,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-03-05T12:21:21Z",
+      "side": 1,
+      "message": "how about a iterate_timeout here? From other tests with paused jobs it looks like there should be something like:\n\n        for x in iterate_timeout(60, \u0027paused job\u0027):\n            if not self.builds:\n                break",
+      "revId": "75cd31b304a7d391ed04bded8066b5195c223a75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_ec52113b",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3803,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-03-05T12:21:21Z",
+      "side": 1,
+      "message": "nit: typo \"retried\"",
+      "range": {
+        "startLine": 3803,
+        "startChar": 42,
+        "endLine": 3803,
+        "endChar": 49
+      },
+      "revId": "75cd31b304a7d391ed04bded8066b5195c223a75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
