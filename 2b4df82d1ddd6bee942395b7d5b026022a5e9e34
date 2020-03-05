@@ -19,6 +19,29 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_d5531116",
+        "filename": "releasenotes/notes/zookeeper-auth-4e3c69c26bb60ce1.yaml",
+        "patchSetId": 16
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-03-05T18:15:35Z",
+      "side": 1,
+      "message": "nodepool-update-zk-auth appears to be the actual name.\n\nAlso, zuul also creates zookeeper nodes that nodepool knows nothing about (e.g., hold request znodes). We need a separate script, I think.",
+      "range": {
+        "startLine": 8,
+        "startChar": 44,
+        "endLine": 8,
+        "endChar": 65
+      },
+      "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_32787bc2",
         "filename": "tests/base.py",
         "patchSetId": 16
