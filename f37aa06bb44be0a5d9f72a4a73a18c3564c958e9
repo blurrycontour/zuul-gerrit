@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_fdedd9ef",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2032,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-03-05T14:30:06Z",
+      "side": 1,
+      "message": "I think this check can be removed, as the mapping to the github levels above will ensure that it\u0027s valid.",
+      "revId": "f37aa06bb44be0a5d9f72a4a73a18c3564c958e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
