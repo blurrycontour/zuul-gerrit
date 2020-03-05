@@ -16,6 +16,24 @@
       "revId": "6825079ceb431932d320ba1c6c4bc28c6cf72557",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_f2c2e333",
+        "filename": "doc/source/reference/pipeline_def.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-03-05T17:47:15Z",
+      "side": 1,
+      "message": "I like that - and I think now that you mention it we should change the reporting of ABORTED too - since we stopped doing Jenkins a long time ago.",
+      "parentUuid": "1fa4df85_327f1b16",
+      "revId": "6825079ceb431932d320ba1c6c4bc28c6cf72557",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
