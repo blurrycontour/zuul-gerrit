@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_327f1b16",
+        "filename": "doc/source/reference/pipeline_def.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T17:44:22Z",
+      "side": 1,
+      "message": "Zuul has traditionally used the words \"cancel/canceled\" to describe this state for builds (Zuul \"cancels\" a build which then reports a result of \"ABORTED\" -- that\u0027s actually just leftover from zuulv2 since that\u0027s what Jenkins reported; I\u0027d be happy to change it).  Github also uses the word cancel (though, despite being American, they use the British spelling of \"cancelled\").\n\nWe might also consider calling this \"dequeue\" since that\u0027s the action that\u0027s actually being performed, and it mirrors the \"enqueue\" reporter.  However, that might be confusing since a successful item is also dequeued, but we would not fire this reporter.\n\nAll things being equal, I think I would prefer this to be \"cancel\".",
+      "revId": "6825079ceb431932d320ba1c6c4bc28c6cf72557",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
