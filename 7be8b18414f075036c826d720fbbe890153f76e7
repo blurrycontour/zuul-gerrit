@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_fe738f14",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T17:00:04Z",
+      "side": 1,
+      "message": "These actually all read as Github restrictions to me.  But we don\u0027t have to blame anyone, we can just say:\n\nUnfortunately, there are a few restrictions that don\u0027t allow this mapping.",
+      "revId": "7be8b18414f075036c826d720fbbe890153f76e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_1e71cb0c",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T17:00:04Z",
+      "side": 1,
+      "message": "creating",
+      "revId": "7be8b18414f075036c826d720fbbe890153f76e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_be63d741",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T17:00:04Z",
+      "side": 1,
+      "message": "Remove comma after both",
+      "revId": "7be8b18414f075036c826d720fbbe890153f76e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_de68131e",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T17:00:04Z",
+      "side": 1,
+      "message": "s/an/a/",
+      "revId": "7be8b18414f075036c826d720fbbe890153f76e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
