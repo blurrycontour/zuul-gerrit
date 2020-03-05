@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_926feffa",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T18:01:53Z",
+      "side": 1,
+      "message": "In nodepool, we have user/password separate.  Even though the config formats are different, I think it would make sense to be consistent.  Either approach has its benefits, but how about we pick one?",
+      "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_32787bc2",
+        "filename": "tests/base.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 2844,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T18:01:53Z",
+      "side": 1,
+      "message": "Whenever we split, we should probably handle the case where there is no password, so that kerberos can be used.",
+      "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_5275f7c9",
+        "filename": "zuul/zk.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T18:01:53Z",
+      "side": 1,
+      "message": "Is this going to encode the password in the acl too?",
+      "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
