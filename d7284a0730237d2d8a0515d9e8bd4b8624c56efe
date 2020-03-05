@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_b2078b82",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T17:49:00Z",
+      "side": 1,
+      "message": "Use double backticks since these are literal values, eg. ``info``.",
+      "revId": "d7284a0730237d2d8a0515d9e8bd4b8624c56efe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_d20c87a6",
+        "filename": "releasenotes/notes/file-comment-levels-9b26156addc3644f.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-05T17:49:00Z",
+      "side": 1,
+      "message": "s/erro/error/",
+      "revId": "d7284a0730237d2d8a0515d9e8bd4b8624c56efe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
