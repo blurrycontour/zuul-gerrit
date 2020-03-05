@@ -16,6 +16,24 @@
       "revId": "dd13a6e59ccad0469c2ee7f96bcd6c8e5bd9a43c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_52209748",
+        "filename": "doc/source/reference/drivers/github.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-03-05T17:36:37Z",
+      "side": 1,
+      "message": "[bot] is correct",
+      "parentUuid": "1fa4df85_1e4a2bab",
+      "revId": "dd13a6e59ccad0469c2ee7f96bcd6c8e5bd9a43c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
