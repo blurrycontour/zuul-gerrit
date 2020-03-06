@@ -18,6 +18,7 @@ import logging
 import os
 import textwrap
 import gc
+import git
 from unittest import skip
 
 import paramiko
@@ -491,6 +492,94 @@ class TestBranchTag(ZuulTestCase):
             dict(name='test-job', result='SUCCESS', ref='refs/tags/foo'),
             dict(name='central-job', result='SUCCESS', ref='refs/tags/bar'),
             dict(name='test2-job', result='SUCCESS', ref='refs/tags/bar')],
+            ordered=False)
+
+    def test_old_tag(self):
+        # Test that a tag of an older commit on a branch runs with the
+        # newest configuration.
+
+        # Arguably it would be more intuitive for a tag to run using a
+        # speculative version of the configuration at the time of the
+        # tag.  But it's not clear that is possible to implement.  If
+        # we are able to implement that, this test would need to
+        # change.  As it stands now, it demonstrates the behavior that
+        # it will use the currently merged configuration for the
+        # branch(es) where the tag appears.
+
+        # Create a branch to ensure this is a branched repo; otherwise
+        # we ignore this.
+        self.create_branch('org/project', 'stable/pike')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable/pike'))
+        self.waitUntilSettled()
+
+        # Add a new job to master
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test2-job
+                run: playbooks/test-job.yaml
+
+            - project:
+                name: org/project
+                tag:
+                  jobs:
+                    - central-job
+                    - test2-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Save the current commit; we're going to tag this later
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        commit = repo.heads['master'].commit
+
+        # Add a second new job to master
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: test2-job
+                run: playbooks/test-job.yaml
+            - job:
+                name: test3-job
+                run: playbooks/test-job.yaml
+
+            - project:
+                name: org/project
+                tag:
+                  jobs:
+                    - central-job
+                    - test2-job
+                    - test3-job
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+
+        # Progress the master branch beyond our tag point
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           parent='refs/changes/1/1/1',
+                                           files=file_dict)
+        B.setMerged()
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Now create the tag at the previous commit
+        event = self.fake_gerrit.addFakeTag('org/project', commit, 'bar')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+        # test2-job and test3-job should run since that is the current
+        # configuration on master.
+        self.assertHistory([
+            dict(name='central-job', result='SUCCESS', ref='refs/tags/bar'),
+            dict(name='test2-job', result='SUCCESS', ref='refs/tags/bar'),
+            dict(name='test3-job', result='SUCCESS', ref='refs/tags/bar')],
             ordered=False)
 
 
