@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_e1076a17",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-03-06T09:09:59Z",
+      "side": 1,
+      "message": "I think, I got your comment wrong the first time I read it. You only meant this first paragraph - where we really don\u0027t need to blame github or zuul. So, I just rephrased this one, fixed the typos and added a short paragraph about zuul reporting only the whole buildset.\n\nPlease let me know if that is what you had in mind or if I missed the point :)",
+      "parentUuid": "1fa4df85_fe738f14",
+      "revId": "7be8b18414f075036c826d720fbbe890153f76e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_1e71cb0c",
         "filename": "doc/source/discussion/github-checks-api.rst",
         "patchSetId": 1
