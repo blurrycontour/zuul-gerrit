@@ -89,6 +89,29 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_3e37dd01",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-03-06T09:10:55Z",
+      "side": 1,
+      "message": "typo: \"for and\"",
+      "range": {
+        "startLine": 142,
+        "startChar": 70,
+        "endLine": 142,
+        "endChar": 73
+      },
+      "revId": "7be8b18414f075036c826d720fbbe890153f76e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_de68131e",
         "filename": "doc/source/discussion/github-checks-api.rst",
         "patchSetId": 1
