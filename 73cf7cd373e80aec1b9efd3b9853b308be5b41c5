@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_f38653b9",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 780,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-06T18:56:23Z",
+      "side": 1,
+      "message": "Maybe?  I\u0027m not sure how important they will ultimately be.  This is, at least, a concise description of what will happen, and the results of individual circumstances can be predicted from it.  Maybe we should see if there are situations that come up and are particularly confusing and add them as notes?  But otherwise, I\u0027m not sure I want to overdo it on this.",
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_dad80cf0",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 18
@@ -36,6 +53,23 @@
         "endLine": 558,
         "endChar": 49
       },
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_93911ff4",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-06T18:56:23Z",
+      "side": 1,
+      "message": "True, but it matches the rest of the methods on this object, so I think it\u0027s good to have it here.  If we plumb the event through in the caller, we can add it.",
       "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -100,6 +134,23 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_b38c5bd7",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 710,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-06T18:56:23Z",
+      "side": 1,
+      "message": "I think I understand your question, and it\u0027s good to be clear about this.  I have written a follow-up change with a unit test that demonstrates what happens when you change the configuration of a job on a branch, and then retroactively tag a commit before that change.  Zuul will use the newer configuration of the job (i.e., the Zuul configuration that merged after the point of the tag).  But of course, it will check out the tagged version of the repo, so the playbooks, etc, would be from that point in time.\n\nI grant that may be unintuitive from one perspective (\"just run the job as it was defined in the repo at the point of the tag\"), but from others, it may be more intuitive.  Many post/tag jobs are defined centrally, and in those cases, one may not expect a tag of a repo to run with an old version of the central config.  This change keeps parity between the two approaches.\n\nI think it will be difficult to model and implement the approach where we use the job definition at the point of the tag.  Zuul\u0027s variant selection is based on branches, and so while it may be straightforward to create a speculative layout with the contents of the tag and then identify which branches the tag is in in order to identify which variants to apply -- that speculative configuration would still interact with the *current* configuration from other repos.  We can\u0027t rewind the state of the entire system to a tag from a single repo.  It might work most of the time, but in some cases you might end up with a Zuul configuration that doesn\u0027t make sense because the delta between the tagged repo and other repos defining parent jobs, etc, is too great.\n\nAnother consideration is that on a tag it\u0027s difficult to determine whether Zuul needs to create a dynamic configuration.  One approach would be to always have Zuul create a dynamic config for tags.  That\u0027s not efficient, but it\u0027s at least possible.\n\nI think these issues will be difficult to overcome, though we have overcome similarly difficult issues to get even to the point of this change.  I have serious doubts about whether we will be comfortable implementing that approach, particularly because of the first issue (delta between the tagged repo and others).  But If we do decide to proceed with that, I think we can make that change after this one.  In other words, I think it\u0027s a natural progression from the current state, to this change, to (if possible) the state you describe.  I don\u0027t think we will be locked into this behavior.",
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_1a5ea475",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 18
@@ -111,6 +162,23 @@
       "writtenOn": "2020-03-06T16:59:53Z",
       "side": 1,
       "message": "I believe that items[-1] is important here because it is the tail set of changes in a speculative state?\n\nIs that worth a comment that we choose this specific item for that reason?",
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_53c167e4",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 886,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-06T18:56:23Z",
+      "side": 1,
+      "message": "Yes, though this is generally not called in speculative scenarios.  It might be more accurate to just say that this is the item under test.",
       "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
