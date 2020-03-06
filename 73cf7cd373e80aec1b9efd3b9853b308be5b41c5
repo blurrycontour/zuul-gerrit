@@ -2,6 +2,46 @@
   "comments": [
     {
       "key": {
+        "uuid": "1fa4df85_7a76b840",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 18
+      },
+      "lineNbr": 780,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-03-06T16:59:53Z",
+      "side": 1,
+      "message": "Some of the consequences of this behavior that are outlined in the commit message should probably go into the documentation too. A follow up for that should be fine.",
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_dad80cf0",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-03-06T16:59:53Z",
+      "side": 1,
+      "message": "This argument doesn\u0027t seem to ever be used. We call this function on line 888 below only passing the hexsha.",
+      "range": {
+        "startLine": 558,
+        "startChar": 31,
+        "endLine": 558,
+        "endChar": 49
+      },
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_1b40a135",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 18
@@ -54,6 +94,23 @@
       "side": 1,
       "message": "Hmm. Are we talking about the same thing?\n\nI ment the job as it was defined on the tag itself (assuming the job is defined in the project with the tag). Even if the same commit exists on different branches, the branches should be identical at that commit.\n\nWhen we run check and gate we want to do that on the head of the branch, but a tag we want exactly as it was, without any new features or fixes.",
       "parentUuid": "1fa4df85_5fd02af8",
+      "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_1a5ea475",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 886,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-03-06T16:59:53Z",
+      "side": 1,
+      "message": "I believe that items[-1] is important here because it is the tail set of changes in a speculative state?\n\nIs that worth a comment that we choose this specific item for that reason?",
       "revId": "73cf7cd373e80aec1b9efd3b9853b308be5b41c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
