@@ -16,6 +16,24 @@
       "revId": "14117c4bb7032592025a3445a117aef4acc65914",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_c78b59c0",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4121,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-03-06T16:18:25Z",
+      "side": 1,
+      "message": "I\u0027d guess for the more specific exception error (otherwise if there\u0027s no scheduler you\u0027d just get IndexError",
+      "parentUuid": "1fa4df85_a09bcc15",
+      "revId": "14117c4bb7032592025a3445a117aef4acc65914",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
