@@ -946,7 +946,10 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
     def addFakeTag(self, project, branch, tag):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
-        commit = repo.heads[branch].commit
+        if branch in repo.heads:
+            commit = repo.heads[branch].commit
+        else:
+            commit = branch
         newrev = commit.hexsha
         ref = 'refs/tags/' + tag
 
