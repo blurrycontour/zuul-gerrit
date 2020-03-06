@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_db6b3bee",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-03-06T07:25:26Z",
+      "side": 1,
+      "message": "I think there are restrictions on both sides. Zuul can e.g. not report each job, but only the whole buildset (but I\u0027ve just seen that I never wrote that down).\nI didn\u0027t mean to blame anyone, I just wanted to provide more detailed information about the restrictions. Just saying there are restrictions doesn\u0027t sound very helpful to me. People might still ask what these restrictions are and if it wouldn\u0027t be possible to implement it like that nonetheless. We might also ask that ourselves some time and have to look that up again ;-)\nI will try to shorten it down and don\u0027t make it sound to \"blamish\" (Is there a word for this?).",
+      "parentUuid": "1fa4df85_fe738f14",
+      "revId": "7be8b18414f075036c826d720fbbe890153f76e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_1e71cb0c",
         "filename": "doc/source/discussion/github-checks-api.rst",
         "patchSetId": 1
