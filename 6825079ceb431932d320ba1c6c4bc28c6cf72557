@@ -34,6 +34,24 @@
       "revId": "6825079ceb431932d320ba1c6c4bc28c6cf72557",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_5ebe59ff",
+        "filename": "doc/source/reference/pipeline_def.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-03-06T08:07:42Z",
+      "side": 1,
+      "message": "Thanks for the response. It was named \"dequeue\" in the beginning (that\u0027s also why the branch name/topic is still \"dequeue-reporting\"), but I had the same feeling that this might be confusing as every item is dequeued in the end. I got the point about Zuul and Jenkins, so I will change this to \"cancel\" ;-)",
+      "parentUuid": "1fa4df85_327f1b16",
+      "revId": "6825079ceb431932d320ba1c6c4bc28c6cf72557",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
