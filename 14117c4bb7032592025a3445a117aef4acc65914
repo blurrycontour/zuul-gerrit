@@ -34,6 +34,24 @@
       "revId": "14117c4bb7032592025a3445a117aef4acc65914",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_7ca0eb90",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4121,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-07T14:58:07Z",
+      "side": 1,
+      "message": "Just for seemless transition of old test and the specific exception - that one knows whats wrong at first glance. If you guys think `self.scheds[0]` is fine I will remove the convenience property.",
+      "parentUuid": "1fa4df85_c78b59c0",
+      "revId": "14117c4bb7032592025a3445a117aef4acc65914",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
