@@ -71,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_1c76973f",
+        "filename": "tests/base.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3526,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-07T15:08:57Z",
+      "side": 1,
+      "message": "I have no preference. `apps` may be too generic imho and `sched_apps` too long. That was the reasoning for using `scheds`.",
+      "parentUuid": "1fa4df85_601074a9",
+      "revId": "4aa1f37be7ae8d5ac9a4e7c73d5b02d8f259d306",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_002980e4",
         "filename": "tests/unit/test_connection.py",
         "patchSetId": 11
@@ -82,6 +100,24 @@
       "writtenOn": "2020-03-04T17:21:50Z",
       "side": 1,
       "message": "I notice that we\u0027re using self.config here, but actually, each of the schedulerapps have a config too.  So should this really be:\n\n  self.scheds.execute(lambda app: app.sched.reconfigure(app.config))\n\nThat would make the lambda more worthwhile and probably means my callable proxy idea is too limited to use.",
+      "revId": "4aa1f37be7ae8d5ac9a4e7c73d5b02d8f259d306",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_3c711345",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-07T15:08:57Z",
+      "side": 1,
+      "message": "Good point",
+      "parentUuid": "1fa4df85_002980e4",
       "revId": "4aa1f37be7ae8d5ac9a4e7c73d5b02d8f259d306",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
