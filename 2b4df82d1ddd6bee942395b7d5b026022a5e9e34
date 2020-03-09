@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_f41942d6",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-09T21:36:46Z",
+      "side": 1,
+      "message": "Next PS copies the config attribute from nodepool.",
+      "parentUuid": "1fa4df85_926feffa",
+      "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_d5531116",
         "filename": "releasenotes/notes/zookeeper-auth-4e3c69c26bb60ce1.yaml",
         "patchSetId": 16
@@ -30,6 +48,30 @@
       "writtenOn": "2020-03-05T18:15:35Z",
       "side": 1,
       "message": "nodepool-update-zk-auth appears to be the actual name.\n\nAlso, zuul also creates zookeeper nodes that nodepool knows nothing about (e.g., hold request znodes). We need a separate script, I think.",
+      "range": {
+        "startLine": 8,
+        "startChar": 44,
+        "endLine": 8,
+        "endChar": 65
+      },
+      "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_b40f4a86",
+        "filename": "releasenotes/notes/zookeeper-auth-4e3c69c26bb60ce1.yaml",
+        "patchSetId": 16
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-09T21:36:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fa4df85_d5531116",
       "range": {
         "startLine": 8,
         "startChar": 44,
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_d47be6f1",
+        "filename": "tests/base.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 2844,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-09T21:36:46Z",
+      "side": 1,
+      "message": "As discussed over IRC, this first implementation only support SASL.",
+      "parentUuid": "1fa4df85_32787bc2",
+      "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_5275f7c9",
         "filename": "zuul/zk.py",
         "patchSetId": 16
@@ -70,6 +130,24 @@
       "writtenOn": "2020-03-05T18:01:53Z",
       "side": 1,
       "message": "Is this going to encode the password in the acl too?",
+      "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_f47e22e2",
+        "filename": "zuul/zk.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-09T21:36:46Z",
+      "side": 1,
+      "message": "Not in PS17",
+      "parentUuid": "1fa4df85_5275f7c9",
       "revId": "2b4df82d1ddd6bee942395b7d5b026022a5e9e34",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
