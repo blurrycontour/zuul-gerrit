@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_4cd9bc1f",
+        "filename": "tests/base.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3526,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-09T06:27:50Z",
+      "side": 1,
+      "message": "Also sometimes we need to access the SchedulerTestApp: `test_scheduler.py:8268` or a property of a scheduler: `tests/base.py:4392`",
+      "parentUuid": "1fa4df85_00de606c",
+      "revId": "4aa1f37be7ae8d5ac9a4e7c73d5b02d8f259d306",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_002980e4",
         "filename": "tests/unit/test_connection.py",
         "patchSetId": 11
