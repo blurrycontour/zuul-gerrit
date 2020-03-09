@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_ec8428d5",
+        "filename": "tests/unit/test_multi_scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-09T10:31:06Z",
+      "side": 1,
+      "message": "Ups :)",
+      "parentUuid": "1fa4df85_ac3743ff",
+      "revId": "72b6d78850e203241b464acbdf363dd0fdf2d270",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_4b1f995a",
         "filename": "zuul/scheduler.py",
         "patchSetId": 5
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Afaik that\u0027s for the tests as long as the scheduler is not really cooperative so we can start multiple schedulers and run them in a controlled way one after the other (until they are cooperative we should keep them from loading the config at the same time). So I think that\u0027s needed for the followup change.",
       "parentUuid": "1fa4df85_4b1f995a",
+      "revId": "72b6d78850e203241b464acbdf363dd0fdf2d270",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_2a1a20cb",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-09T10:31:06Z",
+      "side": 1,
+      "message": "I could also imagine that in a multi-scheduler environment it may be useful to start scheduler in paused mode. But yes, the current main reason is for testing.",
+      "parentUuid": "1fa4df85_8c4da79b",
       "revId": "72b6d78850e203241b464acbdf363dd0fdf2d270",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
