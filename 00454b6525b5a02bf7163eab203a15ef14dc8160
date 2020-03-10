@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_c048f65c",
+        "filename": "zuul/cmd/update_zk_auth.py",
+        "patchSetId": 21
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-10T16:41:57Z",
+      "side": 1,
+      "message": "I think this should be separate from chroot.\n\nThe chroot option lets someone host zuul and nodepool within a larger namespace.  Like \"/something/zuul\".  What we should do with the \u0027--chroot\u0027 argument is pass that into the kazoo client constructor.  Separately, the list of \"root\" nodes (within the chroot), that is, \u0027zuul\u0027 and \u0027nodepool\u0027, should be fixed in this script.  There\u0027s no reason for us to manage anything else.\n\nNodepool has a config file option to pass in a chroot.  It looks like we forgot to add that to Zuul.  Effectively, it\u0027s not possible to use a chroot with Zuul and Nodepool.  But let\u0027s just fix the chroot option in this script, then later we can add the option to Zuul.",
+      "revId": "00454b6525b5a02bf7163eab203a15ef14dc8160",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
