@@ -3210,6 +3210,7 @@ class ZuulWebFixture(fixtures.Fixture):
             connections=self.connections,
             zk_hosts=self.zk_hosts,
             zk_auth=self.zk_auth,
+            zk_timeout=10,
             command_socket=os.path.join(self.test_root, 'web.socket'),
             authenticators=self.authenticators)
         self.web.start()
