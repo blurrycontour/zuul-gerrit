@@ -18,11 +18,19 @@ if [[ -n "${ZUUL_TEST_ROOT:-}" ]]; then
     sudo mount -t tmpfs -o noatime,nodev,nosuid,size=64M none "$ZUUL_TEST_ROOT"
 fi
 
+# Setup Zookeeper certs
+sudo mkdir /etc/zookeeper/ca
+sudo $TOOLSDIR/zk-ca.sh /etc/zookeeper/ca `hostname`
+
 # Setup Zookeeper auth
 grep -q sasl /etc/zookeeper/conf/zoo.cfg || {
     (
         echo requireClientAuthScheme=sasl
         echo authProvider.1=org.apache.zookeeper.server.auth.SASLAuthenticationProvider
+	echo secureClientPort=2281
+	echo ssl.keyStore.location=/etc/zookeeper/ca/keystores/`hostname`.jks
+	echo ssl.keyStore.password=changeit
+	echo ssl.trustStore.location=/etc/zookeeper/ca/certs/cacert.pem
     ) | sudo tee -a /etc/zookeeper/conf/zoo.cfg
 }
 sudo cp tests/fixtures/auth/zookeeper.conf /etc/zookeeper/auth.conf
