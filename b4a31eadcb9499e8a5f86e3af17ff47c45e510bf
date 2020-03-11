@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_3ecc6b60",
+        "filename": "doc/source/howtos/zookeeper.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-11T22:51:40Z",
+      "side": 1,
+      "message": "Yep.  Fixed.",
+      "revId": "b4a31eadcb9499e8a5f86e3af17ff47c45e510bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_5e97e73b",
         "filename": "doc/source/howtos/zookeeper.rst",
         "patchSetId": 4
@@ -36,6 +53,23 @@
       "writtenOn": "2020-03-11T22:45:26Z",
       "side": 1,
       "message": "Might be worth adding the section to which to add these key value pairs.",
+      "revId": "b4a31eadcb9499e8a5f86e3af17ff47c45e510bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_ded8b71f",
+        "filename": "doc/source/howtos/zookeeper.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-11T22:51:40Z",
+      "side": 1,
+      "message": "Yep.  Doesn\u0027t exist in Zuul yet.",
       "revId": "b4a31eadcb9499e8a5f86e3af17ff47c45e510bf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
