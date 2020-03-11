@@ -16,6 +16,24 @@
       "revId": "5821b9fcbb22e006782eea851115dca7ea45709f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_8298af1b",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-03-11T16:00:44Z",
+      "side": 1,
+      "message": "Fungi points out that https://packages.ubuntu.com/bionic-updates/python3.8 does exist so as long as this job installs it we are fine. TIL",
+      "parentUuid": "1fa4df85_428637de",
+      "revId": "5821b9fcbb22e006782eea851115dca7ea45709f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
