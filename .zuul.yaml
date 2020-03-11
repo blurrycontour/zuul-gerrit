@@ -204,7 +204,7 @@
         - zuul-build-image
         - zuul-tox-docs
         - tox-pep8
-        - tox-py35:
+        - tox-py35: &zuul_tox_vars
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -215,17 +215,7 @@
                     ZUUL_TEST_ROOT: /tmp/zuul-test
                 tox_environment:
                     ZUUL_TEST_ROOT: /tmp/zuul-test
-        - tox-py38:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            timeout: 4800  # 80 minutes
-            nodeset: ubuntu-bionic
-            vars:
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
+        - tox-py38: *zuul_tox_vars
         - zuul-build-dashboard
         - zuul-build-dashboard-multi-tenant
         - nodejs-npm-run-lint:
@@ -260,28 +250,8 @@
         - zuul-upload-image
         - zuul-tox-docs
         - tox-pep8
-        - tox-py35:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
-            timeout: 4800  # 80 minutes
-            vars:
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-        - tox-py38:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            timeout: 4800  # 80 minutes
-            nodeset: ubuntu-bionic
-            vars:
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
+        - tox-py35: *zuul_tox_vars
+        - tox-py38: *zuul_tox_vars
         - zuul-build-dashboard
         - nodejs-npm-run-lint:
             vars:
