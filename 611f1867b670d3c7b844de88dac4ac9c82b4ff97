@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_c308d7da",
+        "filename": ".zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-03-12T15:47:24Z",
+      "side": 0,
+      "message": "We should probably drop this job.",
+      "revId": "611f1867b670d3c7b844de88dac4ac9c82b4ff97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_630d63e7",
+        "filename": ".zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-03-12T15:47:24Z",
+      "side": 0,
+      "message": "And here as well.",
+      "revId": "611f1867b670d3c7b844de88dac4ac9c82b4ff97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
