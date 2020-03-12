@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 # Copyright (c) 2019 Red Hat, Inc.
 # Copyright (c) 2024 Acme Gating, LLC
 #
@@ -73,8 +75,9 @@ FROM docker.io/opendevorg/python-base:3.11-bookworm${IMAGE_FLAVOR} as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 ARG IMAGE_FLAVOR=
 
-COPY --from=builder /output/ /output
-RUN /output/install-from-bindep zuul_base \
+RUN --mount=type=bind,from=builder,target=/tmp/builder \
+  cp -r /tmp/builder/output /output \
+  && /output/install-from-bindep zuul_base \
   && rm -rf /output \
   && useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul \
 # This enables git protocol v2 which is more efficient at negotiating
