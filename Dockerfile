@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.1.3-experimental
+
 # Copyright (c) 2019 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,15 +43,14 @@ RUN mkdir /tmp/openshift-install \
 
 FROM opendevorg/python-base as zuul
 
-COPY --from=builder /output/ /output
 RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list \
   && apt-get update \
   && apt-get install -t stretch-backports -y bubblewrap socat \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
-RUN /output/install-from-bindep \
-  && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
-  && rm -rf /output
+RUN --mount=source=/output,target=/output,from=builder \
+  /output/install-from-bindep \
+  && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt
 RUN useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul
 
 VOLUME /var/lib/zuul
