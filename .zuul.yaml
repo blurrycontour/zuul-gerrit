@@ -199,6 +199,7 @@
       - python-base-3.8-container-image
     provides: zuul-container-image
     vars: &zuul_image_vars
+      docker_use_buildkit: true
       docker_images:
         - context: .
           repository: zuul/zuul
