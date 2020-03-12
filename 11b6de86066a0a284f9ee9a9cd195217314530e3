@@ -16,6 +16,29 @@
       "revId": "11b6de86066a0a284f9ee9a9cd195217314530e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_96f456d1",
+        "filename": "tools/zk-ca.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-12T20:44:45Z",
+      "side": 1,
+      "message": "This is not working when CAROOT is not absolute.",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 10
+      },
+      "revId": "11b6de86066a0a284f9ee9a9cd195217314530e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
