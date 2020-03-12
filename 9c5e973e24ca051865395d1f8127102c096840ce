@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_43686720",
+        "filename": "doc/source/howtos/zookeeper.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-12T16:00:54Z",
+      "side": 1,
+      "message": "If we don\u0027t have to change it, shouldn\u0027t this value be renamed to something else like \u0027secret\u0027 ?",
+      "range": {
+        "startLine": 96,
+        "startChar": 11,
+        "endLine": 96,
+        "endChar": 19
+      },
+      "revId": "9c5e973e24ca051865395d1f8127102c096840ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_83117faf",
+        "filename": "tools/zk-ca.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-12T16:00:54Z",
+      "side": 1,
+      "message": "That\u0027s a bit odd to provide such script, wouldn\u0027t it better to wrap the commands with an ansible role to improve re-usability?",
+      "revId": "9c5e973e24ca051865395d1f8127102c096840ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
