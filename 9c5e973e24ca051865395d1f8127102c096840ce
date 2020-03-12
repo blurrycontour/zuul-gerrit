@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_03f90f4c",
+        "filename": "doc/source/howtos/zookeeper.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-12T16:05:49Z",
+      "side": 1,
+      "message": "Good idea, or maybe \"keystorepassword\".  I should also expaind on why we don\u0027t need to change it (some java programs behave badly if a keystore has no password or a blank password).",
+      "revId": "9c5e973e24ca051865395d1f8127102c096840ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1fa4df85_83117faf",
         "filename": "tools/zk-ca.sh",
         "patchSetId": 8
@@ -36,6 +53,23 @@
       "writtenOn": "2020-03-12T16:00:54Z",
       "side": 1,
       "message": "That\u0027s a bit odd to provide such script, wouldn\u0027t it better to wrap the commands with an ansible role to improve re-usability?",
+      "revId": "9c5e973e24ca051865395d1f8127102c096840ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_a3935b00",
+        "filename": "tools/zk-ca.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-12T16:05:49Z",
+      "side": 1,
+      "message": "Just trying to be helpful.  This seemed like more of a bash thing than ansible: a sequence of commands with conditionals.  There\u0027s no interacting with remote nodes or anything.  This is pretty easy to invoke from ansible.  But sure, maybe in the future we should move this to galaxy or something.",
       "revId": "9c5e973e24ca051865395d1f8127102c096840ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
