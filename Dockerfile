@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.1.3-experimental
+
 # Copyright (c) 2019 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,8 +54,9 @@ RUN /output/install-from-bindep \
 FROM docker.io/opendevorg/python-base:3.8 as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
-COPY --from=builder /output/ /output
-RUN /output/install-from-bindep zuul_base \
+RUN --mount=type=bind,from=builder,target=/tmp/builder \
+  cp /tmp/builder/output /output \
+  /output/install-from-bindep zuul_base \
   && rm -rf /output \
   && useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul \
 # This enables git protocol v2 which is more efficient at negotiating
