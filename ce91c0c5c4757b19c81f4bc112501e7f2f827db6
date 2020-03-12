@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_fe1faeb4",
+        "filename": "tox.ini",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-03-12T09:47:07Z",
+      "side": 1,
+      "message": "Not sure about this.",
+      "range": {
+        "startLine": 4,
+        "startChar": 15,
+        "endLine": 4,
+        "endChar": 27
+      },
+      "revId": "ce91c0c5c4757b19c81f4bc112501e7f2f827db6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
