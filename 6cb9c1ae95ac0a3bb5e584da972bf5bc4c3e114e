@@ -16,6 +16,24 @@
       "revId": "6cb9c1ae95ac0a3bb5e584da972bf5bc4c3e114e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_a15b4e52",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-12T23:03:20Z",
+      "side": 1,
+      "message": "oops, that\u0027s not the kazoo function.",
+      "parentUuid": "1fa4df85_813df22d",
+      "revId": "6cb9c1ae95ac0a3bb5e584da972bf5bc4c3e114e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
