@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_dc818d4c",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-12T23:33:09Z",
+      "side": 1,
+      "message": "web also needs the certs",
+      "revId": "4811282f388d0d2e11531d0633067c8ef0d2bbed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
