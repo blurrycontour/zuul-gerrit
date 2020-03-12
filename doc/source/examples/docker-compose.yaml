@@ -32,6 +32,12 @@ services:
     command: "/usr/local/lib/zuul/ansible/2.8/bin/ansible-playbook /var/playbooks/setup.yaml"
   zk:
     image: zookeeper
+    hostname: examples_zk_1.examples_default
+    volumes:
+      - "certs:/var/certs:z"
+      - "./zoo.cfg:/conf/zoo.cfg:z"
+      - "../../../tools/:/var/zuul-tools/:z"
+    command: "/bin/bash -c '/var/zuul-tools/zk-ca.sh /var/certs examples_zk_1.examples_default && chmod -R a+rX /var/certs && /docker-entrypoint.sh zkServer.sh start-foreground'"
   mysql:
     image: mariadb
     environment:
@@ -59,6 +65,7 @@ services:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
+      - "certs:/var/certs:z"
   web:
     command: "sh -c '/var/playbooks/wait-to-start-gearman.sh && zuul-web -f'"
     depends_on:
@@ -103,6 +110,7 @@ services:
     image: zuul/nodepool-launcher
     volumes:
       - "./etc_nodepool/:/etc/nodepool/:z"
+      - "certs:/var/certs:z"
     ports:
       - "8022:8022"
   logs:
@@ -122,3 +130,4 @@ volumes:
   sshkey:
   nodessh:
   logs:
+  certs:
