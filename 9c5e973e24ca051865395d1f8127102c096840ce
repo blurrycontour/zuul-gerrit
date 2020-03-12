@@ -73,6 +73,24 @@
       "revId": "9c5e973e24ca051865395d1f8127102c096840ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_2749b65f",
+        "filename": "tools/zk-ca.sh",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-12T16:18:56Z",
+      "side": 1,
+      "message": "I meant we are probably going to use this script, and I guess other too. How is opendev admin going to setup TLS for zk?\n\nShould I copy and execute it in zuul-operator?",
+      "parentUuid": "1fa4df85_a3935b00",
+      "revId": "9c5e973e24ca051865395d1f8127102c096840ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
