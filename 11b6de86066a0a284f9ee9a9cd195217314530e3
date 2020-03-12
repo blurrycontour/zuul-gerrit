@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_dbd437c0",
+        "filename": "tools/zk-ca.sh",
+        "patchSetId": 10
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-12T20:03:03Z",
+      "side": 1,
+      "message": "Should it run with the `-e` argument?",
+      "revId": "11b6de86066a0a284f9ee9a9cd195217314530e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
