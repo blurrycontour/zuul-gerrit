@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_c77302b1",
+        "filename": "doc/source/howtos/zookeeper.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-03-12T16:20:54Z",
+      "side": 1,
+      "message": "nit: double \u0027with\u0027",
+      "range": {
+        "startLine": 99,
+        "startChar": 57,
+        "endLine": 99,
+        "endChar": 66
+      },
+      "revId": "f97c56033679e5fa8d9dbde6c43a472b5d880885",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_87aaeacf",
+        "filename": "doc/source/howtos/zookeeper.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 3099
+      },
+      "writtenOn": "2020-03-12T16:20:54Z",
+      "side": 1,
+      "message": "Should this be \":2181\" instead? Semicolon seems odd given the use of colons in the examples above.",
+      "range": {
+        "startLine": 112,
+        "startChar": 32,
+        "endLine": 112,
+        "endChar": 37
+      },
+      "revId": "f97c56033679e5fa8d9dbde6c43a472b5d880885",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
