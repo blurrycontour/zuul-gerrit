@@ -43,11 +43,6 @@ RUN mkdir /tmp/openshift-install \
 
 FROM opendevorg/python-base as zuul
 
-RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list \
-  && apt-get update \
-  && apt-get install -t stretch-backports -y bubblewrap socat \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
 RUN --mount=source=/output,target=/output,from=builder \
   /output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt
