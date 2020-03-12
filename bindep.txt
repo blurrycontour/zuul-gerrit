@@ -36,6 +36,12 @@ python3.7 [test platform:ubuntu-bionic]
 python3.7-dev [test platform:ubuntu-bionic]
 bubblewrap [!platform:ubuntu-xenial]
 socat [platform:debian-buster]
+# Put these in tagged with debian-buster so we
+# don't fight with javascript installation for
+# normal jobs in the gate, but just get them
+# for image builds, at least for now.
+nodejs [compile test platform:debian-buster]
+yarnpkg [compile test platform:debian-buster]
 libre2-dev [compile test platform:dpkg]
 libre2-5 [platform:debian-buster]
 libre2-4 [platform:ubuntu-bionic]
