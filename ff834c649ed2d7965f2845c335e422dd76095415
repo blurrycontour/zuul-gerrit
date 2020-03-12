@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_eaba83df",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1004
+      },
+      "writtenOn": "2020-03-12T17:11:47Z",
+      "side": 0,
+      "message": "for those who had to do a second take, bubblewrap was already in bindep",
+      "range": {
+        "startLine": 48,
+        "startChar": 45,
+        "endLine": 48,
+        "endChar": 55
+      },
+      "revId": "ff834c649ed2d7965f2845c335e422dd76095415",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
