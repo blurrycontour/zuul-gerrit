@@ -11,9 +11,17 @@
       - README
       - ^zuul.d/.*$
 
+- job:
+    name: existing-node
+    nodeset:
+      nodes:
+        - name: test_node
+          label: test_label
+
 - project:
     name: org/project
     check:
       jobs:
         - existing-files
         - existing-irr
+        - existing-node

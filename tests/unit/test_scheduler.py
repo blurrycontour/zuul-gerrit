@@ -6344,6 +6344,32 @@ class TestJobUpdateFileMatcher(ZuulTestCase):
 
         self.assertHistory([])
 
+    def test_job_update_nodes(self):
+        "Test that changes to nodes run jobs"
+        # Normally we want to ignore file matchers and run jobs if the
+        # job config changes, but if the only thing about the job
+        # config that changes *is* the file matchers, then we don't
+        # want to run it.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: existing-node
+                nodeset:
+                  nodes:
+                    - name: test_node
+                      label: test_label_changed
+            """)
+
+        file_dict = {'zuul.d/new.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='existing-nodes', result='SUCCESS', changes='1,1'),
+        ])
+
     def test_new_job(self):
         "Test matchers are overridden when creating a new job"
         in_repo_conf = textwrap.dedent(
