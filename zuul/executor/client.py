@@ -489,11 +489,19 @@ class ExecutorClient(object):
             build.worker.updateFromData(data)
             build.__gearman_worker = build.worker.name
 
-            if 'paused' in data and build.paused != data['paused']:
-                build.paused = data['paused']
-                if build.paused:
+            if 'paused' in data and build.pause_scheduled != data['paused']:
+                # Note(tobiash): Set the desired pause state of the build.
+                # In order to avoid a race between child job skipping and
+                # marking the job as paused this must be done during event
+                # processing stage.
+                build.pause_scheduled = data['paused']
+                if build.pause_scheduled:
                     result_data = data.get('data', {})
                     self.sched.onBuildPaused(build, result_data)
+                else:
+                    # Unsetting the pause flag outside of event processing is
+                    # safe.
+                    build.paused = False
 
             if not started:
                 self.log.info("Build %s started" % job)
