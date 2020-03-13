@@ -1880,7 +1880,16 @@ class Build(object):
         self.end_time = None
         self.estimated_time = None
         self.canceled = False
+
+        # Note: In order to avoid a race condition between pausing a job
+        # and skipping child jobs the pause attribute must be set during
+        # setResult. The pause_scheduled attribute is used to forward the
+        # desired paused state to the event processing phase.
+        # This is needed to avoid duplicate onBuildPaused calls before the
+        # build is marked as paused during event processing.
+        self.pause_scheduled = False
         self.paused = False
+
         self.retry = False
         self.parameters = {}
         self.worker = Worker()

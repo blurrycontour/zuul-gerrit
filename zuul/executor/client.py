@@ -487,11 +487,9 @@ class ExecutorClient(object):
             build.worker.updateFromData(data)
             build.__gearman_worker = build.worker.name
 
-            if 'paused' in data and build.paused != data['paused']:
-                build.paused = data['paused']
-                if build.paused:
-                    result_data = data.get('data', {})
-                    self.sched.onBuildPaused(build, result_data)
+            if 'paused' in data and build.pause_scheduled != data['paused']:
+                result_data = data.get('data', {})
+                self.sched.onBuildPaused(build, result_data)
 
             if not started:
                 self.log.info("Build %s started" % job)
