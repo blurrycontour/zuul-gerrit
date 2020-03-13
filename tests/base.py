@@ -14,6 +14,7 @@
 # under the License.
 
 import configparser
+from collections import OrderedDict
 from configparser import ConfigParser
 from contextlib import contextmanager
 import copy
@@ -63,6 +64,19 @@ import testtools.content_type
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
+from zuul.rpcclient import RPCClient
+from zuul.driver.mqtt import MQTTDriver
+from zuul.driver.nullwrap import NullwrapDriver
+from zuul.driver.bubblewrap import BubblewrapDriver
+from zuul.driver.sql import SQLDriver
+from zuul.driver.timer import TimerDriver
+from zuul.driver.smtp import SMTPDriver
+from zuul.driver.git import GitDriver
+from zuul.driver.zuul import ZuulDriver
+from zuul.driver.github import GithubDriver
+from zuul.driver.gitlab import GitlabDriver
+from zuul.driver.pagure import PagureDriver
+from zuul.driver.gerrit import GerritDriver
 from zuul.lib.connections import ConnectionRegistry
 from psutil import Popen
 
@@ -3418,12 +3432,183 @@ class SymLink(object):
         self.target = target
 
 
+class ChangesDatabase:
+    # Set up gerrit related fakes
+    # Set a changes database so multiple FakeGerrit's can report back to
+    # a virtual canonical database given by the configured hostname
+    gerrit_changes_dbs = {}
+    github_changes_dbs = {}
+    pagure_changes_dbs = {}
+    gitlab_changes_dbs = {}
+
+
+class TestGerritDriver(GerritDriver):
+    def __init__(self, registry, changes: ChangesDatabase,
+                 config: ConfigParser, upstream_root: str, event_queues,
+                 poller_events,
+                 add_cleanup: Callable[[Callable[[], None]], None]):
+        super(TestGerritDriver, self).__init__()
+        self.registry = registry
+        self.changes = changes
+        self.upstream_root = upstream_root
+        self.event_queues = event_queues
+        self.poller_events = poller_events
+        self.add_cleanup = add_cleanup
+
+    def getConnection(self, name, config):
+        db = self.changes.gerrit_changes_dbs.setdefault(config['server'], {})
+        poll_event = self.poller_events.setdefault(name, threading.Event())
+        ref_event = self.poller_events.setdefault(name + '-ref',
+                                                  threading.Event())
+        connection = FakeGerritConnection(
+            self, name, config,
+            changes_db=db,
+            upstream_root=self.upstream_root,
+            poller_event=poll_event,
+            ref_watcher_event=ref_event)
+        if connection.web_server:
+            self.add_cleanup(connection.web_server.stop)
+
+        self.event_queues.append(connection.event_queue)
+        setattr(self.registry, 'fake_' + name, connection)
+        return connection
+
+
+class TestGithubDriver(GithubDriver):
+    def __init__(self, registry, changes: ChangesDatabase,
+                 config: ConfigParser, upstream_root: str, event_queues,
+                 rpcclient: RPCClient, git_url_with_auth: bool):
+        super(TestGithubDriver, self).__init__()
+        self.registry = registry
+        self.changes = changes
+        self.config = config
+        self.upstream_root = upstream_root
+        self.event_queues = event_queues
+        self.rpcclient = rpcclient
+        self.git_url_with_auth = git_url_with_auth
+
+    def registerGithubProjects(self, connection):
+        path = self.config.get('scheduler', 'tenant_config')
+        with open(os.path.join(FIXTURE_DIR, path)) as f:
+            tenant_config = yaml.safe_load(f.read())
+        for tenant in tenant_config:
+            sources = tenant['tenant']['source']
+            conf = sources.get(connection.source.name)
+            if not conf:
+                return
+
+            projects = conf.get('config-projects', [])
+            projects.extend(conf.get('untrusted-projects', []))
+
+            client = connection.getGithubClient(None)
+            for project in projects:
+                if isinstance(project, dict):
+                    # This can be a dict with the project as the only key
+                    client.addProjectByName(
+                        list(project.keys())[0])
+                else:
+                    client.addProjectByName(project)
+
+    def getConnection(self, name, config):
+        server = config.get('server', 'github.com')
+        db = self.changes.github_changes_dbs.setdefault(server, {})
+        connection = FakeGithubConnection(
+            self, name, config, self.rpcclient,
+            changes_db=db,
+            upstream_root=self.upstream_root,
+            git_url_with_auth=self.git_url_with_auth)
+        self.event_queues.append(connection.event_queue)
+        setattr(self.registry, 'fake_' + name, connection)
+        self.registerGithubProjects(connection)
+        return connection
+
+
+class TestPagureDriver(PagureDriver):
+    def __init__(self, registry, changes: ChangesDatabase,
+                 config: ConfigParser, upstream_root: str, event_queues,
+                 rpcclient: RPCClient):
+        super(TestPagureDriver, self).__init__()
+        self.registry = registry
+        self.changes = changes
+        self.upstream_root = upstream_root
+        self.event_queues = event_queues
+        self.rpcclient = rpcclient
+
+    def getConnection(self, name, config):
+        server = config.get('server', 'pagure.io')
+        db = self.changes.pagure_changes_dbs.setdefault(server, {})
+        connection = FakePagureConnection(
+            self, name, config, self.rpcclient,
+            changes_db=db,
+            upstream_root=self.upstream_root)
+        self.event_queues.append(connection.event_queue)
+        setattr(self.registry, 'fake_' + name, connection)
+        return connection
+
+
+class TestGitlabDriver(GitlabDriver):
+    def __init__(self, registry, changes: ChangesDatabase,
+                 config: ConfigParser, upstream_root: str, event_queues,
+                 rpcclient: RPCClient):
+        super(TestGitlabDriver, self).__init__()
+        self.registry = registry
+        self.changes = changes
+        self.upstream_root = upstream_root
+        self.event_queues = event_queues
+        self.rpcclient = rpcclient
+
+    def getConnection(self, name, config):
+        server = config.get('server', 'gitlab.com')
+        db = self.changes.gitlab_changes_dbs.setdefault(server, {})
+        connection = FakeGitlabConnection(
+            self, name, config, self.rpcclient,
+            changes_db=db,
+            upstream_root=self.upstream_root)
+        self.event_queues.append(connection.event_queue)
+        setattr(self.registry, 'fake_' + name, connection)
+        return connection
+
+
+class TestConnectionRegistry(ConnectionRegistry):
+    def __init__(self, changes: ChangesDatabase, config: ConfigParser,
+                 event_queues, upstream_root: str, rpcclient: RPCClient,
+                 poller_events, git_url_with_auth: bool,
+                 add_cleanup: Callable[[Callable[[], None]], None]):
+        self.connections = OrderedDict()
+        self.drivers = {}
+
+        self.registerDriver(ZuulDriver())
+        self.registerDriver(TestGerritDriver(
+            self, changes, config, upstream_root, event_queues, poller_events,
+            add_cleanup))
+        self.registerDriver(GitDriver())
+        self.registerDriver(TestGithubDriver(
+            self, changes, config, upstream_root, event_queues, rpcclient,
+            git_url_with_auth))
+        self.registerDriver(SMTPDriver())
+        self.registerDriver(TimerDriver())
+        self.registerDriver(SQLDriver())
+        self.registerDriver(BubblewrapDriver())
+        self.registerDriver(NullwrapDriver())
+        self.registerDriver(MQTTDriver())
+        self.registerDriver(TestPagureDriver(
+            self, changes, config, upstream_root, event_queues, rpcclient))
+        self.registerDriver(TestGitlabDriver(
+            self, changes, config, upstream_root, event_queues, rpcclient))
+
+
 class SchedulerTestApp:
     def __init__(self, log: Logger, config: ConfigParser, zk_config: str,
-                 connections: ConnectionRegistry):
+                 changes: ChangesDatabase, test_root: str,
+                 rpcclient: RPCClient, git_url_with_auth: bool,
+                 source_only: bool,
+                 add_cleanup: Callable[[Callable[[], None]], None]):
         self.log = log
         self.config = config
         self.zk_config = zk_config
+        self.changes = changes
+
+        upstream_root = os.path.join(test_root, "upstream")
 
         self.sched = zuul.scheduler.Scheduler(self.config)
         self.sched.setZuulApp(self)
@@ -3435,7 +3620,18 @@ class SchedulerTestApp:
             self.sched.management_event_queue
         ]
 
-        self.sched.registerConnections(connections)
+        self.poller_events = {}
+        # Register connections from the config using fakes
+        self.connections = TestConnectionRegistry(
+            self.changes, self.config, self.event_queues, upstream_root,
+            rpcclient, self.poller_events, git_url_with_auth, add_cleanup)
+        self.connections.configure(self.config, source_only=source_only)
+        self.sched.registerConnections(self.connections)
+
+        if hasattr(self.connections, 'fake_github'):
+            self.event_queues.append(
+                getattr(self.connections, 'fake_github')
+                .github_event_connector._event_forward_queue)
 
         executor_client = zuul.executor.client.ExecutorClient(
             self.config, self.sched)
@@ -3475,12 +3671,24 @@ class SchedulerTestApp:
 
 
 class SchedulerTestManager:
-    def __init__(self):
+    def __init__(self, changes: ChangesDatabase, test_root: str,
+                 rpcclient: RPCClient, git_url_with_auth: bool,
+                 source_only: bool,
+                 add_cleanup: Callable[[Callable[[], None]], None]):
         self.instances = []
+        self.changes = changes
+        self.test_root = test_root
+        self.rpcclient = rpcclient
+        self.git_url_with_auth = git_url_with_auth
+        self.source_only = source_only
+        self.add_cleanup = add_cleanup
 
-    def create(self, log: Logger, config: ConfigParser, zk_config: str,
-               connections: ConnectionRegistry) -> SchedulerTestApp:
-        app = SchedulerTestApp(log, config, zk_config, connections)
+    def create(self, log: Logger, config: ConfigParser,
+               zk_config: str) -> SchedulerTestApp:
+        app = SchedulerTestApp(log, config, zk_config, self.changes,
+                               self.test_root, self.rpcclient,
+                               self.git_url_with_auth, self.source_only,
+                               self.add_cleanup)
         self.instances.append(app)
         return app
 
@@ -3587,6 +3795,21 @@ class ZuulTestCase(BaseTestCase):
     use_ssl = False
     git_url_with_auth = False
     log_console_port = 19885
+    source_only = False
+
+    def __getattr__(self, name):
+        """Allows to access fake connections the old way, e.g., using
+        `fake_gerrit` for FakeGerritConnection.
+
+        This will access the connection of the first (default) scheduler
+        (`self.scheds.first`). To access connections of a different
+        scheduler use `self.scheds[{X}].connections.fake_{NAME}`.
+        """
+        if name.startswith('fake_') and\
+                hasattr(self.scheds.first.connections, name):
+            return getattr(self.scheds.first.connections, name)
+        raise AttributeError("'ZuulTestCase' object has no attribute '%s'"
+                             % name)
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(self.config,
@@ -3693,12 +3916,15 @@ class ZuulTestCase(BaseTestCase):
         gerritsource.GerritSource.replication_retry_interval = 0.5
         gerritconnection.GerritEventConnector.delay = 0.0
 
-        self.additional_event_queues = []
-        self.poller_events = {}
-        self.configure_connections()
+        self.changes = ChangesDatabase()
+        self.__configure_smtp()
+        self.__configure_mqtt()
 
         self.executor_server = RecordingExecutorServer(
-            self.config, self.connections,
+            self.config, TestConnectionRegistry(
+                self.changes, self.config, [], self.upstream_root,
+                self.rpcclient, {}, self.git_url_with_auth,
+                lambda fcn: self.addCleanup(fcn)),
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
@@ -3708,13 +3934,11 @@ class ZuulTestCase(BaseTestCase):
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds
 
-        self.scheds = SchedulerTestManager()
-        self.scheds.create(
-            self.log, self.config, self.zk_config, self.connections)
-
-        if hasattr(self, 'fake_github'):
-            self.additional_event_queues.append(
-                self.fake_github.github_event_connector._event_forward_queue)
+        self.scheds = SchedulerTestManager(
+            self.changes, self.test_root, self.rpcclient,
+            self.git_url_with_auth, self.source_only,
+            lambda fcn: self.addCleanup(fcn))
+        self.scheds.create(self.log, self.config, self.zk_config)
 
         self.merge_server = None
 
@@ -3726,111 +3950,9 @@ class ZuulTestCase(BaseTestCase):
     def __event_queues(self, matcher) -> List[Queue]:
         sched_queues = map(lambda app: app.event_queues,
                            self.scheds.filter(matcher))
-        return [item for sublist in sched_queues for item in sublist] + \
-            self.additional_event_queues
+        return [item for sublist in sched_queues for item in sublist]
 
-    def configure_connections(self, source_only=False):
-        # Set up gerrit related fakes
-        # Set a changes database so multiple FakeGerrit's can report back to
-        # a virtual canonical database given by the configured hostname
-        self.gerrit_changes_dbs = {}
-        self.github_changes_dbs = {}
-        self.pagure_changes_dbs = {}
-        self.gitlab_changes_dbs = {}
-
-        def getGerritConnection(driver, name, config):
-            db = self.gerrit_changes_dbs.setdefault(config['server'], {})
-            poll_event = self.poller_events.setdefault(name, threading.Event())
-            ref_event = self.poller_events.setdefault(name + '-ref',
-                                                      threading.Event())
-            con = FakeGerritConnection(driver, name, config,
-                                       changes_db=db,
-                                       upstream_root=self.upstream_root,
-                                       poller_event=poll_event,
-                                       ref_watcher_event=ref_event)
-            if con.web_server:
-                self.addCleanup(con.web_server.stop)
-
-            self.additional_event_queues.append(con.event_queue)
-            setattr(self, 'fake_' + name, con)
-            return con
-
-        self.useFixture(fixtures.MonkeyPatch(
-            'zuul.driver.gerrit.GerritDriver.getConnection',
-            getGerritConnection))
-
-        def registerGithubProjects(con):
-            path = self.config.get('scheduler', 'tenant_config')
-            with open(os.path.join(FIXTURE_DIR, path)) as f:
-                tenant_config = yaml.safe_load(f.read())
-            for tenant in tenant_config:
-                sources = tenant['tenant']['source']
-                conf = sources.get(con.source.name)
-                if not conf:
-                    return
-
-                projects = conf.get('config-projects', [])
-                projects.extend(conf.get('untrusted-projects', []))
-
-                client = con.getGithubClient(None)
-                for project in projects:
-                    if isinstance(project, dict):
-                        # This can be a dict with the project as the only key
-                        client.addProjectByName(
-                            list(project.keys())[0])
-                    else:
-                        client.addProjectByName(project)
-
-        def getGithubConnection(driver, name, config):
-            server = config.get('server', 'github.com')
-            db = self.github_changes_dbs.setdefault(server, {})
-            con = FakeGithubConnection(
-                driver, name, config,
-                self.rpcclient,
-                changes_db=db,
-                upstream_root=self.upstream_root,
-                git_url_with_auth=self.git_url_with_auth)
-            self.additional_event_queues.append(con.event_queue)
-            setattr(self, 'fake_' + name, con)
-            registerGithubProjects(con)
-            return con
-
-        self.useFixture(fixtures.MonkeyPatch(
-            'zuul.driver.github.GithubDriver.getConnection',
-            getGithubConnection))
-
-        def getPagureConnection(driver, name, config):
-            server = config.get('server', 'pagure.io')
-            db = self.pagure_changes_dbs.setdefault(server, {})
-            con = FakePagureConnection(
-                driver, name, config,
-                self.rpcclient,
-                changes_db=db,
-                upstream_root=self.upstream_root)
-            self.additional_event_queues.append(con.event_queue)
-            setattr(self, 'fake_' + name, con)
-            return con
-
-        self.useFixture(fixtures.MonkeyPatch(
-            'zuul.driver.pagure.PagureDriver.getConnection',
-            getPagureConnection))
-
-        def getGitlabConnection(driver, name, config):
-            server = config.get('server', 'gitlab.com')
-            db = self.gitlab_changes_dbs.setdefault(server, {})
-            con = FakeGitlabConnection(
-                driver, name, config,
-                self.rpcclient,
-                changes_db=db,
-                upstream_root=self.upstream_root)
-            self.additional_event_queues.append(con.event_queue)
-            setattr(self, 'fake_' + name, con)
-            return con
-
-        self.useFixture(fixtures.MonkeyPatch(
-            'zuul.driver.gitlab.GitlabDriver.getConnection',
-            getGitlabConnection))
-
+    def __configure_smtp(self):
         # Set up smtp related fakes
         # TODO(jhesketh): This should come from lib.connections for better
         # coverage
@@ -3843,6 +3965,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.useFixture(fixtures.MonkeyPatch('smtplib.SMTP', FakeSMTPFactory))
 
+    def __configure_mqtt(self):
         # Set up mqtt related fakes
         self.mqtt_messages = []
 
@@ -3853,10 +3976,6 @@ class ZuulTestCase(BaseTestCase):
         self.useFixture(fixtures.MonkeyPatch(
             'zuul.driver.mqtt.mqttconnection.MQTTConnection.publish',
             fakeMQTTPublish))
-
-        # Register connections from the config using fakes
-        self.connections = zuul.lib.connections.ConnectionRegistry()
-        self.connections.configure(self.config, source_only=source_only)
 
     def setup_config(self, config_file: str):
         # This creates the per-test configuration object.  It can be
@@ -4368,8 +4487,6 @@ class ZuulTestCase(BaseTestCase):
             if not app.sched._paused:
                 for event_queue in app.event_queues:
                     event_queue.join()
-        for event_queue in self.additional_event_queues:
-            event_queue.join()
 
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
@@ -4400,7 +4517,8 @@ class ZuulTestCase(BaseTestCase):
                 # processed
                 self.__eventQueuesJoin(matcher)
                 self.scheds.execute(
-                    lambda app: app.sched.run_handler_lock.acquire())
+                    lambda app: app.sched.run_handler_lock.acquire(),
+                    matcher)
                 if (self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported(matcher) and
                     self.__areAllBuildsWaiting(matcher) and
@@ -4412,7 +4530,8 @@ class ZuulTestCase(BaseTestCase):
                     # components were stable, we don't erroneously
                     # report that we are settled.
                     self.scheds.execute(
-                        lambda app: app.sched.run_handler_lock.release())
+                        lambda app: app.sched.run_handler_lock.release(),
+                        matcher)
                     self.executor_server.lock.release()
                     self.log.debug("...settled. (%s)", msg)
                     self.logState()
@@ -4420,17 +4539,19 @@ class ZuulTestCase(BaseTestCase):
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.release())
             self.executor_server.lock.release()
-            self.scheds.execute(lambda app: app.sched.wake_event.wait(0.1))
+            self.scheds.execute(lambda app: app.sched.wake_event.wait(0.1),
+                                matcher)
 
-    def waitForPoll(self, poller, timeout=30):
-        self.log.debug("Wait for poll on %s", poller)
-        self.poller_events[poller].clear()
-        self.log.debug("Waiting for poll 1 on %s", poller)
-        self.poller_events[poller].wait(timeout)
-        self.poller_events[poller].clear()
-        self.log.debug("Waiting for poll 2 on %s", poller)
-        self.poller_events[poller].wait(timeout)
-        self.log.debug("Done waiting for poll on %s", poller)
+    def waitForPoll(self, poller, timeout=30, matcher=None):
+        for app in self.scheds.filter(matcher):
+            self.log.debug("Wait for poll on %s", poller)
+            app.poller_events[poller].clear()
+            self.log.debug("Waiting for poll 1 on %s", poller)
+            app.poller_events[poller].wait(timeout)
+            app.poller_events[poller].clear()
+            self.log.debug("Waiting for poll 2 on %s", poller)
+            app.poller_events[poller].wait(timeout)
+            self.log.debug("Done waiting for poll on %s", poller)
 
     def logState(self):
         """ Log the current state of the system """

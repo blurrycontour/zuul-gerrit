@@ -409,9 +409,7 @@ class TestMultipleGerrits(ZuulTestCase):
 class TestConnectionsMerger(ZuulTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
-
-    def configure_connections(self):
-        super(TestConnectionsMerger, self).configure_connections(True)
+    source_only = True
 
     def test_connections_merger(self):
         "Test merger only configures source connections"
