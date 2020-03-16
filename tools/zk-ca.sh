@@ -18,9 +18,7 @@
 
 CAROOT=$1
 SERVER=$2
-KEYSTORE_PASSWORD=keystorepassword
 
-EXPORT_PASSWORD=foobar
 SUBJECT='/C=US/ST=California/L=Oakland/O=Company Name/OU=Org'
 TOOLSDIR=$(dirname $0)
 CONFIG="-config $TOOLSDIR/openssl.cnf"
@@ -66,11 +64,8 @@ make_server() {
     openssl ca $CONFIG -batch -policy policy_anything -days 3560 \
             -out $CAROOT/certs/$SERVER.pem \
             -infiles $CAROOT/demoCA/reqs/${SERVER}req.pem
-    openssl pkcs12 -export -name $SERVER \
-            -in $CAROOT/certs/$SERVER.pem \
-            -inkey $CAROOT/keys/${SERVER}key.pem \
-            -passout "pass:$KEYSTORE_PASSWORD" \
-            > $CAROOT/keystores/$SERVER.jks
+    cat $CAROOT/certs/$SERVER.pem $CAROOT/keys/${SERVER}key.pem \
+        > $CAROOT/keystores/$SERVER.pem
 }
 
 help() {
