@@ -410,7 +410,7 @@ class TestConnectionsMerger(ZuulTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
 
-    def configure_connections(self):
+    def configure_connections(self, source_only: bool=False):
         super(TestConnectionsMerger, self).configure_connections(True)
 
     def test_connections_merger(self):
