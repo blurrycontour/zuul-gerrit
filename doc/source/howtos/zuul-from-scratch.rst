@@ -24,6 +24,7 @@ Installation
 
   * :doc:`nodepool_install`
   * :doc:`zuul_install`
+  * :doc:`mysql_install`
 
 Configuration
 -------------
@@ -73,6 +74,11 @@ to appropriate values for your setup.
 
    [scheduler]
    tenant_config=/etc/zuul/main.yaml
+
+   [connection "mysql"]
+   name=zuul
+   driver=sql
+   dburi=mysql+pymysql://zuul:secret@localhost/zuul
    EOF"
 
    sudo bash -c "cat > /etc/zuul/main.yaml <<EOF
