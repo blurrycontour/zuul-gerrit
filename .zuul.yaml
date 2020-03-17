@@ -102,9 +102,6 @@
     description: Run the commands in the Zuul quick-start documentation.
     run: playbooks/quick-start/run.yaml
     post-run: playbooks/quick-start/post.yaml
-    requires:
-      - zuul-container-image
-      - nodepool-container-image
     required-projects:
       - zuul/zuul
 
@@ -134,6 +131,11 @@
     requires:
       - python-builder-container-image
       - python-base-container-image
+      # TODO(jeblair): These should really be in the zuul-quick-start
+      # job, but it doesn't run pull-images.  Perhaps run pull-images
+      # in the base job?
+      - zuul-container-image
+      - nodepool-container-image
     provides: zuul-container-image
     vars: &zuul_image_vars
       docker_images:
@@ -164,6 +166,11 @@
     requires:
       - python-builder-container-image
       - python-base-container-image
+      # TODO(jeblair): These should really be in the zuul-quick-start
+      # job, but it doesn't run pull-images.  Perhaps run pull-images
+      # in the base job?
+      - zuul-container-image
+      - nodepool-container-image
     provides: zuul-container-image
     secrets:
       name: docker_credentials
