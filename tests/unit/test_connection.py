@@ -65,7 +65,7 @@ class TestSQLConnection(ZuulDBTestCase):
     expected_table_prefix = ''
 
     def _sql_tables_created(self, connection_name):
-        connection = self.connections.connections[connection_name]
+        connection = self.scheds.first.connections.connections[connection_name]
         insp = sa.engine.reflection.Inspector(connection.engine)
 
         table_prefix = connection.table_prefix
@@ -83,7 +83,7 @@ class TestSQLConnection(ZuulDBTestCase):
         self._sql_tables_created('resultsdb_postgresql')
 
     def _sql_indexes_created(self, connection_name):
-        connection = self.connections.connections[connection_name]
+        connection = self.scheds.first.connections.connections[connection_name]
         insp = sa.engine.reflection.Inspector(connection.engine)
 
         table_prefix = connection.table_prefix
@@ -128,8 +128,8 @@ class TestSQLConnection(ZuulDBTestCase):
                 connection_name
             )
 
-            conn = self.connections.connections[
-                connection_name].engine.connect()
+            conn = self.scheds.first.connections.connections[connection_name].\
+                engine.connect()
             result = conn.execute(
                 sa.sql.select([reporter.connection.zuul_buildset_table]))
 
@@ -247,8 +247,8 @@ class TestSQLConnection(ZuulDBTestCase):
                 connection_name_1
             )
 
-            conn = self.connections.connections[connection_name_1].\
-                engine.connect()
+            conn = self.scheds.first.connections.\
+                connections[connection_name_1].engine.connect()
             buildsets_resultsdb = conn.execute(sa.sql.select(
                 [reporter1.connection.zuul_buildset_table])).fetchall()
             # Should have been 2 buildset reported to the resultsdb (both
@@ -271,8 +271,8 @@ class TestSQLConnection(ZuulDBTestCase):
                 connection_name_2
             )
 
-            conn = self.connections.connections[connection_name_2].\
-                engine.connect()
+            conn = self.scheds.first.connections.\
+                connections[connection_name_2].engine.connect()
             buildsets_resultsdb_failures = conn.execute(sa.sql.select(
                 [reporter2.connection.zuul_buildset_table])).fetchall()
             # The failure db should only have 1 buildset failed
@@ -409,19 +409,17 @@ class TestMultipleGerrits(ZuulTestCase):
 class TestConnectionsMerger(ZuulTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
-
-    def configure_connections(self):
-        super(TestConnectionsMerger, self).configure_connections(True)
+    source_only = True
 
     def test_connections_merger(self):
         "Test merger only configures source connections"
 
-        self.assertIn("gerrit", self.connections.connections)
-        self.assertIn("github", self.connections.connections)
-        self.assertNotIn("smtp", self.connections.connections)
-        self.assertNotIn("sql", self.connections.connections)
-        self.assertNotIn("timer", self.connections.connections)
-        self.assertNotIn("zuul", self.connections.connections)
+        self.assertIn("gerrit", self.scheds.first.connections.connections)
+        self.assertIn("github", self.scheds.first.connections.connections)
+        self.assertNotIn("smtp", self.scheds.first.connections.connections)
+        self.assertNotIn("sql", self.scheds.first.connections.connections)
+        self.assertNotIn("timer", self.scheds.first.connections.connections)
+        self.assertNotIn("zuul", self.scheds.first.connections.connections)
 
 
 class TestConnectionsCgit(ZuulTestCase):
@@ -429,8 +427,8 @@ class TestConnectionsCgit(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
     def test_cgit_web_url(self):
-        self.assertIn("gerrit", self.connections.connections)
-        conn = self.connections.connections['gerrit']
+        self.assertIn("gerrit", self.scheds.first.connections.connections)
+        conn = self.scheds.first.connections.connections['gerrit']
         source = conn.source
         proj = source.getProject('foo/bar')
         url = conn._getWebUrl(proj, '1')
@@ -443,8 +441,8 @@ class TestConnectionsGitweb(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
     def test_gitweb_url(self):
-        self.assertIn("gerrit", self.connections.connections)
-        conn = self.connections.connections['gerrit']
+        self.assertIn("gerrit", self.scheds.first.connections.connections)
+        conn = self.scheds.first.connections.connections['gerrit']
         source = conn.source
         proj = source.getProject('foo/bar')
         url = conn._getWebUrl(proj, '1')
