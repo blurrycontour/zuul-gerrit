@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_a598d0bf",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 4599,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-19T22:26:05Z",
+      "side": 1,
+      "message": "This is logging:\n2020-03-17 22:50:11,735 zuul.Pipeline.tenant-one.check   DEBUG    [e: afd746868b6549e8a59068ed5759866d] Project org/project not in pipeline \u003cPipeline check\u003e for change \u003cChange 0x7fdd672890b8 org/project 1,1\u003e\n\nSo I think you need to include the project stanza; like:\n\n- project:\n    check:\n      jobs:\n        - test-job",
+      "revId": "367bc076b21adb75e630162af0f0c4fb384eda17",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
