@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_bf31c25b",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-03-19T16:32:19Z",
+      "side": 1,
+      "message": "This need to be initialized in __init__.",
+      "range": {
+        "startLine": 185,
+        "startChar": 0,
+        "endLine": 188,
+        "endChar": 27
+      },
+      "revId": "cac6ca6643c1889c311bbee5bbdebf18107a982c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
