@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fa4df85_d1e7c511",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-20T13:31:15Z",
+      "side": 1,
+      "message": "Just a default location, a key can be anywhere on the FS. Seems not consistent with the sentence below:\n\n`$PUBKEY`` is the location of the SSH public key for the ``zuul`` user. ``$USER`` is the username for the admin user.\n\nwhich is assuming any location of the key",
+      "range": {
+        "startLine": 28,
+        "startChar": 7,
+        "endLine": 28,
+        "endChar": 24
+      },
+      "revId": "a7711b5860f36c6da33fecc8e1fd16eed7a7167a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_919b8d71",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-20T13:31:15Z",
+      "side": 1,
+      "message": "Same as above ... I would not tight the reader to one location. Just a suggestion",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 34
+      },
+      "revId": "a7711b5860f36c6da33fecc8e1fd16eed7a7167a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_1181ddfb",
+        "filename": "doc/source/howtos/gerrit_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-20T13:31:15Z",
+      "side": 1,
+      "message": "I would replace the line above with this one, to make it more generic, or leave the original one only. If the first case I would write a similar sentence to explain what $PRIVKEY is",
+      "range": {
+        "startLine": 70,
+        "startChar": 3,
+        "endLine": 70,
+        "endChar": 63
+      },
+      "revId": "a7711b5860f36c6da33fecc8e1fd16eed7a7167a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_319bb966",
+        "filename": "doc/source/howtos/mysql_install.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-20T13:31:15Z",
+      "side": 1,
+      "message": "nit: tab",
+      "range": {
+        "startLine": 44,
+        "startChar": 1,
+        "endLine": 44,
+        "endChar": 9
+      },
+      "revId": "a7711b5860f36c6da33fecc8e1fd16eed7a7167a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
