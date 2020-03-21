@@ -168,6 +168,23 @@ class TestMergerRepo(ZuulTestCase):
         # And now reset the repo again. This should not crash
         work_repo.reset()
 
+    def test_tag_push_twince(self):
+        self.create_branch('org/project1', 'foobar')
+        files = {'README.txt': 'test'}
+
+        self.addCommitToRepo('org/project', 'add tag',
+                             files, branch='foobar', tag='tag_0.1')
+
+        merger = self.executor_server.merger
+        cache_repo = merger.getRepo('gerrit', 'org/project')
+        cache_repo.update()
+
+        # Delete and recreate tag
+        self.delTagFromRepo('org/project', 'tag_0.1')
+        self.addTagToRepo('org/project', 'tag_0.1', 'HEAD')
+
+        cache_repo.update()
+
     def test_broken_cache(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         work_repo = Repo(parent_path, self.workspace_root,
