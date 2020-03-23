@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_4274f535",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-03-23T18:10:24Z",
+      "side": 1,
+      "message": "Should we keep (and ignore) the --strip option for a while?",
+      "revId": "00447f5e11bc0d6c107f62ec9dd3964e2df47d55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
