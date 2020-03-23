@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_87a56fb8",
+        "filename": "tests/base.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 3196,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-03-23T17:21:36Z",
+      "side": 1,
+      "message": "Is this still needed?",
+      "range": {
+        "startLine": 3196,
+        "startChar": 12,
+        "endLine": 3196,
+        "endChar": 26
+      },
+      "revId": "93ec3daf4745a0c2cd586b83edcdabfb1eef0513",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
