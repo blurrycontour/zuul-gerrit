@@ -56,8 +56,8 @@ def main():
                         default=None,
                         help="The name of the Zuul tenant.  This may be "
                         "required in a multi-tenant environment.")
-    parser.add_argument('--strip', action='store_true', default=False,
-                        help="Strip whitespace from beginning/end of input.")
+    parser.add_argument('--no-strip', action='store_true', default=False,
+                        help="Do not strip whitespace from beginning/end of input.")
     parser.add_argument('--infile',
                         default=None,
                         help="A filename whose contents will be encrypted.  "
@@ -119,7 +119,7 @@ def main():
         plaintext = sys.stdin.read()
 
     plaintext = plaintext.encode("utf-8")
-    if args.strip:
+    if args.no_strip:
         plaintext = plaintext.strip()
 
     pubkey_file = tempfile.NamedTemporaryFile(delete=False)
