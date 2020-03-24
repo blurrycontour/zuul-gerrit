@@ -957,3 +957,37 @@ class TestExecutorExtraPackages(AnsibleZuulTestCase):
         self.assertFalse(ansible_manager.validate())
         ansible_manager.install()
         self.assertTrue(ansible_manager.validate())
+
+
+class TestExecutorDisconnect(AnsibleZuulTestCase):
+    tenant_config_file = 'config/job-pause2/main.yaml'
+
+    def assertFinalState(self):
+        # We intentionally finish this test in a broken state so skip this.
+        pass
+
+    def test_executor_disconnect(self):
+        """
+        Tests that when the executor disconnects from gearman paused jobs
+        are not leaked.
+        """
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.executor_server.release('compile')
+        self.waitUntilSettled('Wait for paused job')
+
+        self.log.info('Shutting down gearman')
+        self.gearman_server.shutdown()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+
+        # Wait for all in process jobs on the executor to vanish.
+        for _ in iterate_timeout(30, 'jobs stopped'):
+            if not self.executor_server.job_workers:
+                break
+
+        self.log.info('Test succeeded, starting shutdown')
