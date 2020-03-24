@@ -5929,7 +5929,7 @@ For CI problems and help debugging, contact ci@example.org"""
         # present is extra confirmation that the scheduler saw the
         # build as lost.
         self.assertHistory([
-            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='ABORTED', changes='1,1'),
         ])
 
     def test_scheduler_disconnect(self):

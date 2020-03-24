@@ -2665,6 +2665,14 @@ class ExecutorExecuteWorker(gear.TextWorker):
         time.sleep(delay)
         return super(ExecutorExecuteWorker, self).handleNoop(packet)
 
+    def _lostConnection(self, conn):
+        # Note(tobiash): We cannot handleDisconnect here because this is
+        # only called on client side per job. Instead hook into this method.
+        super()._lostConnection(conn)
+        for name, worker in self.zuul_executor_server.job_workers.items():
+            self.log.warning('Stopping job %s due to gearman disconnect', name)
+            worker.stop('Lost gearman connection')
+
 
 class ExecutorServer(BaseMergeServer):
     log = logging.getLogger("zuul.ExecutorServer")
@@ -3220,6 +3228,7 @@ class ExecutorServer(BaseMergeServer):
                 sensor.reportStats(self.statsd, base_key)
 
     def finishJob(self, unique):
+        self.log.warning('finishJob %s', unique)
         del(self.job_workers[unique])
 
     def stopJobDiskFull(self, jobdir):
