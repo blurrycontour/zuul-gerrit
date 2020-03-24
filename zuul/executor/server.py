@@ -2497,6 +2497,9 @@ class ExecutorExecuteWorker(gear.TextWorker):
         time.sleep(delay)
         return super(ExecutorExecuteWorker, self).handleNoop(packet)
 
+    def handleDisconnect(self, job):
+        self.zuul_executor_server.stopJobByUnique()
+
 
 class ExecutorServer(BaseMergeServer):
     log = logging.getLogger("zuul.ExecutorServer")
