@@ -123,7 +123,6 @@ class Nodepool(object):
             log.info("Fulfilling empty node request %s", req)
             req.state = model.STATE_FULFILLED
             self.sched.onNodesProvisioned(req)
-            del self.requests[req.uid]
         return req
 
     def cancelRequest(self, request):
@@ -353,7 +352,6 @@ class Nodepool(object):
 
             # Give our results to the scheduler.
             self.sched.onNodesProvisioned(request)
-            del self.requests[request.uid]
 
             self.emitStats(request)
 
@@ -381,6 +379,12 @@ class Nodepool(object):
             log.info("Ignoring canceled node request %s", request)
             # The request was already deleted when it was canceled
             return False
+
+        if request.uid not in self.requests:
+            log.debug("Ignoring unknown node request %s", request.uid)
+            return False
+
+        del self.requests[request.uid]
 
         # If we didn't request nodes and the request is fulfilled then just
         # return. We don't have to do anything in this case. Further don't even
