@@ -382,6 +382,10 @@ class Nodepool(object):
             # The request was already deleted when it was canceled
             return False
 
+        if request.uid not in self.requests:
+            log.debug("Ignoring unknown node request %s", request.uid)
+            return False
+
         # If we didn't request nodes and the request is fulfilled then just
         # return. We don't have to do anything in this case. Further don't even
         # ask ZK for the request as empty requests are not put into ZK.
