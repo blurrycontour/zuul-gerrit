@@ -19,7 +19,8 @@ import zuul.zk
 import zuul.nodepool
 from zuul import model
 
-from tests.base import BaseTestCase, ChrootedKazooFixture, FakeNodepool
+from tests.base import BaseTestCase, ChrootedKazooFixture, FakeNodepool, \
+    iterate_timeout
 
 
 class TestNodepool(BaseTestCase):
@@ -55,8 +56,13 @@ class TestNodepool(BaseTestCase):
 
     def waitForRequests(self):
         # Wait until all requests are complete.
-        while self.nodepool.requests:
-            time.sleep(0.1)
+        for _ in iterate_timeout(30, 'fukfull node requests'):
+            incomplete_requests = [
+                r for r in self.nodepool.requests.values()
+                if not r.fulfilled
+            ]
+            if len(incomplete_requests) == 0:
+                break
 
     def onNodesProvisioned(self, request):
         # This is a scheduler method that the nodepool class calls
