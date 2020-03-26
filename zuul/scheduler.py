@@ -26,6 +26,8 @@ import sys
 import threading
 import time
 import urllib
+from typing import Optional
+from zuul.merger.client import MergeClient
 
 from zuul import configloader
 from zuul import model
@@ -305,7 +307,7 @@ class Scheduler(threading.Thread):
         self._stopped = False
         self._zuul_app = None
         self.executor = None
-        self.merger = None
+        self.merger = None  # type: Optional[MergeClient]
         self.connections = None
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
@@ -408,7 +410,7 @@ class Scheduler(threading.Thread):
     def setExecutor(self, executor):
         self.executor = executor
 
-    def setMerger(self, merger):
+    def setMerger(self, merger: MergeClient):
         self.merger = merger
 
     def setNodepool(self, nodepool):
