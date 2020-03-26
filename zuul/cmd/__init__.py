@@ -17,6 +17,8 @@
 import abc
 import argparse
 import configparser
+from typing import List
+
 import daemon
 import extras
 import io
@@ -165,9 +167,11 @@ class ZuulApp(object):
                 logging_config.setDebug()
         logging_config.apply()
 
-    def configure_connections(self, source_only=False, include_drivers=None):
+    def configure_connections(self, source_only=False, include_drivers=None,
+                              require_sql=False):
         self.connections = zuul.lib.connections.ConnectionRegistry()
-        self.connections.configure(self.config, source_only, include_drivers)
+        self.connections.configure(self.config, source_only, include_drivers,
+                                   require_sql)
 
 
 class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
