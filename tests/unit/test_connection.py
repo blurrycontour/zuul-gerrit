@@ -11,12 +11,16 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+import configparser
+import os
+import re
 import textwrap
 
 import sqlalchemy as sa
 
-from tests.base import ZuulTestCase, ZuulDBTestCase
+import zuul
+from tests.base import ZuulTestCase, BaseTestCase, FIXTURE_DIR, \
+    PostgresqlSchemaFixture, MySQLSchemaFixture
 
 
 def _get_reporter_from_connection_name(reporters, connection_name):
@@ -59,7 +63,7 @@ class TestConnections(ZuulTestCase):
                          'civoter')
 
 
-class TestSQLConnection(ZuulDBTestCase):
+class TestSQLConnection(ZuulTestCase):
     config_file = 'zuul-sql-driver.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
     expected_table_prefix = ''
@@ -123,10 +127,8 @@ class TestSQLConnection(ZuulDBTestCase):
         def check_results(connection_name):
             # Grab the sa tables
             tenant = self.sched.abide.tenants.get('tenant-one')
-            reporter = _get_reporter_from_connection_name(
-                tenant.layout.pipelines['check'].success_actions,
-                connection_name
-            )
+            reporter = [f for f in tenant.layout.pipelines['check']
+                        .success_actions if f.name == 'sql'][0]
 
             conn = self.connections.connections[
                 connection_name].engine.connect()
@@ -224,75 +226,12 @@ class TestSQLConnection(ZuulDBTestCase):
         self.waitUntilSettled()
 
         check_results('resultsdb_mysql')
-        check_results('resultsdb_postgresql')
-
-    def test_multiple_sql_connections(self):
-        "Test putting results in different databases"
-        # Add a successful result
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        # Add a failed result
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.executor_server.failJob('project-test1', B)
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        def check_results(connection_name_1, connection_name_2):
-            # Grab the sa tables for resultsdb
-            tenant = self.sched.abide.tenants.get('tenant-one')
-            reporter1 = _get_reporter_from_connection_name(
-                tenant.layout.pipelines['check'].success_actions,
-                connection_name_1
-            )
-
-            conn = self.connections.connections[connection_name_1].\
-                engine.connect()
-            buildsets_resultsdb = conn.execute(sa.sql.select(
-                [reporter1.connection.zuul_buildset_table])).fetchall()
-            # Should have been 2 buildset reported to the resultsdb (both
-            # success and failure report)
-            self.assertEqual(2, len(buildsets_resultsdb))
-
-            # The first one should have passed
-            self.assertEqual('check', buildsets_resultsdb[0]['pipeline'])
-            self.assertEqual(
-                'org/project', buildsets_resultsdb[0]['project'])
-            self.assertEqual(1, buildsets_resultsdb[0]['change'])
-            self.assertEqual('1', buildsets_resultsdb[0]['patchset'])
-            self.assertEqual('SUCCESS', buildsets_resultsdb[0]['result'])
-            self.assertEqual(
-                'Build succeeded.', buildsets_resultsdb[0]['message'])
-
-            # Grab the sa tables for resultsdb_mysql_failures
-            reporter2 = _get_reporter_from_connection_name(
-                tenant.layout.pipelines['check'].failure_actions,
-                connection_name_2
-            )
-
-            conn = self.connections.connections[connection_name_2].\
-                engine.connect()
-            buildsets_resultsdb_failures = conn.execute(sa.sql.select(
-                [reporter2.connection.zuul_buildset_table])).fetchall()
-            # The failure db should only have 1 buildset failed
-            self.assertEqual(1, len(buildsets_resultsdb_failures))
-
-            self.assertEqual(
-                'check', buildsets_resultsdb_failures[0]['pipeline'])
-            self.assertEqual('org/project',
-                             buildsets_resultsdb_failures[0]['project'])
-            self.assertEqual(2,
-                             buildsets_resultsdb_failures[0]['change'])
-            self.assertEqual(
-                '1', buildsets_resultsdb_failures[0]['patchset'])
-            self.assertEqual(
-                'FAILURE', buildsets_resultsdb_failures[0]['result'])
-            self.assertEqual('Build failed.',
-                             buildsets_resultsdb_failures[0]['message'])
-
-        check_results('resultsdb_mysql', 'resultsdb_mysql_failures')
-        check_results('resultsdb_postgresql', 'resultsdb_postgresql_failures')
+        failed = False
+        try:
+            check_results('resultsdb_postgresql')
+        except Exception:
+            failed = True
+        self.assertIs(True, failed)
 
 
 class TestSQLConnectionPrefix(TestSQLConnection):
@@ -300,7 +239,74 @@ class TestSQLConnectionPrefix(TestSQLConnection):
     expected_table_prefix = 'prefix_'
 
 
-class TestConnectionsBadSQL(ZuulDBTestCase):
+class TestRequiredSQLConnection(BaseTestCase):
+    config = None
+    connections = None
+
+    def setUp(self):
+        super(TestRequiredSQLConnection, self).setUp()
+        self.addCleanup(self.stop_connection)
+
+    def setup_connection(self, config_file):
+        self.config = configparser.ConfigParser()
+        self.config.read(os.path.join(FIXTURE_DIR, config_file))
+
+        # Setup databases
+        for section_name in self.config.sections():
+            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
+                                 section_name, re.I)
+            if not con_match:
+                continue
+
+            if self.config.get(section_name, 'driver') == 'sql':
+                if (self.config.get(section_name, 'dburi') ==
+                        '$MYSQL_FIXTURE_DBURI$'):
+                    f = MySQLSchemaFixture()
+                    self.useFixture(f)
+                    self.config.set(section_name, 'dburi', f.dburi)
+                elif (self.config.get(section_name, 'dburi') ==
+                      '$POSTGRESQL_FIXTURE_DBURI$'):
+                    f = PostgresqlSchemaFixture()
+                    self.useFixture(f)
+                    self.config.set(section_name, 'dburi', f.dburi)
+
+        self.connections = zuul.lib.connections.ConnectionRegistry()
+
+    def stop_connection(self):
+        self.connections.stop()
+
+    def test_sql_multiple_primary_connection(self):
+        exception = None
+        self.setup_connection(
+            'zuul-sql-driver-multiple-default-connections.conf')
+        try:
+            self.connections.configure(self.config, source_only=False,
+                                       require_sql=True)
+        except Exception as e:
+            exception = e
+
+        self.assertEquals(Exception, type(exception), "Wrong exception")
+        self.assertEqual(1, len(exception.args))
+        self.assertEquals("2 of 4 default SQL connections (1 needed)",
+                          exception.args[0], "Wrong exception message")
+
+    def test_sql_multiple_without_primary_connection(self):
+        exception = None
+        self.setup_connection(
+            'zuul-sql-driver-multiple-no-default-connection.conf')
+        try:
+            self.connections.configure(self.config, source_only=False,
+                                       require_sql=True)
+        except Exception as e:
+            exception = e
+
+        self.assertEquals(Exception, type(exception), "Wrong exception")
+        self.assertEqual(1, len(exception.args))
+        self.assertEquals("0 of 4 default SQL connections (1 needed)",
+                          exception.args[0], "Wrong exception message")
+
+
+class TestConnectionsBadSQL(ZuulTestCase):
     config_file = 'zuul-sql-driver-bad.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
@@ -410,8 +416,9 @@ class TestConnectionsMerger(ZuulTestCase):
     config_file = 'zuul-connections-merger.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
 
-    def configure_connections(self):
-        super(TestConnectionsMerger, self).configure_connections(True)
+    def configure_connections(self, source_only=False, require_sql=True):
+        super(TestConnectionsMerger, self).configure_connections(
+            True, require_sql=False)
 
     def test_connections_merger(self):
         "Test merger only configures source connections"
