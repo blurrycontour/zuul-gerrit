@@ -12,6 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from typing import Dict, Any, Optional
+import voluptuous
+from zuul.driver.gerrit.gerritreporter import GerritReporter
+from zuul import model
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.gerrit import gerritconnection
@@ -43,7 +48,8 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
         for (con, checkers) in connection_checker_map.items():
             con.setWatchedCheckers(checkers)
 
-    def getConnection(self, name, config):
+    def getConnection(self, name: str,
+                      config: Dict[str, Any]) -> BaseConnection:
         return gerritconnection.GerritConnection(self, name, config)
 
     def getTrigger(self, connection, config=None):
@@ -52,13 +58,14 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
     def getSource(self, connection):
         return gerritsource.GerritSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
-        return gerritreporter.GerritReporter(self, connection, config)
+    def getReporter(self, connection: BaseConnection, pipeline: model.Pipeline,
+                    config: Optional[Dict[str, Any]]=None) -> GerritReporter:
+        return GerritReporter(self, connection, config)
 
     def getTriggerSchema(self):
         return gerrittrigger.getSchema()
 
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> voluptuous.Schema:
         return gerritreporter.getSchema()
 
     def getRequireSchema(self):

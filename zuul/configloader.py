@@ -21,11 +21,15 @@ import textwrap
 import io
 import re
 import subprocess
-
+from typing import Any
+from typing import Dict
+from typing import Optional
 import voluptuous as vs
-
+from zuul.model import UnparsedAbideConfig
+from zuul.merger.client import MergeClient
+from zuul.lib.connections import ConnectionRegistry
 from zuul import model
-from zuul.lib import yamlutil as yaml
+from zuul.lib import yamlutil as yaml, ansible
 import zuul.manager.dependent
 import zuul.manager.independent
 import zuul.manager.supercedent
@@ -1160,7 +1164,7 @@ class PipelineParser(object):
 
     def __init__(self, pcontext):
         self.log = logging.getLogger("zuul.PipelineParser")
-        self.pcontext = pcontext
+        self.pcontext = pcontext  # type: 'zuul.configloader.ParseContext'
         self.schema = self.getSchema()
 
     def getDriverSchema(self, dtype):
@@ -1268,7 +1272,8 @@ class PipelineParser(object):
             allowed_reporters = self.pcontext.tenant.allowed_reporters
             if conf.get(conf_key):
                 for reporter_name, params \
-                    in conf.get(conf_key).items():
+                        in conf.get(conf_key)\
+                        .items():  # type: str, Dict[str, Any]
                     if allowed_reporters is not None and \
                        reporter_name not in allowed_reporters:
                         raise UnknownConnection(reporter_name)
@@ -1397,9 +1402,13 @@ class AuthorizationRuleParser(object):
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
-    def __init__(self, connections, scheduler, tenant, ansible_manager):
+    def __init__(self,
+                 connections: ConnectionRegistry,
+                 scheduler,  # 'zuul.scheduler.Scheduler'
+                 tenant: model.Tenant,
+                 ansible_manager: ansible.AnsibleManager):
         self.connections = connections
-        self.scheduler = scheduler
+        self.scheduler = scheduler  # 'zuul.scheduler.Scheduler'
         self.tenant = tenant
         self.ansible_manager = ansible_manager
         self.pragma_parser = PragmaParser(self)
@@ -1883,11 +1892,12 @@ class TenantParser(object):
             loading_errors.addError(source_context, None, e)
         return config
 
-    def filterConfigProjectYAML(self, data):
+    def filterConfigProjectYAML(self, data: model.UnparsedConfig):
         # Any config object may appear in a config project.
         return data.copy(trusted=True)
 
-    def filterUntrustedProjectYAML(self, data, loading_errors):
+    def filterUntrustedProjectYAML(self, data: model.UnparsedConfig,
+                                   loading_errors):
         if data and data.pipelines:
             with configuration_exceptions(
                     'pipeline', data.pipelines[0], loading_errors):
@@ -1899,7 +1909,11 @@ class TenantParser(object):
         tpc = tenant.project_configs[project.canonical_name]
         return tpc.load_classes
 
-    def parseConfig(self, tenant, unparsed_config, loading_errors, pcontext):
+    def parseConfig(self,
+                    tenant: model.Tenant,
+                    unparsed_config: model.UnparsedConfig,
+                    loading_errors,
+                    pcontext: ParseContext):
         parsed_config = model.ParsedConfig()
 
         # Handle pragma items first since they modify the source context
@@ -2149,14 +2163,17 @@ class TenantParser(object):
 class ConfigLoader(object):
     log = logging.getLogger("zuul.ConfigLoader")
 
-    def __init__(self, connections, scheduler, merger, key_dir):
+    def __init__(self,
+                 connections: ConnectionRegistry,
+                 scheduler,  # 'zuul.scheduler.Scheduler'
+                 merger: Optional[MergeClient],
+                 key_dir: Optional[str]):
         self.connections = connections
-        self.scheduler = scheduler
+        self.scheduler = scheduler  # 'zuul.scheduler.Scheduler'
         self.merger = merger
+        self.keystorage = None  # type: Optional[KeyStorage]
         if key_dir:
             self.keystorage = KeyStorage(key_dir)
-        else:
-            self.keystorage = None
         self.tenant_parser = TenantParser(connections, scheduler,
                                           merger, self.keystorage)
         self.admin_rule_parser = AuthorizationRuleParser()
@@ -2219,8 +2236,11 @@ class ConfigLoader(object):
                     self.log.warning(err.error)
         return abide
 
-    def reloadTenant(self, abide, tenant, ansible_manager,
-                     unparsed_abide=None):
+    def reloadTenant(self,
+                     abide: model.Abide,
+                     tenant: model.Tenant,
+                     ansible_manager: ansible.AnsibleManager,
+                     unparsed_abide: Optional[UnparsedAbideConfig]=None):
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
         new_abide.admin_rules = abide.admin_rules.copy()
@@ -2296,7 +2316,6 @@ class ConfigLoader(object):
                         fns4.append(fn)
             fns = (["zuul.yaml"] + sorted(fns1) + [".zuul.yaml"] +
                    sorted(fns2) + fns3 + sorted(fns4))
-            incdata = None
             loaded = None
             for fn in fns:
                 data = files.getFile(project.source.connection.connection_name,
