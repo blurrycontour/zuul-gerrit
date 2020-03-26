@@ -12,6 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from typing import Dict, Any, Optional
+import voluptuous
+from zuul import model
+from zuul.driver.pagure.pagurereporter import PagureReporter
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.pagure import pagureconnection
@@ -24,7 +29,8 @@ class PagureDriver(Driver, ConnectionInterface, TriggerInterface,
                    SourceInterface, ReporterInterface):
     name = 'pagure'
 
-    def getConnection(self, name, config):
+    def getConnection(self, name: str,
+                      config: Dict[str, Any]) -> BaseConnection:
         return pagureconnection.PagureConnection(self, name, config)
 
     def getTrigger(self, connection, config=None):
@@ -33,11 +39,11 @@ class PagureDriver(Driver, ConnectionInterface, TriggerInterface,
     def getSource(self, connection):
         return paguresource.PagureSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
-        return pagurereporter.PagureReporter(
-            self, connection, pipeline, config)
+    def getReporter(self, connection: BaseConnection, pipeline: model.Pipeline,
+                    config: Optional[Dict[str, Any]]=None) -> PagureReporter:
+        return PagureReporter(self, connection, pipeline, config)
 
-    def getTriggerSchema(self):
+    def getTriggerSchema(self) -> voluptuous.Schema:
         return paguretrigger.getSchema()
 
     def getReporterSchema(self):

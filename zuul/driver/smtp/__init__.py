@@ -12,6 +12,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from typing import Dict, Any, Optional
+
+import voluptuous
+
+from zuul import model
+from zuul.driver.smtp.smtpreporter import SMTPReporter
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, ReporterInterface
 from zuul.driver.smtp import smtpconnection
 from zuul.driver.smtp import smtpreporter
@@ -20,11 +27,13 @@ from zuul.driver.smtp import smtpreporter
 class SMTPDriver(Driver, ConnectionInterface, ReporterInterface):
     name = 'smtp'
 
-    def getConnection(self, name, config):
+    def getConnection(self, name: str,
+                      config: Dict[str, Any]) -> BaseConnection:
         return smtpconnection.SMTPConnection(self, name, config)
 
-    def getReporter(self, connection, pipeline, config=None):
-        return smtpreporter.SMTPReporter(self, connection, config)
+    def getReporter(self, connection: BaseConnection, pipeline: model.Pipeline,
+                    config: Optional[Dict[str, Any]]=None) -> SMTPReporter:
+        return SMTPReporter(self, connection, config)
 
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> voluptuous.Schema:
         return smtpreporter.getSchema()
