@@ -12,6 +12,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from typing import Dict, Any, Optional
+
+import voluptuous
+
+from zuul import model
+from zuul.driver.github.githubreporter import GithubReporter
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.github import githubconnection
@@ -24,7 +31,8 @@ class GithubDriver(Driver, ConnectionInterface, TriggerInterface,
                    SourceInterface, ReporterInterface):
     name = 'github'
 
-    def getConnection(self, name, config):
+    def getConnection(self, name: str,
+                      config: Dict[str, Any]) -> BaseConnection:
         return githubconnection.GithubConnection(self, name, config)
 
     def getTrigger(self, connection, config=None):
@@ -33,14 +41,15 @@ class GithubDriver(Driver, ConnectionInterface, TriggerInterface,
     def getSource(self, connection):
         return githubsource.GithubSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
-        return githubreporter.GithubReporter(
+    def getReporter(self, connection: BaseConnection, pipeline: model.Pipeline,
+                    config: Optional[Dict[str, Any]]=None) -> GithubReporter:
+        return GithubReporter(
             self, connection, pipeline, config)
 
     def getTriggerSchema(self):
         return githubtrigger.getSchema()
 
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> voluptuous.Schema:
         return githubreporter.getSchema()
 
     def getRequireSchema(self):
