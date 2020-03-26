@@ -18,6 +18,9 @@ import copy
 import json
 import logging
 import os
+from typing import List
+from typing import Optional
+
 import re2
 import struct
 import time
@@ -4363,6 +4366,12 @@ class Tenant(object):
         self.default_base_job = None
         self.report_build_page = False
         self.layout = None
+
+        self.allowed_triggers = None
+        self.allowed_reporters = None  # type: Optional[List[str]]
+        self.allowed_labels = None
+        self.disallowed_labels = None
+        self.default_base_job = None
         # The unparsed configuration from the main zuul config for
         # this tenant.
         self.unparsed_config = None

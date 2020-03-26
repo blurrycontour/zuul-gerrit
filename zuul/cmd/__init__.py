@@ -36,7 +36,6 @@ objgraph = extras.try_import('objgraph')
 pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 
 from zuul.ansible import logconfig
-import zuul.lib.connections
 from zuul.lib.config import get_default
 
 
@@ -165,6 +164,7 @@ class ZuulApp(object):
         logging_config.apply()
 
     def configure_connections(self, source_only=False, include_drivers=None):
+        import zuul.lib.connections
         self.connections = zuul.lib.connections.ConnectionRegistry()
         self.connections.configure(self.config, source_only, include_drivers)
 
