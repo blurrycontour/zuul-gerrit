@@ -13,9 +13,8 @@
 import logging
 import textwrap
 import urllib
-
-from zuul import exceptions
-from zuul import model
+from typing import List
+from zuul import exceptions, model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
 
@@ -46,14 +45,14 @@ class StaticChangeQueueContextManager(object):
 class PipelineManager(object):
     """Abstract Base Class for enqueing and processing Changes in a Pipeline"""
 
-    def __init__(self, sched, pipeline):
+    def __init__(self, sched, pipeline: model.Pipeline):
         self.log = logging.getLogger("zuul.Pipeline.%s.%s" %
                                      (pipeline.tenant.name,
                                       pipeline.name,))
-        self.sched = sched
+        self.sched = sched  # 'zuul.scheduler.Scheduler'
         self.pipeline = pipeline
-        self.event_filters = []
-        self.ref_filters = []
+        self.event_filters = []  # type: List[model.EventFilter]
+        self.ref_filters = []  # type: List[model.RefFilter]
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
