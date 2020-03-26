@@ -15,8 +15,9 @@
 import logging
 import re
 from collections import OrderedDict
+from typing import Dict, Any
 from urllib.parse import urlparse
-
+from zuul.reporter import BaseReporter
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.git
@@ -29,6 +30,7 @@ import zuul.driver.nullwrap
 import zuul.driver.mqtt
 import zuul.driver.pagure
 import zuul.driver.gitlab
+from zuul import model
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 
@@ -43,7 +45,7 @@ class ConnectionRegistry(object):
     log = logging.getLogger("zuul.ConnectionRegistry")
 
     def __init__(self):
-        self.connections = OrderedDict()
+        self.connections = OrderedDict()  # type: Dict[str, BaseConnection]
         self.drivers = {}
 
         self.registerDriver(zuul.driver.zuul.ZuulDriver())
@@ -171,7 +173,10 @@ class ConnectionRegistry(object):
                 sources.append(connection.driver.getSource(connection))
         return sources
 
-    def getReporter(self, connection_name, pipeline, config=None):
+    def getReporter(self,
+                    connection_name: str,
+                    pipeline: model.Pipeline,
+                    config: Dict[str, Dict[str, Any]]=None) -> BaseReporter:
         connection = self.connections[connection_name]
         return connection.driver.getReporter(connection, pipeline, config)
 
