@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_28822250",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-03-27T13:52:35Z",
+      "side": 0,
+      "message": "This is not a valid usecase anymore",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 229,
+        "endChar": 44
+      },
+      "revId": "fd2ca4fc6e7d038d6f2d285a470e39975ee14c8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
