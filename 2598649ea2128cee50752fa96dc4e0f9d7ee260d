@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df33271e_f9d46922",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-03-30T16:32:17Z",
+      "side": 1,
+      "message": "I can try that as well. This would at least guarantee that we don\u0027t have a leak there in other code paths.",
+      "parentUuid": "df33271e_9968bd87",
+      "revId": "2598649ea2128cee50752fa96dc4e0f9d7ee260d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df33271e_f90629ce",
         "filename": "tests/unit/test_nodepool.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2020-03-30T16:29:43Z",
       "side": 1,
       "message": "unfortunate typo",
+      "revId": "2598649ea2128cee50752fa96dc4e0f9d7ee260d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_3926d169",
+        "filename": "tests/unit/test_nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-03-30T16:32:17Z",
+      "side": 1,
+      "message": "whoops",
+      "parentUuid": "df33271e_f90629ce",
       "revId": "2598649ea2128cee50752fa96dc4e0f9d7ee260d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
