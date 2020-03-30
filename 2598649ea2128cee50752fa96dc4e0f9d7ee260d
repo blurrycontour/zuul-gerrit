@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "df33271e_9968bd87",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-30T16:29:43Z",
+      "side": 1,
+      "message": "Should we make sure request.canceled is updated there, instead of deleting the request?",
+      "revId": "2598649ea2128cee50752fa96dc4e0f9d7ee260d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_f90629ce",
+        "filename": "tests/unit/test_nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-30T16:29:43Z",
+      "side": 1,
+      "message": "unfortunate typo",
+      "revId": "2598649ea2128cee50752fa96dc4e0f9d7ee260d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df33271e_e2ef961b",
         "filename": "zuul/nodepool.py",
         "patchSetId": 4
