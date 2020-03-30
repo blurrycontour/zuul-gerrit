@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_19030d75",
+        "filename": "tools/encrypt_secret.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-30T16:43:44Z",
+      "side": 1,
+      "message": "This seems backwards.  The overall effect is that the default does not change, but if someone uses \"--no-strip\" it will now strip.\n\nI\u0027m pretty sure we want to add a \"not\" in this line, and then add a release note indicating we changed the default on encrypt_secret.py.",
+      "revId": "e4e7d8d23aca9d3a76a0802049219217cbb425d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
