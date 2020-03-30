@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_e2ef961b",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-03-30T13:22:59Z",
+      "side": 1,
+      "message": "The request must be deleted before returning. Otherwise it\u0027s leaked.",
+      "revId": "2598649ea2128cee50752fa96dc4e0f9d7ee260d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
