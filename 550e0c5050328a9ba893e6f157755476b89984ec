@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_597c751e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2502,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-03-30T16:40:17Z",
+      "side": 1,
+      "message": "I think this is the hierarchy:\nTextWorker -\u003e Worker -\u003e BaseClient -\u003e BaseClientServer\n\nAnd in BaseClientServer, _lostConnections calls self.handleDisconnect.  We think there\u0027s a minor bug there in that handleDisconnect is first defined on Client, which means it\u0027s not in the inheritance path in BaseClientServer.  But even so, we should be able to implement handleDisconnect here and Python should call it.",
+      "revId": "550e0c5050328a9ba893e6f157755476b89984ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
