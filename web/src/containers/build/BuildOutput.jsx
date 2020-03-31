@@ -13,6 +13,7 @@
 // under the License.
 
 import * as React from 'react'
+import Ansi from 'ansi-to-react'
 import PropTypes from 'prop-types'
 import { Panel } from 'react-bootstrap'
 import {
@@ -53,7 +54,9 @@ class BuildOutput extends React.Component {
     )
   }
 
-  renderFailedTask (host, task) {
+  renderFailedTask(host, task) {
+    // REMOVE TESTING LINE BEFORE APPROVING:
+    task.stdout_lines = "\u001b[34mhello world\n" + task.stdout_lines;
     return (
       <Panel key={host + task.zuul_log_id}>
         <Panel.Heading>{host}: {task.name}</Panel.Heading>
@@ -68,17 +71,21 @@ class BuildOutput extends React.Component {
             <pre key="msg">{task.msg}</pre>
           )}
           {task.exception && (
-            <pre key="exc" style={{ color: 'red' }}>{task.exception}</pre>
+            <pre key="exc" class="exception">{task.exception}</pre>
           )}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
-            <pre key="stdout" style={{ whiteSpace: 'pre-wrap' }} title="stdout">
-              {task.stdout_lines.slice(-42).join('\n')}
-            </pre>
+            <pre class="stdout">{
+              (task.stdout_lines.slice(-42)).map(value => (
+                [<Ansi>{value}</Ansi>, <br />]
+              ))
+            }</pre>
           )}
           {task.stderr_lines && task.stderr_lines.length > 0 && (
-            <pre key="stderr" style={{whiteSpace: 'pre-wrap', color: 'red'}} title="stderr">
-              {task.stderr_lines.slice(-42).join('\n')}
-            </pre>
+            <pre class="stderr">{
+              (task.stderr_lines.slice(-42)).map(value => (
+                [<Ansi>{value}</Ansi>, <br />]
+              ))
+            }</pre>
           )}
         </Panel.Body>
       </Panel>
