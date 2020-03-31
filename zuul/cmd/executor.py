@@ -21,6 +21,7 @@ import signal
 
 import zuul.cmd
 import zuul.executor.server
+import zuul.zk
 
 from zuul.lib.config import get_default
 
@@ -99,11 +100,21 @@ class Executor(zuul.cmd.ZuulDaemonApp):
 
         self.start_log_streamer()
 
+        zookeeper = zuul.zk.ZooKeeper(enable_cache=True)
+        zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts', None)
+        if not zookeeper_hosts:
+            raise Exception("The zookeeper hosts config value is required")
+        zookeeper_timeout = float(get_default(self.config, 'zookeeper',
+                                              'session_timeout', 10.0))
+
+        zookeeper.connect(zookeeper_hosts, timeout=zookeeper_timeout)
+
         ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, self.connections,
                                        jobdir_root=self.job_dir,
                                        keep_jobdir=self.args.keep_jobdir,
                                        log_streaming_port=self.finger_port)
+        self.executor.setZookeeper(zookeeper)
         self.executor.start()
 
         if self.args.nodaemon:
@@ -116,6 +127,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
                     self.exit_handler(signal.SIGINT, None)
         else:
             self.executor.join()
+            zookeeper.disconnect()
 
 
 def main():
