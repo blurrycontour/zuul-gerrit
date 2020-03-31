@@ -15,6 +15,7 @@
 import * as moment from 'moment'
 import 'moment-duration-format'
 import * as React from 'react'
+import ReactAnsi from 'react-ansi'
 import PropTypes from 'prop-types'
 import ReactJson from 'react-json-view'
 import {
@@ -91,7 +92,7 @@ class TaskOutput extends React.Component {
     } else if (typeof(value) === 'string') {
       ret = (
         <pre>
-          {value}
+          <ReactAnsi log={value}/>
         </pre>
       )
     } else if (typeof(value) === 'object') {
