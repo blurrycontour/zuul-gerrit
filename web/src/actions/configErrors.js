@@ -18,6 +18,9 @@ export function fetchConfigErrorsAction (tenant) {
   return (dispatch) => {
     return fetchConfigErrors(tenant.apiPrefix)
       .then(response => {
+        console.log('Got Axios response')
+        console.log(response)
+        console.log(typeof response)
         dispatch({type: 'FETCH_CONFIGERRORS_SUCCESS',
                   errors: response.data})
       })
