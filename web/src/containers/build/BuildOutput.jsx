@@ -14,6 +14,7 @@
 
 import * as React from 'react'
 import { Fragment } from 'react'
+import Ansi from 'ansi-to-react'
 import PropTypes from 'prop-types'
 import { Panel } from 'react-bootstrap'
 import {
@@ -76,27 +77,35 @@ class BuildOutput extends React.Component {
             <Fragment>
               {task.stdout_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stdout'}`}><summary></summary>
-                  <pre key="stdout" title="stdout">
-                    {task.stdout_lines.slice(0, -max_lines).join('\n')}
-                  </pre>
+                  <pre key='stdout' title='stdout'>{
+                    (task.stdout_lines.slice(0, -max_lines)).map(value => (
+                        [<Ansi key='ansi'>{value}</Ansi>, <br key='newline'/>]
+                        ))
+                  }</pre>
                 </details>)}
-            <pre key="stdout" title="stdout">
-              {task.stdout_lines.slice(-max_lines).join('\n')}
-              </pre>
+              <pre key='stdout' title='stdout'>{
+                (task.stdout_lines.slice(-max_lines)).map(value => (
+                    [<Ansi key='ansi'>{value}</Ansi>, <br key='newline'/>]
+                    ))
+              }</pre>
               </Fragment>
           )}
           {task.stderr_lines && task.stderr_lines.length > 0 && (
             <Fragment>
               {task.stderr_lines.length > max_lines && (
                   <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
-                    <pre key="stderr" title="stderr">
-                      {task.stderr_lines.slice(0, -max_lines).join('\n')}
-                    </pre>
+                    <pre key='stderr' title='stderr'>{
+                      (task.stderr_lines.slice(0, -max_lines)).map(value => (
+                          [<Ansi key='ansi'>{value}</Ansi>, <br key='newline'/>]
+                          ))
+                    }</pre>
                   </details>
                 )}
-            <pre key="stderr" title="stderr">
-              {task.stderr_lines.slice(-max_lines).join('\n')}
-            </pre>
+            <pre key='stderr' title='stderr'>{
+              (task.stderr_lines.slice(-max_lines)).map(value => (
+                  [<Ansi key='ansi'>{value}</Ansi>, <br key='newline'/>]
+                  ))
+            }</pre>
             </Fragment>
           )}
         </Panel.Body>
