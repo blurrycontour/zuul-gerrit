@@ -250,7 +250,7 @@ class App extends React.Component {
               { configErrors.length > 0 &&
                 <NotificationDrawer.Toggle
                   className="zuul-config-errors"
-                  hasUnreadMessages
+                  hasUnreadMessages=true
                   style={{color: 'orange'}}
                   onClick={(e) => {
                     e.preventDefault()
