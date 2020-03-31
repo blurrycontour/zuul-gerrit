@@ -18,8 +18,12 @@ export function fetchConfigErrorsAction (tenant) {
   return (dispatch) => {
     return fetchConfigErrors(tenant.apiPrefix)
       .then(response => {
-        dispatch({type: 'FETCH_CONFIGERRORS_SUCCESS',
-                  errors: response.data})
+          if (typeof response.data !== 'undefined') {
+                dispatch({type: 'FETCH_CONFIGERRORS_SUCCESS',
+                          errors: response.data})
+          } else {
+              throw 'Axios response.data is undefined'
+          }
       })
       .catch(error => {
         throw (error)
