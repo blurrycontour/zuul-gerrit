@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_25c20d5a",
+        "filename": "zuul/web/static/.keep",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-03-31T14:07:54Z",
+      "side": 1,
+      "message": ".keep has hit you",
+      "revId": "055f4a0d5b4bde2574cad73e292cd5b8458d4fd4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
