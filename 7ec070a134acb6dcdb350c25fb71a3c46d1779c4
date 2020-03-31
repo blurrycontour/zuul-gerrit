@@ -16,6 +16,24 @@
       "revId": "7ec070a134acb6dcdb350c25fb71a3c46d1779c4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_c52521c4",
+        "filename": "zuul/_setup_hook.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-03-31T14:24:46Z",
+      "side": 1,
+      "message": "Maybe just add:\n\n  if not os.path.islink(\u0027../zuul/web/static\u0027):\n\nhere.",
+      "parentUuid": "3fa7e38b_89adafe8",
+      "revId": "7ec070a134acb6dcdb350c25fb71a3c46d1779c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
