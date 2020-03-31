@@ -301,3 +301,25 @@ details.foldable summary::before {
 details.foldable[open] summary::before {
     content: "less";
 }
+
+
+
+* Summary page stdout/stderr/exception blocks */
+pre.stdout, pre.stderr {
+    white-space: pre-wrap;
+}
+
+pre.exception {
+    color: #AA0000;
+}
+
+/* override patternfly styles which color <code> block blueish */
+pre.stdout > code {
+    color: #000000;
+    background-color: transparent;
+}
+
+pre.stderr > code {
+    color: #AA0000;
+    background-color: transparent;
+}

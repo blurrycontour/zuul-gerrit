@@ -15,6 +15,7 @@
 import * as moment from 'moment'
 import 'moment-duration-format'
 import * as React from 'react'
+import Ansi from 'ansi-to-react'
 import PropTypes from 'prop-types'
 import ReactJson from 'react-json-view'
 import {
@@ -85,9 +86,11 @@ class TaskOutput extends React.Component {
       )
     } else if (typeof(value) === 'string') {
       ret = (
-        <pre>
-          {value}
-        </pre>
+        <pre>{
+          value.split('\n').map(line => (
+              [<Ansi key='ansi'>{line}</Ansi>, <br key='newline'/>]
+              ))
+        }</pre>
       )
     } else if (typeof(value) === 'object') {
       ret = (
