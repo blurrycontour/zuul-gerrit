@@ -1325,7 +1325,7 @@ class Scheduler(threading.Thread):
     def process_management_queue(self):
         self.log.debug("Fetching management event")
         event = self.management_event_queue.get()
-        self.log.debug("Processing management event %s" % event)
+        self.log.warning("Processing management event %s" % event)
         try:
             if isinstance(event, ReconfigureEvent):
                 self._doReconfigureEvent(event)

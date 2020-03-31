@@ -1783,7 +1783,7 @@ class TenantParser(object):
                 branch_cache.setValidFor(tpc)
 
         for job in jobs:
-            self.log.debug("Waiting for cat job %s" % (job,))
+            self.log.warning("Waiting for cat job %s" % (job,))
             job.wait(self.merger.git_timeout)
             if not job.updated:
                 raise Exception("Cat job %s failed" % (job,))
