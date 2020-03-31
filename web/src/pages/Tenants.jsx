@@ -16,7 +16,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
+import { Table } from '@emonty/patternfly-react-side-effects'
 
 import Refreshable from '../containers/Refreshable'
 import { fetchTenantsIfNeeded } from '../actions/tenants'

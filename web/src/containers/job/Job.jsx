@@ -20,7 +20,7 @@ import {
   TabContainer,
   TabPane,
   TabContent,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 import JobVariant from './JobVariant'
 

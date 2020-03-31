@@ -19,7 +19,7 @@ import PropTypes from 'prop-types'
 import {
   Icon,
   Spinner
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 
 class Refreshable extends React.Component {
@@ -44,9 +44,9 @@ class Refreshable extends React.Component {
     const { remoteData } = this.props
     return (
       <Spinner loading={ remoteData.isFetching }>
-        <a className="refresh" onClick={() => {this.updateData(true)}}>
+        <button className="refresh" onClick={() => {this.updateData(true)}}>
           <Icon type="fa" name="refresh" /> refresh&nbsp;&nbsp;
-        </a>
+        </button>
       </Spinner>
     )
   }

@@ -14,7 +14,7 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
-import { Badge } from 'patternfly-react'
+import { Badge } from '@emonty/patternfly-react-side-effects'
 
 import ChangeQueue from './ChangeQueue'
 

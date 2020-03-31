@@ -16,7 +16,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   TreeView,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 
 class Artifact extends React.Component {

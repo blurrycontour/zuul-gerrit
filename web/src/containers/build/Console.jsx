@@ -23,7 +23,7 @@ import {
   Row,
   Col,
   Modal,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 import {
   hasInterestingKeys,

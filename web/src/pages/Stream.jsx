@@ -1,4 +1,3 @@
-/* global JSON, URLSearchParams */
 // Copyright 2018 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -17,7 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import Sockette from 'sockette'
-import {Checkbox, Form, FormGroup, FormControl} from 'patternfly-react'
+import {Checkbox, Form, FormGroup, FormControl} from '@emonty/patternfly-react-side-effects'
 
 import 'xterm/dist/xterm.css'
 import { Terminal } from 'xterm'

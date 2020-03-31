@@ -18,7 +18,7 @@ import { Panel } from 'react-bootstrap'
 import {
   Icon,
   ListView,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 
 class BuildOutput extends React.Component {

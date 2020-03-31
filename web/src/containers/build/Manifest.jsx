@@ -16,7 +16,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {
   TreeView,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 import { Link } from 'react-router-dom'
 
 import { renderTree } from '../../actions/build'

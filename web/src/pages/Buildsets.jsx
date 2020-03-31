@@ -16,7 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
+import { Table } from '@emonty/patternfly-react-side-effects'
 
 import { fetchBuildsets } from '../api'
 import TableFilters from '../containers/TableFilters'

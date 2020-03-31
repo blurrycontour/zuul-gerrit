@@ -27,7 +27,7 @@ import {
   NotificationDrawer,
   TimedToastNotification,
   ToastNotificationList,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 import * as moment from 'moment'
 
 import ErrorBoundary from './containers/ErrorBoundary'

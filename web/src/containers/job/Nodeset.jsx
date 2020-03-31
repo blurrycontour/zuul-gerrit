@@ -22,7 +22,7 @@ import {
   CardBody,
   CardTitle,
   Icon,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 
 class Nodeset extends React.Component {

@@ -15,7 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Table } from 'patternfly-react'
+import { Table } from '@emonty/patternfly-react-side-effects'
 import * as moment from 'moment'
 
 import { fetchNodesIfNeeded } from '../actions/nodes'

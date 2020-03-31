@@ -20,7 +20,7 @@ import { ReactHeight } from 'react-height'
 import ReactJson from 'react-json-view'
 import {
   Icon,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 import SourceContext from '../SourceContext'
 import Nodeset from './Nodeset'

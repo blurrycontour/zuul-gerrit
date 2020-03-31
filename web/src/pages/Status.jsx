@@ -1,4 +1,3 @@
-/* global setTimeout, clearTimeout */
 // Copyright 2018 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -22,7 +21,7 @@ import {
   Form,
   FormGroup,
   FormControl,
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'

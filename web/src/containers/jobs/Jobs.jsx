@@ -24,7 +24,7 @@ import {
   FormControl,
   Icon,
   TreeView
-} from 'patternfly-react'
+} from '@emonty/patternfly-react-side-effects'
 
 
 class JobsList extends React.Component {
