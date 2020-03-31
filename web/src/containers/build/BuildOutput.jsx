@@ -14,6 +14,7 @@
 
 import * as React from 'react'
 import { Fragment } from 'react'
+import Ansi from 'ansi-to-react'
 import PropTypes from 'prop-types'
 import { Panel } from 'react-bootstrap'
 import {
@@ -56,6 +57,7 @@ class BuildOutput extends React.Component {
 
   renderFailedTask (host, task) {
     const max_lines = 42
+    task.stdout_lines = '\u001b[34mhello world\n' + task.stdout_lines
     return (
       <Panel key={host + task.zuul_log_id}>
         <Panel.Heading>{host}: {task.name}</Panel.Heading>
@@ -70,15 +72,17 @@ class BuildOutput extends React.Component {
             <pre key="msg">{task.msg}</pre>
           )}
           {task.exception && (
-            <pre key="exc" style={{ color: 'red' }}>{task.exception}</pre>
+            <pre key="exc" className={`${'exception'}`}>{task.exception}</pre>
           )}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
             <Fragment>
               {task.stdout_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stdout'}`}><summary></summary>
-                  <pre key="stdout" title="stdout">
-                    {task.stdout_lines.slice(0, -max_lines).join('\n')}
-                  </pre>
+                  <pre key='stdout' title='stdout'>{
+                    (task.stdout_lines.slice(-max_lines)).map(value => (
+                        [<Ansi key='ansi'>{value}</Ansi>, <br key='newline'/>]
+                        ))
+                  }</pre>
                 </details>)}
             <pre key="stdout" title="stdout">
               {task.stdout_lines.slice(-max_lines).join('\n')}
