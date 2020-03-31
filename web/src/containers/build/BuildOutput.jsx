@@ -13,6 +13,7 @@
 // under the License.
 
 import * as React from 'react'
+import Ansi from "ansi-to-react"
 import PropTypes from 'prop-types'
 import { Panel } from 'react-bootstrap'
 import {
@@ -71,14 +72,11 @@ class BuildOutput extends React.Component {
             <pre key="exc" style={{ color: 'red' }}>{task.exception}</pre>
           )}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
-            <pre key="stdout" style={{ whiteSpace: 'pre-wrap' }} title="stdout">
-              {task.stdout_lines.slice(-42).join('\n')}
-            </pre>
+            <Ansi>{task.stdout_lines.slice(-42).join('\n')}</Ansi>
           )}
           {task.stderr_lines && task.stderr_lines.length > 0 && (
-            <pre key="stderr" style={{whiteSpace: 'pre-wrap', color: 'red'}} title="stderr">
-              {task.stderr_lines.slice(-42).join('\n')}
-            </pre>
+            <Ansi>{task.stderr_lines.slice(-42).join('\n')}</Ansi>
+
           )}
         </Panel.Body>
       </Panel>
