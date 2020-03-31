@@ -148,9 +148,10 @@ class ZooKeeper(object):
             # Manually retry initial connection attempt
             while True:
                 try:
-                    self.client.start(1)
+                    self.client.start(15)
                     break
-                except KazooTimeoutError:
+                except KazooTimeoutError as e:
+                    self.log.warning("Connection failed: %s" % e)
                     self.logConnectionRetryEvent()
 
         if self.enable_cache:
