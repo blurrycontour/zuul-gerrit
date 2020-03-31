@@ -71,18 +71,10 @@ class BuildOutput extends React.Component {
             <pre key="exc">{task.exception}</pre>
           )}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
-            <span key="stdout" style={{whiteSpace: 'pre'}} title="stdout">
-              {task.stdout_lines.slice(-42).map((line, idx) => (
-                <span key={idx}>{line}<br/></span>))}
-              <br />
-            </span>
+            <Ansi useClasses>{task.stdout_lines.slice(-42)}</Ansi>
           )}
           {task.stderr_lines && task.stderr_lines.length > 0 && (
-            <span key="stderr" style={{whiteSpace: 'pre'}} title="stderr">
-              {task.stderr_lines.slice(-42).map((line, idx) => (
-                <span key={idx}>{line}<br/></span>))}
-              <br />
-            </span>
+            <Ansi useClasses>{task.stderr_lines.slice(-42)}</Ansi>
           )}
         </Panel.Body>
       </Panel>
