@@ -37,9 +37,9 @@ class ConfigErrorsPage extends React.Component {
     return (
       <React.Fragment>
         <div className="pull-right">
-          <a className="refresh" onClick={() => {this.updateData()}}>
+          <button className="refresh" onClick={() => {this.updateData()}}>
             <Icon type="fa" name="refresh" /> refresh&nbsp;&nbsp;
-          </a>
+          </button>
         </div>
         <div className="pull-left">
           <ul className="list-group">
