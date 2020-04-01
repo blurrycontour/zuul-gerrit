@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_b2b2c947",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-01T12:07:22Z",
+      "side": 1,
+      "message": "Does it matter which schedulers is used to access zk?\nIf not, shouldn\u0027t the manager provide a direct access so that we can use `self.scheds.zk` instead?",
+      "range": {
+        "startLine": 193,
+        "startChar": 23,
+        "endLine": 193,
+        "endChar": 50
+      },
+      "revId": "f637243228a8fbcf1ca80c0f4e2114ea870d34c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
