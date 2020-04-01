@@ -16,7 +16,7 @@ Projects layout
 
 A proper PTI needs at least two projects:
 
-* org-config: a :term:`config-project` curated by administrators, and
+* org-config: a :term:`config-project-fake` curated by administrators, and
 * org-jobs: a :term:`untrusted-project` to hold common jobs.
 
 The projects that are being tested or deployed are also
