@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_b2bf69a8",
+        "filename": "tests/unit/test_multi_scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-01T12:19:08Z",
+      "side": 1,
+      "message": "should this test that no jobs are running before the resume?",
+      "revId": "9aed059a6df12904db1d521034ed5db0819ca07e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_3286b914",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-01T12:19:08Z",
+      "side": 1,
+      "message": "might be good to add a release note for the pause/resume command.",
+      "range": {
+        "startLine": 309,
+        "startChar": 12,
+        "endLine": 309,
+        "endChar": 32
+      },
+      "revId": "9aed059a6df12904db1d521034ed5db0819ca07e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_52837d04",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-01T12:19:08Z",
+      "side": 1,
+      "message": "This option doesn\u0027t seem documented for the scheduler.",
+      "range": {
+        "startLine": 318,
+        "startChar": 23,
+        "endLine": 318,
+        "endChar": 77
+      },
+      "revId": "9aed059a6df12904db1d521034ed5db0819ca07e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
