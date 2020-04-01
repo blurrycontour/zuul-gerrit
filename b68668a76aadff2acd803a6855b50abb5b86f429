@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_9e7a31b7",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-01T11:56:42Z",
+      "side": 1,
+      "message": "Since mypy is not running on tests, aren\u0027t these annotations going to be outdated? Or are they somehow already useful to some IDE?",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 52
+      },
+      "revId": "b68668a76aadff2acd803a6855b50abb5b86f429",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_5eaf0929",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 3510,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-01T11:56:42Z",
+      "side": 1,
+      "message": "nit: shouldn\u0027t this be `SchedulerTestManager` ?",
+      "range": {
+        "startLine": 3510,
+        "startChar": 42,
+        "endLine": 3510,
+        "endChar": 45
+      },
+      "revId": "b68668a76aadff2acd803a6855b50abb5b86f429",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
