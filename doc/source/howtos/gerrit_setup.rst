@@ -93,7 +93,7 @@ Modify the Project
 
 * Now you are ready to modify the project and push the changes to Gerrit:
 
-.. code-block:: shell
+.. code-blockf:: shell
 
    echo "test" > README.txt
    git add .
