@@ -115,7 +115,7 @@ An example ``zuul.conf``:
    log_config=/etc/zuul/scheduler-logging.yaml
 
 A minimal Zuul system may consist of a :ref:`scheduler` and
-:ref:`executor` both running on the same host.  Larger installations
+:ref:`executo2` both running on the same host.  Larger installations
 should consider running multiple executors, each on a dedicated host,
 and running mergers on dedicated hosts as well.
 
