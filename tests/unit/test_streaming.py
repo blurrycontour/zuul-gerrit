@@ -515,6 +515,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         # Start the finger gateway daemon
         gateway = zuul.lib.fingergw.FingerGateway(
             ('127.0.0.1', self.gearman_server.port, None, None, None),
+            self.zk,
             (self.host, 0),
             user=None,
             command_socket=None,
