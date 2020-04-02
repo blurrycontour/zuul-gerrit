@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_c5fe8e69",
+        "filename": "zuul/lib/gearworker.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-04-02T08:46:33Z",
+      "side": 1,
+      "message": "While rebasing, I have also updated the debug log for the unregister method.",
+      "range": {
+        "startLine": 65,
+        "startChar": 8,
+        "endLine": 65,
+        "endChar": 70
+      },
+      "revId": "d6beb77397f596dbd333975d31b6f3af02ea8f6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
