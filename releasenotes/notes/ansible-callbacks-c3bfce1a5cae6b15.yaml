@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Support for whitelisting and configuring ansible callbacks had been added.
