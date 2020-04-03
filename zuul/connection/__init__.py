@@ -13,8 +13,10 @@
 # under the License.
 
 import abc
-
+from logging import Logger
+from typing import Optional
 from zuul.lib.logutil import get_annotated_logger
+from zuul.web import ZuulWeb
 
 
 class BaseConnection(object, metaclass=abc.ABCMeta):
@@ -40,8 +42,9 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         # __init__ shouldn't make the actual connection in case this connection
         # isn't used in the layout.
         self.driver = driver
-        self.connection_name = connection_name
+        self.connection_name = connection_name  # type: str
         self.connection_config = connection_config
+        self.log = None  # type: Optional[Logger]
 
     def logEvent(self, event):
         log = get_annotated_logger(self.log, event.zuul_event_id)
@@ -90,7 +93,7 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         list should be safe to remove from the cache."""
         pass
 
-    def getWebController(self, zuul_web):
+    def getWebController(self, zuul_web: ZuulWeb):
         """Return a cherrypy web controller to register with zuul-web.
 
         :param zuul.web.ZuulWeb zuul_web:

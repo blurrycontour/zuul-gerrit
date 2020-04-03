@@ -25,9 +25,10 @@ from urllib.parse import quote_plus
 from datetime import datetime
 
 from zuul.connection import BaseConnection
-from zuul.web.handler import BaseWebController
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.logutil import get_annotated_logger
+from zuul.web import ZuulWeb
+from zuul.web.handler import BaseWebController
 
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 
@@ -321,7 +322,7 @@ class GitlabConnection(BaseConnection):
     def eventDone(self):
         self.event_queue.task_done()
 
-    def getWebController(self, zuul_web):
+    def getWebController(self, zuul_web: ZuulWeb):
         return GitlabWebController(zuul_web, self)
 
     def getProject(self, name):
@@ -446,9 +447,9 @@ class GitlabWebController(BaseWebController):
 
     log = logging.getLogger("zuul.GitlabWebController")
 
-    def __init__(self, zuul_web, connection):
-        self.connection = connection
-        self.zuul_web = zuul_web
+    def __init__(self, zuul_web: ZuulWeb, connection: GitlabConnection):
+        self.connection = connection  # type: GitlabConnection
+        self.zuul_web = zuul_web  # type: ZuulWeb
 
     def _validate_token(self, headers):
         try:

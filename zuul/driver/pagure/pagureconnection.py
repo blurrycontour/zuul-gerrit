@@ -28,13 +28,13 @@ import voluptuous as v
 import gear
 
 from zuul.connection import BaseConnection
-from zuul.lib.logutil import get_annotated_logger
-from zuul.web.handler import BaseWebController
-from zuul.lib.config import get_default
-from zuul.model import Ref, Branch, Tag
-from zuul.lib import dependson
-
 from zuul.driver.pagure.paguremodel import PagureTriggerEvent, PullRequest
+from zuul.lib import dependson
+from zuul.lib.config import get_default
+from zuul.lib.logutil import get_annotated_logger
+from zuul.model import Ref, Branch, Tag
+from zuul.web.handler import BaseWebController
+from zuul.web import ZuulWeb
 
 # Minimal Pagure version supported 5.3.0
 #
@@ -591,7 +591,7 @@ class PagureConnection(BaseConnection):
     def clearBranchCache(self):
         self.project_branch_cache = {}
 
-    def getWebController(self, zuul_web):
+    def getWebController(self, zuul_web: ZuulWeb):
         return PagureWebController(zuul_web, self)
 
     def validateWebConfig(self, config, connections):
@@ -841,9 +841,9 @@ class PagureWebController(BaseWebController):
 
     log = logging.getLogger("zuul.PagureWebController")
 
-    def __init__(self, zuul_web, connection):
-        self.connection = connection
-        self.zuul_web = zuul_web
+    def __init__(self, zuul_web: ZuulWeb, connection: PagureConnection):
+        self.connection = connection  # type: PagureConnection
+        self.zuul_web = zuul_web  # type: ZuulWeb
 
     def _source_whitelisted(self, remote_ip, forwarded_ip):
         if remote_ip and remote_ip in self.connection.source_whitelist:
