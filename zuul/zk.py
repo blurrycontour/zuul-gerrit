@@ -21,6 +21,8 @@ from kazoo.client import KazooClient, KazooState
 from kazoo import exceptions as kze
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.cache import TreeCache, TreeEvent
+from kazoo.recipe.lock import Lock, ReadLock, WriteLock
+from zuul.connection import BaseConnection
 from zuul.model import HoldRequest
 import zuul.model
 
@@ -63,6 +65,8 @@ class ZooKeeper(object):
         self._last_retry_log = 0  # type: int
         self.enable_cache = enable_cache  # type: bool
 
+        self.event_watchers =\
+            {}  # type: Dict[str, List[Callable[[List[str]], None]]]
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
         # which contains raw znode data (among other details), and one for
@@ -718,6 +722,91 @@ class ZooKeeper(object):
         node = "%s/%s" % (parent, child)
         return self.client.get(node)[0].decode(encoding='UTF-8')\
             if self.client and self.client.exists(node) else ''
+
+    def __getZullEventConnectionPath(self, connection: BaseConnection,
+                                     sequence: Optional[str]=None):
+        return self._getZuulNodePath('events', 'connection',
+                                     connection.connection_name,
+                                     sequence or '')
+
+    def __getConnectionEventReadLock(self, connection: BaseConnection)\
+            -> Optional[ReadLock]:
+        if self.client:
+            lock_node = self.__getZullEventConnectionPath(connection)
+            return self.client.ReadLock(lock_node)
+        else:
+            self.log.error("No zookeeper client!")
+            return None
+
+    def __getConnectionEventWriteLock(self, connection: BaseConnection)\
+            -> Optional[WriteLock]:
+        if self.client:
+            lock_node = self.__getZullEventConnectionPath(connection)
+            return self.client.WriteLock(lock_node)
+        else:
+            self.log.error("No zookeeper client!")
+            return None
+
+    def watchConnectionEvents(self, connection: BaseConnection,
+                              watch: Callable[[List[str]], None]):
+        connection_name = connection.connection_name
+        watchers = self.event_watchers[connection_name]
+        if not watchers:
+            watchers = [watch]
+            self.event_watchers[connection_name] = watchers
+
+            if self.client:
+                path = self.__getZullEventConnectionPath(connection)
+                self.client.ensure_path(path)
+
+                zk = self.client
+
+                @zk.ChildrenWatch(path)
+                def watch_children(children):
+                    for watcher in self.event_watchers[connection_name]:
+                        watcher(children)
+            else:
+                self.log.error("No zookeeper client!")
+                return None
+
+        else:
+            watchers.append(watch)
+
+    def popConnectionEvent(self, connection: BaseConnection):
+        event = None
+        if self.client:
+            lock = self.__getConnectionEventReadLock(connection)
+            if lock:
+                try:
+                    path = self.__getZullEventConnectionPath(connection)
+                    children = self.client.get_children(path)
+                finally:
+                    lock.release()
+
+                if len(children) > 0:
+                    sequence = sorted(children)[0]
+                    lock = self.__getConnectionEventWriteLock(connection)
+                    if lock:
+                        try:
+                            path = self.__getZullEventConnectionPath(
+                                connection, sequence)
+                            data = self.client.get(path)[0]
+                            event = json.loads(data.decode(encoding='utf-8'))
+                            self.client.delete(path)
+                        finally:
+                            lock.release()
+        return event
+
+    def pushConnectionEvent(self, connection: BaseConnection, event: Any):
+        if self.client:
+            lock = self.__getConnectionEventWriteLock(connection)
+            if lock:
+                try:
+                    path = self.__getZullEventConnectionPath(connection)
+                    self.client.create(path, json.dumps(event).encode('utf-8'),
+                                       sequence=True, makepath=True)
+                finally:
+                    lock.release()
 
 
 class Launcher():
