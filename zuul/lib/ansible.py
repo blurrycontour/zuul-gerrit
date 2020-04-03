@@ -276,6 +276,14 @@ class AnsibleManager:
     def getZuulAnsiblePluginDir(self, version):
         return os.path.join(self.getAnsibleDir(version), 'zuul', 'ansible')
 
+    def getAnsiblePluginDir(self, version):
+        return os.path.join(self.getAnsibleInstallDir(version),
+                            'lib',
+                            'python3.6',
+                            'site-packages',
+                            'ansible',
+                            'plugins')
+
     def requestVersion(self, version):
         if version not in self._supported_versions:
             raise Exception(
