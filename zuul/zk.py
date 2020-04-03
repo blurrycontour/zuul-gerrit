@@ -13,14 +13,15 @@
 import json
 import logging
 import time
-from typing import Dict
+from typing import Dict, Callable, List, Any
 from typing import Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo import exceptions as kze
+from kazoo.exceptions import NoNodeError
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.cache import TreeCache, TreeEvent
-from kazoo.recipe.lock import Lock
+from kazoo.recipe.lock import Lock, ReadLock, WriteLock
 
 from zuul.model import HoldRequest
 import zuul.model
@@ -64,6 +65,8 @@ class ZooKeeper(object):
         self._last_retry_log = 0  # type: int
         self.enable_cache = enable_cache  # type: bool
 
+        self.event_watchers =\
+            {}  # type: Dict[str, List[Callable[[List[str]], None]]]
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
         # which contains raw znode data (among other details), and one for
@@ -730,6 +733,100 @@ class ZooKeeper(object):
         node = "%s/%s" % (parent, child)
         return self.client.get(node)[0].decode(encoding='UTF-8')\
             if self.client and self.client.exists(node) else ''
+
+    def _getZuulEventConnectionPath(self, connection_name: str,
+                                    path: str, sequence: Optional[str]=None):
+        return self._getZuulNodePath('events', 'connection',
+                                     connection_name, path, sequence or '')
+
+    def _getConnectionEventReadLock(self, connection_name: str)\
+            -> ReadLock:
+        if not self.client:
+            raise Exception("No zookeeper client!")
+        lock_node = self._getZuulEventConnectionPath(connection_name, '')
+        return self.client.ReadLock(lock_node)
+
+    def _getConnectionEventWriteLock(self, connection_name: str)\
+            -> WriteLock:
+        if not self.client:
+            raise Exception("No zookeeper client!")
+        lock_node = self._getZuulEventConnectionPath(connection_name, '')
+        return self.client.WriteLock(lock_node)
+
+    def watchConnectionEvents(self, connection_name: str,
+                              watch: Callable[[List[str]], None]):
+        if connection_name not in self.event_watchers:
+            self.event_watchers[connection_name] = [watch]
+
+            if not self.client:
+                raise Exception("No zookeeper client!")
+
+            path = self._getZuulEventConnectionPath(connection_name, 'nodes')
+            self.client.ensure_path(path)
+
+            zk = self.client
+
+            @zk.ChildrenWatch(path)
+            def watch_children(children):
+                if len(children) > 0:
+                    for watcher in self.event_watchers[connection_name]:
+                        watcher(children)
+        else:
+            self.event_watchers[connection_name].append(watch)
+
+    def hasConnectionEvents(self, connection_name: str) -> bool:
+        if not self.client:
+            raise Exception("No zookeeper client!")
+        with self._getConnectionEventReadLock(connection_name):
+            path = self._getZuulEventConnectionPath(connection_name, 'nodes')
+            try:
+                return len(self.client.get_children(path)) > 0
+            except NoNodeError:
+                return False
+
+    def popConnectionEvent(self, connection_name: str):
+        if not self.client:
+            raise Exception("No zookeeper client!")
+
+        class EventWrapper:
+            def __init__(self, zk, conn_name: str):
+                self.__zk = zk
+                self.connection_name = conn_name
+                self.__lock = self.__zk._getConnectionEventWriteLock(conn_name)
+                self.__lock.acquire()
+                # self.__zk.log.debug("Lock aquired")
+
+            def __enter__(self):
+                event = None
+                path = self.__zk._getZuulEventConnectionPath(
+                    self.connection_name, 'nodes')
+                children = self.__zk.client.get_children(path)
+
+                if len(children) > 0:
+                    sequence = sorted(children)[0]
+                    path = self.__zk._getZuulEventConnectionPath(
+                        self.connection_name, 'nodes', sequence)
+                    data = self.__zk.client.get(path)[0]
+                    event = json.loads(data.decode(encoding='utf-8'))
+                    self.__zk.client.delete(path)
+                    self.__zk.log.debug("Event poped: %s" % event)
+                return event
+
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                self.__lock.release()
+                # self.__zk.log.debug("Lock released")
+
+        return EventWrapper(self, connection_name)
+
+    def pushConnectionEvent(self, connection_name: str, event: Any):
+        if not self.client:
+            raise Exception("No zookeeper client!")
+        with self._getConnectionEventWriteLock(connection_name):
+            path = self._getZuulEventConnectionPath(
+                connection_name, 'nodes') + '/'
+            node = self.client.create(path, json.dumps(event).encode('utf-8'),
+                                      sequence=True, makepath=True)
+            self.log.debug("Node %s created", node)
 
 
 class Launcher():

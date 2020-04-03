@@ -1073,7 +1073,7 @@ class ZuulWeb(object):
 
     def __init__(self, listen_address: str, listen_port: int,
                  gear_server: str, gear_port: int,
-                 connections,  # type: zuul.lib.connections.ConnectionRegistry
+                 connections,
                  authenticators: zuul.lib.auth.AuthenticatorRegistry,
                  zk_hosts: str, zk_timeout: float=10.0,
                  zk_tls_cert: Optional[str]=None,
