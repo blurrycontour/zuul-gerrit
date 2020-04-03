@@ -845,6 +845,11 @@ The following sections of ``zuul.conf`` are used by the executor:
       Value to pass to `git config user.name
       <https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup>`_.
 
+.. attr:: ansible_callback "<name>"
+
+   To whitelist ansible callback <name>. Any attributes found is this section
+   will be added to the callback_<name> section in ansible.cfg.
+
 Operation
 ~~~~~~~~~
 
