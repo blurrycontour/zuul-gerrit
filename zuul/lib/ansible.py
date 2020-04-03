@@ -276,6 +276,19 @@ class AnsibleManager:
     def getZuulAnsiblePluginDir(self, version):
         return os.path.join(self.getAnsibleDir(version), 'zuul', 'ansible')
 
+    def getAnsiblePluginDir(self, version):
+        command = [
+            self.getAnsibleCommand(version, 'python'),
+            '-c',
+            '"import ansible; print(ansible.__file__)"'
+        ]
+
+        ret = subprocess.run(command,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE,
+                             check=True)
+        return os.path.join(os.path.dirname(ret.stdout.decode()), 'plugins')
+
     def requestVersion(self, version):
         if version not in self._supported_versions:
             raise Exception(
