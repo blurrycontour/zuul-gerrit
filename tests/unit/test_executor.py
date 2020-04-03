@@ -15,6 +15,7 @@
 
 import json
 import logging
+import configparser
 import multiprocessing
 import os
 import time
@@ -814,6 +815,43 @@ class TestExecutorFacts(AnsibleZuulTestCase):
         date_time = \
             j[0]['plays'][0]['tasks'][0]['hosts']['localhost']['date_time']
         self.assertEqual(18, len(date_time))
+
+
+class TestAnsibleCallbackConfigs(AnsibleZuulTestCase):
+
+    config_file = 'zuul-executor-ansible-callback.conf'
+    tenant_config_file = 'config/ansible-callbacks/main.yaml'
+
+    def test_ansible_callback_config(self):
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        callbacks = [
+            'callback_test',
+            'callback_nocows = True',
+            'callback_nocows = False',
+            'callback_\\nnocows = True',
+            'callback_\\nnocows = False',
+            'callback_ansible_interpolation'
+        ]
+
+        p = os.path.join(self.history[0].jobdir.root,
+                         'ansible/playbook_0/ansible.cfg')
+        callback_result_file = os.path.join(self.history[0].jobdir.root,
+                                            'trusted/project_0/review.example.com/common-config/playbooks/callback_plugins/test-callback-success')
+        c = configparser.ConfigParser(interpolation=None)
+        c.read(p)
+        self.assertEqual(self.history[0].result, 'SUCCESS')
+        self.assertTrue(os.path.isfile(callback_result_file))
+        for callback in callbacks:
+            self.assertIn(callback, c.sections())
+        self.assertIn('test_field', c['callback_test'])
+        self.assertEqual('test-value', c['callback_test']['test_field'])
+        self.assertIn('test_field', c['callback_ansible_interpolation'])
+        self.assertIn('test-%-value',
+                      c['callback_ansible_interpolation']['test_field'])
 
 
 class TestExecutorStart(ZuulTestCase):
