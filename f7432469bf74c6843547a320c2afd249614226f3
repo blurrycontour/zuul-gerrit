@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_b6cb9e48",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 504,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-03T16:58:11Z",
+      "side": 1,
+      "message": "If, somehow, the build is unpaused on the executor before this event is processed (for example, the executor is being shut down), it may be possible to clear the paused flag here immediately, and then later have the event processor set it.  I don\u0027t know if that would be a problem in practice, but...\n\nI think we can make this simpler by just doing less.  Can we drop the paused_scheduled attribute and simply change this to:\n\nif data.get(\u0027paused\u0027):\n  result_data \u003d ...\n  self.sched.onBuildPaused(...)\n\nAnd set paused\u003dTrue in onBuildPaused?\n\nThe executor sends \"paused:true\" only once, when the build pauses.  It isn\u0027t going to send a second \"paused:true\" while still paused, so I don\u0027t think we need to perform the de-duplication that having pause_scheduled provides.  I think this approach would best approximate what I think is the goal: just letting the result processor handle this work.",
+      "revId": "f7432469bf74c6843547a320c2afd249614226f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
