@@ -9,20 +9,21 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 import json
 import logging
 import time
-from typing import Dict, Any, Callable
-from typing import List
+from typing import Dict
 from typing import Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo import exceptions as kze
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.cache import TreeCache, TreeEvent
-from zuul.model import HoldRequest
+from kazoo.recipe.lock import Lock, WriteLock, ReadLock
+
 import zuul.model
+from zuul.model import HoldRequest
+from zuul.model import Tenant
 
 
 class LockException(Exception):
@@ -718,6 +719,128 @@ class ZooKeeper(object):
         node = "%s/%s" % (parent, child)
         return self.client.get(node)[0].decode(encoding='UTF-8')\
             if self.client and self.client.exists(node) else ''
+
+    def getLayoutHash(self, tenant: Tenant) -> Optional[str]:
+        """
+        Get tenant's layout version.
+
+        A layout version is a hash over all relevant files for the given
+        tenant.
+
+        :param tenant: Tentant
+        :return: Tenant's layout relevant files hash
+        """
+        if self.client:
+            lock_node = self._getZuulNodePath('layout', tenant.name)
+            with self.client.ReadLock(lock_node):
+                node = self._getZuulNodePath('layout', tenant.name)
+                return self.client.get(node)[0].decode(encoding='UTF-8')\
+                    if self.client.exists(node) else None
+        else:
+            self.log.error("No zookeeper client!")
+            return None
+
+    def setLayoutHash(self, tenant: Tenant, hash: str) -> None:
+        if self.client:
+            lock_node = self._getZuulNodePath('layout', tenant.name)
+            with self.client.WriteLock(lock_node):
+                node = self._getZuulNodePath('layout', tenant.name)
+                stat = self.client.exists(node)
+                if stat is None:
+                    self.client.create(node, hash.encode(encoding='UTF-8'),
+                                       makepath=True)
+                else:
+                    self.client.set(node, hash.encode(encoding='UTF-8'),
+                                    version=stat.version)
+        else:
+            self.log.error("No zookeeper client!")
+
+    def getConfigReadLock(self) -> Optional[ReadLock]:
+        lock_node = self._getZuulNodePath('config')
+        return self.client.WriteLock(lock_node) if self.client else None
+
+    def getConfigWriteLock(self) -> Optional[WriteLock]:
+        lock_node = self._getZuulNodePath('config')
+        return self.client.WriteLock(lock_node) if self.client else None
+
+    def loadConfig(self, project: str, branch: str, path: str,
+                   use_lock: bool=True) -> Optional[str]:
+        """
+        Load unparsed config from zookeeper under
+        /zuul/config/&lt;project>/&lt;branch>/&lt;path-to-config>/&lt;shard>
+
+        :param project: Project name
+        :param branch: Branch
+        :param path: Path
+        :param use_lock: Whether the operation should be read-locked
+        :return: The unparsed config an its version as a tuple or None.
+        """
+        if self.client:
+            lock = self.getConfigReadLock() if use_lock else None
+            if lock:
+                lock.acquire()
+            try:
+                node = self._getZuulNodePath('config', project, branch, path)
+                content = "".join(
+                    map(lambda c: self._getConfigPartContent(node, c),
+                        self.client.get_children(node)))\
+                    if self.client.exists(node) else None
+                return content
+            finally:
+                if lock:
+                    lock.release()
+        else:
+            self.log.error("No zookeeper client!")
+            return None
+
+    def saveConfig(self, project: str, branch: str, path: str,
+                   data: Optional[str]) -> None:
+        """
+        Saves unparsed configuration to zookeeper under
+        /zuul/config/&lt;project>/&lt;branch>/&lt;path-to-config>/&lt;shard>
+
+        An update only happens if the currently stored content differs from
+        the provided in `data` param.
+
+        This operation needs to be explicitly locked using lock from
+        `getConfigWriteLock`
+
+        :param project: Project name
+        :param branch: Branch
+        :param path: Path
+        :param data: Unparsed configuration yaml
+        """
+        if self.client:
+            current = self.loadConfig(project, branch, path, use_lock=False)
+
+            if current != data:
+                content = data.encode(encoding='UTF-8')\
+                    if data is not None else None
+
+                node = self._getZuulNodePath('config', project, branch, path)
+                exists = self.client.exists(node)
+
+                if exists:
+                    for child in self.client.get_children(node):
+                        try:
+                            self.log.debug("Deleting: %s/%s" % (node, child))
+                            self.client.delete("%s/%s" % (node, child),
+                                               recursive=True)
+                        except kze.NoNodeError:
+                            pass
+
+                if content is not None:
+                    self.client.ensure_path(node)
+                    chunks = [content[i:i + self.CONFIG_MAX_SIZE]
+                              for i in range(0, len(content),
+                                             self.CONFIG_MAX_SIZE)]
+                    for i, chunk in enumerate(chunks):
+                        self.log.debug("Creating: %s/%d" % (node, i))
+                        self.client.create("%s/%d" % (node, i), chunk)
+                elif exists:
+                    self.client.delete(node)
+        else:
+            self.log.error("No zookeeper client!")
 
 
 class Launcher():
