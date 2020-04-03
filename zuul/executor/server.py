@@ -861,6 +861,15 @@ class AnsibleJob(object):
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
         self.filter_dir = os.path.join(plugin_dir, 'filter')
 
+        self.ansible_callbacks = {}
+        for section_name in self.executor_server.config.sections():
+            callback_match = re.match(r'^ansible_callback ([\'\"]?)(.*)(\1)$',
+                                      section_name, re.I)
+            if not callback_match:
+                continue
+            callback_name = callback_match.group(2)
+            self.ansible_callbacks[callback_name] = dict(config.items(section_name))
+
     def run(self):
         self.running = True
         self.thread = threading.Thread(target=self.execute,
@@ -2075,6 +2084,11 @@ class AnsibleJob(object):
             # and reduces CPU load of the ansible process.
             config.write('internal_poll_interval = 0.01\n')
 
+            if self.ansible_callbacks:
+                config.write('callback_whitelist =')
+                for callback in self.ansible_callbacks.keys():
+                    config.write('    %s' % callback)
+
             config.write('[ssh_connection]\n')
             # NOTE(pabelanger): Try up to 3 times to run a task on a host, this
             # helps to mitigate UNREACHABLE host errors with SSH.
@@ -2093,6 +2107,17 @@ class AnsibleJob(object):
                 "-o ServerAliveInterval=60 " \
                 "-o UserKnownHostsFile=%s" % self.jobdir.known_hosts
             config.write('ssh_args = %s\n' % ssh_args)
+
+            if self.ansible_callbacks:
+                for callback_name, config in self.ansible_callbacks.keys():
+                    callback_config_section = config.get(
+                        "callback_config_section",
+                        "callback_{callback_name}".format(callback_name)
+                    )
+                    config.write("[{config_section}]".format(callback_config_section)
+                    {config.write("{key} = {value}".format(k, config[k]))}
+                     for k in config.keys()
+                     if k != "callback_config_section"}
 
     def _ansibleTimeout(self, msg):
         self.log.warning(msg)
