@@ -858,8 +858,23 @@ class AnsibleJob(object):
         self.action_dir = os.path.join(plugin_dir, 'action')
         self.action_dir_general = os.path.join(plugin_dir, 'actiongeneral')
         self.callback_dir = os.path.join(plugin_dir, 'callback')
+        ansible_plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
+            self.arguments.get('ansible_version'))
+        self.ansible_callback_dir = os.path.join(ansible_plugin_dir, 'callback')
+
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
         self.filter_dir = os.path.join(plugin_dir, 'filter')
+
+        self.ansible_callbacks = {}
+        for section_name in self.executor_server.config.sections():
+            cb_match = re.match(r'^ansible_callback ([\'\"]?)(.*)(\1)$',
+                                section_name, re.I)
+            if not cb_match:
+                continue
+            cb_name = cb_match.group(2)
+            self.ansible_callbacks[cb_name] = dict(
+                self.executor_server.config.items(section_name)
+            )
 
     def run(self):
         self.running = True
@@ -2020,8 +2035,9 @@ class AnsibleJob(object):
         #               mechanism for deployers being able to add callback
         #               plugins.
         if self.ara_callbacks:
-            callback_path = '%s:%s' % (
+            callback_path = '%s:%s:%s' % (
                 self.callback_dir,
+                self.ansible_callback_dir,
                 os.path.dirname(self.ara_callbacks))
         else:
             callback_path = self.callback_dir
@@ -2041,6 +2057,7 @@ class AnsibleJob(object):
             config.write('stdout_callback = zuul_stream\n')
             config.write('filter_plugins = %s\n'
                          % self.filter_dir)
+
             config.write('nocows = True\n')  # save useless stat() calls
             # bump the timeout because busy nodes may take more than
             # 10s to respond
@@ -2075,6 +2092,11 @@ class AnsibleJob(object):
             # and reduces CPU load of the ansible process.
             config.write('internal_poll_interval = 0.01\n')
 
+            if self.ansible_callbacks:
+                config.write('callback_whitelist =\n')
+                for callback in self.ansible_callbacks.keys():
+                    config.write('    %s,\n' % callback)
+
             config.write('[ssh_connection]\n')
             # NOTE(pabelanger): Try up to 3 times to run a task on a host, this
             # helps to mitigate UNREACHABLE host errors with SSH.
@@ -2093,6 +2115,13 @@ class AnsibleJob(object):
                 "-o ServerAliveInterval=60 " \
                 "-o UserKnownHostsFile=%s" % self.jobdir.known_hosts
             config.write('ssh_args = %s\n' % ssh_args)
+
+            if self.ansible_callbacks:
+                for cb_name, cb_config in self.ansible_callbacks.items():
+                    config.write("[callback_%s]\n" % cb_name)
+                    {config.write("%s = %s\n" % (k, cb_config[k]))
+                     for k in cb_config.keys()
+                     if k != "callback_config_section"}
 
     def _ansibleTimeout(self, msg):
         self.log.warning(msg)
