@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "df33271e_618157c3",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-03T12:13:43Z",
+      "side": 1,
+      "message": "mypy is running already as part of the pep8 check. The annotations are indeed helpful for most recent IDEs.",
+      "parentUuid": "df33271e_9e7a31b7",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 52
+      },
+      "revId": "b68668a76aadff2acd803a6855b50abb5b86f429",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df33271e_5eaf0929",
         "filename": "tests/base.py",
         "patchSetId": 13
