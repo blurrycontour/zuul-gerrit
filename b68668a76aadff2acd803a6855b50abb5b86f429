@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "df33271e_e1572725",
+        "filename": "tests/base.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-03T12:26:12Z",
+      "side": 1,
+      "message": "They are supported by IDEs. And very helpful IMHO to navigate the code :) Also some common bugs, e.g. NPE, or inheritance problems may be detected using this.",
+      "parentUuid": "df33271e_9e7a31b7",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 52
+      },
+      "revId": "b68668a76aadff2acd803a6855b50abb5b86f429",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "df33271e_5eaf0929",
         "filename": "tests/base.py",
         "patchSetId": 13
