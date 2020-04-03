@@ -39,6 +39,24 @@
       "revId": "93ec3daf4745a0c2cd586b83edcdabfb1eef0513",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_67e046fc",
+        "filename": "tools/zk-ca.sh",
+        "patchSetId": 19
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-03T14:11:07Z",
+      "side": 1,
+      "message": "Yes, can be used, see https://review.opendev.org/#/c/712817/7/doc/source/examples/zoo.cfg",
+      "parentUuid": "df33271e_04f2189b",
+      "revId": "93ec3daf4745a0c2cd586b83edcdabfb1eef0513",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
