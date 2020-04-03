@@ -13,15 +13,10 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 import cherrypy
 import socket
-from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
-from ws4py.websocket import WebSocket
 import codecs
 import copy
-from datetime import datetime
 import json
 import logging
 import os
@@ -29,13 +24,28 @@ import time
 import select
 import threading
 
-import zuul.lib.repl
-from zuul.lib.re2util import filter_allowed_disallowed
-import zuul.model
-from zuul import exceptions
+from typing import Callable
+from typing import Dict
+from typing import Optional
+from cherrypy._cpdispatch import RoutesDispatcher
+from datetime import datetime
+from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
+from ws4py.websocket import WebSocket
+
 import zuul.rpcclient
 import zuul.zk
-from zuul.lib import commandsocket
+import zuul.lib.repl
+import zuul.model
+
+from zuul import exceptions
+from zuul.lib.auth import AuthenticatorRegistry
+from zuul.lib.commandsocket import CommandSocket
+from zuul.lib.connections import ConnectionRegistry
+from zuul.lib.re2util import filter_allowed_disallowed
+from zuul.lib.repl import REPLServer
+from zuul.model import WebInfo
+from zuul.rpcclient import RPCClient
+from zuul.zk import ZooKeeper
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -1069,27 +1079,37 @@ class StreamManager(object):
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web.ZuulWeb")
 
-    def __init__(self, listen_address, listen_port, gear_server,
-                 gear_port, ssl_key=None, ssl_cert=None, ssl_ca=None,
-                 static_cache_expiry=3600, connections=None,
-                 info=None, static_path=None, zk_hosts=None,
-                 zk_timeout=None, zk_tls_cert=None, zk_tls_key=None,
-                 zk_tls_ca=None, authenticators=None,
-                 command_socket=None):
-        self.start_time = time.time()
-        self.listen_address = listen_address
-        self.listen_port = listen_port
-        self.event_loop = None
-        self.term = None
-        self.server = None
-        self.static_cache_expiry = static_cache_expiry
-        self.info = info
-        self.static_path = os.path.abspath(static_path or STATIC_DIR)
+    def __init__(self, listen_address: str, listen_port: int,
+                 gear_server: str, gear_port: int,
+                 ssl_key: Optional[str]=None, ssl_cert: Optional[str]=None,
+                 ssl_ca: Optional[str]=None,
+                 static_cache_expiry: int=3600,
+                 connections: Optional[ConnectionRegistry]=None,
+                 info: Optional[WebInfo]=None,
+                 static_path: Optional[str]=None,
+                 zk_hosts: Optional[str]=None,
+                 zk_timeout: Optional[int]=None,
+                 zk_tls_cert: Optional[str]=None,
+                 zk_tls_key: Optional[str]=None,
+                 zk_tls_ca: Optional[str]=None,
+                 authenticators: Optional[AuthenticatorRegistry]=None,
+                 command_socket: Optional[str]=None):
+
+        self.start_time = time.time()  # type: float
+        self.listen_address = listen_address  # type: str
+        self.listen_port = listen_port  # type: int
+        self.event_loop = None  # TODO JK: is this needed?
+        self.term = None  # TODO JK: is this needed?
+        self.server = None  # TODO JK: is this needed?
+        self.static_cache_expiry = static_cache_expiry  # type: int
+        self.info = info  # type: Optional[WebInfo]
+        self.static_path = os.path.abspath(
+            static_path or STATIC_DIR)  # type: str
         # instanciate handlers
-        self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
-                                            ssl_key, ssl_cert, ssl_ca,
-                                            client_id='Zuul Web Server')
-        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
+        self.rpc = RPCClient(gear_server, gear_port, ssl_key, ssl_cert, ssl_ca,
+                             client_id='Zuul Web Server')  # type: RPCClient
+        self.zk = ZooKeeper(enable_cache=True)  # type: ZooKeeper
+        self.connections = connections  # type: Optional[ConnectionRegistry]
         if zk_hosts:
             self.zk.connect(hosts=zk_hosts, read_only=True,
                             timeout=zk_timeout, tls_cert=zk_tls_cert,
@@ -1097,20 +1117,21 @@ class ZuulWeb(object):
 
         self.connections = connections
         self.authenticators = authenticators
-        self.stream_manager = StreamManager()
+        self.stream_manager = StreamManager()  # type: StreamManager
 
-        self.command_socket = commandsocket.CommandSocket(command_socket)
+        self.command_socket = CommandSocket(
+            command_socket)  # type: CommandSocket
 
-        self.repl = None
+        self.repl = None  # type: Optional[REPLServer]
 
         self.command_map = {
             'stop': self.stop,
             'repl': self.start_repl,
             'norepl': self.stop_repl,
-        }
+        }  # type: Dict[str, Callable[[], None]]
 
-        route_map = cherrypy.dispatch.RoutesDispatcher()
-        api = ZuulWebAPI(self)
+        route_map = RoutesDispatcher()  # type: RoutesDispatcher
+        api = ZuulWebAPI(self)  # type: ZuulWebAPI
         route_map.connect('api', '/api',
                           controller=api, action='index')
         route_map.connect('api', '/api/info',
@@ -1130,7 +1151,7 @@ class ZuulWeb(object):
         route_map.connect('api', '/api/tenant/{tenant}/job/{job_name}',
                           controller=api, action='job')
         # if no auth configured, deactivate admin routes
-        if self.authenticators.authenticators:
+        if self.authenticators and self.authenticators.authenticators:
             # route order is important, put project actions before the more
             # generic tenant/{tenant}/project/{project} route
             route_map.connect('api', '/api/user/authorizations',
@@ -1185,12 +1206,15 @@ class ZuulWeb(object):
         route_map.connect('api', '/api/tenant/{tenant}/config-errors',
                           controller=api, action='config_errors')
 
-        for connection in connections.connections.values():
-            controller = connection.getWebController(self)
-            if controller:
-                cherrypy.tree.mount(
-                    controller,
-                    '/api/connection/%s' % connection.connection_name)
+        if connections:
+            for connection in connections.connections.values():
+                controller = connection.getWebController(self)
+                if controller:
+                    cherrypy.tree.mount(
+                        controller,
+                        '/api/connection/%s' % connection.connection_name)
+        else:
+            self.log.warning("Connections not set!")
 
         # Add fallthrough routes at the end for the static html/js files
         route_map.connect(
@@ -1274,8 +1298,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     import zuul.lib.connections
     import zuul.lib.auth.authenticators
-    connections = zuul.lib.connections.ConnectionRegistry()
-    auths = zuul.lib.auth.authenticators.AuthenticatorRegistry()
+    connections = ConnectionRegistry()
+    auths = AuthenticatorRegistry()
     z = ZuulWeb(listen_address="127.0.0.1", listen_port=9000,
                 gear_server="127.0.0.1", gear_port=4730,
                 connections=connections, authenticators=auths)

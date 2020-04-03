@@ -2087,7 +2087,7 @@ class GithubConnection(BaseConnection):
 
         return statuses
 
-    def getWebController(self, zuul_web):
+    def getWebController(self, zuul_web: ZuulWeb):
         return GithubWebController(zuul_web, self)
 
     def validateWebConfig(self, config, connections):
@@ -2142,10 +2142,11 @@ class GithubWebController(BaseWebController):
 
     log = logging.getLogger("zuul.GithubWebController")
 
-    def __init__(self, zuul_web, connection):
-        self.connection = connection
-        self.zuul_web = zuul_web
-        self.token = self.connection.connection_config.get('webhook_token')
+    def __init__(self, zuul_web: ZuulWeb, connection: GithubConnection):
+        self.connection = connection  # type: GithubConnection
+        self.zuul_web = zuul_web  # type: ZuulWeb
+        self.token = self.connection.connection_config.get(
+            'webhook_token')  # type: str
 
     def _validate_signature(self, body, headers):
         try:

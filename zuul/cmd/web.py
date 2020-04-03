@@ -17,6 +17,8 @@ import logging
 import signal
 import sys
 
+from typing import Optional
+
 import zuul.cmd
 import zuul.model
 import zuul.web
@@ -25,6 +27,8 @@ import zuul.driver.github
 import zuul.lib.auth
 
 from zuul.lib.config import get_default
+from zuul.model import WebInfo
+from zuul.web import ZuulWeb
 
 
 class WebServer(zuul.cmd.ZuulDaemonApp):
@@ -47,21 +51,18 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.web.stop()
 
     def _run(self):
-        info = zuul.model.WebInfo.fromConfig(self.config)
+        info = WebInfo.fromConfig(self.config)  # type: WebInfo
 
         params = dict()
 
         params['info'] = info
-        params['listen_address'] = get_default(self.config,
-                                               'web', 'listen_address',
-                                               '127.0.0.1')
+        params['listen_address'] = get_default(
+            self.config, 'web', 'listen_address', '127.0.0.1')
         params['listen_port'] = get_default(self.config, 'web', 'port', 9000)
-        params['static_cache_expiry'] = get_default(self.config, 'web',
-                                                    'static_cache_expiry',
-                                                    3600)
-        params['static_path'] = get_default(self.config,
-                                            'web', 'static_path',
-                                            None)
+        params['static_cache_expiry'] = get_default(
+            self.config, 'web', 'static_cache_expiry', 3600)
+        params['static_path'] = get_default(
+            self.config, 'web', 'static_path', None)
         params['gear_server'] = get_default(self.config, 'gearman', 'server')
         params['gear_port'] = get_default(self.config, 'gearman', 'port', 4730)
         params['ssl_key'] = get_default(self.config, 'gearman', 'ssl_key')
@@ -69,8 +70,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
 
         params['command_socket'] = get_default(
-            self.config, 'web', 'command_socket',
-            '/var/lib/zuul/web.socket')
+            self.config, 'web', 'command_socket', '/var/lib/zuul/web.socket')
 
         params['connections'] = self.connections
         params['authenticators'] = self.authenticators
@@ -93,8 +93,9 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params["zk_timeout"] = float(get_default(self.config, 'zookeeper',
                                                  'session_timeout', 10.0))
 
+        self.web = None  # type: Optional[ZuulWeb]
         try:
-            self.web = zuul.web.ZuulWeb(**params)
+            self.web = ZuulWeb(**params)
         except Exception:
             self.log.exception("Error creating ZuulWeb:")
             sys.exit(1)
