@@ -701,6 +701,21 @@ class ZooKeeper(object):
         request.lock.release()
         request.lock = None
 
+    # Scheduler part begins here
+
+    CONFIG_ROOT = "/zuul"
+    # Node content max size: keep ~100kB as a reserve form the 1MB limit
+    CONFIG_MAX_SIZE = 1024 * 1024 - 100 * 1024
+
+    def _getZuulNodePath(self, *args: str) -> str:
+        return "/".join(filter(lambda s: s is not None and s != '',
+                               [self.CONFIG_ROOT] + list(args)))
+
+    def _getConfigPartContent(self, parent, child) -> str:
+        node = "%s/%s" % (parent, child)
+        return self.client.get(node)[0].decode(encoding='UTF-8')\
+            if self.client.exists(node) else ''
+
 
 class Launcher():
     '''
