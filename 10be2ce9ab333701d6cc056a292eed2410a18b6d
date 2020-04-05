@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_60d930f3",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1004
+      },
+      "writtenOn": "2020-04-05T18:22:02Z",
+      "side": 1,
+      "message": "/bin/sh: 1: wget: not found\n\nmaybe curl?",
+      "revId": "10be2ce9ab333701d6cc056a292eed2410a18b6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
