@@ -55,6 +55,13 @@ COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
 
+RUN echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
+  && wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/Debian_10/Release.key -O- | apt-key add - \
+  && apt-get update \
+  && apt-get install -y skopeo \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
 CMD ["/usr/local/bin/zuul-executor", "-f"]
 
 FROM zuul as zuul-fingergw
