@@ -55,3 +55,5 @@ bzip2
 openssh-client [platform:debian platform:apk]
 openssh [platform:rpm]
 coreutils [platform:apk]
+gnupg [platform:debian platform:apk]
+gnupg2 [platform:rpm]
