@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_34947ce8",
+        "filename": "bindep.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-06T17:05:21Z",
+      "side": 1,
+      "message": "I think if we add things to bindep we should make sure that it\u0027s there for all platforms. Otherwise this might break installation on e.g. centos or fedora.",
+      "revId": "f7fa3469947be4827cc0e2410283ef51b1e582f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
