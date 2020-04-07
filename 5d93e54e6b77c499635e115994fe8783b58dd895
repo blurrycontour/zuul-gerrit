@@ -45,6 +45,30 @@
       "revId": "5d93e54e6b77c499635e115994fe8783b58dd895",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_3662a017",
+        "filename": "tools/pip.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-07T20:04:20Z",
+      "side": 1,
+      "message": "whoops, of course",
+      "parentUuid": "df33271e_fbc4a142",
+      "range": {
+        "startLine": 29,
+        "startChar": 14,
+        "endLine": 29,
+        "endChar": 22
+      },
+      "revId": "5d93e54e6b77c499635e115994fe8783b58dd895",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
