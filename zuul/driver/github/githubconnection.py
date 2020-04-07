@@ -1559,7 +1559,11 @@ class GithubConnection(BaseConnection):
             log.debug('Change %s can not merge because it is a draft', change)
             return False
 
-        if not self._hasRequiredStatusChecks(allow_needs, canmerge_data):
+        missing_status_checks = self._getMissingStatusChecks(
+            allow_needs, canmerge_data)
+        if missing_status_checks:
+            log.debug('Change %s can not merge because required status checks '
+                      'are missing: %s', change, missing_status_checks)
             return False
 
         if canmerge_data.get('requiresApprovingReviews'):
@@ -1679,11 +1683,11 @@ class GithubConnection(BaseConnection):
         return resp.json()
 
     @staticmethod
-    def _hasRequiredStatusChecks(allow_needs, canmerge_data):
+    def _getMissingStatusChecks(allow_needs, canmerge_data):
         required_contexts = canmerge_data['requiredStatusCheckContexts']
         if not required_contexts:
             # There are no required contexts -> ok by definition
-            return True
+            return set()
 
         # Strip allow_needs as we will set this in the gate ourselves
         required_contexts = set(
@@ -1693,9 +1697,9 @@ class GithubConnection(BaseConnection):
         successful = set([s[0] for s in canmerge_data['status'].items()
                           if s[1] == 'SUCCESS'])
 
-        # Required contexts must be a subset of the successful contexts as
-        # we allow additional successful status contexts we don't care about.
-        return required_contexts.issubset(successful)
+        # Remove successful checks from the required contexts to get the
+        # remaining missing required status.
+        return required_contexts.difference(successful)
 
     @cachetools.cached(cache=cachetools.TTLCache(maxsize=2048, ttl=3600),
                        key=lambda self, login, project:
