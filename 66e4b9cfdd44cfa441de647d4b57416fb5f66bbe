@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_b8a7c80b",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-04-07T13:26:34Z",
+      "side": 1,
+      "message": "Maybe this should be done for the other \u0027getAnsibleDir\u0027 methods as well?",
+      "range": {
+        "startLine": 272,
+        "startChar": 8,
+        "endLine": 272,
+        "endChar": 21
+      },
+      "revId": "66e4b9cfdd44cfa441de647d4b57416fb5f66bbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
