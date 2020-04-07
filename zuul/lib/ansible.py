@@ -269,11 +269,11 @@ class AnsibleManager:
                             'installed' % version)
         return venv_path
 
-    def getAnsibleDir(self, version):
+    def getZuulAnsibleDir(self, version):
         ansible = self._getAnsible(version)
         return os.path.join(self.zuul_ansible_dir, ansible.version)
 
-    def getAnsiblePluginDir(self, version):
+    def getZuulAnsiblePluginDir(self, version):
         return os.path.join(self.getAnsibleDir(version), 'zuul', 'ansible')
 
     def requestVersion(self, version):
