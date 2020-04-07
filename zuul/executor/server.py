@@ -849,7 +849,7 @@ class AnsibleJob(object):
             self.executor_variables_file = self.executor_server.config.get(
                 'executor', 'variables')
 
-        plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
+        plugin_dir = self.executor_server.ansible_manager.getZuulAnsiblePluginDir(
             self.arguments.get('ansible_version'))
         self.ara_callbacks = \
             self.executor_server.ansible_manager.getAraCallbackPlugin(
