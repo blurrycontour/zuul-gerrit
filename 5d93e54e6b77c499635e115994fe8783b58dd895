@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df33271e_5bb4add1",
+        "filename": "tools/pip.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-07T19:03:18Z",
+      "side": 1,
+      "message": "that\u0027s a surprising syntax :) nice!",
+      "range": {
+        "startLine": 28,
+        "startChar": 8,
+        "endLine": 28,
+        "endChar": 22
+      },
+      "revId": "5d93e54e6b77c499635e115994fe8783b58dd895",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_fbc4a142",
+        "filename": "tools/pip.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-07T19:03:18Z",
+      "side": 1,
+      "message": "however that doesn\u0027t seems to work, shouldn\u0027t it be `$attempts` ?",
+      "range": {
+        "startLine": 29,
+        "startChar": 14,
+        "endLine": 29,
+        "endChar": 22
+      },
+      "revId": "5d93e54e6b77c499635e115994fe8783b58dd895",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
