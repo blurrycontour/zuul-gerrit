@@ -24,6 +24,7 @@ import signal
 import shlex
 import socket
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -2782,8 +2783,16 @@ class ExecutorServer(BaseMergeServer):
             super().unpause()
 
     def graceful(self):
-        # TODOv3: implement
-        pass
+        # This pauses the executor end shuts it down when there is no running
+        # build left anymore
+        self.log.info('Stopping graceful')
+        self.pause()
+        while self.job_workers:
+            self.log.debug('Waiting for %s jobs to end', len(self.job_workers))
+            time.sleep(30)
+        self.stop()
+        self.join()
+        sys.exit(0)
 
     def verboseOn(self):
         self.verbose = True
