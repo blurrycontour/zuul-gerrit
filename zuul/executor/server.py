@@ -2742,6 +2742,8 @@ class ExecutorServer(BaseMergeServer):
         for _ in self.update_threads:
             self.update_queue.put(None)
 
+        self.command_socket.stop()
+
         # All job results should have been sent by now, shutdown the
         # gearman workers.
         if self.process_merge_jobs:
@@ -2757,7 +2759,6 @@ class ExecutorServer(BaseMergeServer):
             self.statsd.gauge(base_key + '.pct_used_ram', 0)
             self.statsd.gauge(base_key + '.running_builds', 0)
 
-        self.command_socket.stop()
         self.stop_repl()
         self.log.debug("Stopped")
 
@@ -2782,8 +2783,17 @@ class ExecutorServer(BaseMergeServer):
             super().unpause()
 
     def graceful(self):
-        # TODOv3: implement
-        pass
+        # This pauses the executor end shuts it down when there is no running
+        # build left anymore
+        self.log.info('Stopping graceful')
+        self.pause()
+        while self.job_workers:
+            self.log.debug('Waiting for %s jobs to end', len(self.job_workers))
+            time.sleep(30)
+        try:
+            self.stop()
+        except Exception:
+            self.log.exception('Error while stopping')
 
     def verboseOn(self):
         self.verbose = True

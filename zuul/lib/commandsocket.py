@@ -55,9 +55,6 @@ class CommandSocket(object):
         # re-entering their loop.
         self.queue.put(b'_stop')
         self.socket_thread.join()
-        self.socket.close()
-        if os.path.exists(self.path):
-            os.unlink(self.path)
 
     def _socketListener(self):
         while self.running:
@@ -79,6 +76,12 @@ class CommandSocket(object):
                     self.queue.put(buf)
             except Exception:
                 self.log.exception("Exception in socket handler")
+
+        # Unlink socket file within the thread so join works and we don't
+        # leak the socket file.
+        self.socket.close()
+        if os.path.exists(self.path):
+            os.unlink(self.path)
 
     def get(self):
         if not self.running:
