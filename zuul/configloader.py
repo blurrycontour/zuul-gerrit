@@ -350,7 +350,7 @@ class ZuulMark(object):
 class ZuulSafeLoader(yaml.SafeLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template',
-                                 'semaphore', 'pragma'))
+                                 'semaphore', 'queue', 'pragma'))
 
     def __init__(self, stream, context):
         wrapped_stream = io.StringIO(stream)
@@ -1351,6 +1351,29 @@ class SemaphoreParser(object):
         return semaphore
 
 
+class QueueParser:
+    def __init__(self, pcontext):
+        self.log = logging.getLogger("zuul.QueueParser")
+        self.pcontext = pcontext
+        self.schema = self.getSchema()
+
+    def getSchema(self):
+        queue = {vs.Required('name'): str,
+                 'per-branch': bool,
+                 '_source_context': model.SourceContext,
+                 '_start_mark': ZuulMark,
+                 }
+        return vs.Schema(queue)
+
+    def fromYaml(self, conf):
+        self.schema(conf)
+        queue = model.Queue(conf['name'], conf.get('per-branch', False))
+        queue.source_context = conf.get('_source_context')
+        queue.start_mark = conf.get('_start_mark')
+        queue.freeze()
+        return queue
+
+
 class AuthorizationRuleParser(object):
     def __init__(self):
         self.log = logging.getLogger("zuul.AuthorizationRuleParser")
@@ -1399,6 +1422,7 @@ class ParseContext(object):
         self.secret_parser = SecretParser(self)
         self.job_parser = JobParser(self)
         self.semaphore_parser = SemaphoreParser(self)
+        self.queue_parser = QueueParser(self)
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
 
@@ -1438,7 +1462,7 @@ class TenantParser(object):
         self.keystorage = keystorage
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
-                     'project-template', 'nodeset', 'secret')
+                     'project-template', 'nodeset', 'secret', 'queue')
 
     project_dict = {str: {
         'include': to_list(classes),
@@ -1730,7 +1754,8 @@ class TenantParser(object):
         untrusted_projects = []
 
         default_include = frozenset(['pipeline', 'job', 'semaphore', 'project',
-                                     'secret', 'project-template', 'nodeset'])
+                                     'secret', 'project-template', 'nodeset',
+                                     'queue'])
 
         for source_name, conf_source in conf_tenant.get('source', {}).items():
             source = self.connections.getSource(source_name)
@@ -1743,7 +1768,8 @@ class TenantParser(object):
                     self._loadProjectKeys(source_name, tpc.project)
                     config_projects.append(tpc)
 
-            current_include = frozenset(default_include - set(['pipeline']))
+            current_include = frozenset(default_include -
+                                        {'pipeline', 'queue'})
             for conf_repo in conf_source.get('untrusted-projects', []):
                 tpcs = self._getProjects(source, conf_repo,
                                          current_include)
@@ -1949,6 +1975,15 @@ class TenantParser(object):
                 parsed_config.semaphores.append(
                     pcontext.semaphore_parser.fromYaml(config_semaphore))
 
+        for config_queue in unparsed_config.queues:
+            classes = self._getLoadClasses(tenant, config_queue)
+            if 'queue' not in classes:
+                continue
+            with configuration_exceptions('queue',
+                                          config_queue, loading_errors):
+                parsed_config.queues.append(
+                    pcontext.queue_parser.fromYaml(config_queue))
+
         for config_template in unparsed_config.project_templates:
             classes = self._getLoadClasses(tenant, config_template)
             if 'project-template' not in classes:
@@ -2065,6 +2100,10 @@ class TenantParser(object):
             with reference_exceptions(
                     'semaphore', semaphore, layout.loading_errors):
                 semaphore_layout.addSemaphore(semaphore)
+
+        for queue in parsed_config.queues:
+            with reference_exceptions('queue', queue, layout.loading_errors):
+                layout.addQueue(queue)
 
         for template in parsed_config.project_templates:
             with reference_exceptions(
