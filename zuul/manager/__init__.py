@@ -9,11 +9,10 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 import logging
 import textwrap
 import urllib
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod
 
 from zuul import exceptions
 from zuul import model
@@ -251,6 +250,10 @@ class PipelineManager(metaclass=ABCMeta):
                 continue
             if item.change.equals(change):
                 self.removeItem(item)
+
+    @abstractmethod
+    def getChangeQueue(self, change, event, existing=None):
+        pass
 
     def reEnqueueItem(self, item, last_head, old_item_ahead, item_ahead_valid):
         log = get_annotated_logger(self.log, item.event)
