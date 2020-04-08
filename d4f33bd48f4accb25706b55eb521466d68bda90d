@@ -125,6 +125,40 @@
       "revId": "d4f33bd48f4accb25706b55eb521466d68bda90d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_08847e5d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 2040,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-08T13:49:57Z",
+      "side": 1,
+      "message": "0: Is this necessary?  Shouldn\u0027t this automatically be included?",
+      "revId": "d4f33bd48f4accb25706b55eb521466d68bda90d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df33271e_e8867a65",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-08T13:49:57Z",
+      "side": 1,
+      "message": "-1: This is going to run on every job, so we should annotate it with the lru cache decorator like we do for ARA.",
+      "revId": "d4f33bd48f4accb25706b55eb521466d68bda90d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
