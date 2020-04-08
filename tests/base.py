@@ -2837,7 +2837,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
             cid = None
         changes[cid] = data
 
-    def release(self, regex=None):
+    def release(self, regex=None, change=None):
         """Release a held build.
 
         :arg str regex: A regular expression which, if supplied, will
@@ -2852,7 +2852,8 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
         self.log.debug("Releasing build %s (%s)" % (regex, len(builds)))
         for build in builds:
-            if not regex or re.match(regex, build.name):
+            if (not regex or re.match(regex, build.name) and
+                not change or build.change == change):
                 self.log.debug("Releasing build %s" %
                                (build.parameters['zuul']['build']))
                 build.release()

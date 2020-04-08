@@ -271,6 +271,7 @@ class Pipeline(object):
         self.queues = []
         self.relative_priority_queues = {}
         self.precedence = PRECEDENCE_NORMAL
+        self.supercedes = []
         self.triggers = []
         self.enqueue_actions = []
         self.start_actions = []
@@ -328,9 +329,10 @@ class Pipeline(object):
     def addQueue(self, queue):
         self.queues.append(queue)
 
-    def getQueue(self, project):
+    def getQueue(self, project, branch):
+        # Queues might be branch specific so match with branch
         for queue in self.queues:
-            if project in queue.projects:
+            if queue.matches(project, branch):
                 return queue
         return None
 
@@ -415,7 +417,7 @@ class ChangeQueue(object):
             self.name = name
         else:
             self.name = ''
-        self.projects = []
+        self.project_branches = []
         self._jobs = set()
         self.queue = []
         self.window = window
@@ -432,12 +434,23 @@ class ChangeQueue(object):
     def getJobs(self):
         return self._jobs
 
-    def addProject(self, project):
-        if project not in self.projects:
-            self.projects.append(project)
+    def addProject(self, project, branch):
+        """
+        Adds a project branch combination to the queue.
+
+        The queue will match exactly this combination. If the caller doesn't
+        care about branches it can supply None (but must supply None as well
+        when matching)
+        """
+        project_branch = (project, branch)
+        if project_branch not in self.project_branches:
+            self.project_branches.append(project_branch)
 
             if not self.name:
                 self.name = project.name
+
+    def matches(self, project, branch):
+        return (project, branch) in self.project_branches
 
     def enqueueChange(self, change, event):
         item = QueueItem(self, change, event)
@@ -3633,6 +3646,7 @@ class UnparsedConfig(object):
         self.nodesets = []
         self.secrets = []
         self.semaphores = []
+        self.queues = []
 
         # The list of files/dirs which this represents.
         self.files_examined = set()
@@ -3646,7 +3660,8 @@ class UnparsedConfig(object):
         # project-branch-path so that we can share them across objects
         source_contexts = {}
         for attr in ['pragmas', 'pipelines', 'jobs', 'project_templates',
-                     'projects', 'nodesets', 'secrets', 'semaphores']:
+                     'projects', 'nodesets', 'secrets', 'semaphores',
+                     'queues']:
             # Make a deep copy of each of our attributes
             old_objlist = getattr(self, attr)
             new_objlist = copy.deepcopy(old_objlist)
@@ -3676,6 +3691,7 @@ class UnparsedConfig(object):
             self.nodesets.extend(conf.nodesets)
             self.secrets.extend(conf.secrets)
             self.semaphores.extend(conf.semaphores)
+            self.queues.extend(conf.queues)
             return
 
         if not isinstance(conf, list):
@@ -3701,6 +3717,8 @@ class UnparsedConfig(object):
                 self.secrets.append(value)
             elif key == 'semaphore':
                 self.semaphores.append(value)
+            elif key == 'queue':
+                self.queues.append(value)
             elif key == 'pragma':
                 self.pragmas.append(value)
             else:
@@ -3720,6 +3738,7 @@ class ParsedConfig(object):
         self.nodesets = []
         self.secrets = []
         self.semaphores = []
+        self.queues = []
 
     def copy(self):
         r = ParsedConfig()
@@ -3732,6 +3751,7 @@ class ParsedConfig(object):
         r.nodesets = self.nodesets[:]
         r.secrets = self.secrets[:]
         r.semaphores = self.semaphores[:]
+        r.queues = self.queues[:]
         return r
 
     def extend(self, conf):
@@ -3744,6 +3764,7 @@ class ParsedConfig(object):
             self.nodesets.extend(conf.nodesets)
             self.secrets.extend(conf.secrets)
             self.semaphores.extend(conf.semaphores)
+            self.queues.extend(conf.queues)
             for regex, projects in conf.projects_by_regex.items():
                 self.projects_by_regex.setdefault(regex, []).extend(projects)
             return
@@ -3777,6 +3798,7 @@ class Layout(object):
         self.nodesets = {}
         self.secrets = {}
         self.semaphores = {}
+        self.queues = {}
         self.loading_errors = LoadingErrors()
 
     def getJob(self, name):
@@ -3884,6 +3906,13 @@ class Layout(object):
             # ignore the duplicate definition
             return
         self.semaphores[semaphore.name] = semaphore
+
+    def addQueue(self, queue):
+        # Change queues must be unique and cannot be overridden.
+        if queue.name in self.queues:
+            raise Exception('Queue %s is already defined' % queue.name)
+
+        self.queues[queue.name] = queue
 
     def addPipeline(self, pipeline):
         if pipeline.tenant is not self.tenant:
@@ -4242,6 +4271,22 @@ class Semaphore(ConfigObject):
             return False
         return (self.name == other.name and
                 self.max == other.max)
+
+
+class Queue(ConfigObject):
+    def __init__(self, name, per_branch=False):
+        super().__init__()
+        self.name = name
+        self.per_branch = per_branch
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, Queue):
+            return False
+        return (self.name == other.name and
+                self.per_branch == other.per_branch)
 
 
 class SemaphoreHandler(object):

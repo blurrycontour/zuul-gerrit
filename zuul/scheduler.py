@@ -1022,7 +1022,8 @@ class Scheduler(threading.Thread):
             last_head = None
             for shared_queue in old_pipeline.queues:
                 # Attempt to keep window sizes from shrinking where possible
-                new_queue = new_pipeline.getQueue(shared_queue.projects[0])
+                project, branch = shared_queue.project_branches[0]
+                new_queue = new_pipeline.getQueue(project, branch)
                 if new_queue and shared_queue.window and (not static_window):
                     new_queue.window = max(shared_queue.window,
                                            new_queue.window_floor)

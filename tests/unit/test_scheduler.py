@@ -20,6 +20,7 @@ import os
 import shutil
 import socket
 import time
+from collections import namedtuple
 from unittest import mock
 from unittest import skip
 from kazoo.exceptions import NoNodeError
@@ -3154,8 +3155,17 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
-        q1 = tenant.layout.pipelines['gate'].getQueue(project1)
-        q2 = tenant.layout.pipelines['gate'].getQueue(project2)
+        # Change queues are created lazy by the dependent pipeline manager
+        # so retrieve the queue first without having to really enqueue a
+        # change first.
+        gate = tenant.layout.pipelines['gate']
+        FakeChange = namedtuple('FakeChange', ['project', 'branch'])
+        fake_a = FakeChange(project1, 'master')
+        fake_b = FakeChange(project2, 'master')
+        gate.manager.getChangeQueue(fake_a, None)
+        gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1, None)
+        q2 = gate.getQueue(project2, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3165,8 +3175,18 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
-        q1 = tenant.layout.pipelines['gate'].getQueue(project1)
-        q2 = tenant.layout.pipelines['gate'].getQueue(project2)
+
+        # Change queues are created lazy by the dependent pipeline manager
+        # so retrieve the queue first without having to really enqueue a
+        # change first.
+        gate = tenant.layout.pipelines['gate']
+        FakeChange = namedtuple('FakeChange', ['project', 'branch'])
+        fake_a = FakeChange(project1, 'master')
+        fake_b = FakeChange(project2, 'master')
+        gate.manager.getChangeQueue(fake_a, None)
+        gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1, None)
+        q2 = gate.getQueue(project2, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3176,8 +3196,17 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
-        q1 = tenant.layout.pipelines['gate'].getQueue(project1)
-        q2 = tenant.layout.pipelines['gate'].getQueue(project2)
+        # Change queues are created lazy by the dependent pipeline manager
+        # so retrieve the queue first without having to really enqueue a
+        # change first.
+        gate = tenant.layout.pipelines['gate']
+        FakeChange = namedtuple('FakeChange', ['project', 'branch'])
+        fake_a = FakeChange(project1, 'master')
+        fake_b = FakeChange(project2, 'master')
+        gate.manager.getChangeQueue(fake_a, None)
+        gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1, None)
+        q2 = gate.getQueue(project2, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3187,8 +3216,17 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
-        q1 = tenant.layout.pipelines['gate'].getQueue(project1)
-        q2 = tenant.layout.pipelines['gate'].getQueue(project2)
+        # Change queues are created lazy by the dependent pipeline manager
+        # so retrieve the queue first without having to really enqueue a
+        # change first.
+        gate = tenant.layout.pipelines['gate']
+        FakeChange = namedtuple('FakeChange', ['project', 'branch'])
+        fake_a = FakeChange(project1, 'master')
+        fake_b = FakeChange(project2, 'master')
+        gate.manager.getChangeQueue(fake_a, None)
+        gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1, None)
+        q2 = gate.getQueue(project2, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -6243,6 +6281,166 @@ For CI problems and help debugging, contact ci@example.org"""
             dict(name='project1-project2-integration',
                  result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
+
+
+class TestChangeQueues(ZuulTestCase):
+    tenant_config_file = 'config/change-queues/main.yaml'
+
+    def _test_dependent_queues_per_branch(self, project,
+                                          queue_name='integrated',
+                                          queue_repo='common-config'):
+        self.create_branch(project, 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(project, 'stable'))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange(project, 'master', 'A')
+        B = self.fake_gerrit.addFakeChange(project, 'stable', 'B')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.executor_server.failJob('project-test', A)
+
+        # Let first go A into gate then B
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # There should be one project-test job at the head of each queue
+        self.assertBuilds([
+            dict(name='project-test', changes='1,1'),
+            dict(name='project-test', changes='2,1'),
+        ])
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        _, p = tenant.getProject(project)
+        q1 = tenant.layout.pipelines['gate'].getQueue(p, 'master')
+        q2 = tenant.layout.pipelines['gate'].getQueue(p, 'stable')
+        self.assertEqual(q1.name, queue_name)
+        self.assertEqual(q2.name, queue_name)
+
+        # Both queues must contain one item
+        self.assertEqual(len(q1.queue), 1)
+        self.assertEqual(len(q2.queue), 1)
+
+        # Fail job on the change on master
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertNotEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 2)
+
+        # Now reconfigure the queue to be non-branched and run the same test
+        # again.
+        conf = textwrap.dedent(
+            """
+            - queue:
+                name: {}
+                per-branch: false
+            """).format(queue_name)
+
+        file_dict = {'zuul.d/queue.yaml': conf}
+        C = self.fake_gerrit.addFakeChange(queue_repo, 'master', 'A',
+                                           files=file_dict)
+        C.setMerged()
+        self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = True
+        D = self.fake_gerrit.addFakeChange(project, 'master', 'D')
+        E = self.fake_gerrit.addFakeChange(project, 'stable', 'E')
+        D.addApproval('Code-Review', 2)
+        E.addApproval('Code-Review', 2)
+
+        self.executor_server.failJob('project-test', D)
+
+        # Let first go A into gate then B
+        self.fake_gerrit.addEvent(D.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(E.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # There should be two project-test jobs in a shared queue
+        self.assertBuilds([
+            dict(name='project-test', changes='4,1'),
+            dict(name='project-test', changes='4,1 5,1'),
+        ])
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        _, p = tenant.getProject(project)
+        q1 = tenant.layout.pipelines['gate'].getQueue(p, 'master')
+        q2 = tenant.layout.pipelines['gate'].getQueue(p, 'stable')
+        q3 = tenant.layout.pipelines['gate'].getQueue(p, None)
+
+        # There should be no branch specific queues anymore
+        self.assertEqual(q1, None)
+        self.assertEqual(q2, None)
+        self.assertEqual(q3.name, queue_name)
+
+        # Both queues must contain one item
+        self.assertEqual(len(q3.queue), 2)
+
+        # Release project-test of D to make history after test deterministic
+        self.executor_server.release('project-test', change='4 1')
+        self.waitUntilSettled()
+
+        # Fail job on the change on master
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertNotEqual(D.data['status'], 'MERGED')
+        self.assertEqual(E.data['status'], 'MERGED')
+        self.assertEqual(D.reported, 2)
+        self.assertEqual(E.reported, 2)
+
+        self.assertHistory([
+            # Independent runs because of per branch queues
+            dict(name='project-test', result='FAILURE', changes='1,1'),
+            dict(name='project-test', result='SUCCESS', changes='2,1'),
+
+            # Same queue with gate reset because of 4,1
+            dict(name='project-test', result='FAILURE', changes='4,1'),
+
+            # Result can be anything depending on timing of the gate reset.
+            dict(name='project-test', changes='4,1 5,1'),
+            dict(name='project-test', result='SUCCESS', changes='5,1'),
+        ], ordered=False)
+
+    def test_dependent_queues_per_branch(self):
+        """
+        Test that change queues can be different for different branches.
+
+        In this case the project contains zuul config so the branches are
+        known upfront and the queues are pre-seeded.
+        """
+        self._test_dependent_queues_per_branch('org/project')
+
+    def test_dependent_queues_per_branch_no_config(self):
+        """
+        Test that change queues can be different for different branches.
+
+        In this case we create changes for two branches in a repo that
+        doesn't contain zuul config so the queues are not pre-seeded
+        in the gate pipeline.
+        """
+        self._test_dependent_queues_per_branch('org/project2')
+
+    def test_dependent_queues_per_branch_untrusted(self):
+        """
+        Test that change queues can be different for different branches.
+
+        In this case we create changes for two branches in an untrusted repo
+        that defines its own queue.
+        """
+        self._test_dependent_queues_per_branch(
+            'org/project3', queue_name='integrated-untrusted',
+            queue_repo='org/project3')
 
 
 class TestJobUpdateBrokenConfig(ZuulTestCase):
