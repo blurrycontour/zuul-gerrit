@@ -267,6 +267,7 @@ class Pipeline(object):
         self.queues = []
         self.relative_priority_queues = {}
         self.precedence = PRECEDENCE_NORMAL
+        self.supercedes = []
         self.triggers = []
         self.enqueue_actions = []
         self.start_actions = []
@@ -321,9 +322,9 @@ class Pipeline(object):
     def addQueue(self, queue):
         self.queues.append(queue)
 
-    def getQueue(self, project):
+    def getQueue(self, project, branch):
         for queue in self.queues:
-            if project in queue.projects:
+            if queue.matches(project, branch):
                 return queue
         return None
 
@@ -407,7 +408,7 @@ class ChangeQueue(object):
             self.name = name
         else:
             self.name = ''
-        self.projects = []
+        self.project_branches = []
         self._jobs = set()
         self.queue = []
         self.window = window
@@ -424,12 +425,16 @@ class ChangeQueue(object):
     def getJobs(self):
         return self._jobs
 
-    def addProject(self, project):
-        if project not in self.projects:
-            self.projects.append(project)
+    def addProject(self, project, branch):
+        project_branch = (project, branch)
+        if project_branch not in self.project_branches:
+            self.project_branches.append(project_branch)
 
             if not self.name:
-                self.name = project.name
+                self.name = '%s-%s' % (project.name, branch)
+
+    def matches(self, project, branch):
+        return (project, branch) in self.project_branches
 
     def enqueueChange(self, change, event):
         item = QueueItem(self, change, event)
