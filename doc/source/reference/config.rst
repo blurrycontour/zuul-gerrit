@@ -86,6 +86,7 @@ the YAML files:
    pipeline_def
    job_def
    project_def
+   queue_def
    secret_def
    nodeset_def
    semaphore_def
