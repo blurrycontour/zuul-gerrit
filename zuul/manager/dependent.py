@@ -37,7 +37,7 @@ class DependentPipelineManager(PipelineManager):
 
         for project_name, project_configs in layout_project_configs.items():
             (trusted, project) = tenant.getProject(project_name)
-            queue_name = None
+            queues_to_add = []  # tuple(name, branch)
             project_in_pipeline = False
             for project_config in layout.getAllProjectConfigs(project_name):
                 project_pipeline_config = project_config.pipelines.get(
@@ -46,34 +46,42 @@ class DependentPipelineManager(PipelineManager):
                     continue
                 project_in_pipeline = True
                 queue_name = project_pipeline_config.queue_name
+                branch = None
                 if queue_name:
-                    break
+                    if project_config.branch_matcher:
+                        # This project config has an implied branch matcher
+                        # so create a queue for that branch.
+                        branch = project_config.source_context.branch
+                queues_to_add.append((queue_name, branch))
             if not project_in_pipeline:
                 continue
-            if queue_name and queue_name in change_queues:
-                change_queue = change_queues[queue_name]
-            else:
-                p = self.pipeline
-                change_queue = model.ChangeQueue(
-                    p,
-                    window=p.window,
-                    window_floor=p.window_floor,
-                    window_increase_type=p.window_increase_type,
-                    window_increase_factor=p.window_increase_factor,
-                    window_decrease_type=p.window_decrease_type,
-                    window_decrease_factor=p.window_decrease_factor,
-                    name=queue_name)
-                if queue_name:
-                    # If this is a named queue, keep track of it in
-                    # case it is referenced again.  Otherwise, it will
-                    # have a name automatically generated from its
-                    # constituent projects.
-                    change_queues[queue_name] = change_queue
-                self.pipeline.addQueue(change_queue)
-                self.log.debug("Created queue: %s" % change_queue)
-            change_queue.addProject(project)
-            self.log.debug("Added project %s to queue: %s" %
-                           (project, change_queue))
+
+            for queue_name, branch in queues_to_add:
+                if queue_name and queue_name in change_queues:
+                    change_queue = change_queues[queue_name]
+                else:
+                    p = self.pipeline
+                    change_queue = model.ChangeQueue(
+                        p,
+                        window=p.window,
+                        window_floor=p.window_floor,
+                        window_increase_type=p.window_increase_type,
+                        window_increase_factor=p.window_increase_factor,
+                        window_decrease_type=p.window_decrease_type,
+                        window_decrease_factor=p.window_decrease_factor,
+                        name=queue_name)
+                    if queue_name:
+                        # If this is a named queue, keep track of it in
+                        # case it is referenced again.  Otherwise, it will
+                        # have a name automatically generated from its
+                        # constituent projects.
+                        change_queues[queue_name] = change_queue
+                    self.pipeline.addQueue(change_queue)
+                    self.log.debug("change-queue: Created queue: %s",
+                                   change_queue)
+                change_queue.addProject(project, branch)
+                self.log.debug("change-queue: Added project %s to queue: %s" %
+                               (project, change_queue))
 
     def getChangeQueue(self, change, event, existing=None):
         log = get_annotated_logger(self.log, event)
@@ -81,14 +89,19 @@ class DependentPipelineManager(PipelineManager):
         # Ignore the existing queue, since we can always get the correct queue
         # from the pipeline. This avoids enqueuing changes in a wrong queue
         # e.g. during re-configuration.
-        queue = self.pipeline.getQueue(change.project)
+        queue = self.pipeline.getQueue(change.project, change.branch)
         if queue:
             return StaticChangeQueueContextManager(queue)
         else:
+            # Dynamic change queues are branch independent so look again with
+            # no branch.
+            queue = self.pipeline.getQueue(change.project, None)
+            if queue:
+                return StaticChangeQueueContextManager(queue)
             # There is no existing queue for this change. Create a
             # dynamic one for this one change's use
             change_queue = model.ChangeQueue(self.pipeline, dynamic=True)
-            change_queue.addProject(change.project)
+            change_queue.addProject(change.project, None)
             self.pipeline.addQueue(change_queue)
             log.debug("Dynamically created queue %s", change_queue)
             return DynamicChangeQueueContextManager(change_queue)
@@ -118,15 +131,17 @@ class DependentPipelineManager(PipelineManager):
 
         # for project in change_queue, project.source get changes, then dedup.
         sources = set()
-        for project in change_queue.projects:
+        for project, _ in change_queue.project_branches:
             sources.add(project.source)
 
         seen = set(change.needed_by_changes)
         needed_by_changes = change.needed_by_changes[:]
         for source in sources:
             log.debug("  Checking source: %s", source)
+            projects = [project_branch[0]
+                        for project_branch in change_queue.project_branches]
             for c in source.getChangesDependingOn(change,
-                                                  change_queue.projects,
+                                                  projects,
                                                   self.pipeline.tenant):
                 if c not in seen:
                     seen.add(c)

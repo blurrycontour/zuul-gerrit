@@ -3154,8 +3154,8 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
-        q1 = tenant.layout.pipelines['gate'].getQueue(project1)
-        q2 = tenant.layout.pipelines['gate'].getQueue(project2)
+        q1 = tenant.layout.pipelines['gate'].getQueue(project1, None)
+        q2 = tenant.layout.pipelines['gate'].getQueue(project2, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3165,8 +3165,8 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
-        q1 = tenant.layout.pipelines['gate'].getQueue(project1)
-        q2 = tenant.layout.pipelines['gate'].getQueue(project2)
+        q1 = tenant.layout.pipelines['gate'].getQueue(project1, None)
+        q2 = tenant.layout.pipelines['gate'].getQueue(project2, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3176,8 +3176,8 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
-        q1 = tenant.layout.pipelines['gate'].getQueue(project1)
-        q2 = tenant.layout.pipelines['gate'].getQueue(project2)
+        q1 = tenant.layout.pipelines['gate'].getQueue(project1, None)
+        q2 = tenant.layout.pipelines['gate'].getQueue(project2, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -3187,8 +3187,8 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         (trusted, project2) = tenant.getProject('org/project2')
-        q1 = tenant.layout.pipelines['gate'].getQueue(project1)
-        q2 = tenant.layout.pipelines['gate'].getQueue(project2)
+        q1 = tenant.layout.pipelines['gate'].getQueue(project1, None)
+        q2 = tenant.layout.pipelines['gate'].getQueue(project2, None)
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
@@ -6217,6 +6217,83 @@ For CI problems and help debugging, contact ci@example.org"""
             dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
             dict(name='project1-project2-integration',
                  result='SUCCESS', changes='1,1 2,1'),
+        ], ordered=False)
+
+
+class TestChangeQueues(ZuulTestCase):
+    tenant_config_file = 'config/change-queues/main.yaml'
+
+    def test_dependent_queues_per_branch(self):
+        "Test that change queues can be different for different branches"
+
+        self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.waitUntilSettled()
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                gate:
+                  queue: stable
+                  jobs:
+                    - project-test
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        prep = self.fake_gerrit.addFakeChange(
+            'org/project', 'stable', 'prep', files=file_dict)
+        prep.setMerged()
+        self.fake_gerrit.addEvent(prep.getChangeMergedEvent())
+        self.waitUntilSettled()
+        # self.sched.reconfigure(self.config)
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'stable', 'B')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.executor_server.failJob('project-test', A)
+
+        # Let first go A into gate then B
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # There should be one project-test job at the head of each queue
+        self.assertBuilds([
+            dict(name='project-test', changes='2,1'),
+            dict(name='project-test', changes='3,1'),
+        ])
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        _, project = tenant.getProject('org/project')
+        q1 = tenant.layout.pipelines['gate'].getQueue(project, 'master')
+        q2 = tenant.layout.pipelines['gate'].getQueue(project, 'stable')
+        self.assertEqual(q1.name, 'integrated')
+        self.assertEqual(q2.name, 'stable')
+
+        # Both queues must contain one item
+        self.assertEqual(len(q1.queue), 1)
+        self.assertEqual(len(q2.queue), 1)
+
+        # Fail job on the change on master
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertNotEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 2)
+
+        # Verify that project-test only ran once for change 2,1
+        self.assertHistory([
+            dict(name='project-test', result='FAILURE', changes='2,1'),
+            dict(name='project-test', result='SUCCESS', changes='3,1'),
         ], ordered=False)
 
 
