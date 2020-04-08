@@ -26,8 +26,8 @@ class TenantParserTestCase(ZuulTestCase):
     create_project_keys = True
 
     CONFIG_SET = set(['pipeline', 'job', 'semaphore', 'project',
-                      'project-template', 'nodeset', 'secret'])
-    UNTRUSTED_SET = CONFIG_SET - set(['pipeline'])
+                      'project-template', 'nodeset', 'secret', 'queue'])
+    UNTRUSTED_SET = CONFIG_SET - set(['pipeline', 'queue'])
 
     def setupAllProjectKeys(self, config: ConfigParser):
         for project in ['common-config', 'org/project1', 'org/project2']:
