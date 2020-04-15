@@ -6260,7 +6260,7 @@ For CI problems and help debugging, contact ci@example.org"""
 
 class TestChangeQueues(ZuulTestCase):
     tenant_config_file = 'config/change-queues/main.yaml'
-    
+
     def _test_dependent_queues_per_branch(self, project):
         self.create_branch(project, 'stable')
         self.fake_gerrit.addEvent(
@@ -6313,7 +6313,7 @@ class TestChangeQueues(ZuulTestCase):
             dict(name='project-test', result='FAILURE', changes='1,1'),
             dict(name='project-test', result='SUCCESS', changes='2,1'),
         ], ordered=False)
-        
+
     def test_dependent_queues_per_branch(self):
         """
         Test that change queues can be different for different branches.
@@ -6332,6 +6332,15 @@ class TestChangeQueues(ZuulTestCase):
         in the gate pipeline.
         """
         self._test_dependent_queues_per_branch('org/project2')
+
+    def test_dependent_queues_per_branch_project_queue(self):
+        """
+        Test that change queues can be different for different branches.
+
+        In this case we create changes for two branches in a repo that
+        references the queue on project level instead of pipeline level.
+        """
+        self._test_dependent_queues_per_branch('org/project3')
 
 
 class TestJobUpdateBrokenConfig(ZuulTestCase):
