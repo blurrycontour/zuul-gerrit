@@ -543,7 +543,7 @@ class PipelineManager(object):
             if trusted_updates:
                 log.debug("Loading dynamic layout (phase 1)")
                 trusted_layout = loader.createDynamicLayout(
-                    item.pipeline.tenant,
+                    item,
                     build_set.files,
                     self.sched.ansible_manager,
                     include_config_projects=True,
@@ -555,7 +555,7 @@ class PipelineManager(object):
             if untrusted_updates:
                 log.debug("Loading dynamic layout (phase 2)")
                 untrusted_layout = loader.createDynamicLayout(
-                    item.pipeline.tenant,
+                    item,
                     build_set.files,
                     self.sched.ansible_manager,
                     include_config_projects=False,
