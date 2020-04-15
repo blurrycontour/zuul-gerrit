@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4c43b2_f4404038",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-04-15T12:31:38Z",
+      "side": 1,
+      "message": "nit: line 33-25 could be combined as\n\n    change_queue \u003d self.created_for_branches.get(branch)",
+      "revId": "87bc8b55baee2f6cb3d76557093d827e3da95d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4c43b2_94445c1d",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-04-15T12:31:38Z",
+      "side": 1,
+      "message": "Maybe the plural form would be better here or even changing it to `change_queue_templates`. For me the template/manager naming is a little confusing. Could the `ChangeQueueManager` be a `ChangeQueueTemplate`?",
+      "revId": "87bc8b55baee2f6cb3d76557093d827e3da95d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4c43b2_d48f042c",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-04-15T12:31:38Z",
+      "side": 1,
+      "message": "nit: You could rewrite that slightly to eliminate the duplicate fallback to the global queue:\n\n    if matching_templates:\n        template \u003d matching_templates[0]\n        branch \u003d None\n        if template.per_branch:\n            # The change queue is not existing yet for this branch\n            branch \u003d change.branch\n\n            # We have a queue template but no queue yet, so create it\n            return StaticChangeQueueContextManager(\n                template.getOrCreateQueue(change.project, branch)\n            )\n\n    # No specific or per-branch template matched so look again with no branch\n    queue \u003d self.pipeline.getQueue(change.project, None)\n    if queue:\n        return StaticChangeQueueContextManager(queue)",
+      "revId": "87bc8b55baee2f6cb3d76557093d827e3da95d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
