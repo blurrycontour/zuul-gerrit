@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4c43b2_178dee7a",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-15T13:13:23Z",
+      "side": 1,
+      "message": "can we comment the semantic of `branch\u003dNone`? And maybe default the `branch` params to `None`? (same for `#matches` and `#getQueue`)?",
+      "range": {
+        "startLine": 428,
+        "startChar": 34,
+        "endLine": 428,
+        "endChar": 40
+      },
+      "revId": "691a8aa9685e6ff8b9df2446e7ac850df06ce5c1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
