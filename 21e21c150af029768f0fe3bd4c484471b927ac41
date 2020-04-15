@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4c43b2_b4ea3872",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-15T12:50:04Z",
+      "side": 1,
+      "message": "Not sure if we want to document this option at this time",
+      "range": {
+        "startLine": 326,
+        "startChar": 1,
+        "endLine": 329,
+        "endChar": 37
+      },
+      "revId": "21e21c150af029768f0fe3bd4c484471b927ac41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
