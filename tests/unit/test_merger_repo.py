@@ -118,7 +118,7 @@ class TestMergerRepo(ZuulTestCase):
         # in the future. As a workaround we must clean up empty directories
         # in .git/refs.
         if parent_repo.git.version_info[:2] < (2, 13):
-            Repo._cleanup_leaked_ref_dirs(parent_path, None, [])
+            Repo._cleanup_leaked_ref_dirs(parent_path, None)
 
         parent_repo.create_head("foobar")
 
