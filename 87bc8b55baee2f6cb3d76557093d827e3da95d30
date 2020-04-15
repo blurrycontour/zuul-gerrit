@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f4c43b2_5d2b1781",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-15T14:49:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f4c43b2_f4404038",
+      "revId": "87bc8b55baee2f6cb3d76557093d827e3da95d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4c43b2_94445c1d",
         "filename": "zuul/manager/dependent.py",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "3f4c43b2_fd97838f",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-15T14:49:55Z",
+      "side": 1,
+      "message": "I named it at first template but wasn\u0027t sasisfied with the naming since it is more than a template. Thus I renamed it (incompletely) to manager. Next PS will consistently use manager.",
+      "parentUuid": "3f4c43b2_94445c1d",
+      "revId": "87bc8b55baee2f6cb3d76557093d827e3da95d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4c43b2_d48f042c",
         "filename": "zuul/manager/dependent.py",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2020-04-15T12:31:38Z",
       "side": 1,
       "message": "nit: You could rewrite that slightly to eliminate the duplicate fallback to the global queue:\n\n    if matching_templates:\n        template \u003d matching_templates[0]\n        branch \u003d None\n        if template.per_branch:\n            # The change queue is not existing yet for this branch\n            branch \u003d change.branch\n\n            # We have a queue template but no queue yet, so create it\n            return StaticChangeQueueContextManager(\n                template.getOrCreateQueue(change.project, branch)\n            )\n\n    # No specific or per-branch template matched so look again with no branch\n    queue \u003d self.pipeline.getQueue(change.project, None)\n    if queue:\n        return StaticChangeQueueContextManager(queue)",
+      "revId": "87bc8b55baee2f6cb3d76557093d827e3da95d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4c43b2_fd4ae324",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-15T14:49:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f4c43b2_d48f042c",
       "revId": "87bc8b55baee2f6cb3d76557093d827e3da95d30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
