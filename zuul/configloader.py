@@ -964,13 +964,14 @@ class ProjectTemplateParser(object):
         self.schema = self.getSchema()
         self.not_pipelines = ['name', 'description', 'templates',
                               'merge-mode', 'default-branch', 'vars',
-                              '_source_context', '_start_mark']
+                              'queue', '_source_context', '_start_mark']
 
     def getSchema(self):
         job = {str: vs.Any(str, JobParser.job_attributes)}
         job_list = [vs.Any(str, job)]
 
         pipeline_contents = {
+            # TODO(tobiash): Remove pipeline specific queue after deprecation
             'queue': str,
             'debug': bool,
             'fail-fast': bool,
@@ -980,6 +981,7 @@ class ProjectTemplateParser(object):
         project = {
             'name': str,
             'description': str,
+            'queue': str,
             'vars': ansible_vars_dict,
             str: pipeline_contents,
             '_source_context': model.SourceContext,
@@ -996,11 +998,13 @@ class ProjectTemplateParser(object):
         project_template = model.ProjectConfig(conf.get('name'))
         project_template.source_context = conf['_source_context']
         project_template.start_mark = conf['_start_mark']
+        project_template.queue_name = conf.get('queue')
         for pipeline_name, conf_pipeline in conf.items():
             if pipeline_name in self.not_pipelines:
                 continue
             project_pipeline = model.ProjectPipelineConfig()
             project_template.pipelines[pipeline_name] = project_pipeline
+            # TODO(tobiash): Remove pipeline specific queue after deprecation
             project_pipeline.queue_name = conf_pipeline.get('queue')
             project_pipeline.debug = conf_pipeline.get('debug')
             project_pipeline.fail_fast = conf_pipeline.get(
@@ -1055,6 +1059,7 @@ class ProjectParser(object):
         job_list = [vs.Any(str, job)]
 
         pipeline_contents = {
+            # TODO(tobiash): Remove pipeline specific queue after deprecation
             'queue': str,
             'debug': bool,
             'fail-fast': bool,
@@ -1069,6 +1074,7 @@ class ProjectParser(object):
             'merge-mode': vs.Any('merge', 'merge-resolve',
                                  'cherry-pick', 'squash-merge'),
             'default-branch': str,
+            'queue': str,
             str: pipeline_contents,
             '_source_context': model.SourceContext,
             '_start_mark': ZuulMark,
@@ -1133,6 +1139,8 @@ class ProjectParser(object):
 
         default_branch = conf.get('default-branch', 'master')
         project_config.default_branch = default_branch
+
+        project_config.queue_name = conf.get('queue', None)
 
         variables = conf.get('vars', {})
         if variables:
