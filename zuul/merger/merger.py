@@ -271,19 +271,22 @@ class Repo(object):
         return self._createRepoObject(self.local_path, self.env)
 
     @staticmethod
-    def _cleanup_leaked_ref_dirs(local_path, log, messages):
+    def _cleanup_leaked_ref_dirs(local_path, log):
         for root, dirs, files in os.walk(
                 os.path.join(local_path, '.git/refs'), topdown=False):
             if not os.listdir(root):
-                if log:
-                    log.debug("Cleaning empty ref dir %s", root)
-                else:
-                    messages.append("Cleaning empty ref dir %s" % root)
+                log.debug("Cleaning empty ref dir %s", root)
                 os.rmdir(root)
 
     @staticmethod
     def _reset(local_path, env, log=None):
-        messages = []
+        if log is None:
+            class ListLog(list):
+                def debug(self, msg, *args):
+                    self.append(msg % args)
+
+            log = ListLog()
+
         repo = Repo._createRepoObject(local_path, env)
         origin = repo.remotes.origin
 
@@ -295,10 +298,7 @@ class Repo(object):
             head_ref = ref.ref
             head = head_ref.remote_head
             repo.create_head(head, head_ref, force=True)
-            if log:
-                log.debug("Reset to %s", head)
-            else:
-                messages.append("Reset to %s" % head)
+            log.debug("Reset to %s", head)
             repo.head.reference = head
             break
 
@@ -306,10 +306,7 @@ class Repo(object):
         remote_heads = {r.remote_head for r in origin.refs}
         for ref in repo.heads:
             if ref.name not in remote_heads:
-                if log:
-                    log.debug("Delete stale local ref %s", ref)
-                else:
-                    messages.append("Delete stale local ref %s" % ref)
+                log.debug("Delete stale local ref %s", ref)
                 repo.delete_head(ref, force=True)
 
         # Note: Before git 2.13 deleting a a ref foo/bar leaves an empty
@@ -317,14 +314,14 @@ class Repo(object):
         # in the future. As a workaround we must clean up empty directories
         # in .git/refs.
         if repo.git.version_info[:2] < (2, 13):
-            Repo._cleanup_leaked_ref_dirs(local_path, log, messages)
+            Repo._cleanup_leaked_ref_dirs(local_path, log)
 
         # Update our local heads to match the remote
         for ref in origin.refs:
             if ref.remote_head == 'HEAD':
                 continue
             repo.create_head(ref.remote_head, ref, force=True)
-        return messages
+        return log
 
     def reset(self, zuul_event_id=None, build=None, process_worker=None):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
