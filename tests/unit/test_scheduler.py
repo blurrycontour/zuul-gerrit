@@ -3190,6 +3190,27 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(q1.name, 'integrated')
         self.assertEqual(q2.name, 'integrated')
 
+    @simple_layout("layouts/template-project-queue.yaml")
+    def test_template_project_queue(self):
+        "Test a shared queue can be constructed from a project-template"
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        (trusted, project1) = tenant.getProject('org/project1')
+        (trusted, project2) = tenant.getProject('org/project2')
+
+        # Change queues are created lazy by the dependent pipeline manager
+        # so retrieve the queue first without having to really enqueue a
+        # change first.
+        gate = tenant.layout.pipelines['gate']
+        FakeChange = namedtuple('FakeChange', ['project', 'branch'])
+        fake_a = FakeChange(project1, 'master')
+        fake_b = FakeChange(project2, 'master')
+        gate.manager.getChangeQueue(fake_a, None)
+        gate.manager.getChangeQueue(fake_b, None)
+        q1 = gate.getQueue(project1, None)
+        q2 = gate.getQueue(project2, None)
+        self.assertEqual(q1.name, 'integrated')
+        self.assertEqual(q2.name, 'integrated')
+
     @simple_layout("layouts/regex-template-queue.yaml")
     def test_regex_template_queue(self):
         "Test a shared queue can be constructed from a regex project-template"
@@ -6441,6 +6462,15 @@ class TestChangeQueues(ZuulTestCase):
         self._test_dependent_queues_per_branch(
             'org/project3', queue_name='integrated-untrusted',
             queue_repo='org/project3')
+
+    def test_dependent_queues_per_branch_project_queue(self):
+        """
+        Test that change queues can be different for different branches.
+
+        In this case we create changes for two branches in a repo that
+        references the queue on project level instead of pipeline level.
+        """
+        self._test_dependent_queues_per_branch('org/project4')
 
 
 class TestJobUpdateBrokenConfig(ZuulTestCase):

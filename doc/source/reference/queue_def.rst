@@ -5,7 +5,7 @@ Queue
 
 Projects that interact with each other should share a ``queue``.
 This is especially used in a :value:`dependent <pipeline.manager.dependent>`
-pipeline. The :attr:`project.<pipeline>.queue` can optionally refer
+pipeline. The :attr:`project.queue` can optionally refer
 to a specific :attr:`queue` object that can further configure the
 behavior of the queue.
 
