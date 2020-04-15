@@ -26,6 +26,10 @@ import sys
 import threading
 import time
 import urllib
+from configparser import ConfigParser
+from queue import Queue
+from typing import Any
+from typing import Dict
 
 from zuul import configloader
 from zuul import model
@@ -42,7 +46,9 @@ import zuul.lib.queue
 import zuul.lib.repl
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
 
-COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
+COMMANDS = ['full-reconfigure', 'smart-reconfigure',
+            'pause', 'resume', 'stop',
+            'repl', 'norepl']
 
 
 class ManagementEvent(object):
@@ -287,28 +293,39 @@ class Scheduler(threading.Thread):
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
 
-    def __init__(self, config, testonly=False):
+    def __init__(self, config: ConfigParser,
+                 testonly: bool=False):
+
         threading.Thread.__init__(self)
+        self.config = config
         self.daemon = True
         self.hostname = socket.getfqdn()
         self.wake_event = threading.Event()
         self.layout_lock = threading.Lock()
         self.run_handler_lock = threading.Lock()
         self.command_map = {
+            'pause': self.pause,
+            'resume': self.resume,
             'stop': self.stop,
             'full-reconfigure': self.fullReconfigureCommandHandler,
             'smart-reconfigure': self.smartReconfigureCommandHandler,
             'repl': self.start_repl,
             'norepl': self.stop_repl,
         }
+
+        self.__resumed = threading.Event()
+        if not get_default(self.config, 'scheduler', 'paused_on_start', False):
+            self.__resumed.set()
+        self.is_paused = False  # Paused state was entered
         self._hibernate = False
-        self._stopped = False
+        self.__stopped = False
+        self.__command_running = False
         self._zuul_app = None
         self.executor = None
         self.merger = None
         self.connections = None
-        self.statsd = get_statsd(config)
-        self.rpc = rpclistener.RPCListener(config, self)
+        self.statsd = get_statsd(self.config)
+        self.rpc = rpclistener.RPCListener(self.config, self)
         self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
         self.repl = None
         self.stats_thread = threading.Thread(target=self.runStats)
@@ -320,11 +337,10 @@ class Scheduler(threading.Thread):
         # the events are handled by the scheduler itself it needs to handle
         # the loading of the triggers.
         # self.triggers['connection_name'] = triggerObject
-        self.triggers = dict()
-        self.config = config
+        self.triggers = dict()  # type: Dict[str, TriggerEvent]
 
-        self.trigger_event_queue = queue.Queue()
-        self.result_event_queue = queue.Queue()
+        self.trigger_event_queue = queue.Queue()  # type: Queue[Any]
+        self.result_event_queue = queue.Queue()  # type: Queue[Any]
         self.management_event_queue = zuul.lib.queue.MergedQueue()
         self.abide = model.Abide()
         self.unparsed_abide = model.UnparsedAbideConfig()
@@ -344,7 +360,7 @@ class Scheduler(threading.Thread):
         else:
             self.zuul_version = zuul_version.release_string
         self.last_reconfigured = None
-        self.tenant_last_reconfigured = {}
+        self.tenant_last_reconfigured = {}  # type: Dict[str, float]
         self.use_relative_priority = False
         if self.config.has_option('scheduler', 'relative_priority'):
             if self.config.getboolean('scheduler', 'relative_priority'):
@@ -361,7 +377,7 @@ class Scheduler(threading.Thread):
 
     def start(self):
         super(Scheduler, self).start()
-        self._command_running = True
+        self.__command_running = True
         self.log.debug("Starting command processor")
         self.command_socket.start()
         self.command_thread = threading.Thread(target=self.runCommand,
@@ -373,8 +389,41 @@ class Scheduler(threading.Thread):
         self.rpc_slow.start()
         self.stats_thread.start()
 
+    def resume(self) -> None:
+        """
+        Resumes scheduler from paused mode.
+        """
+        self.log.debug("Requesting pause mode = False")
+        self.__resumed.set()
+        # Never reconfigured = started in paused mode:
+        if self.last_reconfigured is None:
+            self.reconfigure(self.config)
+        self.wake_event.set()
+
+    @property
+    def is_resumed(self) -> bool:
+        return self.__resumed.is_set()
+
+    @property
+    def is_pausing(self) -> bool:
+        """
+        Whether scheduler is being paused. This happens when #paused is called
+        but some work needs to be done before actual pausing happens.
+
+        :return: True when scheduler is being paused but still finishing work.
+        """
+        return not self.is_resumed and not self.is_paused
+
+    def pause(self) -> None:
+        """
+        Puts scheduler in paused mode.
+        """
+        self.log.debug("Requesting pause mode = True")
+        self.__resumed.clear()
+        self.wake_event.set()
+
     def stop(self):
-        self._stopped = True
+        self.__stopped = True
         self.stats_stop.set()
         self.stopConnections()
         self.wake_event.set()
@@ -384,12 +433,12 @@ class Scheduler(threading.Thread):
         self.rpc_slow.stop()
         self.rpc_slow.join()
         self.stop_repl()
-        self._command_running = False
+        self.__command_running = False
         self.command_socket.stop()
         self.command_thread.join()
 
     def runCommand(self):
-        while self._command_running:
+        while self.__command_running:
             try:
                 command = self.command_socket.get().decode('utf8')
                 if command != '_stop':
@@ -1232,28 +1281,40 @@ class Scheduler(threading.Thread):
         else:
             self.log.debug("Statsd not configured")
         while True:
+            if (not self.is_resumed and
+                    self.management_event_queue.empty() and
+                    self.result_event_queue.empty() and
+                    self.trigger_event_queue.empty()):
+                self.log.debug("Run handler paused")
+                self.is_paused = True
+                self.__resumed.wait()
+                self.is_paused = False
+                self.log.debug("Run handler resumed")
             self.log.debug("Run handler sleeping")
             self.wake_event.wait()
             self.wake_event.clear()
-            if self._stopped:
+            if self.__stopped:
                 self.log.debug("Run handler stopping")
                 return
             self.log.debug("Run handler awake")
             self.run_handler_lock.acquire()
             try:
                 while (not self.management_event_queue.empty() and
-                       not self._stopped):
+                       not self.__stopped and
+                       self.is_resumed):
                     self.process_management_queue()
 
                 # Give result events priority -- they let us stop builds,
                 # whereas trigger events cause us to execute builds.
                 while (not self.result_event_queue.empty() and
-                       not self._stopped):
+                       not self.__stopped and
+                       self.is_resumed):
                     self.process_result_queue()
 
                 if not self._hibernate:
                     while (not self.trigger_event_queue.empty() and
-                           not self._stopped):
+                           not self.__stopped and
+                           self.is_resumed):
                         self.process_event_queue()
 
                 if self._hibernate and self._areAllBuildsComplete():
@@ -1263,7 +1324,8 @@ class Scheduler(threading.Thread):
                     for pipeline in tenant.layout.pipelines.values():
                         try:
                             while (pipeline.manager.processQueue() and
-                                   not self._stopped):
+                                   not self.__stopped and
+                                   self.is_resumed):
                                 pass
                         except Exception:
                             self.log.exception(
