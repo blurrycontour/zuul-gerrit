@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4c43b2_fe61403b",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-15T11:47:32Z",
+      "side": 1,
+      "message": "nit: we could remove the `if log` tests by setting None log to such object:\n\n  class ListLog(list):\n      def debug(self, msg, *args):\n          self.append(msg % args)",
+      "range": {
+        "startLine": 286,
+        "startChar": 8,
+        "endLine": 286,
+        "endChar": 21
+      },
+      "revId": "36452693e4e35a96fdcb8417c9239d5c409839c4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
