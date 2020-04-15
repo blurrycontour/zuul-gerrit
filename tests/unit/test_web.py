@@ -676,6 +676,7 @@ class TestWeb(BaseTestWeb):
                 'configs': [{
                     'templates': [],
                     'default_branch': 'master',
+                    'queue_name': 'integrated',
                     'merge_mode': 'merge-resolve',
                     'pipelines': [{
                         'name': 'check',
@@ -683,7 +684,7 @@ class TestWeb(BaseTestWeb):
                         'jobs': jobs,
                     }, {
                         'name': 'gate',
-                        'queue_name': 'integrated',
+                        'queue_name': 'integrated-overridden',
                         'jobs': jobs,
                     }, {'name': 'post',
                         'queue_name': None,
