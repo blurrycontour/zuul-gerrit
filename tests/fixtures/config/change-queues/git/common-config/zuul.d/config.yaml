@@ -33,3 +33,10 @@
       queue: integrated
       jobs:
         - project-test
+
+- project:
+    name: org/project3
+    queue: integrated
+    gate:
+      jobs:
+        - project-test
