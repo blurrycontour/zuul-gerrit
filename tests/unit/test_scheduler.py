@@ -6415,6 +6415,15 @@ class TestChangeQueues(ZuulTestCase):
             'org/project3', queue_name='integrated-untrusted',
             queue_repo='org/project3')
 
+    def test_dependent_queues_per_branch_project_queue(self):
+        """
+        Test that change queues can be different for different branches.
+
+        In this case we create changes for two branches in a repo that
+        references the queue on project level instead of pipeline level.
+        """
+        self._test_dependent_queues_per_branch('org/project3')
+
 
 class TestJobUpdateBrokenConfig(ZuulTestCase):
     tenant_config_file = 'config/job-update-broken/main.yaml'
