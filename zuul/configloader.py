@@ -2251,8 +2251,9 @@ class ConfigLoader(object):
         return new_abide
 
     def _loadDynamicProjectData(self, config, project,
-                                files, trusted, tenant, loading_errors,
+                                files, trusted, item, loading_errors,
                                 pcontext):
+        tenant = item.pipeline.tenant
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
             branches = ['master']
@@ -2311,6 +2312,9 @@ class ConfigLoader(object):
                             self.log.warning(
                                 "Multiple configuration in %s" %
                                 source_context)
+                            item.warning(
+                                "Multiple configuration in %s" %
+                                source_context)
                             continue
                         loaded = conf_root
 
@@ -2327,9 +2331,10 @@ class ConfigLoader(object):
                     config.extend(self.tenant_parser.parseConfig(
                         tenant, incdata, loading_errors, pcontext))
 
-    def createDynamicLayout(self, tenant, files, ansible_manager,
+    def createDynamicLayout(self, item, files, ansible_manager,
                             include_config_projects=False,
                             zuul_event_id=None):
+        tenant = item.pipeline.tenant
         log = get_annotated_logger(self.log, zuul_event_id)
         pcontext = ParseContext(self.connections, self.scheduler,
                                 tenant, ansible_manager)
@@ -2338,12 +2343,12 @@ class ConfigLoader(object):
             config = model.ParsedConfig()
             for project in tenant.config_projects:
                 self._loadDynamicProjectData(config, project, files, True,
-                                             tenant, loading_errors, pcontext)
+                                             item, loading_errors, pcontext)
         else:
             config = tenant.config_projects_config.copy()
 
         for project in tenant.untrusted_projects:
-            self._loadDynamicProjectData(config, project, files, False, tenant,
+            self._loadDynamicProjectData(config, project, files, False, item,
                                          loading_errors, pcontext)
 
         layout = model.Layout(tenant)
