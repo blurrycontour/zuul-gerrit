@@ -2247,8 +2247,9 @@ class ConfigLoader(object):
         return new_abide
 
     def _loadDynamicProjectData(self, config, project,
-                                files, trusted, tenant, loading_errors,
+                                files, trusted, item, loading_errors,
                                 ansible_manager):
+        tenant = item.pipeline.tenant
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
             branches = ['master']
@@ -2307,6 +2308,9 @@ class ConfigLoader(object):
                             self.log.warning(
                                 "Multiple configuration in %s" %
                                 source_context)
+                            item.warning(
+                                "Multiple configuration in %s" %
+                                source_context)
                             continue
                         loaded = conf_root
 
@@ -2323,24 +2327,25 @@ class ConfigLoader(object):
                     config.extend(self.tenant_parser.parseConfig(
                         tenant, incdata, loading_errors, ansible_manager))
 
-    def createDynamicLayout(self, tenant, files, ansible_manager,
+    def createDynamicLayout(self, item, files, ansible_manager,
                             include_config_projects=False,
                             scheduler=None, connections=None,
                             zuul_event_id=None):
+        tenant = item.pipeline.tenant
         log = get_annotated_logger(self.log, zuul_event_id)
         loading_errors = model.LoadingErrors()
         if include_config_projects:
             config = model.ParsedConfig()
             for project in tenant.config_projects:
                 self._loadDynamicProjectData(
-                    config, project, files, True, tenant, loading_errors,
+                    config, project, files, True, item, loading_errors,
                     ansible_manager)
         else:
             config = tenant.config_projects_config.copy()
 
         for project in tenant.untrusted_projects:
             self._loadDynamicProjectData(
-                config, project, files, False, tenant, loading_errors,
+                config, project, files, False, item, loading_errors,
                 ansible_manager)
 
         layout = model.Layout(tenant)
