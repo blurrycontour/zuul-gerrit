@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Zuul now supports pausing and resuming scheduler using the commands
+    ``zuul-scheduler pause`` and ``zuul-scheduler resume`` respectively. Also
+    scheduler can be started in paused mode using
+    ``scheduler.paused_on_start`` configuration.
+
