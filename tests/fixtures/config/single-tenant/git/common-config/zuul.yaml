@@ -135,6 +135,7 @@
 
 - project:
     name: org/project1
+    queue: integrated
     check:
       jobs:
         - project-merge
@@ -145,7 +146,8 @@
         - project1-project2-integration:
             dependencies: project-merge
     gate:
-      queue: integrated
+      # This will be overridden on project level
+      queue: integrated-overridden
       jobs:
         - project-merge
         - project-test1:
