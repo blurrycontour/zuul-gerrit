@@ -71,19 +71,26 @@ class SharedQueuePipelineManager(PipelineManager, metaclass=ABCMeta):
 
         for project_name, project_configs in layout_project_configs.items():
             (trusted, project) = tenant.getProject(project_name)
-            queue_name = None
+            project_queue_name = None
+            pipeline_queue_name = None
             project_in_pipeline = False
             for project_config in layout.getAllProjectConfigs(project_name):
                 project_pipeline_config = project_config.pipelines.get(
                     self.pipeline.name)
+                if not project_queue_name:
+                    project_queue_name = project_config.queue_name
                 if project_pipeline_config is None:
                     continue
                 project_in_pipeline = True
-                queue_name = project_pipeline_config.queue_name
-                if queue_name:
-                    break
+                # TODO(tobiash): Remove pipeline_queue_name after deprecation
+                if not pipeline_queue_name:
+                    pipeline_queue_name = project_pipeline_config.queue_name
             if not project_in_pipeline:
                 continue
+
+            # Note: we currently support queue name per pipeline and per
+            # project while project has precedence.
+            queue_name = project_queue_name or pipeline_queue_name
 
             # Check if the queue is global or per branch
             queue = layout.queues.get(queue_name)

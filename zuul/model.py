@@ -3438,6 +3438,7 @@ class ProjectConfig(ConfigObject):
         # stanzas.
         self.merge_mode = None
         self.default_branch = None
+        self.queue_name = None
 
     def __repr__(self):
         return '<ProjectConfig %s source: %s %s>' % (
@@ -3453,6 +3454,7 @@ class ProjectConfig(ConfigObject):
         r.variables = self.variables
         r.merge_mode = self.merge_mode
         r.default_branch = self.default_branch
+        r.queue_name = self.queue_name
         return r
 
     def setImpliedBranchMatchers(self, branches):
@@ -3480,6 +3482,7 @@ class ProjectConfig(ConfigObject):
         else:
             d['merge_mode'] = None
         d['templates'] = self.templates
+        d['queue_name'] = self.queue_name
         return d
 
 
