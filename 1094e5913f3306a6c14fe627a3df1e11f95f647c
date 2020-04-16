@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4c43b2_ac92e19d",
+        "filename": "doc/source/reference/queue_def.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-04-16T08:14:29Z",
+      "side": 1,
+      "message": "Maybe we should mention that there can be some unexpected cases with cross project gating and default/fallback branches.\n\nE.g. when you have this option enabled and doing cross project gating and one of the projects is using a fallback branch, you have to merge the dependency first before the dependent change can enter the gate since they no longer share the same change queue.",
+      "revId": "1094e5913f3306a6c14fe627a3df1e11f95f647c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
