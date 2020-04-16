@@ -13,6 +13,8 @@
 import json
 import logging
 import time
+from typing import Dict
+from typing import Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo import exceptions as kze
@@ -20,6 +22,7 @@ from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
+from zuul.model import HoldRequest
 import zuul.model
 
 
@@ -49,17 +52,17 @@ class ZooKeeper(object):
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
 
-    def __init__(self, enable_cache=True):
+    def __init__(self, enable_cache: bool=True):
         '''
         Initialize the ZooKeeper object.
 
         :param bool enable_cache: When True, enables caching of ZooKeeper
             objects (e.g., HoldRequests).
         '''
-        self.client = None
-        self._became_lost = False
-        self._last_retry_log = 0
-        self.enable_cache = enable_cache
+        self.client = None  # type: Optional[KazooClient]
+        self._became_lost = False  # type: bool
+        self._last_retry_log = 0  # type: int
+        self.enable_cache = enable_cache  # type: bool
 
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
@@ -67,8 +70,9 @@ class ZooKeeper(object):
         # storing that data serialized as objects. This allows us to return
         # objects from the APIs, and avoids calling the methods to serialize
         # the data into objects more than once.
-        self._hold_request_tree = None
-        self._cached_hold_requests = {}
+        self._hold_request_tree = None  # type: Optional[TreeCache]
+        self._cached_hold_requests =\
+            {}  # type: Optional[Dict[str, HoldRequest]]
 
     def _dictToStr(self, data):
         return json.dumps(data).encode('utf8')
@@ -713,6 +717,21 @@ class ZooKeeper(object):
                 "Request %s does not hold a lock" % request)
         request.lock.release()
         request.lock = None
+
+    # Scheduler part begins here
+
+    CONFIG_ROOT = "/zuul"
+    # Node content max size: keep ~100kB as a reserve form the 1MB limit
+    CONFIG_MAX_SIZE = 1024 * 1024 - 100 * 1024
+
+    def _getZuulNodePath(self, *args: str) -> str:
+        return "/".join(filter(lambda s: s is not None and s != '',
+                               [self.CONFIG_ROOT] + list(args)))
+
+    def _getConfigPartContent(self, parent, child) -> str:
+        node = "%s/%s" % (parent, child)
+        return self.client.get(node)[0].decode(encoding='UTF-8')\
+            if self.client and self.client.exists(node) else ''
 
 
 class Launcher():
