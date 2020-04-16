@@ -250,8 +250,11 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         '''
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port,
-                           self.config, self.test_root))
+            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.rpcclient, self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
@@ -326,8 +329,11 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
     def test_websocket_streaming(self):
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port,
-                           self.config, self.test_root))
+            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.rpcclient, self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
@@ -399,8 +405,11 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
     def test_websocket_hangup(self):
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port,
-                           self.config, self.test_root))
+            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.rpcclient, self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
