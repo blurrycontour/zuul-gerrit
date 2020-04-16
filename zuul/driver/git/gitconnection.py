@@ -35,6 +35,7 @@ class GitConnection(BaseConnection):
         if 'baseurl' not in self.connection_config:
             raise Exception('baseurl is required for git connections in '
                             '%s' % self.connection_name)
+        self.watcher_thread = None
         self.baseurl = self.connection_config.get('baseurl')
         self.poll_timeout = float(
             self.connection_config.get('poll_delay', 3600 * 2))
