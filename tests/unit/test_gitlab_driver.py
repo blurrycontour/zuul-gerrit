@@ -34,8 +34,11 @@ class TestGitlabWebhook(ZuulTestCase):
 
         # Start the web server
         self.web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port,
-                           self.config, self.test_root))
+            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.rpcclient, self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root))
 
         host = '127.0.0.1'
         # Wait until web server is started
