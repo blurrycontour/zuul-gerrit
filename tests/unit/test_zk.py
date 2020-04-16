@@ -16,6 +16,7 @@
 import testtools
 
 import zuul.zk
+import zuul.zk.exceptions
 from zuul import model
 
 from tests.base import BaseTestCase, ChrootedKazooFixture
@@ -70,7 +71,7 @@ class TestZK(BaseTestCase):
         # Test lock operations
         self.zk.lockHoldRequest(req2, blocking=False)
         with testtools.ExpectedException(
-            zuul.zk.LockException,
+            zuul.zk.exceptions.LockException,
             "Timeout trying to acquire lock .*"
         ):
             self.zk.lockHoldRequest(req2, blocking=True, timeout=2)
