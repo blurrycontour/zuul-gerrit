@@ -72,7 +72,7 @@ class TestGerritCRD(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(B.data['status'], 'NEW')
 
-        for connection in self.connections.connections.values():
+        for connection in self.scheds.first.connections.connections.values():
             connection.maintainCache([])
 
         self.executor_server.hold_jobs_in_build = True
