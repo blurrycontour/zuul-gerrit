@@ -708,7 +708,7 @@ class TestPagureToGerritCRD(ZuulTestCase):
         self.assertFalse(A.is_merged)
         self.assertEqual(B.data['status'], 'NEW')
 
-        for connection in self.connections.connections.values():
+        for connection in self.scheds.first.connections.connections.values():
             connection.maintainCache([])
 
         B.addApproval('Approved', 1)
@@ -793,7 +793,7 @@ class TestGerritToPagureCRD(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertFalse(B.is_merged)
 
-        for connection in self.connections.connections.values():
+        for connection in self.scheds.first.connections.connections.values():
             connection.maintainCache([])
 
         B.addFlag('success', 'https://url', 'Build passed')
@@ -870,7 +870,7 @@ class TestPagureToGithubCRD(ZuulTestCase):
         self.assertFalse(A.is_merged)
         self.assertFalse(B.is_merged)
 
-        for connection in self.connections.connections.values():
+        for connection in self.scheds.first.connections.connections.values():
             connection.maintainCache([])
 
         B.addLabel('approved')
@@ -939,7 +939,7 @@ class TestGithubToPagureCRD(ZuulTestCase):
         self.assertFalse(A.is_merged)
         self.assertFalse(B.is_merged)
 
-        for connection in self.connections.connections.values():
+        for connection in self.scheds.first.connections.connections.values():
             connection.maintainCache([])
 
         B.addFlag('success', 'https://url', 'Build passed')
@@ -998,8 +998,11 @@ class TestPagureWebhook(ZuulTestCase):
         super(TestPagureWebhook, self).setUp()
         # Start the web server
         self.web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port,
-                           self.config, self.test_root))
+            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.rpcclient, self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root))
 
         host = '127.0.0.1'
         # Wait until web server is started
@@ -1043,8 +1046,11 @@ class TestPagureWebhookWhitelist(ZuulTestCase):
         super(TestPagureWebhookWhitelist, self).setUp()
         # Start the web server
         self.web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port,
-                           self.config, self.test_root))
+            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.rpcclient, self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root))
 
         host = '127.0.0.1'
         # Wait until web server is started

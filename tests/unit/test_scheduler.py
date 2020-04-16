@@ -1140,7 +1140,7 @@ class TestScheduler(ZuulTestCase):
         # triggering events.  Since it will have the changes cached
         # already (without approvals), we need to clear the cache
         # first.
-        for connection in self.connections.connections.values():
+        for connection in self.scheds.first.connections.connections.values():
             connection.maintainCache([])
 
         self.executor_server.hold_jobs_in_build = True
