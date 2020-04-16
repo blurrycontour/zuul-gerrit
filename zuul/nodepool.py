@@ -16,7 +16,7 @@ import time
 from collections import defaultdict
 from zuul import model
 from zuul.lib.logutil import get_annotated_logger
-from zuul.zk import LockException
+from zuul.zk.exceptions import LockException
 
 
 def add_resources(target, source):
