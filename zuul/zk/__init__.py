@@ -13,6 +13,8 @@
 import json
 import logging
 import time
+from typing import Dict
+from typing import Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo import exceptions as kze
@@ -21,13 +23,12 @@ from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
+from zuul.zk.exceptions import LockException
+from zuul.zk.nodepool import ZooKeeperNodepoolMixin
+from zuul.zk.zuul import ZooKeeperZuulMixin
 
 
-class LockException(Exception):
-    pass
-
-
-class ZooKeeper(object):
+class ZooKeeper(ZooKeeperNodepoolMixin, ZooKeeperZuulMixin, object):
     '''
     Class implementing the ZooKeeper interface.
 
@@ -49,17 +50,17 @@ class ZooKeeper(object):
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
 
-    def __init__(self, enable_cache=True):
+    def __init__(self, enable_cache: bool=True):
         '''
         Initialize the ZooKeeper object.
 
         :param bool enable_cache: When True, enables caching of ZooKeeper
             objects (e.g., HoldRequests).
         '''
-        self.client = None
-        self._became_lost = False
-        self._last_retry_log = 0
-        self.enable_cache = enable_cache
+        self.client = None  # type: Optional[KazooClient]
+        self._became_lost = False  # type: bool
+        self._last_retry_log = 0  # type: int
+        self.enable_cache = enable_cache  # type: bool
 
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
@@ -67,8 +68,9 @@ class ZooKeeper(object):
         # storing that data serialized as objects. This allows us to return
         # objects from the APIs, and avoids calling the methods to serialize
         # the data into objects more than once.
-        self._hold_request_tree = None
-        self._cached_hold_requests = {}
+        self._hold_request_tree = None  # type: Optional[TreeCache]
+        self._cached_hold_requests =\
+            {}  # type: Optional[Dict[str, zuul.model.HoldRequest]]
 
     def _dictToStr(self, data):
         return json.dumps(data).encode('utf8')
@@ -115,8 +117,9 @@ class ZooKeeper(object):
             self.log.warning("Retrying zookeeper connection")
             self._last_retry_log = now
 
-    def connect(self, hosts, read_only=False, timeout=10.0,
-                tls_cert=None, tls_key=None, tls_ca=None):
+    def connect(self, hosts: str, read_only: bool=False, timeout: float=10.0,
+                tls_cert: Optional[str]=None, tls_key: Optional[str]=None,
+                tls_ca: Optional[str]=None):
         '''
         Establish a connection with ZooKeeper cluster.
 
@@ -134,10 +137,7 @@ class ZooKeeper(object):
         '''
 
         if self.client is None:
-            args = dict(hosts=hosts,
-                        read_only=read_only,
-                        timeout=timeout,
-            )
+            args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
             if tls_key:
                 args['use_ssl'] = True
                 args['keyfile'] = tls_key
@@ -475,275 +475,3 @@ class ZooKeeper(object):
                     node_data.get('hold_job') == identifier):
                 count += 1
         return count
-
-    # Copy of nodepool/zk.py begins here
-    NODE_ROOT = "/nodepool/nodes"
-    LAUNCHER_ROOT = "/nodepool/launchers"
-
-    def _bytesToDict(self, data):
-        return json.loads(data.decode('utf8'))
-
-    def _launcherPath(self, launcher):
-        return "%s/%s" % (self.LAUNCHER_ROOT, launcher)
-
-    def _nodePath(self, node):
-        return "%s/%s" % (self.NODE_ROOT, node)
-
-    def getRegisteredLaunchers(self):
-        '''
-        Get a list of all launchers that have registered with ZooKeeper.
-
-        :returns: A list of Launcher objects, or empty list if none are found.
-        '''
-        try:
-            launcher_ids = self.client.get_children(self.LAUNCHER_ROOT)
-        except kze.NoNodeError:
-            return []
-
-        objs = []
-        for launcher in launcher_ids:
-            path = self._launcherPath(launcher)
-            try:
-                data, _ = self.client.get(path)
-            except kze.NoNodeError:
-                # launcher disappeared
-                continue
-
-            objs.append(Launcher.fromDict(self._bytesToDict(data)))
-        return objs
-
-    def getNodes(self):
-        '''
-        Get the current list of all nodes.
-
-        :returns: A list of nodes.
-        '''
-        try:
-            return self.client.get_children(self.NODE_ROOT)
-        except kze.NoNodeError:
-            return []
-
-    def getNode(self, node):
-        '''
-        Get the data for a specific node.
-
-        :param str node: The node ID.
-
-        :returns: The node data, or None if the node was not found.
-        '''
-        path = self._nodePath(node)
-        try:
-            data, stat = self.client.get(path)
-        except kze.NoNodeError:
-            return None
-        if not data:
-            return None
-
-        d = self._bytesToDict(data)
-        d['id'] = node
-        return d
-
-    def nodeIterator(self):
-        '''
-        Utility generator method for iterating through all nodes.
-        '''
-        for node_id in self.getNodes():
-            node = self.getNode(node_id)
-            if node:
-                yield node
-
-    def getHoldRequests(self):
-        '''
-        Get the current list of all hold requests.
-        '''
-        try:
-            return sorted(self.client.get_children(self.HOLD_REQUEST_ROOT))
-        except kze.NoNodeError:
-            return []
-
-    def getHoldRequest(self, hold_request_id):
-        path = self.HOLD_REQUEST_ROOT + "/" + hold_request_id
-        try:
-            data, stat = self.client.get(path)
-        except kze.NoNodeError:
-            return None
-        if not data:
-            return None
-
-        obj = zuul.model.HoldRequest.fromDict(self._strToDict(data))
-        obj.id = hold_request_id
-        obj.stat = stat
-        return obj
-
-    def storeHoldRequest(self, hold_request):
-        '''
-        Create or update a hold request.
-
-        If this is a new request with no value for the `id` attribute of the
-        passed in request, then `id` will be set with the unique request
-        identifier after successful creation.
-
-        :param HoldRequest hold_request: Object representing the hold request.
-        '''
-        if hold_request.id is None:
-            path = self.client.create(
-                self.HOLD_REQUEST_ROOT + "/",
-                value=hold_request.serialize(),
-                sequence=True,
-                makepath=True)
-            hold_request.id = path.split('/')[-1]
-        else:
-            path = self.HOLD_REQUEST_ROOT + "/" + hold_request.id
-            self.client.set(path, hold_request.serialize())
-
-    def _markHeldNodesAsUsed(self, hold_request):
-        '''
-        Changes the state for each held node for the hold request to 'used'.
-
-        :returns: True if all nodes marked USED, False otherwise.
-        '''
-        def getHeldNodeIDs(request):
-            node_ids = []
-            for data in request.nodes:
-                # TODO(Shrews): Remove type check at some point.
-                # When autoholds were initially changed to be stored in ZK,
-                # the node IDs were originally stored as a list of strings.
-                # A later change embedded them within a dict. Handle both
-                # cases here to deal with the upgrade.
-                if isinstance(data, dict):
-                    node_ids += data['nodes']
-                else:
-                    node_ids.append(data)
-            return node_ids
-
-        failure = False
-        for node_id in getHeldNodeIDs(hold_request):
-            node = self.getNode(node_id)
-            if not node or node['state'] == zuul.model.STATE_USED:
-                continue
-
-            node['state'] = zuul.model.STATE_USED
-
-            name = None
-            label = None
-            if 'name' in node:
-                name = node['name']
-            if 'label' in node:
-                label = node['label']
-
-            node_obj = zuul.model.Node(name, label)
-            node_obj.updateFromDict(node)
-
-            try:
-                self.lockNode(node_obj, blocking=False)
-                self.storeNode(node_obj)
-            except Exception:
-                self.log.exception("Cannot change HELD node state to USED "
-                                   "for node %s in request %s",
-                                   node_obj.id, hold_request.id)
-                failure = True
-            finally:
-                try:
-                    if node_obj.lock:
-                        self.unlockNode(node_obj)
-                except Exception:
-                    self.log.exception(
-                        "Failed to unlock HELD node %s for request %s",
-                        node_obj.id, hold_request.id)
-
-        return not failure
-
-    def deleteHoldRequest(self, hold_request):
-        '''
-        Delete a hold request.
-
-        :param HoldRequest hold_request: Object representing the hold request.
-        '''
-        if not self._markHeldNodesAsUsed(hold_request):
-            self.log.info("Unable to delete hold request %s because "
-                          "not all nodes marked as USED.", hold_request.id)
-            return
-
-        path = self.HOLD_REQUEST_ROOT + "/" + hold_request.id
-        try:
-            self.client.delete(path, recursive=True)
-        except kze.NoNodeError:
-            pass
-
-    def lockHoldRequest(self, request, blocking=True, timeout=None):
-        '''
-        Lock a node request.
-
-        This will set the `lock` attribute of the request object when the
-        lock is successfully acquired.
-
-        :param HoldRequest request: The hold request to lock.
-        '''
-        if not request.id:
-            raise LockException(
-                "Hold request without an ID cannot be locked: %s" % request)
-
-        path = "%s/%s/lock" % (self.HOLD_REQUEST_ROOT, request.id)
-        try:
-            lock = Lock(self.client, path)
-            have_lock = lock.acquire(blocking, timeout)
-        except kze.LockTimeout:
-            raise LockException(
-                "Timeout trying to acquire lock %s" % path)
-
-        # If we aren't blocking, it's possible we didn't get the lock
-        # because someone else has it.
-        if not have_lock:
-            raise LockException("Did not get lock on %s" % path)
-
-        request.lock = lock
-
-    def unlockHoldRequest(self, request):
-        '''
-        Unlock a hold request.
-
-        The request must already have been locked.
-
-        :param HoldRequest request: The request to unlock.
-
-        :raises: ZKLockException if the request is not currently locked.
-        '''
-        if request.lock is None:
-            raise LockException(
-                "Request %s does not hold a lock" % request)
-        request.lock.release()
-        request.lock = None
-
-
-class Launcher():
-    '''
-    Class to describe a nodepool launcher.
-    '''
-
-    def __init__(self):
-        self.id = None
-        self._supported_labels = set()
-
-    def __eq__(self, other):
-        if isinstance(other, Launcher):
-            return (self.id == other.id and
-                    self.supported_labels == other.supported_labels)
-        else:
-            return False
-
-    @property
-    def supported_labels(self):
-        return self._supported_labels
-
-    @supported_labels.setter
-    def supported_labels(self, value):
-        if not isinstance(value, set):
-            raise TypeError("'supported_labels' attribute must be a set")
-        self._supported_labels = value
-
-    @staticmethod
-    def fromDict(d):
-        obj = Launcher()
-        obj.id = d.get('id')
-        obj.supported_labels = set(d.get('supported_labels', []))
-        return obj
