@@ -21,6 +21,7 @@ import ArtifactList from './Artifact'
 import BuildOutput from './BuildOutput'
 
 import * as moment from 'moment'
+import 'moment-timezone'
 import 'moment-duration-format'
 
 
@@ -74,6 +75,9 @@ class Summary extends React.Component {
         } else {
           value = 'false'
         }
+      }
+      if (column === 'start_time' || column === 'end_time') {
+        value = moment.utc(value).local().format('YYYY-MM-DD HH:mm:ss')
       }
       if (column === 'duration') {
           value = moment.duration(value, 'seconds')
