@@ -75,6 +75,9 @@ class Summary extends React.Component {
           value = 'false'
         }
       }
+      if (column === 'start_time' || column === 'end_time') {
+        value = moment.utc(value).local().format('YYYY-MM-DD HH:mm:ss')
+      }
       if (column === 'duration') {
           value = moment.duration(value, 'seconds')
             .format('h [hr] m [min] s [sec]')

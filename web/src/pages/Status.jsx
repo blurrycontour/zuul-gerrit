@@ -13,6 +13,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
+import * as moment from 'moment-timezone'
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
@@ -184,7 +185,7 @@ class StatusPage extends Refreshable {
         <p>Zuul version: <span>{status.zuul_version}</span></p>
         {status.last_reconfigured ? (
           <p>Last reconfigured: <span>
-              {new Date(status.last_reconfigured).toString()}
+              {moment.utc(status.last_reconfigured).local().format('llll')} ({moment.tz.guess()})
           </span></p>) : ''}
       </React.Fragment>
     )
