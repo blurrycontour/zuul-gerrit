@@ -84,6 +84,11 @@ class BuildsPage extends TableFilters {
         {moment.duration(value, 'seconds').format('h [hr] m [min] s [sec]')}
       </Table.Cell>
     )
+    const timeFormat = (value) => (
+      <Table.Cell>
+        {moment.utc(value).local().format('YYYY-MM-DD HH:mm:ss')}
+      </Table.Cell>
+    )
     this.columns = []
     this.filterTypes = []
     const myColumns = [
@@ -103,6 +108,7 @@ class BuildsPage extends TableFilters {
         prop = 'job_name'
       } else if (column === 'start time') {
         prop = 'start_time'
+        formatter = timeFormat
       } else if (column === 'change') {
         prop = 'change'
         formatter = linkChangeFormat
