@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4c43b2_4426546a",
+        "filename": "releasenotes/notes/zookeeper-connection-zuul-web-6e6eb06c0c2e95fa.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-20T13:58:50Z",
+      "side": 1,
+      "message": "ZK was already required for zuul-web to be able to report available labels and nodes.",
+      "range": {
+        "startLine": 5,
+        "startChar": 44,
+        "endLine": 5,
+        "endChar": 62
+      },
+      "revId": "715a23d6cb91eddeadf065228b46bd5efef4d390",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
