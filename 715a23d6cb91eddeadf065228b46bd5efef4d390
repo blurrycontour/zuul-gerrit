@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f4c43b2_04c0cce0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-20T14:23:21Z",
+      "side": 1,
+      "message": "Appearently this was already mandatory (just not in the test cases). So in fact this is a test refactor to supply this in the tests as well in preparation to zk based event ingestion.",
+      "revId": "715a23d6cb91eddeadf065228b46bd5efef4d390",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f4c43b2_4426546a",
         "filename": "releasenotes/notes/zookeeper-connection-zuul-web-6e6eb06c0c2e95fa.yaml",
         "patchSetId": 1
@@ -13,6 +30,30 @@
       "writtenOn": "2020-04-20T13:58:50Z",
       "side": 1,
       "message": "ZK was already required for zuul-web to be able to report available labels and nodes.",
+      "range": {
+        "startLine": 5,
+        "startChar": 44,
+        "endLine": 5,
+        "endChar": 62
+      },
+      "revId": "715a23d6cb91eddeadf065228b46bd5efef4d390",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4c43b2_e4cde031",
+        "filename": "releasenotes/notes/zookeeper-connection-zuul-web-6e6eb06c0c2e95fa.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-20T14:23:21Z",
+      "side": 1,
+      "message": "Oh right, it\u0027s already required since 3.4.0 [1]. I thought it was optional yet. I just validated that it\u0027s really required already [2].\n\n[1] https://zuul-ci.org/docs/zuul/reference/releasenotes.html#relnotes-3-4-0\n[2] https://opendev.org/zuul/zuul/src/branch/master/zuul/cmd/web.py#L88",
+      "parentUuid": "3f4c43b2_4426546a",
       "range": {
         "startLine": 5,
         "startChar": 44,
