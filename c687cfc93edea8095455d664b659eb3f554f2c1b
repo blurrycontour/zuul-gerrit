@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f4c43b2_2412280a",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-20T14:00:45Z",
+      "side": 1,
+      "message": "We could use listeners instead of a thread, but not sure how they are reliable. Polling (as of now) same as with gearman but probably more expensive.",
+      "range": {
+        "startLine": 313,
+        "startChar": 8,
+        "endLine": 315,
+        "endChar": 35
+      },
+      "revId": "c687cfc93edea8095455d664b659eb3f554f2c1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4c43b2_c400a4ae",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 797,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-20T14:00:45Z",
+      "side": 1,
+      "message": "nit: will remove",
+      "range": {
+        "startLine": 797,
+        "startChar": 16,
+        "endLine": 797,
+        "endChar": 53
+      },
+      "revId": "c687cfc93edea8095455d664b659eb3f554f2c1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4c43b2_242b4830",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-20T14:00:45Z",
+      "side": 1,
+      "message": "nit: will remove - too many logs",
+      "range": {
+        "startLine": 812,
+        "startChar": 20,
+        "endLine": 812,
+        "endChar": 66
+      },
+      "revId": "c687cfc93edea8095455d664b659eb3f554f2c1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f4c43b2_0430cc9e",
+        "filename": "zuul/zk.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 817,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-20T14:00:45Z",
+      "side": 1,
+      "message": "nit: will remove",
+      "range": {
+        "startLine": 817,
+        "startChar": 16,
+        "endLine": 817,
+        "endChar": 54
+      },
+      "revId": "c687cfc93edea8095455d664b659eb3f554f2c1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
