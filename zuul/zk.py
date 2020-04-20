@@ -119,8 +119,9 @@ class ZooKeeper(object):
             self.log.warning("Retrying zookeeper connection")
             self._last_retry_log = now
 
-    def connect(self, hosts, read_only=False, timeout=10.0,
-                tls_cert=None, tls_key=None, tls_ca=None):
+    def connect(self, hosts: str, read_only: bool=False, timeout: float=10.0,
+                tls_cert: Optional[str]=None, tls_key: Optional[str]=None,
+                tls_ca: Optional[str]=None):
         '''
         Establish a connection with ZooKeeper cluster.
 
@@ -138,10 +139,7 @@ class ZooKeeper(object):
         '''
 
         if self.client is None:
-            args = dict(hosts=hosts,
-                        read_only=read_only,
-                        timeout=timeout,
-            )
+            args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
             if tls_key:
                 args['use_ssl'] = True
                 args['keyfile'] = tls_key
