@@ -20,6 +20,7 @@ from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import codecs
 import copy
+from typing import Optional
 from datetime import datetime
 import json
 import logging
@@ -28,6 +29,7 @@ import time
 import select
 import threading
 
+import zuul.lib.auth
 import zuul.lib.repl
 from zuul.lib.re2util import filter_allowed_disallowed
 import zuul.model
@@ -1156,31 +1158,38 @@ class StreamManager(object):
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web.ZuulWeb")
 
-    def __init__(self, listen_address, listen_port, gear_server,
-                 gear_port, ssl_key=None, ssl_cert=None, ssl_ca=None,
-                 static_cache_expiry=3600, connections=None,
-                 info=None, static_path=None, zk_hosts=None,
-                 zk_timeout=None, zk_tls_cert=None, zk_tls_key=None,
-                 zk_tls_ca=None, authenticators=None,
-                 command_socket=None):
-        self.start_time = time.time()
-        self.listen_address = listen_address
-        self.listen_port = listen_port
-        self.event_loop = None
-        self.term = None
-        self.server = None
-        self.static_cache_expiry = static_cache_expiry
-        self.info = info
-        self.static_path = os.path.abspath(static_path or STATIC_DIR)
+    def __init__(self, listen_address: str, listen_port: int,
+                 gear_server: str, gear_port: int,
+                 connections,
+                 authenticators: zuul.lib.auth.AuthenticatorRegistry,
+                 zk_hosts: str, zk_timeout: float=10.0,
+                 zk_tls_cert: Optional[str]=None,
+                 zk_tls_key: Optional[str]=None, zk_tls_ca: Optional[str]=None,
+                 ssl_key: str=None, ssl_cert: str=None, ssl_ca: str=None,
+                 static_cache_expiry: int=3600,
+                 info: Optional[zuul.model.WebInfo]=None,
+                 static_path: Optional[str]=None,
+                 command_socket: Optional[str]=None):
+        self.start_time = time.time()  # type: float
+        self.listen_address = listen_address  # type: str
+        self.listen_port = listen_port  # type: int
+        self.event_loop = None  # TODO JK: Is this variable used?
+        self.term = None  # TODO JK: Is this variable used?
+        self.server = None  # type: Optional[str]
+        self.static_cache_expiry = static_cache_expiry  # type: int
+        self.info = info  # type: Optional[zuul.model.WebInfo]
+        self.static_path = os.path\
+            .abspath(static_path or STATIC_DIR)  # type: str
         # instanciate handlers
         self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
                                             ssl_key, ssl_cert, ssl_ca,
                                             client_id='Zuul Web Server')
         self.zk = zuul.zk.ZooKeeper(enable_cache=True)
-        if zk_hosts:
-            self.zk.connect(hosts=zk_hosts, read_only=True,
-                            timeout=zk_timeout, tls_cert=zk_tls_cert,
-                            tls_key=zk_tls_key, tls_ca=zk_tls_ca)
+        if not zk_hosts:
+            raise Exception("Zookeeper is required!")
+        self.zk.connect(hosts=zk_hosts, read_only=True,
+                        timeout=zk_timeout, tls_cert=zk_tls_cert,
+                        tls_key=zk_tls_key, tls_ca=zk_tls_ca)
 
         self.connections = connections
         self.authenticators = authenticators
