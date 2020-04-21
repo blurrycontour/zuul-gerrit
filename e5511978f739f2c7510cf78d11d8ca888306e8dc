@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_ae3a1ae4",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-04-21T08:56:48Z",
+      "side": 1,
+      "message": "You also need to adapt this in the PipelineManager\u0027s  buildChangeQueues method.",
+      "revId": "e5511978f739f2c7510cf78d11d8ca888306e8dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
