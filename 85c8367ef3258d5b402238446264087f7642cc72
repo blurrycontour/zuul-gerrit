@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_e56f13c3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 2118,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-21T19:32:42Z",
+      "side": 1,
+      "message": "That\u0027s a bit odd, iiuc this evaluate as `{None}` and the comprehension still perform the config write. Wouldn\u0027t it be easier to do:\n\n  for k in filter(lambda n: n !\u003d \"callback_config_section\", cb_config):\n    config.write(...)\n\n?",
+      "range": {
+        "startLine": 2116,
+        "startChar": 0,
+        "endLine": 2118,
+        "endChar": 55
+      },
+      "revId": "85c8367ef3258d5b402238446264087f7642cc72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
