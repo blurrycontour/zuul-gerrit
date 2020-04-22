@@ -54,6 +54,9 @@ exposes that log stream over a websocket connection as part of
 .. autoclass:: zuul.web.LogStreamHandler
 .. autoclass:: zuul.web.ZuulWeb
 
+Log streaming can be disabled for a host by setting ``zuul_skip_log_streaming``
+as an ansible hostvar to ``True``.
+
 In addition to real-time streaming, Zuul also installs another callback module,
 :py:mod:`zuul.ansible.base.callback.zuul_json.CallbackModule` that collects all
 of the information about a given run into a json file which is written to the
