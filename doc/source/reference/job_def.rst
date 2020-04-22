@@ -705,8 +705,7 @@ Here is an example of two job definitions:
          depends on job A, but job A is not run for any reason (for
          example, it containes a file matcher which does not match),
          then Zuul will not run any jobs and report an error.  A
-         *soft* dependency will simply be ignored if the dependent job
-         is not run.
+         *soft* dependency will not cause Zuul to report an error.
 
    .. attr:: allowed-projects
 
