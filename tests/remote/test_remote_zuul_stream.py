@@ -19,9 +19,9 @@ import textwrap
 from tests.base import AnsibleZuulTestCase
 
 
-class TestZuulStream26(AnsibleZuulTestCase):
+class AnsibleZuulStreamTestCase(AnsibleZuulTestCase):
+
     tenant_config_file = 'config/remote-zuul-stream/main.yaml'
-    ansible_version = '2.6'
 
     def setUp(self):
         self.log_console_port = 19000 + int(self.ansible_version.split('.')[1])
@@ -31,15 +31,8 @@ class TestZuulStream26(AnsibleZuulTestCase):
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
         self.assertIsNotNone(ansible_remote)
 
-    def _run_job(self, job_name):
-        # Keep the jobdir around so we can inspect contents if an
-        # assert fails. It will be cleaned up anyway as it is contained
-        # in a tmp dir which gets cleaned up after the test.
-        self.executor_server.keep_jobdir = True
-
-        # Output extra ansible info so we might see errors.
-        self.executor_server.verbose = True
-        conf = textwrap.dedent(
+   def _get_conf(self, job_name):
+        return textwrap.dedent(
             """
             - job:
                 name: {job_name}
@@ -65,6 +58,16 @@ class TestZuulStream26(AnsibleZuulTestCase):
                 version=self.ansible_version,
                 console_port=self.log_console_port))
 
+    def _run_job(self, job_name):
+        # Keep the jobdir around so we can inspect contents if an
+        # assert fails. It will be cleaned up anyway as it is contained
+        # in a tmp dir which gets cleaned up after the test.
+        self.executor_server.keep_jobdir = True
+
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        conf = _get_conf(job_name)
+
         file_dict = {'zuul.yaml': conf}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)
@@ -87,6 +90,10 @@ class TestZuulStream26(AnsibleZuulTestCase):
         m = log_re.search(log)
         if m is None:
             raise Exception("'%s' not found in log" % (line,))
+
+
+class TestZuulStream26(AnsibleZuulStreamTestCase):
+    ansible_version = '2.6'
 
     def test_command(self):
         job = self._run_job('command')
@@ -275,3 +282,65 @@ class TestZuulStream28(TestZuulStream27):
 
 class TestZuulStream29(TestZuulStream28):
     ansible_version = '2.9'
+
+
+class AnsibleZuulSkipStreamTest(AnsibleZuulStreamTestCase):
+    ansible_version = '2.9'
+
+   def _get_conf(self, job_name):
+        return textwrap.dedent(
+            """
+            - job:
+                name: {job_name}
+                run: playbooks/{job_name}.yaml
+                ansible-version: {version}
+                vars:
+                  test_console_port: {console_port}
+                roles:
+                  - zuul: org/common-config
+                nodeset:
+                  nodes:
+                    - name: compute1
+                      label: whatever
+                    - name: controller
+                      label: whatever
+                host-vars:
+                  constroller:
+                    zuul_skip_log_streaming: True
+                  compute1:
+                    zuul_skip_log_streaming: True
+
+            - project:
+                check:
+                  jobs:
+                    - {job_name}
+            """.format(
+                job_name=job_name,
+                version=self.ansible_version,
+                console_port=self.log_console_port))
+
+    def assertNotLogLine(self, line, log):
+        pattern = (r'^\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d \| %s$'
+                   % line)
+        log_re = re.compile(pattern, re.MULTILINE)
+        m = log_re.search(log)
+        if m is not None:
+            raise Exception("'%s' found in log" % (line,))
+
+    def test_command(self):
+        job = self._run_job('command')
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'SUCCESS')
+
+            text = self._get_job_output(build)
+            self.assertLogLine(
+                r'RUN START: \[untrusted : review.example.com/org/project/'
+                r'playbooks/command.yaml@master\]', text)
+            self.assertLogLine(r'PLAY \[all\]', text)
+            self.assertLogLine(
+                r'Ansible version={}'.format(self.ansible_version), text)
+            self.assertLogLine(r'TASK \[Show contents of first file\]', text)
+            self.assertNotLogLine(r'controller \| command test one', text)
+            self.assertLogLine(
+                r'controller \| ok: Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)

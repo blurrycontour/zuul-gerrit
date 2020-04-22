@@ -270,6 +270,9 @@ class CallbackModule(default.CallbackModule):
                 if play_vars[host].get('ansible_connection') in ('winrm',):
                     # The winrm connections don't support streaming for now
                     continue
+                if play_vars[host].get('zuul_skip_log_streaming'):
+                    # The host has been configured to not support log streaming
+                    continue
                 if play_vars[host].get('ansible_connection') in ('kubectl', ):
                     # Stream from the forwarded port on kubectl conns
                     port = play_vars[host]['zuul']['resources'][
