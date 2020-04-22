@@ -276,6 +276,9 @@ class CallbackModule(default.CallbackModule):
                 if play_vars[host].get('ansible_connection') in ('winrm',):
                     # The winrm connections don't support streaming for now
                     continue
+                if play_vars[host].get('zuul_skip_log_streaming'):
+                    # The host has been configured to not support log streaming
+                    continue
                 if play_vars[host].get('ansible_connection') in ('kubectl', ):
                     # Stream from the forwarded port on kubectl conns
                     port = play_vars[host]['zuul']['resources'][
@@ -316,6 +319,7 @@ class CallbackModule(default.CallbackModule):
         result_dict = dict(result._result)
         localhost_names = ('localhost', '127.0.0.1', '::1')
         is_localhost = False
+        was_streaming_skipped = False
         task_host = result._host.get_name()
         delegated_vars = result_dict.get('_ansible_delegated_vars', None)
         if delegated_vars:
@@ -335,16 +339,18 @@ class CallbackModule(default.CallbackModule):
             if task_hostvars.get('ansible_host', task_hostvars.get(
                     'ansible_inventory_host', 'localhost')) in localhost_names:
                 is_localhost = True
+            if task_hostvars.get('zuul_skip_log_streaming'):
+                was_streaming_skipped = True
 
-        if not is_localhost and is_task:
+        if not is_localhost and not was_streaming_skipped and is_task:
             self._stop_streamers()
         if result._task.action in ('command', 'shell',
                                    'win_command', 'win_shell'):
             stdout_lines = zuul_filter_result(result_dict)
             # We don't have streaming for localhost and windows modules so get
             # standard out after the fact.
-            if is_localhost or result._task.action in (
-                    'win_command', 'win_shell'):
+            if is_localhost or was_streaming_skipped or \
+                    result._task.action in ('win_command', 'win_shell'):
                 for line in stdout_lines:
                     hostname = self._get_hostname(result)
                     self._log("%s | %s " % (hostname, line))

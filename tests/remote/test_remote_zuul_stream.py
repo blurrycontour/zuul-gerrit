@@ -32,7 +32,7 @@ class FunctionalZuulStreamMixIn:
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
         self.assertIsNotNone(ansible_remote)
 
-    def _run_job(self, job_name, create=True):
+    def _get_conf(self, job_name, create=True):
         # Keep the jobdir around so we can inspect contents if an
         # assert fails. It will be cleaned up anyway as it is contained
         # in a tmp dir which gets cleaned up after the test.
@@ -41,7 +41,7 @@ class FunctionalZuulStreamMixIn:
         # Output extra ansible info so we might see errors.
         self.executor_server.verbose = True
         if create:
-            conf = textwrap.dedent(
+            return textwrap.dedent(
                 """
                 - job:
                     name: {job_name}
@@ -67,13 +67,23 @@ class FunctionalZuulStreamMixIn:
                     version=self.ansible_version,
                     console_port=self.log_console_port))
         else:
-            conf = textwrap.dedent(
+            return textwrap.dedent(
                 """
                 - project:
                     check:
                       jobs:
                         - {job_name}
                 """.format(job_name=job_name))
+
+    def _run_job(self, job_name, create=True):
+        # Keep the jobdir around so we can inspect contents if an
+        # assert fails. It will be cleaned up anyway as it is contained
+        # in a tmp dir which gets cleaned up after the test.
+        self.executor_server.keep_jobdir = True
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        conf = self._get_conf(job_name, create=create)
+
         file_dict = {'zuul.yaml': conf}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)
@@ -226,3 +236,149 @@ class TestZuulStream29(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
     def setUp(self):
         super().setUp()
         self._setUp()
+
+    def test_command(self):
+        job = self._run_job('command')
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'SUCCESS')
+
+            text = self._get_job_output(build)
+            self.assertLogLine(
+                r'RUN START: \[untrusted : review.example.com/org/project/'
+                r'playbooks/command.yaml@master\]', text)
+            self.assertLogLine(r'PLAY \[all\]', text)
+            self.assertLogLine(
+                r'Ansible version={}'.format(self.ansible_version), text)
+            self.assertLogLine(r'TASK \[Show contents of first file\]', text)
+            self.assertLogLine(r'controller \| command test one', text)
+            self.assertLogLine(
+                r'controller \| ok: Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
+            self.assertLogLine(r'TASK \[Show contents of second file\]', text)
+            self.assertLogLine(r'compute1 \| command test two', text)
+            self.assertLogLine(r'controller \| command test two', text)
+            self.assertLogLine(r'compute1 \| This is a rescue task', text)
+            self.assertLogLine(r'controller \| This is a rescue task', text)
+            self.assertLogLine(r'compute1 \| This is an always task', text)
+            self.assertLogLine(r'controller \| This is an always task', text)
+            self.assertLogLine(r'compute1 \| This is a handler', text)
+            self.assertLogLine(r'controller \| This is a handler', text)
+            self.assertLogLine(r'controller \| First free task', text)
+            self.assertLogLine(r'controller \| Second free task', text)
+            self.assertLogLine(r'controller \| This is a shell task after an '
+                               'included role', text)
+            self.assertLogLine(r'compute1 \| This is a shell task after an '
+                               'included role', text)
+            self.assertLogLine(r'controller \| This is a command task after '
+                               'an included role', text)
+            self.assertLogLine(r'compute1 \| This is a command task after an '
+                               'included role', text)
+            self.assertLogLine(r'controller \| This is a shell task with '
+                               'delegate compute1', text)
+            self.assertLogLine(r'controller \| This is a shell task with '
+                               'delegate controller', text)
+            self.assertLogLine(r'compute1 \| item_in_loop1', text)
+            self.assertLogLine(r'compute1 \| ok: Item: item_in_loop1 '
+                               r'Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
+            self.assertLogLine(r'compute1 \| item_in_loop2', text)
+            self.assertLogLine(r'compute1 \| ok: Item: item_in_loop2 '
+                               r'Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
+            self.assertLogLine(r'compute1 \| failed_in_loop1', text)
+            self.assertLogLine(r'compute1 \| ok: Item: failed_in_loop1 '
+                               r'Result: 1', text)
+            self.assertLogLine(r'compute1 \| failed_in_loop2', text)
+            self.assertLogLine(r'compute1 \| ok: Item: failed_in_loop2 '
+                               r'Result: 1', text)
+            self.assertLogLine(r'localhost \| .*No such file or directory: .*'
+                               r'\'/local-shelltask/somewhere/'
+                               r'that/does/not/exist\'', text)
+            self.assertLogLine(r'compute1 \| .*No such file or directory: .*'
+                               r'\'/remote-shelltask/somewhere/'
+                               r'that/does/not/exist\'', text)
+            self.assertLogLine(r'controller \| .*No such file or directory: .*'
+                               r'\'/remote-shelltask/somewhere/'
+                               r'that/does/not/exist\'', text)
+            self.assertLogLine(
+                r'controller \| ok: Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
+            self.assertLogLine('PLAY RECAP', text)
+            # NOTE(pabelanger): Ansible 2.8 added new stats
+            # skipped, rescued, ignored.
+            self.assertLogLine(
+                r'controller \| ok: \d+ changed: \d+ unreachable: 0 failed: 0 '
+                'skipped: 0 rescued: 1 ignored: 0', text)
+            self.assertLogLine(
+                r'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
+                r'org/project/playbooks/command.yaml@master]', text)
+
+
+class TestSkipStreaming(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
+
+    def _get_conf(self, job_name, create=True):
+        if create:
+            return textwrap.dedent(
+                """
+                - job:
+                    name: {job_name}
+                    run: playbooks/{job_name}.yaml
+                    ansible-version: {version}
+                    vars:
+                      test_console_port: {console_port}
+                    roles:
+                      - zuul: org/common-config
+                    nodeset:
+                      nodes:
+                        - name: compute1
+                          label: whatever
+                        - name: controller
+                          label: whatever
+                    host-vars:
+                      constroller:
+                        zuul_skip_log_streaming: True
+                      compute1:
+                        zuul_skip_log_streaming: True
+
+                - project:
+                    check:
+                      jobs:
+                        - {job_name}
+                """.format(
+                    job_name=job_name,
+                    version=self.ansible_version,
+                    console_port=False))
+        else:
+            return textwrap.dedent(
+                """
+                - project:
+                    check:
+                      jobs:
+                        - {job_name}
+                """.format(job_name=job_name))
+
+    def assertNotLogLine(self, line, log):
+        pattern = (r'^\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d \| %s$'
+                   % line)
+        log_re = re.compile(pattern, re.MULTILINE)
+        m = log_re.search(log)
+        if m is not None:
+            raise Exception("'%s' found in log" % (line,))
+
+    def test_command(self):
+        job = self._run_job('command')
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'SUCCESS')
+
+            text = self._get_job_output(build)
+            self.assertLogLine(
+                r'RUN START: \[untrusted : review.example.com/org/project/'
+                r'playbooks/command.yaml@master\]', text)
+            self.assertLogLine(r'PLAY \[all\]', text)
+            self.assertLogLine(
+                r'Ansible version={}'.format(self.ansible_version), text)
+            self.assertLogLine(r'TASK \[Show contents of first file\]', text)
+            self.assertLogLine(r'controller \| command test one', text)
+            self.assertLogLine(
+                r'controller \| ok: Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
+
+            self.assertNotLogLine(r'[controller] Waiting on logger')
+            self.assertNotLogLine(r'[compute1] Waiting on logger')
