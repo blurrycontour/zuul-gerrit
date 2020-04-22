@@ -21,67 +21,82 @@ import voluptuous as v
 import time
 import uuid
 import requests
+from typing import List
 from urllib.parse import quote_plus
 from datetime import datetime
 
 from zuul.connection import BaseConnection
 from zuul.web.handler import BaseWebController
-from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.logutil import get_annotated_logger
 
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 
 
-class GitlabGearmanWorker(object):
-    """A thread that answers gearman requests"""
-    log = logging.getLogger("zuul.GitlabGearmanWorker")
+class GitlabZookeeperWorker(threading.Thread):
+    """A thread that observes zookeper node for changes"""
+    log = logging.getLogger("zuul.GitlabZookeeperWorker")
 
     def __init__(self, connection):
-        self.config = connection.sched.config
-        self.connection = connection
-        handler = "gitlab:%s:payload" % self.connection.connection_name
-        self.jobs = {
-            handler: self.handle_payload,
-        }
-        self.gearworker = ZuulGearWorker(
-            'Zuul Gitlab Worker',
-            'zuul.GitlabGearmanWorker',
-            'gitlab',
-            self.config,
-            self.jobs)
+        threading.Thread.__init__(self)
+        self.__connection = connection  # GitlabConnection
+        self.__zk = connection.sched.zk  # ZooKeeper
+        # Watching events provides an additional wake-up call but since only
+        # one event get processed at a time the thread loop assures that
+        # all events get processed.
+        self.__zk.watchConnectionEvents(connection.connection_name,
+                                        self.__eventWatcher)
+        self.__running = False  # type: bool
 
-    def handle_payload(self, job):
-        args = json.loads(job.arguments)
-        payload = args["payload"]
+    def start(self) -> None:
+        self.__running = True
+        super(GitlabZookeeperWorker, self).start()
 
-        self.log.info(
-            "Gitlab Webhook Received event kind: %(object_kind)s" % payload)
+    def stop(self):
+        self.__running = False
 
-        try:
-            self.__dispatch_event(payload)
-            output = {'return_code': 200}
-        except Exception:
-            output = {'return_code': 503}
-            self.log.exception("Exception handling Gitlab event:")
+    def run(self) -> None:
+        while self.__running:
+            self.__processEvent()
+            time.sleep(0.1)  # sleep if nothing to process
 
-        job.sendWorkComplete(json.dumps(output))
+    def __eventWatcher(self, children: List[str]):
+        # if len(children) > 0:
+        #     self.log.debug("Changed events: %s" % children)
+        #     self.__processEvent()
+        pass
+
+    def __processEvent(self) -> bool:
+        success = False
+        if self.__running:
+            with self.__zk.popConnectionEvent(
+                    self.__connection.connection_name) as event:
+                success = event is not None
+                if event:
+                    payload = event["payload"]
+
+                    self.log.info(
+                        "Gitlab Webhook Received event kind: %(object_kind)s" %
+                        payload)
+
+                    try:
+                        self.__dispatch_event(payload)
+                        success = True
+                    except Exception:
+                        success = False
+                        self.log.exception("Exception handling Gitlab event:")
+
+        return success
 
     def __dispatch_event(self, payload):
         self.log.info(payload)
         event = payload['object_kind']
         try:
             self.log.info("Dispatching event %s" % event)
-            self.connection.addEvent(payload, event)
+            self.__connection.addEvent(payload, event)
         except Exception as err:
             message = 'Exception dispatching event: %s' % str(err)
             self.log.exception(message)
             raise Exception(message)
-
-    def start(self):
-        self.gearworker.start()
-
-    def stop(self):
-        self.gearworker.stop()
 
 
 class GitlabEventConnector(threading.Thread):
@@ -301,15 +316,15 @@ class GitlabConnection(BaseConnection):
 
     def onLoad(self):
         self.log.info('Starting Gitlab connection: %s' % self.connection_name)
-        self.gearman_worker = GitlabGearmanWorker(self)
+        self.zookeeper_worker = GitlabZookeeperWorker(self)
         self.log.info('Starting event connector')
         self._start_event_connector()
         self.log.info('Starting GearmanWorker')
-        self.gearman_worker.start()
+        self.zookeeper_worker.start()
 
     def onStop(self):
         if hasattr(self, 'gearman_worker'):
-            self.gearman_worker.stop()
+            self.zookeeper_worker.stop()
             self._stop_event_connector()
 
     def addEvent(self, data, event=None):
@@ -477,11 +492,10 @@ class GitlabWebController(BaseWebController):
         self._validate_token(headers)
         json_payload = json.loads(body.decode('utf-8'))
 
-        job = self.zuul_web.rpc.submitJob(
-            'gitlab:%s:payload' % self.connection.connection_name,
-            {'payload': json_payload})
-
-        return json.loads(job.data[0])
+        data = {'payload': json_payload}
+        self.zuul_web.zk.pushConnectionEvent(
+            self.connection.connection_name, data)
+        return data
 
 
 def getSchema():
