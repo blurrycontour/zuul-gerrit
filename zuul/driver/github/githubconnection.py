@@ -24,9 +24,11 @@ import time
 import re
 import json
 from collections import OrderedDict
+from typing import List
 
 import cherrypy
 import cachecontrol
+import kazoo.exceptions
 from cachecontrol.cache import DictCache
 from cachecontrol.heuristics import BaseHeuristic
 import cachetools
@@ -40,7 +42,6 @@ from github3.session import AppInstallationTokenAuth
 
 from zuul.connection import BaseConnection
 from zuul.driver.github.graphql import GraphQLClient
-from zuul.lib.gearworker import ZuulGearWorker
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag, Project
@@ -282,47 +283,52 @@ class GithubShaCache(object):
         return cached_prs
 
 
-class GithubGearmanWorker(object):
-    """A thread that answers gearman requests"""
-    log = logging.getLogger("zuul.GithubGearmanWorker")
+class GithubZookeeperWorker:
+    """A thread that observes zookeper node for changes"""
+    log = logging.getLogger("zuul.GithubZookeeperWorker")
 
     def __init__(self, connection):
-        self.config = connection.sched.config
-        self.connection = connection
+        self.__connection = connection  # GithubConnection
+        self.__zk = connection.sched.zk  # ZooKeeper
+        # Watching events provides an additional wake-up call but since only
+        # one event get processed at a time the thread loop assures that
+        # all events get processed.
 
-        handler = "github:%s:payload" % self.connection.connection_name
-        self.jobs = {
-            handler: self.handle_payload,
-        }
+    def start(self) -> None:
+        self.__zk.watchConnectionEvents(self.__connection.connection_name,
+                                        self.__eventWatcher)
 
-        self.gearworker = ZuulGearWorker(
-            'Zuul Github Connector',
-            'zuul.GithubGearmanWorker',
-            'github-gearman-worker',
-            self.config,
-            self.jobs)
+    def stop(self) -> None:
+        self.__zk.unwatchConnectionEvents(self.__connection.connection_name)
 
-    def handle_payload(self, job):
-        args = json.loads(job.arguments)
-        headers = args.get("headers")
-        body = args.get("body")
+    def __eventWatcher(self, children: List[str]) -> None:
+        if len(children) > 0:
+            self.log.debug("Changed events: %s" % children)
+            try:
+                self.__processEvent()
+            except kazoo.exceptions.LockTimeout:
+                self.log.warning("Could not acquire lock")
 
-        delivery = headers.get('x-github-delivery')
-        log = get_annotated_logger(self.log, delivery)
-        log.debug("Github Webhook Received")
+    def __processEvent(self) -> None:
+        with self.__zk.popConnectionEvents(
+                self.__connection.connection_name) as events:
+            for event in events:
+                headers = event.get("headers")
+                body = event.get("body")
 
-        # TODO(jlk): Validate project in the request is a project we know
+                delivery = headers.get('x-github-delivery')
+                log = get_annotated_logger(self.log, delivery)
+                log.debug("Github Webhook Received")
 
-        try:
-            self.__dispatch_event(body, headers, log)
-            output = {'return_code': 200}
-        except Exception:
-            output = {'return_code': 503}
-            log.exception("Exception handling Github event:")
+                # TODO(jlk): Validate project in the request is a project
+                # we know
 
-        job.sendWorkComplete(json.dumps(output))
+                try:
+                    self.__dispatch_event(body, headers, log)
+                except Exception as e:
+                    log.exception("Exception handling Github event:", e)
 
-    def __dispatch_event(self, body, headers, log):
+    def __dispatch_event(self, body, headers, log) -> None:
         try:
             event = headers['x-github-event']
             log.debug("X-Github-Event: " + event)
@@ -332,18 +338,12 @@ class GithubGearmanWorker(object):
 
         delivery = headers.get('x-github-delivery')
         try:
-            self.connection.addEvent(body, event, delivery)
+            self.__connection.addEvent(body, event, delivery)
         except Exception:
             message = 'Exception deserializing JSON body'
             log.exception(message)
             # TODO(jlk): Raise this as something different?
             raise Exception(message)
-
-    def start(self):
-        self.gearworker.start()
-
-    def stop(self):
-        self.gearworker.stop()
 
 
 class GithubEventProcessor(object):
@@ -859,21 +859,22 @@ class GithubConnection(BaseConnection):
 
     def onLoad(self):
         self.log.info('Starting GitHub connection: %s' % self.connection_name)
-        self.gearman_worker = GithubGearmanWorker(self)
+        self.zookeeper_worker = GithubZookeeperWorker(self)
         self.log.info('Authing to GitHub')
         self._authenticateGithubAPI()
         self._prime_installation_map()
         self.log.info('Starting event connector')
         self._start_event_connector()
-        self.log.info('Starting GearmanWorker')
-        self.gearman_worker.start()
+        self.log.info('Starting ZookeeperWorker')
+        self.zookeeper_worker.start()
 
     def onStop(self):
         # TODO(jeblair): remove this check which is here only so that
         # zuul-web can call connections.stop to shut down the sql
         # connection.
-        if hasattr(self, 'gearman_worker'):
-            self.gearman_worker.stop()
+        if hasattr(self, 'zookeeper_worker'):
+            self.zookeeper_worker.stop()
+        if hasattr(self, 'github_event_connector'):
             self._stop_event_connector()
 
     def _start_event_connector(self):
@@ -2186,15 +2187,14 @@ class GithubWebController(BaseWebController):
             headers[key.lower()] = value
         body = cherrypy.request.body.read()
         self._validate_signature(body, headers)
-        # We cannot send the raw body through gearman, so it's easy to just
+        # We cannot send the raw body through zookeeper, so it's easy to just
         # encode it as json, after decoding it as utf-8
         json_body = json.loads(body.decode('utf-8'))
 
-        job = self.zuul_web.rpc.submitJob(
-            'github:%s:payload' % self.connection.connection_name,
-            {'headers': headers, 'body': json_body})
-
-        return json.loads(job.data[0])
+        data = {'headers': headers, 'body': json_body}
+        self.zuul_web.zk.pushConnectionEvent(
+            self.connection.connection_name, data)
+        return data
 
 
 def _status_as_tuple(status):
