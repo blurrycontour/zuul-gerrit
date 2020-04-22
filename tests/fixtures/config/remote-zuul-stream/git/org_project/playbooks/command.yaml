@@ -19,6 +19,7 @@
     - name: Start zuul_console daemon
       zuul_console:
         port: "{{ test_console_port }}"
+      when: test_console_port
 
     - name: Create first file
       copy:
