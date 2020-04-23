@@ -29,7 +29,6 @@ from configparser import ConfigParser
 from typing import Dict
 
 from zuul.lib.named_queue import NamedQueue
-from zuul.model import TriggerEvent
 
 from zuul import configloader
 from zuul import model
