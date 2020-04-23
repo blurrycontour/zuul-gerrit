@@ -50,6 +50,14 @@ An MQTT report uses this schema:
 
       The patchset number.
 
+   .. attr:: commit_id
+
+      The commit id number.
+
+   .. attr:: owner
+
+      The owner username of the change.
+
    .. attr:: ref
 
       The change reference.
@@ -129,10 +137,12 @@ Here is an example of a start message:
     'enqueue_time': '1524801093.5689457',
     'change': '3',
     'patchset': '1',
+    'commit_id': '2db20c7fb26adf9ac9936a9e750ced9b4854a964',
+    'owner': 'username',
     'ref': 'refs/changes/03/3/1',
     'zuul_ref': 'Zf8b3d7cd34f54cb396b488226589db8f',
     'buildset': {
-      'uuid': 'f8b3d7cd34f54cb396b488226589db8f'
+      'uuid': 'f8b3d7cd34f54cb396b488226589db8f',
       'builds': [{
         'job_name': 'linters',
         'voting': True
@@ -157,10 +167,12 @@ Here is an example of a success message:
     'enqueue_time': '1524801093.5689457',
     'change': '3',
     'patchset': '1',
+    'commit_id': '2db20c7fb26adf9ac9936a9e750ced9b4854a964',
+    'owner': 'username',
     'ref': 'refs/changes/03/3/1',
     'zuul_ref': 'Zf8b3d7cd34f54cb396b488226589db8f',
     'buildset': {
-      'uuid': 'f8b3d7cd34f54cb396b488226589db8f'
+      'uuid': 'f8b3d7cd34f54cb396b488226589db8f',
       'builds': [{
         'job_name': 'linters',
         'voting': True

@@ -3211,6 +3211,9 @@ class Change(Branch):
         # in the case of a PR.  Either way, it's the place where we
         # look for depends-on headers.
         self.message = None
+        # This can be the commit id of the patchset enqueued or
+        # in the case of a PR the id of HEAD of the branch.
+        self.commit_id = None
 
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)

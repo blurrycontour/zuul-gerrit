@@ -555,6 +555,8 @@ class TestMQTTConnection(ZuulTestCase):
                           'tenant-one/zuul_start/check/org/project/master')
         mqtt_payload = start_event['msg']
         self.assertEquals(mqtt_payload['project'], 'org/project')
+        self.assertEqual(len(mqtt_payload['commit_id']), 40)
+        self.assertEquals(mqtt_payload['owner'], 'username')
         self.assertEquals(mqtt_payload['branch'], 'master')
         self.assertEquals(mqtt_payload['buildset']['result'], None)
         self.assertEquals(mqtt_payload['buildset']['builds'][0]['job_name'],
