@@ -143,6 +143,7 @@ class ZooKeeper(object):
                 args['keyfile'] = tls_key
                 args['certfile'] = tls_cert
                 args['ca'] = tls_ca
+            self.log.warning("Connecting to Zookeeper: %s" % args)
             self.client = KazooClient(**args)
             self.client.add_listener(self._connection_listener)
             # Manually retry initial connection attempt
