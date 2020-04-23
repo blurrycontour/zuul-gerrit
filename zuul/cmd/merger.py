@@ -16,9 +16,10 @@
 
 import signal
 import sys
-
+from zuul.lib.config import get_default
 import zuul.cmd
 import zuul.merger.server
+import zuul.zk
 
 
 class Merger(zuul.cmd.ZuulDaemonApp):
@@ -51,8 +52,25 @@ class Merger(zuul.cmd.ZuulDaemonApp):
 
         self.setup_logging('merger', 'log_config')
 
+        zookeeper = zuul.zk.ZooKeeper(enable_cache=True)
+        zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts', None)
+        if not zookeeper_hosts:
+            raise Exception("The zookeeper hosts config value is required")
+        zookeeper_tls_key = get_default(self.config, 'zookeeper', 'tls_key')
+        zookeeper_tls_cert = get_default(self.config, 'zookeeper', 'tls_cert')
+        zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
+        zookeeper_timeout = float(get_default(self.config, 'zookeeper',
+                                              'session_timeout', 10.0))
+        zookeeper.connect(
+            zookeeper_hosts,
+            timeout=zookeeper_timeout,
+            tls_cert=zookeeper_tls_cert,
+            tls_key=zookeeper_tls_key,
+            tls_ca=zookeeper_tls_ca)
+
         self.merger = zuul.merger.server.MergeServer(self.config,
                                                      self.connections)
+        self.merger.setZookeeper(zookeeper)
         self.merger.start()
 
         if self.args.nodaemon:
@@ -64,6 +82,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
                     print("Ctrl + C: asking merger to exit nicely...\n")
                     self.exit_handler(signal.SIGINT, None)
         else:
+            zookeeper.disconnect()
             self.merger.join()
 
 
