@@ -2,6 +2,91 @@
   "comments": [
     {
       "key": {
+        "uuid": "1f493fa4_dff39609",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-23T13:05:04Z",
+      "side": 1,
+      "message": "You could also adopt a naming convention.  That would give you the hint, but still let you violate the rule if necessary.",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_bff68af8",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-23T13:05:04Z",
+      "side": 1,
+      "message": "s/into/by/",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_1fddfe6f",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-23T13:05:04Z",
+      "side": 1,
+      "message": "You could make intermediate imply abstract.",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_ffd7724e",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-23T13:05:04Z",
+      "side": 1,
+      "message": "Rather than \u0027variant\u0027 let\u0027s say \u0027jobs that inherit from `foo`\u0027.  Variant is used to describe a job stanza that only applies to certain branches.",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_5fe78641",
+        "filename": "releasenotes/notes/intermediate-jobs-101e04e7e1497af9.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-23T13:05:04Z",
+      "side": 1,
+      "message": "missing word, maybe: \u0027where one wishes\u0027",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_5ccaf919",
         "filename": "tests/unit/test_web.py",
         "patchSetId": 5
