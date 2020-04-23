@@ -16,10 +16,16 @@ import functools
 import logging
 import socket
 import threading
-
+from threading import Thread
+from typing import Any
+from typing import Callable
+from typing import Dict
+from typing import Optional, Tuple
 import zuul.rpcclient
-
-from zuul.lib import commandsocket
+from zuul.lib.commandsocket import CommandSocket
+from zuul.lib.streamer_utils import CustomThreadingTCPServer
+from zuul.rpcclient import RPCClient
+from zuul.zk import ZooKeeper
 from zuul.lib import streamer_utils
 
 
@@ -101,7 +107,11 @@ class FingerGateway(object):
 
     log = logging.getLogger("zuul.fingergw")
 
-    def __init__(self, gearman, address, user, command_socket, pid_file):
+    def __init__(self, gearman: Tuple[str, int, Optional[str], Optional[str],
+                                      Optional[str]],
+                 zookeeper: ZooKeeper, address: Tuple[str, int],
+                 user: Optional[str], command_socket: Optional[str],
+                 pid_file: Optional[str]):
         '''
         Initialize the finger gateway.
 
@@ -113,24 +123,26 @@ class FingerGateway(object):
         :param str command_socket: Path to the daemon command socket.
         :param str pid_file: Path to the daemon PID file.
         '''
-        self.gear_server = gearman[0]
-        self.gear_port = gearman[1]
-        self.gear_ssl_key = gearman[2]
-        self.gear_ssl_cert = gearman[3]
-        self.gear_ssl_ca = gearman[4]
-        self.address = address
-        self.user = user
-        self.pid_file = pid_file
+        self.gear_server: str = gearman[0]
+        self.gear_port: int = gearman[1]
+        self.gear_ssl_key: Optional[str] = gearman[2]
+        self.gear_ssl_cert: Optional[str] = gearman[3]
+        self.gear_ssl_ca: Optional[str] = gearman[4]
+        self.zookeeper: ZooKeeper = zookeeper
+        self.address: Tuple[str, int] = address
+        self.user: Optional[str] = user
+        self.pid_file: Optional[str] = pid_file
 
-        self.rpc = None
-        self.server = None
-        self.server_thread = None
+        self.rpc: Optional[RPCClient] = None
+        self.server: Optional[CustomThreadingTCPServer] = None
+        self.server_thread: Optional[Thread] = None
 
-        self.command_thread = None
-        self.command_running = False
-        self.command_socket = command_socket
+        self.command_thread: Optional[Thread] = None
+        self.command_running: bool = False
+        self.command_socket_path: Optional[str] = command_socket
+        self.command_socket: Optional[CommandSocket] = None
 
-        self.command_map = dict(
+        self.command_map: Dict[str, Callable[[], Any]] = dict(
             stop=self.stop,
         )
 
@@ -168,10 +180,9 @@ class FingerGateway(object):
             pid_file=self.pid_file)
 
         # Start the command processor after the server and privilege drop
-        if self.command_socket:
+        if self.command_socket_path:
             self.log.debug("Starting command processor")
-            self.command_socket = commandsocket.CommandSocket(
-                self.command_socket)
+            self.command_socket = CommandSocket(self.command_socket_path)
             self.command_socket.start()
             self.command_running = True
             self.command_thread = threading.Thread(
