@@ -15,11 +15,12 @@
 import logging
 import signal
 import sys
-
+from typing import Optional
 import zuul.cmd
 import zuul.lib.fingergw
-
+import zuul.zk
 from zuul.lib.config import get_default
+from zuul.lib.fingergw import FingerGateway
 
 
 class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
@@ -32,7 +33,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
 
     def __init__(self):
         super(FingerGatewayApp, self).__init__()
-        self.gateway = None
+        self.gateway: Optional[FingerGateway] = None
 
     def createParser(self):
         parser = super(FingerGatewayApp, self).createParser()
@@ -72,8 +73,11 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
         ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
 
+        zookeeper = zuul.zk.connect_zookeeper(self.config)
+
         self.gateway = zuul.lib.fingergw.FingerGateway(
             (gear_server, gear_port, ssl_key, ssl_cert, ssl_ca),
+            zookeeper,
             (host, port),
             user,
             cmdsock,
@@ -97,6 +101,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         else:
             self.gateway.wait()
 
+        zookeeper.disconnect()
         self.log.info('Stopped Zuul finger gateway app')
 
     def stop(self):
