@@ -12,6 +12,9 @@
 from typing import Optional
 
 from kazoo.client import KazooClient
+import configparser
+
+from zuul.lib.config import get_default
 
 from zuul.zk.base import ZooKeeperClient
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
@@ -55,3 +58,22 @@ class ZooKeeper(object):
 
     def disconnect(self):
         self.client.disconnect()
+
+
+def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
+    zookeeper = ZooKeeper(enable_cache=True)
+    zookeeper_hosts = get_default(config, 'zookeeper', 'hosts', None)
+    if not zookeeper_hosts:
+        raise Exception("The zookeeper hosts config value is required")
+    zookeeper_tls_key = get_default(config, 'zookeeper', 'tls_key')
+    zookeeper_tls_cert = get_default(config, 'zookeeper', 'tls_cert')
+    zookeeper_tls_ca = get_default(config, 'zookeeper', 'tls_ca')
+    zookeeper_timeout = float(get_default(config, 'zookeeper',
+                                          'session_timeout', 10.0))
+    zookeeper.connect(
+        hosts=zookeeper_hosts,
+        timeout=zookeeper_timeout,
+        tls_cert=zookeeper_tls_cert,
+        tls_key=zookeeper_tls_key,
+        tls_ca=zookeeper_tls_ca)
+    return zookeeper
