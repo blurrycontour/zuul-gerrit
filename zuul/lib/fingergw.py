@@ -16,10 +16,10 @@ import functools
 import logging
 import socket
 import threading
-
+from typing import Optional, Tuple
 import zuul.rpcclient
-
-from zuul.lib import commandsocket
+from zuul.lib.commandsocket import CommandSocket
+from zuul.zk import ZooKeeperClient
 from zuul.lib import streamer_utils
 
 
@@ -101,7 +101,13 @@ class FingerGateway(object):
 
     log = logging.getLogger("zuul.fingergw")
 
-    def __init__(self, gearman, address, user, command_socket, pid_file):
+    def __init__(self,
+                 gearman: Tuple,
+                 zk_client: ZooKeeperClient,
+                 address: Tuple,
+                 user: Optional[str],
+                 command_socket: Optional[str],
+                 pid_file: Optional[str]):
         '''
         Initialize the finger gateway.
 
@@ -118,6 +124,7 @@ class FingerGateway(object):
         self.gear_ssl_key = gearman[2]
         self.gear_ssl_cert = gearman[3]
         self.gear_ssl_ca = gearman[4]
+        self.zk_client = zk_client
         self.address = address
         self.user = user
         self.pid_file = pid_file
@@ -128,7 +135,8 @@ class FingerGateway(object):
 
         self.command_thread = None
         self.command_running = False
-        self.command_socket = command_socket
+        self.command_socket_path = command_socket
+        self.command_socket = None
 
         self.command_map = dict(
             stop=self.stop,
@@ -168,10 +176,9 @@ class FingerGateway(object):
             pid_file=self.pid_file)
 
         # Start the command processor after the server and privilege drop
-        if self.command_socket:
+        if self.command_socket_path:
             self.log.debug("Starting command processor")
-            self.command_socket = commandsocket.CommandSocket(
-                self.command_socket)
+            self.command_socket = CommandSocket(self.command_socket_path)
             self.command_socket.start()
             self.command_running = True
             self.command_thread = threading.Thread(
