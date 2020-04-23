@@ -16,9 +16,9 @@
 
 import signal
 import sys
-
 import zuul.cmd
-import zuul.merger.server
+from zuul.merger.server import COMMANDS, MergeServer
+from zuul.zk import ZooKeeperClient
 
 
 class Merger(zuul.cmd.ZuulDaemonApp):
@@ -28,7 +28,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
     def createParser(self):
         parser = super(Merger, self).createParser()
         parser.add_argument('command',
-                            choices=zuul.merger.server.COMMANDS,
+                            choices=COMMANDS,
                             nargs='?')
         return parser
 
@@ -43,7 +43,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         sys.exit(0)
 
     def run(self):
-        if self.args.command in zuul.merger.server.COMMANDS:
+        if self.args.command in COMMANDS:
             self.send_command(self.args.command)
             sys.exit(0)
 
@@ -51,8 +51,8 @@ class Merger(zuul.cmd.ZuulDaemonApp):
 
         self.setup_logging('merger', 'log_config')
 
-        self.merger = zuul.merger.server.MergeServer(self.config,
-                                                     self.connections)
+        zk_client = ZooKeeperClient.fromConfig(self.config).connect()
+        self.merger = MergeServer(self.config, zk_client, self.connections)
         self.merger.start()
 
         if self.args.nodaemon:
@@ -64,6 +64,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
                     print("Ctrl + C: asking merger to exit nicely...\n")
                     self.exit_handler(signal.SIGINT, None)
         else:
+            zk_client.disconnect()
             self.merger.join()
 
 
