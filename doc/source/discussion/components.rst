@@ -49,6 +49,7 @@ which is described below.
       Scheduler -- Database;
       Scheduler -- Gerrit;
       Scheduler -- Zookeeper;
+      Zookeeper -- Finger;
       Zookeeper -- Merger
       Zookeeper -- Nodepool;
       Scheduler -- GitHub;
