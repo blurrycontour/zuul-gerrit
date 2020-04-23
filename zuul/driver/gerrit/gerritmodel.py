@@ -45,7 +45,7 @@ class GerritChange(Change):
         if 'project' not in data:
             raise exceptions.ChangeNotFound(self.number, self.patchset)
         self.project = connection.source.getProject(data['project'])
-        self.id = data['id']
+        self.commit_id = data['id']
         self.branch = data['branch']
         self.url = data['url']
         urlparse = urllib.parse.urlparse(connection.baseurl)
@@ -78,7 +78,7 @@ class GerritChange(Change):
         self.approvals = data['currentPatchSet'].get('approvals', [])
         self.open = data['open']
         self.status = data['status']
-        self.owner = data['owner']
+        self.owner = data['owner'].get('email')
         self.message = data['commitMessage']
 
         self.missing_labels = set()
@@ -99,7 +99,7 @@ class GerritChange(Change):
         if self.patchset is None:
             self.patchset = str(current_revision['_number'])
         self.project = connection.source.getProject(data['project'])
-        self.id = data['change_id']
+        self.commit_id = data['change_id']
         self.branch = data['branch']
         self.url = '%s/%s' % (baseurl, self.number)
         self.uris = [
@@ -147,7 +147,7 @@ class GerritChange(Change):
             self.missing_labels.add(label_name)
         self.open = data['status'] == 'NEW'
         self.status = data['status']
-        self.owner = data['owner']
+        self.owner = data['owner'].get('email')
         self.message = current_revision['commit']['message']
 
 
