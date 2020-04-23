@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_935f5471",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-23T05:46:24Z",
+      "side": 1,
+      "message": "The soft dependency is not about reporting an error but about still running the job even if the dependent job is not in the buildset. So I think this change simplifies this a little bit too much.",
+      "revId": "b107c78de57e649218616f351c161bc20948b1d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
