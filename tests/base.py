@@ -4165,7 +4165,8 @@ class ZuulTestCase(BaseTestCase):
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(
-            self.config, self.scheds.first.connections)
+            self.config, self.zk_client, self.scheds.first.connections
+        )
         self.merge_server.start()
 
     def setUp(self):
