@@ -16,11 +16,12 @@
 import logging
 import signal
 import sys
-
+from typing import Optional
 import zuul.cmd
 import zuul.lib.fingergw
-
+import zuul.zk
 from zuul.lib.config import get_default
+from zuul.lib.fingergw import FingerGateway
 
 
 class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
@@ -33,7 +34,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
 
     def __init__(self):
         super(FingerGatewayApp, self).__init__()
-        self.gateway = None
+        self.gateway = None  # type: Optional[FingerGateway]
 
     def createParser(self):
         parser = super(FingerGatewayApp, self).createParser()
@@ -73,8 +74,26 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
         ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
 
+        zookeeper = zuul.zk.ZooKeeper(enable_cache=True)
+        zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts', None)
+        if not zookeeper_hosts:
+            raise Exception("The zookeeper hosts config value is required")
+        zookeeper_tls_key = get_default(self.config, 'zookeeper', 'tls_key')
+        zookeeper_tls_cert = get_default(self.config, 'zookeeper', 'tls_cert')
+        zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
+        zookeeper_timeout = float(get_default(self.config, 'zookeeper',
+                                              'session_timeout', 10.0))
+
+        zookeeper.connect(
+            zookeeper_hosts,
+            timeout=zookeeper_timeout,
+            tls_cert=zookeeper_tls_cert,
+            tls_key=zookeeper_tls_key,
+            tls_ca=zookeeper_tls_ca)
+
         self.gateway = zuul.lib.fingergw.FingerGateway(
             (gear_server, gear_port, ssl_key, ssl_cert, ssl_ca),
+            zookeeper,
             (host, port),
             user,
             cmdsock,
@@ -98,6 +117,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         else:
             self.gateway.wait()
 
+        zookeeper.disconnect()
         self.log.info('Stopped Zuul finger gateway app')
 
     def stop(self):
