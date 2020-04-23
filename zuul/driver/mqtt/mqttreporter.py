@@ -40,6 +40,8 @@ class MQTTReporter(BaseReporter):
             'change_url': item.change.url,
             'change': getattr(item.change, 'number', ''),
             'patchset': getattr(item.change, 'patchset', ''),
+            'commit_id': getattr(item.change, 'commit_id', ''),
+            'owner': getattr(item.change, 'owner'),
             'ref': getattr(item.change, 'ref', ''),
             'message': self._formatItemReport(
                 item, with_jobs=False),
