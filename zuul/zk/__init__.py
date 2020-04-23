@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import configparser
 import json
 import logging
 import time
@@ -23,6 +24,7 @@ from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
+from zuul.lib.config import get_default
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepoolMixin
 from zuul.zk.zuul import ZooKeeperZuulMixin
@@ -475,3 +477,22 @@ class ZooKeeper(ZooKeeperNodepoolMixin, ZooKeeperZuulMixin, object):
                     node_data.get('hold_job') == identifier):
                 count += 1
         return count
+
+
+def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
+    zookeeper = ZooKeeper(enable_cache=True)
+    zookeeper_hosts = get_default(config, 'zookeeper', 'hosts', None)
+    if not zookeeper_hosts:
+        raise Exception("The zookeeper hosts config value is required")
+    zookeeper_tls_key = get_default(config, 'zookeeper', 'tls_key')
+    zookeeper_tls_cert = get_default(config, 'zookeeper', 'tls_cert')
+    zookeeper_tls_ca = get_default(config, 'zookeeper', 'tls_ca')
+    zookeeper_timeout = float(get_default(config, 'zookeeper',
+                                          'session_timeout', 10.0))
+    zookeeper.connect(
+        hosts=zookeeper_hosts,
+        timeout=zookeeper_timeout,
+        tls_cert=zookeeper_tls_cert,
+        tls_key=zookeeper_tls_key,
+        tls_ca=zookeeper_tls_ca)
+    return zookeeper
