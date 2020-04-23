@@ -22,7 +22,6 @@ from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
-from zuul.model import HoldRequest
 import zuul.model
 
 
@@ -72,7 +71,7 @@ class ZooKeeper(object):
         # the data into objects more than once.
         self._hold_request_tree = None  # type: Optional[TreeCache]
         self._cached_hold_requests =\
-            {}  # type: Optional[Dict[str, HoldRequest]]
+            {}  # type: Optional[Dict[str, zuul.model.HoldRequest]]
 
     def _dictToStr(self, data):
         return json.dumps(data).encode('utf8')
