@@ -3181,6 +3181,9 @@ class Change(Branch):
         # in the case of a PR.  Either way, it's the place where we
         # look for depends-on headers.
         self.message = None
+        # This can be the commit id of the patchset enqueued or
+        # in the case of a PR the id of HEAD of the branch.
+        self.commid_id = None
 
         self.source_event = None
 

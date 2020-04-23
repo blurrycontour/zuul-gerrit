@@ -42,6 +42,7 @@ class GerritChange(Change):
     def updateFromSSH(self, data, connection):
         if self.patchset is None:
             self.patchset = str(data['currentPatchSet']['number'])
+            self.commit_id = str(data['currentPatchSet']['revision'])
         if 'project' not in data:
             raise exceptions.ChangeNotFound(self.number, self.patchset)
         self.project = connection.source.getProject(data['project'])
@@ -96,6 +97,7 @@ class GerritChange(Change):
                                  urlparse.path)
         baseurl = baseurl.rstrip('/')
         current_revision = data['revisions'][data['current_revision']]
+        self.commit_id = current_revision
         if self.patchset is None:
             self.patchset = str(current_revision['_number'])
         self.project = connection.source.getProject(data['project'])

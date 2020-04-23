@@ -1330,6 +1330,7 @@ class GithubConnection(BaseConnection):
             change.project.name, change.number, event=event)
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
+        change.commit_id = change.pr.get('head').get('sha')
 
         # Don't overwrite the files list. The change object is bound to a
         # specific revision and thus the changed files won't change. This is
