@@ -16,6 +16,24 @@
       "revId": "febf3e9b7df5ea505b709c65707782f74c9e0d6c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_92b8e5c8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-04-23T13:59:02Z",
+      "side": 1,
+      "message": "We hit occasional exceptions like those:\n\n ERROR zuul.AnsibleJob: Unable to reset repo \u003cRepo 0x7fe51384b518 /var/cache/zuul-executor/jobs/80e9edc24f794b24b632495a22595370/work/src/github/org/project\u003e\n Traceback (most recent call last):\n   File \"/opt/zuul/lib/python3.6/site-packages/zuul/merger/merger.py\", line 852,  in _mergeItem\n    repo.reset(zuul_event_id\u003dzuul_event_id)\n  File \"/opt/zuul/lib/python3.6/site-packages/zuul/merger/merger.py\", line 336, in reset\n    self._reset(self.local_path, self.env, log)\n  File \"/opt/zuul/lib/python3.6/site-packages/zuul/merger/merger.py\", line 297, in _reset\n    repo.create_head(head, head_ref, force\u003dTrue)\n  File \"/opt/zuul/src/gitpython/git/repo/base.py\", line 373, in create_head\n    return Head.create(self, path, commit, force, logmsg)\n  File \"/opt/zuul/src/gitpython/git/refs/symbolic.py\", line 546, in create\n    return cls._create(repo, path, cls._resolve_ref_on_create, reference, force, logmsg)\n  File \"/opt/zuul/src/gitpython/git/refs/symbolic.py\", line 497, in _create\n    target \u003d repo.rev_parse(str(reference))\n  File \"/opt/zuul/src/gitpython/git/repo/fun.py\", line 334, in rev_parse\n    obj \u003d name_to_object(repo, rev)\n  File \"/opt/zuul/src/gitpython/git/repo/fun.py\", line 147, in name_to_object\n    raise BadName(name)\n gitdb.exc.BadName: Ref \u0027origin/bugfix/foo\u0027 did not resolve to an object\n\nOur assumption is that this has something to do with deleted branches upstream which were referenced by origin/HEAD in the repo cloned from the cache to the work dir. The reason for this might be that we largely ignore  origin/HEAD in zuul already as it hat been always problematic messing with that. However I wasn\u0027t able to directly reproduce this in a test.\n\nWe have this change in production since a while now and it solved the last \u0027unable to reset repo\u0027 problems we had left so far.",
+      "parentUuid": "1f493fa4_3f50bad4",
+      "revId": "febf3e9b7df5ea505b709c65707782f74c9e0d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
