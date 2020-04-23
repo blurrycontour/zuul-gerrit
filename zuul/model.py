@@ -3181,6 +3181,7 @@ class Change(Branch):
         # in the case of a PR.  Either way, it's the place where we
         # look for depends-on headers.
         self.message = None
+        self.commit_id = None
 
         self.source_event = None
 
