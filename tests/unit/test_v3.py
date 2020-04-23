@@ -221,6 +221,81 @@ class TestAbstract(ZuulTestCase):
         self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '1')
 
 
+class TestIntermediate(ZuulTestCase):
+    tenant_config_file = 'config/intermediate/main.yaml'
+
+    def test_intermediate_fail(self):
+        # you can not instantiate from an intermediate job
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: job-instantiate-intermediate
+                parent: job-abstract-intermediate
+
+            - project:
+                check:
+                  jobs:
+                    - job-instantiate-intermediate
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
+        self.assertIn('may only inherit to another abstract job',
+                      A.messages[0])
+
+    def test_intermediate_config_fail(self):
+        # an intermediate job must also be abstract
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: job-intermediate-but-not-abstract
+                intermediate: true
+                abstract: false
+
+            - project:
+                check:
+                  jobs:
+                    - job-intermediate-but-not-abstract
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
+        self.assertIn('An intermediate job must also be abstract',
+                      A.messages[0])
+
+    def test_intermediate_several(self):
+        # test passing through several intermediate jobs
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - job-actual
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '1')
+
+
 class TestFinal(ZuulTestCase):
 
     tenant_config_file = 'config/final/main.yaml'

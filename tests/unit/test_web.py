@@ -422,6 +422,7 @@ class TestWeb(BaseTestWeb):
                 'description': None,
                 'files': [],
                 'final': False,
+                'intermediate': False,
                 'irrelevant_files': [],
                 'match_on_config_updates': True,
                 'name': 'test-job',
@@ -696,6 +697,7 @@ class TestWeb(BaseTestWeb):
                              'description': None,
                              'files': [],
                              'final': False,
+                             'intermediate': False
                              'irrelevant_files': [],
                              'match_on_config_updates': True,
                              'name': 'project-post',
