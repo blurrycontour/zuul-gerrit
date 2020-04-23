@@ -215,6 +215,7 @@ class FakeGerritChange(object):
             'owner': {'email': 'user@example.com',
                       'name': 'User Name',
                       'username': 'username'},
+            'commitMessage': 'amazing change!',
             'patchSets': self.patchsets,
             'project': project,
             'status': status,
@@ -593,6 +594,7 @@ class FakeGerritChange(object):
             "updated": self.data['lastUpdated'],
             "_number": self.number,
             "owner": self.data['owner'],
+            'commitMessage': self.data['commitMessage'],
             "labels": labels,
             "current_revision": self.patchsets[-1]['revision'],
             "revisions": revisions,
@@ -1627,13 +1629,22 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                 'title': mr.title,
                 'state': mr.state,
                 'description': mr.description,
+                "author": {
+                    "name": "Administrator",
+                    "username": "admin"
+                },
                 'updated_at': mr.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                 'sha': mr.patch_number,
                 'labels': mr.labels,
                 'merged_at': mr.merged_at,
+                "diff_refs": {
+                    "base_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00",
+                    "head_sha": "2be7ddb704c7b6b83732fdd5b9f09d5a397b5f8f",
+                    "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
+                },
                 'merge_status': mr.merge_status,
             }, 200, "", "GET"
-
+            
         match = re.match('.+/projects/(.+)/repository/branches$', url)
         if match:
             return [{'name': 'master'}], 200, "", "GET"
