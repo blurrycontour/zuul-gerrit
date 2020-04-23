@@ -237,7 +237,7 @@
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
             nodeset: ubuntu-bionic
-            timeout: 4800  # 80 minutes
+            timeout: 7200  # 120 minutes / 2 hours
             vars: &zuul_tox_vars
                 test_setup_environment:
                     ZUUL_TEST_ROOT: /tmp/zuul-test
