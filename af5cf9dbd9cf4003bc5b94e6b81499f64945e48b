@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_eef97880",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-04-23T23:39:05Z",
+      "side": 1,
+      "message": "yeah, i just moves it from a 6) to a 10) if you\u0027ve specified something and the config parser won\u0027t let you get it wrong.\n\nhttp://sweng.the-davies.net/Home/rustys-api-design-manifesto",
+      "parentUuid": "1f493fa4_dff39609",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_bff68af8",
         "filename": "doc/source/reference/job_def.rst",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2020-04-23T13:05:04Z",
       "side": 1,
       "message": "s/into/by/",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_ee3e9827",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-04-23T23:39:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f493fa4_bff68af8",
       "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_ee033841",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-04-23T23:39:05Z",
+      "side": 1,
+      "message": "I wasn\u0027t sure if this made things easier or more confusing by overloading the argument\n\nI was trying to think of contemporaneous ideas in other oo systems -- maybe it\u0027s like a java interface?  The base job is like an interface; so you can\u0027t create an \"object\" -- in this case a final job -- from it?  It doesn\u0027t quite map though.\n\nI\u0027ll take any advice on what people think is clearer ...",
+      "parentUuid": "1f493fa4_1fddfe6f",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_ffd7724e",
         "filename": "doc/source/reference/job_def.rst",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2020-04-23T13:05:04Z",
       "side": 1,
       "message": "Rather than \u0027variant\u0027 let\u0027s say \u0027jobs that inherit from `foo`\u0027.  Variant is used to describe a job stanza that only applies to certain branches.",
+      "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_2e49a0cf",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-04-23T23:39:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f493fa4_ffd7724e",
       "revId": "af5cf9dbd9cf4003bc5b94e6b81499f64945e48b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
