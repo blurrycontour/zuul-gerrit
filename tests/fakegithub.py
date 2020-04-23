@@ -537,6 +537,9 @@ class FakePull(object):
                 },
                 'ref': pr.branch,
             },
+            'user': {
+                'login': 'octocat'
+            },
             'draft': pr.draft,
             'mergeable': True,
             'state': pr.state,
