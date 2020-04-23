@@ -1330,7 +1330,18 @@ class GithubConnection(BaseConnection):
             change.project.name, change.number, event=event)
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
-
+        change.commit_id = change.pr.get('head').get('sha')
+        # append /commits behind the product number could get
+        # recent commit of the repo which contains author name
+        # and author email.
+        commit_number = str(change.number) + "/commits"
+        com = self.getCommit(
+            change.project.name, commit_number, event=event)
+        change.owner = 
+        { "name": com.get("commit").get("author").get("name"),
+          "email": com.get("commit").get("author").get("email")
+        }
+        change.commit_message = com.get("commit").get("message")
         # Don't overwrite the files list. The change object is bound to a
         # specific revision and thus the changed files won't change. This is
         # important if we got the files later because of the 300 files limit.
@@ -1533,6 +1544,17 @@ class GithubConnection(BaseConnection):
         pr['labels'] = labels
         log.debug('Got PR %s#%s', project_name, number)
         return (pr, probj)
+
+    def getCommit(self, project_name, number, event=None):
+        # List commits on a pull request and return the recent commit
+        github = self.getGithubClient(project_name, zuul_event_id=event)
+        owner, proj = project_name.split('/')
+        for retry in range(5):
+            commits_list = github.pull_request(owner, proj, number)
+            if probj is not None:
+                break
+        commits = [commit.as_dict() for commit in probj]
+        return commits[0]
 
     def canMerge(self, change, allow_needs, event=None):
         # NOTE: The mergeable call may get a false (null) while GitHub is
