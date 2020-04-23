@@ -1198,6 +1198,7 @@ class Job(ConfigObject):
             attempts=3,
             final=False,
             abstract=False,
+            intermediate=False,
             protected=None,
             roles=(),
             required_projects={},
@@ -1260,6 +1261,7 @@ class Job(ConfigObject):
         d['variables'] = self.variables
         d['final'] = self.final
         d['abstract'] = self.abstract
+        d['intermediate'] = self.intermediate
         d['protected'] = self.protected
         d['voting'] = self.voting
         d['timeout'] = self.timeout
@@ -1551,7 +1553,8 @@ class Job(ConfigObject):
 
         for k in self.execution_attributes:
             if (other._get(k) is not None and
-                k not in set(['final', 'abstract', 'protected'])):
+                k not in set(['final', 'abstract', 'protected',
+                              'intermediate'])):
                 if self.final:
                     raise Exception("Unable to modify final job %s attribute "
                                     "%s=%s with variant %s" % (
@@ -1583,6 +1586,19 @@ class Job(ConfigObject):
             self.abstract = other.abstract
         elif other.abstract:
             self.abstract = True
+
+        # An intermediate job may only be inherited by an abstract
+        # job.  Note intermediate jobs must be also be abstract, that
+        # has been enforced during config reading.  Similar to
+        # abstract, it is cleared by inheriting.
+        if self.intermediate and not other.abstract:
+            raise Exception("Intermediate job %s may only inherit "
+                            "to another abstract job" %
+                            (repr(self)))
+        if other.name != self.name:
+            self.intermediate = other.intermediate
+        elif other.intermediate:
+            self.intermediate = True
 
         # Protected may only be set to true
         if other.protected is not None:
