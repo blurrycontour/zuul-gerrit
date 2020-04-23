@@ -17,6 +17,12 @@ import logging
 import os
 import threading
 from abc import ABCMeta
+from configparser import ConfigParser
+from typing import Optional
+
+from zuul.zk import ZooKeeper
+
+from zuul.lib.connections import ConnectionRegistry
 
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
@@ -49,8 +55,9 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     _repo_locks_class = BaseRepoLocks
 
-    def __init__(self, config, component, connections=None):
-        self.connections = connections or {}
+    def __init__(self, config: ConfigParser, component: str,
+                 connections: Optional[ConnectionRegistry]=None):
+        self.connections = connections or ConnectionRegistry()
         self.merge_email = get_default(config, 'merger', 'git_user_email',
                                        'zuul.merger.default@example.com')
         self.merge_name = get_default(config, 'merger', 'git_user_name',
@@ -63,6 +70,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.merge_root = get_default(config, component, 'git_dir',
                                       '/var/lib/zuul/{}-git'.format(component))
+        self.zookeeper: Optional[ZooKeeper] = None
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -88,11 +96,15 @@ class BaseMergeServer(metaclass=ABCMeta):
             self.config,
             self.merger_jobs)
 
+    def setZookeeper(self, zookeeper: ZooKeeper):
+        self.zookeeper = zookeeper
+
     def _getMerger(self, root, cache_root, logger=None):
         return merger.Merger(
-            root, self.connections, self.merge_email, self.merge_name,
-            self.merge_speed_limit, self.merge_speed_time, cache_root, logger,
-            execution_context=True, git_timeout=self.git_timeout)
+            root, self.connections, self.zookeeper, self.merge_email,
+            self.merge_name, self.merge_speed_limit, self.merge_speed_time,
+            cache_root, logger, execution_context=True,
+            git_timeout=self.git_timeout)
 
     def _repoLock(self, connection_name, project_name):
         # The merger does not need locking so return a null lock.
@@ -228,7 +240,8 @@ class BaseMergeServer(metaclass=ABCMeta):
 class MergeServer(BaseMergeServer):
     log = logging.getLogger("zuul.MergeServer")
 
-    def __init__(self, config, connections=None):
+    def __init__(self, config: ConfigParser,
+                 connections: Optional[ConnectionRegistry]=None):
         super().__init__(config, 'merger', connections)
 
         self.command_map = dict(
