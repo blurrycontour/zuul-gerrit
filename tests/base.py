@@ -4164,8 +4164,13 @@ class ZuulTestCase(BaseTestCase):
                              % name)
 
     def _startMerger(self):
+        zk_client = ZooKeeperClient()
+        zk_client.connect(self.zk_config, timeout=30.0)
+        self.addCleanup(zk_client.disconnect)
+
         self.merge_server = zuul.merger.server.MergeServer(
-            self.config, self.scheds.first.connections)
+            self.config, zk_client, self.scheds.first.connections
+        )
         self.merge_server.start()
 
     def setUp(self):

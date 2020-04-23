@@ -26,7 +26,8 @@ import time
 
 import zuul.web
 import zuul.lib.log_streamer
-import zuul.lib.fingergw
+from zuul.lib.fingergw import FingerGateway
+from zuul.zk import ZooKeeperClient
 import tests.base
 from tests.base import iterate_timeout, ZuulWebFixture
 
@@ -521,10 +522,14 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         logfile = open(ansible_log, 'r')
         self.addCleanup(logfile.close)
 
+        zk_client = ZooKeeperClient()
+        zk_client.connect(self.zk_config, timeout=30.0)
+        self.addCleanup(zk_client.disconnect)
+
         # Start the finger gateway daemon
-        gateway = zuul.lib.fingergw.FingerGateway(
+        gateway = FingerGateway(
             ('127.0.0.1', self.gearman_server.port, None, None, None),
-            (self.host, 0),
+            zk_client, (self.host, 0),
             user=None,
             command_socket=None,
             pid_file=None
