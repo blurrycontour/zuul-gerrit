@@ -14,6 +14,9 @@
 # under the License.
 
 from contextlib import contextmanager
+from logging import Logger
+from typing import Dict
+from typing import Optional
 from urllib.parse import urlsplit, urlunsplit, urlparse
 import logging
 import os
@@ -24,6 +27,8 @@ import time
 import git
 import gitdb
 import paramiko
+from zuul.lib.connections import ConnectionRegistry
+from zuul.zk import ZooKeeper
 
 import zuul.model
 
@@ -679,28 +684,31 @@ class Repo(object):
 
 
 class Merger(object):
-    def __init__(self, working_root, connections, email, username,
-                 speed_limit, speed_time, cache_root=None, logger=None,
-                 execution_context=False, git_timeout=300):
-        self.logger = logger
-        if logger is None:
+    def __init__(self, working_root: str, connections: ConnectionRegistry,
+                 zookeeper: ZooKeeper, email: str, username: str,
+                 speed_limit: str, speed_time: str,
+                 cache_root: Optional[str]=None, logger: Optional[Logger]=None,
+                 execution_context: bool=False, git_timeout: int=300):
+        self.logger = logger  # TODO: JK is this wanted? To have 2 loggers?
+        if logger is None:  # one optional and one with default?
             self.log = logging.getLogger("zuul.Merger")
         else:
             self.log = logger
-        self.repos = {}
-        self.working_root = working_root
+        self.repos = {}  # type: Dict[str, Repo]
+        self.working_root = working_root  # type: str
         os.makedirs(working_root, exist_ok=True)
-        self.connections = connections
-        self.email = email
-        self.username = username
-        self.speed_limit = speed_limit
-        self.speed_time = speed_time
-        self.git_timeout = git_timeout
-        self.cache_root = cache_root
+        self.connections = connections  # type: ConnectionRegistry
+        self.zookeeper = zookeeper  # type: ZooKeeper
+        self.email = email  # type: str
+        self.username = username  # type: str
+        self.speed_limit = speed_limit  # type: str
+        self.speed_time = speed_time  # type: str
+        self.git_timeout = git_timeout  # type: int
+        self.cache_root = cache_root  # type: Optional[str]
         # Flag to determine if the merger is used for preparing repositories
         # for job execution. This flag can be used to enable executor specific
         # behavior e.g. to keep the 'origin' remote intact.
-        self.execution_context = execution_context
+        self.execution_context = execution_context  # type: bool
 
     def _addProject(self, hostname, project_name, url, sshkey, zuul_event_id):
         repo = None
