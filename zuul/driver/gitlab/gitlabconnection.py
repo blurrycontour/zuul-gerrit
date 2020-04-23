@@ -409,6 +409,15 @@ class GitlabConnection(BaseConnection):
         change.ref = "refs/merge-requests/%s/head" % change.number
         change.branch = change.mr['target_branch']
         change.patchset = change.mr['sha']
+        if change.mr.get('diff_refs'):
+            change.commit_id = change.mr['diff_refs']['head_sha']
+        else:
+            change.commit_id = None
+        if change.mr.get('author'):
+            change.owner = change.mr['author']['name']
+        else:
+            change.owner = "anonymous"
+
         # Files changes are not part of the Merge Request data
         # See api/merge_requests.html#get-single-mr-changes
         # this endpoint includes file changes information
