@@ -2557,9 +2557,7 @@ class ExecutorServer(BaseMergeServer):
                  keep_jobdir=False,
                  log_streaming_port=DEFAULT_FINGER_PORT,
                  log_console_port=DEFAULT_STREAM_PORT):
-        # TODO(jeblair): add zk client to merger and remove this assignment
-        self.zk_client = zk_client
-        super().__init__(config, 'executor', connections)
+        super().__init__(config, 'executor', zk_client, connections)
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
