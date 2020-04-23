@@ -1631,9 +1631,28 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                 'sha': mr.patch_number,
                 'labels': mr.labels,
                 'merged_at': mr.merged_at,
+                "diff_refs": {
+                    "base_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00",
+                    "head_sha": "2be7ddb704c7b6b83732fdd5b9f09d5a397b5f8f",
+                    "start_sha": "c380d3acebd181f13629a25d2e2acca46ffe1e00"
+                },
                 'merge_status': mr.merge_status,
-            }, 200, "", "GET"
 
+            }, 200, "", "GET"
+        match = re.match(r'.+/projects/(.+)/merge_requests/(\d+)/commits$',
+                         url)
+        if match:
+            mr = self._get_mr(match)
+            return [{
+                        "id": "ed899a2f4b50b4370feeea94676502b42383c746",
+                        "short_id": "ed899a2f4b5",
+                        "title": "Replace sanitize with escape once",
+                        "author_name": "Example User",
+                        "author_email": "user@example.com",
+                        "created_at": "2012-09-20T11:50:22+03:00",
+                        "message": "Replace sanitize with escape once"
+                    }
+            ], 200, "", "GET"
         match = re.match('.+/projects/(.+)/repository/branches$', url)
         if match:
             return [{'name': 'master'}], 200, "", "GET"

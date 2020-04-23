@@ -409,6 +409,19 @@ class GitlabConnection(BaseConnection):
         change.ref = "refs/merge-requests/%s/head" % change.number
         change.branch = change.mr['target_branch']
         change.patchset = change.mr['sha']
+        change.commit_id = change.mr['diff_refs']['head_sha']
+        # append /commits behind the product number could get
+        # recent commit of the repo which contains author name
+        # and author email.
+        commit_number = str(change.number) + "/commits"
+        com_list = self.getPull(
+            change.project.name, commit_number, event=event)
+        recent_commit = com_list[0]
+        change.owner = {
+            "name": recent_commit["author_name"],
+            "email": recent_commit["author_email"]
+        }
+        change.commit_message = recent_commit["message"]
         # Files changes are not part of the Merge Request data
         # See api/merge_requests.html#get-single-mr-changes
         # this endpoint includes file changes information
