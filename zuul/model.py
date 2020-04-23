@@ -1198,6 +1198,7 @@ class Job(ConfigObject):
             attempts=3,
             final=False,
             abstract=False,
+            intermediate=False,
             protected=None,
             roles=(),
             required_projects={},
@@ -1260,6 +1261,7 @@ class Job(ConfigObject):
         d['variables'] = self.variables
         d['final'] = self.final
         d['abstract'] = self.abstract
+        d['intermediate'] = self.intermediate
         d['protected'] = self.protected
         d['voting'] = self.voting
         d['timeout'] = self.timeout
@@ -1571,6 +1573,14 @@ class Job(ConfigObject):
                                  'host_variables', 'group_variables',
                                  'required_projects', 'allowed_projects']):
                     setattr(self, k, other._get(k))
+
+        # An intermediate job may only be inherited by an abstract
+        # job.  Note intermediate jobs must be also be abstract, that
+        # has been enforced during config reading.
+        if self.intermediate and not other.abstract:
+            raise Exception("Intermediate job %s may only inherit "
+                            "to another abstract job" %
+                            (repr(self)))
 
         # Don't set final above so that we don't trip an error halfway
         # through assignment.
