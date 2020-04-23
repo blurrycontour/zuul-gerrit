@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_3f50bad4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-23T13:07:12Z",
+      "side": 1,
+      "message": "Any chance you know what that case is, and is it something we can add to the tests?",
+      "revId": "febf3e9b7df5ea505b709c65707782f74c9e0d6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
