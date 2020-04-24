@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_a5bbf90b",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 32
+      },
+      "lineNbr": 866,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2020-04-24T19:21:03Z",
+      "side": 1,
+      "message": "We discussed it but for posterity I meant \"callback_plugins\" specifically: https://opendev.org/zuul/zuul/src/branch/master/zuul/executor/server.py#L2019-L2027",
+      "parentUuid": "1f493fa4_ca3612e7",
+      "range": {
+        "startLine": 866,
+        "startChar": 4,
+        "endLine": 866,
+        "endChar": 12
+      },
+      "revId": "e5b0598992960d0e2ae742065aa51bd5c7a0dc5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_91c1e883",
         "filename": "doc/source/discussion/components.rst",
         "patchSetId": 32
@@ -84,6 +108,30 @@
       "side": 1,
       "message": "yeah, I don\u0027t think we want to allow access to any section in the config so [ara] would have to be an exception. Since zuul passes it\u0027s environment to ansible, except to any ZUUL_ variables i guess it would be possible to configure it like that otherwise.",
       "parentUuid": "1f493fa4_91c1e883",
+      "range": {
+        "startLine": 869,
+        "startChar": 4,
+        "endLine": 869,
+        "endChar": 17
+      },
+      "revId": "e5b0598992960d0e2ae742065aa51bd5c7a0dc5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_4542f511",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 32
+      },
+      "lineNbr": 869,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2020-04-24T19:21:03Z",
+      "side": 1,
+      "message": "Let\u0027s not make exceptions for ara, I\u0027ll see if ara can pick up \"callback_ara\".",
+      "parentUuid": "1f493fa4_0a00fa00",
       "range": {
         "startLine": 869,
         "startChar": 4,
