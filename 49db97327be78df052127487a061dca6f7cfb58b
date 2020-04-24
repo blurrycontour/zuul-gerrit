@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_afcab369",
+        "filename": "doc/source/reference/pipeline_def.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-24T23:00:33Z",
+      "side": 1,
+      "message": "Yes, I wasn\u0027t sure which approach would be better.  But if me say that, we may want to reorder this to appear below.",
+      "revId": "49db97327be78df052127487a061dca6f7cfb58b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_ca81f291",
         "filename": "zuul/manager/supercedent.py",
         "patchSetId": 1
