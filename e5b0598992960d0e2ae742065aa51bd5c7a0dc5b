@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_71f41cf3",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 32
+      },
+      "lineNbr": 866,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2020-04-24T14:24:42Z",
+      "side": 1,
+      "message": "I wonder if this could be extended to support setting the \"callback_plugins\" option to specify a path where extra callback plugins could be found ?\n\nIt would almost be sufficient to de-couple ara and configure it this way instead.",
+      "range": {
+        "startLine": 866,
+        "startChar": 4,
+        "endLine": 866,
+        "endChar": 12
+      },
+      "revId": "e5b0598992960d0e2ae742065aa51bd5c7a0dc5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_91c1e883",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 32
+      },
+      "lineNbr": 869,
+      "author": {
+        "id": 9061
+      },
+      "writtenOn": "2020-04-24T14:24:42Z",
+      "side": 1,
+      "message": "I guess this is ara\u0027s fault for not following the Ansible standard but the callback is currently configured under [ara], not [callback_ara]. I\u0027ll see what I can do about this in ara.",
+      "range": {
+        "startLine": 869,
+        "startChar": 4,
+        "endLine": 869,
+        "endChar": 17
+      },
+      "revId": "e5b0598992960d0e2ae742065aa51bd5c7a0dc5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
