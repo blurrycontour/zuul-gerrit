@@ -56,6 +56,7 @@ class ManagedAnsible:
                       self.version, self._requirements, self.extra_packages)
         self._run_pip(self._requirements + self.extra_packages,
                       upgrade=upgrade)
+        self._run_ansible_galaxy(self.extra_collections)
 
     def _run_pip(self, requirements, upgrade=False):
         cmd = [os.path.join(self.venv_path, 'bin', 'pip'), 'install',
@@ -65,7 +66,10 @@ class ManagedAnsible:
         cmd.extend(requirements)
         self.log.debug('Running pip: %s', ' '.join(cmd))
 
-        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        collections_path = os.path.join(self.venv_path, 'collections')
+        os.mkdir(collections_path)
+        env = {'ANSIBLE_COLLECTIONS_PATH': collections_path}
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
 
         if p.returncode != 0:
             raise Exception('Package installation failed with exit code %s '
@@ -75,6 +79,23 @@ class ManagedAnsible:
                                              p.stdout.decode(),
                                              p.stderr.decode()))
         self.log.debug('Successfully installed packages %s', requirements)
+
+    def _run_ansible_galaxy(self, collections):
+        cmd = [os.path.join(self.venv_path, 'bin', 'ansible-galaxy'),
+                'collections', 'install']
+        cmd.extend(collections)
+        self.log.debug('Running ansible-galaxy: %s', ' '.join(cmd))
+
+        p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        if p.returncode != 0:
+            raise Exception('Collection installation failed with exit code %s '
+                            'during processing ansible %s:\n'
+                            'stdout:\n%s\n'
+                            'stderr:\n%s' % (p.returncode, self.version,
+                                             p.stdout.decode(),
+                                             p.stderr.decode()))
+        self.log.debug('Successfully installed collections %s', collections)
 
     def _ensure_venv(self):
         if self.python_path:
@@ -135,6 +156,26 @@ class ManagedAnsible:
             result.extend(packages.strip().split(' '))
 
         common_packages = os.environ.get('ANSIBLE_EXTRA_PACKAGES')
+        if common_packages:
+            result.extend(common_packages.strip().split(' '))
+
+        return result
+
+    @property
+    def extra_collections(self):
+        mapping = str.maketrans({
+            '.': None,
+            '-': '_',
+        })
+        env_var = 'ANSIBLE_%s_EXTRA_COLLECTIONS' % self.version.upper().translate(
+            mapping)
+
+        packages = os.environ.get(env_var)
+        result = []
+        if packages:
+            result.extend(packages.strip().split(' '))
+
+        common_packages = os.environ.get('ANSIBLE_EXTRA_COLLECTIONS')
         if common_packages:
             result.extend(common_packages.strip().split(' '))
 
@@ -275,6 +316,9 @@ class AnsibleManager:
 
     def getAnsiblePluginDir(self, version):
         return os.path.join(self.getAnsibleDir(version), 'zuul', 'ansible')
+
+    def getAnsibleCollectionsDir(self, version):
+        return os.path.join(self.getAnsibleDir(version), 'collections')
 
     def requestVersion(self, version):
         if version not in self._supported_versions:
