@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_9eca836a",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1004
+      },
+      "writtenOn": "2020-04-25T14:46:25Z",
+      "side": 1,
+      "message": "We have some failed logs here:\n\n  2020-04-25 01:23:15,859 DEBUG zuul.AnsibleJob: [e: a173d8ce01c14bb992a309562bb59def] [build: 5f2c839d5f194c82b304cc0bf44dbf82] Cleaning empty ref dir /var/lib/zuul/builds/5f2c839d5f194c82b304cc0bf44dbf82/work/src/opendev.org/openstack/openstack-helm-images/.git/refs\n\nBased on the message below, that means that this should evaluate to true and the not should make it skip deleting it.  A unit test would/should confirm but on my initial inspection, it looks like it should not delete .git/refs",
+      "range": {
+        "startLine": 313,
+        "startChar": 44,
+        "endLine": 313,
+        "endChar": 70
+      },
+      "revId": "769ecde8fc92793e6d9e8d200628804604605bb6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
