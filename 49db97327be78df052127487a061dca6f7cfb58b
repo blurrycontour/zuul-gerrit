@@ -2,6 +2,52 @@
   "comments": [
     {
       "key": {
+        "uuid": "1f493fa4_9881fb92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-25T12:05:15Z",
+      "side": 1,
+      "message": "I guess the builds are performed whenever the previous run failed, but should this be configurable? For example:\n\n * Change A updates zookeeper image for TLS support\n * Change B updates zuul deployment to setup TLS\n\nRunning B deployment without a successful A deployment might results in an unstable result.",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 29
+      },
+      "revId": "49db97327be78df052127487a061dca6f7cfb58b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_b8667728",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-25T12:05:15Z",
+      "side": 1,
+      "message": "How is the sequence enforced? Could this be affected by out-of-order event from the review system? And if so, shouldn\u0027t the manager ensure that the build order match the change git reference order?",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 16,
+        "endChar": 47
+      },
+      "revId": "49db97327be78df052127487a061dca6f7cfb58b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_25740999",
         "filename": "doc/source/reference/pipeline_def.rst",
         "patchSetId": 1
