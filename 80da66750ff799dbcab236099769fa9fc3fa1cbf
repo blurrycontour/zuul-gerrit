@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_21722fe4",
+        "filename": "requirements.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-04-26T13:08:08Z",
+      "side": 1,
+      "message": "I\u0027m not sure what the policy is on adding package dependencies?",
+      "range": {
+        "startLine": 41,
+        "startChar": 0,
+        "endLine": 41,
+        "endChar": 9
+      },
+      "revId": "80da66750ff799dbcab236099769fa9fc3fa1cbf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_c14c2ba0",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-04-26T13:08:08Z",
+      "side": 1,
+      "message": "downloading colllections with ansible-galaxy is only available for newer ansible versions",
+      "range": {
+        "startLine": 61,
+        "startChar": 31,
+        "endLine": 61,
+        "endChar": 34
+      },
+      "revId": "80da66750ff799dbcab236099769fa9fc3fa1cbf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
