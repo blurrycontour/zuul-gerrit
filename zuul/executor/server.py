@@ -860,6 +860,9 @@ class AnsibleJob(object):
         self.callback_dir = os.path.join(plugin_dir, 'callback')
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
         self.filter_dir = os.path.join(plugin_dir, 'filter')
+        self.collections_dir = \
+            self.executor_server.ansible_manager.getAnsibleCollectionsDir(
+                self.arguments.get('ansible_version'))
 
     def run(self):
         self.running = True
@@ -2045,6 +2048,7 @@ class AnsibleJob(object):
             # bump the timeout because busy nodes may take more than
             # 10s to respond
             config.write('timeout = 30\n')
+            config.write('collections_paths = %s\n', self.collections_dir)
 
             # We need at least the general action dir as this overwrites the
             # command action plugin for log streaming.
