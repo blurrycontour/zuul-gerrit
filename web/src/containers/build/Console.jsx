@@ -85,13 +85,13 @@ class TaskOutput extends React.Component {
       )
     } else if (typeof(value) === 'string') {
       ret = (
-        <pre>
+        <pre style={{whiteSpace: 'pre-wrap'}}>
           {value}
         </pre>
       )
     } else if (typeof(value) === 'object') {
       ret = (
-        <pre>
+        <pre style={{whiteSpace: 'pre-wrap'}}>
           <ReactJson
             src={value}
             name={null}
@@ -102,7 +102,7 @@ class TaskOutput extends React.Component {
       )
     } else {
       ret = (
-        <pre>
+        <pre style={{whiteSpace: 'pre-wrap'}}>
           {value.toString()}
         </pre>
       )
