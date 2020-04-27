@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_45dc9ee3",
+        "filename": "doc/source/reference/drivers/url.rst",
+        "patchSetId": 23
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-27T09:09:40Z",
+      "side": 1,
+      "message": "I think that maybe a proxy configuration may be useful including credentials. Just a suggestion for a future enhancement.",
+      "range": {
+        "startLine": 8,
+        "startChar": 13,
+        "endLine": 8,
+        "endChar": 53
+      },
+      "revId": "e3861b01569efb7ea8c8493146a52bdbc1791ba4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
