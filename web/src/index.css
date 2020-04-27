@@ -13,6 +13,20 @@ a.refresh {
   text-decoration: none;
 }
 
+:root {
+    --wrap: pre;
+}
+
+[wrap="enabled"] {
+    --wrap: pre-wrap;
+}
+
+/* pre-wrap is needed in order to avoid horizontal-scrolling issues with
+long console/log lines or task output. */
+pre {
+    white-space: var(--wrap);
+}
+
 .time {
   white-space: nowrap;
 }
