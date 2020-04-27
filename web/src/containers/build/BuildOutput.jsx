@@ -54,6 +54,9 @@ class BuildOutput extends React.Component {
   }
 
   renderFailedTask (host, task) {
+    /* tailing value protects browser against accidental huge logs,
+       but we at least 100-200 lines .*/
+    max_lines = 10;
     return (
       <Panel key={host + task.zuul_log_id}>
         <Panel.Heading>{host}: {task.name}</Panel.Heading>
@@ -70,15 +73,50 @@ class BuildOutput extends React.Component {
           {task.exception && (
             <pre key="exc" style={{ color: 'red' }}>{task.exception}</pre>
           )}
+          {}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
+            <Fragment>
+              {task.stdout_lines.length > maxlines && (
+                <Fragment>
+                <Button
+                  onClick={() => setOpen(!open)}
+                  aria-controls="stdout-collapse-pre"
+                  aria-expanded={open}
+                >
+                more</Button>
+                <Collapse in={this.state.open}>
+                  <pre key="stdout" style={{ whiteSpace: 'pre-wrap' }} title="stdout" id="stdout-collapse-pre">
+                  {task.stdout_lines.slice(0, max_lines).join('\n')}
+                  </pre>
+                </Collapse>
+                </Fragment>
+            )}
             <pre key="stdout" style={{ whiteSpace: 'pre-wrap' }} title="stdout">
-              {task.stdout_lines.slice(-42).join('\n')}
-            </pre>
+              {task.stdout_lines.slice(-max_lines).join('\n')}
+              </pre>
+              </Fragment>
           )}
           {task.stderr_lines && task.stderr_lines.length > 0 && (
+            <Fragment>
+              {task.stderr_lines.length > maxlines && (
+                <Fragment>
+                <Button
+                  onClick={() => setOpen(!open)}
+                  aria-controls="stderr-collapse-pre"
+                  aria-expanded={open}
+                >
+                more</Button>
+                <Collapse in={this.state.open}>
+                  <pre key="stderr" style={{ whiteSpace: 'pre-wrap' }} title="stderr" id="stderr-collapse-pre">
+                  {task.stderr_lines.slice(0, max_lines).join('\n')}
+                  </pre>
+                </Collapse>
+                </Fragment>
+              )}
             <pre key="stderr" style={{whiteSpace: 'pre-wrap', color: 'red'}} title="stderr">
-              {task.stderr_lines.slice(-42).join('\n')}
+              {task.stderr_lines.slice(-max_lines).join('\n')}
             </pre>
+            </Fragment>
           )}
         </Panel.Body>
       </Panel>
