@@ -8,6 +8,11 @@ a.refresh {
   border-bottom-style: none;
   text-decoration: none;
 }
+/* pre-wrap is needed in order to avoid horizontal-scrolling issue with
+long console/log lines. */
+pre {
+    white-space: pre-wrap;
+}
 
 .time {
   white-space: nowrap;
@@ -271,4 +276,17 @@ pre.zuul-log-output
 
 .highlight {
   background: rgb(255, 255, 204);
+}
+
+/* User to make the more expand/collapse look like a normal link */
+summary.more
+{
+    color: #0088ce;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+summary.more:hover
+{
+    text-decoration: underline;
 }
