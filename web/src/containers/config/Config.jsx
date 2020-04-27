@@ -39,6 +39,7 @@ class ConfigModal extends React.Component {
     this.state = {
       isModalOpen: false,
       autoReload: false,
+      wrap: false,
      }
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
@@ -50,6 +51,8 @@ class ConfigModal extends React.Component {
     this.handleSave = () => {
       this.handleModalToggle()
       this.props.dispatch(setPreference('autoReload', this.state.autoReload))
+      this.props.dispatch(setPreference('wrap', this.state.wrap))
+      document.documentElement.setAttribute('wrap', (this.state.wrap) ? 'enabled': null)
     }
 
     this.handleAutoReload = () => {
@@ -57,16 +60,25 @@ class ConfigModal extends React.Component {
         autoReload: !autoReload
       }))
     }
+
+    this.handleWrap = () => {
+      this.setState(({ wrap }) => ({
+        wrap: !wrap
+      }))
+    }
+
   }
 
   resetState() {
     this.setState({
       autoReload: this.props.preferences.autoReload,
+      wrap: this.props.preferences.wrap,
     })
+    document.documentElement.setAttribute('wrap', (this.state.wrap) ? 'enabled': null)
   }
 
   render() {
-    const { isModalOpen, autoReload } = this.state
+    const { isModalOpen, autoReload, wrap } = this.state
     return (
       <React.Fragment>
         <Button
@@ -97,6 +109,13 @@ class ConfigModal extends React.Component {
                 label="Auto reload status page"
                 isChecked={autoReload}
                 onChange={this.handleAutoReload}
+              />
+              <Switch
+                key="wrap"
+                id="wrap"
+                label="Auto wrap log lines like terminals"
+                isChecked={wrap}
+                onChange={this.handleWrap}
               />
             </div>
         </Modal>
