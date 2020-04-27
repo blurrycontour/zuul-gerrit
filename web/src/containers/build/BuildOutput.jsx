@@ -13,6 +13,7 @@
 // under the License.
 
 import * as React from 'react'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { Panel } from 'react-bootstrap'
 import {
@@ -54,6 +55,7 @@ class BuildOutput extends React.Component {
   }
 
   renderFailedTask (host, task) {
+    const max_lines = 42
     return (
       <Panel key={host + task.zuul_log_id}>
         <Panel.Heading>{host}: {task.name}</Panel.Heading>
@@ -70,15 +72,33 @@ class BuildOutput extends React.Component {
           {task.exception && (
             <pre key="exc" style={{ color: 'red' }}>{task.exception}</pre>
           )}
+          {}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
+            <Fragment>
+              {task.stdout_lines.length > max_lines && (
+                <details><summary style={{ cursor: 'pointer' }}>more</summary>
+                  <pre key="stdout" style={{ whiteSpace: 'pre-wrap' }} title="stdout">
+                    {task.stdout_lines.slice(0, -max_lines).join('\n')}
+                  </pre>
+                </details>)}
             <pre key="stdout" style={{ whiteSpace: 'pre-wrap' }} title="stdout">
-              {task.stdout_lines.slice(-42).join('\n')}
-            </pre>
+              {task.stdout_lines.slice(-max_lines).join('\n')}
+              </pre>
+              </Fragment>
           )}
           {task.stderr_lines && task.stderr_lines.length > 0 && (
+            <Fragment>
+              {task.stderr_lines.length > max_lines && (
+                  <details><summary style={{ cursor: 'pointer' }}>more</summary>
+                    <pre key="stderr" style={{ whiteSpace: 'pre-wrap' }} title="stderr">
+                      {task.stderr_lines.slice(0, -max_lines).join('\n')}
+                    </pre>
+                  </details>
+                )}
             <pre key="stderr" style={{whiteSpace: 'pre-wrap', color: 'red'}} title="stderr">
-              {task.stderr_lines.slice(-42).join('\n')}
+              {task.stderr_lines.slice(-max_lines).join('\n')}
             </pre>
+            </Fragment>
           )}
         </Panel.Body>
       </Panel>
