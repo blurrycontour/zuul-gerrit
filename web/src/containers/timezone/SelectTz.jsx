@@ -36,7 +36,6 @@ class SelectTz extends React.Component {
   handleChange = (selectedTz) => {
     const tz = selectedTz.value
 
-    localStorage.setItem('zuul_tz_string', tz)
     this.updateState(tz)
   }
 

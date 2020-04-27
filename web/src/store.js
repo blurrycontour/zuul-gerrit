@@ -16,7 +16,21 @@ import { applyMiddleware, createStore } from 'redux'
 import thunk from 'redux-thunk'
 
 import appReducers from './reducers'
+import { save, load } from 'redux-localstorage-simple'
 
-const store = createStore(appReducers, applyMiddleware(thunk))
+const createStoreWithMiddleware
+    = applyMiddleware(
+        thunk,
+        save({
+            states: ['timezone']
+        }) // Saving done here
+    )(createStore)
+
+const store = createStoreWithMiddleware(appReducers, load({
+    states: ['timezone'],
+    preloadedState: {
+        timezone: 'UTC'
+    }
+}))
 
 export default store
