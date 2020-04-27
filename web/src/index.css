@@ -9,6 +9,12 @@ a.refresh {
   text-decoration: none;
 }
 
+/* pre-wrap is needed in order to avoid horizontal-scrolling issues with
+long console/log lines or task output. */
+pre {
+    white-space: pre-wrap;
+}
+
 .time {
   white-space: nowrap;
 }
