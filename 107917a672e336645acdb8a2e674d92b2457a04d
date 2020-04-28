@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_c11078ab",
+        "filename": "doc/source/reference/pipeline_def.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-28T16:57:23Z",
+      "side": 1,
+      "message": "I think it would help to name example use-case such as:\n\n* check\n* gate\n* deploy\n* promote",
+      "revId": "107917a672e336645acdb8a2e674d92b2457a04d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
