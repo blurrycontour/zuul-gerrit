@@ -202,30 +202,54 @@ class AnsibleManager:
             for future in concurrent.futures.as_completed(futures):
                 future.result()
 
-    def validate(self):
+    def _validate_ansible(self, version):
         result = True
-        for version in self._supported_versions:
-            try:
-                command = [
-                    self.getAnsibleCommand(version, 'ansible'),
-                    '--version',
-                ]
+        try:
+            command = [
+                self.getAnsibleCommand(version, 'ansible'),
+                '--version',
+            ]
 
-                ret = subprocess.run(command,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE,
-                                     check=True)
-                self.log.info('Ansible version %s information: \n%s',
-                              version, ret.stdout.decode())
-            except subprocess.CalledProcessError:
-                result = False
-                self.log.exception("Ansible version %s not working" % version)
-            except Exception:
-                result = False
-                self.log.exception(
-                    'Ansible version %s not installed' % version)
-
+            ret = subprocess.run(command,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE,
+                                 check=True)
+            self.log.info('Ansible version %s information: \n%s',
+                          version, ret.stdout.decode())
+        except subprocess.CalledProcessError:
+            result = False
+            self.log.exception("Ansible version %s not working" % version)
+        except Exception:
+            result = False
+            self.log.exception(
+                'Ansible version %s not installed' % version)
         return result
+
+    def _validate_packages(self, version):
+        result = True
+        try:
+            extra_packages = self._getAnsible(version).extra_packages
+            python_package_check = \
+                "import pkg_resources; pkg_resources.require({})".format(
+                    repr(extra_packages))
+
+            command = [self.getAnsibleCommand(version, 'python'),
+                       '-c', python_package_check]
+            subprocess.run(command, check=True)
+        except Exception:
+            result = False
+            self.log.exception(
+                'Ansible version %s installation is missing packages' %
+                version)
+        return result
+
+    def validate(self):
+        for version in self._supported_versions:
+            if not self._validate_ansible(version):
+                return False
+            if not self._validate_packages(version):
+                return False
+        return True
 
     def _getAnsible(self, version):
         if not version:
