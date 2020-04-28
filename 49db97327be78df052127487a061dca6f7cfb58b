@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_8eafc228",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-28T14:39:48Z",
+      "side": 1,
+      "message": "That would be unfortunate, but I don\u0027t think it\u0027s something we can address in this manager (I don\u0027t think we\u0027re going to want to un-merge a change).  I could see a deployer setting a flag though to stop further processing.  That could be done on an external system, or we could expose that in Zuul to allow the pipeline to be disabled.  But let\u0027s leave that for a further enhancement.",
+      "revId": "49db97327be78df052127487a061dca6f7cfb58b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_b8667728",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -42,6 +59,23 @@
         "endLine": 16,
         "endChar": 47
       },
+      "revId": "49db97327be78df052127487a061dca6f7cfb58b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_eea80621",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-28T14:39:48Z",
+      "side": 1,
+      "message": "It\u0027s the order of events.  They won\u0027t be out of order with an event-triggered system like gerrit stream-events or github, but could happen with polling (like gerrit checks).  Given that we want this to be a change-based pipeline, I\u0027m not sure the pipeline is well-placed to determine the order in the git repo.  It might be best for us to try to make sure the drivers report events in the correct order.",
       "revId": "49db97327be78df052127487a061dca6f7cfb58b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
