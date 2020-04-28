@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_a9a8bd8b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-04-28T11:54:23Z",
+      "side": 1,
+      "message": "I can\u0027t believe I\u0027m about to be this guy.\n\nCould you re-wrap this commit message? I don\u0027t think it is a topic to be obsessive about - a few words one way or the other isn\u0027t super bad - but it\u0027s really hard to read them when i have to horizontally scroll in gerrit (and I know you hate horizontal scrolling)",
+      "range": {
+        "startLine": 9,
+        "startChar": 73,
+        "endLine": 9,
+        "endChar": 77
+      },
+      "revId": "dfeae9c4a4d9841e62c7f478f81e191bc851d579",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_89ad019d",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-04-28T11:54:23Z",
+      "side": 1,
+      "message": "it would be better to not move the cheroot line so that it stays with its comment.",
+      "range": {
+        "startLine": 37,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 13
+      },
+      "revId": "dfeae9c4a4d9841e62c7f478f81e191bc851d579",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_e995a541",
+        "filename": "tools/pip.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-04-28T11:54:23Z",
+      "side": 1,
+      "message": "++",
+      "range": {
+        "startLine": 43,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 9
+      },
+      "revId": "dfeae9c4a4d9841e62c7f478f81e191bc851d579",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
