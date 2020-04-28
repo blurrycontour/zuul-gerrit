@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_871fa559",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-28T15:36:36Z",
+      "side": 1,
+      "message": "With regards to adding a flag to customize how `serial` behave in case of failure, then perhaps we could add a flag to customize how `supercedent` behave when there are running build and make it behave like the proposed `serial` manager. I don\u0027t mind either way though.",
+      "parentUuid": "1f493fa4_8eafc228",
+      "revId": "49db97327be78df052127487a061dca6f7cfb58b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_b8667728",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
