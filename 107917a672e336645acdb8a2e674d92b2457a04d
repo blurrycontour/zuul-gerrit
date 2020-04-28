@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_d632f45d",
+        "filename": "doc/source/reference/pipeline_def.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-28T21:51:43Z",
+      "side": 1,
+      "message": "Oops, this does add a deploy example.  Still, I\u0027ll implement your suggestion as a followup.",
+      "revId": "107917a672e336645acdb8a2e674d92b2457a04d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_414aa8ab",
         "filename": "zuul/manager/serial.py",
         "patchSetId": 2
