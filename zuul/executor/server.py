@@ -1149,7 +1149,7 @@ class AnsibleJob(object):
         self.job.sendWorkStatus(0, 100)
 
         result = self.runPlaybooks(args)
-        success = result == 'SUCCESS'
+        success = result in ('SUCCESS', 'WARNING')
 
         self.runCleanupPlaybooks(success)
 

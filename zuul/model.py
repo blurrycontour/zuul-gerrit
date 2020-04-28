@@ -1887,7 +1887,7 @@ class Build(object):
 
     @property
     def failed(self):
-        if self.result and self.result not in ['SUCCESS', 'SKIPPED']:
+        if self.result and self.result not in ['SUCCESS', 'SKIPPED', 'WARNING']:
             return True
         return False
 
@@ -2270,7 +2270,7 @@ class QueueItem(object):
         """Check if all jobs have completed with status SUCCESS.
 
         Return True if all voting jobs have completed with status
-        SUCCESS.  Non-voting jobs are ignored.  Skipped jobs are
+        SUCCESS, SKIPPED or WARNING.  Non-voting jobs are ignored.  Skipped jobs are
         ignored, but skipping all jobs returns a failure.  Incomplete
         builds are considered a failure, hence this is unlikely to be
         useful unless all builds are complete.
@@ -2288,7 +2288,7 @@ class QueueItem(object):
                 # unsuccessful return value
                 if build.result != 'SKIPPED':
                     all_jobs_skipped = False
-                if job.voting and build.result not in ['SUCCESS', 'SKIPPED']:
+                if job.voting and build.result not in ['SUCCESS', 'SKIPPED', 'WARNING']:
                     return False
             elif job.voting:
                 # If the build failed to run and was voting that is an
@@ -2306,7 +2306,7 @@ class QueueItem(object):
         """Check if any jobs have finished with a non-success result.
 
         Return True if any job in the job graph has returned with a
-        status not equal to SUCCESS or SKIPPED, else return False.
+        status not equal to SUCCESS, SKIPPED or WARNING, else return False.
         Non-voting and in-flight jobs are ignored.
 
         """
@@ -2317,7 +2317,7 @@ class QueueItem(object):
                 continue
             build = self.current_build_set.getBuild(job.name)
             if (build and build.result and
-                    build.result not in ['SUCCESS', 'SKIPPED']):
+                    build.result not in ['SUCCESS', 'SKIPPED', 'WARNING']):
                 return True
         return False
 
@@ -2360,7 +2360,7 @@ class QueueItem(object):
             build = self.current_build_set.getBuild(job.name)
             if not build:
                 return True
-            if build.result != 'SUCCESS':
+            if build.result not in ('SUCCESS', 'WARNING'):
                 return True
 
         if not self.item_ahead:
@@ -2399,7 +2399,7 @@ class QueueItem(object):
             return data
 
         for build in builds:
-            if build.result != 'SUCCESS':
+            if build.result not in ('SUCCESS', 'WARNING'):
                 provides = [x.name for x in build.provides]
                 requirement = list(requirements.intersection(set(provides)))
                 raise RequirementsError(
@@ -2452,7 +2452,7 @@ class QueueItem(object):
                     build = self.current_build_set.getBuild(_job.name)
                     if not build:
                         return False
-                    if build.result and build.result != 'SUCCESS':
+                    if build.result and build.result not in ('SUCCESS', 'WARNING'):
                         return False
                     if not build.result and not build.paused:
                         return False
@@ -2502,6 +2502,7 @@ class QueueItem(object):
                 return []
 
         failed_job_names = set()  # Jobs that run and failed
+        warned_job_names = set()  # Jobs that run and produced a warning
         ignored_job_names = set()  # Jobs that were skipped or canceled
         unexecuted_job_names = set()  # Jobs that were not started yet
         jobs_not_started = set()
@@ -2510,6 +2511,8 @@ class QueueItem(object):
             if build:
                 if build.result == 'SUCCESS' or build.paused:
                     pass
+                elif build.result == 'WARNING':
+                    warned_job_names.add(job.name)
                 elif build.result == 'SKIPPED':
                     ignored_job_names.add(job.name)
                 else:  # elif build.result in ('FAILURE', 'CANCELED', ...):
@@ -2582,7 +2585,7 @@ class QueueItem(object):
         jobs_not_requested = set()
         for job in self.job_graph.getJobs():
             build = build_set.getBuild(job.name)
-            if build and (build.result == 'SUCCESS' or build.paused):
+            if build and (build.result in ('SUCCESS', 'WARNING') or build.paused):
                 pass
             elif build and build.result == 'SKIPPED':
                 ignored_job_names.add(job.name)
@@ -2637,7 +2640,7 @@ class QueueItem(object):
         # NOTE(pabelanger): Check successful/paused jobs to see if
         # zuul_return includes zuul.child_jobs.
         build_result = build.result_data.get('zuul', {})
-        if ((build.result == 'SUCCESS' or build.paused)
+        if ((build.result in ('SUCCESS', 'WARNING') or build.paused)
                 and 'child_jobs' in build_result):
             zuul_return = build_result.get('child_jobs', [])
             dependent_jobs = self.job_graph.getDirectDependentJobs(
@@ -2660,7 +2663,7 @@ class QueueItem(object):
                         skip, skip_soft=True)
                     skipped += to_skip
 
-        elif build.result != 'SUCCESS' and not build.paused:
+        elif build.result not in ('SUCCESS', 'WARNING') and not build.paused:
             to_skip = self.job_graph.getDependentJobsRecursively(
                 build.job.name)
             skipped += to_skip
@@ -2777,7 +2780,7 @@ class QueueItem(object):
         build = self.current_build_set.getBuild(job.name)
         result = build.result
         pattern = None
-        if result == 'SUCCESS':
+        if result in ('SUCCESS', 'WARNING'):
             if job.success_message:
                 result = job.success_message
             if job.success_url:
@@ -4622,7 +4625,7 @@ class JobTimeData(object):
 
     def add(self, elapsed, result):
         elapsed = int(elapsed)
-        if result == 'SUCCESS':
+        if result in ('SUCCESS', 'WARNING'):
             self.success_times.append(elapsed)
             self.success_times.pop(0)
             result = 0

@@ -504,7 +504,7 @@ class Scheduler(threading.Thread):
                     jobkey,
                     'RETRY' if result is None else result
                 )
-                if result in ['SUCCESS', 'FAILURE'] and build.start_time:
+                if result in ['SUCCESS', 'WARNING', 'FAILURE'] and build.start_time:
                     dt = int((build.end_time - build.start_time) * 1000)
                     self.statsd.timing(key, dt)
                 self.statsd.incr(key)
