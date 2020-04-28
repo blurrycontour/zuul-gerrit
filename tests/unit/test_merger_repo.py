@@ -422,6 +422,41 @@ class TestMergerRepo(ZuulTestCase):
         self.assertEqual(['master', 'stable', 'stable2', 'stable3'],
                          repo.getBranches())
 
+    def test_garbage_collect(self):
+        '''Tests that git gc doesn't prune FETCH_HEAD'''
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        repo = git.Repo(parent_path)
+        change_ref = 'refs/changes/1/1'
+
+        self.log.info('Creating a commit on %s', change_ref)
+        repo.head.reference = repo.head.commit
+        files = {"README": "creating fake commit\n"}
+        for name, content in files.items():
+            file_name = os.path.join(parent_path, name)
+            with open(file_name, 'a') as f:
+                f.write(content)
+            repo.index.add([file_name])
+        commit = repo.index.commit('Test commit')
+        ref = git.refs.Reference(repo, change_ref)
+        ref.set_commit(commit)
+
+        self.log.info('Cloning parent repo')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        self.log.info('Fetch %s', change_ref)
+        work_repo.fetch(change_ref)
+
+        self.log.info('Checkout master and run garbage collection')
+        work_repo_object = work_repo.createRepoObject(None)
+        work_repo.checkout('master')
+        result = work_repo_object.git.gc('--prune=now')
+        self.log.info(result)
+
+        self.log.info('Dereferencing FETCH_HEAD')
+        commit = work_repo_object.commit('FETCH_HEAD')
+        self.assertIsNotNone(commit)
+
 
 class TestMergerWithAuthUrl(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
