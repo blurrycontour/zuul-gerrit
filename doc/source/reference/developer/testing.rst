@@ -5,6 +5,12 @@ Zuul provides an extensive framework for performing functional testing
 on the system from end-to-end with major external components replaced
 by fakes for ease of use and speed.
 
+To run a single test:
+
+.. code-block:: bash
+
+   stestr run tests.test_foo.TestFoo.test_foo
+
 Test classes that subclass :py:class:`~tests.base.ZuulTestCase` have
 access to a number of attributes useful for manipulating or inspecting
 the environment being simulated in the test:
