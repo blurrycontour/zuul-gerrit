@@ -45,5 +45,9 @@ class TestLibAnsibleManager(BaseTestCase):
         self.assertEquals(
             [mock.call('1.0', 'ansible'),
              mock.call('2.8', 'ansible'),
+             mock.call('1.0', 'python'),
+             mock.call('2.8', 'python'),
             ],
             getAnsibleCommand.mock_calls)
+
+    def test_validate_extra_packages
