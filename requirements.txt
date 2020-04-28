@@ -28,13 +28,13 @@ iso8601
 psutil
 fb-re2>=1.0.6
 paho-mqtt
-cherrypy
+cherrypy==18.3.0; # last version to support cheroot below
 ws4py
 routes
 pathspec
 jsonpath-rw
 urllib3!=1.25.4,!=1.25.5  # https://github.com/urllib3/urllib3/pull/1684
+cheroot<8.1.0
 # TODO(tobiash): cheroot 8.1.0 introduced a regression when handling concurrent
 # requests. Remove the following line when this issue is resolved:
 # https://github.com/cherrypy/cheroot/issues/263
-cheroot<8.1.0
