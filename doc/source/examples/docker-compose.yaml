@@ -87,6 +87,10 @@ services:
       - https_proxy
       - no_proxy=${no_proxy},gerrit,scheduler
       - ZUUL_MYSQL_PASSWORD=secret
+    command: |
+      sh -c 'git config --global user.name Admin && \
+        git config --global user.email admin@example.com && \
+        /usr/local/bin/zuul-executor -f'
     depends_on:
       - scheduler
     image: zuul/zuul-executor
