@@ -95,6 +95,7 @@ services:
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
+      - "certs:/var/certs:z"
   node:
     build:
       dockerfile: node-Dockerfile
