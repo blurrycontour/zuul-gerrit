@@ -31,6 +31,7 @@ import time
 import traceback
 from concurrent.futures.process import ProcessPoolExecutor, BrokenProcessPool
 import re
+from typing import Dict, List
 
 import git
 from urllib.parse import urlsplit
@@ -55,6 +56,7 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
+from zuul.zk import ZooKeeperClient
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -2549,10 +2551,17 @@ class ExecutorServer(BaseMergeServer):
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
 
-    def __init__(self, config, connections=None, jobdir_root=None,
-                 keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT,
-                 log_console_port=DEFAULT_STREAM_PORT):
-        super().__init__(config, 'executor', connections)
+    def __init__(
+        self,
+        config,
+        zk_client: ZooKeeperClient,
+        connections=None,
+        jobdir_root=None,
+        keep_jobdir=False,
+        log_streaming_port=DEFAULT_FINGER_PORT,
+        log_console_port=DEFAULT_STREAM_PORT
+    ):
+        super().__init__(config, 'executor', zk_client, connections)
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -2602,7 +2611,7 @@ class ExecutorServer(BaseMergeServer):
 
         # TODO(tobiash): Take cgroups into account
         self.update_workers = multiprocessing.cpu_count()
-        self.update_threads = []
+        self.update_threads: List[threading.Thread] = []
         # If the execution driver ever becomes configurable again,
         # this is where it would happen.
         execution_wrapper_name = 'bubblewrap'
@@ -2641,7 +2650,7 @@ class ExecutorServer(BaseMergeServer):
                 if subprocess.Popen(["rm", "-Rf", jobdir]).wait():
                     raise RuntimeError("Couldn't delete: " + jobdir)
 
-        self.job_workers = {}
+        self.job_workers: Dict[str, AnsibleJob] = {}
         self.disk_accountant = DiskAccountant(self.jobdir_root,
                                               self.disk_limit_per_job,
                                               self.stopJobDiskFull,

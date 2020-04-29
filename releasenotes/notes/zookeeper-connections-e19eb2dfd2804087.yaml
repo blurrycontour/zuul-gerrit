@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    As further integration with the scale-out scheduler is planned, the
+    :attr:`zookeeper` section ``zuul.conf`` is marked required and
+    future releases may error if it is missing.  Please add it to your
+    configuration now.

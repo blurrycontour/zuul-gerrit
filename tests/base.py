@@ -4289,12 +4289,15 @@ class ZuulTestCase(BaseTestCase):
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
-            self.config, executor_connections,
+            self.config,
+            self.zk_client,
+            executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
             keep_jobdir=KEEP_TEMPDIRS,
-            log_console_port=self.log_console_port)
+            log_console_port=self.log_console_port,
+        )
         self.executor_server.start()
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds

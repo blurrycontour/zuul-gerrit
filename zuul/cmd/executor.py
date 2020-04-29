@@ -19,9 +19,9 @@ import sys
 import signal
 
 import zuul.cmd
-import zuul.executor.server
-
+from zuul.executor.server import COMMANDS, DEFAULT_FINGER_PORT, ExecutorServer
 from zuul.lib.config import get_default
+from zuul.zk import ZooKeeperClient
 
 
 class Executor(zuul.cmd.ZuulDaemonApp):
@@ -34,7 +34,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
                             action='store_true',
                             help='keep local jobdirs after run completes')
         parser.add_argument('command',
-                            choices=zuul.executor.server.COMMANDS,
+                            choices=COMMANDS,
                             nargs='?')
         return parser
 
@@ -68,7 +68,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.log_streamer_pid = child_pid
 
     def run(self):
-        if self.args.command in zuul.executor.server.COMMANDS:
+        if self.args.command in COMMANDS:
             self.send_command(self.args.command)
             sys.exit(0)
 
@@ -90,21 +90,26 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         self.log = logging.getLogger("zuul.Executor")
 
         self.finger_port = int(
-            get_default(self.config, 'executor', 'finger_port',
-                        zuul.executor.server.DEFAULT_FINGER_PORT)
+            get_default(
+                self.config, 'executor', 'finger_port', DEFAULT_FINGER_PORT
+            )
         )
 
         self.start_log_streamer()
 
-        ExecutorServer = zuul.executor.server.ExecutorServer
-        self.executor = ExecutorServer(self.config, self.connections,
-                                       jobdir_root=self.job_dir,
-                                       keep_jobdir=self.args.keep_jobdir,
-                                       log_streaming_port=self.finger_port)
-        self.executor.start()
+        with ZooKeeperClient.fromConfig(self.config) as zk_client:
+            self.executor = ExecutorServer(
+                self.config,
+                zk_client,
+                self.connections,
+                jobdir_root=self.job_dir,
+                keep_jobdir=self.args.keep_jobdir,
+                log_streaming_port=self.finger_port,
+            )
+            self.executor.start()
 
-        if self.args.nodaemon:
-            signal.signal(signal.SIGTERM, self.exit_handler)
+            if self.args.nodaemon:
+                signal.signal(signal.SIGTERM, self.exit_handler)
 
         self.executor.join()
 
