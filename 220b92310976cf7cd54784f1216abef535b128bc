@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_3b27a5cc",
+        "filename": "Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-29T20:54:19Z",
+      "side": 1,
+      "message": "Couldn\u0027t it be installed like the other golang tool using `copy --from\u003dbuilder`?",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 32
+      },
+      "revId": "220b92310976cf7cd54784f1216abef535b128bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
