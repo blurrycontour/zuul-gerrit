@@ -4282,8 +4282,12 @@ class ZuulTestCase(BaseTestCase):
             self.git_url_with_auth, self.addCleanup, True)
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
+        executor_zk_client = ZooKeeperClient()
+        executor_zk_client.connect(self.zk_config, timeout=30.0)
         self.executor_server = RecordingExecutorServer(
-            self.config, executor_connections,
+            self.config,
+            executor_zk_client,
+            executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
@@ -4628,6 +4632,7 @@ class ZuulTestCase(BaseTestCase):
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
         self.scheds.execute(lambda app: app.sched.zk_client.disconnect())
+        self.executor_server.zk_client.disconnect()
         self.printHistory()
         # We whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.
