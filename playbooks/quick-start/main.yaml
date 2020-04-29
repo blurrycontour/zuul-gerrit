@@ -131,7 +131,8 @@
   copy:
     src: ../../doc/source/examples/test1/
     dest: "{{ workspace }}/test1/"
-- name: Commit and upload test change in test1
+
+- name: Setup Base Commit
   shell:
     chdir: "{{ workspace }}/test1/"
     executable: /bin/bash
@@ -142,35 +143,31 @@
       git config gitreview.username 'user'
       mv zuul.yaml .zuul.yaml
       git add .zuul.yaml playbooks
-      git commit -m "Add test Zuul job"
-      git review
-- name: Query open changes
+      git commit -m "base commit"
+
+- include_tasks: create-change-gate-test.yaml
+  loop:
+    - change1
+    - change2
+  loop_control:
+    loop_var: changenum
+
+- name: Approve changes
   uri:
-    url: http://localhost:8080/a/changes/?q=status:open+project:test1&o=CURRENT_REVISION
-    method: GET
+    url: "http://localhost:8080/a/changes/{{ item.id }}/revisions/{{ item.current_revision }}/review"
+    method: POST
     user: admin
     password: secret
-    return_content: true
-  register: changes
-- name: Wait for Zuul to report
-  uri:
-    url: "http://localhost:8080/a/changes/{{ (changes.content[5:]|from_json)[0].id }}//detail"
-    method: GET
-    user: admin
-    password: secret
-    return_content: true
-  register: result
-  until: (result.content[5:]|from_json).messages|length > 1
-  delay: 1
-  retries: 120
-- name: Find the log URL
-  set_fact:
-    log_url: "{{ (result.content[5:]|from_json).messages[1].message|regex_search('(http://[^ ]*)') }}"
-- debug:
-    msg: "{{ log_url }}"
-- name: Fetch log URL
-  get_url:
-    url: "{{ log_url }}job-output.txt"
-    dest: "{{ workspace }}/job-output.txt"
-- name: Verify log contents
-  command: "grep 'Hello world!' {{ workspace }}/job-output.txt"
+    status_code: 200
+    body_format: json
+    body:
+      labels:
+        Code-Review: +2
+        Workflow: +1
+  loop: "{{ check_result }}"
+
+- include_tasks: check-gate-status.yaml
+  loop: "{{ check_result }}"
+
+- include_tasks: change-running-gate-job.yaml
+  loop: "{{ check_result }}"
