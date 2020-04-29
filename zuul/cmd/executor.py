@@ -20,6 +20,7 @@ import signal
 
 import zuul.cmd
 import zuul.executor.server
+import zuul.zk
 
 from zuul.lib.config import get_default
 
@@ -96,16 +97,20 @@ class Executor(zuul.cmd.ZuulDaemonApp):
 
         self.start_log_streamer()
 
+        zookeeper = zuul.zk.connect_zookeeper(self.config)
+
         ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, self.connections,
                                        jobdir_root=self.job_dir,
                                        keep_jobdir=self.args.keep_jobdir,
                                        log_streaming_port=self.finger_port)
+        self.executor.setZookeeper(zookeeper)
         self.executor.start()
 
         if self.args.nodaemon:
             signal.signal(signal.SIGTERM, self.exit_handler)
 
+        zookeeper.disconnect()
         self.executor.join()
 
 
