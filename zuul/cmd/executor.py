@@ -20,8 +20,9 @@ import signal
 
 import zuul.cmd
 import zuul.executor.server
+import zuul.zk
 
-from zuul.lib.config import get_default
+from zuul.lib.config import get_default, connect_zookeeper
 
 
 class Executor(zuul.cmd.ZuulDaemonApp):
@@ -98,11 +99,14 @@ class Executor(zuul.cmd.ZuulDaemonApp):
 
         self.start_log_streamer()
 
+        zookeeper = connect_zookeeper(self.config)
+
         ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, self.connections,
                                        jobdir_root=self.job_dir,
                                        keep_jobdir=self.args.keep_jobdir,
                                        log_streaming_port=self.finger_port)
+        self.executor.setZookeeper(zookeeper)
         self.executor.start()
 
         if self.args.nodaemon:
@@ -114,6 +118,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
                     print("Ctrl + C: asking executor to exit nicely...\n")
                     self.exit_handler(signal.SIGINT, None)
         else:
+            zookeeper.disconnect()
             self.executor.join()
 
 
