@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_e59ac511",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-29T15:55:28Z",
+      "side": 1,
+      "message": "Setting the severity here makes all of the text a sort of rust color which has two problems: not all of the text is necessarily an error, and it reduces the contrast, making it harder to read.  I could see applying a line-by-line highlighter here, but I don\u0027t think we should apply a color to all of the text.",
+      "revId": "adec988ed940da864a04eb88215985d279dbd4da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_459e1907",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-29T15:55:28Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "adec988ed940da864a04eb88215985d279dbd4da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_25a14d47",
+        "filename": "web/src/index.css",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-04-29T15:55:28Z",
+      "side": 1,
+      "message": "This may be an improvement in some circumstances, but I\u0027m not sure it\u0027s universally better.  Some log files with long lines are much easier to read if the lines are not wrapped.  Here is an example: https://zuul.opendev.org/t/zuul/build/8fd0081a6384416e86b489d639728a76/console\n\nI think this should be considered in its own change.",
+      "revId": "adec988ed940da864a04eb88215985d279dbd4da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
