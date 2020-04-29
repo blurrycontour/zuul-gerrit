@@ -39,6 +39,16 @@ RUN mkdir /tmp/openshift-install \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
   && tar xvfz openshift-client.tgz --strip-components=1 -C /tmp/openshift-install
 
+# https://podman.io/getting-started/installation.html
+COPY tools/2472D6D0.gpg /tmp/2472D6D0.gpg
+RUN apt-get update \
+  && apt-get install -y gnupg \
+  && cat /tmp/2472D6D0.gpg | apt-key --keyring /etc/apt/trusted.gpg.d/kubic.gpg add - \
+  && echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
+  && apt-get update \
+  && apt-get install -y \
+      skopeo
+
 FROM docker.io/opendevorg/python-base as zuul
 
 COPY --from=builder /output/ /output
@@ -54,6 +64,7 @@ FROM zuul as zuul-executor
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
+COPY --from=builder /usr/bin/skopeo /usr/local/bin/skopeo
 
 CMD ["/usr/local/bin/zuul-executor", "-f"]
 
