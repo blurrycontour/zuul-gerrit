@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_9b523912",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-04-29T20:33:21Z",
+      "side": 1,
+      "message": "I think you can express this as\n\n libffi7 [platform:dpkg platform:ubuntu-focal]\n libffi6 [platform:dpkg !platform:ubuntu-focal]\n\nWhich might be easier to reason about long term.",
+      "revId": "c0b9070d141fbc3c3ce73009cd26b66fd29f6655",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
