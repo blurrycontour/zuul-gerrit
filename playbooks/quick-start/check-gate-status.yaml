@@ -1,0 +1,18 @@
+---
+
+- name: "Wait for Zuul to report {{item.name}} gate job"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ item.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: gate_status
+  until: (gate_status.content[5:]|from_json).messages|length == 4
+  delay: 1
+  retries: 60
+  
+- name: "Check Zuul has started gate job for {{item.name}}"
+  assert:
+    that:
+      - (gate_status.content[5:]|from_json).messages[3].message is search("Starting gate jobs")

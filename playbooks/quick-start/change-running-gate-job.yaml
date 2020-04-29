@@ -1,0 +1,15 @@
+---
+
+- name: "Query changes are still runing: {{item.name}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{item.id}}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: gate_status
+
+- name: "Check Zuul is still doing {{item.name}} gate jobs"
+  assert:
+    that:
+      - (gate_status.content[5:]|from_json).messages|length == 4
