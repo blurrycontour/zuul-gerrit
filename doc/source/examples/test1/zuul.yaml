@@ -2,10 +2,14 @@
     name: testjob
     run: playbooks/testjob.yaml
 
+- job:
+    name: testjobgate
+    run: playbooks/testjobgate.yaml
+
 - project:
     check:
       jobs:
         - testjob
     gate:
       jobs:
-        - testjob
+        - testjobgate
