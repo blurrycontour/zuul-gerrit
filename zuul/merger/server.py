@@ -56,7 +56,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def __init__(self, config: ConfigParser, component: str,
                  connections: Optional[ConnectionRegistry]=None):
-        self.connections = connections or {}
+        self.connections = connections or {}  # type: ConnectionRegistry
         self.merge_email = get_default(config, 'merger', 'git_user_email')
         self.merge_name = get_default(config, 'merger', 'git_user_name')
         self.merge_speed_limit = get_default(

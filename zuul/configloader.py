@@ -1785,7 +1785,7 @@ class TenantParser(object):
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
             job.wait(self.merger.git_timeout)
-            if not job.updated:
+            if not hasattr(job, 'updated') or not job.updated:
                 raise Exception("Cat job %s failed" % (job,))
             self.log.debug("Cat job %s got files %s" %
                            (job, job.files.keys()))
