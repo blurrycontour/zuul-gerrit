@@ -55,7 +55,7 @@ class BaseMergeServer(metaclass=ABCMeta):
     _repo_locks_class = BaseRepoLocks
 
     def __init__(self, config: ConfigParser, component: str,
-                 connections: Optional[ConnectionRegistry]=None):
+                 connections=None):
         self.connections = connections or {}
         self.merge_email = get_default(config, 'merger', 'git_user_email')
         self.merge_name = get_default(config, 'merger', 'git_user_name')
