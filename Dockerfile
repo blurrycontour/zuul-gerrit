@@ -47,6 +47,13 @@ RUN /output/install-from-bindep \
   && rm -rf /output
 RUN useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul
 
+# https://podman.io/getting-started/installation.html
+# Import the key on the builder image because of gpg
+COPY tools/2472D6D0.gpg /tmp/2472D6D0.gpg
+RUN apt-get update \
+  && apt-get install -y gnupg \
+  && cat /tmp/2472D6D0.gpg | apt-key --keyring /etc/apt/trusted.gpg.d/kubic.gpg add -
+
 VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
 
@@ -54,6 +61,15 @@ FROM zuul as zuul-executor
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
+COPY --from=builder /etc/apt/trusted.gpg.d/kubic.gpg /etc/apt/trusted.gpg.d/kubic.gpg
+
+# https://podman.io/getting-started/installation.html
+RUN echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
+  && apt-get update \
+  && apt-get install -y \
+      skopeo \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 CMD ["/usr/local/bin/zuul-executor", "-f"]
 
