@@ -1,0 +1,4 @@
+- hosts: all
+  tasks:
+  - name: Wait enought time for both changes to be scheduled
+    command: /bin/sleep 30
