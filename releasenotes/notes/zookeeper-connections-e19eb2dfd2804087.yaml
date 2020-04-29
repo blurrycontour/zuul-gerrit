@@ -1,0 +1,6 @@
+---
+upgrade:
+  - |
+    The :attr:`zookeeper` section in ``zuul.conf`` is required for all
+    components, and all components must now be able to connect to
+    ZooKeeper.
