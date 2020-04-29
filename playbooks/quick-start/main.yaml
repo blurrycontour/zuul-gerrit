@@ -131,7 +131,7 @@
   copy:
     src: ../../doc/source/examples/test1/
     dest: "{{ workspace }}/test1/"
-- name: Commit and upload test change in test1
+- name: Setup Base Commit
   shell:
     chdir: "{{ workspace }}/test1/"
     executable: /bin/bash
@@ -142,35 +142,141 @@
       git config gitreview.username 'user'
       mv zuul.yaml .zuul.yaml
       git add .zuul.yaml playbooks
-      git commit -m "Add test Zuul job"
+      git commit -m "base commit"
+- name: Commit and upload gate test change1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git checkout -b change1 master
+      echo "change1" > change1.txt
+      git add change1.txt
+      git commit -m "Change_1" --amend
       git review
-- name: Query open changes
+- name: Commit and upload gate test change2
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git checkout -b change2 master
+      echo "change2" > change2.txt
+      git add change2.txt
+      git commit -m "Change_2" --amend
+      git review
+- name: Query change1
   uri:
-    url: http://localhost:8080/a/changes/?q=status:open+project:test1&o=CURRENT_REVISION
+    url: "http://localhost:8080/a/changes/?q=status:open+project:test1+message:Change_1&o=CURRENT_REVISION"
     method: GET
     user: admin
     password: secret
     return_content: true
-  register: changes
-- name: Wait for Zuul to report
+  register: change1
+- name: Query change2
   uri:
-    url: "http://localhost:8080/a/changes/{{ (changes.content[5:]|from_json)[0].id }}//detail"
+    url: "http://localhost:8080/a/changes/?q=status:open+project:test1+message:Change_2&o=CURRENT_REVISION"
     method: GET
     user: admin
     password: secret
     return_content: true
-  register: result
-  until: (result.content[5:]|from_json).messages|length > 1
+  register: change2
+- name: Wait for Zuul to report into change1
+  uri:
+    url: "http://localhost:8080/a/changes/{{ (change1.content[5:]|from_json)[0].id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result1
+  until: (result1.content[5:]|from_json).messages|length > 1
   delay: 1
   retries: 120
-- name: Find the log URL
+- name: Find the log URL change1
   set_fact:
-    log_url: "{{ (result.content[5:]|from_json).messages[1].message|regex_search('(http://[^ ]*)') }}"
+    log_url: "{{ (result1.content[5:]|from_json).messages[1].message|regex_search('(http://[^ ]*)') }}"
 - debug:
     msg: "{{ log_url }}"
-- name: Fetch log URL
+- name: Fetch log URL change1
   get_url:
     url: "{{ log_url }}job-output.txt"
     dest: "{{ workspace }}/job-output.txt"
 - name: Verify log contents
   command: "grep 'Hello world!' {{ workspace }}/job-output.txt"
+- name: Wait for Zuul to report into change2
+  uri:
+    url: "http://localhost:8080/a/changes/{{ (change2.content[5:]|from_json)[0].id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result2
+  until: (result2.content[5:]|from_json).messages|length > 1
+  delay: 1
+  retries: 120
+- name: Approve change1
+  uri:
+    url: "http://localhost:8080/a/changes/{{ (change1.content[5:]|from_json)[0].id }}/revisions/{{ (change1.content[5:]|from_json)[0].current_revision }}/review"
+    method: POST
+    user: admin
+    password: secret
+    status_code: 200
+    body_format: json
+    body:
+      labels:
+        Code-Review: +2
+        Workflow: +1
+- name: Approve change2
+  uri:
+    url: "http://localhost:8080/a/changes/{{ (change2.content[5:]|from_json)[0].id }}/revisions/{{ (change2.content[5:]|from_json)[0].current_revision }}/review"
+    method: POST
+    user: admin
+    password: secret
+    status_code: 200
+    body_format: json
+    body:
+      labels:
+        Code-Review: +2
+        Workflow: +1
+- name: Wait for Zuul to report change1 gate jobs
+  uri:
+    url: "http://localhost:8080/a/changes/{{ (change1.content[5:]|from_json)[0].id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: gateresult1
+  until: (gateresult1.content[5:]|from_json).messages|length == 4
+  delay: 1
+  retries: 60
+- name: Check Zuul has started gate jobs for change 1
+  fail:
+    msg: "Change 1 gate jobs did not start"
+  when: (gateresult1.content[5:]|from_json).messages[3].message is not search("Starting gate jobs")
+- name: Wait for Zuul to report change2 gate jobs
+  uri:
+    url: "http://localhost:8080/a/changes/{{ (change2.content[5:]|from_json)[0].id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: gateresult2
+  until: (gateresult2.content[5:]|from_json).messages|length == 4
+  delay: 1
+  retries: 60
+- name: Check Zuul has started gate jobs for change 2
+  fail:
+    msg: "Change 2 gate jobs did not start"
+  when: (gateresult2.content[5:]|from_json).messages[3].message is not search("Starting gate jobs")
+- name: Query change1
+  uri:
+    url: "http://localhost:8080/a/changes/{{ (change1.content[5:]|from_json)[0].id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: gateresult3
+- name: Check Zuul is still doing change1 gate jobs
+  fail:
+    msg: "Change 1 gate build was already finished"
+  when: (gateresult3.content[5:]|from_json).messages|length > 4
