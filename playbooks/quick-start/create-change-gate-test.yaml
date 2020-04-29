@@ -1,0 +1,42 @@
+- name: "Commit and upload gate test: {{changenum}}"
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git checkout -b {{changenum}} master
+      echo "{{changenum}}" > {{changenum}}.txt
+      git add {{changenum}}.txt
+      git commit -m "{{changenum}}" --amend
+      git review
+- name: "Query changes: {{changenum}}"
+  uri:
+    url: "http://localhost:8080/a/changes/?q=status:open+project:test1+message:{{changenum}}&o=CURRENT_REVISION"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: querychangeresult
+- name: "Wait for Zuul to report into change: {{changenum}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ (querychangeresult.content[5:]|from_json)[0].id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: check_info
+  until: (check_info.content[5:]|from_json).messages|length > 1
+  delay: 1
+  retries: 120
+- name: "Find the log URL change: {{changenum}}"
+  set_fact:
+    log_url: "{{ (check_info.content[5:]|from_json).messages[1].message|regex_search('(http://[^ ]*)') }}"
+- name: "Fetch log URL change: {{changenum}}"
+  get_url:
+    url: "{{ log_url }}job-output.txt"
+    dest: "{{ workspace }}/job-output.txt"
+- name: "Verify log contents: {{changenum}}"
+  command: "grep 'Hello world!' {{ workspace }}/job-output.txt"
+- set_fact:
+    check_result: "{{check_result|default([]) + [ { 'name': changenum, 'id': (item[5:]|from_json)[0].id, 'current_revision': (item[5:]|from_json)[0].current_revision } ] }}"
+  with_items: "{{querychangeresult.content}}"
