@@ -293,7 +293,7 @@ class ExecutorClient(object):
             project = source.getProject(change['project']['name'])
             if project not in projects:
                 params['projects'].append(make_project_dict(project))
-                projects.add(project)
+
         for p in projects:
             zuul_params['projects'][p.canonical_name] = (dict(
                 name=p.name,
