@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_0a8087f4",
+        "filename": "web/src/index.css",
+        "patchSetId": 7
+      },
+      "lineNbr": 276,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-04-30T12:53:36Z",
+      "side": 1,
+      "message": "nit: comment for `summary.more` not `details.stderr`",
+      "range": {
+        "startLine": 276,
+        "startChar": 1,
+        "endLine": 276,
+        "endChar": 8
+      },
+      "revId": "19a62dc076446951dc6fa2b70026cc53f852555f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
