@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1f493fa4_79b759f6",
+        "filename": "Dockerfile",
+        "patchSetId": 6
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-04-30T23:23:52Z",
+      "side": 1,
+      "message": "I just went through this with https://review.opendev.org/#/c/724462/\n\nbecause it\u0027s not a keyring but an ascii armoured key you want to name it \".asc\"\n\nThen you can just drop it in /etc/apt/trusted.gpg.d and you don\u0027t need gnupg installed or to run apt-key.  it suggests this in the man page :) [1]\n\n[1] http://manpages.ubuntu.com/manpages/bionic/man8/apt-key.8.html",
+      "revId": "ba00f18f58e34c3da0c55cef4b401bd5a0bd18f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_d33db3bb",
         "filename": "Dockerfile",
         "patchSetId": 6
