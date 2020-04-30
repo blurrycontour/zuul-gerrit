@@ -22,6 +22,30 @@
       "revId": "ba00f18f58e34c3da0c55cef4b401bd5a0bd18f7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_d3701375",
+        "filename": "Dockerfile",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-04-30T17:09:42Z",
+      "side": 1,
+      "message": "It\u0027s a good question. It might Just Work - frequently external repos like this will still work across base distro boundaries - like we\u0027ll install things from a bionic repo on a debian-10 image. BUT - it\u0027s possible the soname of libgpgme might be significant in which case the install command will stop working and we\u0027ll have to fix it.\n\nThis almost makes me want to try building the go binaries ourselves in a go builder image to see if we can get ACTUALLY statically linked binaries. :)",
+      "parentUuid": "1f493fa4_d33db3bb",
+      "range": {
+        "startLine": 67,
+        "startChar": 85,
+        "endLine": 67,
+        "endChar": 103
+      },
+      "revId": "ba00f18f58e34c3da0c55cef4b401bd5a0bd18f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
