@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_10def1d8",
+        "filename": "Dockerfile",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-04-30T16:50:38Z",
+      "side": 1,
+      "message": "The manpage for apt-key indicates that --keyring is optional and the default keyring should work fine. Can we drop this so we aren\u0027t stuck to a specific release (which will change over time)?",
+      "range": {
+        "startLine": 46,
+        "startChar": 37,
+        "endLine": 46,
+        "endChar": 79
+      },
+      "revId": "fbfc75dc6d62b790ab306760d147cf98006bc8c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_b0e8dd7b",
+        "filename": "Dockerfile",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-04-30T16:50:38Z",
+      "side": 1,
+      "message": "Apparently its version specific here too so my concern above is not critical.",
+      "range": {
+        "startLine": 47,
+        "startChar": 65,
+        "endLine": 47,
+        "endChar": 70
+      },
+      "revId": "fbfc75dc6d62b790ab306760d147cf98006bc8c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
