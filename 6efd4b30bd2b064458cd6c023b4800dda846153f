@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_a75b8ef3",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-04-30T11:40:26Z",
+      "side": 1,
+      "message": "I will remove both as they are not used. Mainly they are lefovers from the libpod(podman) makefile which was used as a source of inspiration, especially for the help implementation.",
+      "parentUuid": "1f493fa4_e794768d",
+      "revId": "6efd4b30bd2b064458cd6c023b4800dda846153f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_87ebf210",
         "filename": "Makefile",
         "patchSetId": 2
@@ -53,6 +71,24 @@
       "writtenOn": "2020-04-30T11:31:03Z",
       "side": 1,
       "message": "what about cleaning .tox as well?",
+      "revId": "6efd4b30bd2b064458cd6c023b4800dda846153f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_476c4a9b",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-04-30T11:40:26Z",
+      "side": 1,
+      "message": "Not sure about that one, mixed feelings. Lets see what other think about it.",
+      "parentUuid": "1f493fa4_87ebf210",
       "revId": "6efd4b30bd2b064458cd6c023b4800dda846153f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
