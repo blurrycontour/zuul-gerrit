@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_079a42b7",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-04-30T11:31:03Z",
+      "side": 1,
+      "message": "is this used anywhere? If yes, add \"zypper\" - if not, remove it ;)",
+      "range": {
+        "startLine": 4,
+        "startChar": 1,
+        "endLine": 4,
+        "endChar": 51
+      },
+      "revId": "6efd4b30bd2b064458cd6c023b4800dda846153f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_e794768d",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-04-30T11:31:03Z",
+      "side": 1,
+      "message": "not used anywhere",
+      "revId": "6efd4b30bd2b064458cd6c023b4800dda846153f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_87ebf210",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-04-30T11:31:03Z",
+      "side": 1,
+      "message": "what about cleaning .tox as well?",
+      "revId": "6efd4b30bd2b064458cd6c023b4800dda846153f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
