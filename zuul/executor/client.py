@@ -294,7 +294,8 @@ class ExecutorClient(object):
             if project not in projects:
                 params['projects'].append(make_project_dict(project))
                 projects.add(project)
-        for p in projects:
+
+        for p in required_projects:
             zuul_params['projects'][p.canonical_name] = (dict(
                 name=p.name,
                 short_name=p.name.split('/')[-1],
