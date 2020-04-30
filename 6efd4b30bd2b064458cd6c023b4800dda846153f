@@ -60,6 +60,29 @@
     },
     {
       "key": {
+        "uuid": "1f493fa4_b6ac5a9f",
+        "filename": "Makefile",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-04-30T14:35:12Z",
+      "side": 1,
+      "message": "Should we split the lint commands? i wouldn\u0027t want to run npm or yarn unless i\u0027m editing web file.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 33
+      },
+      "revId": "6efd4b30bd2b064458cd6c023b4800dda846153f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_87ebf210",
         "filename": "Makefile",
         "patchSetId": 2
