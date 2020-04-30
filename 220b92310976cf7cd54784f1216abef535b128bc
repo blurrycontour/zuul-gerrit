@@ -22,6 +22,30 @@
       "revId": "220b92310976cf7cd54784f1216abef535b128bc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_aa84f3d3",
+        "filename": "Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-04-30T13:03:46Z",
+      "side": 1,
+      "message": "Oh - that\u0027s an interesting point. Since we install it from packages I didn\u0027t think of that - but you\u0027re TOTALLY right.",
+      "parentUuid": "1f493fa4_3b27a5cc",
+      "range": {
+        "startLine": 66,
+        "startChar": 0,
+        "endLine": 72,
+        "endChar": 32
+      },
+      "revId": "220b92310976cf7cd54784f1216abef535b128bc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
