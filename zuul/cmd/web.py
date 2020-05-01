@@ -105,13 +105,14 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         self.log.info('Zuul Web Server starting')
         self.web.start()
 
-        try:
-            signal.pause()
-        except KeyboardInterrupt:
-            print("Ctrl + C: asking web server to exit nicely...\n")
-            self.exit_handler(signal.SIGINT, None)
-
-        self.web.stop()
+        while True:
+            try:
+                signal.pause()
+            except KeyboardInterrupt:
+                print("Ctrl + C: asking web server to exit nicely...\n")
+                self.exit_handler(signal.SIGINT, None)
+            if not self.web._command_running:
+                break
         self.log.info("Zuul Web Server stopped")
 
     def configure_authenticators(self):
