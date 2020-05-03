@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_da3924d9",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-05-03T12:32:11Z",
+      "side": 1,
+      "message": "Instead of running this here, we should add git_user_name and git_user_email to the [merger] section of doc/source/examples/etc_zuul/zuul.conf. Like:\n\n  [merger]\n  git_user_name\u003dExample Zuul\n  git_user_email\u003dzuul@example.com\n\nI think that will help document for people how they should do that in a production deploymnet.",
+      "range": {
+        "startLine": 90,
+        "startChar": 0,
+        "endLine": 94,
+        "endChar": 1
+      },
+      "revId": "7760342917d07f327b2aa6e086bb12993f3120fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
