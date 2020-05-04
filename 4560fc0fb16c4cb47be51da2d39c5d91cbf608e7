@@ -34,6 +34,24 @@
       "revId": "4560fc0fb16c4cb47be51da2d39c5d91cbf608e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_22f9f64c",
+        "filename": "doc/source/reference/developer/specs/index.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-04T15:04:26Z",
+      "side": 1,
+      "message": "Oops, it seems like a rebase issue.",
+      "parentUuid": "1f493fa4_87045c80",
+      "revId": "4560fc0fb16c4cb47be51da2d39c5d91cbf608e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
