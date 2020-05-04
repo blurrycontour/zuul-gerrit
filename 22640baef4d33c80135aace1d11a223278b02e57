@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_a90cd494",
+        "filename": "doc/source/reference/pipeline_def.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-05-04T07:12:32Z",
+      "side": 1,
+      "message": "why \"partial production\" deployments only? Would a preprod/integration full deployment not be possible? If I understand it correctly I would leave the \"partial production\" out.",
+      "range": {
+        "startLine": 128,
+        "startChar": 9,
+        "endLine": 128,
+        "endChar": 27
+      },
+      "revId": "22640baef4d33c80135aace1d11a223278b02e57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
