@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1fa4df85_9a7b468a",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-04T15:04:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_bb111bb1",
+      "range": {
+        "startLine": 41,
+        "startChar": 22,
+        "endLine": 41,
+        "endChar": 29
+      },
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3fa7e38b_278669b9",
         "filename": "doc/source/developer/specs/zuul-runner.rst",
         "patchSetId": 3
@@ -36,6 +60,24 @@
       "writtenOn": "2020-02-20T20:56:27Z",
       "side": 1,
       "message": "You can change this to a gender-neutral form (and shorten it too!) with \"...shall require the user to provide copies of...\".",
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_3a6ed2c8",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-04T15:04:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fa7e38b_278669b9",
       "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -76,6 +118,24 @@
       "writtenOn": "2020-02-20T20:56:27Z",
       "side": 1,
       "message": "I think it\u0027s worth describing both use cases in the spec.",
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_baee42ea",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-04T15:04:26Z",
+      "side": 1,
+      "message": "Next PS adds both use cases to the spec first section.",
+      "parentUuid": "3fa7e38b_c7b6758d",
       "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -140,6 +200,24 @@
       "writtenOn": "2020-02-20T20:56:27Z",
       "side": 1,
       "message": "The nodes argument doesn\u0027t appear above -- are you replacing that with a user-supplied inventory file?  If so, that\u0027s missing too.",
+      "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1fa4df85_bab6423d",
+        "filename": "doc/source/developer/specs/zuul-runner.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-04T15:04:26Z",
+      "side": 1,
+      "message": "That\u0027s no longer available.",
+      "parentUuid": "3fa7e38b_e7b9317b",
       "revId": "8d5f6068ff6b67f761a5c945f6d95d80dbfd1848",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
