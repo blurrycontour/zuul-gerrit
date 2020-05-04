@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_76d6242a",
+        "filename": "zuul/cmd/web.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-04T11:31:25Z",
+      "side": 1,
+      "message": "What do you think about handling this similar to this?\n\nhttps://review.opendev.org/#/c/718157/4/zuul/cmd/executor.py",
+      "revId": "173ff0cec9cfae4a37ca2dbf33f2ff4955e8a1bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
