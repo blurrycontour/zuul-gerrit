@@ -666,6 +666,9 @@ class PipelineManager(metaclass=ABCMeta):
     def getLayout(self, item):
         if item.item_ahead:
             fallback_layout = item.item_ahead.layout
+            if fallback_layout is None:
+                # We're probably waiting on a merge job for the item ahead.
+                return None
         else:
             fallback_layout = item.pipeline.tenant.layout
         if not item.change.updatesConfig(item.pipeline.tenant):
