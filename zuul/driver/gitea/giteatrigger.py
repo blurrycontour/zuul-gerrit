@@ -15,18 +15,18 @@
 import logging
 import voluptuous as v
 from zuul.trigger import BaseTrigger
-from zuul.driver.pagure.paguremodel import PagureEventFilter
+from zuul.driver.gitea.giteamodel import GiteaEventFilter
 from zuul.driver.util import scalar_or_list, to_list
 
 
-class PagureTrigger(BaseTrigger):
-    name = 'pagure'
-    log = logging.getLogger("zuul.trigger.PagureTrigger")
+class GiteaTrigger(BaseTrigger):
+    name = 'gitea'
+    log = logging.getLogger("zuul.trigger.GiteaTrigger")
 
     def getEventFilters(self, trigger_config):
         efilters = []
         for trigger in to_list(trigger_config):
-            f = PagureEventFilter(
+            f = GiteaEventFilter(
                 trigger=self,
                 types=to_list(trigger['event']),
                 actions=to_list(trigger.get('action')),
@@ -44,7 +44,7 @@ class PagureTrigger(BaseTrigger):
 
 
 def getSchema():
-    pagure_trigger = {
+    gitea_trigger = {
         v.Required('event'):
             # Cannot use same event type than github as it collapse
             # with Registered github triggers if any. The Event filter
@@ -60,4 +60,4 @@ def getSchema():
         'tag': scalar_or_list(str)
     }
 
-    return pagure_trigger
+    return gitea_trigger

@@ -17,60 +17,17 @@ from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
-
-class PullRequest(Change):
-    def __init__(self, project):
-        super(PullRequest, self).__init__(project)
-        self.project = None
-        self.pr = None
-        self.updated_at = None
-        self.title = None
-        self.score = 0
-        self.files = []
-        self.tags = []
-
-    def __repr__(self):
-        r = ['<Change 0x%x' % id(self)]
-        if self.project:
-            r.append('project: %s' % self.project)
-        if self.number:
-            r.append('number: %s' % self.number)
-        if self.patchset:
-            r.append('patchset: %s' % self.patchset)
-        if self.updated_at:
-            r.append('updated: %s' % self.updated_at)
-        if self.status:
-            r.append('status: %s' % self.status)
-        if self.score:
-            r.append('score: %s' % self.score)
-        if self.tags:
-            r.append('tags: %s' % ', '.join(self.tags))
-        if self.is_merged:
-            r.append('state: merged')
-        if self.open:
-            r.append('state: open')
-        return ' '.join(r) + '>'
-
-    def isUpdateOf(self, other):
-        if (self.project == other.project and
-            hasattr(other, 'number') and self.number == other.number and
-            hasattr(other, 'updated_at') and
-            self.updated_at > other.updated_at):
-            return True
-        return False
-
-
-class PagureTriggerEvent(TriggerEvent):
+class GiteaTriggerEvent(TriggerEvent):
     def __init__(self):
-        super(PagureTriggerEvent, self).__init__()
-        self.trigger_name = 'pagure'
+        super(GiteaTriggerEvent, self).__init__()
+        self.trigger_name = 'gitea'
         self.title = None
         self.action = None
         self.status = None
         self.tags = []
 
     def _repr(self):
-        r = [super(PagureTriggerEvent, self)._repr()]
+        r = [super(GiteaTriggerEvent, self)._repr()]
         if self.action:
             r.append("action:%s" % self.action)
         if self.status:
@@ -88,7 +45,7 @@ class PagureTriggerEvent(TriggerEvent):
         return False
 
 
-class PagureEventFilter(EventFilter):
+class GiteaEventFilter(EventFilter):
     def __init__(self, trigger, types=[], refs=[], statuses=[],
                  comments=[], actions=[], tags=[], ignore_deletes=True):
 
@@ -106,7 +63,7 @@ class PagureEventFilter(EventFilter):
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
-        ret = '<PagureEventFilter'
+        ret = '<GiteaEventFilter'
 
         if self._types:
             ret += ' types: %s' % ', '.join(self._types)
@@ -177,7 +134,7 @@ class PagureEventFilter(EventFilter):
 
 # The RefFilter should be understood as RequireFilter (it maps to
 # pipeline requires definition)
-class PagureRefFilter(RefFilter):
+class GiteaRefFilter(RefFilter):
     def __init__(self, connection_name, score=None,
                  open=None, merged=None, status=None, tags=[]):
         RefFilter.__init__(self, connection_name)
@@ -188,7 +145,7 @@ class PagureRefFilter(RefFilter):
         self.tags = tags
 
     def __repr__(self):
-        ret = '<PagureRefFilter connection_name: %s ' % self.connection_name
+        ret = '<GiteaRefFilter connection_name: %s ' % self.connection_name
         if self.score:
             ret += ' score: %s' % self.score
         if self.open is not None:

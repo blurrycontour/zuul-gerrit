@@ -18,17 +18,17 @@ import voluptuous as v
 
 from zuul.reporter import BaseReporter
 from zuul.exceptions import MergeFailure
-from zuul.driver.pagure.paguresource import PagureSource
+from zuul.driver.gitea.giteasource import GiteaSource
 
 
-class PagureReporter(BaseReporter):
-    """Sends off reports to Pagure."""
+class GiteaReporter(BaseReporter):
+    """Sends off reports to Gitea."""
 
-    name = 'pagure'
-    log = logging.getLogger("zuul.PagureReporter")
+    name = 'gitea'
+    log = logging.getLogger("zuul.GiteaReporter")
 
     def __init__(self, driver, connection, pipeline, config=None):
-        super(PagureReporter, self).__init__(driver, connection, config)
+        super(GiteaReporter, self).__init__(driver, connection, config)
         self._commit_status = self.config.get('status', None)
         self._create_comment = self.config.get('comment', True)
         self._merge = self.config.get('merge', False)
@@ -37,11 +37,11 @@ class PagureReporter(BaseReporter):
     def report(self, item):
         """Report on an event."""
 
-        # If the source is not PagureSource we cannot report anything here.
-        if not isinstance(item.change.project.source, PagureSource):
+        # If the source is not GiteaSource we cannot report anything here.
+        if not isinstance(item.change.project.source, GiteaSource):
             return
 
-        # For supporting several Pagure connections we also must filter by
+        # For supporting several Gitea connections we also must filter by
         # the canonical hostname.
         if item.change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
@@ -132,10 +132,10 @@ class PagureReporter(BaseReporter):
 
 
 def getSchema():
-    pagure_reporter = v.Schema({
+    gitea_reporter = v.Schema({
         'status': v.Any('pending', 'success', 'failure'),
         'status-url': str,
         'comment': bool,
         'merge': bool,
     })
-    return pagure_reporter
+    return gitea_reporter

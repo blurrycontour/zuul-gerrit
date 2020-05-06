@@ -19,17 +19,17 @@ import logging
 from zuul.source import BaseSource
 from zuul.model import Project
 
-from zuul.driver.pagure.paguremodel import PagureRefFilter
+from zuul.driver.gitea.giteamodel import GiteaRefFilter
 from zuul.driver.util import scalar_or_list, to_list
 
 
-class PagureSource(BaseSource):
-    name = 'pagure'
-    log = logging.getLogger("zuul.source.PagureSource")
+class GiteaSource(BaseSource):
+    name = 'gitea'
+    log = logging.getLogger("zuul.source.GiteaSource")
 
     def __init__(self, driver, connection, config=None):
         hostname = connection.canonical_hostname
-        super(PagureSource, self).__init__(driver, connection,
+        super(GiteaSource, self).__init__(driver, connection,
                                            hostname, config)
         self.change_re = re.compile(r"/(.*?)/pull-request/(\d+)")
 
@@ -119,7 +119,7 @@ class PagureSource(BaseSource):
         raise NotImplementedError()
 
     def getRequireFilters(self, config):
-        f = PagureRefFilter(
+        f = GiteaRefFilter(
             connection_name=self.connection.connection_name,
             score=config.get('score'),
             open=config.get('open'),
