@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f493fa4_5ab81d75",
+        "filename": "doc/source/howtos/ubuntu_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-05-07T15:45:24Z",
+      "side": 1,
+      "message": "maybe \u0027pip3 install --user bindep\u0027 so people don\u0027t install bindep system wide with pip.",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 27
+      },
+      "revId": "5f88a6997bffbf016ff947f931ed2a5b9456bc42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f493fa4_5a3bfde9",
+        "filename": "doc/source/howtos/ubuntu_setup.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-05-07T15:45:24Z",
+      "side": 1,
+      "message": "should this only be zookeeperd?",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 47
+      },
+      "revId": "5f88a6997bffbf016ff947f931ed2a5b9456bc42",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
