@@ -21,7 +21,7 @@ from zuul.driver.gitea import giteatrigger
 
 
 class GiteaDriver(Driver, ConnectionInterface, TriggerInterface,
-                   SourceInterface, ReporterInterface):
+                  SourceInterface, ReporterInterface):
     name = 'gitea'
 
     def getConnection(self, name, config):

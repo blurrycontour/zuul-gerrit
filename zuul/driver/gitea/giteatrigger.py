@@ -33,7 +33,7 @@ class GiteaTrigger(BaseTrigger):
                 refs=to_list(trigger.get('ref')),
                 comments=to_list(trigger.get('comment')),
                 statuses=to_list(trigger.get('status')),
-                tags=to_list(trigger.get('tag')),
+                labels=to_list(trigger.get('label')),
             )
             efilters.append(f)
 
@@ -50,14 +50,14 @@ def getSchema():
             # with Registered github triggers if any. The Event filter
             # does not have the connections info like the Ref filter (require)
             # have. See manager/__init__.py:addChange
-            scalar_or_list(v.Any('pg_pull_request',
-                                 'pg_pull_request_review',
-                                 'pg_push')),
+            scalar_or_list(v.Any('pull_request',
+                                 'pull_request_review',
+                                 'push')),
         'action': scalar_or_list(str),
         'ref': scalar_or_list(str),
         'comment': scalar_or_list(str),
         'status': scalar_or_list(str),
-        'tag': scalar_or_list(str)
+        'label': scalar_or_list(str)
     }
 
     return gitea_trigger

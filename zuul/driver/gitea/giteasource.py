@@ -30,8 +30,8 @@ class GiteaSource(BaseSource):
     def __init__(self, driver, connection, config=None):
         hostname = connection.canonical_hostname
         super(GiteaSource, self).__init__(driver, connection,
-                                           hostname, config)
-        self.change_re = re.compile(r"/(.*?)/pull-request/(\d+)")
+                                          hostname, config)
+        self.change_re = re.compile(r"/(.*?)/pulls/(\d+)")
 
     def getRefSha(self, project, ref):
         """Return a sha for a given project ref."""
@@ -90,7 +90,9 @@ class GiteaSource(BaseSource):
             change, projects, tenant)
 
     def getCachedChanges(self):
-        return list(self.connection._change_cache.values())
+        # TODO
+        # return list(self.connection._change_cache.values())
+        return []
 
     def getProject(self, name):
         p = self.connection.getProject(name)
