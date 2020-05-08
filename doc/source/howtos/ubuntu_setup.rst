@@ -37,7 +37,10 @@ which we will use in these instructions.
 
    sudo apt-get update
    sudo apt-get install python3-pip git
-   sudo pip3 install bindep
+
+   # install bindep, the --user setting will install bindep only in 
+   # the user profile not global.
+   pip3 install --user bindep
 
 Install Zookeeper
 -----------------
