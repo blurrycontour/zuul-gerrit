@@ -17,6 +17,75 @@ from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
+class PullRequest(Change):
+    def __init__(self, project):
+        super(PullRequest, self).__init__(project)
+        self.project = None
+        self.pr = None
+        self.updated_at = None
+        self.title = None
+        #self.score = 0
+        #self.files = []
+        self.tags = []
+
+    def __repr__(self):
+        r = ['<Change 0x%x' % id(self)]
+        if self.project:
+            r.append('project: %s' % self.project)
+        if self.number:
+            r.append('number: %s' % self.number)
+        if self.patchset:
+            r.append('patchset: %s' % self.patchset)
+        if self.updated_at:
+            r.append('updated: %s' % self.updated_at)
+        if self.status:
+            r.append('status: %s' % self.status)
+        #if self.score:
+        #    r.append('score: %s' % self.score)
+        if self.tags:
+            r.append('tags: %s' % ', '.join(self.tags))
+        if self.is_merged:
+            r.append('state: merged')
+        if self.open:
+            r.append('state: open')
+        return ' '.join(r) + '>'
+
+    def isUpdateOf(self, other):
+        if (self.project == other.project and
+            hasattr(other, 'number') and self.number == other.number and
+            hasattr(other, 'updated_at') and
+            self.updated_at > other.updated_at):
+            return True
+        return False
+
+
+class GiteaTriggerEvent(TriggerEvent):
+    def __init__(self):
+        super(GiteaTriggerEvent, self).__init__()
+        self.trigger_name = 'gitea'
+        self.title = None
+        self.action = None
+        self.status = None
+        self.tags = []
+
+    def _repr(self):
+        r = [super(GiteaTriggerEvent, self)._repr()]
+        if self.action:
+            r.append("action:%s" % self.action)
+        if self.status:
+            r.append("status:%s" % self.status)
+        r.append("project:%s" % self.canonical_project_name)
+        if self.change_number:
+            r.append("pr:%s" % self.change_number)
+        if self.tags:
+            r.append("tags:%s" % ', '.join(self.tags))
+        return ' '.join(r)
+
+    def isPatchsetCreated(self):
+        if self.type == 'pg_pull_request':
+            return self.action in ['opened', 'changed']
+        return False
+
 class GiteaTriggerEvent(TriggerEvent):
     def __init__(self):
         super(GiteaTriggerEvent, self).__init__()

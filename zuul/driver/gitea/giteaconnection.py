@@ -422,7 +422,7 @@ class GiteaConnection(BaseConnection):
             'canonical_hostname', self.server)
         self.git_ssh_key = self.connection_config.get('sshkey')
         self.api_token = self.connection_config.get('api_token')
-        self.webhook_tokens = {}
+        self.webhook_secret = self.connection_config.get('webhook_secret')
         self.baseurl = self.connection_config.get(
             'baseurl', 'https://%s' % self.server).rstrip('/')
         self.cloneurl = self.connection_config.get(
@@ -468,7 +468,8 @@ class GiteaConnection(BaseConnection):
         self.log.debug("Building project %s api_client" % project)
         config = giteapy.Configuration()
         config.host = self.baseurl + "/api/v1"
-        config.api_key = self.api_token
+        if self.api_token != None:
+            config.api_key["access_token"] = self.api_token
         return giteapy.ApiClient(config)
 
     def getWebController(self, zuul_web):
@@ -495,11 +496,11 @@ class GiteaConnection(BaseConnection):
         return url
 
     def getProjectBranches(self, project: str, tenant):
-        api = giteapy.RepositoryApi(self.get_project_api_client(project.name))
+        api = giteapy.RepositoryApi(self.get_project_api_client(project))
+        owner, repo = projectToOwnerAndName(project)
+        branches = api.repo_list_branches(owner, repo)
 
-        branches = api.repo_list_branches(projectToOwnerAndName(project))
-
-        self.log.info("Got branches for %s" % project.name)
+        self.log.info("Got branches for %s" % project)
         return [branch.name for branch in branches]
 
     def getGitUrl(self, project):
@@ -515,7 +516,7 @@ class GiteaConnection(BaseConnection):
                 project, event.change_number, event.patch_number,
                 refresh=refresh, event=event)
             change.source_event = event
-            change.is_current_patchset = (change.pr.get('commit_stop') ==
+            change.is_current_patchset = (change.pr.head.sha ==
                                           event.patch_number)
         else:
             self.log.info("Getting change for %s ref:%s" % (
@@ -617,23 +618,23 @@ class GiteaConnection(BaseConnection):
         # TODO use some newly-created gitea API for this
         return 0
 
-    def _updateChange(self, change, event):
+    def _updateChange(self, change: PullRequest, event):
         # Needs to be rewritten for gitea
         self.log.info("Updating change from gitea %s" % change)
         change.pr = self.getPull(change.project.name, change.number)
         change.ref = "refs/pull/%s/head" % change.number
-        change.branch = change.pr.get('branch')
-        change.patchset = change.pr.get('commit_stop')
-        change.files = change.pr.get('files')
-        change.title = change.pr.get('title')
-        change.tags = change.pr.get('tags')
-        change.open = change.pr.get('status') == 'Open'
-        change.is_merged = change.pr.get('status') == 'Merged'
+        change.branch = change.pr.head.ref
+        change.patchset = change.pr.head.sha
+        #change.files = change.pr.get('files')
+        change.title = change.pr.title
+        change.tags = [label.name for label in change.pr.labels]
+        change.open = change.pr.state == 'open'
+        change.is_merged = change.pr.merged
         change.status = self.getStatus(change.project, change.number)
         change.score = self.getScore(change.pr)
-        change.message = change.pr.get('initial_comment') or ''
+        change.message = change.pr.body
         # last_updated seems to be touch for comment changed/flags - that's OK
-        change.updated_at = change.pr.get('last_updated')
+        change.updated_at = change.pr.updated_at
         self.log.info("Updated change from gitea %s" % change)
 
         if self.sched:
@@ -666,14 +667,20 @@ class GiteaConnection(BaseConnection):
     def getCommitStatus(self, project, number):
         api = giteapy.RepositoryApi(self.get_project_api_client(project))
         owner, repo = projectToOwnerAndName(project)
-        commit = self.getPull(project.name, number).head.sha
-        #api.repo_get_stat
-        #TODO(veecue)
-        #self.log.info(
-        #    "Got pull-request CI status for PR %s on %s status: %s" % (
-        #        number, project, flag.get('status')))
-        #return flag.get('status')
-        return "success"
+        sha = self.getPull(project, number).head.sha
+        statuses = api.repo_list_statuses(owner, repo, sha, sort='recentupdate')
+        context_successes = {}
+        for status in statuses:
+            if not status.context in context_successes:
+                context_successes[status.context] = status.status == 'success'
+        #TODO figure out required contexts (maybe repo_get_combined_status_by_ref does what we want?)
+        #TODO(veecue) parse all statuses and check if for every context, the latest one was sucess
+        self.log.info(
+            "Got pull-request CI status for PR %s on %s status: %s" % (
+                number, project, repr(context_successes)))
+        if all(context_successes.values()):
+            return 'success'
+        return 'failure'
 
     def getChangesDependingOn(self, change, projects, tenant):
         """ Reverse lookup of PR depending on this one
@@ -726,9 +733,8 @@ class GiteaWebController(BaseWebController):
             raise cherrypy.HTTPError(
                 401, 'x-gitea-signature header missing.')
 
-        #project = headers['x-gitea-project']
-        # hardcoded for now. TODO either get it from Gitea API (not exposed currently) or make it configurable
-        token = "1234"
+        # TODO maybe retrieve dynamically from gitea api somehow
+        token = self.connection.webhook_secret
         if not self._validate(body, token, request_signature):
             # Give a second attempt as a token could have been
             # re-generated server side. Refresh the token then retry.
