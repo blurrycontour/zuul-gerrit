@@ -19,6 +19,7 @@ import voluptuous as v
 from zuul.reporter import BaseReporter
 from zuul.exceptions import MergeFailure
 from zuul.driver.gitea.giteasource import GiteaSource
+from zuul.model import QueueItem
 
 
 class GiteaReporter(BaseReporter):
@@ -71,9 +72,9 @@ class GiteaReporter(BaseReporter):
             ret += '- [%s](%s) : %s%s%s%s\n' % job_fields
         return ret
 
-    def addPullComment(self, item, comment=None):
+    def addPullComment(self, item: QueueItem, comment=None):
         message = comment or self._formatItemReport(item)
-        project = item.change.project.name
+        project = item.change.project
         pr_number = item.change.number
         self.log.debug(
             'Reporting change %s, params %s, message: %s' %
@@ -81,7 +82,7 @@ class GiteaReporter(BaseReporter):
         self.connection.commentPull(project, pr_number, message)
 
     def setCommitStatus(self, item):
-        project = item.change.project.name
+        project = item.change.project
         if hasattr(item.change, 'patchset'):
             sha = item.change.patchset
         elif hasattr(item.change, 'newrev'):
@@ -109,7 +110,7 @@ class GiteaReporter(BaseReporter):
             project, change_number, state, url, description, self.context)
 
     def mergePull(self, item):
-        project = item.change.project.name
+        project = item.change.project
         pr_number = item.change.number
 
         for i in [1, 2]:
@@ -133,7 +134,7 @@ class GiteaReporter(BaseReporter):
 
 def getSchema():
     gitea_reporter = v.Schema({
-        'status': v.Any('pending', 'success', 'failure'),
+        'status': v.Any('pending', 'success', 'failure', 'warning', 'error'),
         'status-url': str,
         'comment': bool,
         'merge': bool,
