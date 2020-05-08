@@ -32,7 +32,7 @@ from zuul.connection import BaseConnection
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.lib.config import get_default
-from zuul.model import Ref, Branch, Tag
+from zuul.model import Ref, Branch, Tag, Project
 from zuul.lib import dependson
 
 from zuul.driver.gitea.giteamodel import GiteaTriggerEvent, PullRequest
@@ -62,7 +62,7 @@ from zuul.driver.gitea.giteamodel import GiteaTriggerEvent, PullRequest
 # On each project to be integrated with Zuul needs:
 #
 # The web hook target must be (in repository settings):
-# - http://<zuul-web>/zuul/api/connection/<conn-name>/payload
+# - http://<zuul-web>/api/connection/<conn-name>/payload
 #
 # Repository settings (to be checked):
 # - Minimum score to merge pull-request = 0 or -1
@@ -98,7 +98,7 @@ from zuul.driver.gitea.giteamodel import GiteaTriggerEvent, PullRequest
 
 def _sign_request(body, secret):
     signature = hmac.new(
-        secret.encode('utf-8'), body, hashlib.sha1).hexdigest()
+        secret.encode('utf-8'), body, hashlib.sha256).hexdigest()
     return signature, body
 
 
@@ -143,8 +143,7 @@ class GiteaGearmanWorker(object):
         event = args["event"]
 
         self.log.info(
-            "Gitea Webhook Received (id: %(msg_id)s, topic: %(topic)s)" % (
-                payload))
+            "Gitea Webhook Received (event: %s)" % event)
 
         try:
             self.__dispatch_event(event, payload)
@@ -200,21 +199,12 @@ class GiteaEventConnector(threading.Thread):
         self.daemon = True
         self.connection = connection
         self._stopped = False
-        self.metadata_notif = re.compile(
-            r"^\*\*Metadata Update", re.MULTILINE)
         self.event_handler_mapping = {
-            'issue_comment': self._event_issue_comment,
-            'pull-request.closed': self._event_pull_request_closed,
             'pull_request': self._event_pull_request,
-            'pull-request.flag.added': self._event_flag_added,
-            'push': self._event_ref_updated,
-            'create': self._event_ref_created,
-            'delete': self._event_ref_deleted,
-            'pull-request.initial_comment.edited':
-                self._event_issue_initial_comment,
-            'pull-request.tag.added':
-                self._event_pull_request_tags_changed,
-            'git.tag.creation': self._event_tag_created,
+            'push': self._event_push,
+            'issue_comment': self._event_issue_comment,
+            'pull_request_rejected': self._event_pull_request,
+            'pull_request_approved': self._event_pull_request
         }
 
     def stop(self):
@@ -227,15 +217,14 @@ class GiteaEventConnector(threading.Thread):
             return
 
         self.log.info("Received event: %s" % str(event_type))
-        # self.log.debug("Event payload: %s " % json_body)
+        self.log.debug("Event payload: %s " % json_body)
 
         if event_type not in self.event_handler_mapping:
             message = "Unhandled X-Gitea-Event: %s" % event_type
             self.log.info(message)
             return
 
-        if event_type in self.event_handler_mapping:
-            self.log.debug("Handling event: %s" % event_type)
+        self.log.debug("Handling event: %s" % event_type)
 
         try:
             event = self.event_handler_mapping[event_type](json_body)
@@ -258,91 +247,99 @@ class GiteaEventConnector(threading.Thread):
             self.connection.logEvent(event)
             self.connection.sched.addEvent(event)
 
-    def _event_base(self, body, pull_data_field='pullrequest'):
+    def _event_base(self, body) -> GiteaTriggerEvent:
         event = GiteaTriggerEvent()
+        repo = body.get('repository')
+        event.project_name = repo.get('full_name')
+        return event
 
-        if pull_data_field in body['msg']:
-            data = body['msg'][pull_data_field]
-            data['tags'] = body['msg'].get('tags', [])
-            data['flag'] = body['msg'].get('flag')
-            event.title = data.get('title')
-            event.project_name = data.get('project', {}).get('fullname')
-            event.change_number = data.get('id')
-            event.updated_at = data.get('date_created')
-            event.branch = data.get('branch')
-            event.tags = data.get('tags', [])
-            event.change_url = self.connection.getPullUrl(event.project_name,
-                                                          event.change_number)
-            event.ref = "refs/pull/%s/head" % event.change_number
-            # commit_stop is the tip of the PR branch
-            event.patch_number = data.get('commit_stop')
-            event.type = 'pg_pull_request'
+    def _event_push(self, body):
+        """ Handles ref updated """
+        event = self._event_base(body)
+        event.ref = body.get('ref')
+        BRANCH_REF_PREFIX = 'refs/heads/'
+        if event.ref.startswith(BRANCH_REF_PREFIX):
+            event.branch = event.ref[len(BRANCH_REF_PREFIX):]
+        event.newrev = body.get('after')
+        event.oldrev = body.get('before')
+        if event.oldrev != event.newrev:
+            event.branch_updated = True
+        event.type = 'push'
+        return event
+
+    def _event_pull_request(self, body):
+        """ Handles pull request events """
+        event = self._event_base(body)
+        pr = body.get('pull_request')
+        event.title = pr.get('title')
+        event.change_number = pr.get('number')
+        event.change_url = pr.get('html_url')
+        event.updated_at = pr.get('updated_at')
+        event.branch = pr.get('head').get('label')
+        event.ref = "refs/pull/%s/head" % event.change_number
+        event.labels = [label.get('name') for label in pr.get('labels')]
+        event.patch_number = pr.get('head').get('sha') # commit hash
+
+        action = body.get('action')
+        if action == 'opened':
+            event.action = 'opened'
+        elif action == 'reviewed':
+            review = body.get('review')
+            event.action = {
+                'pull_request_review_rejected': 'rejected',
+                'pull_request_review_approved': 'approved'
+            }.get(review.get('type'))
+        elif action == 'label_updated':
+            event.action = 'labeled'
+            # TODO: compare with previous and detect unlabeled events
         else:
-            data = body['msg']
-            event.type = 'pg_push'
-        return event, data
+            self.log.warn("Unknown PR action: %s", action)
+            return None
+        event.type = 'pull_request'
+        return event
+    
+    def _event_issue_comment(self, body):
+        """ Handles pull request comments """
+        if body.get('is_pull') == False:
+            return None
+        event = self._event_base(body)
+        comment = body.get('comment')
+        event.comment = comment.get('body')
+        event.type = 'pull_request'
+        event.action = 'comment'
+        return event
 
+
+    ## start stuff just copied from pagure
     def _event_issue_initial_comment(self, body):
         """ Handles pull request initial comment change """
-        event, _ = self._event_base(body)
+        event = self._event_base(body)
         event.action = 'changed'
         return event
 
     def _event_pull_request_tags_changed(self, body):
         """ Handles pull request metadata change """
         # pull-request.tag.added/removed use pull_request in payload body
-        event, _ = self._event_base(body, pull_data_field='pull_request')
+        event = self._event_base(body)
         event.action = 'tagged'
-        return event
-
-    def _event_issue_comment(self, body):
-        """ Handles pull request comments """
-        # https://fedora-fedmsg.readthedocs.io/en/latest/topics.html#gitea-pull-request-comment-added
-        event, data = self._event_base(body)
-        last_comment = data.get('comments', [])[-1]
-        if (last_comment.get('notification') is True and
-                not self.metadata_notif.match(
-                    last_comment.get('comment', ''))):
-            # An updated PR (new commits) triggers the comment.added
-            # event. A message is added by gitea on the PR but notification
-            # is set to true.
-            event.action = 'changed'
-        else:
-            if last_comment.get('comment', '').find(':thumbsup:') >= 0:
-                event.action = 'thumbsup'
-                event.type = 'pg_pull_request_review'
-            elif last_comment.get('comment', '').find(':thumbsdown:') >= 0:
-                event.action = 'thumbsdown'
-                event.type = 'pg_pull_request_review'
-            else:
-                event.action = 'comment'
-        # Assume last comment is the one that have triggered the event
-        event.comment = last_comment.get('comment')
-        return event
-
-    def _event_pull_request(self, body):
-        """ Handles pull request opened event """
-        # https://fedora-fedmsg.readthedocs.io/en/latest/topics.html#gitea-pull-request-new
-        event, data = self._event_base(body)
-        event.action = 'opened'
         return event
 
     def _event_pull_request_closed(self, body):
         """ Handles pull request closed event """
-        event, data = self._event_base(body)
+        event = self._event_base(body)
         event.action = 'closed'
         return event
 
     def _event_flag_added(self, body):
         """ Handles flag added event """
         # https://fedora-fedmsg.readthedocs.io/en/latest/topics.html#gitea-pull-request-flag-added
-        event, data = self._event_base(body)
+        event = self._event_base(body)
         event.status = data['flag']['status']
         event.action = 'status'
         return event
 
     def _event_tag_created(self, body):
-        event, data = self._event_base(body)
+        event = self._event_base(body)
         event.project_name = data.get('project_fullname')
         event.tag = data.get('tag')
         event.ref = 'refs/tags/%s' % event.tag
@@ -350,21 +347,9 @@ class GiteaEventConnector(threading.Thread):
         event.newrev = data.get('rev')
         return event
 
-    def _event_ref_updated(self, body):
-        """ Handles ref updated """
-        # https://fedora-fedmsg.readthedocs.io/en/latest/topics.html#gitea-git-receive
-        event, data = self._event_base(body)
-        event.project_name = data.get('project_fullname')
-        event.branch = data.get('branch')
-        event.ref = 'refs/heads/%s' % event.branch
-        event.newrev = data.get('end_commit')
-        event.oldrev = data.get('old_commit')
-        event.branch_updated = True
-        return event
-
     def _event_ref_created(self, body):
         """ Handles ref created """
-        event, data = self._event_base(body)
+        event = self._event_base(body)
         event.project_name = data.get('project_fullname')
         event.branch = data.get('branch')
         event.ref = 'refs/heads/%s' % event.branch
@@ -377,7 +362,7 @@ class GiteaEventConnector(threading.Thread):
 
     def _event_ref_deleted(self, body):
         """ Handles ref deleted """
-        event, data = self._event_base(body)
+        event = self._event_base(body)
         event.project_name = data.get('project_fullname')
         event.branch = data.get('branch')
         event.ref = 'refs/heads/%s' % event.branch
@@ -404,8 +389,8 @@ class GiteaAPIClientException(Exception):
     pass
 
 ### To refactor and add error handling!
-def projectToOwnerAndName(project: str) -> (str, str):
-    parts = project.split("/", maxsplit=2)
+def projectToOwnerAndName(project: Project) -> (str, str):
+    parts = project.name.split("/", maxsplit=2)
     return (parts[0], parts[1])
 
 class GiteaConnection(BaseConnection):
@@ -422,7 +407,7 @@ class GiteaConnection(BaseConnection):
             'canonical_hostname', self.server)
         self.git_ssh_key = self.connection_config.get('sshkey')
         self.api_token = self.connection_config.get('api_token')
-        self.webhook_tokens = {}
+        self.webhook_secret = self.connection_config.get('webhook_secret')
         self.baseurl = self.connection_config.get(
             'baseurl', 'https://%s' % self.server).rstrip('/')
         self.cloneurl = self.connection_config.get(
@@ -468,7 +453,8 @@ class GiteaConnection(BaseConnection):
         self.log.debug("Building project %s api_client" % project)
         config = giteapy.Configuration()
         config.host = self.baseurl + "/api/v1"
-        config.api_key = self.api_token
+        if self.api_token != None:
+            config.api_key["access_token"] = self.api_token
         return giteapy.ApiClient(config)
 
     def getWebController(self, zuul_web):
@@ -480,29 +466,29 @@ class GiteaConnection(BaseConnection):
     def getProject(self, name):
         return self.projects.get(name)
 
-    def addProject(self, project):
+    def addProject(self, project: Project):
         self.projects[project.name] = project
 
-    def getPullUrl(self, project, number):
+    def getPullUrl(self, project: Project, number):
         #TODO use API to be correct
         return '%s/pulls/%s' % (self.getGitwebUrl(project), number)
 
-    def getGitwebUrl(self, project, sha=None):
+    def getGitwebUrl(self, project: Project, sha=None):
         #TODO use API to be correct
         url = '%s/%s' % (self.baseurl, project)
         if sha is not None:
             url += '/commit/%s' % sha
         return url
 
-    def getProjectBranches(self, project: str, tenant):
-        api = giteapy.RepositoryApi(self.get_project_api_client(project.name))
+    def getProjectBranches(self, project: Project, tenant):
+        api = giteapy.RepositoryApi(self.get_project_api_client(project))
+        owner, repo = projectToOwnerAndName(project)
+        branches = api.repo_list_branches(owner, repo)
 
-        branches = api.repo_list_branches(projectToOwnerAndName(project))
-
-        self.log.info("Got branches for %s" % project.name)
+        self.log.info("Got branches for %s" % project)
         return [branch.name for branch in branches]
 
-    def getGitUrl(self, project):
+    def getGitUrl(self, project: Project):
         #TODO use API (https_url or ssh_url) to be correct
         return '%s/%s' % (self.cloneurl, project.name)
 
@@ -515,7 +501,7 @@ class GiteaConnection(BaseConnection):
                 project, event.change_number, event.patch_number,
                 refresh=refresh, event=event)
             change.source_event = event
-            change.is_current_patchset = (change.pr.get('commit_stop') ==
+            change.is_current_patchset = (change.pr.head.sha ==
                                           event.patch_number)
         else:
             self.log.info("Getting change for %s ref:%s" % (
@@ -544,7 +530,7 @@ class GiteaConnection(BaseConnection):
 
         return change
 
-    def _getChange(self, project, number, patchset=None,
+    def _getChange(self, project: Project, number, patchset=None,
                    refresh=False, url=None, event=None):
         change = PullRequest(project.name)
         change.project = project
@@ -574,7 +560,7 @@ class GiteaConnection(BaseConnection):
         log = get_annotated_logger(self.log, event)
         gitea = self.get_project_api_client(change.project.name)
         api = giteapy.RepositoryApi(gitea)
-        owner, name = projectToOwnerAndName(change.project.name)
+        owner, name = projectToOwnerAndName(change.project)
         pr = api.repo_get_pull_request(owner, name, change.number)
 
         mergeable = pr.mergeable
@@ -599,7 +585,7 @@ class GiteaConnection(BaseConnection):
                  change.project.name, change.number, can_merge)
         return can_merge
 
-    def getPull(self, project_name, number) -> giteapy.PullRequest:
+    def getPull(self, project_name: Project, number) -> giteapy.PullRequest:
         gitea = self.get_project_api_client(project_name)
         api = giteapy.RepositoryApi(gitea)
         owner, name = projectToOwnerAndName(project_name)
@@ -610,30 +596,30 @@ class GiteaConnection(BaseConnection):
         self.log.info('Got PR %s#%s', project_name, number)
         return pr
 
-    def getStatus(self, project, number):
-        return self.getCommitStatus(project.name, number)
+    def getStatus(self, project: Project, number):
+        return self.getCommitStatus(project, number)
 
     def getScore(self, pr):
         # TODO use some newly-created gitea API for this
         return 0
 
-    def _updateChange(self, change, event):
+    def _updateChange(self, change: PullRequest, event):
         # Needs to be rewritten for gitea
         self.log.info("Updating change from gitea %s" % change)
-        change.pr = self.getPull(change.project.name, change.number)
+        change.pr = self.getPull(change.project, change.number)
         change.ref = "refs/pull/%s/head" % change.number
-        change.branch = change.pr.get('branch')
-        change.patchset = change.pr.get('commit_stop')
-        change.files = change.pr.get('files')
-        change.title = change.pr.get('title')
-        change.tags = change.pr.get('tags')
-        change.open = change.pr.get('status') == 'Open'
-        change.is_merged = change.pr.get('status') == 'Merged'
+        change.branch = change.pr.head.ref
+        change.patchset = change.pr.head.sha
+        #change.files = change.pr.get('files')
+        change.title = change.pr.title
+        change.labels = [label.name for label in change.pr.labels]
+        change.open = change.pr.state == 'open'
+        change.is_merged = change.pr.merged
         change.status = self.getStatus(change.project, change.number)
         change.score = self.getScore(change.pr)
-        change.message = change.pr.get('initial_comment') or ''
+        change.message = change.pr.body
         # last_updated seems to be touch for comment changed/flags - that's OK
-        change.updated_at = change.pr.get('last_updated')
+        change.updated_at = change.pr.updated_at
         self.log.info("Updated change from gitea %s" % change)
 
         if self.sched:
@@ -641,17 +627,19 @@ class GiteaConnection(BaseConnection):
 
         return change
 
-    def commentPull(self, project, number, message):
+    def commentPull(self, project: Project, number, message):
         api = giteapy.IssueApi(self.get_project_api_client(project))
         owner, repo = projectToOwnerAndName(project)
-        api.issue_create_comment(owner, repo, number, body=message)
+        api.issue_create_comment(owner, repo, number, body=giteapy.CreateIssueCommentOption(
+            body=message
+        ))
         self.log.info("Commented on PR %s#%s", project, number)
 
-    def setCommitStatus(self, project, number, state, url='',
+    def setCommitStatus(self, project: Project, number, state, url='',
                         description='', context=''):
         api = giteapy.RepositoryApi(self.get_project_api_client(project))
         owner, repo = projectToOwnerAndName(project)
-        commit = self.getPull(project.name, number).head.sha
+        commit = self.getPull(project, number).head.sha
         body = giteapy.CreateStatusOption(
             context=context,
             description=description,
@@ -663,17 +651,23 @@ class GiteaConnection(BaseConnection):
         # Wait for 1 second as flag timestamp is by second
         time.sleep(1)
 
-    def getCommitStatus(self, project, number):
+    def getCommitStatus(self, project: Project, number):
         api = giteapy.RepositoryApi(self.get_project_api_client(project))
         owner, repo = projectToOwnerAndName(project)
-        commit = self.getPull(project.name, number).head.sha
-        #api.repo_get_stat
-        #TODO(veecue)
-        #self.log.info(
-        #    "Got pull-request CI status for PR %s on %s status: %s" % (
-        #        number, project, flag.get('status')))
-        #return flag.get('status')
-        return "success"
+        sha = self.getPull(project, number).head.sha
+        statuses = api.repo_list_statuses(owner, repo, sha, sort='recentupdate')
+        context_successes = {}
+        for status in statuses:
+            if not status.context in context_successes:
+                context_successes[status.context] = status.status == 'success'
+        #TODO figure out required contexts (maybe repo_get_combined_status_by_ref does what we want?)
+        #TODO(veecue) parse all statuses and check if for every context, the latest one was sucess
+        self.log.info(
+            "Got pull-request CI status for PR %s on %s status: %s" % (
+                number, project, repr(context_successes)))
+        if all(context_successes.values()):
+            return 'success'
+        return 'failure'
 
     def getChangesDependingOn(self, change, projects, tenant):
         """ Reverse lookup of PR depending on this one
@@ -688,7 +682,7 @@ class GiteaConnection(BaseConnection):
         #return changes_dependencies
         return []
 
-    def mergePull(self, project, number):
+    def mergePull(self, project: Project, number):
         api = giteapy.RepositoryApi(self.get_project_api_client(project))
         owner, repo = projectToOwnerAndName(project)
         #TODO are there any more params, message, etc needed?
@@ -711,7 +705,7 @@ class GiteaWebController(BaseWebController):
             return True
 
     def _validate(self, body, token, request_signature):
-        signature, payload = _sign_request(body, token)
+        signature, _ = _sign_request(body, token)
         if not hmac.compare_digest(str(signature), str(request_signature)):
             self.log.info(
                 "Missmatch (Payload Signature: %s, Request Signature: %s)" % (
@@ -726,9 +720,8 @@ class GiteaWebController(BaseWebController):
             raise cherrypy.HTTPError(
                 401, 'x-gitea-signature header missing.')
 
-        #project = headers['x-gitea-project']
-        # hardcoded for now. TODO either get it from Gitea API (not exposed currently) or make it configurable
-        token = "1234"
+        # TODO maybe retrieve dynamically from gitea api somehow
+        token = self.connection.webhook_secret
         if not self._validate(body, token, request_signature):
             # Give a second attempt as a token could have been
             # re-generated server side. Refresh the token then retry.

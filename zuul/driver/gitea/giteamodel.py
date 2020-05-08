@@ -17,6 +17,47 @@ from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
+class PullRequest(Change):
+    def __init__(self, project):
+        super(PullRequest, self).__init__(project)
+        self.project = None
+        self.pr = None
+        self.updated_at = None
+        self.title = None
+        #self.score = 0
+        #self.files = []
+        self.labels = []
+
+    def __repr__(self):
+        r = ['<Change 0x%x' % id(self)]
+        if self.project:
+            r.append('project: %s' % self.project)
+        if self.number:
+            r.append('number: %s' % self.number)
+        if self.patchset:
+            r.append('patchset: %s' % self.patchset)
+        if self.updated_at:
+            r.append('updated: %s' % self.updated_at)
+        if self.status:
+            r.append('status: %s' % self.status)
+        #if self.score:
+        #    r.append('score: %s' % self.score)
+        if self.labels:
+            r.append('labels: %s' % ', '.join(self.labels))
+        if self.is_merged:
+            r.append('state: merged')
+        if self.open:
+            r.append('state: open')
+        return ' '.join(r) + '>'
+
+    def isUpdateOf(self, other):
+        if (self.project == other.project and
+            hasattr(other, 'number') and self.number == other.number and
+            hasattr(other, 'updated_at') and
+            self.updated_at > other.updated_at):
+            return True
+        return False
+
 class GiteaTriggerEvent(TriggerEvent):
     def __init__(self):
         super(GiteaTriggerEvent, self).__init__()
@@ -24,7 +65,7 @@ class GiteaTriggerEvent(TriggerEvent):
         self.title = None
         self.action = None
         self.status = None
-        self.tags = []
+        self.labels = []
 
     def _repr(self):
         r = [super(GiteaTriggerEvent, self)._repr()]
@@ -35,8 +76,8 @@ class GiteaTriggerEvent(TriggerEvent):
         r.append("project:%s" % self.canonical_project_name)
         if self.change_number:
             r.append("pr:%s" % self.change_number)
-        if self.tags:
-            r.append("tags:%s" % ', '.join(self.tags))
+        if self.labels:
+            r.append("labels:%s" % ', '.join(self.labels))
         return ' '.join(r)
 
     def isPatchsetCreated(self):
@@ -47,7 +88,7 @@ class GiteaTriggerEvent(TriggerEvent):
 
 class GiteaEventFilter(EventFilter):
     def __init__(self, trigger, types=[], refs=[], statuses=[],
-                 comments=[], actions=[], tags=[], ignore_deletes=True):
+                 comments=[], actions=[], labels=[], ignore_deletes=True):
 
         EventFilter.__init__(self, trigger)
 
@@ -59,7 +100,7 @@ class GiteaEventFilter(EventFilter):
         self.comments = [re.compile(x) for x in comments]
         self.actions = actions
         self.statuses = statuses
-        self.tags = tags
+        self.labels = labels
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
@@ -77,8 +118,8 @@ class GiteaEventFilter(EventFilter):
             ret += ' actions: %s' % ', '.join(self.actions)
         if self.statuses:
             ret += ' statuses: %s' % ', '.join(self.statuses)
-        if self.tags:
-            ret += ' tags: %s' % ', '.join(self.tags)
+        if self.labels:
+            ret += ' labels: %s' % ', '.join(self.labels)
         ret += '>'
 
         return ret
@@ -125,8 +166,8 @@ class GiteaEventFilter(EventFilter):
         if self.statuses and not matches_status:
             return False
 
-        if self.tags:
-            if not set(event.tags).intersection(set(self.tags)):
+        if self.labels:
+            if not set(event.labels).intersection(set(self.labels)):
                 return False
 
         return True
@@ -136,13 +177,13 @@ class GiteaEventFilter(EventFilter):
 # pipeline requires definition)
 class GiteaRefFilter(RefFilter):
     def __init__(self, connection_name, score=None,
-                 open=None, merged=None, status=None, tags=[]):
+                 open=None, merged=None, status=None, labels=[]):
         RefFilter.__init__(self, connection_name)
         self.score = score
         self.open = open
         self.merged = merged
         self.status = status
-        self.tags = tags
+        self.labels = labels
 
     def __repr__(self):
         ret = '<GiteaRefFilter connection_name: %s ' % self.connection_name
@@ -154,8 +195,8 @@ class GiteaRefFilter(RefFilter):
             ret += ' merged: %s' % self.merged
         if self.status is not None:
             ret += ' status: %s' % self.status
-        if self.tags:
-            ret += ' tags: %s' % ', '.join(self.tags)
+        if self.labels:
+            ret += ' labels: %s' % ', '.join(self.labels)
         ret += '>'
         return ret
 
@@ -176,8 +217,8 @@ class GiteaRefFilter(RefFilter):
             if change.status != self.status:
                 return False
 
-        if self.tags:
-            if not set(change.tags).intersection(set(self.tags)):
+        if self.labels:
+            if not set(change.labels).intersection(set(self.labels)):
                 return False
 
         return True
