@@ -74,7 +74,7 @@
 
 - job:
     name: zuul-build-dashboard
-    parent: build-javascript-content
+    parent: build-javascript-deployment
     success-url: 'npm/html/'
     files:
       - web/.*
@@ -82,7 +82,6 @@
     vars:
       javascript_content_dir: "../zuul/web/static"
       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-      node_version: 14
     run: playbooks/dashboard/run.yaml
 
 - job:
@@ -239,13 +238,11 @@
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
-        - nodejs-npm-run-lint:
+        - nodejs-run-lint:
             vars:
-              node_version: 14
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-npm-run-test:
+        - nodejs-run-test:
             vars:
-              node_version: 14
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
             success-url: 'npm/reports/bundle.html'
             files:
@@ -262,9 +259,8 @@
         - nodepool-zuul-functional:
             voting: false
         - zuul-build-python-release
-        - build-javascript-content-tarball:
+        - build-javascript-deployment-tarball:
             vars:
-              node_version: 14
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
               create_tarball_directory: build
     gate:
@@ -297,13 +293,11 @@
                 tox_environment:
                     ZUUL_TEST_ROOT: /tmp/zuul-test
         - zuul-build-dashboard
-        - nodejs-npm-run-lint:
+        - nodejs-run-lint:
             vars:
-              node_version: 14
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-npm-run-test:
+        - nodejs-run-test:
             vars:
-              node_version: 14
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
             success-url: 'npm/reports/bundle.html'
             files:
@@ -318,9 +312,8 @@
             requires: nodepool-container-image
             dependencies: zuul-upload-image
         - zuul-build-python-release
-        - build-javascript-content-tarball:
+        - build-javascript-deployment-tarball:
             vars:
-              node_version: 14
               zuul_work_dir: "{{ zuul.project.src_dir }}/web"
               create_tarball_directory: build
     promote:
