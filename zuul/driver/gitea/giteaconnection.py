@@ -488,12 +488,17 @@ class GiteaConnection(BaseConnection):
         return url
 
     def getProjectBranches(self, project: Project, tenant):
+        exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
+
         api = giteapy.RepositoryApi(self.get_project_api_client(project))
         owner, repo = projectToOwnerAndName(project)
         branches = api.repo_list_branches(owner, repo)
 
         self.log.info("Got branches for %s" % project)
+        if exclude_unprotected:
+            branches = [b for b in branches if b.protected]
         return [branch.name for branch in branches]
+
 
     def getGitUrl(self, project: Project):
         #TODO use API (https_url or ssh_url) to be correct
