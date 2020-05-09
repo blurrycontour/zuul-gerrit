@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "ff570b3c_2192adf7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-09T17:41:28Z",
+      "side": 1,
+      "message": "Since it\u0027s just logging I think that\u0027s a compromise we can do.",
+      "revId": "bd176ddb245c34b94399fdcdab591c7a1b18ffbf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_c18491b4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-09T17:41:28Z",
+      "side": 1,
+      "message": "This won\u0027t work since we\u0027re running many ansible sub processes in parallel.",
+      "revId": "bd176ddb245c34b94399fdcdab591c7a1b18ffbf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_81ee1986",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
