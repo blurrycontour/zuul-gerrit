@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_81bc596a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 31944
+      },
+      "writtenOn": "2020-05-09T17:51:40Z",
+      "side": 1,
+      "message": "But from different python threads aka subprocesses? However, you\u0027re way deeper into this than I am :D",
+      "parentUuid": "ff570b3c_c18491b4",
+      "revId": "bd176ddb245c34b94399fdcdab591c7a1b18ffbf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_81ee1986",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
