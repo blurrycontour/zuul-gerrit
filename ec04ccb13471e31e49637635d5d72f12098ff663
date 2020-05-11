@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_123d2bbb",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-11T14:34:38Z",
+      "side": 1,
+      "message": "How does this work together with base jobs (e.g. log upload). Those secrets are generally not available to any user. I guess there is some filtering required to limit the playbooks that are being run? Or do we need some sort of job attribute that allows certain playbooks to be executed locally?",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 32
+      },
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
