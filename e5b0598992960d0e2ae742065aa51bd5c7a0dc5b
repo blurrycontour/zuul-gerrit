@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_4ebf05fb",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 32
+      },
+      "lineNbr": 853,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-05-11T09:19:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f493fa4_032580ab",
+      "revId": "e5b0598992960d0e2ae742065aa51bd5c7a0dc5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_71f41cf3",
         "filename": "doc/source/discussion/components.rst",
         "patchSetId": 32
@@ -178,6 +196,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_0ec50d8f",
+        "filename": "releasenotes/notes/ansible-callbacks-c3bfce1a5cae6b15.yaml",
+        "patchSetId": 32
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-05-11T09:19:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f493fa4_83451046",
+      "revId": "e5b0598992960d0e2ae742065aa51bd5c7a0dc5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f493fa4_a3b80c2a",
         "filename": "zuul/executor/server.py",
         "patchSetId": 32
@@ -189,6 +225,24 @@
       "writtenOn": "2020-05-08T15:23:06Z",
       "side": 1,
       "message": "Since the callbacks are configured in zuul.conf I think it would be better to store this in the executor server. It\u0027s also more efficient to not parse the config for every job.",
+      "revId": "e5b0598992960d0e2ae742065aa51bd5c7a0dc5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_eec1b982",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 864,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-05-11T09:19:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f493fa4_a3b80c2a",
       "revId": "e5b0598992960d0e2ae742065aa51bd5c7a0dc5b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
