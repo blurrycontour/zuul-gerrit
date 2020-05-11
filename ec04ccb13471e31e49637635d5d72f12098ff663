@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_3ec63869",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-11T17:18:55Z",
+      "side": 1,
+      "message": "Next PS mention that this can be done using an inventory file indeed, or using the `--change-url` command line argument too.\n\nTo reproduce the exact merge state, we would need to make that information available, otherwise I think it\u0027s ok to use the same strategy and use the current state of required project.",
+      "parentUuid": "ff570b3c_c8d5c2bb",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_28da7ee8",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 6
@@ -59,6 +77,30 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_7ea550b5",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-11T17:18:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_651c9f6a",
+      "range": {
+        "startLine": 28,
+        "startChar": 0,
+        "endLine": 28,
+        "endChar": 21
+      },
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_c5b64bda",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 6
@@ -82,6 +124,30 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_1e941444",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-11T17:18:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_c5b64bda",
+      "range": {
+        "startLine": 39,
+        "startChar": 22,
+        "endLine": 39,
+        "endChar": 30
+      },
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_08d7bac1",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 6
@@ -93,6 +159,24 @@
       "writtenOn": "2020-05-11T16:05:25Z",
       "side": 1,
       "message": "I don\u0027t see anything about this below.  How does the user go about doing this?",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_1ea2549b",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-11T17:18:55Z",
+      "side": 1,
+      "message": "Next PS includes an example.",
+      "parentUuid": "ff570b3c_08d7bac1",
       "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -187,6 +271,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_5eda0c17",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-11T17:18:55Z",
+      "side": 1,
+      "message": "Or that could be implemented using a single `--post matcher` where matcher is a regular expression that select the playbook by name. Perhaps that can be done as a follow-up?",
+      "parentUuid": "ff570b3c_68e476ad",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_48e1b29a",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 6
@@ -198,6 +300,24 @@
       "writtenOn": "2020-05-11T16:05:25Z",
       "side": 1,
       "message": "It seems weird to have a \u0027depends-on\u0027 option with no change.  Perhaps the option should just be called \"--change-url\", and it could be a multiple-value option that points to change urls.",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_3ed758f0",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-11T17:18:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_48e1b29a",
       "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
