@@ -25,6 +25,29 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_c5b64bda",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-11T15:29:20Z",
+      "side": 1,
+      "message": "shall require",
+      "range": {
+        "startLine": 39,
+        "startChar": 22,
+        "endLine": 39,
+        "endChar": 30
+      },
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_123d2bbb",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 6
@@ -60,6 +83,30 @@
       "side": 1,
       "message": "I think we said that zuul-runner would not run post action. Alternatively we can detect such `site` secret and provide drop-in replacement that uses localhost, one of the initial implementation did that, but that is a bit tricky and skipping post-run seems easier.",
       "parentUuid": "ff570b3c_123d2bbb",
+      "range": {
+        "startLine": 63,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 32
+      },
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_45d7dbee",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-11T15:29:20Z",
+      "side": 1,
+      "message": "Having zuul-runner not executing post playbooks would solve this issue mostly I guess. But I think we should mention that in the spec as well.",
+      "parentUuid": "ff570b3c_c5880b21",
       "range": {
         "startLine": 63,
         "startChar": 0,
