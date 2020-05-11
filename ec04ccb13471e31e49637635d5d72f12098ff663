@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "ff570b3c_c8d5c2bb",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-11T16:05:25Z",
+      "side": 1,
+      "message": "Can you describe how this process would look?  I don\u0027t see any description below of how a user would invoke zuul-runner to run a job that has already run.  I\u0027m curious if you could point it at a zuul inventory file and have it automatically work?  How would it reproduce the previous merge state?",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_28da7ee8",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-11T16:05:25Z",
+      "side": 1,
+      "message": "This seems to be fairly well described below.",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_651c9f6a",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 6
@@ -42,6 +76,23 @@
         "endLine": 39,
         "endChar": 30
       },
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_08d7bac1",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-11T16:05:25Z",
+      "side": 1,
+      "message": "I don\u0027t see anything about this below.  How does the user go about doing this?",
       "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -113,6 +164,40 @@
         "endLine": 64,
         "endChar": 32
       },
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_68e476ad",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-11T16:05:25Z",
+      "side": 1,
+      "message": "I think post actions are going to be important for people to test (fetching logs from test nodes, etc).  Maybe we could add 2 options, both disabled by default:\n\n--post: run all post playbooks except the base job post playbook\n--base-post: run the base job post playbook\n\nBut having an option to supply secrets may still be important.  For example, that could be very useful testing a docker upload job.  But maybe they can just be supplied as extra job variables.  How that looks may depend on what the input inventory looks like.",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_48e1b29a",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-11T16:05:25Z",
+      "side": 1,
+      "message": "It seems weird to have a \u0027depends-on\u0027 option with no change.  Perhaps the option should just be called \"--change-url\", and it could be a multiple-value option that points to change urls.",
       "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
