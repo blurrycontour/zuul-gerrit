@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "ff570b3c_59096d2a",
+        "filename": "releasenotes/notes/github-checks-dequeue-643b7f757ca4d49b.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-12T15:45:08Z",
+      "side": 1,
+      "message": "How about adding a dequeue reporter?  We added \"enqueue\" for the Gerrit checks API, we could likely use a dequeue for both gerrit and github checks.",
+      "revId": "dd8676ac9b0e83fea6b7ef9e0b5a8587b3a79665",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_390e3934",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-12T15:45:08Z",
+      "side": 1,
+      "message": "Queue seems risky here, and likely to change out from under us.\n\nSince what we really want to do is dequeue the item, how about we give every item a uuid, and use that instead?",
+      "revId": "dd8676ac9b0e83fea6b7ef9e0b5a8587b3a79665",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_53282c33",
         "filename": "zuul/scheduler.py",
         "patchSetId": 9
