@@ -151,6 +151,8 @@ class BuildsPage extends TableFilters {
             switch (row.result) {
               case 'SUCCESS':
                 return { className: 'success' }
+              case 'SKIPPED':
+                return { className: 'active' }
               default:
                 return { className: 'warning' }
             }

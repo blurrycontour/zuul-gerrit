@@ -111,7 +111,18 @@ class Buildset extends React.Component {
                 </thead>
                 <tbody>
                   {buildset.builds.map((item, idx) => (
-                    <tr key={idx} className={item.result === 'SUCCESS' ? 'success': 'warning'}>
+                    <tr
+                      key={idx}
+                      className={((result) => {
+                        switch (result) {
+                          case 'SUCCESS':
+                            return 'success'
+                          case 'SKIPPED':
+                            return 'active'
+                          default:
+                            return 'warning'
+                        }
+                      })(item.result)}>
                       {buildRows[idx].map((item, idx) => (
                         <td key={idx}>{item}</td>
                       ))}
