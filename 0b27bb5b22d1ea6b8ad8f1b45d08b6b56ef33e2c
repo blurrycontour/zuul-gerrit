@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_ba1cf46a",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-05-12T19:16:42Z",
+      "side": 1,
+      "message": "this one is broken now, it expects build-javascript-content-tarball\n\nSee https://opendev.org/opendev/base-jobs/src/branch/master/zuul.d/jobs.yaml#L480",
+      "range": {
+        "startLine": 326,
+        "startChar": 9,
+        "endLine": 326,
+        "endChar": 44
+      },
+      "revId": "0b27bb5b22d1ea6b8ad8f1b45d08b6b56ef33e2c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
