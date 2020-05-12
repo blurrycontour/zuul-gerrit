@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_3813d7b7",
+        "filename": "tests/fixtures/zuul-executor-ansible-callback.conf",
+        "patchSetId": 34
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 27336
+      },
+      "writtenOn": "2020-05-12T14:41:19Z",
+      "side": 1,
+      "message": "will not be treated",
+      "range": {
+        "startLine": 5,
+        "startChar": 29,
+        "endLine": 5,
+        "endChar": 45
+      },
+      "revId": "3d2332e50cb79be634b909fff0a9b0a4a4377c43",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
