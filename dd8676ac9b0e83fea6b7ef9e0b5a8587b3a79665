@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_392d9943",
+        "filename": "releasenotes/notes/github-checks-dequeue-643b7f757ca4d49b.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-12T15:53:36Z",
+      "side": 1,
+      "message": "Oh that\u0027s in https://review.opendev.org/711023  -- maybe we should merge that first then we don\u0027t need to put this in the release note?",
+      "revId": "dd8676ac9b0e83fea6b7ef9e0b5a8587b3a79665",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_390e3934",
         "filename": "zuul/driver/github/githubreporter.py",
         "patchSetId": 9
