@@ -34,15 +34,7 @@
     parent: ansible-version
     vars:
       test_ansible_version_major: 2
-      test_ansible_version_minor: 7
-
-- job:
-    name: ansible-27
-    parent: ansible-version
-    ansible-version: 2.7
-    vars:
-      test_ansible_version_major: 2
-      test_ansible_version_minor: 7
+      test_ansible_version_minor: 8
 
 - job:
     name: ansible-28
@@ -66,7 +58,6 @@
     check:
       jobs:
         - ansible-default
-        - ansible-27
         - ansible-28
         - ansible-29
 
@@ -75,6 +66,5 @@
     check:
       jobs:
         - ansible-default-zuul-conf
-        - ansible-27
         - ansible-28
         - ansible-29
