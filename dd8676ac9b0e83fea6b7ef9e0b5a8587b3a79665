@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_53282c33",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-12T15:04:54Z",
+      "side": 1,
+      "message": "nit: find",
+      "range": {
+        "startLine": 470,
+        "startChar": 23,
+        "endLine": 470,
+        "endChar": 28
+      },
+      "revId": "dd8676ac9b0e83fea6b7ef9e0b5a8587b3a79665",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
