@@ -2849,10 +2849,6 @@ class FunctionalAnsibleMixIn(object):
         self._test_plugins(plugin_tests)
 
 
-class TestAnsible26(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
-    ansible_version = '2.6'
-
-
 class TestAnsible27(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
     ansible_version = '2.7'
 
