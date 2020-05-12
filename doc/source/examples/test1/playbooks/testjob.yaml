@@ -1,4 +1,16 @@
 - hosts: all
   tasks:
+    - name: Set test var
+      set_fact:
+        foo:
+          - bar: "323452"
+            sdf: sdfjas
+          - sdgs: asdfasd
+            asdf: asdf
+    - name: Print vars
+      debug:
+        msg: "{{ item }}"
+      loop: "{{ foo }}"
+
     - debug:
         msg: Hello world!
