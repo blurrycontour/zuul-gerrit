@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_78d70fc1",
+        "filename": "doc/source/examples/test1/zuul.yaml",
+        "patchSetId": 20
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-12T14:40:58Z",
+      "side": 1,
+      "message": "There are some cases where it makes sense to run a different job in gate than check, but in general, it\u0027s an anti-pattern.  The thing that we want to teach people in an introductory tutorial is that the same jobs should be used in check and gate, because we\u0027re asserting the same thing.  So I think we should leave this as it was.",
+      "revId": "fb211fd5996531bad68d7725387ae530fdbe2946",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
