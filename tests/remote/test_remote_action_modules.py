@@ -23,9 +23,10 @@ ERROR_SYNC_FROM_OUTSIDE = "Syncing files from outside the working dir"
 ERROR_SYNC_RSH = "Using custom synchronize rsh is prohibited"
 
 
-class TestActionModules26(AnsibleZuulTestCase):
+class FunctionalActionModulesMixIn(AnsibleZuulTestCase):
     tenant_config_file = 'config/remote-action-modules/main.yaml'
-    ansible_version = '2.6'
+    # This should be overriden in child classes.
+    ansible_version = '2.9'
 
     def setUp(self):
         super().setUp()
@@ -218,13 +219,13 @@ class TestActionModules26(AnsibleZuulTestCase):
         self._run_job('known-hosts-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
 
 
-class TestActionModules27(TestActionModules26):
+class TestActionModules27(FunctionalActionModulesMixIn):
     ansible_version = '2.7'
 
 
-class TestActionModules28(TestActionModules27):
+class TestActionModules28(FunctionalActionModulesMixIn):
     ansible_version = '2.8'
 
 
-class TestActionModules29(TestActionModules28):
+class TestActionModules29(FunctionalActionModulesMixIn):
     ansible_version = '2.9'
