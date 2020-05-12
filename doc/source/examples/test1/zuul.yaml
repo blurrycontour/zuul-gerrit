@@ -1,6 +1,7 @@
 - job:
     name: testjob
     run: playbooks/testjob.yaml
+    ansible-version: "2.7"
 
 - project:
     check:
