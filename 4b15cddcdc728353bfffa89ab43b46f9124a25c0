@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_b3a8a81f",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-12T15:23:14Z",
+      "side": 1,
+      "message": "additional",
+      "range": {
+        "startLine": 129,
+        "startChar": 64,
+        "endLine": 129,
+        "endChar": 73
+      },
+      "revId": "4b15cddcdc728353bfffa89ab43b46f9124a25c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
