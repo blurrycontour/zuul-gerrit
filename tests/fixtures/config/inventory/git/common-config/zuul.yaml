@@ -100,15 +100,6 @@
     run: playbooks/jinja2-message.yaml
 
 - job:
-    name: ansible-version27-inventory
-    nodeset:
-      nodes:
-        - name: ubuntu-xenial
-          label: ubuntu-xenial
-    ansible-version: '2.7'
-    run: playbooks/ansible-version.yaml
-
-- job:
     name: ansible-version28-inventory
     nodeset:
       nodes:

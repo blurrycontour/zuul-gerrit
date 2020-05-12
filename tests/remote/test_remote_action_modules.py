@@ -222,14 +222,6 @@ class FunctionalActionModulesMixIn:
         self._run_job('known-hosts-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
 
 
-class TestActionModules27(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
-    ansible_version = '2.7'
-
-    def setUp(self):
-        super().setUp()
-        self._setUp()
-
-
 class TestActionModules28(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
     ansible_version = '2.8'
 

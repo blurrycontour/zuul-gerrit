@@ -2849,10 +2849,6 @@ class FunctionalAnsibleMixIn(object):
         self._test_plugins(plugin_tests)
 
 
-class TestAnsible27(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
-    ansible_version = '2.7'
-
-
 class TestAnsible28(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
     ansible_version = '2.8'
 
@@ -6597,7 +6593,6 @@ class TestAnsibleVersion(AnsibleZuulTestCase):
 
         self.assertHistory([
             dict(name='ansible-default', result='SUCCESS', changes='1,1'),
-            dict(name='ansible-27', result='SUCCESS', changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
             dict(name='ansible-29', result='SUCCESS', changes='1,1'),
         ], ordered=False)
@@ -6618,7 +6613,6 @@ class TestDefaultAnsibleVersion(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='ansible-default-zuul-conf', result='SUCCESS',
                  changes='1,1'),
-            dict(name='ansible-27', result='SUCCESS', changes='1,1'),
             dict(name='ansible-28', result='SUCCESS', changes='1,1'),
             dict(name='ansible-29', result='SUCCESS', changes='1,1'),
         ], ordered=False)

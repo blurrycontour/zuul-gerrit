@@ -1546,9 +1546,7 @@ class AnsibleJob(object):
                 # which python to use on the remote host in an inbuilt
                 # table and essentially "does the right thing"
                 # (i.e. chooses python3 on 3-only hosts like later
-                # Fedoras).  For "auto" with prior versions, fall back
-                # to the old default of /usr/bin/python2 for backwards
-                # compatability.
+                # Fedoras).
                 # If ansible_python_interpreter is set either as a group
                 # var or all-var, then don't do anything here; let the
                 # user control.
@@ -1556,13 +1554,6 @@ class AnsibleJob(object):
                 if (api not in args['vars'] and
                     not is_group_var_set(api, name, args)):
                     python = node.get('python_path', 'auto')
-                    compat = self.arguments.get('ansible_version') in \
-                        ('2.5', '2.6', '2.7')
-                    if python == "auto" and compat:
-                        self.log.debug(
-                            "ansible_version set to auto but "
-                            "overriding to python2 for Ansible <2.8")
-                        python = '/usr/bin/python2'
                     host_vars.setdefault(api, python)
 
                 username = node.get('username')
