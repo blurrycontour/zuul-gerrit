@@ -1,0 +1,17 @@
+- project:
+    check:
+      jobs:
+        - tox-py27
+        - tox-demorepo
+        - tox-pep8:
+            required-projects:
+              - test1
+              - test2
+    gate:
+      jobs:
+        - tox-py27
+        - tox-demorepo
+        - tox-pep8:
+            required-projects:
+              - test1
+              - test2

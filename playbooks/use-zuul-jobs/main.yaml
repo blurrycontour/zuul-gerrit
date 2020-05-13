@@ -1,0 +1,34 @@
+- name: Copy resources in test1
+  copy:
+    src: ../../doc/source/examples/test1-use-zuul-jobs/
+    dest: "{{ workspace }}/test1/"
+- name: Remove Previous Jobs & Pipelines
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git rm -r playbooks .zuul.yaml hello.py
+- name: Push new code 1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Initialize test1 project"
+      git push gerrit
+- name: Push new code 2
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git mv zuul.yaml .zuul.yaml
+      git commit -m"Init test1 pipelines"
+      git review
+
+- name: Check Zuul check status test1 is ok
+  include_tasks: ../setup-tutorial/check-pipeline-ok.yaml
+  vars:
+    item: test1

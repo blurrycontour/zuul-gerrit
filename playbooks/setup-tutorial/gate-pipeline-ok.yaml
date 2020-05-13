@@ -1,0 +1,49 @@
+- name: Wait for Zuul to report gate job has started
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 4
+  delay: 1
+  retries: 60
+- name: "Check Zuul has started gate job"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[3].message is search("Starting gate jobs")
+- name: Wait for Zuul to report gate job has finished
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 5
+  delay: 1
+  retries: 180
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+- name: "Check Zuul has finished gate job"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[4].message is search("Patch Set 1{{':'}} Verified\+2")
+- name: Wait for Zuul to report change merged
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 6
+  delay: 1
+  retries: 180
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+- name: "Check Zuul has merged the change"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[5].message is search("Change has been successfully merged by Zuul")
