@@ -15,8 +15,21 @@ providers:
     pools:
       - name: main
         nodes:
-          - name: node
+          - name: node1
             labels: ubuntu-bionic
             host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjDZ9C89nUVGQ1qZzG/X0onkmcju4kWJ2uTLBdIXsy1"
             python-path: /usr/bin/python3
             username: root
+            max-parallel-jobs: 1
+          - name: node2
+            labels: ubuntu-bionic
+            host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjDZ9C89nUVGQ1qZzG/X0onkmcju4kWJ2uTLBdIXsy1"
+            python-path: /usr/bin/python3
+            username: root
+            max-parallel-jobs: 1
+          - name: node3
+            labels: ubuntu-bionic
+            host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjDZ9C89nUVGQ1qZzG/X0onkmcju4kWJ2uTLBdIXsy1"
+            python-path: /usr/bin/python3
+            username: root
+            max-parallel-jobs: 1
