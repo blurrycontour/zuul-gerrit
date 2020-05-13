@@ -98,11 +98,11 @@
 # the buildset registry.  It includes zuul as a required project
 # because that is where the docker-compose file is located.
 - job:
-    name: zuul-quick-start
+    name: zuul-tutorial
     parent: opendev-buildset-registry-consumer
-    description: Run the commands in the Zuul quick-start documentation.
-    run: playbooks/quick-start/run.yaml
-    post-run: playbooks/quick-start/post.yaml
+    description: Run the commands in the Zuul tutorial documentation.
+    run: playbooks/setup-tutorial/run.yaml
+    post-run: playbooks/setup-tutorial/post.yaml
     required-projects:
       - zuul/zuul
 
@@ -245,7 +245,7 @@
         - zuul-stream-functional-2.9
         - zuul-tox-remote:
             timeout: 2700  # 45 minutes
-        - zuul-quick-start:
+        - zuul-tutorial:
             requires: nodepool-container-image
             dependencies: zuul-build-image
         - nodepool-zuul-functional:
@@ -303,7 +303,7 @@
         - zuul-stream-functional-2.9
         - zuul-tox-remote:
             timeout: 2700  # 45 minutes
-        - zuul-quick-start:
+        - zuul-tutorial:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
         - zuul-build-python-release

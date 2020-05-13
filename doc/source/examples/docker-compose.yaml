@@ -4,7 +4,7 @@ version: '2'
 
 services:
   gerrit:
-    image: gerritcodereview/gerrit
+    image: gerritcodereview/gerrit:3.1.4
     ports:
       - "8080:8080"
       - "29418:29418"

@@ -6,5 +6,6 @@
     ssh_agent:
       stdout: ''
   tasks:
-    - include_tasks: ../setup-tutorial/setup.yaml
-    - include_tasks: main.yaml
+    - include_tasks: setup.yaml
+    - include_tasks: ../quick-start/main.yaml
+    - include_tasks: ../gate-first-patch/main.yaml

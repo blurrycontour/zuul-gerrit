@@ -35,8 +35,8 @@
           {{ ssh_agent.stdout }}
           ssh-add {{ workspace }}/id_rsa
     - block:
-        - name: Run tasks in ssh agent
-          include_tasks: main.yaml
+        - include_tasks: ../quick-start/main.yaml
+        - include_tasks: ../gate-first-patch/main.yaml
       always:
         - name: Stop ssh-agent
           shell:
