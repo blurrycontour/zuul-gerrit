@@ -1,0 +1,33 @@
+From 3a1fecfbdeb2fe7d4f0ee73d5b650b18ddb6e4ce Mon Sep 17 00:00:00 2001
+From: John Doe <jdoe@sftest.com>
+Date: Tue, 4 Sep 2018 11:44:29 +0200
+Subject: [PATCH] Add payload size test
+
+Change-Id: I6955caccc54e87c0f33fbef3c0eaba89d34af324
+---
+ c2                       | 0
+ tests/test_hello_size.py | 8 ++++++++
+ 2 files changed, 8 insertions(+)
+ create mode 100644 c2
+ create mode 100644 tests/test_hello_size.py
+
+diff --git a/c2 b/c2
+new file mode 100644
+index 0000000..e69de29
+diff --git a/tests/test_hello_size.py b/tests/test_hello_size.py
+new file mode 100644
+index 0000000..b18a4c7
+--- /dev/null
++++ b/tests/test_hello_size.py
+@@ -0,0 +1,8 @@
++import unittest
++
++from hello import hello
++
++
++class TestHelloSize(unittest.TestCase):
++    def test_hello_size(self):
++        self.assertLessEqual(len(hello.Hello().run()), 10)
+-- 
+2.14.4
+

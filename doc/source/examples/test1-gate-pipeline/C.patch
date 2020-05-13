@@ -1,0 +1,29 @@
+From 8cf5637cc48fbca967fe6e6635a2dafc59123eff Mon Sep 17 00:00:00 2001
+From: John Doe <jdoe@sftest.com>
+Date: Tue, 4 Sep 2018 11:50:25 +0200
+Subject: [PATCH] Add project readme file
+
+Change-Id: Ieda74f914081322ac11333bb8d871f174ef71d20
+---
+ README.md | 4 ++++
+ c3        | 0
+ 2 files changed, 4 insertions(+)
+ create mode 100644 README.md
+ create mode 100644 c3
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..90cff3a
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,4 @@
++Hello project
++=============
++
++This is a demo project.
+diff --git a/c3 b/c3
+new file mode 100644
+index 0000000..e69de29
+-- 
+2.14.4
+
