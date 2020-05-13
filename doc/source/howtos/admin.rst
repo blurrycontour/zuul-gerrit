@@ -8,3 +8,4 @@ Admin How-to Guides
    zuul-from-scratch
    troubleshooting
    zookeeper
+   rest_api_examples
