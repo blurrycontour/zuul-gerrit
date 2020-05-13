@@ -1,0 +1,41 @@
+From 9c93928f5cb8614210abcd45d856acb4a4e3b6cf Mon Sep 17 00:00:00 2001
+From: Fabien Boucher <fboucher@redhat.com>
+Date: Tue, 4 Sep 2018 16:17:15 +0200
+Subject: [PATCH] Change run payload
+
+Change-Id: I2c67744cb364028c449be051d9208de0a4c9c094
+---
+ c1                  | 0
+ hello/hello.py      | 2 +-
+ tests/test_hello.py | 2 +-
+ 3 files changed, 2 insertions(+), 2 deletions(-)
+ create mode 100644 c1
+
+diff --git a/c1 b/c1
+new file mode 100644
+index 0000000..e69de29
+diff --git a/hello/hello.py b/hello/hello.py
+index 46e7993..03d2872 100644
+--- a/hello/hello.py
++++ b/hello/hello.py
+@@ -1,6 +1,6 @@
+ class Hello():
+     def run(self):
+-        return "Hello Zuul"
++        return "Konnichiwa Zuul"
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/tests/test_hello.py b/tests/test_hello.py
+index d5f81e6..c9e4c2d 100644
+--- a/tests/test_hello.py
++++ b/tests/test_hello.py
+@@ -5,4 +5,4 @@ from hello import hello
+ 
+ class TestHello(unittest.TestCase):
+     def test_hello(self):
+-        self.assertEqual(hello.Hello().run(), 'Hello Zuul')
++        self.assertEqual(hello.Hello().run(), 'Konnichiwa Zuul')
+-- 
+2.14.4
+

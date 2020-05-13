@@ -23,3 +23,4 @@ zuul/web/static/*
 !.keep
 node_modules
 yarn-error.log
+*_mini.yaml

@@ -1,0 +1,54 @@
+- name: Copy resources in test1-use-zuul-jobs
+  copy:
+    src: ../../doc/source/examples/test1-use-zuul-jobs/
+    dest: "{{ workspace }}/test1-gate-first/"
+- name: Remove Previous Jobs & Pipelines
+  shell:
+    chdir: "{{ workspace }}/test1-gate-first/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git rm -r playbooks .zuul.yaml hello.py
+- name: Push new code 1
+  shell:
+    chdir: "{{ workspace }}/test1-gate-first/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Initialize test1 project"
+      git push gerrit
+- name: Push new code 2
+  shell:
+    chdir: "{{ workspace }}/test1-gate-first/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git mv zuul.yaml .zuul.yaml
+      git commit -m"Init test1 pipelines"
+      git review
+- name: Query open changes
+  uri:
+    url: http://localhost:8080/a/changes/?q=status:open+project:test1-gate-first&o=CURRENT_REVISION
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changes
+- set_fact:
+    changeinfo: "{{ {'id': (changes.content[5:]|from_json)[0].id, 'current_revision': (changes.content[5:]|from_json)[0].current_revision} }}"
+- name: Wait for Zuul to report check status
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 2
+  delay: 1
+  retries: 180
+- name: "Check Zuul check status"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[1].message is search("Patch Set 1{{':'}} Verified\+1")

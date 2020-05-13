@@ -1,6 +1,6 @@
 - hosts: localhost
   vars:
-    workspace: /tmp/quickstart-test
+    workspace: /tmp/gate-pipeline-test
     local: true
     ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
     ssh_agent:
