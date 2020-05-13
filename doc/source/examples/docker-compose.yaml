@@ -4,16 +4,15 @@ version: '2'
 
 services:
   gerrit:
-    image: gerritcodereview/gerrit
+    image: gerritcodereview/gerrit:3.1.4
+    environment:
+      - CANONICAL_WEB_URL=http://localhost:8080
     ports:
       - "8080:8080"
       - "29418:29418"
     command: |
       /bin/sh -c '\
-        git config -f /var/gerrit/etc/gerrit.config gerrit.canonicalWebUrl http://localhost:8080/ && \
-        git config -f /var/gerrit/etc/gerrit.config gerrit.ui POLYGERRIT && \
         git config -f /var/gerrit/etc/gerrit.config sendemail.enable false && \
-        git config -f /var/gerrit/etc/gerrit.config noteDb.changes.autoMigrate true && \
         /var/gerrit/bin/gerrit.sh run'
   gerritconfig:
     image: zuul/zuul-executor
@@ -39,7 +38,7 @@ services:
       - "certs:/var/certs:z"
       - "./zoo.cfg:/conf/zoo.cfg:z"
   mysql:
-    image: mariadb
+    image: mariadb:10.4.12
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: zuul
@@ -95,7 +94,7 @@ services:
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
-  node:
+  node1:
     build:
       dockerfile: node-Dockerfile
       context: ./
@@ -103,6 +102,43 @@ services:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
+    image: node-image
+    environment:
+      - START_K1S=yes
+    volumes:
+      - "nodessh:/root/.ssh:z"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  node2:
+    build:
+      dockerfile: node-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: node-image
+    volumes:
+      - "nodessh:/root/.ssh:z"
+  node3:
+    build:
+      dockerfile: node-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: node-image
+    volumes:
+      - "nodessh:/root/.ssh:z"
+  node4:
+    build:
+      dockerfile: node-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: node-image
     volumes:
       - "nodessh:/root/.ssh:z"
   launcher:
