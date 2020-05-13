@@ -1,0 +1,224 @@
+- name: Clone test1
+  git:
+    repo: http://localhost:8080/test1
+    dest: "{{ workspace }}/test1"
+- name: Copy hoz-4-demo-repo.tgz in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/hoz-4-demo-repo.tgz
+    dest: "{{ workspace }}/"
+- name: Setup repository test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git config user.email 'user@example.com'
+      git config user.name 'Example User'
+      git config gitreview.username 'user'
+      git remote add gerrit http://admin:secret@localhost:8080/test1
+      git review -s
+      tar -xzf ../hoz-4-demo-repo.tgz -C .
+      git add -A
+      git commit -m"Initialize test1 project"
+      git push gerrit
+- name: Clone test2
+  git:
+    repo: http://localhost:8080/test2
+    dest: "{{ workspace }}/test2"
+- name: Copy hoz-7-demolib-repo.tgz in test2
+  copy:
+    src: ../../doc/source/examples/test2-job-dependencies/hoz-7-demolib-repo.tgz
+    dest: "{{ workspace }}/"
+- name: Setup repository test2
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git config user.email 'user@example.com'
+      git config user.name 'Example User'
+      git config gitreview.username 'user'
+      git remote add gerrit http://admin:secret@localhost:8080/test2
+      git review -s
+      tar -xzf ../hoz-7-demolib-repo.tgz -C .
+      git add -A
+      git commit -m"Initialize test2 project"
+      git push gerrit
+
+- name: Copy zuul.yaml in test1 & test2
+  copy:
+    src: ../../doc/source/examples/{{item}}-job-dependencies/zuul.yaml
+    dest: "{{ workspace }}/{{item}}/.zuul.yaml"
+  loop:
+    - test1
+    - test2
+
+- name: Setup repository test1 & test2
+  shell:
+    chdir: "{{ workspace }}/{{item}}/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Initialize CI"
+      git review
+  loop:
+    - test1
+    - test2
+
+- name: Check change is merged test1 & test2
+  include_tasks: change-merged.yaml
+  loop:
+    - test1
+    - test2
+
+- name: Copy requirements.txt in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/requirements.txt
+    dest: "{{ workspace }}/test1/"
+- name: Copy tox.ini in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/tox.ini
+    dest: "{{ workspace }}/test1/"
+- name: Copy hello.py in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/hello.py
+    dest: "{{ workspace }}/test1/hello/"
+- name: Add the dependency relationship between test2 and test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Import demolib"
+      git review
+- name: Check test1 change which depends on test2 is merged
+  include_tasks: change-merged.yaml
+  vars:
+    item: test1
+
+- name: Copy zuul_depend in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/zuul_depend.yaml
+    dest: "{{ workspace }}/test1/.zuul.yaml"
+- name: Add zuul_depend to test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Add dependent job"
+      git review
+- name: Check test1 zuul_depend is merged
+  include_tasks: change-merged.yaml
+  vars:
+    item: test1
+
+- name: Copy zuul_depend in test2
+  copy:
+    src: ../../doc/source/examples/test2-job-dependencies/zuul_depend.yaml
+    dest: "{{ workspace }}/test2/.zuul.yaml"
+- name: Add zuul_depend to test2
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Add dependent job in test2 CI"
+      git review
+- name: Check test2 zuul_depend is merged
+  include_tasks: change-merged.yaml
+  vars:
+    item: test2
+
+- name: Modif test2 uhoh
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git checkout -b uhoh
+      sed -i -e "s/Hello Zuul/Hello Dana/" demolib/__init__.py
+      sed -i -e "s/Hello Zuul/Hello Dana/" tests/test_demolib.py
+      git add -A
+      git commit -m"No Zuul, only Dana"
+      git review
+- name: Check test2 Zull Dana check status is error
+  include_tasks: check-pipeline-error.yaml
+  vars:
+    item: test2
+
+- name: Modif test2 goodbye
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git checkout master && git pull origin master && git checkout -b goodbye
+
+- name: Copy goodbye demolib/__init__.py in test2
+  copy:
+    src: ../../doc/source/examples/test2-job-dependencies/demolib_init.py
+    dest: "{{ workspace }}/test2/demolib/__init__.py"
+- name: Add zuul_depend to test2
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Bye Zuul"
+      git review
+- name: Check Zuul check status test2 is ok
+  include_tasks: check-pipeline-ok.yaml
+  vars:
+    item: test2
+- set_fact:
+    test2_bye_check_result: "{{ changeinfo }}"
+
+- name: Modif test1 goodbye
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git checkout master && git pull origin master && git checkout -b goodbye
+- name: Copy goodbye hello/hello.py in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/goodbye_hello.py
+    dest: "{{ workspace }}/test1/hello/hello.py"
+- name: Add zuul_depend to test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Bye Zuul"
+      git review
+- name: Check Zuul check status test1 is error
+  include_tasks: check-pipeline-error.yaml
+  vars:
+    item: test1
+- set_fact:
+    test1_bye_check_result: "{{ changeinfo }}"
+
+- name: Add Depends-On
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git commit --amend -m"Bye Zuul
+
+      Depends-On: http://gerrit:8080/{{test2_bye_check_result.number}}
+      Change-Id: {{test1_bye_check_result.change_id}}"
+      git review
+
+- name: Check Zuul check status test1 is ok
+  include_tasks: check-pipeline-ok.yaml
+  vars:
+    item: test1

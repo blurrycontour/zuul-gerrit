@@ -365,7 +365,7 @@ Have a look at the ``zuul`` object:
     build: fa9996bbdab64e69838d300c8ac0a58d
     buildset: 75fc274cc856422b92e5ac9f87b1ca7a
     change: '14'
-    change_url: http://localhost:8080/14
+    change_url: http://gerrit:8080/14
     child_jobs: []
     executor:
       hostname: gerrit
