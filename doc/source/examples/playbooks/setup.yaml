@@ -109,3 +109,13 @@
           http_password: secret
           groups:
             - "Non-Interactive Users"
+    - name: Install zuul-status plugin
+      uri:
+        url: http://gerrit:8080/a/plugins/zuul-status.jar
+        method: PUT
+        user: admin
+        password: secret
+        status_code: 201
+        body_format: json
+        body:
+          url: https://gerrit-ci.gerritforge.com/view/Plugins-master/job/plugin-zuul-status-bazel-master-master/lastSuccessfulBuild/artifact/bazel-bin/plugins/zuul-status/zuul-status.jar
