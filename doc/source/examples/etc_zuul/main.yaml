@@ -6,7 +6,7 @@
           - zuul-config
         untrusted-projects:
           - test1
-          - test2
+          - test1-gate-first
       opendev.org:
         untrusted-projects:
           - zuul/zuul-jobs:
