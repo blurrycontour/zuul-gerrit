@@ -15,7 +15,10 @@
         docker logs examples_scheduler_1 > {{ ansible_user_dir }}/logs/scheduler.log 2>&1
         docker logs examples_web_1 > {{ ansible_user_dir }}/logs/web.log 2>&1
         docker logs examples_executor_1 > {{ ansible_user_dir }}/logs/executor.log 2>&1
-        docker logs examples_node_1 > {{ ansible_user_dir }}/logs/node.log 2>&1
+        docker logs examples_node1_1 > {{ ansible_user_dir }}/logs/node1.log 2>&1
+        docker logs examples_node2_1 > {{ ansible_user_dir }}/logs/node2.log 2>&1
+        docker logs examples_node3_1 > {{ ansible_user_dir }}/logs/node3.log 2>&1
+        docker logs examples_node4_1 > {{ ansible_user_dir }}/logs/node4.log 2>&1
         docker logs examples_launcher_1 > {{ ansible_user_dir }}/logs/launcher.log 2>&1
         docker logs examples_logs_1 > {{ ansible_user_dir }}/logs/logs.log 2>&1
     - name: Copy docker log files to executor

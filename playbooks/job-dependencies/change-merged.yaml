@@ -1,0 +1,88 @@
+- name: "Query open changes {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/?q=status:open+project:{{item}}&o=CURRENT_REVISION&n=1"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changes
+- set_fact:
+    changeinfo: "{{ {'id': (changes.content[5:]|from_json)[0].id, 'current_revision': (changes.content[5:]|from_json)[0].current_revision} }}"
+- name: "Wait for Zuul to report check status: {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 2
+  delay: 10
+  retries: 180
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+- name: "Check Zuul check status {{item}}"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[1].message is search("Patch Set 1{{':'}} Verified\+1")
+- name: "Approve changes {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/revisions/{{ changeinfo.current_revision }}/review"
+    method: POST
+    user: admin
+    password: secret
+    status_code: 200
+    body_format: json
+    body:
+      labels:
+        Code-Review: "+2"
+        Workflow: "+1"
+- name: "Wait for Zuul to report gate job has started {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 4
+  delay: 1
+  retries: 60
+- name: "Check Zuul has started gate job {{item}}"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[3].message is search("Starting gate jobs")
+- name: "Wait for Zuul to report gate job has finished {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 5
+  delay: 10
+  retries: 180
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+- name: "Check Zuul has finished gate job {{item}}"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[4].message is search("Patch Set 1{{':'}} Verified\+2")
+- name: "Wait for Zuul to report change merged {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 6
+  delay: 10
+  retries: 180
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+- name: "Check Zuul has merged the change {{item}}"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[5].message is search("Change has been successfully merged by Zuul")
