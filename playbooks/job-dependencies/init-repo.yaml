@@ -1,0 +1,25 @@
+- name: "Init {{repoinfo.name}}"
+  include_tasks: ../setup-tutorial/init-repository.yaml
+  vars:
+    item: "{{repoinfo.name}}"
+- name: "Setup repository {{repoinfo.name}}"
+  shell:
+    chdir: "{{ workspace }}/{{repoinfo.name}}/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git review -s
+- name: "Copy {{repoinfo.archive}} in {{repoinfo.name}}"
+  copy:
+    src: ../../doc/source/examples/{{repoinfo.name}}-job-dependencies/{{repoinfo.archive}}
+    dest: "{{ workspace }}/"
+- name: "Setup repository {{repoinfo.name}}"
+  shell:
+    chdir: "{{ workspace }}/{{repoinfo.name}}/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      tar -xzf ../{{repoinfo.archive}} -C .
+      git add -A
+      git commit -m"Initialize {{repoinfo.name}} project"
+      git push -f gerrit master
