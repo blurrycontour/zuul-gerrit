@@ -1,0 +1,27 @@
+- name: "Query open changes {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/?q=status:open+project:{{item}}&o=CURRENT_REVISION&n=1"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changes
+- set_fact:
+    changeinfo: "{{ {'id': (changes.content[5:]|from_json)[0].id, 'change_id': (changes.content[5:]|from_json)[0].change_id, 'number': (changes.content[5:]|from_json)[0]._number, 'current_revision': (changes.content[5:]|from_json)[0].current_revision} }}"
+- name: "Wait for Zuul to report check status: {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}//detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: (result.content[5:]|from_json).messages|length >= 4
+  delay: 10
+  retries: 180
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+- name: "Check Zuul check status {{item}} is ok"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[3].message is search("Patch Set 2{{':'}} Verified\+1")

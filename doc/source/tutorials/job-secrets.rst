@@ -77,7 +77,7 @@ for the config project.
 
 .. code-block:: bash
 
-   ./encrypt_secret.py --tenant example-tenant http://localhost:9000/ config
+   ./tools/encrypt_secret.py --tenant example-tenant http://localhost:9000/ config
    # Type a secret, press enter and hit Ctrl-D. The script outputs:
    writing RSA key
    Public key length: 4096 bits (512 bytes)
@@ -219,20 +219,20 @@ to update the setup.py to use setuptools:
    # test1/setup.py
    import setuptools
 
-   setuptools.setup(name='demo')
+   setuptools.setup(name='change_this_to_a_uniqname')
 
 Also make sure the following packages are installed on the node running the job.
 
 .. code-block:: bash
 
-   sudo yum install -y python-wheel python-twine
+   python3 -m pip --user wheel twine
 
 Encrypt a fake pypi account password (since we don't want to actually
 publish this demo project) using this command:
 
 .. code-block:: bash
 
-   ./encrypt_secret.py --tenant example-tenant http://localhost:9000 test1
+   ./tools/encrypt_secret.py --tenant example-tenant http://localhost:9000 test1
 
 Create this test1 zuul configuration and replace the password payload with
 the output of `encrypt_secret.py` :
