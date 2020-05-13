@@ -77,7 +77,7 @@ to appropriate values for your setup.
 
    sudo bash -c "cat > /etc/zuul/main.yaml <<EOF
    - tenant:
-       name: quickstart
+       name: tutorial
    EOF"
 
 Starting Services
