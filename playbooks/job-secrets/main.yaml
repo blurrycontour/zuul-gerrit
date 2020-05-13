@@ -1,0 +1,217 @@
+- name: Copy config-project in zuul-config
+  copy:
+    src: ../../doc/source/examples/test1-job-secrets/config-project/
+    dest: "{{ workspace }}/zuul-config/"
+
+- name: Generate secret
+  shell:
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      ../../tools/encrypt_secret.py --tenant example-tenant --infile ../../doc/source/examples/test1-job-secrets/config-project-password.txt --outfile {{ workspace }}/zuul-config/zuul.d/my-secret.yaml http://localhost:9000/ zuul-config
+      sed -i -e "s/<name>/my-publication-secret/; s/<fieldname>/password/; s/^\( *\)password:/\1hostname: publication-host.example.com\n\1password:/" {{ workspace }}/zuul-config/zuul.d/my-secret.yaml
+
+- name: Commit and upload zuul-config
+  shell:
+    chdir: "{{ workspace }}/zuul-config/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A .
+      git commit -m "Provide my publication job"
+      git review
+
+- name: Check Zuul check status zuul-config is ok
+  include_tasks: ../setup-tutorial/check-pipeline-ok.yaml
+  vars:
+    item: zuul-config
+
+- name: Approve changes
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/revisions/{{ changeinfo.current_revision }}/review"
+    method: POST
+    user: admin
+    password: secret
+    status_code: 200
+    body_format: json
+    body:
+      labels:
+        Code-Review: "+2"
+        Workflow: "+1"
+
+- name: Check Zuul gate status zuul-config is ok
+  include_tasks: ../setup-tutorial/change-merged.yaml
+  vars:
+    item: zuul-config
+
+- name: Init Test1
+  include_tasks: ../setup-tutorial/init-repository.yaml
+  vars:
+    item: test1
+
+- name: Setup repository test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git review -s
+
+- name: Copy zuul.yaml in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-secrets/config-project-test1/zuul.yaml
+    dest: "{{ workspace }}/test1/.zuul.yaml"
+
+- name: Commit and upload hello.py in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add .zuul.yaml
+      git commit -m "Configure project pipelines"
+      git review
+
+- name: Check Zuul check status test1 is ok
+  include_tasks: ../setup-tutorial/check-pipeline-ok.yaml
+  vars:
+    item: test1
+
+- name: Init Test1
+  include_tasks: ../setup-tutorial/init-repository.yaml
+  vars:
+    item: test1
+
+- name: Setup repository test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git review -s
+
+- name: Copy hoz-4-demo-repo.tgz in workspace
+  copy:
+    src: ../../doc/source/examples/test1-gate-pipeline/hoz-4-demo-repo.tgz
+    dest: "{{ workspace }}/"
+- name: Copy tox.ini in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-pipeline/tox.ini
+    dest: "{{ workspace }}/test1/tox.ini"
+- name: Copy setup.py in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-secrets/untrusted-project/setup.py
+    dest: "{{ workspace }}/test1/"
+- name: Copy playbooks in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-secrets/untrusted-project/playbooks/
+    dest: "{{ workspace }}/test1/playbooks/"
+
+- name: Generate secret
+  shell:
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      ../../tools/encrypt_secret.py --tenant example-tenant --infile ../../doc/source/examples/test1-job-secrets/test1-project-password.txt --outfile {{ workspace }}/test1/.zuul.yaml http://localhost:9000/ test1
+      sed -i -e "s/<name>/my-pypi-secret/; s/<fieldname>/password/; s/^\( *\)password:/\1username: my-pypi-account\n\1password:/" {{ workspace }}/test1/.zuul.yaml
+      cat ../../doc/source/examples/test1-job-secrets/untrusted-project/append_zuul.yaml >> {{ workspace }}/test1/.zuul.yaml
+
+- name: Commit and upload in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m "Provide my upload-pypi job"
+      git review
+
+- name: Check Zuul check status test1 is ok
+  include_tasks: ../setup-tutorial/check-pipeline-ok.yaml
+  vars:
+    item: test1
+
+- name: Approve changes
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/revisions/{{ changeinfo.current_revision }}/review"
+    method: POST
+    user: admin
+    password: secret
+    status_code: 200
+    body_format: json
+    body:
+      labels:
+        Code-Review: "+2"
+        Workflow: "+1"
+
+- name: Check Zuul gate status test1 is ok
+  include_tasks: ../setup-tutorial/change-merged.yaml
+  vars:
+    item: test1
+
+
+
+- name: Add release pipeline to zuul-config pipelines
+  shell:
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      cat ../../doc/source/examples/test1-job-secrets/untrusted-project/append_config_pipeline.yaml >> {{ workspace }}/zuul-config/zuul.d/pipelines.yaml
+
+- name: Commit and upload zuul-config
+  shell:
+    chdir: "{{ workspace }}/zuul-config/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A .
+      git commit -m "Add release pipeline"
+      git review
+
+- name: Check Zuul check status zuul-config is ok
+  include_tasks: ../setup-tutorial/check-pipeline-ok.yaml
+  vars:
+    item: zuul-config
+
+- name: Approve changes
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/revisions/{{ changeinfo.current_revision }}/review"
+    method: POST
+    user: admin
+    password: secret
+    status_code: 200
+    body_format: json
+    body:
+      labels:
+        Code-Review: "+2"
+        Workflow: "+1"
+
+- name: Check Zuul gate status zuul-config is ok
+  include_tasks: ../setup-tutorial/change-merged.yaml
+  vars:
+    item: zuul-config
+
+
+- name: "Wait for release pipeline to come up"
+  uri:
+    url: "http://localhost:9000/api/tenant/example-tenant/status"
+    method: GET
+    return_content: true
+  register: result
+  until: (result.content|from_json).pipelines|length >= 3
+  delay: 1
+  retries: 30
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+
+
+
+
+- name: Push tag test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git tag -a -m 0.0.1 0.0.1
+      git push gerrit 0.0.1

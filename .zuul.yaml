@@ -101,9 +101,63 @@
 - job:
     name: zuul-quick-start
     parent: opendev-buildset-registry-consumer
-    description: Run the commands in the Zuul quick-start documentation.
+    description: Run the commands in the Zuul tutorial documentation.
     run: playbooks/quick-start/run.yaml
-    post-run: playbooks/quick-start/post.yaml
+    post-run: playbooks/setup-tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+
+- job:
+    name: zuul-tutorial-quick-start
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial documentation.
+    run: playbooks/quick-start/run.yaml
+    post-run: playbooks/setup-tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+
+- job:
+    name: zuul-tutorial-gate-your-first-patch
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial documentation.
+    run: playbooks/gate-first-patch/run.yaml
+    post-run: playbooks/setup-tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+
+- job:
+    name: zuul-tutorial-use-zuul-jobs
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial documentation.
+    run: playbooks/use-zuul-jobs/run.yaml
+    post-run: playbooks/setup-tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+
+- job:
+    name: zuul-tutorial-the-gate-pipeline
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial documentation.
+    run: playbooks/gate-pipeline/run.yaml
+    post-run: playbooks/setup-tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+
+- job:
+    name: zuul-tutorial-job-secrets
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial documentation.
+    run: playbooks/job-secrets/run.yaml
+    post-run: playbooks/setup-tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+
+- job:
+    name: zuul-tutorial-job-dependencies
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial documentation.
+    run: playbooks/job-dependencies/run.yaml
+    post-run: playbooks/setup-tutorial/post.yaml
     required-projects:
       - zuul/zuul
 
@@ -248,6 +302,27 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+            timeout: 4800
+        - zuul-tutorial-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 4800
+        - zuul-tutorial-gate-your-first-patch:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 4800
+        - zuul-tutorial-use-zuul-jobs:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 4800
+        - zuul-tutorial-the-gate-pipeline:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 4800
+        - zuul-tutorial-job-dependencies:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 4800
         - nodepool-zuul-functional:
             voting: false
         - zuul-build-python-release
