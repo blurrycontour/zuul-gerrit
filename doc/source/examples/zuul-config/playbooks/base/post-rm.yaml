@@ -1,0 +1,8 @@
+- hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: Ansible delete file example
+      file:
+        path: "{{ item.value.src_dir }}"
+        state: absent
+      loop: "{{ q('dict', zuul.projects) }}"
