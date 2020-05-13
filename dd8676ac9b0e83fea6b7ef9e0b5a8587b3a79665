@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_bcd4e9be",
+        "filename": "releasenotes/notes/github-checks-dequeue-643b7f757ca4d49b.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-05-13T05:38:56Z",
+      "side": 1,
+      "message": "Yes, I can update the release note if we merge https://review.opendev.org/711023 before this one.",
+      "parentUuid": "ff570b3c_392d9943",
+      "revId": "dd8676ac9b0e83fea6b7ef9e0b5a8587b3a79665",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_390e3934",
         "filename": "zuul/driver/github/githubreporter.py",
         "patchSetId": 9
@@ -47,6 +65,24 @@
       "writtenOn": "2020-05-12T15:45:08Z",
       "side": 1,
       "message": "Queue seems risky here, and likely to change out from under us.\n\nSince what we really want to do is dequeue the item, how about we give every item a uuid, and use that instead?",
+      "revId": "dd8676ac9b0e83fea6b7ef9e0b5a8587b3a79665",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_7cf37174",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-05-13T05:38:56Z",
+      "side": 1,
+      "message": "I was just wondering why I used the queue here at all, because originally I intended to use the same parameters as the dequeue command in the zuul cli. So I looked up the other code place where the dequeue event is built from the external_id and I think that the \"queue\" here is just a leftover from testing as it\u0027s never evaluated. I will check that again and remove it if my assumption is correct.\n\nIn that case, I don\u0027t think we need add an additional uuid for the QueueItem here. Although it would simplify this part, we would need another lookup mechanism to find a QueueItem by its uuid. Unless there are other use cases for that I would not add this as the zuul cli dequeue also works without that additional id.",
+      "parentUuid": "ff570b3c_390e3934",
       "revId": "dd8676ac9b0e83fea6b7ef9e0b5a8587b3a79665",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
