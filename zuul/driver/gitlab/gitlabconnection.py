@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import logging
 import threading
 import json
@@ -484,5 +485,6 @@ class GitlabWebController(BaseWebController):
         return json.loads(job.data[0])
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     return v.Any(str, v.Schema(dict))

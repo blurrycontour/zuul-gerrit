@@ -15,6 +15,7 @@
 import logging
 import voluptuous as v
 import time
+import functools
 
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import MERGER_MERGE_RESOLVE, MERGER_MERGE, MERGER_MAP, \
@@ -308,6 +309,7 @@ class GithubReporter(BaseReporter):
         return [self.context]
 
 
+@functools.lru_cache(maxsize=None)
 def getSchema():
     github_reporter = v.Schema({
         'status': v.Any('pending', 'success', 'failure'),

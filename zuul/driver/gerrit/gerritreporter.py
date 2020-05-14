@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import logging
 import voluptuous as v
 
@@ -77,6 +78,7 @@ class GerritReporter(BaseReporter):
         return self._labels
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     gerrit_reporter = v.Any(str, v.Schema(dict))
     return gerrit_reporter

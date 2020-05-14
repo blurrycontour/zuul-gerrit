@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import logging
 import voluptuous as v
 from zuul.driver.gitlab.gitlabmodel import GitlabEventFilter
@@ -39,6 +40,7 @@ class GitlabTrigger(BaseTrigger):
         pass
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     gitlab_trigger = {
         v.Required('event'):

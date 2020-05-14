@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import time
 import logging
 import voluptuous as v
@@ -131,6 +132,7 @@ class PagureReporter(BaseReporter):
         return []
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     pagure_reporter = v.Schema({
         'status': v.Any('pending', 'success', 'failure'),

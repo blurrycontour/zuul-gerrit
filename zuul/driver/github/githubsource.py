@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import re
 import urllib
 import logging
@@ -163,6 +164,7 @@ review = v.Schema({'username': str,
                    })
 
 
+@functools.lru_cache(maxsize=1)
 def getRequireSchema():
     require = {'status': scalar_or_list(str),
                'review': scalar_or_list(review),
@@ -173,6 +175,7 @@ def getRequireSchema():
     return require
 
 
+@functools.lru_cache(maxsize=1)
 def getRejectSchema():
     reject = {'status': scalar_or_list(str),
               'review': scalar_or_list(review),

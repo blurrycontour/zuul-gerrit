@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import logging
 import voluptuous as v
 
@@ -60,6 +61,7 @@ class GitlabReporter(BaseReporter):
         return []
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     gitlab_reporter = v.Schema({
         'comment': bool,

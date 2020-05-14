@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import logging
 import hmac
 import hashlib
@@ -929,6 +930,7 @@ class PagureWebController(BaseWebController):
         return json.loads(job.data[0])
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     pagure_connection = v.Any(str, v.Schema(dict))
     return pagure_connection
