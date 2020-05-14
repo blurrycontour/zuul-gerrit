@@ -282,6 +282,19 @@ class TestWeb(BaseTestWeb):
         }
         self.assertEqual([connection], data)
 
+    def test_web_connections_list_tenant_scoped(self):
+        connection = {
+            'driver': 'gerrit',
+            'name': 'gerrit',
+            'baseurl': 'https://review.example.com',
+            'canonical_hostname': 'review.example.com',
+            'server': 'review.example.com',
+            'port': 29418,
+        }
+        for tenant in ['tenant-one', '', 'nonexistent-tenant']:
+            data = self.get_url('api/tenant/%s/connections' % tenant).json()
+            self.assertEqual([connection], data)
+
     def test_web_bad_url(self):
         # do we redirect to index.html
         resp = self.get_url("status/foo")
@@ -755,10 +768,14 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(404, resp.status_code)
 
     def test_autohold_info_404_on_invalid_id(self):
+        resp = self.get_url("api/autohold/12345")
+        self.assertEqual(404, resp.status_code)
         resp = self.get_url("api/tenant/tenant-one/autohold/12345")
         self.assertEqual(404, resp.status_code)
 
     def test_autohold_delete_404_on_invalid_id(self):
+        resp = self.delete_url("api/autohold/12345")
+        self.assertEqual(404, resp.status_code)
         resp = self.delete_url("api/tenant/tenant-one/autohold/12345")
         self.assertEqual(404, resp.status_code)
 
@@ -780,6 +797,21 @@ class TestWeb(BaseTestWeb):
         request_id = autohold_requests[0]['id']
 
         # Now try the autohold-info API
+        resp = self.get_url("api/autohold/%s" % request_id)
+        self.assertEqual(200, resp.status_code, resp.text)
+        request = resp.json()
+
+        self.assertEqual(request_id, request['id'])
+        self.assertEqual('tenant-one', request['tenant'])
+        self.assertIn('org/project', request['project'])
+        self.assertEqual('project-test2', request['job'])
+        self.assertEqual(".*", request['ref_filter'])
+        self.assertEqual(1, request['max_count'])
+        self.assertEqual(0, request['current_count'])
+        self.assertEqual("reason text", request['reason'])
+        self.assertEqual([], request['nodes'])
+
+        # Scope the request to tenant-one
         resp = self.get_url("api/tenant/tenant-one/autohold/%s" % request_id)
         self.assertEqual(200, resp.status_code, resp.text)
         request = resp.json()
@@ -793,6 +825,10 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(0, request['current_count'])
         self.assertEqual("reason text", request['reason'])
         self.assertEqual([], request['nodes'])
+
+        # Scope the request to tenant-two, forbidden
+        resp = self.get_url("api/tenant/tenant-two/autohold/%s" % request_id)
+        self.assertEqual(403, resp.status_code, resp.text)
 
     def test_autohold_list(self):
         """test listing autoholds through zuul-web"""
@@ -1400,7 +1436,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
         resp = self.delete_url(
-            "api/tenant/tenant-one/autohold/%s" % request['id'],
+            "api/autohold/%s" % request['id'],
             headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(403, resp.status_code)
 
@@ -1444,14 +1480,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual("some reason", request['reason'])
         self.assertEqual(1, request['max_count'])
 
-    def test_autohold_delete(self):
-        authz = {'iss': 'zuul_operator',
-                 'aud': 'zuul.example.com',
-                 'sub': 'testuser',
-                 'zuul': {
-                     'admin': ['tenant-one', ]
-                 },
-                 'exp': time.time() + 3600}
+    def _init_autohold_delete(self, authz):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
 
@@ -1470,13 +1499,51 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request_id = autohold_requests[0]['id']
+        return client, request_id, token
 
+    def test_autohold_delete_wrong_tenant(self):
+        """Make sure authorization rules are applied"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        client, request_id, _ = self._init_autohold_delete(authz)
         # now try the autohold-delete API
+        bad_authz = {'iss': 'zuul_operator',
+                     'aud': 'zuul.example.com',
+                     'sub': 'testuser',
+                     'zuul': {
+                         'admin': ['tenant-two', ]
+                     },
+                     'exp': time.time() + 3600}
+        bad_token = jwt.encode(bad_authz, key='NoDanaOnlyZuul',
+                               algorithm='HS256').decode('utf-8')
         resp = self.delete_url(
-            "api/tenant/tenant-one/autohold/%s" % request_id,
+            "api/autohold/%s" % request_id,
+            headers={'Authorization': 'Bearer %s' % bad_token})
+        # Throw a "Forbidden" error, because user is authenticated but not
+        # authorized for tenant-one
+        self.assertEqual(403, resp.status_code, resp.text)
+        # clean up
+        r = client.autohold_delete(request_id)
+        self.assertTrue(r)
+
+    def test_autohold_delete(self):
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        client, request_id, token = self._init_autohold_delete(authz)
+        resp = self.delete_url(
+            "api/autohold/%s" % request_id,
             headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(204, resp.status_code, resp.text)
-
         # autohold-list should be empty now
         resp = self.get_url(
             "api/tenant/tenant-one/autohold")
@@ -1732,7 +1799,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
-        req = self.get_url('/api/user/authorizations',
+        req = self.get_url('/api/authorizations',
                            headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(401, req.status_code, req.text)
 
@@ -1770,7 +1837,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
             authz['exp'] = time.time() + 3600
             token = jwt.encode(authz, key='NoDanaOnlyZuul',
                                algorithm='HS256').decode('utf-8')
-            req = self.get_url('/api/user/authorizations',
+            req = self.get_url('/api/authorizations',
                                headers={'Authorization': 'Bearer %s' % token})
             self.assertEqual(200, req.status_code, req.text)
             data = req.json()
@@ -1781,6 +1848,33 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
             self.assertEqual(test_user['zuul.admin'],
                              data['zuul']['admin'],
                              "%s got %s" % (authz['sub'], data))
+
+    def test_user_actions_scoped(self):
+        """Test that a user get the right scoped 'zuul.actions' tree"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'venkman'}
+        authz['exp'] = time.time() + 3600
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        req = self.get_url('/api/tenant/tenant-one/authorizations',
+                           headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(200, req.status_code, req.text)
+        data = req.json()
+        self.assertTrue('zuul' in data,
+                        "%s got %s" % (authz['sub'], data))
+        self.assertTrue('admin' in data['zuul'],
+                        "%s got %s" % (authz['sub'], data))
+        self.assertEqual(['tenant-one', ],
+                         data['zuul']['admin'],
+                         "%s got %s" % (authz['sub'], data))
+        req = self.get_url('/api/tenant/tenant-two/authorizations',
+                           headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(200, req.status_code, req.text)
+        data = req.json()
+        self.assertTrue('zuul' in data, data)
+        self.assertTrue('admin' in data['zuul'], data)
+        self.assertEqual([], data['zuul']['admin'], data)
 
 
 class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
