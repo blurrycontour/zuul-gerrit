@@ -815,8 +815,10 @@ class TestWeb(BaseTestWeb):
         self.assertIn('org/project', request['project'])
         self.assertEqual('project-test2', request['job'])
         self.assertEqual(".*", request['ref_filter'])
-        self.assertEqual(1, request['count'])
+        self.assertEqual(1, request['max_count'])
+        self.assertEqual(0, request['current_count'])
         self.assertEqual("reason text", request['reason'])
+        self.assertEqual([], request['nodes'])
 
     def test_autohold_list(self):
         """test listing autoholds through zuul-web"""
@@ -839,8 +841,10 @@ class TestWeb(BaseTestWeb):
         self.assertIn('org/project', ah_request['project'])
         self.assertEqual('project-test2', ah_request['job'])
         self.assertEqual(".*", ah_request['ref_filter'])
-        self.assertEqual(1, ah_request['count'])
+        self.assertEqual(1, ah_request['max_count'])
+        self.assertEqual(0, ah_request['current_count'])
         self.assertEqual("reason text", ah_request['reason'])
+        self.assertEqual([], ah_request['nodes'])
 
         # filter by project
         resp = self.get_url(
@@ -861,8 +865,10 @@ class TestWeb(BaseTestWeb):
         self.assertIn('org/project', ah_request['project'])
         self.assertEqual('project-test2', ah_request['job'])
         self.assertEqual(".*", ah_request['ref_filter'])
-        self.assertEqual(1, ah_request['count'])
+        self.assertEqual(1, ah_request['max_count'])
+        self.assertEqual(0, ah_request['current_count'])
         self.assertEqual("reason text", ah_request['reason'])
+        self.assertEqual([], ah_request['nodes'])
 
     def test_admin_routes_404_by_default(self):
         resp = self.post_url(
