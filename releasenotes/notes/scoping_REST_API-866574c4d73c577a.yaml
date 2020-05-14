@@ -1,0 +1,15 @@
+---
+features:
+  - |
+    REST API: Add non-scoped endpoints for autohold-info and autohold-delete.
+    They are respectively "GET /api/autohold/{id}" and "DELETE /api/autohold/{id}".
+  - |
+    REST API: Add a tenant-scoped endpoint for connections. Connections are not scoped to
+    a tenant, but this makes connections info available for whitelabeled API calls.
+    "GET /api/connections" and "GET /api/tenant/{tenant}/connections" return the
+    same content regardless of the tenant.
+  - |
+    REST API: authorizations: rename the endpoint to '/api/authorizations' and add a
+    tenant-scoped endpoint at '/api/tenant/{tenant}/authorizations'. Calling
+    the latter endpoint will return a list of admin tenants limited to the
+    scoped tenant, if the user has admin privileges on it.
