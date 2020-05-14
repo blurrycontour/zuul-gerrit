@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_7b186974",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3372,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-05-14T20:54:28Z",
+      "side": 1,
+      "message": "Might want to expand on what \"it\" is here. I think you are saying \"we\u0027ll cache the config anyway because the first tenant had no error\" ?",
+      "range": {
+        "startLine": 3372,
+        "startChar": 59,
+        "endLine": 3372,
+        "endChar": 61
+      },
+      "revId": "d5b044c361facb466e0c5cbf0035d5b92923ae32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_1b584d30",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3384,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-05-14T20:54:28Z",
+      "side": 1,
+      "message": "I don\u0027t think this project is loaded by the first tenant.",
+      "range": {
+        "startLine": 3384,
+        "startChar": 54,
+        "endLine": 3384,
+        "endChar": 62
+      },
+      "revId": "d5b044c361facb466e0c5cbf0035d5b92923ae32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_dbfff5fe",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 671,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-05-14T20:54:28Z",
+      "side": 1,
+      "message": "As an aid to other reviewers: getLayout() is called by prepareItem(). prepareItem() returns False if getLayout() returns None. prepareItem() is called by _processOneItem() and it checks the return value of prepareItem() and uses it as a ready(ness) flag. If it isn\u0027t ready it basically noops and the next loop through processQueue will check if things are ready again.\n\nAll that to say the return None here creates a delay in processQueue until the parent and child both have layouts ready.",
+      "revId": "d5b044c361facb466e0c5cbf0035d5b92923ae32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
