@@ -794,6 +794,10 @@ class TestWeb(BaseTestWeb):
         self.assertEqual("reason text", request['reason'])
         self.assertEqual([], request['nodes'])
 
+        # Scope the request to tenant-two, not found
+        resp = self.get_url("api/tenant/tenant-two/autohold/%s" % request_id)
+        self.assertEqual(404, resp.status_code, resp.text)
+
     def test_autohold_list(self):
         """test listing autoholds through zuul-web"""
         client = zuul.rpcclient.RPCClient('127.0.0.1',
@@ -1477,14 +1481,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual("some reason", request['reason'])
         self.assertEqual(1, request['max_count'])
 
-    def test_autohold_delete(self):
-        authz = {'iss': 'zuul_operator',
-                 'aud': 'zuul.example.com',
-                 'sub': 'testuser',
-                 'zuul': {
-                     'admin': ['tenant-one', ]
-                 },
-                 'exp': time.time() + 3600}
+    def _init_autohold_delete(self, authz):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
 
@@ -1503,13 +1500,51 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request_id = autohold_requests[0]['id']
+        return client, request_id, token
 
+    def test_autohold_delete_wrong_tenant(self):
+        """Make sure authorization rules are applied"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        client, request_id, _ = self._init_autohold_delete(authz)
         # now try the autohold-delete API
+        bad_authz = {'iss': 'zuul_operator',
+                     'aud': 'zuul.example.com',
+                     'sub': 'testuser',
+                     'zuul': {
+                         'admin': ['tenant-two', ]
+                     },
+                     'exp': time.time() + 3600}
+        bad_token = jwt.encode(bad_authz, key='NoDanaOnlyZuul',
+                               algorithm='HS256').decode('utf-8')
+        resp = self.delete_url(
+            "api/tenant/tenant-one/autohold/%s" % request_id,
+            headers={'Authorization': 'Bearer %s' % bad_token})
+        # Throw a "Forbidden" error, because user is authenticated but not
+        # authorized for tenant-one
+        self.assertEqual(403, resp.status_code, resp.text)
+        # clean up
+        r = client.autohold_delete(request_id)
+        self.assertTrue(r)
+
+    def test_autohold_delete(self):
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        client, request_id, token = self._init_autohold_delete(authz)
         resp = self.delete_url(
             "api/tenant/tenant-one/autohold/%s" % request_id,
             headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(204, resp.status_code, resp.text)
-
         # autohold-list should be empty now
         resp = self.get_url(
             "api/tenant/tenant-one/autohold")
@@ -1765,7 +1800,11 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
+        # TODO(mhu) deprecated, remove after next release
         req = self.get_url('/api/user/authorizations',
+                           headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(401, req.status_code, req.text)
+        req = self.get_url('/api/tenant/tenant-one/authorizations',
                            headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(401, req.status_code, req.text)
 
@@ -1803,6 +1842,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
             authz['exp'] = time.time() + 3600
             token = jwt.encode(authz, key='NoDanaOnlyZuul',
                                algorithm='HS256').decode('utf-8')
+            # TODO(mhu) deprecated, remove after next release
             req = self.get_url('/api/user/authorizations',
                                headers={'Authorization': 'Bearer %s' % token})
             self.assertEqual(200, req.status_code, req.text)
@@ -1812,6 +1852,30 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
             self.assertTrue('admin' in data['zuul'],
                             "%s got %s" % (authz['sub'], data))
             self.assertEqual(test_user['zuul.admin'],
+                             data['zuul']['admin'],
+                             "%s got %s" % (authz['sub'], data))
+
+            req = self.get_url('/api/tenant/tenant-one/authorizations',
+                               headers={'Authorization': 'Bearer %s' % token})
+            self.assertEqual(200, req.status_code, req.text)
+            data = req.json()
+            self.assertTrue('zuul' in data,
+                            "%s got %s" % (authz['sub'], data))
+            self.assertTrue('admin' in data['zuul'],
+                            "%s got %s" % (authz['sub'], data))
+            self.assertEqual(test_user['zuul.admin'],
+                             data['zuul']['admin'],
+                             "%s got %s" % (authz['sub'], data))
+
+            req = self.get_url('/api/tenant/tenant-two/authorizations',
+                               headers={'Authorization': 'Bearer %s' % token})
+            self.assertEqual(200, req.status_code, req.text)
+            data = req.json()
+            self.assertTrue('zuul' in data,
+                            "%s got %s" % (authz['sub'], data))
+            self.assertTrue('admin' in data['zuul'],
+                            "%s got %s" % (authz['sub'], data))
+            self.assertEqual([],
                              data['zuul']['admin'],
                              "%s got %s" % (authz['sub'], data))
 
