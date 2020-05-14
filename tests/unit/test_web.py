@@ -20,6 +20,8 @@ import socket
 import textwrap
 import time
 import jwt
+import sys
+import subprocess
 
 import requests
 
@@ -2080,3 +2082,141 @@ class TestWebMulti(BaseTestWeb):
             'server': 'github.com',
         }
         self.assertEqual([gerrit_connection, github_connection], data)
+
+
+class TestCLIViaWebApi(BaseTestWeb):
+    config_file = 'zuul-admin-web.conf'
+
+    def test_autohold(self):
+        """Test that autohold can be set with the CLI through REST"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'autohold', '--reason', 'some reason',
+             '--tenant', 'tenant-one', '--project', 'org/project',
+             '--job', 'project-test2', '--count', '1'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        # Check result in rpc client
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        autohold_requests = client.autohold_list()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        request = autohold_requests[0]
+        self.assertEqual('tenant-one', request['tenant'])
+        self.assertIn('org/project', request['project'])
+        self.assertEqual('project-test2', request['job'])
+        self.assertEqual(".*", request['ref_filter'])
+        self.assertEqual("some reason", request['reason'])
+        self.assertEqual(1, request['max_count'])
+
+    def test_enqueue(self):
+        """Test that the CLI can enqueue a change via REST"""
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        A.addApproval('Approved', 1)
+
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'enqueue', '--tenant', 'tenant-one',
+             '--trigger', 'gerrit', '--project', 'org/project',
+             '--pipeline', 'gate', '--change', '1,1'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        self.waitUntilSettled()
+
+    def test_enqueue_ref(self):
+        """Test that the CLI can enqueue a ref via REST"""
+        p = "review.example.com/org/project"
+        upstream = self.getUpstreamRepos([p])
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
+        A_commit = str(upstream[p].commit('master'))
+        self.log.debug("A commit: %s" % A_commit)
+
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'enqueue-ref', '--tenant', 'tenant-one',
+             '--trigger', 'gerrit', '--project', 'org/project',
+             '--pipeline', 'post', '--ref', 'master',
+             '--oldrev', '90f173846e3af9154517b88543ffbd1691f31366',
+             '--newrev', A_commit],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        self.waitUntilSettled()
+
+    def test_dequeue(self):
+        """Test that the CLI can dequeue a change via REST"""
+        start_builds = len(self.builds)
+        self.create_branch('org/project', 'stable')
+        self.executor_server.hold_jobs_in_build = True
+        self.commitConfigUpdate('common-config', 'layouts/timer.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, 'Wait for a build on hold'):
+            if len(self.builds) > start_builds:
+                break
+        self.waitUntilSettled()
+
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'dequeue', '--tenant', 'tenant-one', '--project', 'org/project',
+             '--pipeline', 'periodic', '--ref', 'refs/heads/stable'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        self.waitUntilSettled()
+
+        self.commitConfigUpdate('common-config',
+                                'layouts/no-timer.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
