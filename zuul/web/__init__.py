@@ -434,9 +434,12 @@ class ZuulWebAPI(object):
                              'project': request['project'],
                              'job': request['job'],
                              'ref_filter': request['ref_filter'],
-                             'count': request['max_count'],
+                             'max_count': request['max_count'],
+                             'current_count': request['current_count'],
                              'reason': request['reason'],
-                             'node_hold_expiration': request['node_expiration']
+                             'node_expiration': request['node_expiration'],
+                             'expired': request['expired'],
+                             'nodes': request['nodes']
                             })
             return result
 
@@ -466,9 +469,12 @@ class ZuulWebAPI(object):
                 'project': request['project'],
                 'job': request['job'],
                 'ref_filter': request['ref_filter'],
-                'count': request['max_count'],
+                'max_count': request['max_count'],
+                'current_count': request['current_count'],
                 'reason': request['reason'],
-                'node_hold_expiration': request['node_expiration']
+                'node_expiration': request['node_expiration'],
+                'expired': request['expired'],
+                'nodes': request['nodes']
             }
 
     def _autohold_delete(self, request_id):
