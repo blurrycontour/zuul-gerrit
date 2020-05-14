@@ -755,11 +755,11 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(404, resp.status_code)
 
     def test_autohold_info_404_on_invalid_id(self):
-        resp = self.get_url("api/tenant/tenant-one/autohold/12345")
+        resp = self.get_url("api/autohold/12345")
         self.assertEqual(404, resp.status_code)
 
     def test_autohold_delete_404_on_invalid_id(self):
-        resp = self.delete_url("api/tenant/tenant-one/autohold/12345")
+        resp = self.delete_url("api/autohold/12345")
         self.assertEqual(404, resp.status_code)
 
     def test_autohold_info(self):
@@ -780,7 +780,7 @@ class TestWeb(BaseTestWeb):
         request_id = autohold_requests[0]['id']
 
         # Now try the autohold-info API
-        resp = self.get_url("api/tenant/tenant-one/autohold/%s" % request_id)
+        resp = self.get_url("api/autohold/%s" % request_id)
         self.assertEqual(200, resp.status_code, resp.text)
         request = resp.json()
 
@@ -1400,7 +1400,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
         resp = self.delete_url(
-            "api/tenant/tenant-one/autohold/%s" % request['id'],
+            "api/autohold/%s" % request['id'],
             headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(403, resp.status_code)
 
@@ -1473,7 +1473,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
 
         # now try the autohold-delete API
         resp = self.delete_url(
-            "api/tenant/tenant-one/autohold/%s" % request_id,
+            "api/autohold/%s" % request_id,
             headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(204, resp.status_code, resp.text)
 
