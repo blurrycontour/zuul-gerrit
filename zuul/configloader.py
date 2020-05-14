@@ -14,6 +14,7 @@ import base64
 import collections
 from contextlib import contextmanager
 import copy
+import functools
 import itertools
 import os
 import logging
@@ -480,7 +481,9 @@ class NodeSetParser(object):
         self.schema = self.getSchema(False)
         self.anon_schema = self.getSchema(True)
 
-    def getSchema(self, anonymous=False):
+    @classmethod
+    @functools.lru_cache(maxsize=1)
+    def getSchema(cls, anonymous=False):
         node = {vs.Required('name'): to_list(str),
                 vs.Required('label'): str,
                 }
@@ -550,7 +553,9 @@ class SecretParser(object):
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
-    def getSchema(self):
+    @classmethod
+    @functools.lru_cache(maxsize=1)
+    def getSchema(cls):
         secret = {vs.Required('name'): str,
                   vs.Required('data'): dict,
                   '_source_context': model.SourceContext,
@@ -962,7 +967,9 @@ class ProjectTemplateParser(object):
                               'merge-mode', 'default-branch', 'vars',
                               '_source_context', '_start_mark']
 
-    def getSchema(self):
+    @classmethod
+    @functools.lru_cache(maxsize=1)
+    def getSchema(cls):
         job = {str: vs.Any(str, JobParser.job_attributes)}
         job_list = [vs.Any(str, job)]
 
@@ -1046,7 +1053,9 @@ class ProjectParser(object):
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
-    def getSchema(self):
+    @classmethod
+    @functools.lru_cache(maxsize=1)
+    def getSchema(cls):
         job = {str: vs.Any(str, JobParser.job_attributes)}
         job_list = [vs.Any(str, job)]
 
@@ -1157,9 +1166,10 @@ class PipelineParser(object):
     def __init__(self, pcontext):
         self.log = logging.getLogger("zuul.PipelineParser")
         self.pcontext = pcontext
-        self.schema = self.getSchema()
+        self.schema = self.getSchema(pcontext.connections)
 
-    def getDriverSchema(self, dtype):
+    @classmethod
+    def getDriverSchema(cls, dtype, connections):
         methods = {
             'trigger': 'getTriggerSchema',
             'reporter': 'getReporterSchema',
@@ -1169,15 +1179,16 @@ class PipelineParser(object):
 
         schema = {}
         # Add the configured connections as available layout options
-        for connection_name, connection in \
-            self.pcontext.connections.connections.items():
+        for connection_name, connection in connections.connections.items():
             method = getattr(connection.driver, methods[dtype], None)
             if method:
                 schema[connection_name] = to_list(method())
 
         return schema
 
-    def getSchema(self):
+    @classmethod
+    @functools.lru_cache(maxsize=1)
+    def getSchema(cls, connections):
         manager = vs.Any('independent',
                          'dependent',
                          'serial',
@@ -1216,12 +1227,13 @@ class PipelineParser(object):
                     '_source_context': model.SourceContext,
                     '_start_mark': ZuulMark,
                     }
-        pipeline['require'] = self.getDriverSchema('require')
-        pipeline['reject'] = self.getDriverSchema('reject')
-        pipeline['trigger'] = vs.Required(self.getDriverSchema('trigger'))
+        pipeline['require'] = cls.getDriverSchema('require', connections)
+        pipeline['reject'] = cls.getDriverSchema('reject', connections)
+        pipeline['trigger'] = vs.Required(cls.getDriverSchema('trigger',
+                                                              connections))
         for action in ['enqueue', 'start', 'success', 'failure',
                        'merge-failure', 'no-jobs', 'disabled', 'dequeue']:
-            pipeline[action] = self.getDriverSchema('reporter')
+            pipeline[action] = cls.getDriverSchema('reporter', connections)
         return vs.Schema(pipeline)
 
     def fromYaml(self, conf):
@@ -1338,7 +1350,9 @@ class SemaphoreParser(object):
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
-    def getSchema(self):
+    @classmethod
+    @functools.lru_cache(maxsize=1)
+    def getSchema(cls):
         semaphore = {vs.Required('name'): str,
                      'max': int,
                      '_source_context': model.SourceContext,
@@ -1361,7 +1375,9 @@ class AuthorizationRuleParser(object):
         self.log = logging.getLogger("zuul.AuthorizationRuleParser")
         self.schema = self.getSchema()
 
-    def getSchema(self):
+    @classmethod
+    @functools.lru_cache(maxsize=1)
+    def getSchema(cls):
 
         authRule = {vs.Required('name'): str,
                     vs.Required('conditions'): to_list(dict)
@@ -1483,10 +1499,15 @@ class TenantParser(object):
         self.tenant_source(value)
 
     def getSchema(self):
+        return self._getSchema(self.validateTenantSources())
+
+    @classmethod
+    @functools.lru_cache(maxsize=1)
+    def _getSchema(cls, tenant_sources):
         tenant = {vs.Required('name'): str,
                   'max-nodes-per-job': int,
                   'max-job-timeout': int,
-                  'source': self.validateTenantSources(),
+                  'source': tenant_sources,
                   'exclude-unprotected-branches': bool,
                   'allowed-triggers': to_list(str),
                   'allowed-reporters': to_list(str),

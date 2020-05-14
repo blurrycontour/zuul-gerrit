@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import logging
 import time
 import voluptuous as v
@@ -114,5 +115,6 @@ def qosValue(value):
     return value
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     return v.Schema({v.Required('topic'): topicValue, 'qos': qosValue})

@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import logging
 import voluptuous as v
 from zuul.trigger import BaseTrigger
@@ -43,6 +44,7 @@ class PagureTrigger(BaseTrigger):
         pass
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     pagure_trigger = {
         v.Required('event'):

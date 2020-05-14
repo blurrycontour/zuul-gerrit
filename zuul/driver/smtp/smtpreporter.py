@@ -13,6 +13,8 @@
 # under the License.
 
 import logging
+import functools
+
 import voluptuous as v
 
 from zuul.lib.logutil import get_annotated_logger
@@ -49,6 +51,7 @@ class SMTPReporter(BaseReporter):
                                  zuul_event_id=item.event)
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     smtp_reporter = v.Schema({
         'to': str,

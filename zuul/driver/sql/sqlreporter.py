@@ -13,6 +13,7 @@
 # under the License.
 
 import datetime
+import functools
 import json
 import logging
 import time
@@ -107,6 +108,7 @@ class SQLReporter(BaseReporter):
                     db_build.createArtifact(**artifact)
 
 
+@functools.lru_cache(maxsize=1)
 def getSchema():
     sql_reporter = v.Schema(None)
     return sql_reporter

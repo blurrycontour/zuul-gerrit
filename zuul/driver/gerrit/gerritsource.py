@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import functools
 import re
 import urllib
 import logging
@@ -159,6 +160,7 @@ approval = vs.Schema({'username': str,
                       }, extra=vs.ALLOW_EXTRA)
 
 
+@functools.lru_cache(maxsize=1)
 def getRequireSchema():
     require = {'approval': scalar_or_list(approval),
                'open': bool,
@@ -168,6 +170,7 @@ def getRequireSchema():
     return require
 
 
+@functools.lru_cache(maxsize=1)
 def getRejectSchema():
     reject = {'approval': scalar_or_list(approval)}
 
