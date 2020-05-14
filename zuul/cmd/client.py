@@ -36,12 +36,15 @@ class ZuulRESTClient(object):
     """Basic client for Zuul's REST API"""
     def __init__(self, url, verify=False, auth_token=None):
         self.url = url
+        if not self.url.endswith('/'):
+            self.url += '/'
         self.auth_token = auth_token
-        self.base_url = urllib.parse.urljoin(self.url, '/api/')
         self.verify = verify
-        self.session = requests.Session(
-            verify=self.verify,
-            headers={'Authorization': 'Bearer %s' % self.auth_token})
+        self.base_url = urllib.parse.urljoin(self.url, 'api/')
+        self.session = requests.Session()
+        self.session.verify = self.verify
+        self.session.headers = dict(
+            Authorization='Bearer %s' % self.auth_token)
 
     def _check_status(self, req):
         try:
