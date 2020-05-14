@@ -503,13 +503,13 @@ class ZuulWebAPI(object):
     @cherrypy.tools.handle_options(allowed_methods=['GET', 'DELETE', ])
     def autohold_by_request_id(self, tenant, request_id):
         if cherrypy.request.method == 'GET':
-            return self._autohold_info(request_id)
+            return self._autohold_info(tenant, request_id)
         elif cherrypy.request.method == 'DELETE':
-            return self._autohold_delete(request_id)
+            return self._autohold_delete(tenant, request_id)
         else:
             raise cherrypy.HTTPError(405)
 
-    def _autohold_info(self, request_id):
+    def _autohold_info(self, tenant, request_id):
         job = self.rpc.submitJob('zuul:autohold_info',
                                  {'request_id': request_id})
         if job.failure:
@@ -518,7 +518,11 @@ class ZuulWebAPI(object):
             request = json.loads(job.data[0])
             if not request:
                 raise cherrypy.HTTPError(
-                    404, 'Hold request %s does not exist.' % request_id)
+                    404, 'Hold request %s not found.' % request_id)
+            if tenant != request['tenant']:
+                # return 404 rather than 403 to avoid leaking tenant info
+                raise cherrypy.HTTPError(
+                    404, 'Hold request %s not found.' % request_id)
             resp = cherrypy.response
             resp.headers['Access-Control-Allow-Origin'] = '*'
             return {
@@ -535,10 +539,9 @@ class ZuulWebAPI(object):
                 'nodes': request['nodes']
             }
 
-    def _autohold_delete(self, request_id):
+    def _autohold_delete(self, tenant, request_id):
         # We need tenant info from the request for authz
-        request = self._autohold_info(request_id)
-
+        request = self._autohold_info(tenant, request_id)
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
@@ -589,12 +592,16 @@ class ZuulWebAPI(object):
             'buildsets': '/api/tenant/{tenant}/buildsets',
             'buildset': '/api/tenant/{tenant}/buildset/{uuid}',
             'config_errors': '/api/tenant/{tenant}/config-errors',
+            # TODO(mhu) remove after next release
             'authorizations': '/api/user/authorizations',
+            'tenant_authorizations': ('/api/tenant/{tenant}'
+                                      '/authorizations'),
             'autohold': '/api/tenant/{tenant}/project/{project:.*}/autohold',
             'autohold_list': '/api/tenant/{tenant}/autohold',
-            'autohold_by_request_id': '/api/tenant/{tenant}/'
-                                      'autohold/{request_id}',
-            'autohold_delete': '/api/tenant/{tenant}/autohold/{request_id}',
+            'autohold_by_request_id': ('/api/tenant/{tenant}'
+                                       '/autohold/{request_id}'),
+            'autohold_delete': ('/api/tenant/{tenant}'
+                                '/autohold/{request_id}'),
             'enqueue': '/api/tenant/{tenant}/project/{project:.*}/enqueue',
             'dequeue': '/api/tenant/{tenant}/project/{project:.*}/dequeue',
             'promote': '/api/tenant/{tenant}/promote',
@@ -638,11 +645,11 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(403)
         return user_authz
 
-    # TODO good candidate for caching
+    # TODO(mhu) deprecated, remove next version
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['GET', ])
-    def user_authorizations(self):
+    def authorizations(self):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
             return basic_error
@@ -650,12 +657,50 @@ class ZuulWebAPI(object):
         claims, token_error = self._auth_token_check()
         if token_error is not None:
             return token_error
+        try:
+            admin_tenants = self._authorizations()
+        except exceptions.AuthTokenException as e:
+            for header, contents in e.getAdditionalHeaders().items():
+                cherrypy.response.headers[header] = contents
+            cherrypy.response.status = e.HTTPError
+            return {'description': e.error_description,
+                    'error': e.error,
+                    'realm': e.realm}
+        return {'zuul': {'admin': admin_tenants}, }
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options(allowed_methods=['GET', ])
+    def tenant_authorizations(self, tenant):
+        basic_error = self._basic_auth_header_check()
+        if basic_error is not None:
+            return basic_error
+        # AuthN/AuthZ
+        claims, token_error = self._auth_token_check()
+        if token_error is not None:
+            return token_error
+        try:
+            admin_tenants = self._authorizations()
+        except exceptions.AuthTokenException as e:
+            for header, contents in e.getAdditionalHeaders().items():
+                cherrypy.response.headers[header] = contents
+            cherrypy.response.status = e.HTTPError
+            return {'description': e.error_description,
+                    'error': e.error,
+                    'realm': e.realm}
+        return {'zuul': {'admin': tenant in admin_tenants,
+                         'scope': [tenant, ]}, }
+
+    # TODO good candidate for caching
+    def _authorizations(self):
+        rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
+        claims = self.zuulweb.authenticators.authenticate(rawToken)
         if 'zuul' in claims and 'admin' in claims.get('zuul', {}):
             return {'zuul': {'admin': claims['zuul']['admin']}, }
         job = self.rpc.submitJob('zuul:get_admin_tenants',
                                  {'claims': claims})
         admin_tenants = json.loads(job.data[0])
-        return {'zuul': {'admin': admin_tenants}, }
+        return admin_tenants
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -1221,7 +1266,10 @@ class ZuulWeb(object):
             # route order is important, put project actions before the more
             # generic tenant/{tenant}/project/{project} route
             route_map.connect('api', '/api/user/authorizations',
-                              controller=api, action='user_authorizations')
+                              controller=api, action='authorizations')
+            route_map.connect('api', '/api/tenant/{tenant}/authorizations',
+                              controller=api,
+                              action='tenant_authorizations')
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/autohold',
@@ -1239,7 +1287,8 @@ class ZuulWeb(object):
                 '/api/tenant/{tenant}/promote',
                 controller=api, action='promote')
         route_map.connect('api', '/api/tenant/{tenant}/autohold/{request_id}',
-                          controller=api, action='autohold_by_request_id')
+                          controller=api,
+                          action='autohold_by_request_id')
         route_map.connect('api', '/api/tenant/{tenant}/autohold',
                           controller=api, action='autohold_list')
         route_map.connect('api', '/api/tenant/{tenant}/projects',
