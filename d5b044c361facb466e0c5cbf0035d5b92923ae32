@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_5b9805bf",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3372,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-14T20:57:20Z",
+      "side": 1,
+      "message": "The second thing is true, but I was trying to say that the persistent errors aren\u0027t a big deal because they get filtered out.",
+      "revId": "d5b044c361facb466e0c5cbf0035d5b92923ae32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_1b584d30",
         "filename": "tests/unit/test_v3.py",
         "patchSetId": 2
@@ -42,6 +59,23 @@
         "endLine": 3384,
         "endChar": 62
       },
+      "revId": "d5b044c361facb466e0c5cbf0035d5b92923ae32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_3b9391a5",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3384,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-14T20:57:20Z",
+      "side": 1,
+      "message": "Agreed.",
       "revId": "d5b044c361facb466e0c5cbf0035d5b92923ae32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
