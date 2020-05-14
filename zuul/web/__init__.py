@@ -445,7 +445,7 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def autohold_by_request_id(self, tenant, request_id):
+    def autohold_by_request_id(self, request_id):
         if cherrypy.request.method == 'GET':
             return self._autohold_info(request_id)
         elif cherrypy.request.method == 'DELETE':
@@ -540,9 +540,8 @@ class ZuulWebAPI(object):
             'authorizations': '/api/user/authorizations',
             'autohold': '/api/tenant/{tenant}/project/{project:.*}/autohold',
             'autohold_list': '/api/tenant/{tenant}/autohold',
-            'autohold_by_request_id': '/api/tenant/{tenant}/'
-                                      'autohold/{request_id}',
-            'autohold_delete': '/api/tenant/{tenant}/autohold/{request_id}',
+            'autohold_by_request_id': '/api/autohold/{request_id}',
+            'autohold_delete': '/api/autohold/{request_id}',
             'enqueue': '/api/tenant/{tenant}/project/{project:.*}/enqueue',
             'dequeue': '/api/tenant/{tenant}/project/{project:.*}/dequeue',
         }
@@ -1153,7 +1152,7 @@ class ZuulWeb(object):
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/dequeue',
                 controller=api, action='dequeue')
-        route_map.connect('api', '/api/tenant/{tenant}/autohold/{request_id}',
+        route_map.connect('api', '/api/autohold/{request_id}',
                           controller=api, action='autohold_by_request_id')
         route_map.connect('api', '/api/tenant/{tenant}/autohold',
                           controller=api, action='autohold_list')

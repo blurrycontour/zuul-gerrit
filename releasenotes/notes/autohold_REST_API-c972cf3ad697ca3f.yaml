@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    REST API: remove the tenant from the autohold-info and autohold-delete endpoints.
+    They become respectively "GET /api/autohold/{id}" and "DELETE /api/autohold/{id}". 
