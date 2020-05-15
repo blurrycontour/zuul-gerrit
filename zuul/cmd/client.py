@@ -81,19 +81,30 @@ class ZuulRESTClient(object):
         url = urllib.parse.urljoin(
             self.base_url,
             'tenant/%s/autohold' % tenant)
+        # auth not needed here
         req = requests.get(url, verify=self.verify)
         self._check_status(req)
         resp = req.json()
-        # reformat the answer to match RPC format
-        ret = {}
-        for d in resp:
-            key = ','.join([d['tenant'],
-                            d['project'],
-                            d['job'],
-                            d['ref_filter']])
-            ret[key] = (d['count'], d['reason'], d['node_hold_expiration'])
+        return resp
 
-        return ret
+    def autohold_delete(self, id):
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'autohold/%s' % id)
+        req = self.session.delete(url)
+        self._check_status(req)
+        resp = req.json()
+        return resp
+
+    def autohold_info(self, id):
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'autohold/%s' % id)
+        # auth not needed here
+        req = requests.get(url, verify=self.verify)
+        self._check_status(req)
+        resp = req.json()
+        return resp
 
     def enqueue(self, tenant, pipeline, project, trigger, change):
         if not self.auth_token:
