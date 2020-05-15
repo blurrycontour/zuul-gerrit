@@ -127,10 +127,10 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         }
         return format_methods[self._action]
 
-    def _formatItemReport(self, item, with_jobs=True):
+    def _formatItemReport(self, item, with_jobs=True, with_history=False):
         """Format a report from the given items. Usually to provide results to
         a reporter taking free-form text."""
-        ret = self._getFormatter()(item, with_jobs)
+        ret = self._getFormatter()(item, with_jobs, with_history)
 
         if item.current_build_set.warning_messages:
             warning = '\n  '.join(item.current_build_set.warning_messages)
@@ -145,7 +145,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
         return ret
 
-    def _formatItemReportEnqueue(self, item, with_jobs=True):
+    def _formatItemReportEnqueue(
+        self, item, with_jobs=True, with_history=False
+    ):
         status_url = get_default(self.connection.sched.config,
                                  'web', 'status_url', '')
         if status_url:
@@ -156,7 +158,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             change=item.change.getSafeAttributes(),
             status_url=status_url)
 
-    def _formatItemReportStart(self, item, with_jobs=True):
+    def _formatItemReportStart(self, item, with_jobs=True, with_history=False):
         status_url = get_default(self.connection.sched.config,
                                  'web', 'status_url', '')
         if status_url:
@@ -167,13 +169,19 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             change=item.change.getSafeAttributes(),
             status_url=status_url)
 
-    def _formatItemReportSuccess(self, item, with_jobs=True):
+    def _formatItemReportSuccess(
+        self, item, with_jobs=True, with_history=False
+    ):
         msg = item.pipeline.success_message
         if with_jobs:
             msg += '\n\n' + self._formatItemReportJobs(item)
+        if with_history:
+            msg += '\n\n' + self._formatItemReportHistory(item)
         return msg
 
-    def _formatItemReportFailure(self, item, with_jobs=True):
+    def _formatItemReportFailure(
+        self, item, with_jobs=True, with_history=False
+    ):
         if item.dequeued_needing_change:
             msg = 'This change depends on a change that failed to merge.\n'
         elif item.didMergerFail():
@@ -184,12 +192,18 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             msg = item.pipeline.failure_message
             if with_jobs:
                 msg += '\n\n' + self._formatItemReportJobs(item)
+            if with_history:
+                msg += '\n\n' + self._formatItemReportHistory(item)
         return msg
 
-    def _formatItemReportMergeFailure(self, item, with_jobs=True):
+    def _formatItemReportMergeFailure(
+        self, item, with_jobs=True, with_history=False
+    ):
         return item.pipeline.merge_failure_message
 
-    def _formatItemReportNoJobs(self, item, with_jobs=True):
+    def _formatItemReportNoJobs(
+        self, item, with_jobs=True, with_history=False
+    ):
         status_url = get_default(self.connection.sched.config,
                                  'web', 'status_url', '')
         if status_url:
@@ -200,7 +214,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             change=item.change.getSafeAttributes(),
             status_url=status_url)
 
-    def _formatItemReportDisabled(self, item, with_jobs=True):
+    def _formatItemReportDisabled(
+        self, item, with_jobs=True, with_history=False
+    ):
         if item.current_build_set.result == 'SUCCESS':
             return self._formatItemReportSuccess(item)
         elif item.current_build_set.result == 'FAILURE':
@@ -253,4 +269,10 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         jobs_fields = self._getItemReportJobsFields(item)
         for job_fields in jobs_fields:
             ret += '- %s%s : %s%s%s%s\n' % job_fields
+        return ret
+
+    def _formatItemReportHistory(self, item):
+        ret = "Previous build results can be found [here]({}).\n".format(
+            item.formatHistoryUrl()
+        )
         return ret

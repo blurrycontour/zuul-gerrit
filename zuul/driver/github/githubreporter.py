@@ -208,7 +208,7 @@ class GithubReporter(BaseReporter):
 
     def updateCheck(self, item):
         log = get_annotated_logger(self.log, item.event)
-        message = self._formatItemReport(item)
+        message = self._formatItemReport(item, with_history=True)
         project = item.change.project.name
         pr_number = item.change.number
         sha = item.change.patchset

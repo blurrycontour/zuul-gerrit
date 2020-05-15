@@ -2773,6 +2773,21 @@ class QueueItem(object):
         )
         return self.formatUrlPattern(pattern)
 
+    def formatHistoryUrl(self):
+        # If we don't have a web root set, we can't format any url
+        if not self.pipeline.tenant.web_root:
+            # Apparently we have no website
+            return None
+        pattern = urllib.parse.urljoin(
+            self.pipeline.tenant.web_root,
+            # Regarding the change, we don't want to filter for a specific
+            # patch set, as we want to get the history for whole change and not
+            # just the latest patch.
+            "buildsets?change={change.number}&pipeline={pipeline.name}"
+            "&procjet={change.project.name}",
+        )
+        return self.formatUrlPattern(pattern)
+
     def formatProvisionalJobResult(self, job):
         build = self.current_build_set.getBuild(job.name)
         result = build.result
