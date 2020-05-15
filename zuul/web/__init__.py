@@ -346,6 +346,48 @@ class ZuulWebAPI(object):
         return result
 
     @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def promote(self, tenant):
+        basic_error = self._basic_auth_header_check()
+        if basic_error is not None:
+            return basic_error
+        if cherrypy.request.method != 'POST':
+            raise cherrypy.HTTPError(405)
+        # AuthN/AuthZ
+        rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
+        try:
+            claims = self.zuulweb.authenticators.authenticate(rawToken)
+        except exceptions.AuthTokenException as e:
+            for header, contents in e.getAdditionalHeaders().items():
+                cherrypy.response.headers[header] = contents
+            cherrypy.response.status = e.HTTPError
+            return {'description': e.error_description,
+                    'error': e.error,
+                    'realm': e.realm}
+        self.is_authorized(claims, tenant)
+        msg = 'User "%s" requesting "%s" on %s'
+        self.log.info(
+            msg % (claims['__zuul_uid_claim'], 'promote', tenant))
+
+        body = cherrypy.request.json
+        if not all(field in body for field in ['pipeline', 'change_ids']):
+            raise cherrypy.HTTPError(400,
+                                     'Invalid request body')
+        if isinstance(body['change_ids'], list):
+            change_ids = body['change_ids']
+        else:
+            change_ids = [body['change_ids'], ]
+        job = self.rpc.submitJob('zuul:promote',
+                                 {'tenant': tenant,
+                                  'pipeline': body['pipeline'],
+                                  'change_ids': change_ids})
+        result = not job.failure
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return result
+
+    @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def autohold_list(self, tenant, *args, **kwargs):
         # we don't use json_in because a payload is not mandatory with GET
@@ -553,6 +595,7 @@ class ZuulWebAPI(object):
                                 '/autohold/{request_id}'),
             'enqueue': '/api/tenant/{tenant}/project/{project:.*}/enqueue',
             'dequeue': '/api/tenant/{tenant}/project/{project:.*}/dequeue',
+            'promote': '/api/tenant/{tenant}/promote',
         }
 
     @cherrypy.expose
@@ -1173,6 +1216,8 @@ class ZuulWeb(object):
             route_map.connect('api', '/api/tenant/{tenant}/authorizations',
                               controller=api,
                               action='tenant_authorizations')
+            route_map.connect('api', '/api/tenant/{tenant}/promote',
+                              controller=api, action='promote')
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/autohold',
