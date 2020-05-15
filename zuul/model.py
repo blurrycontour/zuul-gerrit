@@ -2773,6 +2773,17 @@ class QueueItem(object):
         )
         return self.formatUrlPattern(pattern)
 
+    def formatHistoryUrl(self):
+        if not self.pipeline.tenant.web_root:
+            # Apparently we have no website
+            return None
+        pattern = urllib.parse.urljoin(
+            self.pipeline.tenant.web_root,
+            "buildsets?change={change.number},{change.patchset}"
+            "&pipeline={pipeline.name}"
+        )
+        return self.formatUrlPattern(pattern)
+
     def formatProvisionalJobResult(self, job):
         build = self.current_build_set.getBuild(job.name)
         result = build.result
