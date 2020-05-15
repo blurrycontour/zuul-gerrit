@@ -8,9 +8,9 @@ Tenant Scoped REST API
 Users can perform some privileged actions at the tenant level through protected
 endpoints of the REST API, if these endpoints are activated.
 
-The supported actions are **autohold**, **enqueue/enqueue-ref**,
-**dequeue/dequeue-ref** and **promote**. These are similar to the ones available
-through Zuul's CLI.
+The supported actions are **autohold**, **promote**, **enqueue/enqueue-ref** and
+**dequeue/dequeue-ref**. These are similar to the ones available through Zuul's
+CLI.
 
 The protected endpoints require a bearer token, passed to Zuul Web Server as the
 **Authorization** header of the request. The token and this workflow follow the
