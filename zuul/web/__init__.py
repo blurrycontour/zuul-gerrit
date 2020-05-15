@@ -1272,6 +1272,8 @@ class ZuulWeb(object):
             route_map.connect('api', '/api/tenant/{tenant}/authorizations',
                               controller=api,
                               action='tenant_authorizations')
+            route_map.connect('api', '/api/tenant/{tenant}/promote',
+                              controller=api, action='promote')
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/autohold',
