@@ -2183,6 +2183,10 @@ class TestWebMulti(BaseTestWeb):
 class TestCLIViaWebApi(BaseTestWeb):
     config_file = 'zuul-admin-web.conf'
 
+    def _popen(self, cmd_list):
+        return subprocess.Popen(
+            cmd_list, stdout=subprocess.PIPE, universal_newlines=True)
+
     def test_autohold(self):
         """Test that autohold can be set with the CLI through REST"""
         authz = {'iss': 'zuul_operator',
@@ -2194,15 +2198,14 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
-        p = subprocess.Popen(
+        p = self._popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'autohold', '--reason', 'some reason',
              '--tenant', 'tenant-one', '--project', 'org/project',
-             '--job', 'project-test2', '--count', '1'],
-            stdout=subprocess.PIPE)
-        output = p.communicate()
-        self.assertEqual(p.returncode, 0, output[0])
+             '--job', 'project-test2', '--count', '1'])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertEqual(p.returncode, 0, stderr_txt)
         # Check result in rpc client
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
@@ -2217,6 +2220,112 @@ class TestCLIViaWebApi(BaseTestWeb):
         self.assertEqual(".*", request['ref_filter'])
         self.assertEqual("some reason", request['reason'])
         self.assertEqual(1, request['max_count'])
+        # clean up
+        client.autohold_delete(request['id'])
+        autohold_requests = client.autohold_list()
+        self.assertEqual([], autohold_requests)
+
+    def test_autohold_info(self):
+        """Test we can get autohold-info with the CLI through REST"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = self._popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'autohold', '--reason', 'some reason',
+             '--tenant', 'tenant-one', '--project', 'org/project',
+             '--job', 'project-test2', '--count', '1'])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertEqual(p.returncode, 0, stderr_txt)
+        # Check result in rpc client
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        autohold_requests = client.autohold_list()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        request = autohold_requests[0]
+        p = self._popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url,
+             'autohold-info',
+             '--tenant', 'tenant-one', request['id']])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertEqual(p.returncode, 0, stderr_txt)
+        self.assertTrue(
+            ("ID: %s" % request['id']) in stdout_txt,
+            stdout_txt)
+        self.assertTrue(
+            ("Tenant: %s" % request['tenant']) in stdout_txt,
+            stdout_txt)
+        self.assertTrue(
+            ("Project: %s" % request['project']) in stdout_txt,
+            stdout_txt)
+        self.assertTrue(
+            ("Max Count: %s" % request['max_count']) in stdout_txt,
+            stdout_txt)
+        # fail without tenant info
+        p = self._popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url,
+             'autohold-info', request['id']])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertNotEqual(p.returncode, 0, stdout_txt)
+        # clean up
+        client.autohold_delete(request['id'])
+        autohold_requests = client.autohold_list()
+        self.assertEqual([], autohold_requests)
+
+    def test_autohold_delete(self):
+        """Test we can delete autoholds with the CLI through REST"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = self._popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'autohold', '--reason', 'some reason',
+             '--tenant', 'tenant-one', '--project', 'org/project',
+             '--job', 'project-test2', '--count', '1'])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertEqual(p.returncode, 0, stderr_txt)
+        # Check result in rpc client
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        autohold_requests = client.autohold_list()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        request = autohold_requests[0]
+        # fail without tenant info
+        p = self._popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'autohold-delete', request['id']])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertNotEqual(p.returncode, 0, stdout_txt)
+        p = self._popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'autohold-delete',
+             '--tenant', 'tenant-one', request['id']])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertEqual(p.returncode, 0, stderr_txt)
+        info = client.autohold_info(request['id'])
+        self.assertTrue(not info)
 
     def test_enqueue(self):
         """Test that the CLI can enqueue a change via REST"""
@@ -2233,7 +2342,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
-        p = subprocess.Popen(
+        p = self._popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'enqueue', '--tenant', 'tenant-one',
@@ -2262,17 +2371,16 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
-        p = subprocess.Popen(
+        p = self._popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'enqueue-ref', '--tenant', 'tenant-one',
              '--project', 'org/project',
              '--pipeline', 'post', '--ref', 'master',
              '--oldrev', '90f173846e3af9154517b88543ffbd1691f31366',
-             '--newrev', A_commit],
-            stdout=subprocess.PIPE)
-        output = p.communicate()
-        self.assertEqual(p.returncode, 0, output[0])
+             '--newrev', A_commit])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertEqual(p.returncode, 0, stderr_txt)
         self.waitUntilSettled()
 
     def test_dequeue(self):
@@ -2298,14 +2406,13 @@ class TestCLIViaWebApi(BaseTestWeb):
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
-        p = subprocess.Popen(
+        p = self._popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'dequeue', '--tenant', 'tenant-one', '--project', 'org/project',
-             '--pipeline', 'periodic', '--ref', 'refs/heads/stable'],
-            stdout=subprocess.PIPE)
-        output = p.communicate()
-        self.assertEqual(p.returncode, 0, output[0])
+             '--pipeline', 'periodic', '--ref', 'refs/heads/stable'])
+        stdout_txt, stderr_txt = p.communicate()
+        self.assertEqual(p.returncode, 0, stderr_txt)
         self.waitUntilSettled()
 
         self.commitConfigUpdate('common-config',
