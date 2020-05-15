@@ -80,19 +80,34 @@ class ZuulRESTClient(object):
         url = urllib.parse.urljoin(
             self.base_url,
             'tenant/%s/autohold' % tenant)
+        # auth not needed here
         req = requests.get(url, verify=self.verify)
         self._check_status(req)
         resp = req.json()
-        # reformat the answer to match RPC format
-        ret = {}
-        for d in resp:
-            key = ','.join([d['tenant'],
-                            d['project'],
-                            d['job'],
-                            d['ref_filter']])
-            ret[key] = (d['count'], d['reason'], d['node_hold_expiration'])
+        return resp
 
-        return ret
+    def autohold_delete(self, id, tenant):
+        if tenant is None:
+            raise Exception("tenant required when using the REST client")
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/autohold/%s' % (tenant, id))
+        req = self.session.delete(url)
+        self._check_status(req)
+        # DELETE doesn't return a body, just the HTTP code
+        return (req.status_code == 204)
+
+    def autohold_info(self, id, tenant):
+        if tenant is None:
+            raise Exception("tenant required when using the REST client")
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/autohold/%s' % (tenant, id))
+        # auth not needed here
+        req = requests.get(url, verify=self.verify)
+        self._check_status(req)
+        resp = req.json()
+        return resp
 
     def enqueue(self, tenant, pipeline, project, trigger, change):
         if not self.auth_token:
@@ -216,19 +231,23 @@ class Client(zuul.cmd.ZuulApp):
         cmd_autohold_delete = subparsers.add_parser(
             'autohold-delete', help='delete autohold request')
         cmd_autohold_delete.set_defaults(func=self.autohold_delete)
+        cmd_autohold_delete.add_argument('--tenant', help='tenant name',
+                                         required=False, default=None)
         cmd_autohold_delete.add_argument('id', metavar='REQUEST_ID',
                                          help='the hold request ID')
 
         cmd_autohold_info = subparsers.add_parser(
             'autohold-info', help='retrieve autohold request detailed info')
         cmd_autohold_info.set_defaults(func=self.autohold_info)
+        cmd_autohold_info.add_argument('--tenant', help='tenant name',
+                                       required=False, default=None)
         cmd_autohold_info.add_argument('id', metavar='REQUEST_ID',
                                        help='the hold request ID')
 
         cmd_autohold_list = subparsers.add_parser(
             'autohold-list', help='list autohold requests')
         cmd_autohold_list.add_argument('--tenant', help='tenant name',
-                                       required=False)
+                                       required=True)
         cmd_autohold_list.set_defaults(func=self.autohold_list)
 
         cmd_enqueue = subparsers.add_parser('enqueue', help='enqueue a change')
@@ -459,11 +478,17 @@ class Client(zuul.cmd.ZuulApp):
 
     def autohold_delete(self):
         client = self.get_client()
-        return client.autohold_delete(self.args.id)
+        if isinstance(client, ZuulRESTClient):
+            return client.autohold_delete(self.args.id, self.args.tenant)
+        else:
+            return client.autohold_delete(self.args.id)
 
     def autohold_info(self):
         client = self.get_client()
-        request = client.autohold_info(self.args.id)
+        if isinstance(client, ZuulRESTClient):
+            request = client.autohold_info(self.args.id, self.args.tenant)
+        else:
+            request = client.autohold_info(self.args.id)
 
         if not request:
             print("Autohold request not found")
