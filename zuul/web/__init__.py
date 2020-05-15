@@ -1270,6 +1270,8 @@ class ZuulWeb(object):
             route_map.connect('api', '/api/tenant/{tenant}/authorizations',
                               controller=api,
                               action='tenant_authorizations')
+            route_map.connect('api', '/api/tenant/{tenant}/promote',
+                              controller=api, action='promote')
             route_map.connect(
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/autohold',
@@ -1282,10 +1284,6 @@ class ZuulWeb(object):
                 'api',
                 '/api/tenant/{tenant}/project/{project:.*}/dequeue',
                 controller=api, action='dequeue')
-            route_map.connect(
-                'api',
-                '/api/tenant/{tenant}/promote',
-                controller=api, action='promote')
         route_map.connect('api', '/api/tenant/{tenant}/autohold/{request_id}',
                           controller=api,
                           action='autohold_by_request_id')
