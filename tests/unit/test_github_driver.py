@@ -1837,7 +1837,10 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
         self.assertEqual("success", check_run["conclusion"])
         self.assertThat(
             check_run["output"]["summary"],
-            MatchesRegex(r'.*Build succeeded.*', re.DOTALL)
+            MatchesRegex(
+                r'.*Build succeeded.*Previous build results can be found.*',
+                re.DOTALL,
+            )
         )
         self.assertIsNotNone(check_run["completed_at"])
         # A completed check run should not provide any custom actions
