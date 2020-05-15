@@ -2030,6 +2030,100 @@ class TestCLIViaWebApi(BaseTestWeb):
         self.assertEqual(".*", request['ref_filter'])
         self.assertEqual("some reason", request['reason'])
         self.assertEqual(1, request['max_count'])
+        # clean up
+        client.autohold_delete(request['id'])
+        autohold_requests = client.autohold_list()
+        self.assertEqual([], autohold_requests)
+
+    def test_autohold_info(self):
+        """Test we can get autohold-info with the CLI through REST"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'autohold', '--reason', 'some reason',
+             '--tenant', 'tenant-one', '--project', 'org/project',
+             '--job', 'project-test2', '--count', '1'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        # Check result in rpc client
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        autohold_requests = client.autohold_list()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        request = autohold_requests[0]
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url,
+             'autohold-info', request['id']],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        self.assertTrue(
+            ("ID: %s" % request['id']) in output[0],
+            output[0])
+        self.assertTrue(
+            ("Tenant: %s" % request['tenant']) in output[0],
+            output[0])
+        self.assertTrue(
+            ("Project: %s" % request['project']) in output[0],
+            output[0])
+        self.assertTrue(
+            ("Max Count: %s" % request['max_count']) in output[0],
+            output[0])
+        # clean up
+        client.autohold_delete(request['id'])
+        autohold_requests = client.autohold_list()
+        self.assertEqual([], autohold_requests)
+
+    def test_autohold_delete(self):
+        """Test we can delete autoholds with the CLI through REST"""
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'autohold', '--reason', 'some reason',
+             '--tenant', 'tenant-one', '--project', 'org/project',
+             '--job', 'project-test2', '--count', '1'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        # Check result in rpc client
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        autohold_requests = client.autohold_list()
+        self.assertNotEqual([], autohold_requests)
+        self.assertEqual(1, len(autohold_requests))
+        request = autohold_requests[0]
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'autohold-delete', request['id']],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        info = client.autohold_info(request['id'])
+        self.assertTrue(not info)
 
     def test_enqueue(self):
         """Test that the CLI can enqueue a change via REST"""
