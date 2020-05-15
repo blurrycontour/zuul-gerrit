@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_8d66d5c0",
+        "filename": "doc/source/howtos/ubuntu_setup.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-05-15T13:00:05Z",
+      "side": 1,
+      "message": "nit: white space",
+      "range": {
+        "startLine": 41,
+        "startChar": 67,
+        "endLine": 41,
+        "endChar": 68
+      },
+      "revId": "54d2f594aaae8bf8855ee2db66e1f8b1e71c9760",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
