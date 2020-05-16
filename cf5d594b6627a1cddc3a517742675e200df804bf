@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_fe1bab7d",
+        "filename": "doc/source/howtos/ubuntu_setup.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-05-16T08:56:49Z",
+      "side": 1,
+      "message": "Nit (and I thought sphinx catches this): heading underlines should be as long as the line above it.",
+      "range": {
+        "startLine": 4,
+        "startChar": 6,
+        "endLine": 4,
+        "endChar": 9
+      },
+      "revId": "cf5d594b6627a1cddc3a517742675e200df804bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
