@@ -52,6 +52,24 @@
       "revId": "e743c33181395caf1fc424941baa7250642705aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_f552a13a",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 30176
+      },
+      "writtenOn": "2020-05-17T19:33:43Z",
+      "side": 1,
+      "message": "This is what i\u0027m using now. When I try it with the \"OAuth-compliant header\" I get a \"401 Unauthorized\" When I use the Private-Token I can login. On https://docs.gitlab.com/ee/api/README.html#personalproject-access-tokens says it should work, but it is not.",
+      "parentUuid": "ff570b3c_d5a95d24",
+      "revId": "e743c33181395caf1fc424941baa7250642705aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
