@@ -206,7 +206,7 @@ class GitlabAPIClient():
         self.session = requests.Session()
         self.baseurl = '%s/api/v4/' % baseurl
         self.api_token = api_token
-        self.headers = {'Authorization': 'Bearer %s' % (
+        self.headers = {'PRIVATE-TOKEN': '%s' % (
             self.api_token)}
 
     def _manage_error(self, data, code, url, verb, zuul_event_id=None):
