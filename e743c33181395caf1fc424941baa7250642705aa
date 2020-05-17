@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_8287a9b5",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-05-17T15:25:23Z",
+      "side": 1,
+      "message": "What are the advantages of using the \u0027PRIVATE-TOKEN\u0027 header ? \n\nI don\u0027t why one would use this kind of token instead of personal access tokens but OAuth2 tokens (\"Resource owner password credentials flow\") can be used with \u0027Authorization\u0027 header. They don\u0027t work with \u0027PRIVATE-TOKEN\u0027 header.",
+      "revId": "e743c33181395caf1fc424941baa7250642705aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
