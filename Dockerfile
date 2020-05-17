@@ -13,6 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+FROM docker.io/library/node:14-buster as js-builder
+
+COPY web /tmp/src
+# Explicitly run the Javascript build
+RUN cd /tmp/src && yarn install -d && yarn build
+
 FROM docker.io/opendevorg/python-builder:3.8 as builder
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -25,14 +31,7 @@ ARG OPENSHIFT_URL=https://github.com/openshift/origin/releases/download/v3.11.0/
 ARG OPENSHIFT_SHA=4b0f07428ba854174c58d2e38287e5402964c9a9355f6c359d1242efd0990da3
 
 COPY . /tmp/src
-RUN /tmp/src/tools/install-js-tools.sh
-# Explicitly run the Javascript build.
-RUN cd /tmp/src \
-  && mkdir -p zuul/web/static \
-  && ln -sfn ../zuul/web/static web/build \
-  && cd /tmp/src/web \
-  && yarn install -d \
-  && yarn build
+COPY --from=js-builder /tmp/src/build /tmp/src/zuul/web/static
 RUN assemble
 
 # The wheel install method doesn't run the setup hooks as the source based
