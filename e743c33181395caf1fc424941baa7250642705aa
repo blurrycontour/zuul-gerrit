@@ -16,6 +16,24 @@
       "revId": "e743c33181395caf1fc424941baa7250642705aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_62441575",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 30176
+      },
+      "writtenOn": "2020-05-17T15:57:27Z",
+      "side": 1,
+      "message": "For me it was not clear how to get it working Authorization  Bearer token. So after trial and error I got this working. Maybe I did something wrong.",
+      "parentUuid": "ff570b3c_8287a9b5",
+      "revId": "e743c33181395caf1fc424941baa7250642705aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
