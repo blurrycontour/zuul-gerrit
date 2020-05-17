@@ -70,6 +70,24 @@
       "revId": "e743c33181395caf1fc424941baa7250642705aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_d89cf46b",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-05-17T20:25:27Z",
+      "side": 1,
+      "message": "I don\u0027t encounter this issue :-/\nBoth commands work with a personal access token:\n- curl --header \"Private-Token: \u003cyour_access_token\u003e\" https://gitlab.com/api/v4/projects\n- curl https://gitlab.com/api/v4/projects?private_token\u003d\u003cmy_access_token\u003e\n\nAre you using gitlab.com or another instance ?",
+      "parentUuid": "ff570b3c_f552a13a",
+      "revId": "e743c33181395caf1fc424941baa7250642705aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
