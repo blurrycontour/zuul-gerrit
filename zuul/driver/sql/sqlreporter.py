@@ -88,6 +88,7 @@ class SQLReporter(BaseReporter):
                     uuid=build.uuid,
                     job_name=build.job.name,
                     result=result,
+                    held=build.held,
                     start_time=start,
                     end_time=end,
                     voting=build.job.voting,
