@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_cd98a676",
+        "filename": "doc/source/reference/developer/ansible.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-05-18T15:11:43Z",
+      "side": 1,
+      "message": "zuul_skip_log_streaming",
+      "revId": "614efc3a6e92cd164799ff7ffe710b9752be8b05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
