@@ -817,6 +817,7 @@ class ZuulWebAPI(object):
             'uuid': build.uuid,
             'job_name': build.job_name,
             'result': build.result,
+            'held': build.held,
             'start_time': start_time,
             'end_time': end_time,
             'duration': duration,
@@ -875,14 +876,14 @@ class ZuulWebAPI(object):
     def builds(self, tenant, project=None, pipeline=None, change=None,
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, node_name=None,
-               result=None, limit=50, skip=0):
+               result=None, held=None, limit=50, skip=0):
         connection = self._get_connection(tenant)
 
         builds = connection.getBuilds(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, node_name=node_name,
-            result=result, limit=limit, offset=skip)
+            result=result, held=held, limit=limit, offset=skip)
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'

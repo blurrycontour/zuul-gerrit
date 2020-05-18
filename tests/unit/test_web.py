@@ -1436,6 +1436,18 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual("some reason", request['reason'])
         self.assertEqual(1, request['max_count'])
 
+        # Trigger the actual autohold, check that the held build is stored
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.executor_server.failJob('project-test2', B)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+        held_builds = self.get_url(
+            "api/tenant/tenant-one/builds?held=True").json()
+        all_builds = self.get_url(
+            "api/tenant/tenant-one/builds?job_name=project-test2").json()
+        self.assertEqual(len(held_builds), 1, all_builds)
+
     def test_autohold_delete(self):
         authz = {'iss': 'zuul_operator',
                  'aud': 'zuul.example.com',
