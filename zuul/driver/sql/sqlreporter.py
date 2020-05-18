@@ -59,6 +59,7 @@ class SQLReporter(BaseReporter):
             node_name=build.node_name,
             error_detail=build.error_detail,
             final=final,
+            held=build.held,
         )
 
         return db_build
@@ -100,7 +101,6 @@ class SQLReporter(BaseReporter):
                     # stats about builds. It doesn't understand how to store
                     # information about the change.
                     continue
-
                 retry_builds = item.current_build_set.getRetryBuildsForJob(
                     job.name
                 )

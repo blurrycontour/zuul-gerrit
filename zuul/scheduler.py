@@ -1565,12 +1565,14 @@ class Scheduler(threading.Thread):
         # failed / retry_limit / post_failure and have an autohold request.
         hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
         if build.result not in hold_list:
-            return
+            return False
 
         request = self._getAutoholdRequest(build)
-        self.log.debug("Got autohold %s", request)
         if request is not None:
+            self.log.debug("Got autohold %s", request)
             self.nodepool.holdNodeSet(build.nodeset, request, build)
+            return True
+        return False
 
     def _doBuildCompletedEvent(self, event):
         build = event.build
@@ -1582,7 +1584,10 @@ class Scheduler(threading.Thread):
         # to pass this on to the pipeline manager, make sure we return
         # the nodes to nodepool.
         try:
-            self._processAutohold(build)
+            event.build.held = self._processAutohold(build)
+            self.log.debug(
+                'build "%s" held status set to %s' % (event.build,
+                                                      event.build.held))
         except Exception:
             log.exception("Unable to process autohold for %s" % build)
         try:
