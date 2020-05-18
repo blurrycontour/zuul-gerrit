@@ -22,6 +22,7 @@ from tests.base import AnsibleZuulTestCase
 class TestZuulStream26(AnsibleZuulTestCase):
     tenant_config_file = 'config/remote-zuul-stream/main.yaml'
     ansible_version = '2.6'
+    wait_timeout = 120
 
     def setUp(self):
         self.log_console_port = 19000 + int(self.ansible_version.split('.')[1])

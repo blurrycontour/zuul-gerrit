@@ -26,6 +26,7 @@ ERROR_SYNC_RSH = "Using custom synchronize rsh is prohibited"
 class TestActionModules26(AnsibleZuulTestCase):
     tenant_config_file = 'config/remote-action-modules/main.yaml'
     ansible_version = '2.6'
+    wait_timeout = 120
 
     def setUp(self):
         super().setUp()
