@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright: (c) 2012, Michael DeHaan <michael.dehaan@gmail.com>, and others
@@ -669,7 +668,3 @@ def main():
         module.fail_json(msg='non-zero return code', **result)
 
     module.exit_json(**result)
-
-
-if __name__ == '__main__':
-    main()
