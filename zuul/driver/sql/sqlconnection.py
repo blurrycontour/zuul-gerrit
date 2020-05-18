@@ -60,7 +60,7 @@ class DatabaseSession(object):
                   change=None, branch=None, patchset=None, ref=None,
                   newrev=None, event_id=None, uuid=None, job_name=None,
                   voting=None, node_name=None, result=None, provides=None,
-                  limit=50, offset=0):
+                  held=None, limit=50, offset=0):
 
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
@@ -103,6 +103,7 @@ class DatabaseSession(object):
         q = self.listFilter(q, build_table.c.node_name, node_name)
         q = self.listFilter(q, build_table.c.result, result)
         q = self.listFilter(q, provides_table.c.name, provides)
+        q = self.listFilter(q, build_table.c.held, held)
 
         q = q.order_by(build_table.c.id.desc()).\
             limit(limit).\
@@ -295,6 +296,7 @@ class SQLConnection(BaseConnection):
             uuid = sa.Column(sa.String(36))
             job_name = sa.Column(sa.String(255))
             result = sa.Column(sa.String(255))
+            held = sa.Column(sa.Boolean)
             start_time = sa.Column(sa.DateTime)
             end_time = sa.Column(sa.DateTime)
             voting = sa.Column(sa.Boolean)
