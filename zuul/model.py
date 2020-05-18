@@ -1877,6 +1877,7 @@ class Build(object):
         self.canceled = False
         self.paused = False
         self.retry = False
+        self.held = False
         self.parameters = {}
         self.worker = Worker()
         self.node_labels = []
