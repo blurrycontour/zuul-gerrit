@@ -1964,6 +1964,37 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
         self.assertEqual("some reason", ah_request['reason'])
 
 
+class TestHeldAttributeInBuildInfo(ZuulDBTestCase, BaseTestWeb):
+    config_file = 'zuul-sql-driver.conf'
+    tenant_config_file = 'config/sql-driver/main.yaml'
+
+    @simple_layout('layouts/autohold.yaml')
+    def test_autohold_and_retrieve_held_build_info(self):
+        """Ensure the "held" attribute can be used to filter builds"""
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.autohold('tenant-one', 'org/project', 'project-test2',
+                            "", "", "reason text", 1)
+        self.assertTrue(r)
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.executor_server.failJob('project-test2', B)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        all_builds = self.get_url("api/tenant/tenant-one/builds?"
+                                  "project=org/project").json()
+        held_builds = self.get_url("api/tenant/tenant-one/builds?"
+                                   "project=org/project&"
+                                   "held=1").json()
+        self.assertEqual(len(held_builds), 1, all_builds)
+        held_build = held_builds[0]
+        self.assertEqual('project-test2', held_build['job_name'], held_build)
+        self.assertEqual(True, held_build['held'], held_build)
+
+
 class TestWebMulti(BaseTestWeb):
     config_file = 'zuul-gerrit-github.conf'
 
