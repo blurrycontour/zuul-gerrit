@@ -1828,6 +1828,9 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(1, len(request2.nodes))
         self.assertEqual(1, len(request2.nodes[0]["nodes"]))
 
+        # The build should also have the "held" flag set to True
+        self.assertEqual(True, self.history[1].held, self.history[1])
+
         # Another failed change should not hold any more nodes
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         self.executor_server.failJob('project-test2', C)
