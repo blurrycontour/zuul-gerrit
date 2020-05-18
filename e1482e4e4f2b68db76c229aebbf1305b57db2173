@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_3a951d34",
+        "filename": "doc/source/howtos/ubuntu_setup.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-05-18T12:43:24Z",
+      "side": 1,
+      "message": "If you end up needing to make another revision anyway, it might be nice to copy the wording from the openSUSE document indicating this is only necessary if you intend to use GitHub. The CentOS and Fedora documents are also missing that disclaimer too though, so we can always update this one at the same time we fix those.",
+      "revId": "e1482e4e4f2b68db76c229aebbf1305b57db2173",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
