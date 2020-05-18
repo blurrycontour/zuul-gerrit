@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_6f9b5565",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1191,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-05-18T11:57:14Z",
+      "side": 1,
+      "message": "Is it possible for the connections to change during runtime in a way that would impact the schema? If that\u0027s the case we might need to implement a proper __hash__() for the connection registry.",
+      "revId": "908824ed578d0d5714662fd5b9d40825fb55bed9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
