@@ -88,6 +88,24 @@
       "revId": "e743c33181395caf1fc424941baa7250642705aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_c0c34e88",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 30176
+      },
+      "writtenOn": "2020-05-18T13:30:09Z",
+      "side": 1,
+      "message": "Both are working fine.\n\nBut when I use:\ncurl --header \"Authorization: Bearer \u003cyour_access_token\u003e\" https://gitlab.example.com/api/v4/projects\n\nI get a \u0027401 Unauthorized\u0027, that is why I changed the code.\n\nWe use an private gitlab instance.",
+      "parentUuid": "ff570b3c_d89cf46b",
+      "revId": "e743c33181395caf1fc424941baa7250642705aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
