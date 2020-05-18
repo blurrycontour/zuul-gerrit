@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_4d5e5676",
+        "filename": "doc/source/reference/developer/ansible.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-05-18T15:11:43Z",
+      "side": 1,
+      "message": "AFAIK there was no way to avoid a 30 seconds delay (https://opendev.org/zuul/zuul/src/branch/master/zuul/ansible/base/callback/zuul_stream.py#L303) for each ansible command/shell tasks when \"zuul_console\" isn\u0027t used (for example \"prepare-workspace-openshift\" role doesn\u0027t use it).\n\nShould not be mentioned that \u0027zuul_skip_log_streaming\u0027 should be enabled when \u0027zuul_console\u0027 module isn\u0027t used ?",
+      "revId": "43ad92d56b344498d0ea8c69f97adb772cea1db1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
