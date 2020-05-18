@@ -2367,6 +2367,7 @@ class FakeBuild(object):
         self.waiting = False
         self.paused = False
         self.aborted = False
+        self.held = False
         self.requeue = False
         self.created = time.time()
         self.changes = None
@@ -2421,6 +2422,7 @@ class FakeBuild(object):
 
         if self.executor_server.hold_jobs_in_build:
             self.log.debug('Holding build %s' % self.unique)
+            self.held = True
             self._wait()
         self.log.debug("Build %s continuing" % self.unique)
 
@@ -2531,7 +2533,8 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                          ref=build.parameters['zuul']['ref'],
                          newrev=build.parameters['zuul'].get('newrev'),
                          parameters=build.parameters, jobdir=build.jobdir,
-                         pipeline=build.parameters['zuul']['pipeline'])
+                         pipeline=build.parameters['zuul']['pipeline'],
+                         held=build.held)
         )
         self.executor_server.running_builds.remove(build)
         del self.executor_server.job_builds[self.job.unique]
