@@ -1828,6 +1828,10 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(1, len(request2.nodes))
         self.assertEqual(1, len(request2.nodes[0]["nodes"]))
 
+        # The build should also have the "held" flag set to True
+        build_id = request2.nodes[0]['build']
+        # TODO get the build info from the build id, check the held attribute
+
         # Another failed change should not hold any more nodes
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         self.executor_server.failJob('project-test2', C)
