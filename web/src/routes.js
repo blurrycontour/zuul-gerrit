@@ -24,6 +24,8 @@ import BuildPage from './pages/Build'
 import BuildLogsPage from './pages/BuildLogs'
 import BuildConsolePage from './pages/BuildConsole'
 import LogFilePage from './pages/LogFile'
+import AutoholdRequestPage from './pages/Autohold'
+import AutoholdsPage from './pages/Autoholds'
 import BuildsPage from './pages/Builds'
 import BuildsetPage from './pages/Buildset'
 import BuildsetsPage from './pages/Buildsets'
@@ -71,6 +73,15 @@ const routes = () => [
     title: 'Buildsets',
     to: '/buildsets',
     component: BuildsetsPage
+  },
+  {
+    title: 'Autohold Requests',
+    to: '/autoholds',
+    component: AutoholdsPage
+  },
+  {
+    to: '/autohold/:autoholdRequestId',
+    component: AutoholdRequestPage
   },
   {
     to: '/status/change/:changeId',
