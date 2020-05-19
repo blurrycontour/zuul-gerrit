@@ -192,6 +192,10 @@ class TableFilters extends React.Component {
     )
   }
 
+  renderExtraFilters = () => {
+      return
+  }
+
   renderFilter = () => {
     const { currentFilterType, activeFilters } = this.state
     return (
@@ -205,6 +209,7 @@ class TableFilters extends React.Component {
               />
             {this.renderFilterInput()}
           </Filter>
+          {this.renderExtraFilters()}
         </div>
         {activeFilters && activeFilters.length > 0 && (
           <Toolbar.Results>
