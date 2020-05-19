@@ -5,23 +5,13 @@ Zuul Client
 
 Zuul includes a simple command line client that may be used to affect Zuul's
 behavior while running. It must be run on a host that has access to the Gearman
-server (e.g., locally on the Zuul host), or on a host with access to Zuul's web
-server.
+server (e.g., locally on the Zuul host).
 
 Configuration
 -------------
 
 The client uses the same zuul.conf file as the server, and will look
 for it in the same locations if not specified on the command line.
-
-If both sections are present, the ``gearman`` section takes precedence over the
-``webclient`` section, meaning the client will execute commands using the Gearman
-server over the REST API.
-
-It is also possible to run the client without a configuration file, by using the
-``--zuul-url`` option to specify the base URL of the Zuul web server.
-
-.. note:: Not all commands are available through the REST API.
 
 Usage
 -----
@@ -141,8 +131,6 @@ for these more advanced operations.
 Promote
 ^^^^^^^
 
-.. note:: This command is only available through a Gearman connection.
-
 .. program-output:: zuul promote --help
 
 Example::
@@ -154,8 +142,6 @@ Note that the format of changes id is <number>,<patchset>.
 Show
 ^^^^
 
-.. note:: This command is only available through a Gearman connection.
-
 .. program-output:: zuul show --help
 
 Example::
@@ -164,8 +150,6 @@ Example::
 
 tenant-conf-check
 ^^^^^^^^^^^^^^^^^
-
-.. note:: This command is only available through a Gearman connection.
 
 .. program-output:: zuul tenant-conf-check --help
 
