@@ -176,6 +176,17 @@ Example::
 This command validates the tenant configuration schema. It exits '-1' in
 case of errors detected.
 
+console-stream
+^^^^^^^^^^^^^^
+
+.. note:: This command is only available through the REST API.
+
+.. program-output:: zuul console-stream --help
+
+This command streams the console log of an ongoing job for a given change.
+`Change` is in the form "change_number,patchset" (gerrit) or
+"pull_request,commithash" (github).
+
 create-auth-token
 ^^^^^^^^^^^^^^^^^
 
