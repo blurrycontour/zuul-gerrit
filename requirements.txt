@@ -38,3 +38,5 @@ urllib3!=1.25.4,!=1.25.5  # https://github.com/urllib3/urllib3/pull/1684
 # requests. Remove the following line when this issue is resolved:
 # https://github.com/cherrypy/cheroot/issues/263
 cheroot<8.1.0
+# current version is 8.1, python3.5 goes up to 7.0 only
+websockets>=7.0

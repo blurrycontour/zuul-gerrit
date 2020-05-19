@@ -1,0 +1,11 @@
+---
+features:
+  - |
+    Add a "zuul-web-client" CLI client, intended for end users with extended
+    authorizations over a tenant (but not quite Zuul operators). This client
+    consists of the REST API client that was taken out the original Zuul CLI
+    client.
+deprecations:
+  - |
+    The Zuul CLI client is limited to using the gearman client. To perform commands
+    using the REST API, use the new zuul-web-client CLI client.
