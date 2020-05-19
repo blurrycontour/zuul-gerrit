@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_c1c85475",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "Quick notes below based on discussion in IRC (in short, most things should be tenant-scoped, except the connections and info endpoints).",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_a1c3a056",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "I think we can drop this (global autohold).",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_01a40cb9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "This is good (tenant autohold).",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_e1a638c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "Drop global autohold.",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_41aa8484",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "Keep tenant autohold.",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_21add09a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "Keep global connections.",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_81977c48",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "Drop tenant connections.",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_61922859",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "Drop global authorizations.  This will be an API breakage, so maybe just leave the /user/authorizations endpoint alone in this patch, and then remove it later?  Unless we\u0027re sure nothing is using it, in which case we can drop it now.",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_c19df466",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-19T16:47:44Z",
+      "side": 1,
+      "message": "Keep this.",
+      "revId": "5d683522933302925cc32e4b19ce30194e000b27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
