@@ -48,6 +48,7 @@ function getHomepageUrl (url) {
 
   // Remove known sub-path
   const subDir = [
+    '/autohold/',
     '/build/',
     '/buildset/',
     '/job/',
@@ -122,6 +123,16 @@ function fetchStatus (apiPrefix) {
 function fetchChangeStatus (apiPrefix, changeId) {
   return Axios.get(apiUrl + apiPrefix + 'status/change/' + changeId)
 }
+function fetchAutoholds (apiPrefix, queryString) {
+  let path = 'autohold'
+  if (queryString) {
+    path += '?' + queryString.slice(1)
+  }
+  return Axios.get(apiUrl + apiPrefix + path)
+}
+function fetchAutohold (apiPrefix, autoholdId) {
+  return Axios.get(apiUrl + apiPrefix + 'autohold/' + autoholdId)
+}
 function fetchBuild (apiPrefix, buildId) {
   return Axios.get(apiUrl + apiPrefix + 'build/' + buildId)
 }
@@ -168,6 +179,8 @@ export {
   fetchChangeStatus,
   fetchConfigErrors,
   fetchStatus,
+  fetchAutohold,
+  fetchAutoholds,
   fetchBuild,
   fetchBuilds,
   fetchBuildset,
