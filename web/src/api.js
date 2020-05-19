@@ -122,6 +122,13 @@ function fetchStatus (apiPrefix) {
 function fetchChangeStatus (apiPrefix, changeId) {
   return Axios.get(apiUrl + apiPrefix + 'status/change/' + changeId)
 }
+function fetchAutoholds (apiPrefix, project) {
+  let path = 'autohold'
+  if (project) {
+    path += '?project=' + project
+  }
+  return Axios.get(apiUrl + apiPrefix + path)
+}
 function fetchBuild (apiPrefix, buildId) {
   return Axios.get(apiUrl + apiPrefix + 'build/' + buildId)
 }
@@ -168,6 +175,7 @@ export {
   fetchChangeStatus,
   fetchConfigErrors,
   fetchStatus,
+  fetchAutoholds,
   fetchBuild,
   fetchBuilds,
   fetchBuildset,
