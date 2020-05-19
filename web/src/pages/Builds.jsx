@@ -44,7 +44,15 @@ class BuildsPage extends TableFilters {
   updateData = (filters) => {
     let queryString = ''
     if (filters) {
-      filters.forEach(item => queryString += '&' + item.key + '=' + item.value)
+      filters.forEach(item => {
+          if (item.key === 'held') {
+              if (item.value === true) {
+                  queryString += '&' + item.key + '=' + item.value
+              }
+          } else {
+              queryString += '&' + item.key + '=' + item.value
+          }
+      })
     }
     this.setState({builds: null})
     fetchBuilds(this.props.tenant.apiPrefix, queryString).then(response => {
@@ -125,7 +133,7 @@ class BuildsPage extends TableFilters {
         cell: {formatters: [formatter]}
       })
       if (prop !== 'start_time' && prop !== 'ref_url' && prop !== 'duration'
-          && prop !== 'log_url' && prop !== 'uuid') {
+          && prop !== 'log_url' && prop !== 'uuid' && prop !== 'held') {
         this.filterTypes.push({
           id: prop,
           title: label,
@@ -140,6 +148,13 @@ class BuildsPage extends TableFilters {
       title: 'Build',
       placeholder: 'Filter by Build UUID',
       filterType: 'text',
+    })
+    this.filterTypes.push({
+      id: 'held',
+      title: 'Held Status',
+      placeholder: 'Show only builds that triggered a autohold request',
+      filterType: 'select',
+      filterValues: [true, null],
     })
   }
 
@@ -159,7 +174,12 @@ class BuildsPage extends TableFilters {
               case 'SUCCESS':
                 return { className: 'success' }
               default:
-                return { className: 'warning' }
+                switch (row.held) {
+                  case true:
+                    return { className: 'danger' }
+                  default:
+                    return { className: 'warning' }
+                }
             }
           }} />
       </Table.PfProvider>)
