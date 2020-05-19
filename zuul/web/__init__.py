@@ -441,6 +441,8 @@ class ZuulWebAPI(object):
                              'expired': request['expired'],
                              'nodes': request['nodes']
                             })
+            resp = cherrypy.response
+            resp.headers['Access-Control-Allow-Origin'] = '*'
             return result
 
     @cherrypy.expose
