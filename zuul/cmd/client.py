@@ -15,8 +15,10 @@
 # under the License.
 
 import argparse
+import asyncio
 import babel.dates
 import datetime
+import json
 import jwt
 import logging
 import prettytable
@@ -26,6 +28,7 @@ import time
 import textwrap
 import requests
 import urllib.parse
+import websockets
 
 import zuul.rpcclient
 import zuul.cmd
@@ -171,6 +174,53 @@ class ZuulRESTClient(object):
     def get_running_jobs(self, *args, **kwargs):
         raise NotImplementedError(
             'This action is unsupported by the REST API')
+
+    def get_change_status(self, tenant, change):
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/status/change/%s' % (tenant, change))
+        req = requests.get(url, verify=self.verify)
+        return req.json()
+
+    def get_console_stream(self, tenant, change, job):
+        stream_uri = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/console-stream' % tenant)
+        # change protocol
+        if stream_uri.startswith('http'):
+            stream_uri = 'ws' + stream_uri[len('http'):]
+        else:
+            stream_uri = 'ws' + stream_uri
+        status = self.get_change_status(tenant, change)
+        if len(status) != 1:
+            raise Exception('Change "%s" not found' % change)
+        jobs = status[0]['jobs']
+        job_info = [j for j in jobs if j['name'] == job]
+        if len(job_info) != 1:
+            msg = 'Job "%s" not found for change %s\n' % (job, change)
+            msg += 'Possible jobs are:\n'
+            for j in jobs:
+                msg += '\t%s\n' % j['name']
+            raise Exception(msg)
+        job_info = job_info[0]
+        if job_info['result'] is not None:
+            print(
+                'Job ended in status "%s", '
+                'report URL is %s' % (job_info['result'],
+                                      job_info['report_url']))
+            return
+        if not job_info['queued']:
+            raise Exception('Job not queued yet')
+        uuid = job_info['uuid']
+        payload = {'uuid': uuid, 'logfile': 'console.log'}
+
+        async def logstream():
+            async with websockets.connect(stream_uri) as w:
+                await w.send(json.dumps(payload))
+                async for message in w:
+                    print(f"{message}")
+
+        asyncio.get_event_loop().run_until_complete(logstream())
 
 
 class Client(zuul.cmd.ZuulApp):
@@ -375,6 +425,18 @@ class Client(zuul.cmd.ZuulApp):
             default=600,
             required=False)
         cmd_create_auth_token.set_defaults(func=self.create_auth_token)
+
+        cmd_cstream = subparsers.add_parser('console-stream',
+                                            help='Stream the console log '
+                                                 'for the job of a given '
+                                                 'change')
+        cmd_cstream.add_argument('--tenant', help='tenant name',
+                                 required=True)
+        cmd_cstream.add_argument('--job', help='job name',
+                                 required=True)
+        cmd_cstream.add_argument('--change', help='change id',
+                                 required=True)
+        cmd_cstream.set_defaults(func=self.console_stream)
 
         return parser
 
@@ -767,6 +829,15 @@ class Client(zuul.cmd.ZuulApp):
             err_code = 1
         finally:
             sys.exit(err_code)
+
+    def console_stream(self):
+        client = self.get_client()
+        if isinstance(client, ZuulRESTClient):
+            client.get_console_stream(self.args.tenant,
+                                      self.args.change,
+                                      self.args.job)
+        else:
+            raise Exception('argument --zuul-url needed')
 
 
 def main():
