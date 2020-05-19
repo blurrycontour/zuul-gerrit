@@ -16,7 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
+import { Table, Checkbox } from 'patternfly-react'
 import * as moment from 'moment-timezone'
 import 'moment-duration-format'
 
@@ -37,14 +37,22 @@ class BuildsPage extends TableFilters {
       builds: null,
       currentFilterType: this.filterTypes[0],
       activeFilters: [],
+      showHeldOnly: false,
       currentValue: ''
     }
   }
 
   updateData = (filters) => {
+    const { showHeldOnly } = this.state
+
     let queryString = ''
     if (filters) {
-      filters.forEach(item => queryString += '&' + item.key + '=' + item.value)
+      filters.forEach(item => {
+           queryString += '&' + item.key + '=' + item.value
+      })
+    }
+    if (showHeldOnly) {
+        queryString += '&held=1'
     }
     this.setState({builds: null})
     fetchBuilds(this.props.tenant.apiPrefix, queryString).then(response => {
@@ -55,6 +63,7 @@ class BuildsPage extends TableFilters {
   componentDidMount () {
     document.title = 'Zuul Builds'
     if (this.props.tenant.name) {
+      this.updateHeldFilterFromUrl()
       this.updateData(this.getFilterFromUrl())
     }
   }
@@ -62,6 +71,7 @@ class BuildsPage extends TableFilters {
   componentDidUpdate (prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name ||
         this.props.timezone !== prevProps.timezone) {
+      this.updateHeldFilterFromUrl()
       this.updateData(this.getFilterFromUrl())
     }
   }
@@ -125,7 +135,7 @@ class BuildsPage extends TableFilters {
         cell: {formatters: [formatter]}
       })
       if (prop !== 'start_time' && prop !== 'ref_url' && prop !== 'duration'
-          && prop !== 'log_url' && prop !== 'uuid') {
+          && prop !== 'log_url' && prop !== 'uuid' && prop !== 'held') {
         this.filterTypes.push({
           id: prop,
           title: label,
@@ -141,6 +151,48 @@ class BuildsPage extends TableFilters {
       placeholder: 'Filter by Build UUID',
       filterType: 'text',
     })
+  }
+
+  updateHeldFilter = event => {
+      const { activeFilters, showHeldOnly } = this.state
+      this.setState({ showHeldOnly: event.target.checked })
+      this.updateData(activeFilters)
+      this.updateUrl(activeFilters)
+  }
+
+  updateHeldFilterFromUrl = () => {
+      const urlParams = new URLSearchParams(this.props.location.search)
+      const { showHeldOnly } = this.state
+      let updated = showHeldOnly
+      urlParams.getAll('held').forEach(param => {
+          if (param) {
+              updated = true
+          }
+      })
+      this.setState({showHeldOnly: updated})
+  }
+
+  updateUrlExtraFilters = (activeFilters, path) => {
+      const { showHeldOnly } = this.state
+      if (showHeldOnly) {
+          if (activeFilters.length > 0) {
+            path += '&'
+          } else {
+            path += '?'
+          }
+          path += 'held=1'
+      }
+      return path
+  }
+
+  renderExtraFilters = () => {
+      const { showHeldOnly } = this.state
+      return (
+          <Checkbox checked={showHeldOnly}
+                    onChange={e => this.updateHeldFilter(e)}>
+              Show held jobs only
+          </Checkbox>
+      )
   }
 
   renderTable (builds) {
@@ -159,7 +211,12 @@ class BuildsPage extends TableFilters {
               case 'SUCCESS':
                 return { className: 'success' }
               default:
-                return { className: 'warning' }
+                switch (row.held) {
+                  case true:
+                    return { className: 'danger' }
+                  default:
+                    return { className: 'warning' }
+                }
             }
           }} />
       </Table.PfProvider>)

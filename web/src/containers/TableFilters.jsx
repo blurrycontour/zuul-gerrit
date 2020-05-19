@@ -54,7 +54,8 @@ class TableFilters extends React.Component {
         )
       })
     }
-    window.history.pushState({path: path}, '', path)
+    let extraPath = this.updateUrlExtraFilters(activeFilters, path)
+    window.history.pushState({path: extraPath}, '', extraPath)
   }
 
   filterAdded = (field, value) => {
@@ -192,6 +193,14 @@ class TableFilters extends React.Component {
     )
   }
 
+  renderExtraFilters = () => {
+      return
+  }
+
+  updateUrlExtraFilters = (activeFilters, path) => {
+      return path
+  }
+
   renderFilter = () => {
     const { currentFilterType, activeFilters } = this.state
     return (
@@ -205,6 +214,7 @@ class TableFilters extends React.Component {
               />
             {this.renderFilterInput()}
           </Filter>
+          {this.renderExtraFilters()}
         </div>
         {activeFilters && activeFilters.length > 0 && (
           <Toolbar.Results>
