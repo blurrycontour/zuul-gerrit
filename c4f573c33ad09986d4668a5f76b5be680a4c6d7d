@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_31ed06b7",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2039,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-20T16:35:23Z",
+      "side": 1,
+      "message": "Can you elaborate on this change a bit, either in the commit message or a comment here?  It looks like universal_newlines is backwards compat.  Why not just leave this as it was?",
+      "revId": "c4f573c33ad09986d4668a5f76b5be680a4c6d7d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
