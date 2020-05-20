@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_6ef5db56",
+        "filename": "doc/source/howtos/user.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-20T16:06:08Z",
+      "side": 1,
+      "message": "Since this requires operators generate manual tokens for users, maybe we should put this under the admin guide?  I worry that a typical user visiting this page would be unable to perform most of these actions and be baffled.  By including it in the admin section, users are less likely to stumble upon it, and admins can still supply a link to users when they issue tokens.",
+      "revId": "00b46e87edf03d2f0bf72d7f4dd3e1cc222e5620",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
