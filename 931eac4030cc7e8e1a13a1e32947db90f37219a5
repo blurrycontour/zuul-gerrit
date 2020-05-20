@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_2862b30a",
+        "filename": ".zuul.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-05-20T19:18:23Z",
+      "side": 0,
+      "message": "I think we should continue to specify the version to keep stuff in sync. It wasn\u0027t long ago that zuul was testing itself with node 6, 8, and 10 because we weren\u0027t specific.",
+      "range": {
+        "startLine": 233,
+        "startChar": 14,
+        "endLine": 233,
+        "endChar": 30
+      },
+      "revId": "931eac4030cc7e8e1a13a1e32947db90f37219a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_a84ec393",
+        "filename": "tools/pip.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-05-20T19:18:23Z",
+      "side": 0,
+      "message": "I think we should keep this otherwise when 16 happens we\u0027ll be out of sync across our jobs.",
+      "range": {
+        "startLine": 27,
+        "startChar": 38,
+        "endLine": 27,
+        "endChar": 48
+      },
+      "revId": "931eac4030cc7e8e1a13a1e32947db90f37219a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
