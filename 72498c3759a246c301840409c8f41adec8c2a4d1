@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_51207af7",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-20T16:37:28Z",
+      "side": 1,
+      "message": "Should we put everything above into a method we can share with enqueue and dequeue?",
+      "revId": "72498c3759a246c301840409c8f41adec8c2a4d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
