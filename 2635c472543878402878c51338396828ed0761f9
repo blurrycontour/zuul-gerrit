@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_91a332b2",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1407,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-20T16:28:11Z",
+      "side": 1,
+      "message": "-1: Extra / ?",
+      "revId": "2635c472543878402878c51338396828ed0761f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_71a65ec3",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-20T16:28:11Z",
+      "side": 1,
+      "message": "Should we think about performing the tenant check first and returning a 404 if it doesn\u0027t match?  That might set us up to avoid future data leaks. (not a minus one)",
+      "revId": "2635c472543878402878c51338396828ed0761f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
