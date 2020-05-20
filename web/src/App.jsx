@@ -247,7 +247,6 @@ class App extends React.Component {
           <div className='collapse navbar-collapse'>
             {tenant.name && this.renderMenu()}
             <ul className='nav navbar-nav navbar-utility'>
-              { configErrors.length > 0 &&
                 <NotificationDrawer.Toggle
                   className="zuul-config-errors"
                   hasUnreadMessages
@@ -256,7 +255,6 @@ class App extends React.Component {
                     e.preventDefault()
                     this.setState({showErrors: !this.state.showErrors})}}
                   />
-              }
               <li>
                 <Link to='/openapi'>API</Link>
               </li>
