@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_4398a873",
+        "filename": ".zuul.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-05-20T19:47:09Z",
+      "side": 1,
+      "message": "Maybe add a description here that says the opendev case allows us to test a multitenant install. I think that is the same for software factory?",
+      "revId": "349991c5686b47c72fed1cd8123f8caf72ac422e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
