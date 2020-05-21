@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_e6d3b9ff",
+        "filename": "zuul/web/static/.keep",
+        "patchSetId": 30
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-21T15:26:08Z",
+      "side": 1,
+      "message": "is this expected?",
+      "revId": "bdb27dd053d40afb635e85fd487a595c973775f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
