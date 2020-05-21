@@ -114,7 +114,7 @@ class StatusPage extends Refreshable {
   }
 
   componentDidUpdate (prevProps) {
-    if (this.props.timezone !== prevProps.timezo) {
+    if (this.props.timezone !== prevProps.timezone) {
       this.loadState()
     }
   }
