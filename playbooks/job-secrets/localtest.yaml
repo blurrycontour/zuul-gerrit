@@ -1,0 +1,30 @@
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-job-secrets
+    local: true
+    ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    ssh_agent:
+      stdout: ''
+  tasks:
+    - include_tasks: ../setup-tutorial/setup.yaml
+    - include_tasks: main.yaml
+    - name: Create logs directory
+      file:
+        state: directory
+        path: "{{ ansible_user_dir }}/zuul/logs"
+        mode: 0755
+    - name: Save docker log files
+      shell: |
+        docker logs examples_gerrit_1 > {{ ansible_user_dir }}/zuul/logs/gerrit.log 2>&1
+        docker logs examples_gerritconfig_1 > {{ ansible_user_dir }}/zuul/logs/gerritconfig.log 2>&1
+        docker logs examples_zk_1 > {{ ansible_user_dir }}/zuul/logs/zk.log 2>&1
+        docker logs examples_mysql_1 > {{ ansible_user_dir }}/zuul/logs/mysql.log 2>&1
+        docker logs examples_scheduler_1 > {{ ansible_user_dir }}/zuul/logs/scheduler.log 2>&1
+        docker logs examples_web_1 > {{ ansible_user_dir }}/zuul/logs/web.log 2>&1
+        docker logs examples_executor_1 > {{ ansible_user_dir }}/zuul/logs/executor.log 2>&1
+        docker logs examples_node1_1 > {{ ansible_user_dir }}/zuul/logs/node1.log 2>&1
+        docker logs examples_node2_1 > {{ ansible_user_dir }}/zuul/logs/node2.log 2>&1
+        docker logs examples_node3_1 > {{ ansible_user_dir }}/zuul/logs/node3.log 2>&1
+        docker logs examples_node4_1 > {{ ansible_user_dir }}/zuul/logs/node4.log 2>&1
+        docker logs examples_launcher_1 > {{ ansible_user_dir }}/zuul/logs/launcher.log 2>&1
+        docker logs examples_logs_1 > {{ ansible_user_dir }}/zuul/logs/logs.log 2>&1
