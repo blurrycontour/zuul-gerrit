@@ -1,6 +1,6 @@
 - hosts: all
   vars:
-    workspace: /tmp/quickstart-test
+    workspace: /tmp/tutorial-quick-start
     local: false
   roles:
     - name: ensure-docker
@@ -35,8 +35,10 @@
           {{ ssh_agent.stdout }}
           ssh-add {{ workspace }}/id_rsa
     - block:
-        - name: Run tasks in ssh agent
-          include_tasks: main.yaml
+        - include_tasks: ../setup-tutorial/setup.yaml
+          vars:
+            tutorial_quick_start: "tutorial"
+        - include_tasks: main.yaml
       always:
         - name: Stop ssh-agent
           shell:

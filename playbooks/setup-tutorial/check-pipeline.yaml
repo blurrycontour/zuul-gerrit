@@ -1,0 +1,47 @@
+- name: "Query open changes {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/?q=project:{{item}}&o=CURRENT_REVISION&n=1"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changes
+
+- set_fact:
+    changeinfo: "{{ {'id': (changes.content[5:]|from_json)[0].id, 'change_id': (changes.content[5:]|from_json)[0].change_id, 'number': (changes.content[5:]|from_json)[0]._number, 'current_revision': (changes.content[5:]|from_json)[0].current_revision} }}"
+    #commentnum: "{{ 1 if commentnum|default(None) == None else commentnum }}"
+    patchset: "{{ 1 if patchset|default(None) == None else patchset }}"
+    pipeline_expected_result: "{{ 'ok' if pipeline_expected_result|default(None) == None else pipeline_expected_result }}"
+    check_timeout: "{{ 60 if check_timeout|default(None) == None else check_timeout }}"
+- set_fact:
+    json_query_check_ko: "messages[?contains(@.message, 'Patch Set {{patchset}}: Verified-1')]"
+    json_query_check_ok: "messages[?contains(@.message, 'Patch Set {{patchset}}: Verified+1')]"
+- set_fact:
+    json_query_check: "{{ json_query_check_ok if pipeline_expected_result == 'ok' else json_query_check_ko }}"
+
+- name: "Wait for Zuul to report check status: {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: result.status == 200 and (result.content[5:] | from_json | to_json | from_json | json_query(json_query_check) | length >= 1)
+  delay: 1
+  retries: "{{ check_timeout|int }}"
+
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+
+- name: "Check Zuul check status {{item}} is {{pipeline_expected_result}}"
+  assert:
+    that:
+      - (result.content[5:] | from_json | to_json | from_json | json_query(json_query_check) | length == 1)
+
+- set_fact:
+    #commentnum: !!null
+    patchset: !!null
+    pipeline_expected_result: !!null
+    json_query_check: !!null
+    check_timeout: !!null
