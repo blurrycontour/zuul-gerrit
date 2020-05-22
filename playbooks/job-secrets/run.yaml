@@ -1,6 +1,6 @@
 - hosts: all
   vars:
-    workspace: /tmp/tutorial-quick-start
+    workspace: /tmp/tutorial-job-secrets
     local: false
   roles:
     - name: ensure-docker

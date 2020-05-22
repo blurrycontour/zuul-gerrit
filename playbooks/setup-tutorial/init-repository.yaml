@@ -1,0 +1,28 @@
+- name: "Make sure {{item}} is empty"
+  file:
+    path: "{{ workspace }}/{{item}}"
+    state: absent
+- name: "Clone {{item}}"
+  git:
+    repo: "http://localhost:8080/{{item}}"
+    dest: "{{ workspace }}/{{item}}"
+- name: "Reinit repository {{item}} to first commit"
+  shell:
+    chdir: "{{ workspace }}/{{item}}/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git reset --hard $(git rev-list --max-parents=0 --abbrev-commit HEAD)
+      git remote add gerritadmin http://admin:secret@localhost:8080/{{item}}
+      git push -f gerritadmin master
+      git remote rm gerritadmin
+- name: "Setup repository {{item}}"
+  shell:
+    chdir: "{{ workspace }}/{{item}}/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git remote add gerrit http://user:secret@localhost:8080/{{item}}
+      git config user.email 'user@example.com'
+      git config user.name 'Example User'
+      git config gitreview.username 'user'

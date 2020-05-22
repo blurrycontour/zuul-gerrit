@@ -1,0 +1,2 @@
+nose
+git+http://gerrit:8080/test2.git
