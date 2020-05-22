@@ -1,0 +1,9 @@
+- project:
+    check:
+      jobs:
+        - tox-py27
+        - tox-pep8
+    gate:
+      jobs:
+        - tox-py27
+        - tox-pep8
