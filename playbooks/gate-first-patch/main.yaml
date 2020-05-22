@@ -1,0 +1,67 @@
+---
+- name: Init Test1
+  include_tasks: ../setup-tutorial/init-repository.yaml
+  vars:
+    item: test1
+
+- name: Setup repository test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git review -s
+
+- name: Copy hello.py in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-first/hello.py
+    dest: "{{ workspace }}/test1/hello.py"
+
+- name: Commit and upload hello.py in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add hello.py
+      git commit -m"Initialize test1 project"
+      git push gerrit
+
+- name: Copy resources in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-first/
+    dest: "{{ workspace }}/test1/"
+
+- name: Commit and upload resources in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      mv zuul.yaml .zuul.yaml
+      git add -A
+      git commit -m"Init test1 pipelines"
+      git review
+
+- name: Check Zuul check status test1 is ok
+  include_tasks: ../setup-tutorial/check-pipeline.yaml
+  vars:
+    item: test1
+
+- name: Approve changes
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/revisions/{{ changeinfo.current_revision }}/review"
+    method: POST
+    user: admin
+    password: secret
+    status_code: 200
+    body_format: json
+    body:
+      labels:
+        Code-Review: "+2"
+        Workflow: "+1"
+
+- name: Check Zuul gate status test1 is ok
+  include_tasks: ../setup-tutorial/change-merged.yaml
+  vars:
+    item: test1

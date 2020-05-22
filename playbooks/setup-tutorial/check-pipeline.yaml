@@ -1,0 +1,47 @@
+- name: "Query open changes {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/?q=project:{{item}}&o=CURRENT_REVISION&n=1"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changes
+
+- set_fact:
+    changeinfo: "{{ {'id': (changes.content[5:]|from_json)[0].id, 'change_id': (changes.content[5:]|from_json)[0].change_id, 'number': (changes.content[5:]|from_json)[0]._number, 'current_revision': (changes.content[5:]|from_json)[0].current_revision} }}"
+    commentnum: "{{ 1 if commentnum|default(None) == None else commentnum }}"
+    patchset: "{{ 1 if patchset|default(None) == None else patchset }}"
+    pipeline_expected_result: "{{ 'ok' if pipeline_expected_result|default(None) == None else pipeline_expected_result }}"
+
+- name: "Wait for Zuul to report check status: {{item}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: result.status == 200 and (result.content[5:]|from_json).messages|length >= (commentnum|int+1)
+  delay: 10
+  retries: 180
+- debug:
+    msg: "number of retries: {{ result.attempts }}"
+    
+- set_fact:
+    verif: "{{ 'Verified+1' if pipeline_expected_result == 'ok' else 'Verified-1' }}"
+
+- debug:
+    msg: "{{ (result.content[5:]|from_json).messages[commentnum|int].message }}"
+    
+- name: "Check Zuul check status {{item}} is {{pipeline_expected_result}}"
+  assert:
+    that:
+      - (result.content[5:]|from_json).messages[{{ commentnum|int }}].message is search("Patch Set {{ patchset }}{{':'}} {{verif|regex_escape()}}")
+  ignore_errors: true
+- debug:
+    msg: "DEBUG result {{result}}"
+
+- set_fact:
+    commentnum: !!null
+    patchset: !!null
+    pipeline_expected_result: !!null
