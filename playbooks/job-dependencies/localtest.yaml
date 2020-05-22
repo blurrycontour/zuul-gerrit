@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/job-dependencies
+    local: true
+    ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    ssh_agent:
+      stdout: ''
+  tasks:
+    - include_tasks: ../setup-tutorial/setup.yaml
+    - include_tasks: main.yaml

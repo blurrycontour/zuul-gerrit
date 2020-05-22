@@ -1,0 +1,63 @@
+---
+- name: "Gate pipeline: set variable: {{title}}"
+  set_fact:
+    json_query_change_gate_started: "messages[?contains(@.message, 'Starting gate jobs')]"
+    json_query_change_gate_ko: "messages[?contains(@.message, 'Patch Set 1: Verified-2')]"
+    json_query_change_gate_ok: "messages[?contains(@.message, 'Patch Set 1: Verified+2')]"
+    json_query_change_merged_ok: "messages[?contains(@.message, 'Change has been successfully merged by Zuul')]"
+    gate_timeout: "{{ 60 if gate_timeout|default(None) == None else gate_timeout }}"
+
+- name: "Gate pipeline: Wait for Zuul to report gate job has started: {{title}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: result.status == 200 and (result.content[5:] | from_json | to_json | from_json | json_query(json_query_change_gate_started) | length == 1)
+  delay: 1
+  retries: 30
+
+- name: "Gate pipeline: check Zuul has started gate job: {{title}}"
+  assert:
+    that:
+      - (result.content[5:] | from_json | to_json | from_json | json_query(json_query_change_gate_started) | length == 1)
+
+- name: "Gate pipeline: Wait for Zuul to report gate job has finished: {{title}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: result.status == 200 and (result.content[5:] | from_json | to_json | from_json | json_query(json_query_change_gate_ok) | length == 1)
+  delay: 1
+  retries: "{{ gate_timeout|int }}"
+
+- name: "Gate pipeline: check Zuul has finished gate job: {{title}}"
+  assert:
+    that:
+      - (result.content[5:] | from_json | to_json | from_json | json_query(json_query_change_gate_ok) | length == 1)
+
+- name: "Gate pipeline: change is merged: {{title}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: result.status == 200 and (result.content[5:] | from_json | to_json | from_json | json_query(json_query_change_merged_ok) | length == 1)
+  delay: 1
+  retries: 30
+
+- name: "Gate pipeline: check Zuul has merged the change: {{title}}"
+  assert:
+    that:
+      - (result.content[5:] | from_json | to_json | from_json | json_query(json_query_change_merged_ok) | length == 1)
+
+- name: "Gate pipeline: clean temp data: {{title}}"
+  set_fact:
+    gate_timeout: !!null

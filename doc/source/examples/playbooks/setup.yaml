@@ -42,7 +42,8 @@
         password: secret
         body: "{{ lookup('file', '/var/ssh/admin.pub') }}"
         status_code: 201
-        HEADER_Content-Type: text/plain
+        headers:
+          Content-Type: text/plain
 
     - name: Create temp dir for Gerrit config update
       shell: mktemp -d
@@ -109,3 +110,49 @@
           http_password: secret
           groups:
             - "Non-Interactive Users"
+    - name: Install checks plugin
+      uri:
+        url: http://gerrit:8080/a/plugins/checks.jar
+        method: PUT
+        user: admin
+        password: secret
+        status_code: 201,405
+        body_format: json
+        body:
+          url: https://gerrit-ci.gerritforge.com/view/Plugins-stable-3.1/job/plugin-checks-bazel-stable-3.1/lastSuccessfulBuild/artifact/bazel-bin/plugins/checks/checks.jar
+          #rl: https://gerrit-ci.gerritforge.com/view/Plugins-stable-3.2/job/plugin-checks-bazel-master-stable-3.2/lastSuccessfulBuild/artifact/bazel-bin/plugins/checks/checks.jar
+          #url: https://gerrit-ci.gerritforge.com/view/Plugins-master/job/plugin-checks-bazel-master-master/lastSuccessfulBuild/artifact/bazel-bin/plugins/checks/checks.jar
+      register: gerrit_check_plugin
+
+    - block:
+        - name: Configure Checks zuul-config
+          uri:
+            url: http://gerrit:8080/a/plugins/checks/checkers/
+            method: POST
+            user: admin
+            password: secret
+            status_code: 201
+            body_format: json
+            body:
+              uuid: "zuul_check:zuul-config"
+              name: "Check Pipeline"
+              description: "Zuul check pipeline"
+              repository: "zuul-config"
+          ignore_errors: True
+
+        - name: Configure Checks test1
+          uri:
+            url: http://gerrit:8080/a/plugins/checks/checkers/
+            method: POST
+            user: admin
+            password: secret
+            status_code: 201
+            body_format: json
+            body:
+              uuid: "zuul_check:test1"
+              name: "Check Pipeline"
+              description: "Zuul check pipeline"
+              repository: "test1"
+          ignore_errors: True
+
+      when: gerrit_check_plugin.status==201

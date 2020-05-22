@@ -1,0 +1,49 @@
+---
+- name: "Check pipeline: query open changes: {{title}}"
+  uri:
+    url: "http://localhost:8080/a/changes/?q=project:{{projectname}}&o=CURRENT_REVISION&n=1"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changes
+
+- name: "Check pipeline: set variable: {{title}}"
+  set_fact:
+    changeinfo: "{{ {'id': (changes.content[5:]|from_json)[0].id, 'change_id': (changes.content[5:]|from_json)[0].change_id, 'number': (changes.content[5:]|from_json)[0]._number, 'current_revision': (changes.content[5:]|from_json)[0].current_revision} }}"
+    patchset: "{{ 1 if patchset|default(None) == None else patchset }}"
+    pipeline_expected_result: "{{ 'ok' if pipeline_expected_result|default(None) == None else pipeline_expected_result }}"
+    check_timeout: "{{ 60 if check_timeout|default(None) == None else check_timeout }}"
+
+- name: "Check pipeline: set variable: {{title}}"
+  set_fact:
+    json_query_check_ko: "messages[?contains(@.message, 'Patch Set {{patchset}}: Verified-1')]"
+    json_query_check_ok: "messages[?contains(@.message, 'Patch Set {{patchset}}: Verified+1')]"
+
+- name: "Check pipeline: set variable: {{title}}"
+  set_fact:
+    json_query_check: "{{ json_query_check_ok if pipeline_expected_result == 'ok' else json_query_check_ko }}"
+
+- name: "Check pipeline: Wait for Zuul to report check status: {{title}}"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changeinfo.id }}/detail"
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: result
+  until: result.status == 200 and (result.content[5:] | from_json | to_json | from_json | json_query(json_query_check) | length >= 1)
+  delay: 1
+  retries: "{{ check_timeout|int }}"
+
+- name: "Check pipeline: check status '{{title}}' is {{pipeline_expected_result}}"
+  assert:
+    that:
+      - (result.content[5:] | from_json | to_json | from_json | json_query(json_query_check) | length == 1)
+
+- name: "Check pipeline: clean temp data: {{title}}"
+  set_fact:
+    patchset: !!null
+    pipeline_expected_result: !!null
+    json_query_check: !!null
+    check_timeout: !!null
