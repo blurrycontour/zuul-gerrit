@@ -1,0 +1,50 @@
+---
+- name: Init Test1
+  include_tasks: ../setup-tutorial/init-repository.yaml
+  vars:
+    projectname: test1
+
+- name: Setup repository test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git review -s
+
+- name: Copy hello.py in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-first/hello.py
+    dest: "{{ workspace }}/test1/hello.py"
+
+- name: Commit and upload hello.py in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add hello.py
+      git commit -m"Initialize test1 project"
+      git push gerrit
+
+- name: Copy resources in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-first/
+    dest: "{{ workspace }}/test1/"
+
+- name: Commit and upload resources in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      mv zuul.yaml .zuul.yaml
+      git add -A
+      git commit -m"Init test1 pipelines"
+      git review
+
+- name: Check Zuul check status test1 is ok
+  include_tasks: ../setup-tutorial/change-merged.yaml
+  vars:
+    title: "Init pipelines test1"
+    projectname: test1

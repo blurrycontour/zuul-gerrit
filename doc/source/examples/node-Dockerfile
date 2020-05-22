@@ -1,18 +1,31 @@
-FROM rastasheep/ubuntu-sshd
+FROM ubuntu:20.04
 
 RUN apt-get update \
-    && apt-get -y install \
+    && DEBIAN_FRONTEND="noninteractive" apt-get -y install \
         git \
-        python-tox \
+        openssh-server \
+        python2 \
         python3 \
+        python3-pip \
+        python3-venv \
         rsync \
-    && apt-get clean \
     ;
+
+RUN python3 -m pip install -U pip \
+    wheel \
+    setuptools \
+    virtenv \
+    virtualenv \
+    tox \
+    twine
 
 # If proxy environment variables supplied during build allow pass through via
 # ~/.ssh/environment, as the test env likely will require these set for any
 # job launched on the node to be capable of internet access.
 RUN set -e ; \
+    mkdir /var/run/sshd ; \
+    sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config ; \
+    sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config ; \
     if [ -n "${http_proxy}" ]; then \
         sed -ri 's/#PermitUserEnvironment no/PermitUserEnvironment yes/g' /etc/ssh/sshd_config; \
         mkdir -p ~/.ssh; \
@@ -21,3 +34,17 @@ RUN set -e ; \
         echo "no_proxy=${no_proxy}" >> ~/.ssh/environment; \
     fi \
     ;
+
+RUN echo 'root:root' |chpasswd
+
+COPY --chown=root:root ./ssh_host_ed25519_key /etc/ssh/ssh_host_ed25519_key
+COPY ./ssh_host_ed25519_key.pub /etc/ssh/ssh_host_ed25519_key.pub
+RUN chmod 0600 /etc/ssh/ssh_host_ed25519_key
+
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+EXPOSE 22
+EXPOSE 9023
+
+ENTRYPOINT ["/usr/sbin/sshd", "-D" ]

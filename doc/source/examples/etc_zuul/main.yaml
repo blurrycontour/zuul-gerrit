@@ -1,5 +1,6 @@
 - tenant:
     name: example-tenant
+    #web-root: http://web:9000/t/example-tenant/status
     source:
       gerrit:
         config-projects:
