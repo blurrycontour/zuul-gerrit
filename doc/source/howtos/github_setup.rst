@@ -104,7 +104,7 @@ Edit ``/etc/zuul/main.yaml`` so that it looks like this:
 .. code-block:: yaml
 
    - tenant:
-       name: quickstart
+       name: tutorial
        source:
          zuul-git:
            config-projects:

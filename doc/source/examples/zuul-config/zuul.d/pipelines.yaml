@@ -22,6 +22,15 @@
       gerrit:
         Verified: -1
       mysql:
+    enqueue:
+      gerrit:
+        comment: False
+    start:
+      gerrit:
+        comment: False
+    no-jobs:
+      gerrit:
+        comment: False
 
 - pipeline:
     name: gate

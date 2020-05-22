@@ -1,0 +1,34 @@
+---
+
+- name: check if test1 exists
+  stat:
+    path: "{{ workspace }}/{{projectname}}"
+  register: test1dir
+  when: projectname == "test1"
+
+- name: "Clone {{projectname}}"
+  git:
+    repo: "http://localhost:8080/{{projectname}}"
+    dest: "{{ workspace }}/{{projectname}}"
+  when: (test1dir.skipped is defined and test1dir.skipped)
+        or
+        (test1dir.stat.exists is defined and not test1dir.stat.exists)
+
+- name: "Setup repository {{projectname}}"
+  shell:
+    chdir: "{{ workspace }}/{{projectname}}/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      {% if (test1dir.skipped is defined and test1dir.skipped)
+             or
+             (test1dir.stat.exists is defined and not test1dir.stat.exists) %}
+      git config user.email 'user@example.com'
+      git config user.name 'Example User'
+      git config gitreview.username 'user'
+      git review -s
+      {% else %}
+      git reset --hard $(git log --pretty=oneline | grep "Initial commit" | awk {'print $1'} | head -1)
+      git remote add gerritadmin http://admin:secret@localhost:8080/a/{{projectname}}
+      git push -f gerritadmin
+      {% endif %}
