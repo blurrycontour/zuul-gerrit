@@ -16,6 +16,24 @@
       "revId": "72498c3759a246c301840409c8f41adec8c2a4d1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_a0d69726",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-05-25T15:37:30Z",
+      "side": 1,
+      "message": "I\u0027ve been itching to do that for a while, I\u0027ll do this in a follow-up patch for clarity if that\u0027s okay with you",
+      "parentUuid": "ff570b3c_51207af7",
+      "revId": "72498c3759a246c301840409c8f41adec8c2a4d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
