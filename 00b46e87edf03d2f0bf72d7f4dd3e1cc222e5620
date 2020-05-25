@@ -16,6 +16,24 @@
       "revId": "00b46e87edf03d2f0bf72d7f4dd3e1cc222e5620",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_9dbf80cf",
+        "filename": "doc/source/howtos/user.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-05-25T14:26:47Z",
+      "side": 1,
+      "message": "fair, moved to the admin doc",
+      "parentUuid": "ff570b3c_6ef5db56",
+      "revId": "00b46e87edf03d2f0bf72d7f4dd3e1cc222e5620",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
