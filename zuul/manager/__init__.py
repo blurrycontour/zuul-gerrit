@@ -1112,9 +1112,10 @@ class PipelineManager(metaclass=ABCMeta):
                 log.info("Reported change %s did not merge because it %s,"
                          "status: all-succeeded: %s, merged: %s",
                          item.change, error_reason, succeeded, merged)
-                change_queue.decreaseWindowSize()
-                log.debug("%s window size decreased to %s",
-                          change_queue, change_queue.window)
+                if error_reason != 'failed to merge':
+                    change_queue.decreaseWindowSize()
+                    log.debug("%s window size decreased to %s",
+                              change_queue, change_queue.window)
                 raise exceptions.MergeFailure(
                     "Change %s failed to merge" % item.change)
             else:
