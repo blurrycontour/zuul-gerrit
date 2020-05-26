@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_877f25aa",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-26T06:01:04Z",
+      "side": 1,
+      "message": "I guess this needs to be python-dateutil",
+      "revId": "2c815c755c840b1ba47651819a4109320a78f8d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
