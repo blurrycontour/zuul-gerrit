@@ -16,6 +16,24 @@
       "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_79239106",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1105,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-26T13:57:11Z",
+      "side": 1,
+      "message": "The tests override it in FakeGithubConnection in order to do some accounting.",
+      "parentUuid": "ff570b3c_d9ef3de7",
+      "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
