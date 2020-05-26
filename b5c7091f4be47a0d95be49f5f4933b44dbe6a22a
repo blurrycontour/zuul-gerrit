@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_88fe0303",
+        "filename": "doc/source/reference/queue_def.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-26T21:45:05Z",
+      "side": 1,
+      "message": "We should mention that this can only be defined in a config-project.\n\nHowever, are we sure that\u0027s what we want?  We\u0027re only going to use the first instance of a queue, so would it be harmful to allow untrusted projects to define it?  Today, if a project stanza doesn\u0027t appear in a config-project, that project can name its own queue.  We could permit the same by allowing the queue object to appear anywhere, and if an admin cares enough to specify the queue, they can do it in a config-project (thereby depriving the untrusted-project of the opportunity of specifying the queue).",
+      "revId": "b5c7091f4be47a0d95be49f5f4933b44dbe6a22a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
