@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "ff570b3c_596226da",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2020-05-26T06:21:38Z",
+      "side": 1,
+      "message": "{\u0027merge_status\u0027: \u0027can_be_merged\u0027, \n\u0027sha\u0027: \u0027f7f5e004c2fb1bc84985a36ca7441a7a44b50d3e\u0027, \u0027target_branch\u0027: \u0027master\u0027, \n\u0027merged_at\u0027: None, \n\u0027updated_at\u0027: \u00272020-05-24T09:44:18.640185Z\u0027, \n\u0027labels\u0027: [],\n\u0027description\u0027: \u0027\u0027, \n\u0027title\u0027: \u0027A\u0027, \n\u0027state\u0027: \u0027opened\u0027}\n \u003cclass \u0027dict\u0027\u003e",
+      "range": {
+        "startLine": 412,
+        "startChar": 14,
+        "endLine": 412,
+        "endChar": 23
+      },
+      "revId": "6f6eb459cc3e7086acba00911a1a86ddfd63e91a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_d920f69e",
         "filename": "zuul/driver/gitlab/gitlabconnection.py",
         "patchSetId": 7
