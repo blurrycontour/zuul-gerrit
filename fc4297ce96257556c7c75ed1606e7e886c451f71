@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_d9ef3de7",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1105,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-05-26T13:54:17Z",
+      "side": 1,
+      "message": "Is this something we expect might be different? Seems like we could just use GithubClientManager on 1127",
+      "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
