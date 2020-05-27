@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_73e9d4b5",
+        "filename": "releasenotes/notes/kubectl-port-forward-b6e5e8033c9b9ede.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-27T14:41:34Z",
+      "side": 1,
+      "message": "console streaming does not work without https://review.opendev.org/715308",
+      "parentUuid": "ff570b3c_73df143a",
+      "revId": "0737ee1facb993f30be79143ea290d0adedadcbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_d3db807a",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -47,6 +65,24 @@
       "writtenOn": "2020-05-27T14:34:55Z",
       "side": 1,
       "message": "This has a typo.",
+      "revId": "0737ee1facb993f30be79143ea290d0adedadcbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_13c5f83c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-27T14:41:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_d3e5400c",
       "revId": "0737ee1facb993f30be79143ea290d0adedadcbc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
