@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_984f6a69",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 1387,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-27T11:44:17Z",
+      "side": 1,
+      "message": "Specifying this in the tenant config was done in the spec. However there was a discussion on IRC a few weeks back with the conclusion that it\u0027s actually better to decide this based on the queue since circular dependencies operate in the same shared queue which makes this a natural choice.\n\nThis way it\u0027s more flexible as the project can decide without an admin while still keeping the possibility to disallow cyclic deps in a config project.",
+      "parentUuid": "ff570b3c_3d7610da",
+      "revId": "bdf483ff281a90852c8a336d2da1221e4b459773",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_bdefc085",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 28
