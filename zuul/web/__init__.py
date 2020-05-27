@@ -12,10 +12,10 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
 import cherrypy
 import socket
+
+from cachetools.func import ttl_cache
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import codecs
@@ -657,11 +657,15 @@ class ZuulWebAPI(object):
         admin_tenants = json.loads(job.data[0])
         return {'zuul': {'admin': admin_tenants}, }
 
+    @ttl_cache(ttl=600)
+    def _tenants(self):
+        job = self.rpc.submitJob('zuul:tenant_list', {})
+        return json.loads(job.data[0])
+
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def tenants(self):
-        job = self.rpc.submitJob('zuul:tenant_list', {})
-        ret = json.loads(job.data[0])
+        ret = self._tenants()
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
@@ -918,16 +922,8 @@ class ZuulWebAPI(object):
             })
         return ret
 
-    def _get_connection(self, tenant):
-        # Ask the scheduler which sql connection to use for this tenant
-        job = self.rpc.submitJob('zuul:tenant_sql_connection',
-                                 {'tenant': tenant})
-        connection_name = json.loads(job.data[0])
-
-        if not connection_name:
-            raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
-
-        return self.zuulweb.connections.connections[connection_name]
+    def _get_connection(self):
+        return self.zuulweb.connections.connections['database']
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -936,7 +932,10 @@ class ZuulWebAPI(object):
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, node_name=None,
                result=None, final=None, held=None, limit=50, skip=0):
-        connection = self._get_connection(tenant)
+        connection = self._get_connection()
+
+        tenants = self._tenants()
+
 
         # If final is None, we return all builds, both final and non-final
         if final is not None:
@@ -956,7 +955,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def build(self, tenant, uuid):
-        connection = self._get_connection(tenant)
+        connection = self._get_connection()
 
         data = connection.getBuilds(tenant=tenant, uuid=uuid, limit=1)
         if not data:
@@ -995,7 +994,7 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     def badge(self, tenant, project=None, pipeline=None, branch=None):
-        connection = self._get_connection(tenant)
+        connection = self._get_connection()
 
         buildsets = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline,
@@ -1018,7 +1017,7 @@ class ZuulWebAPI(object):
     def buildsets(self, tenant, project=None, pipeline=None, change=None,
                   branch=None, patchset=None, ref=None, newrev=None,
                   uuid=None, result=None, limit=50, skip=0):
-        connection = self._get_connection(tenant)
+        connection = self._get_connection()
 
         buildsets = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
@@ -1034,7 +1033,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def buildset(self, tenant, uuid):
-        connection = self._get_connection(tenant)
+        connection = self._get_connection()
 
         data = connection.getBuildset(tenant, uuid)
         if not data:

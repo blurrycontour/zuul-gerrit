@@ -6078,8 +6078,8 @@ class TestProvidesRequiresBuildset(ZuulTestCase):
             }])
 
 
-class TestProvidesRequires(ZuulDBTestCase):
-    config_file = "zuul-sql-driver.conf"
+class TestProvidesRequiresMysql(ZuulDBTestCase):
+    config_file = "zuul-sql-driver-mysql.conf"
 
     @simple_layout('layouts/provides-requires.yaml')
     def test_provides_requires_shared_queue_fast(self):
@@ -6618,6 +6618,10 @@ class TestProvidesRequires(ZuulDBTestCase):
             B.messages[0].count(
                 'Job image-user requires artifact(s) images'),
             1, B.messages[0])
+
+
+class TestProvidesRequiresPostgres(TestProvidesRequiresMysql):
+    config_file = "zuul-sql-driver-postgres.conf"
 
 
 class TestForceMergeMissingTemplate(ZuulTestCase):

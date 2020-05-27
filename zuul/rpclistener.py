@@ -185,7 +185,6 @@ class RPCListener(RPCListenerBase):
         'get_running_jobs',
         'get_job_log_stream_address',
         'tenant_list',
-        'tenant_sql_connection',
         'status_get',
         'job_get',
         'job_list',
@@ -375,16 +374,6 @@ class RPCListener(RPCListenerBase):
                            'projects': len(tenant.untrusted_projects),
                            'queue': queue_size})
         job.sendWorkComplete(json.dumps(output))
-
-    def handle_tenant_sql_connection(self, job):
-        args = json.loads(job.arguments)
-        sql_driver = self.sched.connections.drivers['sql']
-        conn = sql_driver.tenant_connections.get(args['tenant'])
-        if conn:
-            name = conn.connection_name
-        else:
-            name = ''
-        job.sendWorkComplete(json.dumps(name))
 
     def handle_status_get(self, job):
         args = json.loads(job.arguments)
