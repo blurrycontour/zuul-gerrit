@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ff570b3c_73df143a",
+        "filename": "releasenotes/notes/kubectl-port-forward-b6e5e8033c9b9ede.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-27T14:34:55Z",
+      "side": 1,
+      "message": "I don\u0027t understand what was fixed here.  And I\u0027m not sure we need a release note for this.",
+      "revId": "0737ee1facb993f30be79143ea290d0adedadcbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_d3db807a",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -13,6 +30,23 @@
       "writtenOn": "2020-05-27T14:30:32Z",
       "side": 1,
       "message": "nit: Could",
+      "revId": "0737ee1facb993f30be79143ea290d0adedadcbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_d3e5400c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-27T14:34:55Z",
+      "side": 1,
+      "message": "This has a typo.",
       "revId": "0737ee1facb993f30be79143ea290d0adedadcbc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
