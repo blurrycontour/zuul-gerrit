@@ -62,7 +62,8 @@ class BaseTestWeb(ZuulTestCase):
                            self.test_root,
                            info=zuul.model.WebInfo.fromConfig(
                                self.zuul_ini_config),
-                           zk_hosts=self.zk_config))
+                           zk_hosts=self.zk_config,
+                           fake_sql=self.fake_sql))
 
         self.executor_server.hold_jobs_in_build = True
 
@@ -1017,7 +1018,7 @@ class TestWebSecrets(BaseTestWeb):
 
 class TestInfo(ZuulDBTestCase, BaseTestWeb):
 
-    config_file = 'zuul-sql-driver.conf'
+    config_file = 'zuul-sql-driver-mysql.conf'
 
     def setUp(self):
         super(TestInfo, self).setUp()
@@ -1144,7 +1145,7 @@ class TestGraphiteUrl(TestInfo):
 
 
 class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
-    config_file = 'zuul-sql-driver.conf'
+    config_file = 'zuul-sql-driver-mysql.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
     def test_web_list_builds(self):
@@ -1258,7 +1259,7 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
 
 
 class TestArtifacts(ZuulDBTestCase, BaseTestWeb, AnsibleZuulTestCase):
-    config_file = 'zuul-sql-driver.conf'
+    config_file = 'zuul-sql-driver-mysql.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
     def test_artifacts(self):
@@ -2091,7 +2092,7 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
 
 
 class TestHeldAttributeInBuildInfo(ZuulDBTestCase, BaseTestWeb):
-    config_file = 'zuul-sql-driver.conf'
+    config_file = 'zuul-sql-driver-mysql.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
     def test_autohold_and_retrieve_held_build_info(self):
