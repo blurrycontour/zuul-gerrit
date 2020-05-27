@@ -17,6 +17,9 @@ import re
 from collections import OrderedDict
 from urllib.parse import urlparse
 
+from zuul import model
+from zuul.driver.sql.sqlconnection import SQLConnection
+from zuul.driver.sql.sqlreporter import SQLReporter
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.git
@@ -83,7 +86,8 @@ class ConnectionRegistry(object):
         for driver in self.drivers.values():
             driver.stop()
 
-    def configure(self, config, source_only=False, include_drivers=None):
+    def configure(self, config, source_only=False, include_drivers=None,
+                  require_sql=False):
         # Register connections from the config
         connections = OrderedDict()
 
@@ -158,7 +162,53 @@ class ConnectionRegistry(object):
                     connections[driver.name] = DefaultConnection(
                         driver, driver.name, {})
 
+        if require_sql:
+            sql_connections = [
+                c for c in connections.values()
+                if isinstance(c.driver, zuul.driver.sql.SQLDriver)]
+            if not sql_connections:
+                raise Exception("At least one sql connection is required")
+
+            default_connections = sql_connections if len(sql_connections) == 1\
+                else list(filter(lambda c: c.default, sql_connections))
+
+            if len(default_connections) != 1:
+                raise Exception("%d of %d default SQL connections (1 needed)"
+                                % (len(default_connections),
+                                   len(sql_connections)))
+
         self.connections = connections
+
+    def getSqlDefault(self) -> SQLConnection:
+        """
+        Gets the default SQL connection. This is whether the only configured
+        connection or one marked as default.
+
+        :return: Default SQL connection.
+        """
+        connections = [c for c in self.connections.values()
+                       if isinstance(c, SQLConnection)]
+        if len(connections) == 0:
+            raise Exception("No SQL connections!")
+        elif len(connections) == 1:
+            return connections[0]
+        else:
+            default = [c for c in connections if c.default]
+            if len(default) == 1:
+                return default[0]
+            else:
+                raise Exception("Multiple SQL connection without a default!")
+
+    def getSqlDefaultReporter(self, pipeline: model.Pipeline) -> SQLReporter:
+        """
+        Gets the defatul SQL reporter. Such reporter is based on the
+        `getSqlDefault`.
+
+        :param pipeline: Pipeline
+        :return: Default SQL reporter
+        """
+        connection = self.getSqlDefault()
+        return connection.driver.getReporter(connection, pipeline)
 
     def getSource(self, connection_name):
         connection = self.connections[connection_name]
