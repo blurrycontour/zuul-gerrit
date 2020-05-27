@@ -5,11 +5,9 @@
       gerrit:
         - event: patchset-created
     success:
-      resultsdb_mysql: null
       gerrit:
         Verified: 1
     failure:
-      resultsdb_mysql: null
       gerrit:
         Verified: -1
 
