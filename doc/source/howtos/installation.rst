@@ -148,6 +148,10 @@ service in Zuul, and a connection to Gerrit.
     user=zuul
     sshkey=/home/zuul/.ssh/id_rsa
 
+    [connection mysql]
+    driver=sql
+    dburi=mysql+pymysql://zuul:secret@mysql/zuul
+
 See :ref:`components` and :ref:`connections` for more details.
 
 The following tells Zuul to read its configuration from and operate on
