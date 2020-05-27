@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Streaming logs from kubectl node has been fixed, it was incorrectly parsing
+    the port-forward command output resulting in an invalid error message about
+    a missing kubectl and socat command.
