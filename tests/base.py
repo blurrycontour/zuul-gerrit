@@ -3723,7 +3723,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.additional_event_queues = []
         self.poller_events = {}
-        self.configure_connections()
+        self.configure_connections(require_sql=True)
 
         self.executor_server = RecordingExecutorServer(
             self.config, self.connections,
@@ -3757,7 +3757,7 @@ class ZuulTestCase(BaseTestCase):
         return [item for sublist in sched_queues for item in sublist] + \
             self.additional_event_queues
 
-    def configure_connections(self, source_only=False):
+    def configure_connections(self, source_only=False, require_sql=True):
         # Set up gerrit related fakes
         # Set a changes database so multiple FakeGerrit's can report back to
         # a virtual canonical database given by the configured hostname
@@ -3884,7 +3884,8 @@ class ZuulTestCase(BaseTestCase):
 
         # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
-        self.connections.configure(self.config, source_only=source_only)
+        self.connections.configure(self.config, source_only=source_only,
+                                   require_sql=require_sql)
 
     def setup_config(self, config_file: str):
         # This creates the per-test configuration object.  It can be
@@ -3922,6 +3923,26 @@ class ZuulTestCase(BaseTestCase):
         # Make test_root persist after ansible run for .flag test
         config.set('executor', 'trusted_rw_paths', self.test_root)
         self.setupAllProjectKeys(config)
+
+        # Setup databases
+        for section_name in config.sections():
+            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
+                                 section_name, re.I)
+            if not con_match:
+                continue
+
+            if config.get(section_name, 'driver') == 'sql':
+                if (config.get(section_name, 'dburi') ==
+                    '$MYSQL_FIXTURE_DBURI$'):
+                    f = MySQLSchemaFixture()
+                    self.useFixture(f)
+                    config.set(section_name, 'dburi', f.dburi)
+                elif (config.get(section_name, 'dburi') ==
+                      '$POSTGRESQL_FIXTURE_DBURI$'):
+                    f = PostgresqlSchemaFixture()
+                    self.useFixture(f)
+                    config.set(section_name, 'dburi', f.dburi)
+
         return config
 
     def setupSimpleLayout(self, config: ConfigParser):
@@ -4914,29 +4935,6 @@ class AnsibleZuulTestCase(ZuulTestCase):
 class SSLZuulTestCase(ZuulTestCase):
     """ZuulTestCase but using SSL when possible"""
     use_ssl = True
-
-
-class ZuulDBTestCase(ZuulTestCase):
-    def setup_config(self, config_file: str):
-        config = super(ZuulDBTestCase, self).setup_config(config_file)
-        for section_name in config.sections():
-            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
-                                 section_name, re.I)
-            if not con_match:
-                continue
-
-            if config.get(section_name, 'driver') == 'sql':
-                if (config.get(section_name, 'dburi') ==
-                    '$MYSQL_FIXTURE_DBURI$'):
-                    f = MySQLSchemaFixture()
-                    self.useFixture(f)
-                    config.set(section_name, 'dburi', f.dburi)
-                elif (config.get(section_name, 'dburi') ==
-                      '$POSTGRESQL_FIXTURE_DBURI$'):
-                    f = PostgresqlSchemaFixture()
-                    self.useFixture(f)
-                    config.set(section_name, 'dburi', f.dburi)
-        return config
 
 
 class ZuulGithubAppTestCase(ZuulTestCase):

@@ -160,7 +160,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             tls_key=zookeeper_tls_key,
             tls_ca=zookeeper_tls_ca)
 
-        self.configure_connections()
+        self.configure_connections(require_sql=True)
         self.sched.setExecutor(gearman)
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
