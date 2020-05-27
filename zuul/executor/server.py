@@ -355,6 +355,7 @@ class KubeFwd(object):
             self.port = m.group(1)
         else:
             try:
+                self.log.error("Coul not find the forwarded port: %s", line)
                 fwd.kill()
             except Exception:
                 pass
