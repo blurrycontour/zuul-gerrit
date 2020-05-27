@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_3d7610da",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 1387,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-27T11:32:40Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this check that the project or tenant allow circular dependencies?",
+      "revId": "bdf483ff281a90852c8a336d2da1221e4b459773",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_bdefc085",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-27T11:32:40Z",
+      "side": 1,
+      "message": "perhaps this new debug statement could be done only if the history or the dependency_graph contain something?",
+      "revId": "bdf483ff281a90852c8a336d2da1221e4b459773",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
