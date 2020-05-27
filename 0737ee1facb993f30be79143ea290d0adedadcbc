@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_d3db807a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-27T14:30:32Z",
+      "side": 1,
+      "message": "nit: Could",
+      "revId": "0737ee1facb993f30be79143ea290d0adedadcbc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
