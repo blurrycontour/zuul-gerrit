@@ -16,6 +16,24 @@
       "revId": "cc289038314c89ba6428ac500dffabc8704dbd96",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_5f0bf122",
+        "filename": "releasenotes/notes/kubectl-port-forward-b6e5e8033c9b9ede.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-05-27T16:56:49Z",
+      "side": 1,
+      "message": "Alright, thank you for the suggestion.",
+      "parentUuid": "ff570b3c_93458873",
+      "revId": "cc289038314c89ba6428ac500dffabc8704dbd96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
