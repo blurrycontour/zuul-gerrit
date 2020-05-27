@@ -189,6 +189,8 @@ class SQLConnection(BaseConnection):
         self.connection = None
         self.tables_established = False
         self.table_prefix = self.connection_config.get('table_prefix', '')
+        self.default = self.connection_config.get('default', 'false')\
+                           .lower() == 'true'
 
         try:
             self.dburi = self.connection_config.get('dburi')
