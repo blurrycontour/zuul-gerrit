@@ -28,6 +28,7 @@ import voluptuous as vs
 from zuul.model import UnparsedAbideConfig
 from zuul.merger.client import MergeClient
 from zuul.lib.connections import ConnectionRegistry
+from zuul.driver.sql.sqlconnection import SQLConnection
 from zuul import model
 from zuul.lib import yamlutil as yaml, ansible
 import zuul.manager.dependent
@@ -1271,12 +1272,25 @@ class PipelineParser(object):
             reporter_set = []
             allowed_reporters = self.pcontext.tenant.allowed_reporters
             if conf.get(conf_key):
+                if conf_key in ['success', 'failure', 'merge-failure']:
+                    # SQL reporters are required (an implied SQL reporter is
+                    # added to every pipeline, ...(1)
+                    sql_reporter = self.pcontext.connections\
+                        .getSqlDefaultReporter(pipeline)
+                    sql_reporter.setAction(conf_key)
+                    reporter_set.append(sql_reporter)
                 for reporter_name, params \
                         in conf.get(conf_key)\
                         .items():  # type: str, Dict[str, Any]
                     if allowed_reporters is not None and \
                        reporter_name not in allowed_reporters:
                         raise UnknownConnection(reporter_name)
+                    if type(self.pcontext.connections
+                                .connections[reporter_name]) == SQLConnection:
+                        # (1)... explicit SQL reporters are ignored)
+                        self.log.warning("Ignoring SQL reporter configured in"
+                                         " pipeline %s" % pipeline.name)
+                        continue
                     reporter = self.pcontext.connections.getReporter(
                         reporter_name, pipeline, params)
                     reporter.setAction(conf_key)
@@ -1286,6 +1300,16 @@ class PipelineParser(object):
         # If merge-failure actions aren't explicit, use the failure actions
         if not pipeline.merge_failure_actions:
             pipeline.merge_failure_actions = pipeline.failure_actions
+
+        for conf_key, action in self.reporter_actions.items():
+            if conf_key in ['success', 'failure', 'merge-failure']\
+                    and not getattr(pipeline, action):
+                # SQL reporters are required ... add SQL reporters to the
+                # rest of actions.
+                sql_reporter = self.pcontext.connections\
+                    .getSqlDefaultReporter(pipeline)
+                sql_reporter.setAction(conf_key)
+                setattr(pipeline, action, [sql_reporter])
 
         pipeline.disable_at = conf.get(
             'disable-after-consecutive-failures', None)
