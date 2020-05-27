@@ -53,6 +53,14 @@ The connection options for the SQL driver are:
       if you rely on external databases which you don't have under control.
       The default is to have no prefix.
 
+   .. attr:: default
+      :default: false
+
+      If there are more than one sql connections defined exactly one of them
+      must be marked as default. This connection will then be used for storing
+      build results if no other connection is marked as default in the tenant
+      configuration.
+
 .. _sql_reporter:
 
 Reporter Configuration
