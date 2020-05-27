@@ -28,7 +28,6 @@ from zuul.lib import encryption
 from tests.base import (
     AnsibleZuulTestCase,
     ZuulTestCase,
-    ZuulDBTestCase,
     FIXTURE_DIR,
     simple_layout,
     iterate_timeout,
@@ -6078,7 +6077,7 @@ class TestProvidesRequiresBuildset(ZuulTestCase):
             }])
 
 
-class TestProvidesRequires(ZuulDBTestCase):
+class TestProvidesRequires(ZuulTestCase):
     config_file = "zuul-sql-driver.conf"
 
     @simple_layout('layouts/provides-requires.yaml')

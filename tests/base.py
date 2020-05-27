@@ -4233,6 +4233,26 @@ class ZuulTestCase(BaseTestCase):
         # Make test_root persist after ansible run for .flag test
         config.set('executor', 'trusted_rw_paths', self.test_root)
         self.setupAllProjectKeys(config)
+
+        # Setup databases
+        for section_name in config.sections():
+            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
+                                 section_name, re.I)
+            if not con_match:
+                continue
+
+            if config.get(section_name, 'driver') == 'sql':
+                if (config.get(section_name, 'dburi') ==
+                    '$MYSQL_FIXTURE_DBURI$'):
+                    f = MySQLSchemaFixture()
+                    self.useFixture(f)
+                    config.set(section_name, 'dburi', f.dburi)
+                elif (config.get(section_name, 'dburi') ==
+                      '$POSTGRESQL_FIXTURE_DBURI$'):
+                    f = PostgresqlSchemaFixture()
+                    self.useFixture(f)
+                    config.set(section_name, 'dburi', f.dburi)
+
         return config
 
     def setupSimpleLayout(self, config: ConfigParser):
@@ -5232,29 +5252,6 @@ class AnsibleZuulTestCase(ZuulTestCase):
 class SSLZuulTestCase(ZuulTestCase):
     """ZuulTestCase but using SSL when possible"""
     use_ssl = True
-
-
-class ZuulDBTestCase(ZuulTestCase):
-    def setup_config(self, config_file: str):
-        config = super(ZuulDBTestCase, self).setup_config(config_file)
-        for section_name in config.sections():
-            con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
-                                 section_name, re.I)
-            if not con_match:
-                continue
-
-            if config.get(section_name, 'driver') == 'sql':
-                if (config.get(section_name, 'dburi') ==
-                    '$MYSQL_FIXTURE_DBURI$'):
-                    f = MySQLSchemaFixture()
-                    self.useFixture(f)
-                    config.set(section_name, 'dburi', f.dburi)
-                elif (config.get(section_name, 'dburi') ==
-                      '$POSTGRESQL_FIXTURE_DBURI$'):
-                    f = PostgresqlSchemaFixture()
-                    self.useFixture(f)
-                    config.set(section_name, 'dburi', f.dburi)
-        return config
 
 
 class ZuulGithubAppTestCase(ZuulTestCase):
