@@ -5,6 +5,10 @@
 SQL
 ===
 
+.. warning::
+
+   This driver is deprecated, use :attr:`database` configuration instead.
+
 The SQL driver supports reporters only.  Only one connection per
 database is permitted.
 

@@ -17,6 +17,9 @@ import re
 from collections import OrderedDict
 from urllib.parse import urlparse
 
+from zuul import model
+from zuul.driver.sql.sqlconnection import SQLConnection
+from zuul.driver.sql.sqlreporter import SQLReporter
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.git
@@ -85,9 +88,17 @@ class ConnectionRegistry(object):
         for driver in self.drivers.values():
             driver.stop()
 
-    def configure(self, config, source_only=False, include_drivers=None):
+    def configure(self, config, source_only=False, include_drivers=None,
+                  require_sql=False):
         # Register connections from the config
         connections = OrderedDict()
+
+        if 'database' in config.sections() and not source_only:
+            driver = self.drivers['sql']
+            con_config = dict(config.items('database'))
+
+            connection = driver.getConnection('database', con_config)
+            connections['database'] = connection
 
         for section_name in config.sections():
             con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
@@ -126,6 +137,12 @@ class ConnectionRegistry(object):
 
             connection = driver.getConnection(con_name, con_config)
             connections[con_name] = connection
+            if con_driver == 'sql' and 'database' not in connections:
+                # The [database] section was missing. To stay backwards
+                # compatible duplicate the first database connection to the
+                # connection named 'database'
+                connections['database'] = driver.getConnection(
+                    'database', con_config)
 
         # If the [gerrit] or [smtp] sections still exist, load them in as a
         # connection named 'gerrit' or 'smtp' respectfully
@@ -160,7 +177,34 @@ class ConnectionRegistry(object):
                     connections[driver.name] = DefaultConnection(
                         driver, driver.name, {})
 
+        if require_sql:
+            if 'database' not in connections:
+                raise Exception("Database configuration is required")
+
         self.connections = connections
+
+    def getSqlConnection(self) -> SQLConnection:
+        """
+        Gets the default SQL connection. This is either the only configured
+        connection or one marked as default.
+
+        :return: Default SQL connection.
+        """
+        connection = self.connections.get('database')
+        if not connection:
+            raise Exception("No SQL connections")
+        return connection
+
+    def getSqlReporter(self, pipeline: model.Pipeline) -> SQLReporter:
+        """
+        Gets the default SQL reporter. Such reporter is based on the
+        `getSqlConnection`.
+
+        :param pipeline: Pipeline
+        :return: Default SQL reporter
+        """
+        connection = self.getSqlConnection()
+        return connection.driver.getReporter(connection, pipeline)
 
     def getSource(self, connection_name):
         connection = self.connections[connection_name]
