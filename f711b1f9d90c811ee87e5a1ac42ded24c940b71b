@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_13221b02",
+        "filename": "tests/fixtures/zuul-sql-driver-multiple-default-connections.conf",
+        "patchSetId": 20
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-05-27T12:43:21Z",
+      "side": 1,
+      "message": "Those connections are ignored, see related tests",
+      "range": {
+        "startLine": 26,
+        "startChar": 0,
+        "endLine": 37,
+        "endChar": 32
+      },
+      "revId": "f711b1f9d90c811ee87e5a1ac42ded24c940b71b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_7321d7fb",
+        "filename": "tests/fixtures/zuul-sql-driver-multiple-no-default-connection.conf",
+        "patchSetId": 20
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-05-27T12:43:21Z",
+      "side": 1,
+      "message": "Those connections are ignored, see related tests",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 32
+      },
+      "revId": "f711b1f9d90c811ee87e5a1ac42ded24c940b71b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_d38543d1",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-05-27T12:43:21Z",
+      "side": 1,
+      "message": "Ignoring explicit SQL connections",
+      "range": {
+        "startLine": 282,
+        "startChar": 12,
+        "endLine": 282,
+        "endChar": 40
+      },
+      "revId": "f711b1f9d90c811ee87e5a1ac42ded24c940b71b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_b361af3c",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-05-27T12:43:21Z",
+      "side": 1,
+      "message": "all results in the one reporter \"reporter1\".",
+      "range": {
+        "startLine": 290,
+        "startChar": 54,
+        "endLine": 290,
+        "endChar": 55
+      },
+      "revId": "f711b1f9d90c811ee87e5a1ac42ded24c940b71b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
