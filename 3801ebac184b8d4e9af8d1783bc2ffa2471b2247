@@ -16,6 +16,23 @@
       "revId": "3801ebac184b8d4e9af8d1783bc2ffa2471b2247",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_f9864c65",
+        "filename": "doc/source/discussion/gating.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-05-28T15:56:05Z",
+      "side": 1,
+      "message": "Well, if the second is approved after the first is enqueued but before the first is merged, it also won\u0027t automatically enqueue the second once the first merges, right? Maybe:\n\n\"If the second change is approved before the first is merged, Zuul can\u0027t act on the approval and won\u0027t automatically enqueue the second change, requiring a new approval event to enqueue it after the first change merges.\"",
+      "revId": "3801ebac184b8d4e9af8d1783bc2ffa2471b2247",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
