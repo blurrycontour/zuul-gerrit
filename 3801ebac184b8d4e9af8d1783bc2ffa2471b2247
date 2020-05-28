@@ -33,6 +33,23 @@
       "revId": "3801ebac184b8d4e9af8d1783bc2ffa2471b2247",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_99cbd051",
+        "filename": "doc/source/discussion/gating.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T16:03:52Z",
+      "side": 1,
+      "message": "Even better.  :)",
+      "revId": "3801ebac184b8d4e9af8d1783bc2ffa2471b2247",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
