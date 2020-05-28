@@ -60,11 +60,23 @@ it once for each client:
    tools/zk-ca.sh /etc/zookeeper/ca zookeeper2.example.com
    tools/zk-ca.sh /etc/zookeeper/ca zookeeper3.example.com
 
+To generate multiple certificates you can also specify multiple clients:
+
+.. code-block::
+
+   mkdir /etc/zookeeper/ca
+   tools/zk-ca.sh \
+       /etc/zookeeper/ca \
+       zookeeper1.example.com \
+       zookeeper2.example.com \
+       zookeeper3.example.com
+
 Add the following to ``/etc/zookeeper/zoo.cfg``:
 
 .. code-block::
 
    # Necessary for TLS support
+   client.secure=true
    serverCnxnFactory=org.apache.zookeeper.server.NettyServerCnxnFactory
 
    # Client TLS configuration
@@ -77,6 +89,12 @@ Add the following to ``/etc/zookeeper/zoo.cfg``:
    ssl.quorum.keyStore.location=/etc/zookeeper/ca/keystores/zookeeper1.example.com.pem
    ssl.quorum.keyStore.password=keystorepassword
    ssl.quorum.trustStore.location=/etc/zookeeper/ca/certs/cacert.pem
+   #ssl.quorum.trustStore.password=keystorepassword
+
+   # To upgrade an already running ZooKeeper ensemble to TLS without downtime
+   # by taking advantage of port unification functionality
+   # (see https://zookeeper.apache.org/doc/r3.6.1/zookeeperAdmin.html#Quorum+TLS)
+   portUnification=true
 
 Change the name of the certificate filenames as appropriate for the
 host (e.g., ``zookeeper1.example.com.pem``).
