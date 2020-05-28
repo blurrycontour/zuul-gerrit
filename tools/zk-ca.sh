@@ -17,88 +17,153 @@
 # Manage a CA for Zookeeper
 
 CAROOT=$1
-SERVER=$2
 
-SUBJECT='/C=US/ST=California/L=Oakland/O=Company Name/OU=Org'
+SUBJECT=${SUBJECT:-'/C=US/ST=California/L=Oakland/O=Company Name/OU=Org'}
 TOOLSDIR=$(dirname $0)
 ABSTOOLSDIR=$(cd $TOOLSDIR ;pwd)
-CONFIG="-config $ABSTOOLSDIR/openssl.cnf"
+CONFIG="$ABSTOOLSDIR/openssl.cnf"
 
 make_ca() {
-    mkdir $CAROOT/demoCA
-    mkdir $CAROOT/demoCA/reqs
-    mkdir $CAROOT/demoCA/newcerts
-    mkdir $CAROOT/demoCA/crl
-    mkdir $CAROOT/demoCA/private
-    chmod 700 $CAROOT/demoCA/private
-    touch $CAROOT/demoCA/index.txt
-    touch $CAROOT/demoCA/index.txt.attr
-    mkdir $CAROOT/certs
-    mkdir $CAROOT/keys
-    mkdir $CAROOT/keystores
-    chmod 700 $CAROOT/keys
-    chmod 700 $CAROOT/keystores
+    mkdir "${CAROOT}/demoCA"
+    mkdir "${CAROOT}/demoCA/reqs"
+    mkdir "${CAROOT}/demoCA/newcerts"
+    mkdir "${CAROOT}/demoCA/crl"
+    mkdir "${CAROOT}/demoCA/private"
+    chmod 700 "${CAROOT}/demoCA/private"
+    touch "${CAROOT}/demoCA/index.txt"
+    touch "${CAROOT}/demoCA/index.txt.attr"
+    mkdir "${CAROOT}/certs"
+    mkdir "${CAROOT}/keys"
+    mkdir "${CAROOT}/keystores"
+    chmod 700 "${CAROOT}/keys"
+    chmod 700 "${CAROOT}/keystores"
 
-    openssl req $CONFIG -new -nodes -subj "$SUBJECT/CN=caroot" \
-            -keyout $CAROOT/demoCA/private/cakey.pem \
-            -out $CAROOT/demoCA/reqs/careq.pem
-    openssl ca $CONFIG -create_serial -days 3560 -batch -selfsign -extensions v3_ca \
-            -out $CAROOT/demoCA/cacert.pem \
-            -keyfile $CAROOT/demoCA/private/cakey.pem \
-            -infiles $CAROOT/demoCA/reqs/careq.pem
-    cp $CAROOT/demoCA/cacert.pem $CAROOT/certs
+    openssl req \
+            -config "${CONFIG}" \
+            -new \
+            -nodes \
+            -subj "$SUBJECT/CN=caroot" \
+            -keyout "${CAROOT}/demoCA/private/cakey.pem" \
+            -out "${CAROOT}/demoCA/reqs/careq.pem"
+    openssl ca \
+            -config "${CONFIG}" \
+            -create_serial \
+            -days 3560 \
+            -batch \
+            -selfsign \
+            -extensions v3_ca \
+            -out "${CAROOT}/demoCA/cacert.pem" \
+            -keyfile "${CAROOT}/demoCA/private/cakey.pem" \
+            -infiles "${CAROOT}/demoCA/reqs/careq.pem"
+    cp "${CAROOT}/demoCA/cacert.pem" "${CAROOT}/certs"
 }
 
 make_client() {
-    openssl req $CONFIG -new -nodes -subj "$SUBJECT/CN=client" \
-            -keyout $CAROOT/keys/clientkey.pem \
-            -out $CAROOT/demoCA/reqs/clientreq.pem
-    openssl ca $CONFIG -batch -policy policy_anything -days 3560 \
-            -out $CAROOT/certs/client.pem \
-            -infiles $CAROOT/demoCA/reqs/clientreq.pem
+    openssl req \
+            -config "${CONFIG}" \
+            -new \
+            -nodes \
+            -subj "$SUBJECT/CN=client" \
+            -keyout "${CAROOT}/keys/clientkey.pem" \
+            -out "${CAROOT}/demoCA/reqs/clientreq.pem"
+    openssl ca \
+            -config "${CONFIG}" \
+            -batch \
+            -policy policy_anything \
+            -days 3560 \
+            -out "${CAROOT}/certs/client.pem" \
+            -infiles "${CAROOT}/demoCA/reqs/clientreq.pem"
 }
 
 make_server() {
-    openssl req $CONFIG -new -nodes -subj "$SUBJECT/CN=$SERVER" \
-            -keyout $CAROOT/keys/${SERVER}key.pem \
-            -out $CAROOT/demoCA/reqs/${SERVER}req.pem
-    openssl ca $CONFIG -batch -policy policy_anything -days 3560 \
-            -out $CAROOT/certs/$SERVER.pem \
-            -infiles $CAROOT/demoCA/reqs/${SERVER}req.pem
-    cat $CAROOT/certs/$SERVER.pem $CAROOT/keys/${SERVER}key.pem \
-        > $CAROOT/keystores/$SERVER.pem
+    SERVER="${1}"
+    openssl req \
+            -config "${CONFIG}" \
+            -new \
+            -nodes \
+            -subj "$SUBJECT/CN=${SERVER}" \
+            -keyout "${CAROOT}/keys/${SERVER}key.pem" \
+            -out "${CAROOT}/demoCA/reqs/${SERVER}req.pem"
+    openssl ca \
+            -config "${CONFIG}" \
+            -batch \
+            -policy policy_anything \
+            -days 3560 \
+            -out "${CAROOT}/certs/${SERVER}.pem" \
+            -infiles "${CAROOT}/demoCA/reqs/${SERVER}req.pem"
+    cat "${CAROOT}/certs/${SERVER}.pem" "${CAROOT}/keys/${SERVER}key.pem" \
+        > "${CAROOT}/keystores/${SERVER}.pem"
+}
+
+make_keystore() {
+    SERVER="${1}"
+    openssl pkcs12 \
+            -export \
+            -in "${CAROOT}/keystores/${SERVER}.pem" \
+            -out "${CAROOT}/keystores/${SERVER}.pkcs12" \
+            -password pass:keystorepassword
+
+    keytool -v \
+            -import \
+            -trustcacerts \
+            -noprompt \
+            -alias cacert \
+            -file "${CAROOT}/certs/cacert.pem" \
+            -keystore "${CAROOT}/keystores/${SERVER}.jks" \
+            -storepass keystorepassword
+
+    keytool -v \
+            -importkeystore \
+            -srckeystore "${CAROOT}/keystores/${SERVER}.pkcs12"  \
+            -srcstoretype PKCS12 \
+            -srcalias 1 \
+            -srcstorepass keystorepassword \
+            -destkeystore "${CAROOT}/keystores/${SERVER}.jks" \
+            -deststoretype JKS \
+            -destalias "${SERVER}" \
+            -deststorepass keystorepassword
 }
 
 help() {
-    echo "$0 CAROOT [SERVER]"
+    echo "$(basename ${0}) CAROOT [SERVER...]"
     echo
     echo "  CAROOT is the path to a directory in which to store the CA"
     echo "         and certificates."
-    echo "  SERVER is the FQDN of a server for which a certificate should"
-    echo "         be generated"
+    echo "  SERVER one or more FQDN of a server(s) for which a certificate"
+    echo "         should be generated"
+    echo
+    echo "  Environment:"
+    echo "    SUBJECT .. certificate subject"
+    echo "               default: /C=US/ST=California/L=Oakland/O=Company Name/OU=Org"
 }
 
-if [ ! -d "$CAROOT" ]; then
+if [ ! -f ~/.rnd ]; then
+    echo "No ~/.rnd! Generate one (e.g.: dd if=/dev/urandom of=~/.rnd bs=256 count=1)"
+fi
+
+if [ ! -d "${CAROOT}" ]; then
     echo "CAROOT must be a directory"
     help
     exit 1
 fi
 
-cd $CAROOT
-CAROOT=`pwd`
+cd "${CAROOT}"
+CAROOT="$(pwd)"
 
-if [ ! -d "$CAROOT/demoCA" ]; then
+if [ ! -d "${CAROOT}/demoCA" ]; then
     echo 'Generate CA'
     make_ca
     echo 'Generate client certificate'
     make_client
 fi
 
-if [ -f "$CAROOT/certs/$SERVER.pem" ]; then
-    echo "Certificate for $SERVER already exists"
-    exit 0
-fi
-
-if [ "$SERVER" != "" ]; then
-    make_server
-fi
+for server in ${@:2}; do
+  if [ -f "${CAROOT}/certs/${server}.pem" ]; then
+      echo "Certificate for ${server} already exists"
+  fi
+  if [ "${server}" != "" ]; then
+      make_server "${server}"
+      echo "Generate keystore"
+      make_keystore "${server}"
+  fi
+done
