@@ -60,11 +60,23 @@ it once for each client:
    tools/zk-ca.sh /etc/zookeeper/ca zookeeper2.example.com
    tools/zk-ca.sh /etc/zookeeper/ca zookeeper3.example.com
 
+To generate multiple certificates you can also specify multiple clients:
+
+.. code-block::
+
+   mkdir /etc/zookeeper/ca
+   tools/zk-ca.sh \
+       /etc/zookeeper/ca \
+       zookeeper1.example.com \
+       zookeeper2.example.com \
+       zookeeper3.example.com
+
 Add the following to ``/etc/zookeeper/zoo.cfg``:
 
 .. code-block::
 
    # Necessary for TLS support
+   client.secure=true
    serverCnxnFactory=org.apache.zookeeper.server.NettyServerCnxnFactory
 
    # Client TLS configuration
@@ -77,6 +89,12 @@ Add the following to ``/etc/zookeeper/zoo.cfg``:
    ssl.quorum.keyStore.location=/etc/zookeeper/ca/keystores/zookeeper1.example.com.pem
    ssl.quorum.keyStore.password=keystorepassword
    ssl.quorum.trustStore.location=/etc/zookeeper/ca/certs/cacert.pem
+   #ssl.quorum.trustStore.password=keystorepassword
+
+   # To upgrade an already running ZooKeeper ensemble to TLS without downtime
+   # by taking advantage of port unification functionality
+   # (see https://zookeeper.apache.org/doc/r3.6.1/zookeeperAdmin.html#Quorum+TLS)
+   portUnification=true
 
 Change the name of the certificate filenames as appropriate for the
 host (e.g., ``zookeeper1.example.com.pem``).
@@ -97,6 +115,12 @@ client connections (this is equivalent to the ``clientPort`` option).
 Omit it to disable plaintext connections.  The earlier addition of
 ``secureClientPort`` to the config file instructs ZooKeeper to listen
 for encrypted connections on port 2281.
+
+.. code-block::
+
+   server.1=zookeeper1.example.com:2888:3888;2181
+   server.2=zookeeper2.example.com:2888:3888;2181
+   server.3=zookeeper3.example.com:2888:3888;2181
 
 Be sure to specify port 2281 rather than the standard 2181 in the
 :attr:`zookeeper.hosts` setting in ``zuul.conf``.
