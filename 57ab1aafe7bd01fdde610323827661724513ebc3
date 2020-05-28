@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_75d078f8",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T21:55:20Z",
+      "side": 1,
+      "message": "I don\u0027t think I fully understand this.  If we have a cycle A-B, why can\u0027t we enqueue C that depends on A?  Final queue would be: (A, B), C.\n\nIf the issue is that when we get to this point in the code after enqueing A we don\u0027t want to enqueue B using this method, that makes sense, but we have knowledge of the cycle, so can we use that?  I think this is safe if we proceed only after the cycle is complete.  How about this process:\n\n* Add A, identify B as a dependency in enqueueChangesAhead, recurse into this for B\n  * Add B, identify A as a dependency already enqueued, no action needed\n  * Identify A-B as a cycle\n  * Enqueue changes behind B\n    * The full cycle has been enqueued, so we can safely enqueue changess behind it\n    * For each member of the cycle, enqueue changes behind it:\n      * (member\u003dA): B is behind A but is part of the cycle, so skip\n      * (member\u003dA): C is behind A and is not part of the cycle, so enqueue it\n      * (member\u003dB): A is behind B but is part of the cycle, so skip\n* Identify A-B as a cycle (we\u0027re back in this method for A)\n* Enqueue changes behind A\n  * We\u0027d run the algorithm again here, which isn\u0027t necessary but should be safe as it should no-op.  Maybe we can optimize by checking history.",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_55cbb448",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T21:55:20Z",
+      "side": 1,
+      "message": "I think this could use a comment about what happens in this case.  How do we get to a case where we have started reporting a bundle but are canceling jobs?  Why is it okay not to clear the builds here?  Is it because the only reason we would cancel builds after a bundle starts reporting is because the bundle has failed, and therefore we know it\u0027s going to be dequeued immediately afterwords?  If we don\u0027t change this code, does anything bad happen?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_b5da1014",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T21:55:20Z",
+      "side": 1,
+      "message": "Similar question here: why is this changing?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_95d54ce8",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 771,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T21:55:20Z",
+      "side": 1,
+      "message": "I had some questions about this (why doesn\u0027t the original code work?  what about bundles ahead of items?) but in trying to answer them, I can\u0027t actually find this used anywhere.  Is method dead code?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_f505a87b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 1301,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T21:55:20Z",
+      "side": 1,
+      "message": "nit: Maybe capitalize these if you want to keep them?  But maybe they aren\u0027t necessary?  I think the reporter log lines tell us this?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_d5086492",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T21:55:20Z",
+      "side": 1,
+      "message": "Maybe use the past tense (\"that failed\")?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_3500c067",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 1737,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T21:55:20Z",
+      "side": 1,
+      "message": "Why did this need to change?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
