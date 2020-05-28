@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_be1b1a19",
+        "filename": "doc/source/discussion/gating.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-05-28T15:33:55Z",
+      "side": 1,
+      "message": "This describes the situation where both changes are approved, but the original text didn\u0027t assume that.  This case may be worth highlighting, but maybe we should reword it slightly.\n\nMaybe just something like \"Further, if both changes have been approved for merging before the first is enqueued, then Zuul will be unaware....\"",
+      "revId": "3801ebac184b8d4e9af8d1783bc2ffa2471b2247",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
