@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_2cc6b24a",
+        "filename": "doc/source/howtos/zookeeper.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-05-29T12:51:29Z",
+      "side": 1,
+      "message": "Is this code block intended? There is a similar one above and the text explains the ;2181 anyway.",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 123,
+        "endChar": 49
+      },
+      "revId": "02d7f5d88e62f71ee3c692c46a8cab1ab7a6f631",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
