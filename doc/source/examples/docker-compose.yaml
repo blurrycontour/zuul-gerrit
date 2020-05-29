@@ -104,48 +104,48 @@ services:
       - "./etc_zuul/:/etc/zuul/:z"
   node1:
     build:
-      dockerfile: node-Dockerfile
+      dockerfile: node-Dockerfile-user
       context: ./
       args:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
-    image: examples_node
+    image: examples_node_user
     volumes:
-      - "nodessh:/root/.ssh:z"
+      - "nodessh:/home/zuul/.ssh:z"
   node2:
     build:
-      dockerfile: node-Dockerfile
+      dockerfile: node-Dockerfile-user
       context: ./
       args:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
-    image: examples_node
+    image: examples_node_user
     volumes:
-      - "nodessh:/root/.ssh:z"
+      - "nodessh:/home/zuul/.ssh:z"
   node3:
     build:
-      dockerfile: node-Dockerfile
+      dockerfile: node-Dockerfile-user
       context: ./
       args:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
-    image: examples_node
+    image: examples_node_user
     volumes:
-      - "nodessh:/root/.ssh:z"
+      - "nodessh:/home/zuul/.ssh:z"
   node4:
     build:
-      dockerfile: node-Dockerfile
+      dockerfile: node-Dockerfile-user
       context: ./
       args:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
-    image: examples_node
+    image: examples_node_user
     volumes:
-      - "nodessh:/root/.ssh:z"
+      - "nodessh:/home/zuul/.ssh:z"
   launcher:
     depends_on:
       - zk

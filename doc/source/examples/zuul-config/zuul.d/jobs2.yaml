@@ -14,7 +14,7 @@
       - playbooks/base/post-ssh.yaml
       - playbooks/base/post-logs.yaml
     roles:
-      - zuul: zuul/zuul-jobs
+      - zuul: g-chauvel/zuul-jobs
     timeout: 1800
     nodeset:
       nodes:
