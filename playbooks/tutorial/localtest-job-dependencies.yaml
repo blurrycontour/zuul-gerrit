@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-job-dependencies
+    local: true
+    ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    ssh_agent:
+      stdout: ''
+  tasks:
+    - set_fact:
+        docker_config_dir: docker-config-1
+        docker_config_file: docker-compose-nodes.yaml
+        nodepool_file: nodepool-nodes.yaml
+    - name: Setup Tutorial Execution
+      include_tasks: setup.yaml
+    - name: Run quick-start tutorial
+      include_tasks: quick-start.yaml
+    - name: Run job dependencies tutorial
+      include_tasks: job-dependencies.yaml
