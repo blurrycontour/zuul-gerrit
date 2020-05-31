@@ -101,11 +101,24 @@
 - job:
     name: zuul-quick-start
     parent: opendev-buildset-registry-consumer
-    description: Run the commands in the Zuul quick-start documentation.
-    run: playbooks/quick-start/run.yaml
-    post-run: playbooks/quick-start/post.yaml
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+    run: playbooks/tutorial-common/run.yaml
+    post-run: playbooks/tutorial-common/post.yaml
     required-projects:
       - zuul/zuul
+    vars:
+      run_playbook: quick-start.yaml
+
+- job:
+    name: zuul-tutorial-quick-start
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+    run: playbooks/tutorial-common/run.yaml
+    post-run: playbooks/tutorial-common/post.yaml
+    required-projects:
+      - zuul/zuul
+    vars:
+      run_playbook: quick-start.yaml
 
 # Image building jobs
 - secret:
@@ -246,6 +259,9 @@
         - zuul-tox-remote:
             timeout: 2700  # 45 minutes
         - zuul-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+        - zuul-tutorial-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
         - nodepool-zuul-functional:
