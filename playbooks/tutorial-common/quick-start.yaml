@@ -1,0 +1,117 @@
+---
+- name: "Start Tutorial quick-start"
+  debug:
+    msg: ""
+
+- name: Init Test1
+  include_tasks: ../tutorial-common/init-repository.yaml
+  vars:
+    projectname: test1
+
+- name: Copy data to test1
+  copy:
+    src: ../../doc/source/examples/test1/
+    dest: "{{ workspace }}/test1/"
+
+- name: Commit and upload test change in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      mv zuul.yaml .zuul.yaml
+      git add .zuul.yaml playbooks
+      git commit -m "Add test Zuul job"
+      git review
+
+- name: Wait for Zuul to report check ok
+  include_tasks: ../tutorial-common/check-pipeline.yaml
+  vars:
+    title: "test job test1"
+    projectname: test1
+
+- name: Save test1 change info
+  set_fact:
+    changetest1: "{{ changeinfo }}"
+
+- name: "Check finger URL"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changetest1.id }}/detail"
+    method: GET
+    user: user
+    password: secret
+    return_content: true
+  register: result
+  vars:
+    json_query_finger: "messages[?contains(@.message, 'testjob finger://')]"
+  until: result.status == 200 and (result.content[5:] | from_json | to_json | from_json | json_query(json_query_finger) | length == 1)
+
+- name: Configure a Base Job zuul-config
+  copy:
+    src: ../../doc/source/examples/zuul-config/playbooks/base/
+    dest: "{{ workspace }}/zuul-config/playbooks/base/"
+
+- name: Update the base job definition
+  copy:
+    src: ../../doc/source/examples/zuul-config/zuul.d/jobs2.yaml
+    dest: "{{ workspace }}/zuul-config/zuul.d/jobs.yaml"
+
+- name: Commit and upload zuul-config
+  shell:
+    chdir: "{{ workspace }}/zuul-config/"
+    executable: /bin/bash
+    warn: false
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add playbooks zuul.d/jobs.yaml
+      git commit -m "Update Zuul base job"
+      git review
+
+- name: "Wait for Zuul to report merge: Update Zuul base job"
+  include_tasks: ../tutorial-common/change-merged.yaml
+  vars:
+    title: "Update Zuul base job"
+    projectname: zuul-config
+
+- name: "Set recheck"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changetest1.id }}/revisions/current/review"
+    method: POST
+    user: user
+    password: secret
+    status_code: 200
+    body_format: json
+    body:
+      message: "recheck"
+
+- name: "Wait for Zuul to report recheck status"
+  uri:
+    url: "http://localhost:8080/a/changes/{{ changetest1.id }}/detail"
+    method: GET
+    user: user
+    password: secret
+    return_content: true
+  register: result
+  vars:
+    json_query_checkk: "messages[?contains(@.message, 'Build succeeded.')]"
+  until: result.status == 200 and (result.content[5:] | from_json | to_json | from_json | json_query(json_query_checkk) | length == 2)
+  delay: 1
+  retries: 90
+
+- set_fact:
+    json_query_log_url: "messages[?contains(@.message, 'http://')].message | [0]"
+
+- name: Find the log URL
+  set_fact:
+    log_url: "{{ result.content[5:] | from_json | to_json | from_json | json_query(json_query_log_url) | regex_search('(http://[^ ]*)') }}"
+
+- debug:
+    msg: "{{ log_url }}"
+
+- name: Fetch log URL
+  get_url:
+    url: "{{ log_url }}job-output.txt"
+    dest: "{{ workspace }}/job-output.txt"
+
+- name: Verify log contents
+  command: "grep 'Hello world!' {{ workspace }}/job-output.txt"
