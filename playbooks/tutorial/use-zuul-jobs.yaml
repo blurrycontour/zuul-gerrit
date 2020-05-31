@@ -1,0 +1,42 @@
+---
+- name: Init Test1
+  include_role:
+    name: init-repository
+  vars:
+    projectname: test1
+
+- name: Copy use-zuul-jobs.tgz in test1
+  copy:
+    src: ../../doc/source/tutorials/archive/use-zuul-jobs.tgz
+    dest: "{{ workspace }}/"
+
+- name: Commit and upload resources in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      tar xzf ../use-zuul-jobs.tgz -C .
+      git add -A .
+
+- name: Copy .zuul.yaml in test1
+  copy:
+    src: ../../doc/source/examples/test1-use-zuul-jobs/zuul.yaml
+    dest: "{{ workspace }}/test1/.zuul.yaml"
+
+- name: Commit and upload pipelines in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add .zuul.yaml
+      git commit -m"Init test1 pipelines"
+      git review
+
+- include_role:
+    name: check-pipeline
+  vars:
+    title: "Init test1 pipeline"
+    projectname: test1
+    check_timeout: 500
