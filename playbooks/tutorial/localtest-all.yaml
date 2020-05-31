@@ -17,3 +17,5 @@
       include_tasks: quick-start.yaml
     - name: Run gate your first patch tutorial
       include_tasks: gate-first-patch.yaml
+    - name: Run use zuul jobs tutorial
+      include_tasks: use-zuul-jobs.yaml
