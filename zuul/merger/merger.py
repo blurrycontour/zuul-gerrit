@@ -201,7 +201,10 @@ class Repo(object):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
         mygit = git.cmd.Git(os.getcwd())
         mygit.update_environment(**self.env)
-
+        dircontent = os.listdir("/")
+        log.info("dircontent:{}".format(dircontent))
+        dircontent = os.listdir("/parent-job")
+        log.info("dircontentbis:{}".format(dircontent))
         for attempt in range(1, self.retry_attempts + 1):
             try:
                 with timeout_handler(self.local_path):
@@ -679,6 +682,9 @@ class Merger(object):
             log = get_annotated_logger(self.log, zuul_event_id)
             log.exception("Unable to add project %s/%s",
                           hostname, project_name)
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("DEBUG hostname %s, project_name %s, url %s",
+                  hostname, project_name, url)
         return repo
 
     def getRepo(self, connection_name, project_name, zuul_event_id=None):
