@@ -1,0 +1,33 @@
+---
+
+- name: "Start Tutorial gate your first patch"
+  debug:
+    msg: ""
+
+- include_tasks: ../tutorial-common/init-repository.yaml
+  vars:
+    projectname: test1
+
+- name: Copy resources in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-first/
+    dest: "{{ workspace }}/test1/"
+
+- name: Commit and upload resources in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      mv zuul.yaml .zuul.yaml
+      git add -A
+      git commit -m"Init test1 pipelines"
+      git review
+
+- name: Check Zuul check status test1 is ok
+  include_tasks: ../tutorial-common/change-merged.yaml
+  vars:
+    title: "Init pipelines test1"
+    projectname: test1
+    check_timeout: 90
+    gate_timeout: 90
