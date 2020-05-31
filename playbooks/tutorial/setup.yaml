@@ -2,7 +2,7 @@
 - name: Run docker-compose up
   when: not local
   shell:
-    cmd: docker-compose up -d
+    cmd: docker-compose -f docker-compose-zuul-ci.yaml up -d
     chdir: src/opendev.org/zuul/zuul/doc/source/examples
 
 - name: Run docker-compose up
