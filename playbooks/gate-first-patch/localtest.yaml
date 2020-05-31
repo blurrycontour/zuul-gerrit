@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-gate-first-patch
+    local: true
+    ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    ssh_agent:
+      stdout: ''
+  tasks:
+    - name: Setup Tutorial Execution
+      include_tasks: ../tutorial-common/setup.yaml
+    - name: Execute quick-start
+      include_tasks: ../tutorial-common/quick-start.yaml
+    - name: Run playbook
+      include_tasks: ../tutorial-common/gate-first-patch.yaml
