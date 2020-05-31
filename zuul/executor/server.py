@@ -1105,10 +1105,14 @@ class AnsibleJob(object):
                 project['override_branch'],
                 project['override_checkout'],
                 project['default_branch'])
-            self.log.info("Checking out %s %s %s",
+            self.log.info("Checking oout %s %s %s",
                           project['canonical_name'], selected_desc,
                           selected_ref)
-            repo.checkout(selected_ref)
+            repo_commit = repo.checkout(selected_ref)
+
+            self.log.info("Checked out %s %s %s %s",
+                          project['canonical_name'], selected_desc,
+                          selected_ref, repo_commit)
 
             # Update the inventory variables to indicate the ref we
             # checked out
@@ -1730,8 +1734,12 @@ class AnsibleJob(object):
                 root,
                 self.executor_server.merge_root,
                 self.log)
-            merger.checkoutBranch(project.connection_name, project.name,
-                                  branch)
+            if project.name != "zuul/zuul-jobs":
+                self.log.debug("call merger.checkoutBranch >%s<", project)
+                merger.checkoutBranch(project.connection_name, project.name,
+                                      branch)
+            else:
+                self.log.debug("no ckeckout for zuul/zuul-jobs")
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
                            project, branch, root)
