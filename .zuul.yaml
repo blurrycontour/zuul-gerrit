@@ -164,6 +164,18 @@
        run_playbooks:
          - job-secrets.yaml
 
+- job:
+    name: zuul-tutorial-job-dependencies
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial job dependencies documentation.
+    run: playbooks/tutorial/run.yaml
+    post-run: playbooks/tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+    vars:
+       run_playbooks:
+         - job-dependencies.yaml
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -321,7 +333,11 @@
         - zuul-tutorial-job-secrets:
             requires: nodepool-container-image
             dependencies: zuul-build-image
-            timeout: 3000
+            timeout: 3000  # 50 minutes
+        - zuul-tutorial-job-dependencies:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 3600  # 60 minutes
         - nodepool-zuul-functional:
             voting: false
         - zuul-build-python-release
