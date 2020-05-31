@@ -4,7 +4,6 @@
     workspace: /tmp/tutorial-zuul
     local: true
     run_playbooks:
-      - gate-first-patch.yaml
       - use-zuul-jobs.yaml
   tasks:
     - name: Run tutorial
