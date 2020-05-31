@@ -38,10 +38,9 @@
     - block:
         - include_tasks: setup.yaml
         - include_tasks: quick-start.yaml
-        - name: Run playbook
+        - include_tasks: "{{ item }}"
           when: run_playbooks is defined
           loop: "{{ run_playbooks }}"
-          command: "ansible-playbook -f 50 -v {{ item }}"
       always:
         - name: Stop ssh-agent
           shell:
