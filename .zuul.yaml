@@ -131,6 +131,15 @@
     vars:
       run_playbook: gate-first-patch.yaml
 
+- job:
+    name: zuul-tutorial-use-zuul-jobs
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial use zuul jobs documentation.
+    run: playbooks/use-zuul-jobs/run.yaml
+    post-run: playbooks/tutorial-common/post.yaml
+    required-projects:
+      - zuul/zuul
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -276,6 +285,9 @@
             requires: nodepool-container-image
             dependencies: zuul-build-image
         - zuul-tutorial-gate-your-first-patch:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+        - zuul-tutorial-use-zuul-jobs:
             requires: nodepool-container-image
             dependencies: zuul-build-image
         - nodepool-zuul-functional:
