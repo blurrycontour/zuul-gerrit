@@ -134,6 +134,15 @@
     required-projects:
       - zuul/zuul
 
+- job:
+    name: zuul-tutorial-gate-pipeline-use-zuul-jobs
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorials gate pipelines and use zuul jobs documentation.
+    run: playbooks/tutorial-common/run.yaml
+    post-run: playbooks/tutorial-common/post.yaml
+    required-projects:
+      - zuul/zuul
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -284,6 +293,10 @@
         - zuul-tutorial-use-zuul-jobs:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-tutorial-gate-pipeline-use-zuul-jobs:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 3000
         - nodepool-zuul-functional:
             voting: false
         - zuul-build-python-release
