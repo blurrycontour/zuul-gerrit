@@ -2,14 +2,25 @@
 - name: Run docker-compose up
   when: not local
   shell:
-    cmd: docker-compose -p zuul_tutorial up -d
-    chdir: src/opendev.org/zuul/zuul/doc/source/examples
+    cmd: docker-compose -f {{ docker_compose_file }} -p zuul_tutorial up -d
+    chdir: "src/opendev.org/zuul/zuul/doc/source/examples/{{ docker_config_dir }}"
+
+- name: Copy docker-compose.yaml
+  copy:
+    src: ../../doc/source/examples/{{ docker_config_dir }}/{{ docker_config_file }}
+    dest: ../../doc/source/examples/{{ docker_config_dir }}/docker-compose.yaml
+
+- name: Copy nodepool.yaml
+  copy:
+    src: ../../doc/source/examples/{{ docker_config_dir }}/etc_nodepool/{{ nodepool_file }}
+    dest: ../../doc/source/examples/{{ docker_config_dir }}/etc_nodepool/nodepool.yaml
 
 - name: Run docker-compose up
   when: local
   shell:
-    cmd: docker-compose -p zuul_tutorial up -d
-    chdir: ../../doc/source/examples
+    cmd: docker-compose -f docker-compose.yaml -p zuul_tutorial up -d
+    chdir: "../../doc/source/examples/{{ docker_config_dir }}"
+
 
 - name: Print list of images
   command: docker image ls --all --digests --no-trunc
