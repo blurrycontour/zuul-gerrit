@@ -1,0 +1,8 @@
+---
+- hosts: all
+  roles:
+    - ensure-twine
+    - role: upload-pypi
+      pypi_repository: pypitest
+      pypi_repository_url: https://test.pypi.org/legacy/
+      when: zuul_success | bool
