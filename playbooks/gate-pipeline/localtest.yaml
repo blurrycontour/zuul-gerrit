@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-gate-pipeline
+    local: true
+    ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    ssh_agent:
+      stdout: ''
+  tasks:
+    - name: Setup Tutorial Execution
+      include_tasks: ../tutorial-common/setup.yaml
+    - include_tasks: ../quick-start/main.yaml
+    - include_tasks: main.yaml
