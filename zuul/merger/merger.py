@@ -81,7 +81,8 @@ class Repo(object):
 
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
-                 retry_attempts=3, retry_interval=30, zuul_event_id=None):
+                 retry_attempts=3, retry_interval=30, zuul_event_id=None,
+                 repokey=None):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
@@ -104,6 +105,7 @@ class Repo(object):
         self._initialized = False
         self.retry_attempts = retry_attempts
         self.retry_interval = retry_interval
+        self.repokey = repokey
         try:
             self._setup_known_hosts()
         except Exception:
@@ -169,7 +171,11 @@ class Repo(object):
                 clone_url = self.cache_path
                 rewrite_url = True
             else:
-                clone_url = self.remote_url
+                parent_url = "/parent-job/{}".format(self.repokey)
+                if os.path.exists(parent_url):
+                    clone_url = parent_url
+                else:
+                    clone_url = self.remote_url
 
             log.debug("Cloning from %s to %s",
                       redact_url(clone_url), self.local_path)
@@ -201,7 +207,15 @@ class Repo(object):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
         mygit = git.cmd.Git(os.getcwd())
         mygit.update_environment(**self.env)
-
+        for mydir in [
+                "/", "/parent-job", "/parent-job/opendev.org",
+                "/parent-job/opendev.org/zuul"
+        ]:
+            try:
+                dircontent = os.listdir(mydir)
+                log.info("merger dircontent {} :{}".format(mydir, dircontent))
+            except Exception:
+                pass
         for attempt in range(1, self.retry_attempts + 1):
             try:
                 with timeout_handler(self.local_path):
@@ -324,6 +338,8 @@ class Repo(object):
             if ref.remote_head == 'HEAD':
                 continue
             repo.create_head(ref.remote_head, ref, force=True)
+        if log:
+            log.debug("DEBUG _reset repo.head.commit %s", repo.head.commit)
         return messages
 
     def reset(self, zuul_event_id=None, build=None, process_worker=None):
@@ -529,6 +545,7 @@ class Repo(object):
             # https://github.com/git/git/blob/master/Documentation/RelNotes/1.9.0.txt#L18-L20
             self._git_fetch(repo, 'origin', zuul_event_id)
         self._git_fetch(repo, 'origin', zuul_event_id, tags=True, prune=True)
+        log.debug("repo.head.commit %s", repo.head.commit)
 
     def isUpdateNeeded(self, repo_state, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
@@ -672,13 +689,16 @@ class Merger(object):
                 url, path, self.email, self.username, self.speed_limit,
                 self.speed_time, sshkey=sshkey, cache_path=cache_path,
                 logger=self.logger, git_timeout=self.git_timeout,
-                zuul_event_id=zuul_event_id)
+                zuul_event_id=zuul_event_id, repokey=key)
 
             self.repos[key] = repo
         except Exception:
             log = get_annotated_logger(self.log, zuul_event_id)
             log.exception("Unable to add project %s/%s",
                           hostname, project_name)
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("DEBUG hostname %s, project_name %s, url %s",
+                  hostname, project_name, url)
         return repo
 
     def getRepo(self, connection_name, project_name, zuul_event_id=None):

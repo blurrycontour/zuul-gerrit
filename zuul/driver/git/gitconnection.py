@@ -46,6 +46,7 @@ class GitConnection(BaseConnection):
                 self.canonical_hostname = r.hostname
             else:
                 self.canonical_hostname = 'localhost'
+        self.zuulci = self.connection_config.get('zuulci')
         self.projects = {}
         self._change_cache = {}
 
@@ -54,6 +55,7 @@ class GitConnection(BaseConnection):
         d.update({
             "baseurl": self.baseurl,
             "canonical_hostname": self.canonical_hostname,
+            "zuulci": self.zuulci,
         })
         return d
 
@@ -75,6 +77,20 @@ class GitConnection(BaseConnection):
         return job.files
 
     def lsRemote(self, project):
+        for mydir in [
+                "/", "/parent-job", "/parent-job/opendev.org",
+                "/parent-job/opendev.org/zuul"
+        ]:
+            try:
+                dircontent = os.listdir(mydir)
+                self.log.info("gitconnection dircontent {}:{}".format(
+                    mydir, dircontent))
+            except Exception:
+                pass
+        if os.path.exists("/parent-job/opendev.org/zuul/zuul-jobs"):
+            self.log.debug("zuulci PATH exists !")
+        else:
+            self.log.debug("zuulci PATH do not exist !")
         refs = {}
         client = git.cmd.Git()
         output = client.ls_remote(
