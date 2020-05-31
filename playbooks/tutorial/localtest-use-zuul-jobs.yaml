@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-use-zuul-jobs
+    local: true
+    ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    ssh_agent:
+      stdout: ''
+  tasks:
+    - name: Setup Tutorial Execution
+      include_tasks: ../tutorial/setup.yaml
+    - name: Run quick-start tutorial
+      include_tasks: ../tutorial/quick-start.yaml
+    - name: Run use zuul jobs tutorial
+      include_tasks: ../tutorial/use-zuul-jobs.yaml
