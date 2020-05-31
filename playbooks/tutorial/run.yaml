@@ -3,6 +3,8 @@
   vars:
     workspace: /tmp/tutorial-zuul
     local: false
+  environment:
+    GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
   roles:
     - name: ensure-docker
       use_upstream_docker: false
