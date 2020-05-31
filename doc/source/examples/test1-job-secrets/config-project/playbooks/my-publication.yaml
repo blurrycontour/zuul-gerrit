@@ -1,0 +1,21 @@
+---
+- hosts: all
+  tasks:
+    # Copy secret to a configuration file
+    - name: Install secret
+      copy:
+        content: "{{ publication_secret.password }}"
+        dest: ".publication-secret"
+      no_log: true
+
+    # Uses as an environment variable
+    - name: Run publication command
+      command: env
+      environment:
+        MY_SECRET: "{{ publication_secret.password }}"
+        MY_HOST: "{{ publication_secret.hostname }}"
+
+    - name: Remove secret file
+      file:
+        path: ".publication-secret"
+        state: absent
