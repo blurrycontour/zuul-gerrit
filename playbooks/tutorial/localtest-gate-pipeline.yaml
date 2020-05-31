@@ -3,7 +3,7 @@
   vars:
     workspace: /tmp/tutorial-zuul
     local: true
-    skip_quick_start: yes
+    skip_quick_start: no
     zuul_tutorial_confignum: 1
     run_playbooks:
       - gate-pipeline.yaml
