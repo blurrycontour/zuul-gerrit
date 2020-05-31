@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
   vars:
-    workspace: /tmp/tutorial-gate-first-patch
+    workspace: /tmp/tutorial-gate-pipeline
     local: true
     ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
     ssh_agent:
@@ -9,15 +9,11 @@
   tasks:
     - set_fact:
         docker_config_dir: docker-config-1
-        docker_config_file: docker-compose-quickstart.yaml
-        nodepool_file: nodepool-quickstart.yaml
+        docker_config_file: docker-compose-nodes.yaml
+        nodepool_file: nodepool-nodes.yaml
     - name: Setup Tutorial Execution
       include_tasks: setup.yaml
     - name: Run quick-start tutorial
       include_tasks: quick-start.yaml
-    - name: Run gate your first patch tutorial
-      include_tasks: gate-first-patch.yaml
-    - name: Run use zuul jobs tutorial
-      include_tasks: use-zuul-jobs.yaml
     - name: Run gate pipeline tutorial
       include_tasks: gate-pipeline.yaml
