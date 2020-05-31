@@ -23,3 +23,5 @@
       include_tasks: gate-pipeline.yaml
     - name: Run job secrets tutorial
       include_tasks: job-secrets.yaml
+    - name: Run job dependencies tutorial
+      include_tasks: job-dependencies.yaml
