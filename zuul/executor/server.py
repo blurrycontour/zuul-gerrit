@@ -1108,7 +1108,11 @@ class AnsibleJob(object):
             self.log.info("Checking out %s %s %s",
                           project['canonical_name'], selected_desc,
                           selected_ref)
-            repo.checkout(selected_ref)
+            repo_commit = repo.checkout(selected_ref)
+
+            self.log.info("Checked out %s %s %s",
+                          project['canonical_name'], selected_desc,
+                          selected_ref, repo_commit)
 
             # Update the inventory variables to indicate the ref we
             # checked out
