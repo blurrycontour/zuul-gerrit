@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-gate-first-patch
+    local: true
+    ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    ssh_agent:
+      stdout: ''
+  tasks:
+    - name: Setup Tutorial Execution
+      include_tasks: ../tutorial/setup.yaml
+    - name: Run quick-start tutorial
+      include_tasks: ../tutorial/quick-start.yaml
+    - name: Run gate your first patch tutorial
+      include_tasks: ../tutorial/gate-first-patch.yaml
+    - name: Run use zuul jobs tutorial
+      include_tasks: ../tutorial/use-zuul-jobs.yaml
+    - name: Run gate pipeline tutorial
+      include_tasks: ../tutorial/gate-pipeline-tuto.yaml
+    - name: Run job secrets tutorial
+      include_tasks: ../tutorial/job-secrets.yaml
+    - name: Run job dependencies tutorial
+      include_tasks: ../tutorial/job-dependencies.yaml
