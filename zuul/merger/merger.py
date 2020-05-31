@@ -679,6 +679,8 @@ class Merger(object):
             log = get_annotated_logger(self.log, zuul_event_id)
             log.exception("Unable to add project %s/%s",
                           hostname, project_name)
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("DEBUG hostname %s, project_name %s, url %s", hostname, project_name, url)
         return repo
 
     def getRepo(self, connection_name, project_name, zuul_event_id=None):
