@@ -4,10 +4,9 @@
     workspace: /tmp/tutorial-zuul
     local: true
     skip_quick_start: no
-    zuul_tutorial_confignum: 1
     run_playbooks:
-      - job-secrets.yaml
       - job-dependencies.yaml
+    zuul_tutorial_confignum: 1
   tasks:
     - name: Run tutorial
       include_tasks: run-tutorial.yaml

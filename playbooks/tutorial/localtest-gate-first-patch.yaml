@@ -3,6 +3,7 @@
   vars:
     workspace: /tmp/tutorial-zuul
     local: true
+    skip_quick_start: no
     run_playbooks:
       - gate-first-patch.yaml
   tasks:
