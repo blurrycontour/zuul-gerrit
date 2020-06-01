@@ -757,7 +757,7 @@ class PagureConnection(BaseConnection):
         pagure = self.get_project_api_client(project_name)
         pr = pagure.get_pr(number)
         diffstats = pagure.get_pr_diffstats(number)
-        pr['files'] = diffstats.keys()
+        pr['files'] = list(diffstats.keys())
         self.log.info('Got PR %s#%s', project_name, number)
         return pr
 
