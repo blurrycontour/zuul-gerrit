@@ -37,14 +37,21 @@ class BuildsPage extends TableFilters {
       builds: null,
       currentFilterType: this.filterTypes[0],
       activeFilters: [],
+      activeCheckboxes: [],
       currentValue: ''
     }
+    this.checkboxFilters = [
+        {id: 'held', label: 'Show held builds only'},
+    ]
   }
 
-  updateData = (filters) => {
+  updateData = (filters, checkboxes) => {
     let queryString = ''
     if (filters) {
       filters.forEach(item => queryString += '&' + item.key + '=' + item.value)
+    }
+    if (checkboxes) {
+      checkboxes.forEach(item => queryString += '&' + item + '=1')
     }
     this.setState({builds: null})
     fetchBuilds(this.props.tenant.apiPrefix, queryString).then(response => {
@@ -55,14 +62,16 @@ class BuildsPage extends TableFilters {
   componentDidMount () {
     document.title = 'Zuul Builds'
     if (this.props.tenant.name) {
-      this.updateData(this.getFilterFromUrl())
+      let { activeFilters, activeCheckboxes } = this.getFilterFromUrl()
+      this.updateData(activeFilters, activeCheckboxes)
     }
   }
 
   componentDidUpdate (prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name ||
         this.props.timezone !== prevProps.timezone) {
-      this.updateData(this.getFilterFromUrl())
+      let { activeFilters, activeCheckboxes } = this.getFilterFromUrl()
+      this.updateData(activeFilters, activeCheckboxes)
     }
   }
 
@@ -159,7 +168,12 @@ class BuildsPage extends TableFilters {
               case 'SUCCESS':
                 return { className: 'success' }
               default:
-                return { className: 'warning' }
+                switch (row.held) {
+                  case true:
+                    return { className: 'danger' }
+                  default:
+                    return { className: 'warning' }
+                }
             }
           }} />
       </Table.PfProvider>)
