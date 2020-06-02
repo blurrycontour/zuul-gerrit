@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_e0401238",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-02T12:50:09Z",
+      "side": 1,
+      "message": "You are right. I think I did not really consider enqueuing changes behind with my Github centric world view ;)\n\nWill fix.",
+      "parentUuid": "ff570b3c_75d078f8",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_55cbb448",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 29
@@ -30,6 +48,24 @@
       "writtenOn": "2020-05-28T21:55:20Z",
       "side": 1,
       "message": "I think this could use a comment about what happens in this case.  How do we get to a case where we have started reporting a bundle but are canceling jobs?  Why is it okay not to clear the builds here?  Is it because the only reason we would cancel builds after a bundle starts reporting is because the bundle has failed, and therefore we know it\u0027s going to be dequeued immediately afterwords?  If we don\u0027t change this code, does anything bad happen?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_750fa687",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-02T12:50:09Z",
+      "side": 1,
+      "message": "Yes, this is for the case where a bundle is failing.\n\nSince an item that is part of a bundle will also fail if any other item in the bundle failed we want to keep the build results. Otherwise the reporting might be misleading and/or incomplete.\n\nWill add a comment to make this clear.",
+      "parentUuid": "ff570b3c_55cbb448",
       "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_35688ef3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-02T12:50:09Z",
+      "side": 1,
+      "message": "The reason for this change was to only cancel jobs that are still running. With the change in the scheduler\u0027s cancelJob() method this is no longer necessary. I\u0027ll remove it.",
+      "parentUuid": "ff570b3c_b5da1014",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_95d54ce8",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 29
@@ -64,6 +118,24 @@
       "writtenOn": "2020-05-28T21:55:20Z",
       "side": 1,
       "message": "I had some questions about this (why doesn\u0027t the original code work?  what about bundles ahead of items?) but in trying to answer them, I can\u0027t actually find this used anywhere.  Is method dead code?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_157d8ab1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 771,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-02T12:50:09Z",
+      "side": 1,
+      "message": "Yes, I think this is dead code. Will remove it.",
+      "parentUuid": "ff570b3c_95d54ce8",
       "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_3a1fdd6c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 1301,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-02T12:50:09Z",
+      "side": 1,
+      "message": "Will capitalize. I found those messages helpful for debugging, so I\u0027d like to keep them if there are no strong objections. IIRC there were other messages in here no capitalized and I wanted to be consistent. Unfortunately I can\u0027t find those messages anymore and now I look like a fool :P",
+      "parentUuid": "ff570b3c_f505a87b",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_d5086492",
         "filename": "zuul/reporter/__init__.py",
         "patchSetId": 29
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_35cc0e34",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-02T12:50:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_d5086492",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_3500c067",
         "filename": "zuul/scheduler.py",
         "patchSetId": 29
@@ -115,6 +223,24 @@
       "writtenOn": "2020-05-28T21:55:20Z",
       "side": 1,
       "message": "Why did this need to change?",
+      "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_351fee6c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 1737,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-02T12:50:09Z",
+      "side": 1,
+      "message": "For items in a failing bundle the cancelJobs() might also be called for the item that caused the bundle to fail.\n\nI also can\u0027t think of a reason to change this to CANCELED when there is already a result available and the job wasn\u0027t really canceled.",
+      "parentUuid": "ff570b3c_3500c067",
       "revId": "57ab1aafe7bd01fdde610323827661724513ebc3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
