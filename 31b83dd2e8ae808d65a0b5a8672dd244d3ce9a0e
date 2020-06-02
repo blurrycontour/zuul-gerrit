@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_e0dad2e6",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-06-02T10:39:53Z",
+      "side": 0,
+      "message": "I\u0027m still not sure why you\u0027re removing this line here.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 28
+      },
+      "revId": "31b83dd2e8ae808d65a0b5a8672dd244d3ce9a0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
