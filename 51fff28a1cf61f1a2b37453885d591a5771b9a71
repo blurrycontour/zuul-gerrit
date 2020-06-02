@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_da97c18f",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-06-02T07:31:40Z",
+      "side": 1,
+      "message": "data[\u0027id\u0027] is the change id, what you see in the footer on gerrit changes. If you want the commit id you should use current_revision.\n\nhttps://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#change-info",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 35
+      },
+      "revId": "51fff28a1cf61f1a2b37453885d591a5771b9a71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_5ae9f117",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 22
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-06-02T07:31:40Z",
+      "side": 1,
+      "message": "Also this would be in a different format compared to \u0027id\u0027.\n\nid: \u003cproject\u003e~\u003cbranch\u003e~\u003cChange-Id\u003e\nchange_id: \u003cChange-Id\u003e",
+      "range": {
+        "startLine": 102,
+        "startChar": 0,
+        "endLine": 102,
+        "endChar": 42
+      },
+      "revId": "51fff28a1cf61f1a2b37453885d591a5771b9a71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
