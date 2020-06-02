@@ -35,6 +35,7 @@ class BuildsetsPage extends TableFilters {
       buildsets: null,
       currentFilterType: this.filterTypes[0],
       activeFilters: [],
+      activeCheckboxes: [],
       currentValue: ''
     }
   }
@@ -88,6 +89,7 @@ class BuildsetsPage extends TableFilters {
     )
     this.columns = []
     this.filterTypes = []
+    this.checkboxFilters = []
     const myColumns = [
       'project',
       'branch',
