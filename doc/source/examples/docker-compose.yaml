@@ -91,47 +91,35 @@ services:
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
   node1:
-    build:
-      dockerfile: node-Dockerfile
-      context: ./
-      args:
-        http_proxy: "${http_proxy}"
-        https_proxy: "${http_proxy}"
-        no_proxy: "${no_proxy},gerrit"
     image: zuul-tutorial_node
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit
     volumes:
       - "nodessh:/root/.ssh:z"
   node2:
-    build:
-      dockerfile: node-Dockerfile
-      context: ./
-      args:
-        http_proxy: "${http_proxy}"
-        https_proxy: "${http_proxy}"
-        no_proxy: "${no_proxy},gerrit"
     image: zuul-tutorial_node
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit
     volumes:
       - "nodessh:/root/.ssh:z"
   node3:
-    build:
-      dockerfile: node-Dockerfile
-      context: ./
-      args:
-        http_proxy: "${http_proxy}"
-        https_proxy: "${http_proxy}"
-        no_proxy: "${no_proxy},gerrit"
     image: zuul-tutorial_node
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit
     volumes:
       - "nodessh:/root/.ssh:z"
   node4:
-    build:
-      dockerfile: node-Dockerfile
-      context: ./
-      args:
-        http_proxy: "${http_proxy}"
-        https_proxy: "${http_proxy}"
-        no_proxy: "${no_proxy},gerrit"
     image: zuul-tutorial_node
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit
     volumes:
       - "nodessh:/root/.ssh:z"
   launcher:
@@ -144,13 +132,11 @@ services:
     ports:
       - "8022:8022"
   logs:
-    build:
-      dockerfile: logs-Dockerfile
-      context: ./
-      args:
-        http_proxy: "${http_proxy}"
-        https_proxy: "${http_proxy}"
-        no_proxy: "${no_proxy}"
+    image: zuul/zuul-tutorial-logs
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit
     ports:
       - "8000:80"
     volumes:
