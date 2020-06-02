@@ -238,6 +238,22 @@
     vars: *zuul_image_vars
 
 - job:
+    name: zuul-build-tutorial-image
+    parent: opendev-build-docker-image
+    description: Build Tutorial images.
+    allowed-projects: zuul/zuul
+    timeout: 1800  # 30 minutes
+    provides: zuul-tutorial-image
+    vars:
+      docker_images:
+        - context: doc/source/examples
+          repository: zuul/zuul-tutorial-node
+          dockerfile: node-Dockerfile
+        - context: doc/source/examples
+          repository: zuul/zuul-tutorial-logs
+          dockerfile: logs-Dockerfile
+
+- job:
     name: zuul-build-python-release
     parent: build-python-release
     pre-run: playbooks/release/pre.yaml
@@ -255,7 +271,13 @@
       node_version: 14
     check:
       jobs:
-        - zuul-build-image
+        - opendev-buildset-registry
+        - zuul-build-image:
+            dependencies:
+              - opendev-buildset-registry
+        - zuul-build-tutorial-image:
+            dependencies:
+              - opendev-buildset-registry
         - zuul-tox-docs
         - tox-linters:
             vars:
@@ -301,27 +323,41 @@
             timeout: 2700  # 45 minutes
         - zuul-quick-start:
             requires: nodepool-container-image
-            dependencies: zuul-build-image
+            dependencies:
+              - zuul-build-image
+              - zuul-build-tutorial-image
         - zuul-tutorial-quick-start:
             requires: nodepool-container-image
-            dependencies: zuul-build-image
+            dependencies:
+              - zuul-build-image
+              - zuul-build-tutorial-image
         - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
-            dependencies: zuul-build-image
+            dependencies:
+              - zuul-build-image
+              - zuul-build-tutorial-image
         - zuul-tutorial-use-zuul-jobs:
             requires: nodepool-container-image
-            dependencies: zuul-build-image
+            dependencies:
+              - zuul-build-image
+              - zuul-build-tutorial-image
         - zuul-tutorial-gate-pipeline-use-zuul-jobs:
             requires: nodepool-container-image
-            dependencies: zuul-build-image
+            dependencies:
+              - zuul-build-image
+              - zuul-build-tutorial-image
             timeout: 3000
         - zuul-tutorial-job-secrets:
             requires: nodepool-container-image
-            dependencies: zuul-build-image
+            dependencies:
+              - zuul-build-image
+              - zuul-build-tutorial-image
             timeout: 3000
         - zuul-tutorial-job-dependencies:
             requires: nodepool-container-image
-            dependencies: zuul-build-image
+            dependencies:
+              - zuul-build-image
+              - zuul-build-tutorial-image
             timeout: 4000
         - nodepool-zuul-functional:
             voting: false
