@@ -16,7 +16,7 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
-import { Button, Filter, FormControl, Toolbar } from 'patternfly-react'
+import { Button, Filter, FormControl, Toolbar, Checkbox } from 'patternfly-react'
 
 
 class TableFilters extends React.Component {
@@ -35,13 +35,23 @@ class TableFilters extends React.Component {
           value: param})
       })
     })
-    this.setState({activeFilters: activeFilters})
-    return activeFilters
+    let activeCheckboxes = []
+    this.checkboxFilters.forEach(item => {
+        urlParams.getAll(item.id).forEach(param => {
+            // assuming checkboxes would be used for boolean filters
+            if (param === '1') {
+                activeCheckboxes.push(item.id)
+            }
+        })
+    })
+    this.setState({activeFilters: activeFilters,
+                   activeCheckboxes: activeCheckboxes})
+    return activeFilters, activeCheckboxes
   }
 
-  updateUrl (activeFilters) {
+  updateUrl (activeFilters, activeCheckboxes) {
     let path = window.location.pathname
-    if (activeFilters.length > 0) {
+    if (activeFilters.length > 0 || activeCheckboxes.length > 0) {
       path += '?'
       activeFilters.forEach((item, idx) => {
         if (idx > 0) {
@@ -52,6 +62,15 @@ class TableFilters extends React.Component {
           + '=' +
           encodeURIComponent(item.value)
         )
+      })
+      activeCheckboxes.forEach((item, idx) => {
+          if (activeFilters.length > 0 || idx > 0 ) {
+              path += '&'
+          }
+          path += (
+              // Assuming checkbox filters would map to boolean values.
+              encodeURIComponent(item) + '=1'
+          )
       })
     }
     window.history.pushState({path: path}, '', path)
@@ -83,8 +102,9 @@ class TableFilters extends React.Component {
       value: value
     }]
     this.setState({ activeFilters: activeFilters })
-    this.updateData(activeFilters)
-    this.updateUrl(activeFilters)
+    let activeCheckboxes = this.state.activeCheckboxes
+    this.updateData(activeFilters, activeCheckboxes)
+    this.updateUrl(activeFilters, activeCheckboxes)
   }
 
   selectFilterType = filterType => {
@@ -156,7 +176,7 @@ class TableFilters extends React.Component {
   }
 
   removeFilter = filter => {
-    const { activeFilters } = this.state
+    const { activeFilters, activeCheckboxes } = this.state
 
     let index = activeFilters.indexOf(filter)
     if (index > -1) {
@@ -165,15 +185,16 @@ class TableFilters extends React.Component {
         ...activeFilters.slice(index + 1)
       ]
       this.setState({ activeFilters: updated })
-      this.updateData(updated)
-      this.updateUrl(updated)
+      this.updateData(updated, activeCheckboxes)
+      this.updateUrl(updated, activeCheckboxes)
     }
   }
 
   clearFilters = () => {
-    this.setState({ activeFilters: [] })
-    this.updateData()
-    this.updateUrl([])
+    this.setState({ activeFilters: [],
+                    activeCheckboxes: [] })
+    this.updateData([], [])
+    this.updateUrl([], [])
   }
 
   renderFilterInput() {
@@ -192,6 +213,38 @@ class TableFilters extends React.Component {
     )
   }
 
+  updateCheckbox = (checkboxId, event) => {
+      const { activeFilters, activeCheckboxes } = this.state
+      let updatedCheckboxes = []
+      if (event.target.checked) {
+          updatedCheckboxes.push(checkboxId)
+      } else {
+          let cb_index = activeCheckboxes.indexOf(checkboxId)
+          updatedCheckboxes = [
+              ...activeCheckboxes.slice(0, cb_index),
+              ...activeCheckboxes.slice(cb_index + 1)
+          ]
+      }
+      this.setState({ activeCheckboxes: updatedCheckboxes })
+      this.updateData(activeFilters, updatedCheckboxes)
+      this.updateUrl(activeFilters, updatedCheckboxes)
+  }
+
+  renderCheckboxes() {
+      const { activeCheckboxes } = this.state
+      return (
+          this.checkboxFilters.map(item => {
+            let cb_index = activeCheckboxes.indexOf(item.id)
+            return (
+                <Checkbox key={item.id}
+                          checked={cb_index > -1}
+                          onChange={e => this.updateCheckbox(item.id, e)}>
+                    {item.label}
+                </Checkbox>
+            )
+          }))
+  }
+
   renderFilter = () => {
     const { currentFilterType, activeFilters } = this.state
     return (
@@ -205,6 +258,7 @@ class TableFilters extends React.Component {
               />
             {this.renderFilterInput()}
           </Filter>
+          {this.renderCheckboxes()}
         </div>
         {activeFilters && activeFilters.length > 0 && (
           <Toolbar.Results>
