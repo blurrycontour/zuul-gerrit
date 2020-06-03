@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_6db6968c",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_e76488bb",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_4758d4f8",
         "filename": "doc/source/examples/node-Dockerfile",
         "patchSetId": 3
@@ -118,6 +136,24 @@
       "writtenOn": "2020-06-03T17:54:27Z",
       "side": 1,
       "message": "I Agree. But to me \"static node\" sounds a lot like a standard server and not a VM or a container where it\u0027s unlikely to be connected as root.\nbut also: why not ?",
+      "parentUuid": "ff570b3c_4758d4f8",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_4db91277",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "ff570b3c_4758d4f8",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
@@ -160,6 +196,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_8dae8a2b",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_275b20f6",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_8775cc66",
         "filename": "doc/source/examples/node-Dockerfile",
         "patchSetId": 3
@@ -188,6 +242,24 @@
       "writtenOn": "2020-06-03T17:54:27Z",
       "side": 1,
       "message": "required for pip as --user",
+      "parentUuid": "ff570b3c_8775cc66",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_eda90624",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "ff570b3c_8775cc66",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
@@ -230,6 +302,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_cda4024e",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_67707873",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_c76b4482",
         "filename": "doc/source/examples/playbooks/project.config",
         "patchSetId": 3
@@ -258,6 +348,42 @@
       "writtenOn": "2020-06-03T17:54:27Z",
       "side": 1,
       "message": "I agree, but there are some use cases in the following tutorials where users are asked to do a standard push.",
+      "parentUuid": "ff570b3c_c76b4482",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_ed574625",
+        "filename": "doc/source/examples/playbooks/project.config",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "removed for this change",
+      "parentUuid": "ff570b3c_87614c08",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_2d4e5e96",
+        "filename": "doc/source/examples/playbooks/project.config",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "ff570b3c_c76b4482",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
@@ -312,6 +438,42 @@
       "side": 1,
       "message": "used one time.",
       "parentUuid": "ff570b3c_e71e486e",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_4d3c72e0",
+        "filename": "doc/source/examples/playbooks/project.config",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "removed for this change",
+      "parentUuid": "ff570b3c_1cdf520d",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_0d36fa03",
+        "filename": "doc/source/examples/playbooks/project.config",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:00:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_a76610ba",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
