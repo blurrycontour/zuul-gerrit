@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_0d1f1a6c",
+        "filename": "doc/source/examples/test1-gate-first/hello.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_07337c15",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_e735a8f8",
         "filename": "doc/source/tutorials/gate-your-first-patch.rst",
         "patchSetId": 3
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_9c57e258",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:10:07Z",
+      "side": 1,
+      "message": "That\u0027s more or less what I did first.\n\nBut this is a simple way to make a fresh start, users can execute tutorials in any order they want and it will work.\n\nthe only prerequisite, is to run quick-start first.",
+      "parentUuid": "ff570b3c_4739f4ef",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_273cc0df",
         "filename": "doc/source/tutorials/gate-your-first-patch.rst",
         "patchSetId": 3
@@ -64,6 +100,24 @@
       "writtenOn": "2020-06-03T17:37:00Z",
       "side": 1,
       "message": "This (and the YAML code blocks below) should use literalinclude so that the tutorial and test content are kept in sync.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_08042814",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_273cc0df",
       "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_ad0f0e35",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:10:07Z",
+      "side": 1,
+      "message": "Done, removed \"Initialize test1 project\" push",
+      "parentUuid": "ff570b3c_87266ccd",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_672198b4",
         "filename": "doc/source/tutorials/gate-your-first-patch.rst",
         "patchSetId": 3
@@ -98,6 +170,24 @@
       "writtenOn": "2020-06-03T17:37:00Z",
       "side": 1,
       "message": "Also literalinclude.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_8d0a0a23",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_672198b4",
       "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +211,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_ed058615",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_c72ce4ad",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_a72730c7",
         "filename": "playbooks/gate-first-patch/run.yaml",
         "patchSetId": 3
@@ -132,6 +240,24 @@
       "writtenOn": "2020-06-03T17:37:00Z",
       "side": 1,
       "message": "I bet we could make this run.yaml file common to all the tutorials that runs up to this point, then add a job variable for what extra tasks files to include.  That way we\u0027re not copying this file to all the new jobs.\n\nFor an example of the kind of structure I\u0027m talking about, take a look here:\n\nhttps://opendev.org/opendev/system-config/src/branch/master/zuul.d/system-config-run.yaml#L126\n\nThat variable is used inside the job\u0027s run playbook to determine what other playbooks it should run.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_e81a946c",
+        "filename": "playbooks/gate-first-patch/run.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T22:10:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_a72730c7",
       "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
