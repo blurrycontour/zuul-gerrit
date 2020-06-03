@@ -22,6 +22,30 @@
       "revId": "f7043649d37b609276cff7b8371e70b4398fb275",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_2c0ae71e",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-06-03T16:28:44Z",
+      "side": 1,
+      "message": "I think it may be possible but I am afraid that such advanced CSS would delay this from being shipped for... a very long time. \n\nMy concerns are around browser support. See https://stackoverflow.com/a/56926015/99834",
+      "parentUuid": "ff570b3c_81b3fc97",
+      "range": {
+        "startLine": 78,
+        "startChar": 70,
+        "endLine": 78,
+        "endChar": 74
+      },
+      "revId": "f7043649d37b609276cff7b8371e70b4398fb275",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
