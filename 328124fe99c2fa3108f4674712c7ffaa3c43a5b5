@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_a741f0a8",
+        "filename": ".zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "I tried to in the previous all-in-one change I abandonned: patchset 3: https://review.opendev.org/#/c/728194/3\nbut nodepool won\u0027t let me!.\n\nI was told on #zuul that I have to so a add-switch-remove scheme.",
+      "parentUuid": "ff570b3c_07625cae",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_e76488bb",
         "filename": "doc/source/examples/node-Dockerfile",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2020-06-03T17:13:50Z",
       "side": 1,
       "message": "We shouldn\u0027t need anythong other than python3 at this point.",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_390a281f",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "That\u0027s what i did at the begining, but:\n\nERROR:  py27: InterpreterNotFound: python2.7",
+      "parentUuid": "ff570b3c_e76488bb",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_b96638ba",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "I Agree. But to me \"static node\" sounds a lot like a standard server and not a VM or a container where it\u0027s unlikely to be connected as root.\nbut also: why not ?",
+      "parentUuid": "ff570b3c_4758d4f8",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_275b20f6",
         "filename": "doc/source/examples/node-Dockerfile",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2020-06-03T17:13:50Z",
       "side": 1,
       "message": "None of these should be necessary.",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_276e80ff",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "I agree, but they are going to be installed anyway. it\u0027s also to save some time during job execution.\nSame idea why I installed \"python3-venv\"",
+      "parentUuid": "ff570b3c_275b20f6",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_c7fb4444",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "required for pip as --user",
+      "parentUuid": "ff570b3c_8775cc66",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_67707873",
         "filename": "doc/source/examples/node-Dockerfile",
         "patchSetId": 3
@@ -98,6 +188,24 @@
       "writtenOn": "2020-06-03T17:13:50Z",
       "side": 1,
       "message": "Why the PAM change?",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_67007835",
+        "filename": "doc/source/examples/node-Dockerfile",
+        "patchSetId": 3
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "It was in the previous used image, so I kept it.\nhttps://github.com/rastasheep/ubuntu-sshd/blob/master/18.04/Dockerfile",
+      "parentUuid": "ff570b3c_67707873",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_87614c08",
+        "filename": "doc/source/examples/playbooks/project.config",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "I agree, but there are some use cases in the following tutorials where users are asked to do a standard push.",
+      "parentUuid": "ff570b3c_c76b4482",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_a76610ba",
         "filename": "doc/source/examples/playbooks/project.config",
         "patchSetId": 3
@@ -132,6 +258,24 @@
       "writtenOn": "2020-06-03T17:13:50Z",
       "side": 1,
       "message": "Ditto.",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_e71e486e",
+        "filename": "doc/source/examples/playbooks/project.config",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "use on time, see follow up tutorial \"job-secrets\".\nWe can make users push as admin tho.",
+      "parentUuid": "ff570b3c_a76610ba",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -178,6 +322,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_d9616cd5",
+        "filename": "playbooks/quick-start/localtest.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "default yamllint was complaining about document-start, so I added them.",
+      "parentUuid": "ff570b3c_0707fccb",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_e70928dd",
         "filename": "playbooks/quick-start/localtest.yaml",
         "patchSetId": 3
@@ -189,6 +351,24 @@
       "writtenOn": "2020-06-03T17:13:50Z",
       "side": 1,
       "message": "The purpose of this playbook is to facilitate local testing of the gate job.  So this should run exactly what the gate job runs, but with an SSH configuration suitable for running locally.  In other words, we shouldn\u0027t add this task here.",
+      "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_b9b8f810",
+        "filename": "playbooks/quick-start/localtest.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-03T17:54:27Z",
+      "side": 1,
+      "message": "This is just old \"main.yaml\" split into 2 files: \"setup.yaml\" and \"main.yaml\".\n   \nThe history behind this is:\nI wanted first other tutorials to just run this setup.yaml and their main.yaml and not main.yaml from quick-start.",
+      "parentUuid": "ff570b3c_e70928dd",
       "revId": "328124fe99c2fa3108f4674712c7ffaa3c43a5b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
