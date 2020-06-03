@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_07337c15",
+        "filename": "doc/source/examples/test1-gate-first/hello.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-03T17:37:00Z",
+      "side": 1,
+      "message": "Is this a tab?",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_e735a8f8",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-03T17:37:00Z",
+      "side": 1,
+      "message": "I think we might want to add some more words here about how this requires a running Zuul system, and if users already have one available, they should be able to adapt this to what they have (substituting their own project for \"test1\"), or they can use the quick-start to set up a local Zuul first.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_4739f4ef",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-03T17:37:00Z",
+      "side": 1,
+      "message": "Rather than a force-push, can we do one of the following?\n\n1) Continue from where we left test1 (you can just overwrite the .zuul.yaml).\nor\n2) Instruct users to start this next commit by removing everything in the repo.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_273cc0df",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-03T17:37:00Z",
+      "side": 1,
+      "message": "This (and the YAML code blocks below) should use literalinclude so that the tutorial and test content are kept in sync.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_87266ccd",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-03T17:37:00Z",
+      "side": 1,
+      "message": "Let\u0027s not do that.  We\u0027re not teaching a useful skill here.  Let\u0027s do one of the following:\n\n1) Add the job along with the tests.  (I prefer this, it shows off one of Zuul\u0027s strengths).\n2) Add the tests along with a noop job.  (I don\u0027t like this, it means we may have merged broken code).",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_672198b4",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-03T17:37:00Z",
+      "side": 1,
+      "message": "Also literalinclude.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_c72ce4ad",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-03T17:37:00Z",
+      "side": 1,
+      "message": "Also literalinclude.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_a72730c7",
+        "filename": "playbooks/gate-first-patch/run.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-03T17:37:00Z",
+      "side": 1,
+      "message": "I bet we could make this run.yaml file common to all the tutorials that runs up to this point, then add a job variable for what extra tasks files to include.  That way we\u0027re not copying this file to all the new jobs.\n\nFor an example of the kind of structure I\u0027m talking about, take a look here:\n\nhttps://opendev.org/opendev/system-config/src/branch/master/zuul.d/system-config-run.yaml#L126\n\nThat variable is used inside the job\u0027s run playbook to determine what other playbooks it should run.",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
