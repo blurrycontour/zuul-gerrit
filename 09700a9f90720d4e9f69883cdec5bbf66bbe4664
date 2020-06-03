@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_b29c986a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1505,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-03T12:23:44Z",
+      "side": 1,
+      "message": "Cache size of one doesn\u0027t make sense in a multi-tenant setup.",
+      "revId": "09700a9f90720d4e9f69883cdec5bbf66bbe4664",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
