@@ -46,6 +46,30 @@
       "revId": "f7043649d37b609276cff7b8371e70b4398fb275",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_8c7fb313",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-06-03T16:47:53Z",
+      "side": 1,
+      "message": "Well it is confusing that clicking `more` seems to display the whole task output, and clicking `more` again shrink it back to the last lines.\n\nSo it seems like the this is a CSS trick, why not using a state variable to set the max_lines? Then we could have better control, and perhaps a `more` / `less` buttons to adjust it.",
+      "parentUuid": "ff570b3c_2c0ae71e",
+      "range": {
+        "startLine": 78,
+        "startChar": 70,
+        "endLine": 78,
+        "endChar": 74
+      },
+      "revId": "f7043649d37b609276cff7b8371e70b4398fb275",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
