@@ -16,6 +16,24 @@
       "revId": "aece40f7cd9d9b01e89a92672e2f3a995156be8d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_d535a046",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-04T11:43:06Z",
+      "side": 1,
+      "message": "I think the preferable solution is a smarter solution that doesn\u0027t need a fixed delay.",
+      "parentUuid": "ff570b3c_75d8141d",
+      "revId": "aece40f7cd9d9b01e89a92672e2f3a995156be8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
