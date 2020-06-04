@@ -168,7 +168,7 @@ class GerritEventConnector(threading.Thread):
 
     log = logging.getLogger("zuul.GerritEventConnector")
     tracer = trace.get_tracer("zuul")
-    delay = 10.0
+    delay = 20.0
 
     def __init__(self, connection):
         super(GerritEventConnector, self).__init__()
