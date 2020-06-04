@@ -9,5 +9,5 @@
   tasks:
     - name: Setup Tutorial Execution
       include_tasks: ../tutorial-common/setup.yaml
-    - name: Run tasks in ssh agent
-      include_tasks: main.yaml
+    - name: Run Quick-Start tutorial
+      include_tasks: ../tutorial-common/quick-start.yaml
