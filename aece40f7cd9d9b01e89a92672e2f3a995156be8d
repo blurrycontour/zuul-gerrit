@@ -34,6 +34,24 @@
       "revId": "aece40f7cd9d9b01e89a92672e2f3a995156be8d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_153b9837",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-04T11:43:37Z",
+      "side": 1,
+      "message": "This change was meant to start this discussion.",
+      "parentUuid": "ff570b3c_d535a046",
+      "revId": "aece40f7cd9d9b01e89a92672e2f3a995156be8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
