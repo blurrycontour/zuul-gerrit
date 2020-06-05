@@ -70,6 +70,30 @@
       "revId": "f7043649d37b609276cff7b8371e70b4398fb275",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_78b91aca",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-06-05T08:05:36Z",
+      "side": 1,
+      "message": "Huh... Doing it. Now I am clearly more sympathetic to what the web devs. I hope it will not break someone\u0027s custom build niche browser.",
+      "parentUuid": "ff570b3c_8c7fb313",
+      "range": {
+        "startLine": 78,
+        "startChar": 70,
+        "endLine": 78,
+        "endChar": 74
+      },
+      "revId": "f7043649d37b609276cff7b8371e70b4398fb275",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
