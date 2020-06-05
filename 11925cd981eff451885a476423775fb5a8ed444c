@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_03e4df3a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-06-05T21:29:22Z",
+      "side": 1,
+      "message": "Might be good to add: `Story: 2007761` for the context.",
+      "revId": "11925cd981eff451885a476423775fb5a8ed444c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
