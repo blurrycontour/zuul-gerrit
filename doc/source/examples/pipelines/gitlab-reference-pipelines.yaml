@@ -1,0 +1,27 @@
+- pipeline:
+    name: gitlab-check
+    description: |
+      Newly uploaded patchsets enter this pipeline to receive an
+      initial +/-1 Verified vote.
+    manager: independent
+    trigger:
+      gitlab.com:
+        - event: gl_merge_request
+          action: comment
+          comment: (?i)^\s*recheck\s*$
+        - event: gl_merge_request
+          action:
+            - opened
+            - changed
+    success:
+      gitlab.com:
+        comment: true
+      sqlreporter:
+    failure:
+      gitlab.com:
+        comment: true
+      sqlreporter:
+    start:
+      gitlab.com:
+        comment: true
+      sqlreporter:

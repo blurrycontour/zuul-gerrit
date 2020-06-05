@@ -21,6 +21,7 @@ Zuul includes the following drivers:
    gerrit
    github
    pagure
+   gitlab
    git
    mqtt
    smtp
