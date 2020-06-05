@@ -552,3 +552,35 @@ class TestPolling(ZuulTestCase):
         self.assertHistory([
             dict(name='tag-job', result='SUCCESS'),
         ])
+
+
+class TestWrongConnection(ZuulTestCase):
+    config_file = 'zuul-connections-multiple-gerrits.conf'
+    tenant_config_file = 'config/wrong-connection-in-pipeline/main.yaml'
+
+    def test_wrong_connection(self):
+        # Test if the wrong connection is configured in a gate pipeline
+
+        # Our system has two gerrits, and we have configured a gate
+        # pipeline to trigger on the "review_gerrit" connection, but
+        # report (and merge) via "another_gerrit".
+        A = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_review_gerrit.addEvent(A.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        B = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'B')
+        # Let's try this as if the change was merged (say, via another tenant).
+        B.setMerged()
+        B.addApproval('Code-Review', 2)
+        self.fake_review_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 0)
+        self.assertEqual(B.reported, 0)
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+            dict(name='test-job', result='SUCCESS', changes='2,1'),
+        ], ordered=False)

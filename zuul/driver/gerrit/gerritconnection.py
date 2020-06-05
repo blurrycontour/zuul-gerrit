@@ -917,6 +917,13 @@ class GerritConnection(BaseConnection):
 
         ref = 'refs/heads/' + change.branch
         self.log.debug("Waiting for %s to appear in git repo" % (change))
+        if not hasattr(change, '_ref_sha'):
+            self.log.error("Unable to confirm change in git repo: "
+                           "the change has not been reported; "
+                           "this pipeline may be misconfigured "
+                           "(check for multiple Gerrit connections).")
+            return False
+
         if self._waitForRefSha(change.project, ref, change._ref_sha):
             self.log.debug("Change %s is in the git repo" %
                            (change))
