@@ -51,6 +51,10 @@ class GerritReporter(BaseReporter):
         # the canonical hostname.
         if item.change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
+            log.debug("Not reporting %s as this Gerrit reporter "
+                      "is for %s and the change is from %s",
+                      item, self.connection.canonical_hostname,
+                      item.change.project.source.connection.canonical_hostname)
             return
 
         comments = self.getFileComments(item)
