@@ -94,6 +94,30 @@
       "revId": "f7043649d37b609276cff7b8371e70b4398fb275",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_21fbcd47",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-06-08T14:07:04Z",
+      "side": 1,
+      "message": "FWIW- if that\u0027s a problem I believe webpack is already transpiling stuff with some support for older browsers - but we already also don\u0027t support like like IE, so I think it\u0027s fine. :)",
+      "parentUuid": "ff570b3c_78b91aca",
+      "range": {
+        "startLine": 78,
+        "startChar": 70,
+        "endLine": 78,
+        "endChar": 74
+      },
+      "revId": "f7043649d37b609276cff7b8371e70b4398fb275",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
