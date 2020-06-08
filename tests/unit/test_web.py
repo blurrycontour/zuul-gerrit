@@ -1888,7 +1888,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                              "%s got %s" % (authz['sub'], data))
 
     def test_authorizations_no_header(self):
-        """Test that missing Authorization header results in HTTP 403"""
+        """Test that missing Authorization header results in HTTP 401"""
         req = self.get_url('/api/user/authorizations')
         self.assertEqual(401, req.status_code, req.text)
 
