@@ -16,6 +16,8 @@ import re
 
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
+EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
+
 
 class MergeRequest(Change):
     def __init__(self, project):
@@ -71,13 +73,18 @@ class GitlabTriggerEvent(TriggerEvent):
 
 
 class GitlabEventFilter(EventFilter):
-    def __init__(self, trigger, types=[], actions=[], comments=[]):
+    def __init__(
+            self, trigger, types=[], actions=[],
+            comments=[], refs=[], ignore_deletes=True):
         super(GitlabEventFilter, self).__init__(self)
         self._types = types
         self.types = [re.compile(x) for x in types]
         self.actions = actions
         self._comments = comments
         self.comments = [re.compile(x) for x in comments]
+        self._refs = refs
+        self.refs = [re.compile(x) for x in refs]
+        self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
         ret = '<GitlabEventFilter'
@@ -88,6 +95,10 @@ class GitlabEventFilter(EventFilter):
             ret += ' actions: %s' % ', '.join(self.actions)
         if self._comments:
             ret += ' comments: %s' % ', '.join(self._comments)
+        if self._refs:
+            ret += ' refs: %s' % ', '.join(self._refs)
+        if self.ignore_deletes:
+            ret += ' ignore_deletes: %s' % self.ignore_deletes
         ret += '>'
 
         return ret
@@ -98,6 +109,18 @@ class GitlabEventFilter(EventFilter):
             if etype.match(event.type):
                 matches_type = True
         if self.types and not matches_type:
+            return False
+
+        matches_ref = False
+        if event.ref is not None:
+            for ref in self.refs:
+                if ref.match(event.ref):
+                    matches_ref = True
+        if self.refs and not matches_ref:
+            return False
+        if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
+            # If the updated ref has an empty git sha (all 0s),
+            # then the ref is being deleted
             return False
 
         matches_action = False
