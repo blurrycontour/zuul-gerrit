@@ -166,6 +166,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_2f1c5976",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T13:27:25Z",
+      "side": 1,
+      "message": "Thinking about it I don\u0027t think that\u0027s safe to allow Zuul to receive payload w/o any verification. So the current situation where a webhook secret must be set is correct IMO.",
+      "parentUuid": "ff570b3c_0f5235df",
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_668329cc",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
