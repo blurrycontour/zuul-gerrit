@@ -1,4 +1,4 @@
-// Copyright 2018 Red Hat, Inc
+// Copyright 2020 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -13,31 +13,49 @@
 // under the License.
 
 import {
-  INFO_FETCH_REQUEST,
-  INFO_FETCH_SUCCESS,
-  INFO_FETCH_FAIL,
-} from '../actions/info'
+  USER_ACL_REQUEST,
+  USER_ACL_SUCCESS,
+  USER_ACL_FAILURE,
+  USER_LOGGED_IN,
+  USER_LOGGED_OUT,
+} from '../actions/user'
 
 export default (state = {
   isFetching: false,
-  tenant: null,
-  capabilities: null,
+  user: null,
+  token: null,
+  adminTenants: []
 }, action) => {
   switch (action.type) {
-    case INFO_FETCH_REQUEST:
-    case INFO_FETCH_FAIL:
+    case USER_LOGGED_IN:
       return {
         isFetching: true,
-        tenant: null,
+        user: action.user,
+        token: action.user.access_token,
+        adminTenants: []
       }
-    case INFO_FETCH_SUCCESS:
+  case USER_LOGGED_OUT:
+    return {
+      isFetching: false,
+      user: null,
+      token: null,
+      adminTenants: []
+    }
+    case USER_ACL_REQUEST:
       return {
-        isFetching: false,
-        tenant: action.tenant,
-        capabilities: action.capabilities,
-        ready: true
+        isFetching: true,
       }
-    default:
-      return state
+  case USER_ACL_FAILURE:
+    return {
+      isFetching: false,
+      adminTenants: []
+    }
+  case USER_ACL_SUCCESS:
+    return {
+      isFetching: false,
+      adminTenants: action.adminTenants,
+    }
+  default:
+    return state
   }
 }

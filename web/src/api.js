@@ -107,6 +107,9 @@ function getStreamUrl (apiPrefix) {
 function fetchInfo () {
   return Axios.get(apiUrl + 'info')
 }
+function fetchTenantInfo (apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'info')
+}
 function fetchOpenApi () {
   return Axios.get(getHomepageUrl () + 'openapi.yaml')
 }
@@ -161,6 +164,21 @@ function fetchNodes (apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
 
+// token-protected API
+function fetchUserAuthorizations (apiPrefix, token) {
+  // Axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.get['Authorization'] = 'Bearer ' + token
+  console.log('using headers ', instance.defaults.headers)
+  let res = instance.get(apiPrefix + 'authorizations')
+    .catch(err => {console.log('headers', err.request)})
+    // Axios.defaults.headers.common['Authorization'] = ''
+  return res
+}
+
+
 export {
   apiUrl,
   getHomepageUrl,
@@ -180,5 +198,7 @@ export {
   fetchNodes,
   fetchOpenApi,
   fetchTenants,
-  fetchInfo
+  fetchInfo,
+  fetchTenantInfo,
+  fetchUserAuthorizations,
 }
