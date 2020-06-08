@@ -127,3 +127,28 @@ class TestGitlabDriver(ZuulTestCase):
             A.getMergeRequestCommentedEvent('recheck'))
         self.waitUntilSettled()
         self.assertEqual(4, len(self.history))
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_ref_updated(self):
+
+        event = self.fake_gitlab.getPushEvent('org/project')
+        expected_newrev = event[1]['after']
+        expected_oldrev = event[1]['before']
+        self.fake_gitlab.emitEvent(event)
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(
+            'SUCCESS',
+            self.getJobFromHistory('project-post-job').result)
+
+        job = self.getJobFromHistory('project-post-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual('refs/heads/master', zuulvars['ref'])
+        self.assertEqual('post', zuulvars['pipeline'])
+        self.assertEqual('project-post-job', zuulvars['job'])
+        self.assertEqual('master', zuulvars['branch'])
+        self.assertEqual(
+            'https://gitlab/org/project/tree/%s' % zuulvars['newrev'],
+            zuulvars['change_url'])
+        self.assertEqual(expected_newrev, zuulvars['newrev'])
+        self.assertEqual(expected_oldrev, zuulvars['oldrev'])
