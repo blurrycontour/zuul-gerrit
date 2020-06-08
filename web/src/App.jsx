@@ -32,11 +32,13 @@ import * as moment from 'moment'
 
 import ErrorBoundary from './containers/ErrorBoundary'
 import SelectTz from './containers/timezone/SelectTz'
+import AuthContainer from './containers/auth/Auth'
 import logo from './images/logo.png'
 import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
+import { createUserManagerFromTenant } from './actions/auth'
 
 class App extends React.Component {
   static propTypes = {
@@ -47,6 +49,8 @@ class App extends React.Component {
     timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
+    user: PropTypes.object,
+    userManager: PropTypes.object,
     dispatch: PropTypes.func
   }
 
@@ -153,6 +157,7 @@ class App extends React.Component {
         this.props.dispatch(tenantAction)
         if (tenantName) {
           this.props.dispatch(fetchConfigErrorsAction(tenantAction.tenant))
+          this.props.dispatch(createUserManagerFromTenant(tenantName))
         }
       }
     }
@@ -234,9 +239,9 @@ class App extends React.Component {
   }
 
   render() {
-    const { menuCollapsed, showErrors } = this.state
-    const { errors, configErrors, tenant } = this.props
 
+    const { menuCollapsed, showErrors } = this.state
+    const { errors, configErrors, tenant, user } = this.props
     return (
       <React.Fragment>
         <Masthead
@@ -277,6 +282,11 @@ class App extends React.Component {
               <li>
               <SelectTz/>
               </li>
+              {tenant.name && (
+                <li>
+                <AuthContainer />
+                </li>
+              )}
             </ul>
             {showErrors && this.renderConfigErrors(configErrors)}
           </div>
@@ -304,6 +314,8 @@ export default withRouter(connect(
     configErrors: state.configErrors,
     info: state.info,
     tenant: state.tenant,
-    timezone: state.timezone
+    timezone: state.timezone,
+    user: state.user,
+    userManager: state.auth.userManager
   })
 )(App))
