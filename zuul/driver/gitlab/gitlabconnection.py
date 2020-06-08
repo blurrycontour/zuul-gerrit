@@ -28,6 +28,7 @@ from zuul.connection import BaseConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import Ref, Branch
 
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 
@@ -97,6 +98,7 @@ class GitlabEventConnector(threading.Thread):
         self.event_handler_mapping = {
             'merge_request': self._event_merge_request,
             'note': self._event_note,
+            'push': self._event_push,
         }
 
     def stop(self):
@@ -105,13 +107,13 @@ class GitlabEventConnector(threading.Thread):
 
     def _event_base(self, body):
         event = GitlabTriggerEvent()
-        attrs = body['object_attributes']
-        event.updated_at = int(datetime.strptime(
-            attrs['updated_at'], '%Y-%m-%d %H:%M:%S %Z').strftime('%s'))
-        event.created_at = int(datetime.strptime(
-            attrs['created_at'], '%Y-%m-%d %H:%M:%S %Z').strftime('%s'))
+        attrs = body.get('object_attributes')
+        if attrs:
+            event.updated_at = int(datetime.strptime(
+                attrs['updated_at'], '%Y-%m-%d %H:%M:%S %Z').strftime('%s'))
+            event.created_at = int(datetime.strptime(
+                attrs['created_at'], '%Y-%m-%d %H:%M:%S %Z').strftime('%s'))
         event.project_name = body['project']['path_with_namespace']
-        event.ref = "refs/merge-requests/%s/head" % event.change_number
         return event
 
     # https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#merge-request-events
@@ -120,6 +122,7 @@ class GitlabEventConnector(threading.Thread):
         attrs = body['object_attributes']
         event.title = attrs['title']
         event.change_number = attrs['iid']
+        event.ref = "refs/merge-requests/%s/head" % event.change_number
         event.branch = attrs['target_branch']
         event.patch_number = attrs['last_commit']['id']
         event.change_url = self.connection.getPullUrl(event.project_name,
@@ -138,12 +141,29 @@ class GitlabEventConnector(threading.Thread):
         mr = body['merge_request']
         event.title = mr['title']
         event.change_number = mr['iid']
+        event.ref = "refs/merge-requests/%s/head" % event.change_number
         event.branch = mr['target_branch']
         event.patch_number = mr['last_commit']['id']
         event.change_url = self.connection.getPullUrl(event.project_name,
                                                       event.change_number)
         event.action = 'comment'
         event.type = 'gl_merge_request'
+        return event
+
+    # https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#push-events
+    def _event_push(self, body):
+        event = self._event_base(body)
+        event.branch = body['ref'].replace('refs/heads/', '')
+        event.ref = body['ref']
+        event.newrev = body['after']
+        event.oldrev = body['before']
+        if event.newrev == '0' * 40:
+            event.branch_deleted = True
+        elif event.oldrev == '0' * 40:
+            event.branch_created = True
+        else:
+            event.branch_updated = True
+        event.type = 'gl_push'
         return event
 
     def _handleEvent(self):
@@ -371,7 +391,24 @@ class GitlabConnection(BaseConnection):
         else:
             self.log.info("Getting change for %s ref:%s" % (
                 project, event.ref))
-            raise NotImplementedError
+            if event.ref and event.ref.startswith('refs/tags/'):
+                raise NotImplementedError
+            elif event.ref and event.ref.startswith('refs/heads/'):
+                change = Branch(project)
+                change.branch = event.branch
+            else:
+                change = Ref(project)
+                change.branch = None
+            change.ref = event.ref
+            change.oldrev = event.oldrev
+            change.newrev = event.newrev
+            change.url = self.getGitwebUrl(project, sha=event.newrev)
+
+            # TODO(fbo) do not rely on the merger to extract filenames
+            # as the payload seems to have the needed data
+            change.files = None
+
+            change.source_event = event
         return change
 
     def _getChange(self, project, number, patchset=None,

@@ -13,6 +13,8 @@
 # under the License.
 
 import re
+import os
+import git
 import socket
 
 from tests.base import ZuulTestCase, simple_layout
@@ -127,3 +129,67 @@ class TestGitlabDriver(ZuulTestCase):
             A.getMergeRequestCommentedEvent('recheck'))
         self.waitUntilSettled()
         self.assertEqual(4, len(self.history))
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_ref_updated(self):
+
+        event = self.fake_gitlab.getPushEvent('org/project')
+        expected_newrev = event[1]['after']
+        expected_oldrev = event[1]['before']
+        self.fake_gitlab.emitEvent(event)
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(
+            'SUCCESS',
+            self.getJobFromHistory('project-post-job').result)
+
+        job = self.getJobFromHistory('project-post-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual('refs/heads/master', zuulvars['ref'])
+        self.assertEqual('post', zuulvars['pipeline'])
+        self.assertEqual('project-post-job', zuulvars['job'])
+        self.assertEqual('master', zuulvars['branch'])
+        self.assertEqual(
+            'https://gitlab/org/project/tree/%s' % zuulvars['newrev'],
+            zuulvars['change_url'])
+        self.assertEqual(expected_newrev, zuulvars['newrev'])
+        self.assertEqual(expected_oldrev, zuulvars['oldrev'])
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_ref_created(self):
+
+        self.create_branch('org/project', 'stable-1.0')
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        newrev = repo.commit('refs/heads/stable-1.0').hexsha
+        event = self.fake_gitlab.getPushEvent(
+            'org/project', branch='refs/heads/stable-1.0',
+            before='0' * 40, after=newrev)
+        old = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        self.fake_gitlab.emitEvent(event)
+        self.waitUntilSettled()
+        new = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        # New timestamp should be greater than the old timestamp
+        self.assertLess(old, new)
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(
+            'SUCCESS',
+            self.getJobFromHistory('project-post-job').result)
+        job = self.getJobFromHistory('project-post-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual('refs/heads/stable-1.0', zuulvars['ref'])
+        self.assertEqual('post', zuulvars['pipeline'])
+        self.assertEqual('project-post-job', zuulvars['job'])
+        self.assertEqual('stable-1.0', zuulvars['branch'])
+        self.assertEqual(newrev, zuulvars['newrev'])
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_ref_deleted(self):
+
+        event = self.fake_gitlab.getPushEvent(
+            'org/project', 'stable-1.0', after='0' * 40)
+        self.fake_gitlab.emitEvent(event)
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
