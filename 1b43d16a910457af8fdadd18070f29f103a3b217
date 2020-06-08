@@ -297,6 +297,30 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_e400c338",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T14:48:06Z",
+      "side": 1,
+      "message": "Ok let\u0027s remove that line then.",
+      "parentUuid": "ff570b3c_01ba0909",
+      "range": {
+        "startLine": 35,
+        "startChar": 13,
+        "endLine": 35,
+        "endChar": 80
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_0674edfc",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
