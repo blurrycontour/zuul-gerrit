@@ -95,6 +95,10 @@ class BaseTestWeb(ZuulTestCase):
         return requests.delete(
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
 
+    def options_url(self, url, *args, **kwargs):
+        return requests.options(
+            urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
+
     def tearDown(self):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -1644,6 +1648,62 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.waitUntilSettled()
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
 
+    def test_OPTIONS(self):
+        """Ensure that protected endpoints handle CORS preflight requests
+        properly"""
+        # Note that %tenant, %project are not relevant here. The client is
+        # just checking what the endpoint allows.
+        endpoints = [
+            {'action': 'enqueue',
+             'path': 'api/tenant/my-tenant/project/my-project/enqueue',
+             'allowed_methods': ['POST', ]},
+            {'action': 'enqueue_ref',
+             'path': 'api/tenant/my-tenant/project/my-project/enqueue',
+             'allowed_methods': ['POST', ]},
+            {'action': 'autohold',
+             'path': 'api/tenant/my-tenant/project/my-project/autohold',
+             'allowed_methods': ['GET', 'POST', ]},
+            {'action': 'autohold_by_request_id',
+             'path': 'api/tenant/my-tenant/autohold/123',
+             'allowed_methods': ['GET', 'DELETE', ]},
+            {'action': 'authorizations',
+             'path': 'api/user/authorizations',
+             'allowed_methods': ['GET', ]},
+            {'action': 'dequeue',
+             'path': 'api/tenant/my-tenant/project/my-project/enqueue',
+             'allowed_methods': ['POST', ]},
+        ]
+        for endpoint in endpoints:
+            preflight = self.options_url(
+                endpoint['path'],
+                headers={'Access-Control-Request-Method': 'GET',
+                         'Access-Control-Request-Headers': 'Authorization'})
+            self.assertEqual(
+                204,
+                preflight.status_code,
+                "%s failed: %s" % (endpoint['action'], preflight.text))
+            self.assertEqual(
+                '*',
+                preflight.headers.get('Access-Control-Allow-Origin'),
+                "%s failed: %s" % (endpoint['action'], preflight.headers))
+            self.assertEqual(
+                'Authorization, Content-Type',
+                preflight.headers.get('Access-Control-Allow-Headers'),
+                "%s failed: %s" % (endpoint['action'], preflight.headers))
+            allowed_methods = preflight.headers.get(
+                'Access-Control-Allow-Methods').split(', ')
+            self.assertTrue(
+                'OPTIONS' in allowed_methods,
+                "%s has allowed methods: %s" % (endpoint['action'],
+                                                allowed_methods))
+            for method in endpoint['allowed_methods']:
+                self.assertTrue(
+                    method in allowed_methods,
+                    "%s has allowed methods: %s,"
+                    " expected: %s" % (endpoint['action'],
+                                       allowed_methods,
+                                       endpoint['allowed_methods']))
+
 
 class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
     config_file = 'zuul-admin-web-no-override.conf'
@@ -1830,6 +1890,11 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
             self.assertEqual(test_user['zuul.admin'],
                              data['zuul']['admin'],
                              "%s got %s" % (authz['sub'], data))
+
+    def test_authorizations_no_header(self):
+        """Test that missing Authorization header results in HTTP 401"""
+        req = self.get_url('/api/user/authorizations')
+        self.assertEqual(401, req.status_code, req.text)
 
 
 class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):

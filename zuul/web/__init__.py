@@ -68,6 +68,30 @@ class SaveParamsTool(cherrypy.Tool):
 cherrypy.tools.save_params = SaveParamsTool()
 
 
+def handle_options(allowed_methods=None):
+    if cherrypy.request.method == 'OPTIONS':
+        methods = allowed_methods or ['GET', 'OPTIONS']
+        if allowed_methods and 'OPTIONS' not in allowed_methods:
+            methods = methods + ['OPTIONS']
+        # discard decorated handler
+        request = cherrypy.serving.request
+        request.handler = None
+        # Set CORS response headers
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        resp.headers['Access-Control-Allow-Headers'] =\
+            ', '.join(['Authorization', 'Content-Type'])
+        resp.headers['Access-Control-Allow-Methods'] =\
+            ', '.join(methods)
+        # Allow caching of the preflight response
+        resp.headers['Access-Control-Max-Age'] = 86400
+        resp.status = 204
+
+
+cherrypy.tools.handle_options = cherrypy.Tool('on_start_resource',
+                                              handle_options)
+
+
 class ChangeFilter(object):
     def __init__(self, desired):
         self.desired = desired
@@ -240,6 +264,7 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options(allowed_methods=['POST', ])
     def dequeue(self, tenant, project):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
@@ -284,6 +309,7 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options(allowed_methods=['POST', ])
     def enqueue(self, tenant, project):
         basic_error = self._basic_auth_header_check()
         if basic_error is not None:
@@ -356,6 +382,7 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options(allowed_methods=['GET', 'POST', ])
     def autohold(self, tenant, project=None):
         # we don't use json_in because a payload is not mandatory with GET
         # Note: GET handling is redundant with autohold_list
@@ -443,6 +470,7 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options(allowed_methods=['GET', 'DELETE', ])
     def autohold_by_request_id(self, tenant, request_id):
         if cherrypy.request.method == 'GET':
             return self._autohold_info(request_id)
@@ -586,7 +614,11 @@ class ZuulWebAPI(object):
     # TODO good candidate for caching
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options(allowed_methods=['GET', ])
     def user_authorizations(self):
+        basic_error = self._basic_auth_header_check()
+        if basic_error is not None:
+            return basic_error
         rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
         try:
             claims = self.zuulweb.authenticators.authenticate(rawToken)
