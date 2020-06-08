@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_614ae55b",
+        "filename": "doc/source/examples/pipelines/gitlab-reference-pipelines.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-06-08T13:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_542b2432",
+      "range": {
+        "startLine": 19,
+        "startChar": 6,
+        "endLine": 19,
+        "endChar": 17
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_06c34d39",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
@@ -184,6 +208,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_2148ed5a",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-06-08T13:43:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_2f1c5976",
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_668329cc",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
@@ -219,6 +261,30 @@
       "side": 1,
       "message": "I tried with Guest role and it worked to leave comments. I\u0027ll set Guest here. Let me know if that\u0027s ok for you.",
       "parentUuid": "ff570b3c_668329cc",
+      "range": {
+        "startLine": 35,
+        "startChar": 13,
+        "endLine": 35,
+        "endChar": 80
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_01ba0909",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-06-08T13:43:20Z",
+      "side": 1,
+      "message": "The GitLab documentation (https://docs.gitlab.com/ee/user/permissions.html) mentions that \"All users will be able to leave comments on public and internal projects\", Guest role is only required for private projects.",
+      "parentUuid": "ff570b3c_8f8125ff",
       "range": {
         "startLine": 35,
         "startChar": 13,
