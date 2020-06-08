@@ -1594,6 +1594,25 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
 
+    def getPushEvent(
+            self, project, before=None, after=None,
+            branch='refs/heads/master'):
+        name = 'gl_push'
+        if not after:
+            repo_path = os.path.join(self.upstream_root, project)
+            repo = git.Repo(repo_path)
+            after = repo.head.commit.hexsha
+        data = {
+            'object_kind': 'push',
+            'before': before or '1' * 40,
+            'after': after,
+            'ref': branch,
+            'project': {
+                'path_with_namespace': project
+            },
+        }
+        return (name, data)
+
 
 class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
     log = logging.getLogger("zuul.test.FakeGitlabAPIClient")
