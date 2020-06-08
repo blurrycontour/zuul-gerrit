@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_dce0effb",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 922,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-06-08T23:42:10Z",
+      "side": 1,
+      "message": "The change doesn\u0027t seems like it is being logged and we should probably include it\u0027s repr in the log message.",
+      "range": {
+        "startLine": 922,
+        "startChar": 28,
+        "endLine": 922,
+        "endChar": 38
+      },
+      "revId": "68eb24a22cd3fd4cdd412edf87d29f13a328e98c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
