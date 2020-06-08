@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_542b2432",
+        "filename": "doc/source/examples/pipelines/gitlab-reference-pipelines.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "Other driver reference pipelines file does not add this explanation. I prefer to keep as it is then.",
+      "parentUuid": "ff570b3c_064d0dc3",
+      "range": {
+        "startLine": 19,
+        "startChar": 6,
+        "endLine": 19,
+        "endChar": 17
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_06c34d39",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
@@ -36,6 +60,24 @@
       "writtenOn": "2020-06-06T02:20:00Z",
       "side": 1,
       "message": "nitpick: \u0027GitLab\u0027 instead of \u0027Gitlab\u0027 ?",
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_6f43f114",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_06c34d39",
       "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_cf479d1e",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "Yes you are right. I\u0027ll remove that line.",
+      "parentUuid": "ff570b3c_467a65f0",
+      "range": {
+        "startLine": 13,
+        "startChar": 38,
+        "endLine": 14,
+        "endChar": 24
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_46dee510",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
@@ -82,6 +148,24 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_0f5235df",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "Fixed but not optional for the moment.\n\nFor now the driver assumes the x-gitlab-token header to be there so the secret must be set. I agree this is a limitation. I\u0027ll fix this on the driver code base into another review.",
+      "parentUuid": "ff570b3c_46dee510",
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_668329cc",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
@@ -93,6 +177,30 @@
       "writtenOn": "2020-06-06T02:20:00Z",
       "side": 1,
       "message": "\"Developer\" role isn\u0027t always required. For example \"Developer\" role is not required for public projects. The user should be able to leave comments.",
+      "range": {
+        "startLine": 35,
+        "startChar": 13,
+        "endLine": 35,
+        "endChar": 80
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_8f8125ff",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "I tried with Guest role and it worked to leave comments. I\u0027ll set Guest here. Let me know if that\u0027s ok for you.",
+      "parentUuid": "ff570b3c_668329cc",
       "range": {
         "startLine": 35,
         "startChar": 13,
@@ -128,6 +236,30 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_cf915d56",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_0674edfc",
+      "range": {
+        "startLine": 57,
+        "startChar": 6,
+        "endLine": 57,
+        "endChar": 35
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_660e898c",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
@@ -139,6 +271,24 @@
       "writtenOn": "2020-06-06T02:20:00Z",
       "side": 1,
       "message": "Isn\u0027t a blank line missing below this header ?",
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_6fadb19a",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_660e898c",
       "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -168,6 +318,30 @@
     },
     {
       "key": {
+        "uuid": "ff570b3c_0f751533",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_e66e192a",
+      "range": {
+        "startLine": 131,
+        "startChar": 34,
+        "endLine": 131,
+        "endChar": 46
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_46638542",
         "filename": "doc/source/reference/drivers/gitlab.rst",
         "patchSetId": 3
@@ -179,6 +353,30 @@
       "writtenOn": "2020-06-06T02:20:00Z",
       "side": 1,
       "message": "Since only merge requests are built, \"Only used for Pull Request based items.\" could be removed.",
+      "range": {
+        "startLine": 149,
+        "startChar": 66,
+        "endLine": 150,
+        "endChar": 40
+      },
+      "revId": "1b43d16a910457af8fdadd18070f29f103a3b217",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_af9ce95b",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-08T12:59:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ff570b3c_46638542",
       "range": {
         "startLine": 149,
         "startChar": 66,
