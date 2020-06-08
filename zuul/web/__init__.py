@@ -261,6 +261,21 @@ class ZuulWebAPI(object):
                 'error': e,
                 'realm': self.zuulweb.authenticators.default_realm}
 
+    def _auth_token_check(self):
+        rawToken = \
+            cherrypy.request.headers['Authorization'][len('Bearer '):]
+        try:
+            claims = self.zuulweb.authenticators.authenticate(rawToken)
+        except exceptions.AuthTokenException as e:
+            for header, contents in e.getAdditionalHeaders().items():
+                cherrypy.response.headers[header] = contents
+            cherrypy.response.status = e.HTTPError
+            return (claims,
+                    {'description': e.error_description,
+                     'error': e.error,
+                     'realm': e.realm})
+        return (claims, None)
+
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -394,17 +409,9 @@ class ZuulWebAPI(object):
             if basic_error is not None:
                 return basic_error
             # AuthN/AuthZ
-            rawToken = \
-                cherrypy.request.headers['Authorization'][len('Bearer '):]
-            try:
-                claims = self.zuulweb.authenticators.authenticate(rawToken)
-            except exceptions.AuthTokenException as e:
-                for header, contents in e.getAdditionalHeaders().items():
-                    cherrypy.response.headers[header] = contents
-                cherrypy.response.status = e.HTTPError
-                return {'description': e.error_description,
-                        'error': e.error,
-                        'realm': e.realm}
+            claims, token_error = self._auth_token_check()
+            if token_error is not None:
+                return token_error
             self.is_authorized(claims, tenant)
             msg = 'User "%s" requesting "%s" on %s/%s'
             self.log.info(
@@ -510,16 +517,9 @@ class ZuulWebAPI(object):
         if basic_error is not None:
             return basic_error
         # AuthN/AuthZ
-        rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
-        try:
-            claims = self.zuulweb.authenticators.authenticate(rawToken)
-        except exceptions.AuthTokenException as e:
-            for header, contents in e.getAdditionalHeaders().items():
-                cherrypy.response.headers[header] = contents
-            cherrypy.response.status = e.HTTPError
-            return {'description': e.error_description,
-                    'error': e.error,
-                    'realm': e.realm}
+        claims, token_error = self._auth_token_check()
+        if token_error is not None:
+            return token_error
         self.is_authorized(claims, request['tenant'])
         msg = 'User "%s" requesting "%s" on %s/%s'
         self.log.info(
@@ -616,20 +616,13 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['GET', ])
     def user_authorizations(self):
-        try:
-            rawToken =\
-                cherrypy.request.headers['Authorization'][len('Bearer '):]
-        except KeyError:
-            raise cherrypy.HTTPError(403, '"Authorization" header required')
-        try:
-            claims = self.zuulweb.authenticators.authenticate(rawToken)
-        except exceptions.AuthTokenException as e:
-            for header, contents in e.getAdditionalHeaders().items():
-                cherrypy.response.headers[header] = contents
-            cherrypy.response.status = e.HTTPError
-            return {'description': e.error_description,
-                    'error': e.error,
-                    'realm': e.realm}
+        basic_error = self._basic_auth_header_check()
+        if basic_error is not None:
+            return basic_error
+        # AuthN/AuthZ
+        claims, token_error = self._auth_token_check()
+        if token_error is not None:
+            return token_error
         if 'zuul' in claims and 'admin' in claims.get('zuul', {}):
             return {'zuul': {'admin': claims['zuul']['admin']}, }
         job = self.rpc.submitJob('zuul:get_admin_tenants',
