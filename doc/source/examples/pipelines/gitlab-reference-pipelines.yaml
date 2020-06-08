@@ -25,3 +25,16 @@
       gitlab.com:
         comment: true
       sqlreporter:
+
+- pipeline:
+    name: post
+    post-review: true
+    manager: independent
+    trigger:
+      gitlab.com:
+        - event: gl_push
+          ref: ^refs/heads/.*$
+    success:
+      sqlreporter:
+    failure:
+      sqlreporter:
