@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_81d3b9d5",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-06-08T14:07:04Z",
+      "side": 1,
+      "message": "If you respin this for some other reason, this indentation is bong. #notaminusone",
+      "revId": "fe030227871110f802698946a89502a725a091a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
