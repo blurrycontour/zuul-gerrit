@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_f96dfa99",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-09T11:16:35Z",
+      "side": 1,
+      "message": "How about repeating the \"Reviewed-by\" part similar to how this is handled with \"Signed-off-by\" header in git?\n\nSo basically:\n\n    Reviewed-by: John Doe \u003cjohn.doe@example.com\u003e\n    Reviewed-by: James Dean \u003cjames.dean@example.com\u003e",
+      "revId": "76185a13ae7269cd1ad4eed8e3846604b5c263a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
