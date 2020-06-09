@@ -173,6 +173,7 @@ class GithubReporter(BaseReporter):
 
         for i in [1, 2]:
             try:
+                log.debug('trying to merge')
                 self.connection.mergePull(project, pr_number, message, sha=sha,
                                           method=merge_mode,
                                           zuul_event_id=item.event)
@@ -274,19 +275,14 @@ class GithubReporter(BaseReporter):
         if not account:
             return message
 
-        name = account['name']
-        email = account['email']
-        message += '\n\nReviewed-by: '
-
-        if name:
-            message += name
-        if email:
-            if name:
-                message += ' '
-            message += '<' + email + '>'
-        if name or email:
-            message += '\n             '
-        message += account['html_url']
+        if change.reviews:
+            message += '\n\nReviewed-by: '
+            review_users = []
+            for r in change.reviews:
+                name = r['by']['username']
+                email = r['by']['email']
+                review_users.append(f'{name} <{email}>')
+            message += ', '.join(review_users)
 
         return message
 
