@@ -1,15 +1,18 @@
+---
 - hosts: all
   vars:
-    workspace: /tmp/quickstart-test
+    workspace: /tmp/tutorial-zuul
     local: false
   roles:
     - name: ensure-docker
       use_upstream_docker: false
-      docker_compose_install: true
     - use-buildset-registry
   tasks:
     - name: Install git-review
       command: python3 -m pip install git-review
+      become: true
+    - name: Install docker-compose
+      command: python3 -m pip install docker-compose
       become: true
     - name: Create workspace directory
       file:
@@ -35,8 +38,14 @@
           {{ ssh_agent.stdout }}
           ssh-add {{ workspace }}/id_rsa
     - block:
-        - name: Run tasks in ssh agent
-          include_tasks: main.yaml
+        - name: Setup Tutorial Execution
+          include_tasks: setup.yaml
+        - name: Run quick-start tutorial
+          include_tasks: quick-start.yaml
+        - name: Run tutorials
+          include_tasks: "{{ item }}"
+          when: run_playbooks is defined
+          loop: "{{ run_playbooks }}"
       always:
         - name: Stop ssh-agent
           shell:
