@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-zuul
+    local: true
+  tasks:
+    - name: Run tutorial
+      include_tasks: run-tutorial.yaml
