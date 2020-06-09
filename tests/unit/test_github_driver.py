@@ -14,7 +14,7 @@
 
 import os
 import re
-from testtools.matchers import MatchesRegex, StartsWith
+from testtools.matchers import MatchesRegex, Not, StartsWith
 import urllib
 import socket
 import time
@@ -635,7 +635,7 @@ class TestGithubDriver(ZuulTestCase):
         self.waitUntilSettled()
         self.assertTrue(A.is_merged)
         self.assertThat(A.merge_message,
-                        MatchesRegex(r'.*PR title.*Reviewed-by.*', re.DOTALL))
+                        MatchesRegex(r'.*PR title.*', re.DOTALL))
         self.assertEqual(len(A.comments), 0)
 
         # pipeline merges the pull request on success after failure
@@ -669,6 +669,43 @@ class TestGithubDriver(ZuulTestCase):
         # returned
         self.assertEqual(D.comments[0],
                          'Pull request merge failed: 403 Merge not allowed')
+
+    @simple_layout('layouts/merging-github.yaml', driver='github')
+    def test_report_pull_merge_message_reviewed_by(self):
+        # pipeline merges the pull request on success
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+        self.assertTrue(A.is_merged)
+        # assert that no 'Reviewed-By' is in merge commit message
+        self.assertThat(A.merge_message,
+                        Not(MatchesRegex(r'.*Reviewed-By.*', re.DOTALL)))
+
+        B = self.fake_github.openFakePullRequest('org/project', 'master', 'B')
+        A.addReview('derp', 'APPROVED')
+
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+        self.assertTrue(A.is_merged)
+        # assert that 'Reviewed-By' with single user is in merge commit message
+        self.assertThat(A.merge_message,
+                        MatchesRegex(
+                            r'.*Reviewed-by: derp <derp@derp.com>.*', 
+                            re.DOTALL))
+
+        C = self.fake_github.openFakePullRequest('org/project', 'master', 'B')
+        A.addReview('derp', 'APPROVED')
+        A.addReview('herp', 'COMMENTED')
+
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+        self.assertTrue(A.is_merged)
+        # assert that 'Reviewed-By' with multiple users is in merge commit message
+        self.assertThat(A.merge_message,
+                        MatchesRegex(
+                            r'.*Reviewed-by: derp <derp@derp.com>, herp <herp@derp.com>.*', 
+                            re.DOTALL))
 
     @simple_layout('layouts/dependent-github.yaml', driver='github')
     def test_draft_pr(self):
