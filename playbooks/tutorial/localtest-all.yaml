@@ -11,3 +11,5 @@
       include_tasks: setup.yaml
     - name: Run quick-start tutorial
       include_tasks: quick-start.yaml
+    - name: Run gate your first patch tutorial
+      include_tasks: gate-first-patch.yaml
