@@ -7,10 +7,6 @@
     ssh_agent:
       stdout: ''
   tasks:
-    - set_fact:
-        docker_config_dir: docker-config-1
-        docker_config_file: docker-compose-quickstart.yaml
-        nodepool_file: nodepool-quickstart.yaml
     - name: Setup Tutorial Execution
       include_tasks: setup.yaml
     - name: Run quick-start tutorial
