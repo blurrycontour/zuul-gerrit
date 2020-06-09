@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_f93a1ac2",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-06-09T11:06:23Z",
+      "side": 1,
+      "message": "Zuul still claims support for Python 3.5. f-strings are a Python \u003e\u003d 3.6 feature.",
+      "revId": "489b0dfb99d535085005b963b3530d88ae048ad1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
