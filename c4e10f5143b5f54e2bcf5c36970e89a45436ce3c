@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_fed4a749",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1891,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-10T12:47:56Z",
+      "side": 1,
+      "message": "nit: The test case checks for 401",
+      "range": {
+        "startLine": 1891,
+        "startChar": 66,
+        "endLine": 1891,
+        "endChar": 69
+      },
+      "revId": "c4e10f5143b5f54e2bcf5c36970e89a45436ce3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
