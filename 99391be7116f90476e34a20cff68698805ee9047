@@ -16,6 +16,23 @@
       "revId": "99391be7116f90476e34a20cff68698805ee9047",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_a11ccbc1",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-10T15:32:40Z",
+      "side": 1,
+      "message": "We can\u0027t know that failures is a list of strings.  Even if we decide to whitelist this for the one instance we know about, any other module could return a \"failures\" key of a different format.",
+      "revId": "99391be7116f90476e34a20cff68698805ee9047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
