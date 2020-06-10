@@ -20,3 +20,4 @@ providers:
             host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOgHJYejINIKzUiuSJ2MN8uPc+dfFrZ9JH1hLWS8gI+g"
             python-path: /usr/bin/python3
             username: root
+            max-parallel-jobs: 2
