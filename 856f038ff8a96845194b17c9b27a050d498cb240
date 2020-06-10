@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_e2c99e51",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-10T20:34:40Z",
+      "side": 1,
+      "message": "Should we include latest in the tag list for version numbers once we\u0027ve completed the manual enqueues? This way the tag builds can be latest if they are most recent?",
+      "range": {
+        "startLine": 145,
+        "startChar": 160,
+        "endLine": 145,
+        "endChar": 170
+      },
+      "revId": "856f038ff8a96845194b17c9b27a050d498cb240",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
