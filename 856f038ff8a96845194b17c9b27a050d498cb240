@@ -22,6 +22,23 @@
       "revId": "856f038ff8a96845194b17c9b27a050d498cb240",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_e237de4a",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-10T20:36:32Z",
+      "side": 1,
+      "message": "In practice for us, they are almost always less recent since we usually retroactively tag after newer commits have landed.",
+      "revId": "856f038ff8a96845194b17c9b27a050d498cb240",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
