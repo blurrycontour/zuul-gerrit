@@ -16,6 +16,23 @@
       "revId": "f7786e67f3439e378b742d6624ccd592393e0a4c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff570b3c_05cadc4d",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1115,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-10T21:15:25Z",
+      "side": 1,
+      "message": "I\u0027m worried about this too.  I think the risk is high enough we should add a \"decrease_window\u003dTrue\" after line 1109.  That\u0027s better because we probably also don\u0027t need to decrease it for \"did not have any jobs configured\".\n\nOr, given that, just change this conditional on line 1115 to \"if not succeeded\".",
+      "revId": "f7786e67f3439e378b742d6624ccd592393e0a4c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
