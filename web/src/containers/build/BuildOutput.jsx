@@ -67,10 +67,13 @@ class BuildOutput extends React.Component {
              </strong>
            )}
           {task.msg && (
-            <pre key="msg">{task.msg}</pre>
+            <pre title="msg" key="msg">{task.msg}</pre>
+          )}
+          {task.failures && (
+            <pre title="failures" key="failures">{task.failures}</pre>
           )}
           {task.exception && (
-            <pre key="exc" style={{ color: 'red' }}>{task.exception}</pre>
+            <pre title="exc" key="exc" style={{ color: 'red' }}>{task.exception}</pre>
           )}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
             <Fragment>
