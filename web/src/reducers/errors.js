@@ -20,11 +20,15 @@ import {
   CLEAR_ERRORS,
   addApiError,
 } from '../actions/errors'
-
+import { DEQUEUE_FAIL } from '../actions/adminActions'
 
 export default (state = [], action) => {
   // Intercept API failure
   if (action.error && action.type.match(/.*_FETCH_FAIL$/)) {
+    action = addApiError(action.error)
+  }
+  // Admin API failures
+  if (action.error && action.type === DEQUEUE_FAIL ) {
     action = addApiError(action.error)
   }
   switch (action.type) {

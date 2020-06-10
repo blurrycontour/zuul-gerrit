@@ -16,10 +16,14 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { MessageDialog, Icon } from 'patternfly-react'
 
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
 import ChangePanel from './ChangePanel'
+import { dequeue, dequeue_ref } from '../../api'
+import { addDequeueError } from '../../actions/adminActions'
+import { addError } from '../../actions/errors'
 
 
 class Change extends React.Component {
@@ -27,7 +31,14 @@ class Change extends React.Component {
     change: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
-    tenant: PropTypes.object
+    pipeline: PropTypes.string,
+    tenant: PropTypes.object,
+    user: PropTypes.object,
+    dispatch: PropTypes.func,
+  }
+
+  state = {
+    showDequeueModal: false,
   }
 
   renderStatusIcon (change) {
@@ -75,8 +86,81 @@ class Change extends React.Component {
     return <img alt="Line" src={image} style={{verticalAlign: 'baseline'}} />
   }
 
+  renderDequeueButton () {
+    return (
+      <span
+        className='zuul-build-status pficon pficon-off'
+        title='Dequeue this change'
+        onClick={(event) => {
+          event.preventDefault()
+          this.setState(() => ({showDequeueModal: true}))
+        }}/>
+    )
+  }
+
+  dequeueConfirm = () => {
+    const { tenant, user, change, pipeline} =this.props
+    let projectName = change.project
+    let changeId = change.id || 'NA'
+    let changeRef = change.ref
+    this.setState(() => ({showDequeueModal: false}))
+    if (/^[0-9a-f]{40}$/.test(changeId)) {
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline, changeRef, user.user.access_token)
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
+    // is this a pre-merge pipeline?
+    } else if (changeId !== 'NA') {
+      dequeue(tenant.apiPrefix, projectName, pipeline, changeId, user.user.access_token)
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
+    // what is it?!
+    } else {
+      this.props.dispatch(addError({
+        url: null,
+        status: 'Invalid change ID ' + changeId,
+        text: ''
+      }))
+    }
+  }
+
+  dequeueCancel = () => {
+    this.setState(() => ({showDequeueModal: false}))
+  }
+
+  showDequeueModal = () => {
+    this.setState(() => ({showDequeueModal: true}))
+  }
+
+  renderDequeueMessageDialog() {
+    const { change } =this.props
+    let projectName = change.project
+    let changeId = change.id || 'NA'
+    // let changeRef = change.ref
+    const primaryContent = <p>You are about to dequeue Change <strong>{ changeId }</strong> on project { projectName }.</p>
+    const secondaryContent = <p>Please confirm that you want to cancel <strong>all ongoing builds</strong> for this change.</p>
+    const icon = <Icon type='pf' name='warning-triangle-o' />
+    return (
+        <MessageDialog
+          show={this.state.showDequeueModal}
+          onHide={this.dequeueCancel}
+          primaryAction={this.dequeueConfirm}
+          secondaryAction={this.dequeueCancel}
+          primaryActionButtonContent="Confirm"
+          secondaryActionButtonContent="Cancel"
+          title="Dequeue Change?"
+          icon={icon}
+          primaryContent={primaryContent}
+          secondaryContent={secondaryContent}
+          accessibleName="dequeueWarningDialog"
+          accessibleDescription="dequeueWarningDialogContent"
+        />
+    )
+  }
+
   render () {
-    const { change, queue, expanded } = this.props
+    const { change, queue, expanded, user, tenant } = this.props
     let row = []
     let i
     for (i = 0; i < queue._tree_columns; i++) {
@@ -99,14 +183,27 @@ class Change extends React.Component {
         <ChangePanel change={change} globalExpanded={expanded} />
       </td>
     )
+    if (user.adminTenants && user.adminTenants.indexOf(tenant.name) !== -1) {
+      row.push(
+        <td key={i + 2} className={'zuul-change-row'}>
+          {this.renderDequeueButton()}
+        </td>
+      )
+    }
     return (
+      <React.Fragment>
       <table className="zuul-change-box" style={{boxSizing: 'content-box'}}>
         <tbody>
           <tr>{row}</tr>
         </tbody>
       </table>
+      {this.renderDequeueMessageDialog()}
+      </React.Fragment>
     )
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(Change)
+export default connect(state => ({
+  tenant: state.tenant,
+  user: state.user,
+}))(Change)
