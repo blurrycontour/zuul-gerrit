@@ -98,6 +98,9 @@ class BuildOutput extends React.Component {
           {task.msg && (
             <pre key="msg" title="msg">{task.msg}</pre>
           )}
+          {task.failures && (
+            <pre key="failures" title="failures">{task.failures}</pre>
+          )}
           {task.exception && (
             <pre key="exc" style={{ color: 'red' }} title="exc">{task.exception}</pre>
           )}

@@ -38,7 +38,7 @@ import {
   taskPathMatches,
 } from '../../actions/build'
 
-const INTERESTING_KEYS = ['msg', 'cmd', 'stdout', 'stderr']
+const INTERESTING_KEYS = ['msg', 'cmd', 'stdout', 'stderr', 'failures']
 
 
 class TaskOutput extends React.Component {
