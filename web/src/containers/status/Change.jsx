@@ -20,6 +20,7 @@ import { Link } from 'react-router-dom'
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
 import ChangePanel from './ChangePanel'
+import { dequeue, dequeue_ref } from '../../api'
 
 
 class Change extends React.Component {
@@ -27,7 +28,9 @@ class Change extends React.Component {
     change: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
-    tenant: PropTypes.object
+    pipeline: PropTypes.string,
+    tenant: PropTypes.object,
+    user: PropTypes.object,
   }
 
   renderStatusIcon (change) {
@@ -75,8 +78,49 @@ class Change extends React.Component {
     return <img alt="Line" src={image} style={{verticalAlign: 'baseline'}} />
   }
 
+  renderDequeueButton () {
+    const { tenant, user, change, pipeline} =this.props
+    let projectName = change.project
+    let changeId = change.id || 'NA'
+    let changeRef = change.ref
+    let dequeueFunc = () => {
+      // is this a post-merge pipeline?
+      if (/^[0-9a-f]{40}$/.test(changeId)) {
+        dequeue_ref(tenant.apiPrefix, projectName, pipeline, changeRef, user.user.access_token)
+          .then(() => {
+            alert('Buildset for change "' + changeId + '" dequeued.')
+          })
+          .catch(error => {
+            alert('Failed to dequeue buildset: ', error)
+          })
+      // is this a pre-merge pipeline?
+      } else if (changeId !== 'NA') {
+        dequeue(tenant.apiPrefix, projectName, pipeline, changeId, user.user.access_token)
+          .then(() => {
+            alert('Buildset for change "' + changeId + '" dequeued.')
+          })
+          .catch(error => {
+            console.log(error)
+            alert('Failed to dequeue buildset: ', error)
+          })
+      // what is it?!
+      } else {
+        alert('Invalid change ID ' + changeId)
+      }
+    }
+    return (
+      <span
+        className='zuul-build-status pficon pficon-off'
+        title='Dequeue this change'
+        onClick={(event) => {
+          event.preventDefault()
+          dequeueFunc()
+        }}/>
+    )
+  }
+
   render () {
-    const { change, queue, expanded } = this.props
+    const { change, queue, expanded, tenant, user } = this.props
     let row = []
     let i
     for (i = 0; i < queue._tree_columns; i++) {
@@ -99,6 +143,13 @@ class Change extends React.Component {
         <ChangePanel change={change} globalExpanded={expanded} />
       </td>
     )
+    if (user.adminTenants && user.adminTenants.indexOf(tenant.name) !== -1) {
+      row.push(
+        <td key={i + 2} className={'zuul-change-row'}>
+          {this.renderDequeueButton()}
+        </td>
+      )
+    }
     return (
       <table className="zuul-change-box" style={{boxSizing: 'content-box'}}>
         <tbody>
@@ -109,4 +160,7 @@ class Change extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(Change)
+export default connect(state => ({
+  tenant: state.tenant,
+  user: state.user,
+}))(Change)
