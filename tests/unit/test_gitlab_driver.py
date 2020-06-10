@@ -96,7 +96,7 @@ class TestGitlabDriver(ZuulTestCase):
         job = self.getJobFromHistory('project-test2')
         zuulvars = job.parameters['zuul']
         self.assertEqual(str(A.number), zuulvars['change'])
-        self.assertEqual(str(A.patch_number), zuulvars['patchset'])
+        self.assertEqual(str(A.sha), zuulvars['patchset'])
         self.assertEqual('master', zuulvars['branch'])
         self.assertEquals('https://gitlab/org/project/merge_requests/1',
                           zuulvars['items'][0]['change_url'])
@@ -111,6 +111,64 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertThat(
             A.notes[1]['body'],
             MatchesRegex(r'.*project-test2.*SUCCESS.*', re.DOTALL))
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_updated(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+        mr_tip1_sha = A.sha
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+        self.assertHistory(
+            [
+                {'name': 'project-test1', 'changes': '1,%s' % mr_tip1_sha},
+                {'name': 'project-test2', 'changes': '1,%s' % mr_tip1_sha},
+            ], ordered=False
+        )
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        mr_tip2_sha = A.sha
+        self.waitUntilSettled()
+        self.assertEqual(4, len(self.history))
+        self.assertHistory(
+            [
+                {'name': 'project-test1', 'changes': '1,%s' % mr_tip1_sha},
+                {'name': 'project-test2', 'changes': '1,%s' % mr_tip1_sha},
+                {'name': 'project-test1', 'changes': '1,%s' % mr_tip2_sha},
+                {'name': 'project-test2', 'changes': '1,%s' % mr_tip2_sha}
+            ], ordered=False
+        )
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_updated_builds_aborted(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+        mr_tip1_sha = A.sha
+
+        self.executor_server.hold_jobs_in_build = True
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        mr_tip2_sha = A.sha
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory(
+            [
+                {'name': 'project-test1', 'result': 'ABORTED',
+                 'changes': '1,%s' % mr_tip1_sha},
+                {'name': 'project-test2', 'result': 'ABORTED',
+                 'changes': '1,%s' % mr_tip1_sha},
+                {'name': 'project-test1', 'changes': '1,%s' % mr_tip2_sha},
+                {'name': 'project-test2', 'changes': '1,%s' % mr_tip2_sha}
+            ], ordered=False
+        )
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_commented(self):

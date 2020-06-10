@@ -20,6 +20,7 @@ EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
 
 class MergeRequest(Change):
+
     def __init__(self, project):
         super(MergeRequest, self).__init__(project)
         self.updated_at = None
@@ -67,7 +68,7 @@ class GitlabTriggerEvent(TriggerEvent):
         return ' '.join(r)
 
     def isPatchsetCreated(self):
-        if self.type == 'gl_pull_request':
+        if self.type == 'gl_merge_request':
             return self.action in ['opened', 'changed']
         return False
 

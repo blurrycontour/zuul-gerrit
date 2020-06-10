@@ -195,7 +195,7 @@ class GitlabEventConnector(threading.Thread):
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._getChange(project,
                                            event.change_number,
-                                           event.patch_number,
+                                           patchset=event.patch_number,
                                            refresh=True,
                                            url=event.change_url,
                                            event=event)
@@ -383,7 +383,7 @@ class GitlabConnection(BaseConnection):
             self.log.info("Getting change for %s#%s" % (
                 project, event.change_number))
             change = self._getChange(
-                project, event.change_number, event.patch_number,
+                project, event.change_number, patchset=event.patch_number,
                 refresh=refresh, event=event)
             change.source_event = event
             change.is_current_patchset = (change.patchset ==
