@@ -9,6 +9,7 @@
         - event: gl_merge_request
           action:
             - opened
+            - changed
     start:
       gitlab:
         comment: True

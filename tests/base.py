@@ -1647,7 +1647,7 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                 'state': mr.state,
                 'description': mr.description,
                 'updated_at': mr.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
-                'sha': mr.patch_number,
+                'sha': mr.sha,
                 'labels': mr.labels,
                 'merged_at': mr.merged_at,
                 'merge_status': mr.merge_status,
@@ -1692,13 +1692,11 @@ class FakeGitlabMergeRequest(object):
         self.created_at = datetime.datetime.now()
         self.updated_at = self.created_at
         self.merged_at = None
-        self.patch_number = None
+        self.sha = None
         self.state = 'opened'
         self.merge_status = 'can_be_merged'
-        self.uuid = uuid.uuid4().hex
         self.labels = []
         self.notes = []
-        self.upstream_root = upstream_root
         self.url = "https://%s/%s/merge_requests/%s" % (
             self.gitlab.server, urllib.parse.quote_plus(
                 self.project), self.number)
@@ -1748,10 +1746,10 @@ class FakeGitlabMergeRequest(object):
                 f.write(content)
             repo.index.add([fn])
 
-        self.patch_number = repo.index.commit(msg).hexsha
+        self.sha = repo.index.commit(msg).hexsha
 
-        repo.create_head(self.getMRReference(), self.patch_number, force=True)
-        self.mr_ref.set_commit(self.patch_number)
+        repo.create_head(self.getMRReference(), self.sha, force=True)
+        self.mr_ref.set_commit(self.sha)
         repo.head.reference = 'master'
         repo.git.clean('-x', '-f', '-d')
         repo.heads['master'].checkout()
@@ -1774,12 +1772,15 @@ class FakeGitlabMergeRequest(object):
                     '%Y-%m-%d %H:%M:%S UTC'),
                 'iid': self.number,
                 'target_branch': self.branch,
-                'last_commit': {
-                    'id': self.patch_number,
-                }
+                'last_commit': {'id': self.sha}
             },
         }
         return (name, data)
+
+    def getMergeRequestUpdatedEvent(self):
+        self._addCommitInMR()
+        self._updateTimeStamp()
+        return self.getMergeRequestOpenedEvent()
 
     def getMergeRequestCommentedEvent(self, note):
         self.addNote(note)
@@ -1795,9 +1796,7 @@ class FakeGitlabMergeRequest(object):
                 'title': self.title,
                 'iid': self.number,
                 'target_branch': self.branch,
-                'last_commit': {
-                    'id': self.patch_number,
-                },
+                'last_commit': {'id': self.sha}
             },
             'object_attributes': {
                 'created_at': note_date,
