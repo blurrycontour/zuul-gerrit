@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff570b3c_a1fdebb2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-10T15:20:20Z",
+      "side": 1,
+      "message": "Or they could click the \"FAILED\" button on the console output.",
+      "revId": "99391be7116f90476e34a20cff68698805ee9047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
