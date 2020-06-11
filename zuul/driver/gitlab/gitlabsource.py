@@ -12,7 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import re
 import logging
+import urllib
 
 from zuul.model import Project
 from zuul.source import BaseSource
@@ -28,6 +30,7 @@ class GitlabSource(BaseSource):
         hostname = connection.canonical_hostname
         super(GitlabSource, self).__init__(driver, connection,
                                            hostname, config)
+        self.change_re = re.compile(r"/(.*?)/(?:-/)?merge_requests/(\d+)")
 
     def getRefSha(self, project, ref):
         """Return a sha for a given project ref."""
@@ -53,7 +56,27 @@ class GitlabSource(BaseSource):
         return self.connection.getChange(event, refresh)
 
     def getChangeByURL(self, url):
-        raise NotImplementedError()
+        try:
+            parsed = urllib.parse.urlparse(url)
+        except ValueError:
+            return None
+        m = self.change_re.match(parsed.path)
+        if not m:
+            return None
+        project_name = m.group(1)
+        try:
+            num = int(m.group(2))
+        except ValueError:
+            return None
+        mr = self.connection.getPull(project_name, num)
+        if not mr:
+            return None
+        project = self.getProject(project_name)
+        change = self.connection._getChange(
+            project, num,
+            patchset=mr['sha'],
+            url=url)
+        return change
 
     def getChangesDependingOn(self, change, projects, tenant):
         raise NotImplementedError()

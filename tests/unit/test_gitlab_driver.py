@@ -404,3 +404,33 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('project-post-job').result,
                          'SUCCESS')
         self.assertEqual(r, True)
+
+    @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab')
+    def test_crd_independent(self):
+
+        # Create a change in project1 that a project2 change will depend on
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project1', 'master', 'A')
+
+        # Create a commit in B that sets the dependency on A
+        msg = "Depends-On: %s" % A.url
+        B = self.fake_gitlab.openFakeMergeRequest(
+            'org/project2', 'master', 'B', description=msg)
+
+        # Make an event to re-use
+        self.fake_gitlab.emitEvent(B.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # The changes for the job from project2 should include the project1
+        # PR content
+        changes = self.getJobFromHistory(
+            'project2-test', 'org/project2').changes
+
+        self.assertEqual(changes, "%s,%s %s,%s" % (A.number,
+                                                   A.sha,
+                                                   B.number,
+                                                   B.sha))
+
+        # There should be no more changes in the queue
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
