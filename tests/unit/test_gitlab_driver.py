@@ -286,3 +286,45 @@ class TestGitlabDriver(ZuulTestCase):
                          self.getJobFromHistory('project-test2').result)
         self.assertEqual('SUCCESS',
                          self.getJobFromHistory('project-test3').result)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_ref_updated_and_tenant_reconfigure(self):
+
+        self.waitUntilSettled()
+        old = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+
+        zuul_yaml = [
+            {'job': {
+                'name': 'project-post-job2',
+                'run': 'job.yaml'
+            }},
+            {'project': {
+                'post': {
+                    'jobs': [
+                        'project-post-job2'
+                    ]
+                }
+            }}
+        ]
+        playbook = "- hosts: all\n  tasks: []"
+        self.create_commit(
+            'org/project',
+            {'.zuul.yaml': yaml.dump(zuul_yaml),
+             'job.yaml': playbook},
+            message='Add InRepo configuration'
+        )
+        event = self.fake_gitlab.getPushEvent('org/project')
+        self.fake_gitlab.emitEvent(event)
+        self.waitUntilSettled()
+
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        # New timestamp should be greater than the old timestamp
+        self.assertLess(old, new)
+
+        self.assertHistory(
+            [{'name': 'project-post-job'},
+             {'name': 'project-post-job2'},
+            ], ordered=False
+        )
