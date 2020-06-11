@@ -18,6 +18,8 @@ import git
 import yaml
 import socket
 
+import zuul.rpcclient
+
 from tests.base import ZuulTestCase, simple_layout
 from tests.base import ZuulWebFixture
 
@@ -328,3 +330,77 @@ class TestGitlabDriver(ZuulTestCase):
              {'name': 'project-post-job2'},
             ], ordered=False
         )
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_client_dequeue_change(self):
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        client.dequeue(
+            tenant='tenant-one',
+            pipeline='check',
+            project='org/project',
+            change='%s,%s' % (A.number, A.sha),
+            ref=None)
+
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        check_pipeline = tenant.layout.pipelines['check']
+        self.assertEqual(check_pipeline.getAllItems(), [])
+        self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 2)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_client_enqueue_change(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.enqueue(tenant='tenant-one',
+                           pipeline='check',
+                           project='org/project',
+                           trigger='gitlab',
+                           change='%s,%s' % (A.number, A.sha))
+        self.waitUntilSettled()
+
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'SUCCESS')
+        self.assertEqual(r, True)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_client_enqueue_ref(self):
+        repo_path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(repo_path)
+        headsha = repo.head.commit.hexsha
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.enqueue_ref(
+            tenant='tenant-one',
+            pipeline='post',
+            project='org/project',
+            trigger='gitlab',
+            ref='master',
+            oldrev='1' * 40,
+            newrev=headsha)
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-post-job').result,
+                         'SUCCESS')
+        self.assertEqual(r, True)
