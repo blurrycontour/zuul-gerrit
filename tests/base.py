@@ -1698,8 +1698,7 @@ class FakeGitlabMergeRequest(object):
         self.labels = []
         self.notes = []
         self.url = "https://%s/%s/merge_requests/%s" % (
-            self.gitlab.server, urllib.parse.quote_plus(
-                self.project), self.number)
+            self.gitlab.server, self.project, self.number)
         self.is_merged = False
         self.mr_ref = self._createMRRef()
         self._addCommitInMR(files=files)
