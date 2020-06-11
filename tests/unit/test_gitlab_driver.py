@@ -15,6 +15,7 @@
 import re
 import os
 import git
+import yaml
 import socket
 
 from tests.base import ZuulTestCase, simple_layout
@@ -251,3 +252,37 @@ class TestGitlabDriver(ZuulTestCase):
         self.fake_gitlab.emitEvent(event)
         self.waitUntilSettled()
         self.assertEqual(0, len(self.history))
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_pull_request_with_dyn_reconf(self):
+
+        zuul_yaml = [
+            {'job': {
+                'name': 'project-test3',
+                'run': 'job.yaml'
+            }},
+            {'project': {
+                'check': {
+                    'jobs': [
+                        'project-test3'
+                    ]
+                }
+            }}
+        ]
+        playbook = "- hosts: all\n  tasks: []"
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project', 'master', 'A')
+        A.addCommit(
+            {'.zuul.yaml': yaml.dump(zuul_yaml),
+             'job.yaml': playbook}
+        )
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test1').result)
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test2').result)
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test3').result)
