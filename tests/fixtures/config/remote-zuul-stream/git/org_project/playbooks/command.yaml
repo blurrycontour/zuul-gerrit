@@ -97,3 +97,9 @@
       args:
         chdir: /remote-shelltask/somewhere/that/does/not/exist
       failed_when: false
+
+- hosts: compute1
+  tasks:
+    - name: Command Not Found
+      command: command-not-found
+      failed_when: false
