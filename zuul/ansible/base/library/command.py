@@ -498,12 +498,13 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
                 if t.is_alive():
                     console.addLine("[Zuul] standard output/error still open "
                                     "after child exited")
-                if fail_json_kwargs:
-                    # we hit an exception and need to use the rc from
-                    # fail_json_kwargs
-                    rc = fail_json_kwargs['rc']
+        if fail_json_kwargs:
+            # we hit an exception and need to use the rc from
+            # fail_json_kwargs
+            rc = fail_json_kwargs['rc']
 
-                console.addLine("[Zuul] Task exit code: %s\n" % rc)
+        with Console(zuul_log_id) as console:
+            console.addLine("[Zuul] Task exit code: %s\n" % rc)
 
         if fail_json_kwargs:
             self.fail_json(**fail_json_kwargs)
