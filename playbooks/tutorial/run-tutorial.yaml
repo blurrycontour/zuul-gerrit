@@ -1,0 +1,6 @@
+---
+- name: Setup Tutorial Execution
+  include_tasks: setup.yaml
+
+- name: Run quick-start tutorial
+  include_tasks: quick-start.yaml
