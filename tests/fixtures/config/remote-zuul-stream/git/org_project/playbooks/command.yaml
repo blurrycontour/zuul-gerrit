@@ -108,3 +108,9 @@
       item: transitive-three
     - role: include-echo-role
       item: transitive-four
+
+- hosts: compute1
+  tasks:
+    - name: Command Not Found
+      command: command-not-found
+      failed_when: false
