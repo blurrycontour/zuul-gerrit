@@ -15,6 +15,7 @@
 import os
 import re
 import textwrap
+from datetime import datetime, timedelta
 
 from tests.base import AnsibleZuulTestCase
 
@@ -97,6 +98,20 @@ class FunctionalZuulStreamMixIn:
         if m is None:
             raise Exception("'%s' not found in log" % (line,))
 
+    def _getLogTime(self, line, log):
+        pattern = (r'^(\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d)'
+                   r' \| %s\n'
+                   r'(\d\d\d\d-\d\d-\d\d \d\d:\d\d\:\d\d\.\d\d\d\d\d\d)'
+                   % line)
+        log_re = re.compile(pattern, re.MULTILINE)
+        m = log_re.search(log)
+        if m is None:
+            raise Exception("'%s' not found in log" % (line,))
+        else:
+            date1 = datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S.%f")
+            date2 = datetime.strptime(m.group(2), "%Y-%m-%d %H:%M:%S.%f")
+            return (date1, date2)
+
     def test_command(self):
         job = self._run_job('command')
         with self.jobLog(job):
@@ -166,6 +181,10 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine(
                 r'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
                 r'org/project/playbooks/command.yaml@master]', text)
+            time1, time2 = self._getLogTime(r'TASK \[Command Not Found\]',
+                                            text)
+            self.assertLess((time2 - time1) / timedelta(milliseconds=1),
+                            5000)
 
         # Run a pre-defined job that is defined in a trusted repo to test
         # localhost tasks.
