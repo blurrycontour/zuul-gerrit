@@ -5,5 +5,8 @@ zuul_tutorial_config:
   - dir: docker-config-1
     compose_file: docker-compose-nodes.yaml
     nodepool_file: nodepool-nodes.yaml
+  - dir: docker-config-1
+    compose_file: docker-compose-nodes.yaml
+    nodepool_file: nodepool-nodess.yaml
 
 zuul_tutorial_docker_compose_dest_base_dir: "{{ zuul.project.src_dir + '/doc/source/examples' if not local else '../../doc/source/examples' }}"
