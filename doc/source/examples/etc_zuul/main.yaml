@@ -7,8 +7,8 @@
         untrusted-projects:
           - test1
           - test2
-      opendev.org:
+      mygithub:
         untrusted-projects:
-          - zuul/zuul-jobs:
+          - g-chauvel/zuul-jobs:
               include:
                 - job
