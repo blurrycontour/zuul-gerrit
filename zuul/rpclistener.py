@@ -165,6 +165,7 @@ class RPCListener(RPCListenerBase):
         'config_errors_list',
         'connection_list',
         'authorize_user',
+        'tenant_auth_realm',
     ]
 
     def start(self):
@@ -362,6 +363,12 @@ class RPCListener(RPCListenerBase):
             if self._is_authorized(tenant, claims):
                 admin_tenants.append(tenant_name)
         job.sendWorkComplete(json.dumps(admin_tenants))
+
+    def handle_tenant_auth_realm(self, job):
+        args = json.loads(job.arguments)
+        tenant_name = args['tenant']
+        tenant = self.sched.abide.tenants.get(tenant_name)
+        job.sendWorkComplete(json.dumps(tenant.default_auth_realm))
 
     def handle_tenant_list(self, job):
         output = []
