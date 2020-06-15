@@ -5242,6 +5242,7 @@ class Tenant(object):
         self.default_ansible_version = None
 
         self.authorization_rules = []
+        self.default_auth_realm = None
 
     @property
     def all_projects(self):
