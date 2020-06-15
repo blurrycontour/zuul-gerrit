@@ -340,6 +340,22 @@ configuration. Some examples of tenant definitions are:
       :ref:`tenant-scoped-rest-api`.
 
 
+   .. attr:: authentication-realm
+
+      Each authenticator defined in Zuul's configuration is associated to a realm.
+      When authenticating through Zuul's Web User Interface under this tenant, the
+      Web UI will redirect the user to this realm's authentication service. The
+      authenticator must be of the type ``OpenIDConnect``.
+
+      .. note::
+
+         Defining a default realm for a tenant will not invalidate access tokens
+         issued from other configured realms, especially if they match the tenant's
+         admin rules. This is intended, so that an operator can for example issue
+         an overriding access token manually. If this is an issue, it is advised
+         to add finer filtering to admin rules, for example filtering by the ``iss``
+         claim (generally equal to the issuer ID).
+
 .. _admin_rule_definition:
 
 Access Rule
