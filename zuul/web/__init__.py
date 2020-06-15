@@ -41,6 +41,7 @@ from zuul.zk.components import ComponentRegistry, WebComponent
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.system import ZuulSystem
+from zuul.zk.config_cache import SystemConfigCache
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
 
@@ -254,12 +255,24 @@ class ZuulWebAPI(object):
         self.system = ZuulSystem(self.zk_client)
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client,
                                              enable_node_cache=True)
+        self.unparsed_abide = zuul.model.UnparsedAbideConfig()
+        self.system_config_cache = SystemConfigCache(
+            self.zk_client,
+            self._update_tenant_auth_cache)
+        self._update_tenant_auth_cache()
         self.zuulweb = zuulweb
         self.cache = {}
         self.cache_time = {}
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
         self.status_lock = threading.Lock()
+
+    def _update_tenant_auth_cache(self):
+        # SystemConfigCache will call this on init, before we have
+        # assigned the local attribute, so ignore that case.
+        if not hasattr(self, 'system_config_cache'):
+            return
+        self.unparsed_abide, _ = self.system_config_cache.get()
 
     def _basic_auth_header_check(self):
         """make sure protected endpoints have a Authorization header with the
@@ -644,6 +657,15 @@ class ZuulWebAPI(object):
     def tenant_info(self, tenant):
         info = self.zuulweb.info.copy()
         info.tenant = tenant
+        tenant_config = self.unparsed_abide.tenants.get(tenant)
+        if tenant_config is not None:
+            # TODO: should we return 404 if tenant not found?
+            tenant_auth_realm = tenant_config.get('authentication-realm')
+            if tenant_auth_realm is not None:
+                if (info.capabilities is not None and
+                    info.capabilities.toDict().get('auth') is not None):
+                    info.capabilities.capabilities['auth']['default_realm'] =\
+                        tenant_auth_realm
         return self._handleInfo(info)
 
     def _handleInfo(self, info):
@@ -692,6 +714,8 @@ class ZuulWebAPI(object):
             return {'description': e.error_description,
                     'error': e.error,
                     'realm': e.realm}
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
         return {'zuul': {'admin': admin_tenants}, }
 
     @cherrypy.expose
@@ -714,6 +738,8 @@ class ZuulWebAPI(object):
             return {'description': e.error_description,
                     'error': e.error,
                     'realm': e.realm}
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
         return {'zuul': {'admin': tenant in admin_tenants,
                          'scope': [tenant, ]}, }
 
