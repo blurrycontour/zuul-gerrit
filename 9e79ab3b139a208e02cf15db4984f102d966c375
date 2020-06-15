@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_9f0dc539",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-15T20:29:23Z",
+      "side": 1,
+      "message": "Why isn\u0027t this implemented?  Typically this behaves almost exactly like a branch.",
+      "revId": "9e79ab3b139a208e02cf15db4984f102d966c375",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
