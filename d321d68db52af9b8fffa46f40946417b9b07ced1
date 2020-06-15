@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_641e6871",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-15T20:26:48Z",
+      "side": 1,
+      "message": "Is there anything like a github app for gitlab that would allow folks to avoid having to generate a token for each project?  That doesn\u0027t really scale to hundreds or thousands of projects.",
+      "revId": "d321d68db52af9b8fffa46f40946417b9b07ced1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
