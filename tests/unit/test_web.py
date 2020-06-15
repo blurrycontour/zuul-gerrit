@@ -1059,6 +1059,32 @@ class TestWebCapabilitiesInfo(TestInfo):
         return info
 
 
+class TestTenantAuthRealmInfo(TestWebCapabilitiesInfo):
+
+    tenant_config_file = 'config/authorization/rules-templating/main.yaml'
+
+    def test_tenant_info(self):
+        expected_info = self._expected_info()
+        info = self.get_url("api/tenant/tenant-zero/info").json()
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC1'
+        self.assertEqual(expected_info,
+                         info,
+                         info)
+        info = self.get_url("api/tenant/tenant-one/info").json()
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC1'
+        self.assertEqual(expected_info,
+                         info,
+                         info)
+        info = self.get_url("api/tenant/tenant-two/info").json()
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC2'
+        self.assertEqual(expected_info,
+                         info,
+                         info)
+
+
 class TestTenantInfoConfigBroken(BaseTestWeb):
 
     tenant_config_file = 'config/broken/main.yaml'
