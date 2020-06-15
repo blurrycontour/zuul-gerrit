@@ -135,6 +135,14 @@
     required-projects:
       - zuul/zuul
 
+- job:
+    name: zuul-tutorial-gate-your-first-patch
+    parent: zuul-tutorial-quick-start
+    description: Run the commands in the Zuul tutorial gate your first patch documentation.
+    vars:
+      run_playbooks:
+        - gate-first-patch.yaml
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -286,6 +294,9 @@
             requires: nodepool-container-image
             dependencies: zuul-build-image
         - zuul-tutorial-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+        - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-build-image
         - nodepool-zuul-functional:
