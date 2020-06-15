@@ -41,6 +41,7 @@ from zuul.zk.components import ComponentRegistry, WebComponent
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.system import ZuulSystem
+from zuul.zk.config_cache import SystemConfigCache
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
 
@@ -644,6 +645,15 @@ class ZuulWebAPI(object):
     def tenant_info(self, tenant):
         info = self.zuulweb.info.copy()
         info.tenant = tenant
+        tenant_config = self.zuulweb.unparsed_abide.tenants.get(tenant)
+        if tenant_config is not None:
+            # TODO: should we return 404 if tenant not found?
+            tenant_auth_realm = tenant_config.get('authentication-realm')
+            if tenant_auth_realm is not None:
+                if (info.capabilities is not None and
+                    info.capabilities.toDict().get('auth') is not None):
+                    info.capabilities.capabilities['auth']['default_realm'] =\
+                        tenant_auth_realm
         return self._handleInfo(info)
 
     def _handleInfo(self, info):
@@ -692,6 +702,8 @@ class ZuulWebAPI(object):
             return {'description': e.error_description,
                     'error': e.error,
                     'realm': e.realm}
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
         return {'zuul': {'admin': admin_tenants}, }
 
     @cherrypy.expose
@@ -714,6 +726,8 @@ class ZuulWebAPI(object):
             return {'description': e.error_description,
                     'error': e.error,
                     'realm': e.realm}
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
         return {'zuul': {'admin': tenant in admin_tenants,
                          'scope': [tenant, ]}, }
 
@@ -1308,6 +1322,13 @@ class ZuulWeb(object):
 
         self.component_registry = ComponentRegistry(self.zk_client)
 
+        self.unparsed_abide = zuul.model.UnparsedAbideConfig()
+
+        self.system_config_cache_wake_event = threading.Event()
+        self.system_config_cache = SystemConfigCache(
+            self.zk_client,
+            self.system_config_cache_wake_event.set)
+
         self.connections = connections
         self.authenticators = authenticators
         self.stream_manager = StreamManager()
@@ -1459,6 +1480,16 @@ class ZuulWeb(object):
     def port(self):
         return cherrypy.server.bound_addr[1]
 
+    def updateSystemConfigCache(self):
+        while self._system_config_running:
+            try:
+                self.system_config_cache_wake_event.wait()
+                if not self._system_config_running:
+                    return
+                self.unparsed_abide, _ = self.system_config_cache.get()
+            except Exception:
+                self.log.exception("Exception while processing command")
+
     def start(self):
         self.log.debug("ZuulWeb starting")
         self.stream_manager.start()
@@ -1475,6 +1506,13 @@ class ZuulWeb(object):
         self.command_thread.start()
         self.component_info.state = self.component_info.RUNNING
 
+        self.system_config_thread = threading.Thread(
+            target=self.updateSystemConfigCache,
+            name='system_config')
+        self._system_config_running = True
+        self.system_config_thread.daemon = True
+        self.system_config_thread.start()
+
     def stop(self):
         self.log.debug("ZuulWeb stopping")
         self.component_info.state = self.component_info.STOPPED
@@ -1486,6 +1524,9 @@ class ZuulWeb(object):
         cherrypy.server.httpserver = None
         self.wsplugin.unsubscribe()
         self.stream_manager.stop()
+        self._system_config_running = False
+        self.system_config_cache_wake_event.set()
+        self.system_config_thread.join()
         self.zk_client.disconnect()
         self.stop_repl()
         self._command_running = False

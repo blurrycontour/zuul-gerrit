@@ -1535,6 +1535,7 @@ class TenantParser(object):
                   'default-parent': str,
                   'default-ansible-version': vs.Any(str, float),
                   'admin-rules': to_list(str),
+                  'authentication-realm': str,
                   # TODO: Ignored, allowed for backwards compat, remove for v5.
                   'report-build-page': bool,
                   'web-root': str,
@@ -1555,6 +1556,8 @@ class TenantParser(object):
                 conf['exclude-unprotected-branches']
         if conf.get('admin-rules') is not None:
             tenant.authorization_rules = conf['admin-rules']
+        if conf.get('authentication-realm') is not None:
+            tenant.default_auth_realm = conf['authentication-realm']
         tenant.web_root = conf.get('web-root', self.scheduler.globals.web_root)
         if tenant.web_root and not tenant.web_root.endswith('/'):
             tenant.web_root += '/'
