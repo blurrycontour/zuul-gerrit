@@ -25,9 +25,9 @@ services:
     volumes:
       - "sshkey:/var/ssh:z"
       - "nodessh:/var/node:z"
-      - "./playbooks/:/var/playbooks/:z"
+      - "../playbooks/:/var/playbooks/:z"
       - "certs:/var/certs:z"
-      - "../../../tools/:/var/zuul-tools/:z"
+      - "../../../../tools/:/var/zuul-tools/:z"
     # NOTE(pabelanger): Be sure to update this line each time we change the
     # default version of ansible for Zuul.
     command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/playbooks/setup.yaml"
@@ -36,7 +36,7 @@ services:
     hostname: examples_zk_1.examples_default
     volumes:
       - "certs:/var/certs:z"
-      - "./zoo.cfg:/conf/zoo.cfg:z"
+      - "../zoo.cfg:/conf/zoo.cfg:z"
   mysql:
     image: mariadb:10.4.12
     environment:
@@ -62,7 +62,7 @@ services:
     image: zuul/zuul-scheduler
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
-      - "./playbooks/:/var/playbooks/:z"
+      - "../playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "certs:/var/certs:z"
   web:
@@ -77,7 +77,7 @@ services:
       ZUUL_MYSQL_PASSWORD: secret
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
-      - "./playbooks/:/var/playbooks/:z"
+      - "../playbooks/:/var/playbooks/:z"
       - "certs:/var/certs:z"
   executor:
     privileged: true
@@ -91,17 +91,51 @@ services:
     image: zuul/zuul-executor
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
-      - "./playbooks/:/var/playbooks/:z"
+      - "../playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
-  node:
+  node1:
     build:
       dockerfile: node-Dockerfile
-      context: ./
+      context: ../
       args:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
+    image: zuul_tutorial_node
+    volumes:
+      - "nodessh:/root/.ssh:z"
+  node2:
+    build:
+      dockerfile: node-Dockerfile
+      context: ../
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: zuul_tutorial_node
+    volumes:
+      - "nodessh:/root/.ssh:z"
+  node3:
+    build:
+      dockerfile: node-Dockerfile
+      context: ../
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: zuul_tutorial_node
+    volumes:
+      - "nodessh:/root/.ssh:z"
+  node4:
+    build:
+      dockerfile: node-Dockerfile
+      context: ../
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: zuul_tutorial_node
     volumes:
       - "nodessh:/root/.ssh:z"
   launcher:
@@ -116,7 +150,7 @@ services:
   logs:
     build:
       dockerfile: logs-Dockerfile
-      context: ./
+      context: ../
       args:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
