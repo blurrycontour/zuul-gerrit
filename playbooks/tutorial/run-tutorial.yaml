@@ -1,0 +1,7 @@
+---
+- name: Setup Tutorial Execution
+  include_role:
+    name: setup-tutorial
+
+- name: Run quick-start tutorial
+  include_tasks: quick-start.yaml
