@@ -1512,6 +1512,8 @@ class TenantParser(object):
                 conf['exclude-unprotected-branches']
         if conf.get('admin-rules') is not None:
             tenant.authorization_rules = conf['admin-rules']
+        if conf.get('authentication-realm') is not None:
+            tenant.default_auth_realm = conf['authentication-realm']
         if conf.get('report-build-page') is not None:
             tenant.report_build_page = conf['report-build-page']
         tenant.web_root = conf.get('web-root', self.scheduler.web_root)
