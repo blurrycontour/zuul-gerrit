@@ -60,3 +60,4 @@ bzip2
 openssh-client [platform:debian platform:apk]
 openssh [platform:rpm]
 coreutils [platform:apk]
+openafs-krb5 [platform:debian]
