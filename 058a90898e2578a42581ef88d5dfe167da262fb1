@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_df373de3",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-15T20:31:47Z",
+      "side": 1,
+      "message": "It seems like most of this change uses sha for the patchset id.  Should we be using it here too?",
+      "revId": "058a90898e2578a42581ef88d5dfe167da262fb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
