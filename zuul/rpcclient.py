@@ -146,3 +146,10 @@ class RPCClient(object):
             return False
         else:
             return json.loads(job.data[0])
+
+    def get_auth_realm(self, tenant):
+        data = {'tenant': tenant}
+        job = self.submitJob('zuul:tenant_auth_realm', data)
+        if job.failure:
+            return None
+        return json.loads(job.data[0])

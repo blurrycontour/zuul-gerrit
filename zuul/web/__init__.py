@@ -637,6 +637,14 @@ class ZuulWebAPI(object):
     def tenant_info(self, tenant):
         info = self.zuulweb.info.copy()
         info.tenant = tenant
+        data = {'tenant': tenant}
+        job = self.rpc.submitJob('zuul:tenant_auth_realm', data)
+        tenant_auth_realm = json.loads(job.data[0])
+        if tenant_auth_realm is not None:
+            if (info.capabilities is not None and
+                info.capabilities.toDict().get('auth') is not None):
+                info.capabilities.capabilities['auth']['default_realm'] =\
+                    tenant_auth_realm
         return self._handleInfo(info)
 
     def _handleInfo(self, info):
