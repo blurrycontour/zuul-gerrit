@@ -4364,6 +4364,7 @@ class Tenant(object):
         self.default_ansible_version = None
 
         self.authorization_rules = []
+        self.default_auth_realm = None
 
     def _addProject(self, tpc):
         """Add a project to the project index
