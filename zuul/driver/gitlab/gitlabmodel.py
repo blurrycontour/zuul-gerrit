@@ -57,6 +57,7 @@ class GitlabTriggerEvent(TriggerEvent):
         self.title = None
         self.action = None
         self.change_number = None
+        self.tags = []
 
     def _repr(self):
         r = [super(GitlabTriggerEvent, self)._repr()]
@@ -65,6 +66,8 @@ class GitlabTriggerEvent(TriggerEvent):
         r.append("project:%s" % self.canonical_project_name)
         if self.change_number:
             r.append("mr:%s" % self.change_number)
+        if self.tags:
+            r.append("tags:%s" % ', '.join(self.tags))
         return ' '.join(r)
 
     def isPatchsetCreated(self):
@@ -76,7 +79,7 @@ class GitlabTriggerEvent(TriggerEvent):
 class GitlabEventFilter(EventFilter):
     def __init__(
             self, trigger, types=[], actions=[],
-            comments=[], refs=[], ignore_deletes=True):
+            comments=[], refs=[], tags=[], ignore_deletes=True):
         super(GitlabEventFilter, self).__init__(self)
         self._types = types
         self.types = [re.compile(x) for x in types]
@@ -85,6 +88,7 @@ class GitlabEventFilter(EventFilter):
         self.comments = [re.compile(x) for x in comments]
         self._refs = refs
         self.refs = [re.compile(x) for x in refs]
+        self.tags = tags
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
@@ -100,6 +104,8 @@ class GitlabEventFilter(EventFilter):
             ret += ' refs: %s' % ', '.join(self._refs)
         if self.ignore_deletes:
             ret += ' ignore_deletes: %s' % self.ignore_deletes
+        if self.tags:
+            ret += ' tags: %s' % ', '.join(self.tags)
         ret += '>'
 
         return ret
@@ -138,6 +144,10 @@ class GitlabEventFilter(EventFilter):
                 matches_comment_re = True
         if self.comments and not matches_comment_re:
             return False
+
+        if self.tags:
+            if not set(event.tags).intersection(set(self.tags)):
+                return False
 
         return True
 

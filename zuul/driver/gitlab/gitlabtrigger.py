@@ -32,6 +32,7 @@ class GitlabTrigger(BaseTrigger):
                 actions=to_list(trigger.get('action')),
                 comments=to_list(trigger.get('comment')),
                 refs=to_list(trigger.get('ref')),
+                tags=to_list(trigger.get('tag')),
             )
             efilters.append(f)
         return efilters
@@ -51,5 +52,6 @@ def getSchema():
         'action': scalar_or_list(str),
         'comment': scalar_or_list(str),
         'ref': scalar_or_list(str),
+        'tag': scalar_or_list(str)
     }
     return gitlab_trigger

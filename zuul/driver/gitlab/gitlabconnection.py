@@ -28,7 +28,7 @@ from zuul.connection import BaseConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Ref, Branch
+from zuul.model import Ref, Branch, Tag
 
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 
@@ -99,6 +99,7 @@ class GitlabEventConnector(threading.Thread):
             'merge_request': self._event_merge_request,
             'note': self._event_note,
             'push': self._event_push,
+            'tag_push': self._event_tag_push,
         }
 
     def stop(self):
@@ -163,6 +164,16 @@ class GitlabEventConnector(threading.Thread):
             event.branch_created = True
         else:
             event.branch_updated = True
+        event.type = 'gl_push'
+        return event
+
+    # https://gitlab.com/help/user/project/integrations/webhooks#tag-events
+    def _event_tag_push(self, body):
+        event = self._event_base(body)
+        event.ref = body['ref']
+        event.newrev = body['after']
+        event.oldrev = None
+        event.tag = body['ref'].replace('refs/tags/', '')
         event.type = 'gl_push'
         return event
 
@@ -392,7 +403,9 @@ class GitlabConnection(BaseConnection):
             self.log.info("Getting change for %s ref:%s" % (
                 project, event.ref))
             if event.ref and event.ref.startswith('refs/tags/'):
-                raise NotImplementedError
+                change = Tag(project)
+                change.tag = event.tag
+                change.branch = None
             elif event.ref and event.ref.startswith('refs/heads/'):
                 change = Branch(project)
                 change.branch = event.branch

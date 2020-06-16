@@ -256,6 +256,28 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual(0, len(self.history))
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_tag_created(self):
+
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        repo.create_tag('1.0')
+        tagsha = repo.tags['1.0'].commit.hexsha
+        event = self.fake_gitlab.getGitTagEvent(
+            'org/project', '1.0', tagsha)
+        self.fake_gitlab.emitEvent(event)
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(
+            'SUCCESS',
+            self.getJobFromHistory('project-tag-job').result)
+        job = self.getJobFromHistory('project-tag-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual('refs/tags/1.0', zuulvars['ref'])
+        self.assertEqual('tag', zuulvars['pipeline'])
+        self.assertEqual('project-tag-job', zuulvars['job'])
+        self.assertEqual(tagsha, zuulvars['newrev'])
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_pull_request_with_dyn_reconf(self):
 
         zuul_yaml = [

@@ -1613,6 +1613,19 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         }
         return (name, data)
 
+    def getGitTagEvent(self, project, tag, sha):
+        name = 'gl_push'
+        data = {
+            'object_kind': 'tag_push',
+            'before': '0' * 40,
+            'after': sha,
+            'ref': 'refs/tags/%s' % tag,
+            'project': {
+                'path_with_namespace': project
+            },
+        }
+        return (name, data)
+
 
 class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
     log = logging.getLogger("zuul.test.FakeGitlabAPIClient")
