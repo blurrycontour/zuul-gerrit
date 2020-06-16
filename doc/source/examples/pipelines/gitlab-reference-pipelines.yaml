@@ -38,3 +38,16 @@
       sqlreporter:
     failure:
       sqlreporter:
+
+- pipeline:
+    name: tag
+    post-review: true
+    manager: independent
+    trigger:
+      gitlab:
+        - event: gl_push
+          ref: ^refs/tags/.*$
+    success:
+      sqlreporter:
+    failure:
+      sqlreporter:

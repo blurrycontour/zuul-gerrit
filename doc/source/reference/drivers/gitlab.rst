@@ -29,6 +29,7 @@ Each project to be integrated with Zuul needs in "Settings/Webhooks":
 - "URL" set to
   ``http://<zuul-web>/zuul/api/connection/<conn-name>/payload``
 - "Merge request events" set to "on"
+- "Tag push events" set to "on"
 - "Comments" set to "on"
 - Define a "Secret Token"
 
@@ -137,6 +138,7 @@ the following options.
       a regular expression and multiple refs may be listed. GitLab
       always sends full ref name, eg. ``refs/heads/bar`` and this
       string is matched against the regular expression.
+
 
 Reporter Configuration
 ----------------------
