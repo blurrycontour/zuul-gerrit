@@ -22,6 +22,24 @@
       "revId": "b5e894ec569cdd4eb1843223e50a45f338bd5fea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_3b9be672",
+        "filename": "tools/test-setup.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-16T08:36:03Z",
+      "side": 1,
+      "message": "CI is green so looks backwards compatible.",
+      "parentUuid": "bf51134e_007af122",
+      "revId": "b5e894ec569cdd4eb1843223e50a45f338bd5fea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
