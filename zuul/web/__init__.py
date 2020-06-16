@@ -763,14 +763,37 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    def nodes(self, tenant):
+    def nodes(self, tenant, type=None, provider=None, state=None,
+              in_state_less_than=None, in_state_more_than=None):
+
+        def filter_by_key(d, **kw):
+            for key, value in kw.items():
+                if value is not None:
+                    if key == 'in_state_less_than':
+                        if time.time() - d['state_time'] > int(value):
+                            return False
+                    elif key == 'in_state_more_than':
+                        if time.time() - d['state_time'] < int(value):
+                            return False
+                    elif key == 'type':
+                        if value not in d[key]:
+                            return False
+                    else:
+                        if d[key] != value:
+                            return False
+            return True
+
         ret = []
         for node in self.zk.nodeIterator():
             node_data = {}
             for key in ("id", "type", "connection_type", "external_id",
                         "provider", "state", "state_time", "comment"):
                 node_data[key] = node.get(key)
-            ret.append(node_data)
+            if filter_by_key(node_data, type=type,
+                             provider=provider, state=state,
+                             in_state_less_than=in_state_less_than,
+                             in_state_more_than=in_state_more_than):
+                ret.append(node_data)
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
