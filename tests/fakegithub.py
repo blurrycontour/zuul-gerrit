@@ -521,6 +521,7 @@ class FakePull(object):
             },
             'merged': pr.is_merged,
             'body': pr.body,
+            'body_text': pr.body_text,
             'changed_files': len(pr.files),
             'labels': [{'name': l} for l in pr.labels]
         }

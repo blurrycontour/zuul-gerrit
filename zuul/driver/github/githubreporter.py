@@ -265,10 +265,12 @@ class GithubReporter(BaseReporter):
                                         zuul_event_id=item.event)
 
     def _formatMergeMessage(self, change):
-        message = ''
-
+        message = []
         if change.title:
-            message += change.title
+            message.append(change.title)
+        if change.body_text:
+            message.append(change.body_text)
+        merge_message = "\n\n".join(message)
 
         if change.reviews:
             review_users = []
@@ -276,10 +278,10 @@ class GithubReporter(BaseReporter):
                 name = r['by']['username']
                 email = r['by']['email']
                 review_users.append('Reviewed-by: {} <{}>'.format(name, email))
-            message += '\n\n'
-            message += '\n'.join(review_users)
+            merge_message += '\n\n'
+            merge_message += '\n'.join(review_users)
 
-        return message
+        return merge_message
 
     def getSubmitAllowNeeds(self):
         """Get a list of code review labels that are allowed to be

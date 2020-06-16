@@ -34,6 +34,7 @@ class PullRequest(Change):
         self.pr = None
         self.updated_at = None
         self.title = None
+        self.body_text = None
         self.reviews = []
         self.files = []
         self.labels = []
