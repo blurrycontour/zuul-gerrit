@@ -1374,6 +1374,7 @@ class GithubConnection(BaseConnection):
             else:
                 message = change.title
         change.message = message
+        change.body_text = change.pr.get("body_text")
 
         # Note(tobiash): The updated_at timestamp is a moving target that is
         # not bound to the pull request 'version' we can solve that by just not

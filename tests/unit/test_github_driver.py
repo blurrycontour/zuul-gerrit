@@ -630,12 +630,14 @@ class TestGithubDriver(ZuulTestCase):
     def test_report_pull_merge(self):
         # pipeline merges the pull request on success
         A = self.fake_github.openFakePullRequest('org/project', 'master',
-                                                 'PR title')
+                                                 'PR title',
+                                                 body='i shouldnt be seen',
+                                                 body_text='PR body')
         self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
         self.waitUntilSettled()
         self.assertTrue(A.is_merged)
         self.assertThat(A.merge_message,
-                        MatchesRegex(r'.*PR title.*', re.DOTALL))
+                        MatchesRegex(r'.*PR title\nPR body.*', re.DOTALL))
         self.assertEqual(len(A.comments), 0)
 
         # pipeline merges the pull request on success after failure
