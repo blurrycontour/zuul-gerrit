@@ -18,30 +18,92 @@ import { connect } from 'react-redux'
 import { Table } from 'patternfly-react'
 import * as moment from 'moment'
 
-import { fetchNodesIfNeeded } from '../actions/nodes'
-import Refreshable from '../containers/Refreshable'
+import { fetchNodes } from '../api'
+import Refreshable from '../containers/TableFilters'
 
 
 class NodesPage extends Refreshable {
   static propTypes = {
     tenant: PropTypes.object,
-    remoteData: PropTypes.object,
     dispatch: PropTypes.func
   }
 
-  updateData (force) {
-    this.props.dispatch(fetchNodesIfNeeded(this.props.tenant, force))
+  constructor () {
+    super()
+    this.prepareTableHeaders()
+    this.state = {
+      nodes: null,
+      currentFilterType: this.filterTypes[0],
+      activeFilters: [],
+      currentValue: ''
+    }
+  }
+
+  transformParamValueToFilterValue (key, value) {
+    if (key === 'in_state_less_than' || key === 'in_state_more_than') {
+      return value + ' seconds'
+    } else {
+      return value
+    }
+  }
+
+  transformFilterValueToParamValue (key, value) {
+    if (key === 'in_state_less_than' || key === 'in_state_more_than') {
+      let durationValue = {}
+      if (/(\d+\s*\w+)/.test(value)) {
+        let durationMatch = value.match(/(\d+\s*\w+)/g)
+        durationMatch.forEach(item => {
+          let chunk = Array.from(item.matchAll(/(\d+)\s*(\w+)/g))[0]
+          let unit = chunk[2].toLowerCase()
+          if (unit === 'seconds' || unit === 'second') {
+            durationValue.seconds = chunk[1]
+          } else if (unit === 'minutes' || unit === 'minute') {
+            durationValue.minutes = chunk[1]
+          } else if (unit === 'hours' || unit === 'hour') {
+            durationValue.hours = chunk[1]
+          } else if (unit === 'days' || unit === 'day') {
+            durationValue.days = chunk[1]
+          } else {
+            alert('Valid time units are "days", "hours", "minutes", "seconds"')
+          }
+        })
+      } else {
+        // assume seconds
+        durationValue.seconds = value
+      }
+      let val = moment.duration(durationValue).asSeconds()
+      return val
+    } else {
+      return value
+    }
+  }
+
+  updateData = (filters) => {
+    let queryString = ''
+    if (filters) {
+      filters.forEach(item =>
+        queryString += '&' + item.key + '=' + this.transformFilterValueToParamValue(item.key, item.value))
+    }
+    this.setState({nodes: null})
+    fetchNodes(this.props.tenant.apiPrefix, queryString).then(response => {
+      this.setState({nodes: response.data})
+    })
   }
 
   componentDidMount () {
     document.title = 'Zuul Nodes'
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData(this.getFilterFromUrl())
+    }
   }
 
-  render () {
-    const { remoteData } = this.props
-    const nodes = remoteData.nodes
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData(this.getFilterFromUrl())
+    }
+  }
 
+  prepareTableHeaders() {
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = value => <Table.Cell>{value}</Table.Cell>
     const cellLabelsFormat = value => <Table.Cell>{value.join(',')}</Table.Cell>
@@ -53,12 +115,12 @@ class NodesPage extends Refreshable {
       <Table.Cell style={{fontFamily: 'Menlo,Monaco,Consolas,monospace'}}>
         {moment.unix(value).fromNow()}
       </Table.Cell>)
-
-    const columns = []
+    this.columns = []
+    this.filterTypes = []
     const myColumns = [
       'id', 'labels', 'connection', 'server', 'provider', 'state',
       'age', 'comment'
-    ]
+      ]
     myColumns.forEach(column => {
       let formatter = cellFormat
       let prop = column
@@ -74,22 +136,42 @@ class NodesPage extends Refreshable {
         prop = 'state_time'
         formatter = cellAgeFormat
       }
-      columns.push({
-        header: {label: column, formatters: [headerFormat]},
+      const label = column.charAt(0).toUpperCase() + column.slice(1)
+      this.columns.push({
+        header: {label: label, formatters: [headerFormat]},
         property: prop,
         cell: {formatters: [formatter]}
       })
+      if (['type', 'provider', 'state'].includes(prop)) {
+        this.filterTypes.push({
+          id: prop,
+          title: label,
+          placeholder: 'Filter by ' + label,
+          filterType: 'text',
+        })
+      }
     })
+    this.filterTypes.push({
+      id: 'in_state_less_than',
+      title: 'in state for less than',
+      placeholder: 'seconds',
+      filterType: 'text',
+    })
+    this.filterTypes.push({
+      id: 'in_state_more_than',
+      title: 'in state for more than',
+      placeholder: 'seconds',
+      filterType: 'text',
+    })
+  }
+
+  renderTable (nodes) {
     return (
-      <React.Fragment>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
         <Table.PfProvider
           striped
           bordered
           hover
-          columns={columns}
+          columns={this.columns}
         >
           <Table.Header/>
           <Table.Body
@@ -97,12 +179,22 @@ class NodesPage extends Refreshable {
             rowKey="id"
           />
         </Table.PfProvider>
-      </React.Fragment>
     )
   }
+
+  render () {
+    const { nodes } = this.state
+    return (
+      <React.Fragment>
+        {this.renderFilter()}
+        {nodes ? this.renderTable(nodes) : <p>Loading...</p>}
+      </React.Fragment>
+    )
+
+  }
+
 }
 
 export default connect(state => ({
-  tenant: state.tenant,
-  remoteData: state.nodes,
+  tenant: state.tenant
 }))(NodesPage)

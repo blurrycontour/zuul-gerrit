@@ -24,6 +24,16 @@ class TableFilters extends React.Component {
     location: PropTypes.object
   }
 
+  // use these functions if a query parameter must be transformed from the query
+  // string to the filter box and vice-versa (example: durations)
+  transformParamValueToFilterValue (key, value) {
+    return value
+  }
+
+  transformFilterValueToParamValue (key, value) {
+    return value
+  }
+
   getFilterFromUrl = () => {
     const urlParams = new URLSearchParams(this.props.location.search)
     let activeFilters = []
@@ -32,7 +42,7 @@ class TableFilters extends React.Component {
         activeFilters.push({
           label: item.title + ': ' + param,
           key: item.id,
-          value: param})
+          value: this.transformParamValueToFilterValue(item.id, param)})
       })
     })
     this.setState({activeFilters: activeFilters})
@@ -50,7 +60,7 @@ class TableFilters extends React.Component {
         path += (
           encodeURIComponent(item.key)
           + '=' +
-          encodeURIComponent(item.value)
+          encodeURIComponent(this.transformFilterValueToParamValue(item.key, item.value))
         )
       })
     }
