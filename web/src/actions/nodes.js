@@ -33,9 +33,9 @@ const failedNodes = error => ({
   error
 })
 
-const fetchNodes = (tenant) => dispatch => {
+export const fetchNodes = (tenant, queryString) => dispatch => {
   dispatch(requestNodes())
-  return API.fetchNodes(tenant.apiPrefix)
+  return API.fetchNodes(tenant.apiPrefix, queryString)
     .then(response => dispatch(receiveNodes(tenant.name, response.data)))
     .catch(error => dispatch(failedNodes(error)))
 }
@@ -55,9 +55,9 @@ const shouldFetchNodes = (tenant, state) => {
   return false
 }
 
-export const fetchNodesIfNeeded = (tenant, force) => (
+export const fetchNodesIfNeeded = (tenant, queryString, force) => (
   dispatch, getState) => {
     if (force || shouldFetchNodes(tenant, getState())) {
-      return dispatch(fetchNodes(tenant))
+      return dispatch(fetchNodes(tenant, queryString))
     }
 }

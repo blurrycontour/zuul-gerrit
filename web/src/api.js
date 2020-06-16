@@ -157,8 +157,12 @@ function fetchJobs (apiPrefix) {
 function fetchLabels (apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'labels')
 }
-function fetchNodes (apiPrefix) {
-  return Axios.get(apiUrl + apiPrefix + 'nodes')
+function fetchNodes (apiPrefix, queryString) {
+  let path = 'nodes'
+  if (queryString) {
+    path += '?' + queryString.slice(1)
+  }
+  return Axios.get(apiUrl + apiPrefix + path)
 }
 
 export {
