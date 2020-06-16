@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_1d14134e",
+        "filename": "playbooks/quick-start/run.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-06-16T13:02:45Z",
+      "side": 1,
+      "message": "nit: odd position, perhaps that should be before or after container roles?",
+      "revId": "ca63ba72a857ec434342a8cd6846db73a711ea13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
