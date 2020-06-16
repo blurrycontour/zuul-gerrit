@@ -120,6 +120,7 @@
     name: zuul-quick-start
     parent: opendev-buildset-registry-consumer
     description: Run the commands in the Zuul quick-start documentation.
+    post-run: playbooks/quick-start/pre.yaml
     run: playbooks/quick-start/run.yaml
     post-run: playbooks/quick-start/post.yaml
     required-projects:

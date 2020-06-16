@@ -2,12 +2,6 @@
   vars:
     workspace: /tmp/quickstart-test
     local: false
-  roles:
-    - name: ensure-docker
-      use_upstream_docker: false
-      docker_compose_install: true
-    - ensure-pip
-    - use-buildset-registry
   tasks:
     - name: Install git-review
       command: python3 -m pip install git-review
