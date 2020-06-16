@@ -541,6 +541,7 @@ class Project(object):
     def toDict(self):
         d = {}
         d['name'] = self.name
+        d['short_name'] = self.name.split('/')[-1]
         d['connection_name'] = self.connection_name
         d['canonical_name'] = self.canonical_name
         return d
@@ -3123,13 +3124,7 @@ class Ref(object):
     def toDict(self):
         # Render to a dict to use in passing json to the executor
         d = dict()
-        d['project'] = dict(
-            name=self.project.name,
-            short_name=self.project.name.split('/')[-1],
-            canonical_hostname=self.project.canonical_hostname,
-            canonical_name=self.project.canonical_name,
-            src_dir=os.path.join('src', self.project.canonical_name),
-        )
+        d['project'] = self.project.toDict()
         return d
 
 
