@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_c8c01b54",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-06-16T13:17:53Z",
+      "side": 1,
+      "message": "i guess that should be `pre-run`",
+      "range": {
+        "startLine": 123,
+        "startChar": 4,
+        "endLine": 123,
+        "endChar": 8
+      },
+      "revId": "ffc11ec11a9e2acf21a6418d922a9d6819bcf13f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
