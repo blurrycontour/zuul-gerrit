@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchProjectsIfNeeded } from '../actions/projects'
 import Refreshable from '../containers/Refreshable'
@@ -84,7 +85,7 @@ class ProjectsPage extends Refreshable {
       })
     })
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
@@ -100,7 +101,7 @@ class ProjectsPage extends Refreshable {
             rowKey="name"
           />
         </Table.PfProvider>
-      </React.Fragment>
+      </PageSection>
     )
   }
 }

@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildsetIfNeeded } from '../actions/build'
 import Refreshable from '../containers/Refreshable'
@@ -42,12 +43,12 @@ class BuildsetPage extends Refreshable {
     const { remoteData } = this.props
     const buildset = remoteData.buildsets[this.props.match.params.buildsetId]
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
         {buildset && <Buildset buildset={buildset}/>}
-      </React.Fragment>
+      </PageSection>
     )
   }
 }

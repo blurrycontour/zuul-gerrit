@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import {
   Icon
 } from 'patternfly-react'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchConfigErrorsAction } from '../actions/configErrors'
 
@@ -35,7 +36,7 @@ class ConfigErrorsPage extends React.Component {
   render () {
     const { configErrors } = this.props
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div className="pull-right">
           {/* Lint warning jsx-a11y/anchor-is-valid */}
           {/* eslint-disable-next-line */}
@@ -61,7 +62,7 @@ class ConfigErrorsPage extends React.Component {
             })}
           </ul>
         </div>
-      </React.Fragment>
+      </PageSection>
     )
   }
 }
