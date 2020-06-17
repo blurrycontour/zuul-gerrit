@@ -143,7 +143,7 @@
     vars:
       run_playbooks:
         - gate-first-patch.yaml
-      zuul_tutorial_confignum: 2
+      zuul_tutorial_confignum: 3
 
 - job:
     name: zuul-tutorial-use-zuul-jobs
@@ -152,6 +152,7 @@
     vars:
       run_playbooks:
         - use-zuul-jobs.yaml
+      zuul_tutorial_confignum: 3
 
 - job:
     name: zuul-tutorial-gate-pipeline
@@ -160,7 +161,7 @@
     vars:
       run_playbooks:
         - gate-pipeline.yaml
-      zuul_tutorial_confignum: 1
+      zuul_tutorial_confignum: 3
 
 - job:
     name: zuul-tutorial-job-secrets
@@ -169,7 +170,7 @@
     vars:
       run_playbooks:
         - job-secrets.yaml
-      zuul_tutorial_confignum: 1
+      zuul_tutorial_confignum: 3
 
 - job:
     name: zuul-tutorial-job-dependencies
@@ -178,7 +179,20 @@
     vars:
       run_playbooks:
         - job-dependencies.yaml
-      zuul_tutorial_confignum: 1
+      zuul_tutorial_confignum: 3
+
+- job:
+    name: zuul-tutorial-blob
+    parent: zuul-tutorial-quick-start
+    description: One tutorial to bring them all and in tests bind them
+    vars:
+      run_playbooks:
+        - gate-first-patch.yaml
+        - use-zuul-jobs.yaml
+        - gate-pipeline.yaml
+        - job-secrets.yaml
+        - job-dependencies.yaml
+      zuul_tutorial_confignum: 3
 
 # Image building jobs
 - secret:
@@ -351,6 +365,10 @@
             requires: nodepool-container-image
             dependencies: zuul-build-image
             timeout: 3600  # 60 minutes
+        - zuul-tutorial-blob:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 7200  # 120 minutes
         - nodepool-zuul-functional:
             voting: false
         - zuul-build-python-release
