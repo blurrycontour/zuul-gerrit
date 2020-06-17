@@ -1,39 +1,6 @@
----
-
-- name: Run tasks in parallel
-  hosts: allnodes
-  connection: local
-  gather_facts: no
+- hosts: all
   tasks:
-    - name: Pretend to create instances 1
-      command: "sleep {{ item }}"  # Instead of calling a long running operation at a cloud provider, we just sleep.
-      with_items:
-        - 5
-        - 6
-        - 7
-      register: _create_instances
-      async: 600  # Maximum runtime in seconds. Adjust as needed.
-      poll: 0  # Fire and continue (never poll)
-
-    - name: Wait for creation to finish
-      async_status:
-        jid: "{{ item.ansible_job_id }}"
-      register: _jobs
-      until: _jobs.finished
-      delay: 5  # Check every 5 seconds. Adjust as you like.
-      retries: 10  # Retry up to 10 times. Adjust as needed.
-      with_items: "{{ _create_instances.results }}"
-
-- name: Run tasks in sequence
-  hosts: ubuntu-focal, ubuntu-fokal
-  gather_facts: no
-  tasks:
-    - name: Pretend to create instances 2
-      command: "sleep {{ item }}"  # Instead of calling a long running operation at a cloud provider, we just sleep.
-      with_items:
-        - 3
-        - 4
-        - 5
-    - name: runner host using delegate_to
-      shell: "echo 'lign1'; sleep 1; echo 'ligne2'; sleep 5; echo 'fin'"
-      delegate_to: ubuntu-foqal
+    - name: Run unittests
+      shell:
+        cmd: "sleep 60; python3 -m unittest -v hello"
+        chdir: "{{ zuul.project.src_dir }}"

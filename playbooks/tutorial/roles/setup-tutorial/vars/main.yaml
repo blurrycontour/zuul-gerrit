@@ -1,9 +1,15 @@
 zuul_tutorial_config:
   - compose_file: docker-compose.yaml
     nodepool_file: nodepool-quickstart.yaml
+    zuulconf_file: zuul-quickstart.conf
   - compose_file: docker-compose.yaml
     nodepool_file: nodepool-nodes.yaml
-  - compose_file: docker-compose-nodes.yaml
+    zuulconf_file: zuul-quickstart.conf
+  - compose_file: docker-compose.yaml
     nodepool_file: nodepool-nodess.yaml
+    zuulconf_file: zuul-quickstart.conf
+  - compose_file: docker-compose-parallel.yaml
+    nodepool_file: nodepool-quickstart-parallel-jobs.yaml
+    zuulconf_file: zuul-parallel.conf
 
 zuul_tutorial_docker_compose_dest_base_dir: "{{ zuul.project.src_dir + '/doc/source/examples' if not local else '../../doc/source/examples' }}"
