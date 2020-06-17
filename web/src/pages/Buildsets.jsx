@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildsets } from '../api'
 import TableFilters from '../containers/TableFilters'
@@ -151,10 +152,10 @@ class BuildsetsPage extends TableFilters {
   render() {
     const { buildsets } = this.state
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         {this.renderFilter()}
         {buildsets ? this.renderTable(buildsets) : <p>Loading...</p>}
-      </React.Fragment>
+      </PageSection>
     )
   }
 }

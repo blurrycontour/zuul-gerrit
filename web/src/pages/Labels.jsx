@@ -16,6 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Table } from 'patternfly-react'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchLabelsIfNeeded } from '../actions/labels'
 import Refreshable from '../containers/Refreshable'
@@ -59,7 +60,7 @@ class LabelsPage extends Refreshable {
       })
     })
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
@@ -75,7 +76,8 @@ class LabelsPage extends Refreshable {
             rowKey="name"
           />
         </Table.PfProvider>
-      </React.Fragment>)
+      </PageSection>
+    )
   }
 }
 
