@@ -4,9 +4,9 @@
     workspace: /tmp/tutorial-zuul
     local: true
     skip_quick_start: no
-    zuul_tutorial_confignum: 2
     run_playbooks:
       - gate-pipeline.yaml
+    zuul_tutorial_confignum: 3
   environment:
     GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
   tasks:
