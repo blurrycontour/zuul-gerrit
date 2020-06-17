@@ -3,6 +3,7 @@
   vars:
     workspace: /tmp/tutorial-zuul
     local: true
+  zuul_tutorial_confignum: 3
   environment:
     GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
   tasks:
