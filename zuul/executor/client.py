@@ -129,6 +129,9 @@ class ExecutorClient(object):
 
         self.cleanup_thread = GearmanCleanup(self)
         self.cleanup_thread.start()
+        
+        self.src_dir_uuid = get_default(self.config, 'executor',
+                                        'src_dir_uuid', False)
 
     def stop(self):
         self.log.debug("Stopping")
@@ -153,7 +156,9 @@ class ExecutorClient(object):
             short_name=item.change.project.name.split('/')[-1],
             canonical_hostname=item.change.project.canonical_hostname,
             canonical_name=item.change.project.canonical_name,
-            src_dir=os.path.join('src', item.change.project.canonical_name),
+            src_dir=os.path.join(uuid if self.src_dir_uuid else '',
+                                 'src',
+                                 item.change.project.canonical_name),
         )
 
         zuul_params = dict(build=uuid,
@@ -302,7 +307,8 @@ class ExecutorClient(object):
                 # project.values() is easier for callers
                 canonical_name=p.canonical_name,
                 canonical_hostname=p.canonical_hostname,
-                src_dir=os.path.join('src', p.canonical_name),
+                src_dir=os.path.join(uuid if self.src_dir_uuid else '',
+                                     'src', p.canonical_name),
                 required=(p in required_projects),
             ))
         params['zuul_event_id'] = item.event.zuul_event_id
