@@ -19,7 +19,8 @@ from zuul.lib import strings
 
 def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
                              dependent_changes=[], merger_items=[],
-                             redact_secrets_and_keys=True):
+                             redact_secrets_and_keys=True,
+                             src_dir_uuid=False):
     """Returns a list of all the parameters needed to build a job.
 
     These parameters may be passed to zuul-executors (via gearman) to perform
@@ -34,7 +35,7 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
         short_name=item.change.project.name.split('/')[-1],
         canonical_hostname=item.change.project.canonical_hostname,
         canonical_name=item.change.project.canonical_name,
-        src_dir=os.path.join('src',
+        src_dir=os.path.join(uuid if src_dir_uuid else '', 'src',
                              strings.workspace_project_path(
                                  item.change.project.canonical_hostname,
                                  item.change.project.name,
@@ -194,7 +195,7 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
             # project.values() is easier for callers
             canonical_name=p.canonical_name,
             canonical_hostname=p.canonical_hostname,
-            src_dir=os.path.join('src',
+            src_dir=os.path.join(uuid if src_dir_uuid else '', 'src',
                                  strings.workspace_project_path(
                                      p.canonical_hostname,
                                      p.name,

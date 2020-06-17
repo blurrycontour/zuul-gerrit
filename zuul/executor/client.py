@@ -141,6 +141,9 @@ class ExecutorClient(object):
         self.cleanup_thread = GearmanCleanup(self)
         self.cleanup_thread.start()
 
+        self.src_dir_uuid = get_default(self.config, 'executor',
+                                        'src_dir_uuid', False)
+
     def stop(self):
         self.log.debug("Stopping")
         self.cleanup_thread.stop()
@@ -161,7 +164,8 @@ class ExecutorClient(object):
         params = zuul.executor.common.construct_gearman_params(
             uuid, self.sched, nodeset,
             job, item, pipeline, dependent_changes, merger_items,
-            redact_secrets_and_keys=False)
+            redact_secrets_and_keys=False,
+            src_dir_uuid=self.src_dir_uuid)
         # TODO: deprecate and remove this variable?
         params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
 

@@ -392,6 +392,33 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       If a value higher than ``max_hold_expiration`` is supplied during
       hold request creation, it will be lowered to this value.
 
+.. attr:: executor
+
+   .. attr:: src_dir_uuid
+      :default: False
+
+      A boolean which indicates whether to prepend :var:`Jobs source directory
+      <zuul.project.src_dir>`
+      with :var:`zuul.build`.
+
+      This is mainly useful when using `nodepool static driver
+      <https://zuul-ci.org/docs/nodepool/configuration.html#static-driver>`__
+      and `max-parallel-jobs
+      <https://zuul-ci.org/docs/nodepool/configuration.html#attr-providers.[static].pools.nodes.max-parallel-jobs>`__
+      >=2 to avoid Jobs using the same source directory
+
+      .. note:: Enabling this setting will break most of zuul-jobs roles.
+                for example:
+
+                `prepare-workspace
+                <https://zuul-ci.org/docs/zuul-jobs/general-roles.html#role-prepare-workspace>`__
+                should be used with ``zuul_workspace_root: "{{ zuul.build }}"``
+
+                `upload-pypi
+                <https://zuul-ci.org/docs/zuul-jobs/python-roles.html#role-upload-pypi>`__
+                should be used with
+                ``pypi_path: "{{ zuul.build }}/src/{{ zuul.project.canonical_name }}/dist"``
+
 Operation
 ~~~~~~~~~
 

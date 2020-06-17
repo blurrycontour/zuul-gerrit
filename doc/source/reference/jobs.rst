@@ -357,7 +357,9 @@ of item.
       .. var:: src_dir
 
          The path to the source code relative to the work dir.  E.g.,
-         `src/git.example.com/org/project`.
+         `src/git.example.com/org/project` or
+         `{{ zuul.build }}/src/git.example.com/org/project` if you enable
+         :attr:`executor.src_dir_uuid`
 
    .. var:: projects
       :type: dict
@@ -392,7 +394,9 @@ of item.
       .. var:: src_dir
 
          The path to the source code, relative to the work dir.  E.g.,
-         `src/git.example.com/org/project`.
+         `src/git.example.com/org/project` or
+         `{{ zuul.build }}/src/git.example.com/org/project` if you enable
+         :attr:`executor.src_dir_uuid`
 
       .. var:: required
 
@@ -477,7 +481,9 @@ of item.
 
             The path to the source code on the remote host, relative
             to the home dir of the remote user.
-            E.g., `src/git.example.com/org/project`.
+            E.g., `src/git.example.com/org/project` or
+            `{{ zuul.build }}/src/git.example.com/org/project` if you enable
+            :attr:`executor.src_dir_uuid`
 
       .. var:: branch
 

@@ -3355,7 +3355,6 @@ class Ref(object):
             short_name=self.project.name.split('/')[-1],
             canonical_hostname=self.project.canonical_hostname,
             canonical_name=self.project.canonical_name,
-            src_dir=os.path.join('src', self.project.canonical_name),
         )
         return d
 

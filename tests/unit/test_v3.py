@@ -7018,3 +7018,45 @@ class TestReturnWarnings(AnsibleZuulTestCase):
         self.assertTrue(A.reported)
         self.assertIn('This is the first warning', A.messages[0])
         self.assertIn('This is the second warning', A.messages[0])
+
+
+class TestSrcDirUuid(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
+
+    def setup_config(self, config_file: str):
+        config = super(TestSrcDirUuid, self).setup_config(config_file)
+        config.set('executor', 'src_dir_uuid', 'True')
+        return config
+
+    def test_playbook(self):
+
+        with open(os.path.join(FIXTURE_DIR,
+                               'config/ansible/git/',
+                               'common-config/zuul-uuid.yaml')) as f:
+            common_config = f.read()
+
+        file_dict = {'zuul.yaml': common_config}
+
+        A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+
+        # This test runs a bit long and needs extra time.
+        self.wait_timeout = 300
+        # Keep the jobdir around so we can inspect contents if an
+        # assert fails.
+        self.executor_server.keep_jobdir = True
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        # Add a site variables file, used by check-vars
+        path = os.path.join(FIXTURE_DIR, 'config', 'ansible',
+                            'variables.yaml')
+        self.config.set('executor', 'variables', path)
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        build_check_vars = self.getJobFromHistory('check-vars')
+        with self.jobLog(build_check_vars):
+            self.assertEqual(build_check_vars.result, 'SUCCESS')
