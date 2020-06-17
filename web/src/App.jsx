@@ -21,18 +21,51 @@ import { matchPath, withRouter } from 'react-router'
 import { Link, Redirect, Route, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 import {
-  Icon,
-  Masthead,
-  Notification,
-  NotificationDrawer,
   TimedToastNotification,
   ToastNotificationList,
 } from 'patternfly-react'
 import * as moment from 'moment'
+import {
+  Brand,
+  Button,
+  ButtonVariant,
+  Drawer,
+  DrawerActions,
+  DrawerCloseButton,
+  DrawerContent,
+  DrawerContentBody,
+  DrawerPanelContent,
+  Dropdown,
+  DropdownItem,
+  KebabToggle,
+  Nav,
+  NavItem,
+  NavList,
+  NotificationBadge,
+  NotificationDrawer,
+  NotificationDrawerBody,
+  NotificationDrawerHeader,
+  NotificationDrawerList,
+  NotificationDrawerListItem,
+  NotificationDrawerListItemBody,
+  NotificationDrawerListItemHeader,
+  Page,
+  PageHeader,
+  PageHeaderTools,
+  PageHeaderToolsGroup,
+  PageHeaderToolsItem,
+} from '@patternfly/react-core'
+
+import {
+  BellIcon,
+  BookIcon,
+  CodeIcon,
+  UsersIcon,
+} from '@patternfly/react-icons'
 
 import ErrorBoundary from './containers/ErrorBoundary'
 import SelectTz from './containers/timezone/SelectTz'
-import logo from './images/logo.png'
+import logo from './images/logo.svg'
 import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
@@ -47,49 +80,45 @@ class App extends React.Component {
     timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    isKebabDropdownOpen: false,
   }
 
   state = {
-    menuCollapsed: true,
-    showErrors: false
-  }
-
-  onNavToggleClick = () => {
-    this.setState({
-      menuCollapsed: !this.state.menuCollapsed
-    })
-  }
-
-  onNavClick = () => {
-    this.setState({
-      menuCollapsed: true
-    })
-  }
-
-  constructor() {
-    super()
-    this.menu = routes()
+    showErrors: false,
   }
 
   renderMenu() {
-    const { location } = this.props
+    const { location, tenant } = this.props
     const activeItem = this.menu.find(
       item => location.pathname === item.to
     )
-    return (
-      <ul className='nav navbar-nav navbar-primary'>
-        {this.menu.filter(item => item.title).map(item => (
-          <li key={item.to} className={item === activeItem ? 'active' : ''}>
-            <Link
-              to={this.props.tenant.linkPrefix + item.to}
-              onClick={this.onNavClick}>
-              {item.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    )
+
+    if (tenant.name) {
+      return (
+        <Nav aria-label="Nav" variant="horizontal">
+          <NavList>
+            {this.menu.filter(item => item.title).map(item => (
+              <NavItem
+                itemId={item.to}
+                key={item.to}
+                isActive={item === activeItem}
+              >
+                <Link
+                  to={this.props.tenant.linkPrefix + item.to}
+                  onClick={this.onNavClick}
+                >
+                  {item.title}
+                </Link>
+              </NavItem>
+            ))}
+          </NavList>
+        </Nav>
+      )
+    } else {
+      // Return an empty navigation bar in case we don't have an active tenant
+      return <Nav aria-label="Nav" variant="horizontal"/>
+    }
   }
 
   renderContent = () => {
@@ -158,6 +187,43 @@ class App extends React.Component {
     }
   }
 
+  constructor() {
+    super()
+    this.menu = routes()
+  }
+
+  handleKebabDropdownToggle = (isKebabDropdownOpen) => {
+    this.setState({
+      isKebabDropdownOpen
+    })
+  }
+
+  handleKebabDropdownSelect = () => {
+    this.setState({
+      isKebabDropdownOpen: !this.state.isKebabDropdownOpen
+    })
+  }
+
+  handleApiLink = () => {
+    const { history } = this.props
+    history.push('/openapi')
+  }
+
+  handleDocumentationLink = () => {
+    window.open('https://zuul-ci.org/docs', '_blank', 'noopener noreferrer')
+  }
+
+  handleTenantLink = () => {
+    const { history, tenant } = this.props
+    history.push(tenant.defaultRoute)
+  }
+
+  handleDrawerClose = () => {
+    this.setState({
+      showErrors: false
+    })
+  }
+
   renderErrors = (errors) => {
     return (
       <ToastNotificationList>
@@ -191,107 +257,163 @@ class App extends React.Component {
         ctxPath += ' (' + item.source_context.branch + ')'
       }
       errors.push(
-        <Notification
+        <NotificationDrawerListItem
           key={idx}
-          seen={false}
+          variant="danger"
           onClick={() => {
             history.push(this.props.tenant.linkPrefix + '/config-errors')
             this.setState({showErrors: false})
           }}
           >
-          <Icon className='pull-left' type='pf' name='error-circle-o' />
-          <Notification.Content>
-            <Notification.Message>
-              {error}
-            </Notification.Message>
-            <Notification.Info
-              leftText={item.source_context.project}
-              rightText={ctxPath}
-              />
-          </Notification.Content>
-        </Notification>
+          <NotificationDrawerListItemHeader title={error} variant="danger" />
+          <NotificationDrawerListItemBody>
+              {item.source_context.project} | {ctxPath}
+          </NotificationDrawerListItemBody>
+        </NotificationDrawerListItem>
       )
     })
-    return (
-      <NotificationDrawer style={{minWidth: '500px'}}>
-      <NotificationDrawer.Panel>
-        <NotificationDrawer.PanelHeading>
-          <NotificationDrawer.PanelTitle>
-            Config Errors
-          </NotificationDrawer.PanelTitle>
-          <NotificationDrawer.PanelCounter
-            text={errors.length + ' error(s)'} />
-        </NotificationDrawer.PanelHeading>
-        <NotificationDrawer.PanelCollapse id={1} collapseIn>
-          <NotificationDrawer.PanelBody key='containsNotifications'>
-            {errors.map(item => (item))}
-          </NotificationDrawer.PanelBody>
 
-        </NotificationDrawer.PanelCollapse>
-        </NotificationDrawer.Panel>
-      </NotificationDrawer>
+    return (
+      <DrawerPanelContent>
+        <NotificationDrawer>
+          <NotificationDrawerHeader
+            count={errors.length}
+            title="Config Errors"
+            unreadText="error(s)"
+          >
+            <DrawerActions>
+              <DrawerCloseButton onClick={this.handleDrawerClose} />
+            </DrawerActions>
+          </NotificationDrawerHeader>
+          <NotificationDrawerBody>
+            <NotificationDrawerList>
+              {errors.map(item => (item))}
+            </NotificationDrawerList>
+          </NotificationDrawerBody>
+        </NotificationDrawer>
+      </DrawerPanelContent>
     )
   }
 
   render() {
-    const { menuCollapsed, showErrors } = this.state
+    const { isKebabDropdownOpen, showErrors } = this.state
     const { errors, configErrors, tenant } = this.props
+
+    const nav = this.renderMenu()
+
+    const kebabDropdownItems = [
+      <DropdownItem key="api" onClick={event => this.handleApiLink(event)}>
+        <CodeIcon /> API
+      </DropdownItem>,
+      <DropdownItem
+        key="documentation"
+        onClick={event => this.handleDocumentationLink(event)}
+      >
+        <BookIcon /> Documentation
+      </DropdownItem>,
+    ]
+
+    if (tenant.name) {
+      kebabDropdownItems.push(
+        <DropdownItem
+          key="tenant"
+          onClick={event => this.handleTenantLink(event)}
+        >
+          <UsersIcon /> Tenant
+        </DropdownItem>
+      )
+    }
+
+    const pageHeaderTools = (
+      <PageHeaderTools>
+        {/* The utility navbar is only visible on desktop sizes
+            and replaced by a kebab dropdown for smaller sizes */}
+        <PageHeaderToolsGroup
+          visibility={{ default: 'hidden', lg: 'visible' }}
+        >
+          <PageHeaderToolsItem>
+            <Link to='/openapi'>
+              <Button variant={ButtonVariant.plain}>
+                <CodeIcon /> API
+              </Button>
+            </Link>
+          </PageHeaderToolsItem>
+          <PageHeaderToolsItem>
+            <a
+              href='https://zuul-ci.org/docs'
+              rel='noopener noreferrer'
+              target='_blank'
+            >
+              <Button variant={ButtonVariant.plain}>
+                <BookIcon /> Documentation
+              </Button>
+            </a>
+          </PageHeaderToolsItem>
+          {tenant.name && (
+            <PageHeaderToolsItem>
+              <Link to={tenant.defaultRoute}>
+                <Button variant={ButtonVariant.plain}>
+                  <strong>Tenant</strong> {tenant.name}
+                </Button>
+              </Link>
+            </PageHeaderToolsItem>
+          )}
+        </PageHeaderToolsGroup>
+        <PageHeaderToolsGroup>
+          {/* this kebab dropdown replaces the icon buttons and is hidden for
+              desktop sizes */}
+          <PageHeaderToolsItem visibility={{ lg: 'hidden' }}>
+            <Dropdown
+              isPlain
+              position="right"
+              onSelect={this.handleKebabDropdownSelect}
+              toggle={<KebabToggle onToggle={this.handleKebabDropdownToggle} />}
+              isOpen={isKebabDropdownOpen}
+              dropdownItems={kebabDropdownItems}
+            />
+          </PageHeaderToolsItem>
+        </PageHeaderToolsGroup>
+        {configErrors.length > 0 &&
+          <NotificationBadge
+            isRead={false}
+            aria-label="Notifications"
+            onClick={(e) => {
+              e.preventDefault()
+              this.setState({showErrors: !this.state.showErrors})
+            }}
+          >
+            <BellIcon />
+          </NotificationBadge>
+        }
+        <SelectTz/>
+      </PageHeaderTools>
+    )
+
+    const pageHeader = (
+      <PageHeader
+        logo={<Brand src={logo} alt='Zuul logo' className="zuul-brand" />}
+        logoProps={{href: tenant.defaultRoute}}
+        headerTools={pageHeaderTools}
+        topNav={nav}
+      />
+    )
+
+    const drawerPanelContent = this.renderConfigErrors(configErrors)
 
     return (
       <React.Fragment>
-        <Masthead
-          iconImg={logo}
-          onNavToggleClick={this.onNavToggleClick}
-          navToggle
-          thin
-          >
-          <div className='collapse navbar-collapse'>
-            {tenant.name && this.renderMenu()}
-            <ul className='nav navbar-nav navbar-utility'>
-              { configErrors.length > 0 &&
-                <NotificationDrawer.Toggle
-                  className="zuul-config-errors"
-                  hasUnreadMessages
-                  style={{color: 'orange'}}
-                  onClick={(e) => {
-                    e.preventDefault()
-                    this.setState({showErrors: !this.state.showErrors})}}
-                  />
-              }
-              <li>
-                <Link to='/openapi'>API</Link>
-              </li>
-              <li>
-                <a href='https://zuul-ci.org/docs'
-                   rel='noopener noreferrer' target='_blank'>
-                  Documentation
-                </a>
-              </li>
-              {tenant.name && (
-                <li>
-                  <Link to={tenant.defaultRoute}>
-                    <strong>Tenant</strong> {tenant.name}
-                  </Link>
-                </li>
-              )}
-              <li>
-              <SelectTz/>
-              </li>
-            </ul>
-            {showErrors && this.renderConfigErrors(configErrors)}
-          </div>
-          {!menuCollapsed && (
-            <div className='collapse navbar-collapse navbar-collapse-1 in'>
-              {tenant.name && this.renderMenu()}
-            </div>
-          )}
-        </Masthead>
         {errors.length > 0 && this.renderErrors(errors)}
-        <div className='container-fluid container-cards-pf'>
-          <ErrorBoundary>
-            {this.renderContent()}
-          </ErrorBoundary>
-        </div>
+        <Page header={pageHeader}>
+          <Drawer isExpanded={showErrors}>
+            <DrawerContent panelContent={drawerPanelContent}>
+              <DrawerContentBody>
+                <ErrorBoundary>
+                  {this.renderContent()}
+                </ErrorBoundary>
+              </DrawerContentBody>
+            </DrawerContent>
+          </Drawer>
+        </Page>
       </React.Fragment>
     )
   }

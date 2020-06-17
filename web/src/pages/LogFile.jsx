@@ -16,6 +16,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { parse } from 'query-string'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchLogfileIfNeeded } from '../actions/logfile'
 import Refreshable from '../containers/Refreshable'
@@ -110,12 +111,12 @@ class LogFilePage extends Refreshable {
     const build = this.props.build.builds[this.props.match.params.buildId]
     const severity = parse(this.props.location.search).severity
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
         {remoteData.data && <LogFile build={build} data={remoteData.data} severity={severity}/>}
-      </React.Fragment>
+      </PageSection>
     )
   }
 }
