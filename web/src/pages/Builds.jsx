@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 import * as moment from 'moment-timezone'
 import 'moment-duration-format'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuilds } from '../api'
 import TableFilters from '../containers/TableFilters'
@@ -168,10 +169,10 @@ class BuildsPage extends TableFilters {
   render() {
     const { builds } = this.state
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         {this.renderFilter()}
         {builds ? this.renderTable(builds) : <p>Loading...</p>}
-      </React.Fragment>
+      </PageSection>
     )
   }
 }

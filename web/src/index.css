@@ -1,8 +1,13 @@
+#root {
+    /* This is needed to make the navigation bar fixed on top */
+    height: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
 }
+
 a.refresh {
   cursor: pointer;
   border-bottom-style: none;
@@ -13,9 +18,17 @@ a.refresh {
   white-space: nowrap;
 }
 
-/* Notification bell color */
-.fa-bell {
-  color: orange;
+/* Navigation bar */
+.zuul-brand {
+    /* TODO (felix): If we can define a size in the logo.svg itself, this
+       shouldn't be necessary. */
+    height: 30px;
+    width: 30px;
+}
+
+.zuul-select-tz {
+    /* That's the color PF4 uses for the dropdown items in the navbar */
+    color: var(--pf-global--Color--dark-100);
 }
 
 /* Status page */
@@ -300,4 +313,25 @@ details.foldable summary::before {
 
 details.foldable[open] summary::before {
     content: "less";
+}
+
+/* Overwrite PF4 navbar rules to enforce the 'lg' layout of the navbar also for
+   'xl' sized screens. This will keep the navbar stacked (like it was in Zuul
+   before) and prevent PF4 to put all elements in a single line with horizontal
+   scrolling (which would look something like:
+   ZUUL | < Status Projects Jobs Labels No... > | API Documentation Tenant */
+@media screen and (min-width: 1200px) {
+    .pf-c-page__header-nav {
+        grid-column: 1/-1;
+        grid-row: 2/3;
+    }
+
+    .pf-c-page {
+        --pf-c-page__header-nav--PaddingRight: var(
+            --pf-c-page__header-nav--lg--PaddingRight
+        );
+        --pf-c-page__header-nav--PaddingLeft: var(
+            --pf-c-page__header-nav--lg--PaddingLeft
+        );
+    }
 }
