@@ -15,6 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchJobsIfNeeded } from '../actions/jobs'
 import Refreshable from '../containers/Refreshable'
@@ -41,7 +42,7 @@ class JobsPage extends Refreshable {
     const { remoteData } = this.props
     const jobs = remoteData.jobs[this.props.tenant.name]
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
@@ -49,7 +50,8 @@ class JobsPage extends Refreshable {
           <Jobs
               jobs={jobs}
               />}
-      </React.Fragment>)
+      </PageSection>
+    )
   }
 }
 
