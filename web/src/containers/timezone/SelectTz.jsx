@@ -14,7 +14,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Select from 'react-select'
 import moment from 'moment-timezone'
-import { Icon } from 'patternfly-react'
+import { OutlinedClockIcon } from '@patternfly/react-icons'
 import { connect } from 'react-redux'
 import { setTimezoneAction } from '../../actions/timezone'
 
@@ -81,11 +81,7 @@ class SelectTz extends React.Component {
       borderWidth: '0 0 0 1px',
       cursor: 'pointer',
       display: 'initial',
-      fontSize: '11px',
       padding: '6px'
-    }
-    const iconStyles = {
-      padding: '5px'
     }
     const customStyles = {
       container: () => ({
@@ -116,8 +112,9 @@ class SelectTz extends React.Component {
     }
     return (
         <div style={containerStyles}>
-        <Icon style={iconStyles} type="fa" name="clock-o" />
+        <OutlinedClockIcon/>
         <Select
+            className="zuul-select-tz"
             styles={customStyles}
             value={this.state.currentValue}
             onChange={this.handleChange}

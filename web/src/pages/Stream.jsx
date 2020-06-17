@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import Sockette from 'sockette'
 import {Checkbox, Form, FormGroup, FormControl} from 'patternfly-react'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import 'xterm/dist/xterm.css'
 import { Terminal } from 'xterm'
@@ -176,7 +177,7 @@ class StreamPage extends React.Component {
 
   render () {
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <Form inline>
           <FormGroup controlId='stream'>
             <FormControl
@@ -202,7 +203,7 @@ class StreamPage extends React.Component {
           </FormGroup>
         </Form>
         <div ref={ref => this.terminal = ref}/>
-      </React.Fragment>
+      </PageSection>
     )
   }
 }

@@ -15,6 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchChangeIfNeeded } from '../actions/change'
 import ChangePanel from '../containers/status/ChangePanel'
@@ -56,7 +57,7 @@ class ChangeStatusPage extends Refreshable {
     const { remoteData } = this.props
     const change = remoteData.change
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div><br />
@@ -68,7 +69,7 @@ class ChangeStatusPage extends Refreshable {
               />
           </div>
         ))}
-      </React.Fragment>)
+      </PageSection>)
   }
 }
 
