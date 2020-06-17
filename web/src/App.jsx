@@ -22,7 +22,6 @@ import { Link, Redirect, Route, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 import {
   Icon,
-  Masthead,
   Notification,
   NotificationDrawer,
   TimedToastNotification,
@@ -38,6 +37,27 @@ import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
 
+import {
+  Brand,
+  Button,
+  ButtonVariant,
+  Dropdown,
+  DropdownItem,
+  KebabToggle,
+  Nav,
+  NavItem,
+  NavList,
+  Page,
+  PageHeader,
+  PageHeaderTools,
+  PageHeaderToolsGroup,
+  PageHeaderToolsItem,
+  PageSection,
+  PageSectionVariants,
+} from '@patternfly/react-core';
+
+import { BookIcon, CodeIcon, UsersIcon } from '@patternfly/react-icons';
+
 class App extends React.Component {
   static propTypes = {
     errors: PropTypes.array,
@@ -47,7 +67,8 @@ class App extends React.Component {
     timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    isKebabDropdownOpen: false,
   }
 
   state = {
@@ -67,6 +88,18 @@ class App extends React.Component {
     })
   }
 
+  onKebabDropdownToggle = (isKebabDropdownOpen) => {
+    this.setState({
+      isKebabDropdownOpen
+    });
+  };
+
+  onKebabDropdownSelect = (event) => {
+    this.setState({
+      isKebabDropdownOpen: !this.state.isKebabDropdownOpen
+    });
+  };
+
   constructor() {
     super()
     this.menu = routes()
@@ -78,17 +111,24 @@ class App extends React.Component {
       item => location.pathname === item.to
     )
     return (
-      <ul className='nav navbar-nav navbar-primary'>
-        {this.menu.filter(item => item.title).map(item => (
-          <li key={item.to} className={item === activeItem ? 'active' : ''}>
-            <Link
-              to={this.props.tenant.linkPrefix + item.to}
-              onClick={this.onNavClick}>
-              {item.title}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <Nav aria-label="Nav" variant="horizontal">
+        <NavList>
+          {this.menu.filter(item => item.title).map(item => (
+            <NavItem
+              itemId={item.to}
+              key={item.to}
+              isActive={item === activeItem}
+            >
+              <Link
+                to={this.props.tenant.linkPrefix + item.to}
+                onClick={this.onNavClick}
+              >
+                {item.title}
+              </Link>
+            </NavItem>
+          ))}
+        </NavList>
+      </Nav>
     )
   }
 
@@ -233,18 +273,112 @@ class App extends React.Component {
     )
   }
 
+  handleApiLink = (event) => {
+    const { history } = this.props;
+    history.push('/openapi');
+  }
+
+  handleDocumentationLink = (event) => {
+    window.open('https://zuul-ci.org/docs', '_blank', 'noopener noreferrer');
+  }
+
+  handleTenantLink = (event) => {
+    const { history, tenant } = this.props;
+    history.push(tenant.defaultRoute);
+  }
+
   render() {
-    const { menuCollapsed, showErrors } = this.state
+    const { isKebabDropdownOpen, menuCollapsed, showErrors } = this.state
     const { errors, configErrors, tenant } = this.props
+
+    const nav = this.renderMenu();
+
+    const kebabDropdownItems = [
+      <DropdownItem key="api" onClick={event => this.handleApiLink(event)}>
+        <CodeIcon /> API
+      </DropdownItem>,
+      <DropdownItem
+        key="documentation"
+        onClick={event => this.handleDocumentationLink(event)}
+      >
+        <BookIcon /> Documentation
+      </DropdownItem>,
+    ]
+
+    {tenant.name && (
+      kebabDropdownItems.push(
+        <DropdownItem
+          key="tenant"
+          onClick={event => this.handleTenantLink(event)}
+        >
+          <UsersIcon /> Tenant
+        </DropdownItem>
+      )
+    )}
+
+    const pageHeaderTools = (
+      <PageHeaderTools>
+        {/* The utility navbar is only visible on desktop sizes
+            and replaced by a kebab dropdown for smaller sizes */}
+        <PageHeaderToolsGroup
+          visibility={{ default: 'hidden', lg: 'visible' }}
+        >
+          <PageHeaderToolsItem>
+            <Link to='/openapi'>
+              <Button variant={ButtonVariant.plain}>
+                <CodeIcon /> API
+              </Button>
+            </Link>
+          </PageHeaderToolsItem>
+          <PageHeaderToolsItem>
+            <a
+              href='https://zuul-ci.org/docs'
+              rel='noopener noreferrer'
+              target='_blank'
+            >
+              <Button variant={ButtonVariant.plain}>
+                <BookIcon /> Documentation
+              </Button>
+            </a>
+          </PageHeaderToolsItem>
+          {tenant.name && (
+            <PageHeaderToolsItem>
+              <Link to={tenant.defaultRoute}>
+                <Button variant={ButtonVariant.plain}>
+                  <strong>Tenant</strong> {tenant.name}
+                </Button>
+              </Link>
+            </PageHeaderToolsItem>
+          )}
+        </PageHeaderToolsGroup>
+        <PageHeaderToolsGroup>
+          <PageHeaderToolsItem visibility={{ lg: 'hidden' }} /** this kebab dropdown replaces the icon buttons and is hidden for desktop sizes */>
+            <Dropdown
+              isPlain
+              position="right"
+              onSelect={this.onKebabDropdownSelect}
+              toggle={<KebabToggle onToggle={this.onKebabDropdownToggle} />}
+              isOpen={isKebabDropdownOpen}
+              dropdownItems={kebabDropdownItems}
+            />
+          </PageHeaderToolsItem>
+        </PageHeaderToolsGroup>
+        <SelectTz/>
+      </PageHeaderTools>
+    );
+
+    const pageHeader = (
+      <PageHeader
+        logo={<Brand src={logo} alt='Zuul logo' />}
+        headerTools={pageHeaderTools}
+        topNav={nav}
+      />
+    );
 
     return (
       <React.Fragment>
-        <Masthead
-          iconImg={logo}
-          onNavToggleClick={this.onNavToggleClick}
-          navToggle
-          thin
-          >
+        {/* TODO (felix): NotificationDrawer + Toggle */}
+        {/*
           <div className='collapse navbar-collapse'>
             {tenant.name && this.renderMenu()}
             <ul className='nav navbar-nav navbar-utility'>
@@ -258,40 +392,16 @@ class App extends React.Component {
                     this.setState({showErrors: !this.state.showErrors})}}
                   />
               }
-              <li>
-                <Link to='/openapi'>API</Link>
-              </li>
-              <li>
-                <a href='https://zuul-ci.org/docs'
-                   rel='noopener noreferrer' target='_blank'>
-                  Documentation
-                </a>
-              </li>
-              {tenant.name && (
-                <li>
-                  <Link to={tenant.defaultRoute}>
-                    <strong>Tenant</strong> {tenant.name}
-                  </Link>
-                </li>
-              )}
-              <li>
-              <SelectTz/>
-              </li>
-            </ul>
-            {showErrors && this.renderConfigErrors(configErrors)}
           </div>
-          {!menuCollapsed && (
-            <div className='collapse navbar-collapse navbar-collapse-1 in'>
-              {tenant.name && this.renderMenu()}
-            </div>
-          )}
-        </Masthead>
+        */}
         {errors.length > 0 && this.renderErrors(errors)}
-        <div className='container-fluid container-cards-pf'>
-          <ErrorBoundary>
-            {this.renderContent()}
-          </ErrorBoundary>
-        </div>
+        <Page header={pageHeader}>
+          <PageSection variant={PageSectionVariants.light}>
+            <ErrorBoundary>
+              {this.renderContent()}
+            </ErrorBoundary>
+          </PageSection>
+        </Page>
       </React.Fragment>
     )
   }
