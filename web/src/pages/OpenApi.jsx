@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import SwaggerUi from 'swagger-ui'
 import 'swagger-ui/dist/swagger-ui.css'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchOpenApiIfNeeded } from '../actions/openapi'
 import Refreshable from '../containers/Refreshable'
@@ -51,12 +52,12 @@ class OpenApiPage extends Refreshable {
 
   render() {
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div className="pull-right" style={{display: 'flex'}}>
           {this.renderSpinner()}
         </div>
         <div id="swaggerContainer" />
-      </React.Fragment>
+      </PageSection>
     )
   }
 }

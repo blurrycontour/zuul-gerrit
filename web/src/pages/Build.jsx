@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildIfNeeded } from '../actions/build'
 import Refreshable from '../containers/Refreshable'
@@ -43,7 +44,7 @@ class BuildPage extends Refreshable {
     const { remoteData } = this.props
     const build = remoteData.builds[this.props.match.params.buildId]
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
@@ -51,7 +52,7 @@ class BuildPage extends Refreshable {
        <Build build={build} active='summary'>
          <Summary build={build}/>
        </Build>}
-      </React.Fragment>
+      </PageSection>
     )
   }
 }
