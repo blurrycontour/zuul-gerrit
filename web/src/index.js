@@ -21,13 +21,29 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import 'patternfly/dist/css/patternfly.min.css'
 import 'patternfly/dist/css/patternfly-additions.min.css'
-import './index.css'
+// NOTE (felix): The Patternfly 4 CSS file must be imported before the App
+// component. Otherwise, the CSS rules are imported in the wrong order and some
+// wildcard expressions could break the layout:
+// https://forum.patternfly.org/t/wildcard-selector-more-specific-after-upgrade-to-patternfly-4-react-version-3-75-2/261
+// Usually it should be imported at the uppermost positon, but as we don't want
+// PF3 to overrule PF4, we import PF4 styles after PF3.
+import '@patternfly/react-core/dist/styles/base.css'
+// To avoid that PF4 breaks existing PF3 components by some wildcard CSS rules,
+// we include our own migration CSS file that restores relevant parts of those
+// rules.
+// TODO (felix): Remove this import after the PF4 migration
+import './pf4-migration.css'
 
 import { getHomepageUrl } from './api'
 import registerServiceWorker from './registerServiceWorker'
 import { fetchInfoIfNeeded } from './actions/info'
 import store from './store'
 import App from './App'
+
+// Importing our custom css file after the App allows us to also overwrite the
+// style attributes of PF4 component (as their CSS is loaded when the component
+// is imported within the App).
+import './index.css'
 
 // Load info endpoint
 store.dispatch(fetchInfoIfNeeded())

@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildIfNeeded } from '../actions/build'
 import Refreshable from '../containers/Refreshable'
@@ -45,7 +46,7 @@ class BuildConsolePage extends Refreshable {
     const hash = this.props.location.hash.substring(1).split('/')
 
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
@@ -57,7 +58,7 @@ class BuildConsolePage extends Refreshable {
              displayPath={hash.length>0?hash:undefined}
            />
          </Build>}
-      </React.Fragment>
+      </PageSection>
     )
   }
 }
