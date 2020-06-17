@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import Project from '../containers/project/Project'
 import { fetchProjectIfNeeded } from '../actions/project'
@@ -44,13 +45,13 @@ class ProjectPage extends Refreshable {
     const tenantProjects = remoteData.projects[this.props.tenant.name]
     const projectName = this.props.match.params.projectName
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
         {tenantProjects && tenantProjects[projectName] &&
          <Project project={tenantProjects[projectName]} />}
-      </React.Fragment>
+      </PageSection>
     )
   }
 }

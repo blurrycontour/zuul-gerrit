@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Table } from 'patternfly-react'
 import * as moment from 'moment'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchNodesIfNeeded } from '../actions/nodes'
 import Refreshable from '../containers/Refreshable'
@@ -81,7 +82,7 @@ class NodesPage extends Refreshable {
       })
     })
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div style={{float: 'right'}}>
           {this.renderSpinner()}
         </div>
@@ -97,7 +98,7 @@ class NodesPage extends Refreshable {
             rowKey="id"
           />
         </Table.PfProvider>
-      </React.Fragment>
+      </PageSection>
     )
   }
 }
