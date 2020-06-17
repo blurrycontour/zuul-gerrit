@@ -20,27 +20,3 @@
       nodes:
         - name: ubuntu-focal
           label: ubuntu-focal
-
-- job:
-    name: base-multinode
-    parent: base
-    description: |
-      A node which will execute on multiple nodes
-    nodeset:
-      nodes:
-        - name: ubuntu-focal
-          label: ubuntu-focal
-        - name: ubuntu-fokal
-          label: ubuntu-fokal
-        - name: ubuntu-foqal
-          label: ubuntu-foqal
-      groups:
-        - name: allnodes
-          nodes:
-            - ubuntu-focal
-            - ubuntu-fokal
-            - ubuntu-foqal
-        - name: nodecandk
-          nodes:
-            - ubuntu-focal
-            - ubuntu-fokal
