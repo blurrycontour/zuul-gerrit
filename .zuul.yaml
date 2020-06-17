@@ -143,6 +143,7 @@
     vars:
       run_playbooks:
         - gate-first-patch.yaml
+      zuul_tutorial_confignum: 2
 
 - job:
     name: zuul-tutorial-use-zuul-jobs
