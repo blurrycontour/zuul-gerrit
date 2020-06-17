@@ -1,0 +1,28 @@
+/* Patternfly 4 migration:
+ * These are extracts from the original Patternfly 3 CSS rules which are
+ * overwritten by some Patternfly 4 CSS wildcard expression. These expressions
+ * mostly affect the padding and margin of various HTML tags being set to 0.
+ *
+ * Those wildcard rules can be found in
+ * node_modules/@patternfly/react-core/dist/styles/base.css by searching for
+ * "[class*="pf-c-"]" (without quotes).
+ *
+ * To "restore" those original values, we can copy the overwritten parts from
+ * the original CSS rules and paste them here.
+ *
+ * This file should be save to delete after the transition is finished.
+ */
+
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+pre {
+    padding: 9.5px;
+    margin: 0 0 10px;
+}
+
+p {
+    margin: 0 0 10px;
+}
