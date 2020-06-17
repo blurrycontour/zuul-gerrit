@@ -1,0 +1,51 @@
+/* Patternfly 4 migration:
+ * These are extracts from the original Patternfly 3 CSS rules which are
+ * overridden by some Patternfly 4 CSS wildcard expression. These expressions
+ * mostly affect the padding and margin of various HTML tags being set to 0.
+ *
+ * Those wildcard rules can be found in
+ * node_modules/@patternfly/react-core/dist/styles/base.css by searching for
+ * "[class*="pf-c-"]" (without quotes).
+ *
+ * To "restore" those original values, we can copy the overwritten parts from
+ * the original CSS rules and paste them here.
+ *
+ * This file should be save to delete after the transition is finished.
+ */
+
+.h1, .h2, .h3, h1, h2, h3, .pf-c-title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+pre {
+    padding: 9.5px;
+    margin: 0 0 10px;
+}
+
+p {
+    margin: 0 0 10px;
+}
+
+/* Correct line height for job result labels on status page due to larger
+   font size */
+span.zuul-job-result.label {
+    line-height: 0.7;
+}
+
+/* Overwrite a PF3 rule that sets a padding-top for the whole body. Most
+   probably because they placed the menu/navbar atop of the whole body. */
+.layout-pf.layout-pf-fixed body {
+    padding-top: 0;
+}
+
+.zuul-status-content {
+    /* Don't let the "row" class break the page layout */
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.zuul-status-content .pf-c-content li+li {
+    /* Avoid duplicated lines/borders for the job items on the status page */
+    margin-top: 0;
+}
