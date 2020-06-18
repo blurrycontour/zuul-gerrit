@@ -20,7 +20,7 @@ import {
   CLEAR_ERRORS,
   addApiError,
 } from '../actions/errors'
-import { DEQUEUE_FAIL } from '../actions/adminActions'
+import { DEQUEUE_FAIL, ENQUEUE_FAIL } from '../actions/adminActions'
 
 export default (state = [], action) => {
   // Intercept API failure
@@ -29,6 +29,9 @@ export default (state = [], action) => {
   }
   // Admin API failures
   if (action.error && action.type === DEQUEUE_FAIL ) {
+    action = addApiError(action.error)
+  }
+  if (action.error && action.type === ENQUEUE_FAIL ) {
     action = addApiError(action.error)
   }
   switch (action.type) {
