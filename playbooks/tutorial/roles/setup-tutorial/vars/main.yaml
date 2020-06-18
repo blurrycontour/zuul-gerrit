@@ -1,0 +1,5 @@
+zuul_tutorial_config:
+  - compose_file: docker-compose.yaml
+    nodepool_file: nodepool-quickstart.yaml
+
+zuul_tutorial_docker_compose_dest_base_dir: "{{ zuul.project.src_dir + '/doc/source/examples' if not local else '../../doc/source/examples' }}"
