@@ -1,0 +1,19 @@
+- job:
+    name: tox-demorepo
+    description: tox test for test1 with dependencies
+    parent: tox-py38
+    required-projects:
+      - test1
+      - test2
+    vars:
+      zuul_work_dir: "{{ zuul.projects['gerrit/test1'].src_dir }}"
+
+- project:
+    check:
+      jobs:
+        - tox-demorepo
+        - tox-pep8
+    gate:
+      jobs:
+        - tox-demorepo
+        - tox-pep8
