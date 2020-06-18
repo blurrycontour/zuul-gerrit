@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_f8d5bfe6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-06-18T10:16:27Z",
+      "side": 1,
+      "message": "I believe you mean 3.8 :)",
+      "range": {
+        "startLine": 11,
+        "startChar": 10,
+        "endLine": 11,
+        "endChar": 13
+      },
+      "revId": "82dcf64738af99329a048f4485645e2d5f706b4d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
