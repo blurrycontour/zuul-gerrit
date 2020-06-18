@@ -42,9 +42,10 @@ class Buildset extends React.Component {
       let label = column
       let value = buildset[column]
       if (column === 'change') {
+        let changeId = buildset.change ? buildset.change + ',' + buildset.patchset : buildset.newrev
         value = (
           <a href={buildset.ref_url}>
-            {buildset.change},{buildset.patchset}
+            {changeId}
           </a>
         )
       }

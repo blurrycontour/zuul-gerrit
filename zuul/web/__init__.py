@@ -344,28 +344,31 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(400,
                                      'Invalid request body')
 
-    def _enqueue(self, tenant, project, trigger, change, pipeline, **kwargs):
-        job = self.rpc.submitJob('zuul:enqueue',
-                                 {'tenant': tenant,
-                                  'pipeline': pipeline,
-                                  'project': project,
-                                  'trigger': trigger,
-                                  'change': change, })
+    def _enqueue(self, tenant, project, change, pipeline, trigger=None,
+                 **kwargs):
+        args = {'tenant': tenant,
+                'pipeline': pipeline,
+                'project': project,
+                'change': change, }
+        if trigger is not None:
+            args['trigger'] = trigger
+        job = self.rpc.submitJob('zuul:enqueue', args)
         result = not job.failure
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
-    def _enqueue_ref(self, tenant, project, trigger, ref,
-                     oldrev, newrev, pipeline, **kwargs):
-        job = self.rpc.submitJob('zuul:enqueue_ref',
-                                 {'tenant': tenant,
-                                  'pipeline': pipeline,
-                                  'project': project,
-                                  'trigger': trigger,
-                                  'ref': ref,
-                                  'oldrev': oldrev,
-                                  'newrev': newrev, })
+    def _enqueue_ref(self, tenant, project, ref,
+                     oldrev, newrev, pipeline, trigger=None, **kwargs):
+        args = {'tenant': tenant,
+                'pipeline': pipeline,
+                'project': project,
+                'ref': ref,
+                'oldrev': oldrev,
+                'newrev': newrev, }
+        if trigger is not None:
+            args['trigger'] = trigger
+        job = self.rpc.submitJob('zuul:enqueue_ref', args)
         result = not job.failure
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
