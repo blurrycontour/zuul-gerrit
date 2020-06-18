@@ -16,6 +16,24 @@
       "revId": "058a90898e2578a42581ef88d5dfe167da262fb1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_2877de04",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-06-18T16:35:56Z",
+      "side": 1,
+      "message": "I think it is fine the event.patch_number is attrs[\u0027last_commit\u0027][\u0027id\u0027].",
+      "parentUuid": "bf51134e_df373de3",
+      "revId": "058a90898e2578a42581ef88d5dfe167da262fb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
