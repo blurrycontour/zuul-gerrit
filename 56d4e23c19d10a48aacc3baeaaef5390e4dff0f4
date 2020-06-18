@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_b87187e1",
+        "filename": "playbooks/zuul-stream/pre.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-18T10:28:29Z",
+      "side": 1,
+      "message": "move to \"roles:\" ?",
+      "range": {
+        "startLine": 13,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 24
+      },
+      "revId": "56d4e23c19d10a48aacc3baeaaef5390e4dff0f4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
