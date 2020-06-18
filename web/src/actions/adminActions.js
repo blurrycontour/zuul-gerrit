@@ -13,9 +13,15 @@
 // under the License.
 
 export const DEQUEUE_FAIL = 'DEQUEUE_FAIL'
+export const ENQUEUE_FAIL = 'ENQUEUE_FAIL'
 
 
 export const addDequeueError = error => ({
   type: DEQUEUE_FAIL,
+  error: error
+})
+
+export const addEnqueueError = error => ({
+  type: ENQUEUE_FAIL,
   error: error
 })
