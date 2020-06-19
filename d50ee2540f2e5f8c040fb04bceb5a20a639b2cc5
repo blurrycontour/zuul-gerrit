@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_d7f4ef88",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-06-19T08:30:58Z",
+      "side": 1,
+      "message": "the _ methods are not exposed, and the arg order is a remnant from these actions not being properly tenant-scoped. I\u0027ll fix it in the next PS for consistency",
+      "parentUuid": "bf51134e_99cf62af",
+      "range": {
+        "startLine": 472,
+        "startChar": 12,
+        "endLine": 472,
+        "endChar": 58
+      },
+      "revId": "d50ee2540f2e5f8c040fb04bceb5a20a639b2cc5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_39c0d67b",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 15
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_f77c93ec",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-06-19T08:30:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_39c0d67b",
+      "range": {
+        "startLine": 478,
+        "startChar": 41,
+        "endLine": 478,
+        "endChar": 53
+      },
+      "revId": "d50ee2540f2e5f8c040fb04bceb5a20a639b2cc5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_9944821d",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 15
@@ -59,6 +107,30 @@
       "writtenOn": "2020-06-18T13:12:00Z",
       "side": 1,
       "message": "How can the tenant be None here?",
+      "range": {
+        "startLine": 509,
+        "startChar": 43,
+        "endLine": 509,
+        "endChar": 54
+      },
+      "revId": "d50ee2540f2e5f8c040fb04bceb5a20a639b2cc5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_37872bda",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-06-19T08:30:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_9944821d",
       "range": {
         "startLine": 509,
         "startChar": 43,
