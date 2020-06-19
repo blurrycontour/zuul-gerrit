@@ -24,6 +24,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
     reparenting algorithm for handling errors.
     """
     changes_merge = True
+    type = 'dependent'
 
     def __init__(self, *args, **kwargs):
         super(DependentPipelineManager, self).__init__(*args, **kwargs)
