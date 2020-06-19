@@ -1,5 +1,6 @@
 - job:
     name: unit-tests
+    parent: base-multinode
     description: Run unittest
     run: playbooks/unittests.yaml
 
