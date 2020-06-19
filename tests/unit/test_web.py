@@ -149,6 +149,8 @@ class TestWeb(BaseTestWeb):
         data = resp.json()
         status_jobs = []
         for p in data['pipelines']:
+            self.assertIn('manager', p, p)
+            self.assertTrue(len(p.get('triggers', [])) > 0, p)
             for q in p['change_queues']:
                 if p['name'] in ['gate', 'conflict']:
                     self.assertEqual(q['window'], 20)
