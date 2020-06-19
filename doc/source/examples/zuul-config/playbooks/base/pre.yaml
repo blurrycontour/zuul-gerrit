@@ -1,4 +1,11 @@
+- hosts: localhost
+  roles:
+    - role: emit-job-header
+      zuul_log_path_shard_build: true
+    - log-inventory
+
 - hosts: all
   roles:
     - add-build-sshkey
-    - prepare-workspace
+    - role: prepare-workspace
+      zuul_workspace_root: "{{ zuul.build }}"

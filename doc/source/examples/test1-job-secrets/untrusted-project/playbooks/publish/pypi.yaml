@@ -6,4 +6,5 @@
     - role: upload-pypi
       pypi_repository: pypitest
       pypi_repository_url: https://test.pypi.org/legacy/
+      pypi_path: "{{ zuul.build }}/src/{{ zuul.project.canonical_name }}/dist"
       when: zuul_success | bool
