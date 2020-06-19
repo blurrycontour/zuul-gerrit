@@ -19,6 +19,7 @@ class IndependentPipelineManager(PipelineManager):
     """PipelineManager that puts every Change into its own ChangeQueue."""
 
     changes_merge = False
+    type = 'independent'
 
     def _postConfig(self, layout):
         super(IndependentPipelineManager, self)._postConfig(layout)
