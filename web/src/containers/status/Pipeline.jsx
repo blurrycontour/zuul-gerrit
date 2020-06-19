@@ -14,10 +14,34 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
-import { Badge } from 'patternfly-react'
+import { Badge, Icon } from 'patternfly-react'
 
 import ChangeQueue from './ChangeQueue'
 
+const periodicIcon = <Icon
+  type='fa'
+  name='clock-o'
+  title='A periodic pipeline runs jobs on a regular basis.'/>
+const dependentIcon = <Icon
+  type='fa'
+  name='code-fork'
+  title='A dependent pipeline ensures that every change is tested exactly in the order it is going to be merged into the repository.'/>
+const independentIcon = <Icon
+  type='fa'
+  name='flask'
+  title='An independent pipeline treats every change as independent of other changes in it.'/>
+const serialIcon = <Icon
+  type='fa'
+  name='rocket'
+  title='A serial pipeline supports shared queues, but only one item in each shared queue is processed at a time.'/>
+const supercedentIcon = <Icon
+  type='pf'
+  name='bundle'
+  title='A supercedent pipeline groups items by project and ref, and processes only one item per grouping at a time. Only two items (currently processing and latest) can be queued per grouping.' />
+const defaultIcon = <Icon
+  type='fa'
+  name='cogs'
+  title='Unknown pipeline type' />
 
 class Pipeline extends React.Component {
   static propTypes = {
@@ -112,13 +136,40 @@ class Pipeline extends React.Component {
     return found
   }
 
+  renderPipelineIcon () {
+    const { pipeline } = this.props
+    // check if periodic first
+    let pIcon = null
+    if (pipeline.triggers) {
+      pipeline.triggers.forEach(trigger => {
+        if (trigger.driver === 'timer') {
+          pIcon = periodicIcon
+        }
+      })
+    }
+    if (pIcon) {
+      return (pIcon)
+    }
+    if (pipeline.manager === 'independent') {
+      return (independentIcon)
+    } else if (pipeline.manager === 'dependent') {
+      return (dependentIcon)
+    } else if (pipeline.manager === 'serial') {
+      return (serialIcon)
+    } else if (pipeline.manager === 'supercedent') {
+      return (supercedentIcon)
+    } else {
+      return (defaultIcon)
+    }
+  }
+
   render () {
     const { pipeline, filter, expanded } = this.props
     const count = this.createTree(pipeline)
     return (
       <div className="zuul-pipeline col-sm-6 col-md-4">
         <div className="zuul-pipeline-header">
-          <h3>{pipeline.name} <Badge>{count}</Badge></h3>
+          <h3>{this.renderPipelineIcon()} {pipeline.name} <Badge>{count}</Badge></h3>
           {pipeline.description ? (
             <small>
               <p>{pipeline.description.split(/\r?\n\r?\n/)}</p>
