@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_48add92f",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-19T16:56:30Z",
+      "side": 1,
+      "message": "I believe force pushing is the right way. As I Wrote, I did try at first to do just a \"git rm -r .\"\nBut, just like the quickstart tutorial, not all tutorials that were designed by the software factory members ends with a change being merged. Beginning a new tutorial, git review will prompt the user to push 2 changes.\nWe are also showing the reader with the \"gerritadmin\" remote that it is an unusual way to to push data to a gerrit server.\n\nThe only glitch I have found is when you try to run another tutorial after the last one of the series \"Job Dependencies\" because a 2nd repository depends on jobs added in the first one.",
+      "parentUuid": "ff570b3c_9c57e258",
+      "revId": "a1dfb147be8fc5ebd51036fedcf79380d6b5c904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_273cc0df",
         "filename": "doc/source/tutorials/gate-your-first-patch.rst",
         "patchSetId": 3
