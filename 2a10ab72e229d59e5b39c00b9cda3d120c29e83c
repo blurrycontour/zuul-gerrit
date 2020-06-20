@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_ae647323",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-20T18:19:22Z",
+      "side": 1,
+      "message": "atm I have an error if I try to make a reference  :var:`executor.src_dir_uuid`.\n\"zuuldoc:var reference target not found\"",
+      "range": {
+        "startLine": 357,
+        "startChar": 9,
+        "endLine": 357,
+        "endChar": 32
+      },
+      "revId": "2a10ab72e229d59e5b39c00b9cda3d120c29e83c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
