@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { I18n } from 'react-redux-i18n'
 
 import { fetchBuildIfNeeded } from '../actions/build'
 import Refreshable from '../containers/Refreshable'
@@ -35,7 +36,7 @@ class BuildPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Build'
+    document.title = I18n.t('buildPage.title')
     super.componentDidMount()
   }
 

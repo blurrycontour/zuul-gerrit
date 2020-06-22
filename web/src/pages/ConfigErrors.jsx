@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import {
   Icon
 } from 'patternfly-react'
+import { Translate } from 'react-redux-i18n'
 
 import { fetchConfigErrorsAction } from '../actions/configErrors'
 
@@ -40,7 +41,7 @@ class ConfigErrorsPage extends React.Component {
           {/* Lint warning jsx-a11y/anchor-is-valid */}
           {/* eslint-disable-next-line */}
           <a className="refresh" onClick={() => {this.updateData()}}>
-            <Icon type="fa" name="refresh" /> refresh&nbsp;&nbsp;
+            <Icon type="fa" name="refresh" /> <Translate value="configErrorsPage.refresh" />&nbsp;&nbsp;
           </a>
         </div>
         <div className="pull-left">
