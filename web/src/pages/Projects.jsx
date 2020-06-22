@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import { fetchProjectsIfNeeded } from '../actions/projects'
 import Refreshable from '../containers/Refreshable'
@@ -34,7 +35,7 @@ class ProjectsPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Projects'
+    document.title = I18n.t("projectsPage.title")
     super.componentDidMount()
   }
 
@@ -43,10 +44,10 @@ class ProjectsPage extends Refreshable {
     const projects = remoteData.projects[this.props.tenant.name]
 
     if (!projects) {
-      return (<p>Loading...</p>)
+      return (<p><Translate value="projectsPage.loading" /></p>)
     }
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading><Translate value={"projectsPage." + value} /></Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
     const cellProjectFormat = (value, row) => (
@@ -62,7 +63,7 @@ class ProjectsPage extends Refreshable {
         </Link>
       </Table.Cell>)
     const columns = []
-    const myColumns = ['name', 'connection', 'type', 'last builds']
+    const myColumns = ['name', 'connection', 'type', 'lastBuilds']
     myColumns.forEach(column => {
       let formatter = cellFormat
       let prop = column
@@ -72,7 +73,7 @@ class ProjectsPage extends Refreshable {
       if (column === 'connection') {
         prop = 'connection_name'
       }
-      if (column === 'last builds') {
+      if (column === 'lastBuilds') {
         prop = 'name'
         formatter = cellBuildFormat
       }
