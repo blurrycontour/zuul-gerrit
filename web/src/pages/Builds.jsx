@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 import * as moment from 'moment-timezone'
 import 'moment-duration-format'
+import { _, t } from '../locales/utils'
 
 import { fetchBuilds } from '../api'
 import TableFilters from '../containers/TableFilters'
@@ -53,7 +54,7 @@ class BuildsPage extends TableFilters {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Builds'
+    document.title = t('Zuul Builds')
     if (this.props.tenant.name) {
       this.updateData(this.getFilterFromUrl())
     }
@@ -67,11 +68,11 @@ class BuildsPage extends TableFilters {
   }
 
   prepareTableHeaders() {
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading>{_(value)}</Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
     const linkBuildFormat = (value, rowdata) => (
-      <Table.Cell>
+      <Table.Cell title={t(value)}>
         <Link to={this.props.tenant.linkPrefix + '/build/' + rowdata.rowData.uuid}>{value}</Link>
       </Table.Cell>
     )
@@ -99,16 +100,17 @@ class BuildsPage extends TableFilters {
       'pipeline',
       'change',
       'duration',
-      'start time',
+      'start_time',
       'result']
     myColumns.forEach(column => {
       let prop = column
+      let label = column.charAt(0).toUpperCase() + column.slice(1)
       let formatter = cellFormat
       // Adapt column name and property name
       if (column === 'job') {
         prop = 'job_name'
-      } else if (column === 'start time') {
-        prop = 'start_time'
+      } else if (column === 'start_time') {
+        label = 'Start Time'
         formatter = timeFormat
       } else if (column === 'change') {
         prop = 'change'
@@ -118,7 +120,6 @@ class BuildsPage extends TableFilters {
       } else if (column === 'duration') {
         formatter = durationFormat
       }
-      const label = column.charAt(0).toUpperCase() + column.slice(1)
       this.columns.push({
         header: {label: label, formatters: [headerFormat]},
         property: prop,
@@ -128,8 +129,8 @@ class BuildsPage extends TableFilters {
           && prop !== 'log_url' && prop !== 'uuid') {
         this.filterTypes.push({
           id: prop,
-          title: label,
-          placeholder: 'Filter by ' + label,
+          title: t(label),
+          placeholder: t('filterBy', {filter: t(label)}),
           filterType: 'text',
         })
       }
@@ -137,8 +138,8 @@ class BuildsPage extends TableFilters {
     // Add build filter at the end
     this.filterTypes.push({
       id: 'uuid',
-      title: 'Build',
-      placeholder: 'Filter by Build UUID',
+      title: t('Build'),
+      placeholder: t('Filter by Build UUID'),
       filterType: 'text',
     })
   }
@@ -170,7 +171,7 @@ class BuildsPage extends TableFilters {
     return (
       <React.Fragment>
         {this.renderFilter()}
-        {builds ? this.renderTable(builds) : <p>Loading...</p>}
+        {builds ? this.renderTable(builds) : <p>{_('Loading...')}</p>}
       </React.Fragment>
     )
   }

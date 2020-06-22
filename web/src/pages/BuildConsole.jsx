@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { t } from '../locales/utils'
 
 import { fetchBuildIfNeeded } from '../actions/build'
 import Refreshable from '../containers/Refreshable'
@@ -35,7 +36,7 @@ class BuildConsolePage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Build'
+    document.title = t('Zuul Build')
     super.componentDidMount()
   }
 

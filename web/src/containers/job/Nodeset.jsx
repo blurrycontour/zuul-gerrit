@@ -23,6 +23,7 @@ import {
   CardTitle,
   Icon,
 } from 'patternfly-react'
+import { t } from '../../locales/utils'
 
 
 class Nodeset extends React.Component {
@@ -43,13 +44,13 @@ class Nodeset extends React.Component {
           })
           return (
             <li className="list-group-item" key={idx}>
-              <span title="Node name">
+              <span title={t('Node name')}>
                 {item.name}
               </span> -&nbsp;
-              <span title="Label name">
+              <span title={t('Label name')}>
                 {item.label}
               </span>
-              <span title="Groups">
+              <span title={t('Groups')}>
                 {groups.length > 0 && ' (' + groups.map(item => (item)) + ') '}
               </span>
             </li>)
@@ -64,7 +65,7 @@ class Nodeset extends React.Component {
         <CardBody>
           <AggregateStatusNotifications>
             <AggregateStatusNotification>
-              <span title="Nodes">
+              <span title={t('Nodes')}>
                 <Icon type="pf" name="server" />
                 <AggregateStatusCount>
                   {nodeset.nodes.length}
@@ -72,7 +73,7 @@ class Nodeset extends React.Component {
               </span>
             </AggregateStatusNotification>
             <AggregateStatusNotification>
-              <span title="Groups">
+              <span title={t('Groups')}>
                 <Icon type="pf" name="server-group" />
                 <AggregateStatusCount>
                   {nodeset.groups.length}

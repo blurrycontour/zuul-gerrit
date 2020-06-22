@@ -16,6 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { _ } from '../../locales/utils'
 
 import ArtifactList from './Artifact'
 import BuildOutput from './BuildOutput'
@@ -46,18 +47,42 @@ class Summary extends React.Component {
     }
 
     myColumns.forEach(column => {
-      let label = column
+      let label = _(column)
+      if (column === 'job_name') {
+        label = _('job name')
+      }
+      if (column === 'start_time') {
+        label = _('start time')
+      }
+      if (column === 'end_time') {
+        label = _('end time')
+      }
+      if (column === 'oldrev') {
+        label = _('old revision')
+      }
+      if (column === 'newrev' || column === 'new_rev' ) {
+        label = _('new revision')
+      }
+      if (column === 'ref_url') {
+        label = _('ref URL')
+      }
+      if (column === 'log_url') {
+        label = _('log URL')
+      }
+      if (column === 'event_id') {
+        label = _('event ID')
+      }
       let value = build[column]
       if (column === 'job_name') {
-        label = 'job'
         value = (
           <React.Fragment>
           <Link to={this.props.tenant.linkPrefix + '/job/' + value}>
             {value}
           </Link>
           <span> &mdash; </span>
-          <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + value + '&project=' + build.project} title="See previous runs of this job inside current project.">
-            build history
+          <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + value + '&project=' + build.project}
+                title="See previous runs of this job inside current project.">
+            {_('build history')}
           </Link>
           </React.Fragment>
         )
@@ -71,9 +96,9 @@ class Summary extends React.Component {
       }
       if (column === 'voting') {
         if (value) {
-          value = 'true'
+          value = _('true')
         } else {
-          value = 'false'
+          value = _('false')
         }
       }
       if (column === 'start_time' || column === 'end_time') {
@@ -87,7 +112,6 @@ class Summary extends React.Component {
         value = <a href={value}>{value}</a>
       }
       if (column === 'log_url') {
-        label = 'log url'
         if (build.manifest && build.manifest.index_links) {
           value = <a href={value + 'index.html'}>{value}</a>
         } else {
@@ -95,11 +119,7 @@ class Summary extends React.Component {
         }
       }
       if (column === 'ref_url') {
-        label = 'ref url'
         value = <a href={value}>{value}</a>
-      }
-      if (column === 'event_id') {
-        label = 'event id'
       }
       if (value) {
         rows.push({key: label, value: value})
@@ -118,9 +138,9 @@ class Summary extends React.Component {
             ))}
           </tbody>
         </table>
-        <h3>Artifacts</h3>
+        <h3>{_('Artifacts')}</h3>
         <ArtifactList build={build}/>
-        <h3>Results</h3>
+        <h3>{_('Results')}</h3>
         {build.hosts && <BuildOutput output={build.hosts}/>}
       </React.Fragment>
     )
