@@ -21,6 +21,7 @@ import ReactJson from 'react-json-view'
 import {
   Icon,
 } from 'patternfly-react'
+import { Translate } from 'react-redux-i18n'
 
 import SourceContext from '../SourceContext'
 import Nodeset from './Nodeset'
@@ -39,30 +40,30 @@ class JobVariant extends React.Component {
   renderStatus (variant) {
     const status = [{
       icon: variant.voting ? 'connected' : 'disconnected',
-      name: variant.voting ? 'Voting' : 'Non-voting'
+      name: variant.voting ? 'voting' : 'nonVoting'
     }]
     if (variant.abstract) {
       status.push({
         icon: 'infrastructure',
-        name: 'Abstract'
+        name: 'abstract'
       })
     }
     if (variant.final) {
       status.push({
         icon: 'infrastructure',
-        name: 'Final'
+        name: 'final'
       })
     }
     if (variant.post_review) {
       status.push({
         icon: 'locked',
-        name: 'Post review'
+        name: 'postReview'
       })
     }
     if (variant.protected) {
       status.push({
         icon: 'locked',
-        name: 'Protected'
+        name: 'protected'
       })
     }
 
@@ -71,7 +72,7 @@ class JobVariant extends React.Component {
           {status.map((item, idx) => (
             <div key={idx} className="list-view-pf-additional-info-item">
               <Icon type='pf' name={item.icon} />
-              {item.name}
+              <Translate value={'jobContainer.jobVariant.' + item.name} />
             </div>
           ))}
       </div>
@@ -101,7 +102,7 @@ class JobVariant extends React.Component {
       if (label === 'builds') {
         value = (
           <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + variant.name}>
-            build history
+            <Translate value='jobContainer.jobVariant.buildHistory' />
           </Link>
         )
       }
@@ -155,7 +156,7 @@ class JobVariant extends React.Component {
           </ReactHeight>
         )
       }
-      rows.push({label: label, value: value})
+      rows.push({label: <Translate value={'jobContainer.jobVariant.jobInfos.' + label} />, value: value})
     })
     const jobInfosList = [
       'required_projects', 'dependencies', 'files', 'irrelevant_files', 'roles'
@@ -177,7 +178,7 @@ class JobVariant extends React.Component {
               item = <Role role={value} />
             } else if (label === 'dependencies') {
               if (value['soft']) {
-                item = value['name'] + ' (soft)'
+                item = <Translate value='jobContainer.jobVariant.soft' dependency={value['name']} />
               } else {
                 item = value['name']
               }
@@ -192,7 +193,7 @@ class JobVariant extends React.Component {
           })}
         </ul>
       )
-      rows.push({label: label, value: items})
+      rows.push({label: <Translate value={'jobContainer.jobVariant.jobInfosList.' + label} />, value: items})
     })
     return (
       <div>

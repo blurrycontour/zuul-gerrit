@@ -1,0 +1,83 @@
+Zuul internationalization
+=========================
+
+The Zuul dashboard supports multiple languages. In alphabetical order:
+
+* English
+* French (français)
+
+Adding a language
+-----------------
+
+If you are fluent in a language, you can add support for it in Zuul by following
+these steps.
+
+#. Create a new locale folder in web/src/locales. It should be named after the
+   international, two-letter language code of the new language.
+#. Copy web/src/locales/en/translations.js (or any existing translation file you
+   want to use as a base) into the new folder.
+#. Translate all the strings!
+#. Import your new file in web/src/locales/translations.js, following the existing
+   model for already supported languages.
+#. In web/src/locales/config.js, add your language to ``supportedLocales``.
+#. Add your language at the top of this document.
+
+Commit and submit for review.
+
+Adding new strings
+------------------
+
+Translating is done with the **react-redux-i18n** library.
+
+There are two methods to handle the translation of text strings:
+
+* the ``Translate`` component - used for rendering translated text within React
+  components. Text translated this way is updated automatically if the user
+  switches to a different language.
+* the ``I18n.t`` function - can be used to translate anything that cannot be
+  nested into a component, for example properties within a component or HTML
+  tag.
+
+More details on how to work with react-redux-i18n can be found on the project's
+`repository`_ , and in this `tutorial`_.
+
+When adding strings to the translations.js files, one should make sure the entry
+has no duplicates. A simple way to do so is to use the following namespace:
+
+``myPage.myTextGroup.myString``
+
+.. _repository: https://github.com/artisavotins/react-redux-i18n
+.. _tutorial: https://phrase.com/blog/posts/react-redux-tutorial-internationalization-with-react-i18n-redux/
+
+Adding translations in a language you don't know
+------------------------------------------------
+
+If you are adding a new feature to the Zuul dashboard, chances are you might
+not be able to translate the extra text in every language supported by Zuul.
+As long as the english version of the extra text is correct, missing translations
+should *never* prevent a feature from being merged. It is however advised to
+notify known Zuul translators, so that they can work with you on the translation
+of your feature in their language.
+
+Unofficial list of Zuul dashboard translators
+---------------------------------------------
+
+Feel free to add these people to your reviews if you need help with a specific
+language translation:
+
+French
+......
+
+* Matthieu Huin <mhuin@redhat.com>
+
+Known limitations
+-----------------
+
+Strings translated using the `I18n.t` method are not refreshed when the user selects
+a language. A simple workaround is to switch to another page in the dashboard,
+then come back.
+
+TODO
+----
+
+Localize durations. There is probably support for this in the Moment library.

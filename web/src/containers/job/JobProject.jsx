@@ -14,6 +14,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Translate } from 'react-redux-i18n'
 
 
 class JobProject extends React.Component {
@@ -27,9 +28,9 @@ class JobProject extends React.Component {
       <span>
         {project.project_name}
         {project.override_branch && (
-        ' ( override-branch: ' + project.override_branch + ')')}
+        <Translate value='jobContainer.jobProject.overrideBranch' item={project.override_branch} />)}
         {project.override_checkout && (
-        ' ( override-checkout: ' + project.override_checkout+ ')')}
+        <Translate value='jobContainer.jobProject.overrideCheckout' item={project.override_checkout} />)}
       </span>
     )
   }

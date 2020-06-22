@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { I18n } from 'react-redux-i18n'
 
 import Project from '../containers/project/Project'
 import { fetchProjectIfNeeded } from '../actions/project'
@@ -35,7 +36,8 @@ class ProjectPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Project | ' + this.props.match.params.projectName
+    document.title = I18n.t('projectPage.title',
+                            {projectName: this.props.match.params.projectName})
     super.componentDidMount()
   }
 

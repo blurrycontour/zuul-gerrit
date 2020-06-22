@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 import * as moment from 'moment-timezone'
 import 'moment-duration-format'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import { fetchBuilds } from '../api'
 import TableFilters from '../containers/TableFilters'
@@ -53,7 +54,7 @@ class BuildsPage extends TableFilters {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Builds'
+    document.title = I18n.t('buildsPage.title')
     if (this.props.tenant.name) {
       this.updateData(this.getFilterFromUrl())
     }
@@ -67,11 +68,11 @@ class BuildsPage extends TableFilters {
   }
 
   prepareTableHeaders() {
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading><Translate value={'buildsPage.' + value} /></Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
     const linkBuildFormat = (value, rowdata) => (
-      <Table.Cell>
+      <Table.Cell title={I18n.t('buildsPage.' + value)}>
         <Link to={this.props.tenant.linkPrefix + '/build/' + rowdata.rowData.uuid}>{value}</Link>
       </Table.Cell>
     )
@@ -99,7 +100,7 @@ class BuildsPage extends TableFilters {
       'pipeline',
       'change',
       'duration',
-      'start time',
+      'start_time',
       'result']
     myColumns.forEach(column => {
       let prop = column
@@ -107,8 +108,7 @@ class BuildsPage extends TableFilters {
       // Adapt column name and property name
       if (column === 'job') {
         prop = 'job_name'
-      } else if (column === 'start time') {
-        prop = 'start_time'
+      } else if (column === 'start_time') {
         formatter = timeFormat
       } else if (column === 'change') {
         prop = 'change'
@@ -118,9 +118,8 @@ class BuildsPage extends TableFilters {
       } else if (column === 'duration') {
         formatter = durationFormat
       }
-      const label = column.charAt(0).toUpperCase() + column.slice(1)
       this.columns.push({
-        header: {label: label, formatters: [headerFormat]},
+        header: {label: column, formatters: [headerFormat]},
         property: prop,
         cell: {formatters: [formatter]}
       })
@@ -128,8 +127,8 @@ class BuildsPage extends TableFilters {
           && prop !== 'log_url' && prop !== 'uuid') {
         this.filterTypes.push({
           id: prop,
-          title: label,
-          placeholder: 'Filter by ' + label,
+          title: I18n.t('buildsPage.' + column),
+          placeholder: I18n.t('buildsPage.filterBy', {filter: I18n.t('buildsPage.' + column)}),
           filterType: 'text',
         })
       }
@@ -137,8 +136,8 @@ class BuildsPage extends TableFilters {
     // Add build filter at the end
     this.filterTypes.push({
       id: 'uuid',
-      title: 'Build',
-      placeholder: 'Filter by Build UUID',
+      title: I18n.t('buildsPage.build'),
+      placeholder: I18n.t('buildsPage.filterByUUID'),
       filterType: 'text',
     })
   }
@@ -170,7 +169,7 @@ class BuildsPage extends TableFilters {
     return (
       <React.Fragment>
         {this.renderFilter()}
-        {builds ? this.renderTable(builds) : <p>Loading...</p>}
+        {builds ? this.renderTable(builds) : <p><Translate value='buildsPage.loading' /></p>}
       </React.Fragment>
     )
   }
