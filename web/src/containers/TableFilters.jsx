@@ -17,6 +17,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Filter, FormControl, Toolbar } from 'patternfly-react'
+import { Translate } from 'react-redux-i18n'
 
 
 class TableFilters extends React.Component {
@@ -225,7 +226,7 @@ class TableFilters extends React.Component {
             <Button onClick={e => {
               e.preventDefault()
               this.clearFilters()
-            }}>Clear All Filters</Button>
+          }}><Translate value="tableFiltersContainer.clear" /></Button>
             </Toolbar.Results>
         )}
       </React.Fragment>

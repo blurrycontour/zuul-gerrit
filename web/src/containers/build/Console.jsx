@@ -24,6 +24,7 @@ import {
   Col,
   Modal,
 } from 'patternfly-react'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import {
   hasInterestingKeys,
@@ -57,7 +58,7 @@ class TaskOutput extends React.Component {
       <div key='results'>
         {interesting_results.length>0 &&
          <React.Fragment>
-           <h5 key='results-header'>results</h5>
+           <h5 key='results-header'><Translate value='buildContainer.console.results' /></h5>
            {interesting_results.map((idx) => (
              <div className='zuul-console-task-result' key={idx}>
                <h4 key={idx}>{idx}: {findLoopLabel(value[idx])}</h4>
@@ -180,23 +181,23 @@ class HostTask extends React.Component {
     const ai = []
     if (this.state.failed) {
       ai.push(
-        <ListView.InfoItem key="failed" title="Click for details">
-          <span className="task-failed" onClick={this.open}>FAILED</span>
+        <ListView.InfoItem key="failed" title={I18n.t('buildContainer.console.clickForDetails')}>
+          <span className="task-failed" onClick={this.open}><Translate value='buildContainer.console.FAILED' /></span>
         </ListView.InfoItem>)
     } else if (this.state.changed) {
       ai.push(
-        <ListView.InfoItem key="changed" title="Click for details">
-          <span className="task-changed" onClick={this.open}>CHANGED</span>
+        <ListView.InfoItem key="changed" title={I18n.t('buildContainer.console.clickForDetails')}>
+          <span className="task-changed" onClick={this.open}><Translate value='buildContainer.console.CHANGED' /></span>
         </ListView.InfoItem>)
     } else if (this.state.skipped) {
       ai.push(
-        <ListView.InfoItem key="skipped" title="Click for details">
-          <span className="task-skipped" onClick={this.open}>SKIPPED</span>
+        <ListView.InfoItem key="skipped" title={I18n.t('buildContainer.console.clickForDetails')}>
+          <span className="task-skipped" onClick={this.open}><Translate value='buildContainer.console.SKIPPED' /></span>
         </ListView.InfoItem>)
     } else if (this.state.ok) {
       ai.push(
-        <ListView.InfoItem key="ok" title="Click for details">
-          <span className="task-ok" onClick={this.open}>OK</span>
+        <ListView.InfoItem key="ok" title={I18n.t('buildContainer.console.clickForDetails')}>
+          <span className="task-ok" onClick={this.open}><Translate value='buildContainer.console.OK' /></span>
         </ListView.InfoItem>)
     }
     ai.push(
@@ -269,7 +270,7 @@ class HostTask extends React.Component {
             <Modal.Title>{hostname}
               <span className="zuul-console-modal-header-link">
                 <a href={'#'+makeTaskPath(taskPath)}>
-                  <Icon type="fa" name="link" title="Permalink" />
+                  <Icon type="fa" name="link" title={I18n.t('buildContainer.console.permalink')} />
                 </a>
               </span>
             </Modal.Title>
@@ -302,9 +303,9 @@ class PlayBook extends React.Component {
     const ai = []
     if (playbook.trusted) {
       ai.push(
-        <ListView.InfoItem key="trusted" title="This playbook runs in a trusted execution context, which permits executing code on the Zuul executor and allows access to all Ansible features.">
+        <ListView.InfoItem key="trusted" title={I18n.t('buildContainer.console.infoTrusted')}>
           <span className="additionalinfo-icon">
-            <Icon type='pf' name='info' /> Trusted
+            <Icon type='pf' name='info' /> <Translate value='buildContainer.console.trusted' />
           </span>
         </ListView.InfoItem>
       )
@@ -315,14 +316,16 @@ class PlayBook extends React.Component {
         stacked={true}
         additionalInfo={ai}
         initExpanded={expand}
-        heading={playbook.phase[0].toUpperCase() + playbook.phase.slice(1) + ' playbook'}
+        heading={I18n.t('buildContainer.console.playbookPhase',
+                        {phase: playbook.phase[0].toUpperCase() + playbook.phase.slice(1)})
+                }
         description={playbook.playbook}
       >
           {playbook.plays.map((play, idx) => (
             <React.Fragment key={idx}>
               <Row key='play'>
                 <Col sm={12}>
-                  <strong>Play: {play.play.name}</strong>
+                  <strong><Translate value='buildContainer.console.play' playname={play.play.name} /></strong>
                 </Col>
               </Row>
               {play.tasks.map((task, idx2) => (

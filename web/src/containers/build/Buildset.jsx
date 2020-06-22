@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 import { Panel } from 'react-bootstrap'
 import * as moment from 'moment'
 import 'moment-duration-format'
+import { Translate } from 'react-redux-i18n'
 
 
 class Buildset extends React.Component {
@@ -39,7 +40,7 @@ class Buildset extends React.Component {
     ]
 
     myColumns.forEach(column => {
-      let label = column
+      let label = <Translate value={'buildContainer.buildset.columns.' + column} />
       let value = buildset[column]
       if (column === 'change') {
         value = (
@@ -49,7 +50,6 @@ class Buildset extends React.Component {
         )
       }
       if (column === 'event_id') {
-        label = 'event id'
       }
       if (value) {
         rows.push({key: label, value: value})
@@ -66,7 +66,8 @@ class Buildset extends React.Component {
             row.push(moment.duration(build.duration, 'seconds')
                      .format('h [hr] m [min] s [sec]'))
           } else if (column === 'voting') {
-            row.push(build.voting ? 'true' : 'false')
+            row.push(build.voting ? <Translate value='buildContainer.buildset.votingTrue' />
+        : <Translate value='buildContainer.buildset.votingFalse' />)
           } else if (column === 'result') {
             row.push(<Link
                        to={this.props.tenant.linkPrefix + '/build/' + build.uuid}>
@@ -83,7 +84,9 @@ class Buildset extends React.Component {
     return (
       <React.Fragment>
         <Panel>
-          <Panel.Heading>Buildset result {buildset.uuid}</Panel.Heading>
+          <Panel.Heading>
+            <Translate value='buildContainer.buildset.buildsetResult' uuid={buildset.uuid} />
+          </Panel.Heading>
           <Panel.Body>
             <table className="table table-striped table-bordered">
               <tbody>
@@ -99,13 +102,17 @@ class Buildset extends React.Component {
         </Panel>
         {buildset.builds &&
           <Panel>
-            <Panel.Heading>Builds</Panel.Heading>
+            <Panel.Heading>
+              <Translate value='buildContainer.buildset.builds' />
+            </Panel.Heading>
             <Panel.Body>
               <table className="table table-striped table-bordered">
                 <thead>
                   <tr>
                     {buildColumns.map(item => (
-                      <td key={item}>{item}</td>
+                      <td key={item}>
+                        <Translate value={'buildContainer.buildset.buildColumns.' + item} />
+                      </td>
                     ))}
                   </tr>
                 </thead>

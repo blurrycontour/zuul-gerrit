@@ -16,6 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { Translate } from 'react-redux-i18n'
 
 import ArtifactList from './Artifact'
 import BuildOutput from './BuildOutput'
@@ -46,18 +47,18 @@ class Summary extends React.Component {
     }
 
     myColumns.forEach(column => {
-      let label = column
+      let label = (<Translate value={'buildContainer.summary.columns.' + column} />)
       let value = build[column]
       if (column === 'job_name') {
-        label = 'job'
         value = (
           <React.Fragment>
           <Link to={this.props.tenant.linkPrefix + '/job/' + value}>
             {value}
           </Link>
           <span> &mdash; </span>
-          <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + value + '&project=' + build.project} title="See previous runs of this job inside current project.">
-            build history
+          <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + value + '&project=' + build.project}
+                title="See previous runs of this job inside current project.">
+            <Translate value='buildContainer.summary.buildHistory' />
           </Link>
           </React.Fragment>
         )
@@ -71,9 +72,9 @@ class Summary extends React.Component {
       }
       if (column === 'voting') {
         if (value) {
-          value = 'true'
+          value = <Translate value='buildContainer.summary.true' />
         } else {
-          value = 'false'
+          value = <Translate value='buildContainer.summary.false' />
         }
       }
       if (column === 'start_time' || column === 'end_time') {
@@ -87,7 +88,6 @@ class Summary extends React.Component {
         value = <a href={value}>{value}</a>
       }
       if (column === 'log_url') {
-        label = 'log url'
         if (build.manifest && build.manifest.index_links) {
           value = <a href={value + 'index.html'}>{value}</a>
         } else {
@@ -95,11 +95,9 @@ class Summary extends React.Component {
         }
       }
       if (column === 'ref_url') {
-        label = 'ref url'
         value = <a href={value}>{value}</a>
       }
       if (column === 'event_id') {
-        label = 'event id'
       }
       if (value) {
         rows.push({key: label, value: value})
@@ -118,9 +116,9 @@ class Summary extends React.Component {
             ))}
           </tbody>
         </table>
-        <h3>Artifacts</h3>
+        <h3><Translate value='buildContainer.summary.artifacts' /></h3>
         <ArtifactList build={build}/>
-        <h3>Results</h3>
+        <h3><Translate value='buildContainer.summary.results' /></h3>
         {build.hosts && <BuildOutput output={build.hosts}/>}
       </React.Fragment>
     )
