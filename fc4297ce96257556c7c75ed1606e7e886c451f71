@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bf51134e_b7fdcdb2",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2127,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T23:11:17Z",
+      "side": 1,
+      "message": "Should this class override _authenticateGithubAPI()? The old code didn\u0027t but that may be a good hygiene things for our tests.",
+      "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_d9ef3de7",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 2
@@ -31,6 +48,23 @@
       "side": 1,
       "message": "The tests override it in FakeGithubConnection in order to do some accounting.",
       "parentUuid": "ff570b3c_d9ef3de7",
+      "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_37b9bde8",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1304,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T23:11:17Z",
+      "side": 1,
+      "message": "This block reads oddly now. We\u0027ve put the logic into getGithubClientsForProjects() on line 1313, and so want to noop here. But maybe it would be better to express this as:\n\n  if not projects:\n      # We aren\u0027t in the context of a change queue....\n  # Otherwise we use the input projects list and look for changes in the supplied projects.\n\n  clients \u003d self._github_client_manager.getGithubClientsForProjects(projects)",
       "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
