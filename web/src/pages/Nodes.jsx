@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Table } from 'patternfly-react'
 import * as moment from 'moment'
+import { _, t } from '../locales/utils'
 
 import { fetchNodesIfNeeded } from '../actions/nodes'
 import Refreshable from '../containers/Refreshable'
@@ -34,7 +35,7 @@ class NodesPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Nodes'
+    document.title = t('Zuul Nodes')
     super.componentDidMount()
   }
 
@@ -42,7 +43,7 @@ class NodesPage extends Refreshable {
     const { remoteData } = this.props
     const nodes = remoteData.nodes
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading>{_(value)}</Table.Heading>
     const cellFormat = value => <Table.Cell>{value}</Table.Cell>
     const cellLabelsFormat = value => <Table.Cell>{value.join(',')}</Table.Cell>
     const cellPreFormat = value => (
@@ -53,6 +54,14 @@ class NodesPage extends Refreshable {
       <Table.Cell style={{fontFamily: 'Menlo,Monaco,Consolas,monospace'}}>
         {moment.unix(value).fromNow()}
       </Table.Cell>)
+    const cellStateFormat = value => {
+      let transValue = 'nodestate.' + value
+      // Do not translate the values to make it easier for users to someday filter by state
+      // Instead show the translation when hovering on the cell
+      return (
+        <Table.Cell title={t(transValue)}>{value}</Table.Cell>
+      )
+    }
 
     const columns = []
     const myColumns = [
@@ -73,6 +82,9 @@ class NodesPage extends Refreshable {
       } else if (column === 'age') {
         prop = 'state_time'
         formatter = cellAgeFormat
+      }
+      else if (column === 'state') {
+        formatter = cellStateFormat
       }
       columns.push({
         header: {label: column, formatters: [headerFormat]},

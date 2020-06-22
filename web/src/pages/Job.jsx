@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { t } from '../locales/utils'
 
 import Job from '../containers/job/Job'
 import Refreshable from '../containers/Refreshable'
@@ -35,7 +36,7 @@ class JobPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Job | ' + this.props.match.params.jobName
+    document.title = t('jobPageTitle', {jobName: this.props.match.params.jobName})
     super.componentDidMount()
   }
 

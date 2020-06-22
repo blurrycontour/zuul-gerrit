@@ -23,6 +23,7 @@ import {
   FormGroup,
   FormControl,
 } from 'patternfly-react'
+import { _, t } from '../locales/utils'
 
 import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'
@@ -97,7 +98,7 @@ class StatusPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Status'
+    document.title = t('Zuul Status')
     this.loadState()
     super.componentDidMount()
   }
@@ -164,17 +165,21 @@ class StatusPage extends Refreshable {
   }
 
   renderStatusHeader (status) {
+    let teq_len = status.trigger_event_queue ?
+                  status.trigger_event_queue.length :
+                  '0'
+    let meq_len = status.management_event_queue ?
+                  status.management_event_queue.length :
+                  '0'
+    let req_len = status.result_event_queue ?
+                  status.result_event_queue.length :
+                  '0'
     return (
       <p>
-        Queue lengths: <span>{status.trigger_event_queue ?
-                              status.trigger_event_queue.length : '0'
-          }</span> events,&nbsp;
-        <span>{status.management_event_queue ?
-              status.management_event_queue.length : '0'
-          }</span> management events,&nbsp;
-        <span>{status.result_event_queue ?
-              status.result_event_queue.length : '0'
-          }</span> results.
+        {_('Queue lengths: ')}
+        <span>{teq_len}</span>{_('statusPage.events', {count: teq_len})},&nbsp;
+        <span>{meq_len}</span>{_('statusPage.management_events', {count: meq_len})},&nbsp;
+        <span>{req_len}</span>{_('statusPage.results', {count: req_len})}.
       </p>
     )
   }
@@ -182,9 +187,9 @@ class StatusPage extends Refreshable {
   renderStatusFooter (status) {
     return (
       <React.Fragment>
-        <p>Zuul version: <span>{status.zuul_version}</span></p>
+        <p>{_('Zuul version: ')}<span>{status.zuul_version}</span></p>
         {status.last_reconfigured ? (
-          <p>Last reconfigured: <span>
+          <p>{_('Last reconfigured: ')}<span>
               {moment.utc(status.last_reconfigured).tz(this.props.timezone).format('llll')}
           </span></p>) : ''}
       </React.Fragment>
@@ -204,7 +209,7 @@ class StatusPage extends Refreshable {
         <FormGroup controlId='status'>
           <FormControl
             type='text'
-            placeholder='change or project name'
+            placeholder={t('change or project name')}
             defaultValue={filter}
             inputRef={i => this.filter = i}
             onKeyPress={this.handleKeyPress} />
@@ -214,14 +219,14 @@ class StatusPage extends Refreshable {
               onClick={() => {this.setFilter('')}}
               style={{cursor: 'pointer', zIndex: 10, pointerEvents: 'auto'}}
               >
-              <Icon type='pf' title='Clear filter' name='delete' />
+              <Icon type='pf' title={t('Clear filter')} name='delete' />
               &nbsp;
             </span>
           </FormControl.Feedback>
             )}
         </FormGroup>
         <FormGroup controlId='status'>
-          &nbsp; Expand by default:&nbsp;
+          &nbsp;{_('Expand by default')}&nbsp;
           <Checkbox
             defaultChecked={expanded}
             onChange={this.handleCheckBox} />
@@ -236,7 +241,7 @@ class StatusPage extends Refreshable {
             defaultChecked={autoReload}
             onChange={(e) => {this.setState({autoReload: e.target.checked})}}
             style={{marginTop: '0px'}}>
-            auto reload
+            {_('auto reload')}
           </Checkbox>
         </div>
 
@@ -261,4 +266,5 @@ export default connect(state => ({
   tenant: state.tenant,
   timezone: state.timezone,
   remoteData: state.status,
+  locale: state.i18n.locale,
 }))(StatusPage)

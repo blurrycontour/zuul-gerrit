@@ -25,6 +25,7 @@ import {
   Icon,
   TreeView
 } from 'patternfly-react'
+import { t, _ } from '../../locales/utils'
 
 
 class JobsList extends React.Component {
@@ -163,7 +164,7 @@ class JobsList extends React.Component {
           <FormGroup controlId='jobs'>
             <FormControl
               type='text'
-              placeholder='job name'
+              placeholder={t('job name')}
               defaultValue={filter}
               inputRef={i => this.filter = i}
               onKeyPress={this.handleKeyPress} />
@@ -174,14 +175,14 @@ class JobsList extends React.Component {
                                  this.filter.value = ''}}
                   style={{cursor: 'pointer', zIndex: 10, pointerEvents: 'auto'}}
                 >
-                  <Icon type='pf' title='Clear filter' name='delete' />
+                  <Icon type='pf' title={t('Clear filter')} name='delete' />
                   &nbsp;
                 </span>
               </FormControl.Feedback>
             )}
           </FormGroup>
           <FormGroup controlId='jobs-flatten'>
-            &nbsp; Flatten list &nbsp;
+            &nbsp; {_('Flatten list')} &nbsp;
             <Checkbox
               defaultChecked={flatten}
               onChange={(e) => this.setState({flatten: e.target.checked})} />
