@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_77db357b",
+        "filename": ".zuul.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-22T23:49:23Z",
+      "side": 1,
+      "message": "Yes it will be just to rename quick-start. I did try to rename it but as it\u0027s used by nodepool it can\u0027t be done directly (see error on patch 3 https://review.opendev.org/#/c/728194/3).\nAt least that\u0027s what I was told on #zuul,  a add-switch-remove pattern is needed.\nchange on nodepool: https://review.opendev.org/#/c/728262/",
+      "parentUuid": "bf51134e_2416ada9",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_448641dd",
         "filename": "/COMMIT_MSG",
         "patchSetId": 22
@@ -30,6 +48,24 @@
       "writtenOn": "2020-06-22T22:41:31Z",
       "side": 1,
       "message": "The problem with this is we\u0027ll need to make sure we\u0027re keeping it up to date. The nice thing about relying on latest is we find out it is broken quickly and can fix it.",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_f7ef451b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-22T23:49:23Z",
+      "side": 1,
+      "message": "Gerrit \"latest\" now points to 3.2.2 which does work, but mariadb latest which is 10.4.13 still crashes. I do think it\u0027s best to use fixed known working version and have a reminder somewhere to try new versions.",
+      "parentUuid": "bf51134e_448641dd",
       "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_57339162",
+        "filename": "playbooks/tutorial/roles/change-merged/meta/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-22T23:49:23Z",
+      "side": 1,
+      "message": "check-pipeline and gate-pipeline work reliably. You are right, it can happen that the result of one of those 2 will be checked and valid on the first try. The purpose is to check the step performed correctly, so it\u0027s fine.",
+      "parentUuid": "bf51134e_b7302dea",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_842339bd",
         "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
         "patchSetId": 22
@@ -81,6 +135,24 @@
       "writtenOn": "2020-06-22T22:41:31Z",
       "side": 1,
       "message": "Why not let git review -s do this?",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_974c0943",
+        "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-22T23:49:23Z",
+      "side": 1,
+      "message": "This was done in order to change known_hosts for a localtest. Using GIT_SSH_COMMAND we can specify the file for git, but it can\u0027t be done for git-review which does not allow passing options to scp.\nBy fetching commit-msg here, no scp is performed by git-review. This way someone running localtest\u0027s tutorial won\u0027t be prompt to accept a fingerprint.",
+      "parentUuid": "bf51134e_842339bd",
       "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -104,6 +176,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_1762b9ae",
+        "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-22T23:49:23Z",
+      "side": 1,
+      "message": "As written in the commit message, this commit also includes preparation for other tutorials.\nthis is the easiest and cleaniest method (IMO) to go from one tutorial to another without forcing the reader to redo quick-start tutorial.\n\nsee my comment in the following tutorial change: \nhttps://review.opendev.org/#/c/732067/3/doc/source/tutorials/gate-your-first-patch.rst@27",
+      "parentUuid": "bf51134e_f7058512",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_8475f9cd",
         "filename": "playbooks/tutorial/roles/setup-tutorial/defaults/main.yaml",
         "patchSetId": 22
@@ -115,6 +205,24 @@
       "writtenOn": "2020-06-22T22:41:31Z",
       "side": 1,
       "message": "What uses this var? A git grep shows this is the only place this name is used.",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_570d51e6",
+        "filename": "playbooks/tutorial/roles/setup-tutorial/defaults/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-22T23:49:23Z",
+      "side": 1,
+      "message": "In this change yes, will be useful for following tutorials.\n\nAs written in the commit message, this change also has a few elements which will be common for all follow up tutorials. If it\u0027s not used here I should have not included in this change, but it felt akward adding in the 2nd tutorials things that will be used by all tutorials.",
+      "parentUuid": "bf51134e_8475f9cd",
       "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -138,6 +246,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_37125d0a",
+        "filename": "playbooks/tutorial/run-localtest-all.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-22T23:49:23Z",
+      "side": 1,
+      "message": "atm yes, it won\u0027t be in the next change",
+      "parentUuid": "bf51134e_64b6e58c",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_44bbe170",
         "filename": "playbooks/tutorial/run-localtest-quick-start.yaml",
         "patchSetId": 22
@@ -149,6 +275,24 @@
       "writtenOn": "2020-06-22T22:41:31Z",
       "side": 1,
       "message": "This file is identical to run-localtest-all.yaml",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_17be39d4",
+        "filename": "playbooks/tutorial/run-localtest-quick-start.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-22T23:49:23Z",
+      "side": 1,
+      "message": "\"One tutorial to bring them all and in test bind them.\"\nA list has to start with a first element, doesn\u0027t it ?",
+      "parentUuid": "bf51134e_44bbe170",
       "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
