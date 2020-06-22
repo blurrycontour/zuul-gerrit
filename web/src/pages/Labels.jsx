@@ -16,6 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Table } from 'patternfly-react'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import { fetchLabelsIfNeeded } from '../actions/labels'
 import Refreshable from '../containers/Refreshable'
@@ -33,7 +34,7 @@ class LabelsPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Labels'
+    document.title = I18n.t('Zuul Labels')
     super.componentDidMount()
   }
 
@@ -42,18 +43,19 @@ class LabelsPage extends Refreshable {
     const labels = remoteData.labels[this.props.tenant.name]
 
     if (!labels) {
-      return (<p>Loading...</p>)
+      return (<p><Translate value='Loading...' /></p>)
     }
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading><Translate value={value} /></Table.Heading>
     const cellFormat = value => <Table.Cell>{value}</Table.Cell>
     const columns = []
     const myColumns = ['name']
     myColumns.forEach(column => {
       let formatter = cellFormat
       let prop = column
+      let label = column.charAt(0).toUpperCase() + column.slice(1)
       columns.push({
-        header: {label: column, formatters: [headerFormat]},
+        header: {label: label, formatters: [headerFormat]},
         property: prop,
         cell: {formatters: [formatter]}
       })

@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Panel } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import { Translate } from 'react-redux-i18n'
 
 
 function updateSelection (event) {
@@ -54,16 +55,16 @@ class LogFile extends React.Component {
     return (
       <React.Fragment>
         <Panel>
-          <Panel.Heading>Build result {build.uuid}</Panel.Heading>
+          <Panel.Heading><Translate value='buildResult' uuid={build.uuid} /></Panel.Heading>
           <Panel.Body>
-            <Link to="?">All</Link>&nbsp;
-            <Link to="?severity=1">Debug</Link>&nbsp;
-            <Link to="?severity=2">Info</Link>&nbsp;
-            <Link to="?severity=3">Warning</Link>&nbsp;
-            <Link to="?severity=4">Error</Link>&nbsp;
-            <Link to="?severity=5">Trace</Link>&nbsp;
-            <Link to="?severity=6">Audit</Link>&nbsp;
-            <Link to="?severity=7">Critical</Link>&nbsp;
+            <Link to="?"><Translate value='All' /></Link>&nbsp;
+            <Link to="?severity=1"><Translate value='Debug' /></Link>&nbsp;
+            <Link to="?severity=2"><Translate value='Info' /></Link>&nbsp;
+            <Link to="?severity=3"><Translate value='Warning' /></Link>&nbsp;
+            <Link to="?severity=4"><Translate value='Error' /></Link>&nbsp;
+            <Link to="?severity=5"><Translate value='Trace' /></Link>&nbsp;
+            <Link to="?severity=6"><Translate value='Audit' /></Link>&nbsp;
+            <Link to="?severity=7"><Translate value='Critical' /></Link>&nbsp;
           </Panel.Body>
         </Panel>
         <pre className="zuul-log-output">

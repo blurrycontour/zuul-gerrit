@@ -20,6 +20,7 @@ import {
   Icon,
   ListView,
 } from 'patternfly-react'
+import { I18n } from 'react-redux-i18n'
 
 
 class BuildOutput extends React.Component {
@@ -28,6 +29,7 @@ class BuildOutput extends React.Component {
   }
 
   renderHosts (hosts) {
+    // TODO icon colors not supported in PF3
     return (
       <ListView>
         {Object.entries(hosts).map(([host, values]) => (
@@ -35,15 +37,15 @@ class BuildOutput extends React.Component {
             key={host}
             heading={host}
             additionalInfo={[
-              <ListView.InfoItem key="ok" title="Task OK">
-                <Icon type='pf' name='info' />
+              <ListView.InfoItem key="ok" title={I18n.t('Task OK')}>
+                <Icon type='pf' name='ok' />
                 <strong>{values.ok}</strong>
               </ListView.InfoItem>,
-              <ListView.InfoItem key="changed" title="Task changed">
-                <Icon type='pf' name='ok' />
+              <ListView.InfoItem key="changed" title={I18n.t('Task changed')}>
+                <Icon type='pf' name='on-running' color='#a28301'/>
                 <strong>{values.changed}</strong>
               </ListView.InfoItem>,
-              <ListView.InfoItem key="fail" title="Task failure">
+              <ListView.InfoItem key="fail" title={I18n.t('Task failure')}>
                 <Icon type='pf' name='error-circle-o' />
                 <strong>{values.failures}</strong>
               </ListView.InfoItem>

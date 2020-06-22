@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import Sockette from 'sockette'
 import {Checkbox, Form, FormGroup, FormControl} from 'patternfly-react'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import 'xterm/dist/xterm.css'
 import { Terminal } from 'xterm'
@@ -88,7 +89,7 @@ class StreamPage extends React.Component {
     if (logfile) {
       params.logfile = logfile
     }
-    document.title = 'Zuul Stream | ' + params.uuid.slice(0, 7)
+    document.title = I18n.t('streamPageTitle', {id: params.uuid.slice(0, 7)})
 
     const term = new Terminal()
 
@@ -126,7 +127,7 @@ class StreamPage extends React.Component {
       },
       onclose: e => {
        console.log('onclose', e)
-       this.onMessage('\n--- END OF STREAM ---\n')
+       this.onMessage(I18n.t('\n--- END OF STREAM ---\n'))
       },
       onerror: e => {
        console.log('onerror:', e)
@@ -181,20 +182,20 @@ class StreamPage extends React.Component {
           <FormGroup controlId='stream'>
             <FormControl
               type='text'
-              placeholder='search'
+              placeholder={I18n.t('search')}
               onKeyPress={this.handleKeyPress}
             />
-            &nbsp; Use regex:&nbsp;
+        &nbsp; <Translate value='Use regex:' />&nbsp;
             <Checkbox
               checked={this.state.searchRegex}
               onChange={this.handleCheckBoxRegex}>
             </Checkbox>
-            &nbsp; Case sensitive:&nbsp;
+            &nbsp; <Translate value='Case sensitive' />&nbsp;
             <Checkbox
               checked={this.state.searchCaseSensitive}
               onChange={this.handleCheckBoxCaseSensitive}>
             </Checkbox>
-            &nbsp; Whole word:&nbsp;
+            &nbsp; <Translate value='Whole word' />&nbsp;
             <Checkbox
               checked={this.state.searchWholeWord}
               onChange={this.handleCheckBoxWholeWord}>

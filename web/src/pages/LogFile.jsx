@@ -16,6 +16,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { parse } from 'query-string'
+import { I18n } from 'react-redux-i18n'
 
 import { fetchLogfileIfNeeded } from '../actions/logfile'
 import Refreshable from '../containers/Refreshable'
@@ -43,7 +44,7 @@ class LogFilePage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Build Logfile'
+    document.title = I18n.t('Zuul Build Logfile')
     super.componentDidMount()
   }
 

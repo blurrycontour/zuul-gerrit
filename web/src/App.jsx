@@ -29,9 +29,11 @@ import {
   ToastNotificationList,
 } from 'patternfly-react'
 import * as moment from 'moment'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import ErrorBoundary from './containers/ErrorBoundary'
 import SelectTz from './containers/timezone/SelectTz'
+import LanguageSelector from './containers/LanguageSwitcher'
 import logo from './images/logo.png'
 import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
@@ -47,7 +49,8 @@ class App extends React.Component {
     timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    locale: PropTypes.string,
   }
 
   state = {
@@ -84,7 +87,7 @@ class App extends React.Component {
             <Link
               to={this.props.tenant.linkPrefix + item.to}
               onClick={this.onNavClick}>
-              {item.title}
+              <Translate value={item.title} />
             </Link>
           </li>
         ))}
@@ -97,7 +100,7 @@ class App extends React.Component {
     const allRoutes = []
 
     if (info.isFetching) {
-      return (<h2>Fetching info...</h2>)
+      return (<h2><Translate value='Fetching info...'/></h2>)
     }
     this.menu
       // Do not include '/tenants' route in white-label setup
@@ -217,10 +220,10 @@ class App extends React.Component {
       <NotificationDrawer.Panel>
         <NotificationDrawer.PanelHeading>
           <NotificationDrawer.PanelTitle>
-            Config Errors
+            <Translate value='Config Errors' />
           </NotificationDrawer.PanelTitle>
           <NotificationDrawer.PanelCounter
-            text={errors.length + ' error(s)'} />
+            text={I18n.t('errorCount', {count: errors.length})} />
         </NotificationDrawer.PanelHeading>
         <NotificationDrawer.PanelCollapse id={1} collapseIn>
           <NotificationDrawer.PanelBody key='containsNotifications'>
@@ -259,24 +262,25 @@ class App extends React.Component {
                   />
               }
               <li>
-                <Link to='/openapi'>API</Link>
+                <Link to='/openapi'><Translate value='API' /></Link>
               </li>
               <li>
                 <a href='https://zuul-ci.org/docs'
                    rel='noopener noreferrer' target='_blank'>
-                  Documentation
+                  <Translate value='Documentation' />
                 </a>
               </li>
               {tenant.name && (
                 <li>
                   <Link to={tenant.defaultRoute}>
-                    <strong>Tenant</strong> {tenant.name}
+                    <strong><Translate value='Tenant' /></strong> {tenant.name}
                   </Link>
                 </li>
               )}
               <li>
               <SelectTz/>
               </li>
+              <li><LanguageSelector/></li>
             </ul>
             {showErrors && this.renderConfigErrors(configErrors)}
           </div>
@@ -304,6 +308,7 @@ export default withRouter(connect(
     configErrors: state.configErrors,
     info: state.info,
     tenant: state.tenant,
-    timezone: state.timezone
+    timezone: state.timezone,
+    locale: state.i18n.locale,
   })
 )(App))

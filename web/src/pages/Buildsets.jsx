@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import { fetchBuildsets } from '../api'
 import TableFilters from '../containers/TableFilters'
@@ -51,7 +52,7 @@ class BuildsetsPage extends TableFilters {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Buildsets'
+    document.title = I18n.t('Zuul Buildsets')
     if (this.props.tenant.name) {
       this.updateData(this.getFilterFromUrl())
     }
@@ -64,7 +65,7 @@ class BuildsetsPage extends TableFilters {
   }
 
   prepareTableHeaders() {
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading><Translate value={value} /></Table.Heading>
     const cellFormat = (value) => <Table.Cell>{value}</Table.Cell>
     const linkChangeFormat = (value, rowdata) => (
       <Table.Cell>
@@ -78,7 +79,7 @@ class BuildsetsPage extends TableFilters {
       </Table.Cell>
     )
     const linkBuildsetFormat = (value, rowdata) => (
-      <Table.Cell>
+      <Table.Cell title={I18n.t(value)}>
         <Link
           to={this.props.tenant.linkPrefix +
               '/buildset/' + rowdata.rowData.uuid}>
@@ -97,12 +98,12 @@ class BuildsetsPage extends TableFilters {
     myColumns.forEach(column => {
       let prop = column
       let formatter = cellFormat
+      let label = column.charAt(0).toUpperCase() + column.slice(1)
       if (column === 'change') {
         formatter = linkChangeFormat
       } else if (column === 'result') {
         formatter = linkBuildsetFormat
       }
-      const label = column.charAt(0).toUpperCase() + column.slice(1)
       this.columns.push({
         header: {label: label, formatters: [headerFormat]},
         property: prop,
@@ -111,8 +112,8 @@ class BuildsetsPage extends TableFilters {
       if (column !== 'builds') {
         this.filterTypes.push({
           id: prop,
-          title: label,
-          placeholder: 'Filter by ' + label,
+          title: I18n.t(label),
+          placeholder: I18n.t('filterBy', {filter: I18n.t(label)}),
           filterType: 'text',
         })
       }
@@ -120,8 +121,8 @@ class BuildsetsPage extends TableFilters {
     // Add buildset filter at the end
     this.filterTypes.push({
       id: 'uuid',
-      title: 'Buildset',
-      placeholder: 'Filter by Buildset UUID',
+      title: I18n.t('Buildset'),
+      placeholder: I18n.t('Filter by Buildset UUID'),
       filterType: 'text',
     })
   }
@@ -153,7 +154,7 @@ class BuildsetsPage extends TableFilters {
     return (
       <React.Fragment>
         {this.renderFilter()}
-        {buildsets ? this.renderTable(buildsets) : <p>Loading...</p>}
+        {buildsets ? this.renderTable(buildsets) : <p><Translate value='Loading...' /></p>}
       </React.Fragment>
     )
   }

@@ -15,6 +15,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { I18n } from 'react-redux-i18n'
 
 import { fetchBuildsetIfNeeded } from '../actions/build'
 import Refreshable from '../containers/Refreshable'
@@ -34,7 +35,7 @@ class BuildsetPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Buildset'
+    document.title = I18n.t('Zuul Buildset')
     super.componentDidMount()
   }
 

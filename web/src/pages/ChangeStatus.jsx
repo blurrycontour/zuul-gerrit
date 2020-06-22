@@ -15,6 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { I18n } from 'react-redux-i18n'
 
 import { fetchChangeIfNeeded } from '../actions/change'
 import ChangePanel from '../containers/status/ChangePanel'
@@ -41,7 +42,7 @@ class ChangeStatusPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = this.props.match.params.changeId + ' | Zuul Status'
+    document.title = I18n.t('changeStatusPageTitle', {changeId: this.props.match.params.changeId})
     super.componentDidMount()
   }
 

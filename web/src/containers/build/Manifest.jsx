@@ -18,6 +18,7 @@ import {
   TreeView,
 } from 'patternfly-react'
 import { Link } from 'react-router-dom'
+import { Translate } from 'react-redux-i18n'
 
 import { renderTree } from '../../actions/build'
 
@@ -45,13 +46,15 @@ class Manifest extends React.Component {
               to={tenant.linkPrefix + '/build/' + build.uuid + '/log' + path + name}>
               {obj.name}
             </Link>
-            &nbsp;&nbsp;(<a href={log_url + path + name + raw_suffix(obj)}>raw</a>
+            &nbsp;&nbsp;(<a href={log_url + path + name + raw_suffix(obj)}>
+              <Translate value='raw' /></a>
             &nbsp;<span className="fa fa-external-link"/>)
           </span>),
         (log_url, path, name, obj) => (
           <span>
             {obj.name}
-            &nbsp;&nbsp;(<a href={log_url + path + name + raw_suffix(obj)}>raw</a>
+            &nbsp;&nbsp;(<a href={log_url + path + name + raw_suffix(obj)}>
+              <Translate value='raw' /></a>
             &nbsp;<span className="fa fa-external-link"/>)
           </span>
         )))

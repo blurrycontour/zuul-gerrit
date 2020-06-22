@@ -14,6 +14,7 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
+import { Translate } from 'react-redux-i18n'
 
 import Change from './Change'
 
@@ -45,7 +46,7 @@ class ChangeQueue extends React.Component {
     })
     return (
       <div className="change-queue" data-zuul-pipeline={pipeline}>
-        <p>Queue: <abbr title={queue.name}>{shortName}</abbr></p>
+        <p><Translate value='Queue: ' /><abbr title={queue.name}>{shortName}</abbr></p>
         {changesList}
       </div>)
   }

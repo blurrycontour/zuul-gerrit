@@ -17,6 +17,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
+import { Translate, I18n } from 'react-redux-i18n'
 
 import Refreshable from '../containers/Refreshable'
 import { fetchTenantsIfNeeded } from '../actions/tenants'
@@ -33,7 +34,7 @@ class TenantsPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Tenants'
+    document.title = I18n.t('Zuul Tenants')
     this.updateData()
   }
 
@@ -43,22 +44,24 @@ class TenantsPage extends Refreshable {
   render () {
     const { remoteData } = this.props
     const tenants = remoteData.tenants
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading><Translate value={value} /></Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
     const columns = []
     const myColumns = [
       'name', 'status', 'projects', 'jobs', 'builds', 'buildsets',
-      'projects count', 'queue']
+      'projects_count', 'queue']
     myColumns.forEach(column => {
       let prop = column
-      if (column === 'projects count') {
+      let label = column.charAt(0).toUpperCase() + column.slice(1)
+      if (column === 'projects_count') {
+        label = 'Projects Count'
         prop = 'projects'
       } else if (column === 'projects') {
         prop = 'projects_link'
       }
       columns.push({
-        header: {label: column,
+        header: {label: label,
           formatters: [headerFormat]},
         property: prop,
         cell: {formatters: [cellFormat]}
@@ -66,15 +69,15 @@ class TenantsPage extends Refreshable {
     })
     tenants.forEach(tenant => {
       tenant.status = (
-        <Link to={'/t/' + tenant.name + '/status'}>Status</Link>)
+        <Link to={'/t/' + tenant.name + '/status'}><Translate value='Status' /></Link>)
       tenant.projects_link = (
-        <Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)
+        <Link to={'/t/' + tenant.name + '/projects'}><Translate value='Projects' /></Link>)
       tenant.jobs = (
-        <Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)
+        <Link to={'/t/' + tenant.name + '/jobs'}><Translate value='Jobs' /></Link>)
       tenant.builds = (
-        <Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)
+        <Link to={'/t/' + tenant.name + '/builds'}><Translate value='Builds' /></Link>)
       tenant.buildsets = (
-        <Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)
+        <Link to={'/t/' + tenant.name + '/buildsets'}><Translate value='Buildsets' /></Link>)
     })
     return (
       <React.Fragment>
