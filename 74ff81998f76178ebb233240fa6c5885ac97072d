@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_b7714d0f",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1660,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T23:54:55Z",
+      "side": 1,
+      "message": "Minor nit, this code path and the one tested above are equivalent due to how the enqueue api works.",
+      "revId": "74ff81998f76178ebb233240fa6c5885ac97072d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_978a49bc",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T23:54:55Z",
+      "side": 1,
+      "message": "Nit we don\u0027t seem to rely on the default behavior below. Maybe we should just force callers to supply this list?",
+      "range": {
+        "startLine": 73,
+        "startChar": 34,
+        "endLine": 73,
+        "endChar": 55
+      },
+      "revId": "74ff81998f76178ebb233240fa6c5885ac97072d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_17f2b970",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T23:54:55Z",
+      "side": 1,
+      "message": "If anyone else is wondering the order of decorators doesn\u0027t impact processing order. The processing order is set by cherrypy separately and that is why we don\u0027t fall through and raise a 405 for using the OPTIONS request type on this path (and others).",
+      "revId": "74ff81998f76178ebb233240fa6c5885ac97072d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
