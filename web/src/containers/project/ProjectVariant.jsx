@@ -16,6 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { _ } from '../../locales/utils'
 
 
 class ProjectVariant extends React.Component {
@@ -28,7 +29,7 @@ class ProjectVariant extends React.Component {
     const { tenant, variant } = this.props
     const rows = []
 
-    rows.push({label: 'Merge mode', value: variant.merge_mode})
+    rows.push({label: _('Merge mode'), value: variant.merge_mode})
 
     if (variant.templates.length > 0) {
       const templateList = (
@@ -37,7 +38,7 @@ class ProjectVariant extends React.Component {
             <li className='list-group-item' key={idx}>{item}</li>))}
         </ul>
       )
-      rows.push({label: 'Templates', value: templateList})
+      rows.push({label: _('Templates'), value: templateList})
     }
 
     variant.pipelines.forEach(pipeline => {
@@ -46,7 +47,7 @@ class ProjectVariant extends React.Component {
       const jobList = (
         <React.Fragment>
           {pipeline.queue_name && (
-            <p><strong>Queue: </strong> {pipeline.queue_name} </p>)}
+            <p><strong>{_('Queue: ')}</strong> {pipeline.queue_name} </p>)}
           <ul className='list-group'>
             {pipeline.jobs.map((item, idx) => (
               <li className='list-group-item' key={idx}>
@@ -58,7 +59,7 @@ class ProjectVariant extends React.Component {
           </ul>
         </React.Fragment>
       )
-      rows.push({label: pipeline.name + ' jobs', value: jobList})
+      rows.push({label: _('pipelineJobs', {pipeline: pipeline.name}), value: jobList})
     })
 
     return (

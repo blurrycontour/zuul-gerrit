@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import SwaggerUi from 'swagger-ui'
 import 'swagger-ui/dist/swagger-ui.css'
+import { t } from '../locales/utils'
 
 import { fetchOpenApiIfNeeded } from '../actions/openapi'
 import Refreshable from '../containers/Refreshable'
@@ -34,7 +35,7 @@ class OpenApiPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul API'
+    document.title = t('Zuul API')
     this.updateData()
   }
 

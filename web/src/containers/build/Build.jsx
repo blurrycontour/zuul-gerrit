@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Panel } from 'react-bootstrap'
+import { _ } from '../../locales/utils'
 
 class Build extends React.Component {
   static propTypes = {
@@ -30,26 +31,28 @@ class Build extends React.Component {
     const { build, active } = this.props
     return (
       <Panel>
-        <Panel.Heading>Build result {build.uuid}</Panel.Heading>
+        <Panel.Heading>
+          {_('buildResult', {uuid: build.uuid})}
+        </Panel.Heading>
         <Panel.Body>
             <div>
               <ul className="nav nav-tabs nav-tabs-pf">
                 <li className={active==='summary'?'active':undefined}>
                   <Link to={this.props.tenant.linkPrefix + '/build/' + build.uuid}>
-                    Summary
+                    {_('Summary')}
                   </Link>
                 </li>
                 {build.manifest &&
                  <li className={active==='logs'?'active':undefined}>
                    <Link to={this.props.tenant.linkPrefix + '/build/' + build.uuid + '/logs'}>
-                     Logs
+                     {_('Logs')}
                    </Link>
                  </li>}
                 {build.output &&
                  <li className={active==='console'?'active':undefined}>
                    <Link
                      to={this.props.tenant.linkPrefix + '/build/' + build.uuid + '/console'}>
-                     Console
+                     {_('Console')}
                    </Link>
                  </li>}
 
