@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_2416ada9",
+        "filename": ".zuul.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "This new job is identical to the job above. Do we need both or can we remove the old job and basically just give it this new \u0027tutorial\u0027 name?",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_448641dd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "The problem with this is we\u0027ll need to make sure we\u0027re keeping it up to date. The nice thing about relying on latest is we find out it is broken quickly and can fix it.",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_84269914",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "Being consistent with the settings overrides below would be nice. Makes it clearer where we are doing those changes.",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_b7302dea",
+        "filename": "playbooks/tutorial/roles/change-merged/meta/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "For these three roles to work reliably you may need to add a sleep timeout to the testjob.yaml playbook. Otherwise I would expect the job can start and complete before the polling above even starts?",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_842339bd",
+        "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "Why not let git review -s do this?",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_f7058512",
+        "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "This block feels like it deserves a comment. If the projectdir exists we are reseting it? But why do we need to reset --hard to the first commit then refetch all history from gerrit (and wherever else)? Seems to me we can just assume a previous pass had set things up and maybe we just want to git remote update \u0026\u0026 git reset --hard origin master?",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_8475f9cd",
+        "filename": "playbooks/tutorial/roles/setup-tutorial/defaults/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "What uses this var? A git grep shows this is the only place this name is used.",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_64b6e58c",
+        "filename": "playbooks/tutorial/run-localtest-all.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "This file is identical to run-localtest-quick-start.yaml",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_44bbe170",
+        "filename": "playbooks/tutorial/run-localtest-quick-start.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-22T22:41:31Z",
+      "side": 1,
+      "message": "This file is identical to run-localtest-all.yaml",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
