@@ -20,6 +20,7 @@ import {
   Icon,
   Spinner
 } from 'patternfly-react'
+import { Translate } from 'react-redux-i18n'
 
 
 class Refreshable extends React.Component {
@@ -47,7 +48,7 @@ class Refreshable extends React.Component {
         {/* Lint warning jsx-a11y/anchor-is-valid */}
         {/* eslint-disable-next-line */}
         <a className="refresh" onClick={() => {this.updateData(true)}}>
-          <Icon type="fa" name="refresh" /> refresh&nbsp;&nbsp;
+          <Icon type="fa" name="refresh" /> <Translate value="refreshable.refresh" />&nbsp;&nbsp;
         </a>
       </Spinner>
     )
