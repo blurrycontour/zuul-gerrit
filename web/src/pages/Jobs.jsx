@@ -15,6 +15,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { t } from '../locales/utils'
 
 import { fetchJobsIfNeeded } from '../actions/jobs'
 import Refreshable from '../containers/Refreshable'
@@ -33,7 +34,7 @@ class JobsPage extends Refreshable {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Jobs'
+    document.title = t('Zuul Jobs')
     super.componentDidMount()
   }
 

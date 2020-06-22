@@ -1,4 +1,4 @@
-// Copyright 2018 Red Hat, Inc
+// Copyright 2020 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -13,27 +13,18 @@
 // under the License.
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import { _ } from '../../locales/utils'
+import { Translate, I18n } from 'react-redux-i18n'
 
-
-class JobProject extends React.Component {
-  static propTypes = {
-    project: PropTypes.object.isRequired
-  }
-
-  render() {
-    const { project } = this.props
-    return (
-      <span>
-        {project.project_name}
-        {project.override_branch && (
-        _('overrideBranch', {item: project.override_branch}) )}
-        {project.override_checkout && (
-        _('overrideCheckout', {item: project.override_checkout}) )}
-      </span>
-    )
-  }
+// Use in components
+function _ (translatable, optionalVars = {}) {
+  return (
+    <Translate value={translatable} {...optionalVars} />
+  )
 }
 
-export default JobProject
+// Use in variables, or component props
+function t (translatable, optionalVars = {}) {
+  return I18n.t(translatable, optionalVars)
+}
+
+export { _, t }

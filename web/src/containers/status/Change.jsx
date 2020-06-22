@@ -16,6 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { t } from '../../locales/utils'
 
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
@@ -30,20 +31,28 @@ class Change extends React.Component {
     tenant: PropTypes.object
   }
 
+  translateErrorReasons (reasons) {
+    let reason = ''
+    reasons.forEach(r => {
+      reason += t(r)
+      reason += ', '
+    })
+    return reason.replace(/,\s*$/, '')
+  }
+
   renderStatusIcon (change) {
     let iconGlyph = 'pficon pficon-ok'
-    let iconTitle = 'Succeeding'
+    let iconTitle = t('Succeeding')
     if (change.active !== true) {
       iconGlyph = 'pficon pficon-pending'
-      iconTitle = 'Waiting until closer to head of queue to' +
-        ' start jobs'
+      iconTitle = t('Waiting until closer to head of queue to start jobs')
     } else if (change.live !== true) {
       iconGlyph =  'pficon pficon-info'
-      iconTitle = 'Dependent change required for testing'
+      iconTitle = t('Dependent change required for testing')
     } else if (change.failing_reasons &&
                change.failing_reasons.length > 0) {
       let reason = change.failing_reasons.join(', ')
-      iconTitle = 'Failing because ' + reason
+      iconTitle = t('Failing because ') + this.translateErrorReasons(change.failing_reasons)
       if (reason.match(/merge conflict/)) {
         iconGlyph = 'pficon pficon-error-circle-o zuul-build-merge-conflict'
       } else {
