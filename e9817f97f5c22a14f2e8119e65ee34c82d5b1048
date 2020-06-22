@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_696ec32f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2047,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-06-22T18:16:29Z",
+      "side": 1,
+      "message": "It seems like the queue should be cached here to correctly enforce queue object uniqueness property. Otherwise another project can propose a dup key, resulting in a config-error once the change is merged.",
+      "revId": "e9817f97f5c22a14f2e8119e65ee34c82d5b1048",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_69c7e397",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 3887,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-06-22T18:16:29Z",
+      "side": 1,
+      "message": "nit: that comment doesn\u0027t seems to be up-to-date, e.g. queue can be defined by untrusted projects.",
+      "range": {
+        "startLine": 3887,
+        "startChar": 24,
+        "endLine": 3887,
+        "endChar": 73
+      },
+      "revId": "e9817f97f5c22a14f2e8119e65ee34c82d5b1048",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
