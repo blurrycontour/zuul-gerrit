@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_e5d321d4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-06-22T09:30:13Z",
+      "side": 1,
+      "message": "It looks like this is only the case on my local machine (for local development in general?) and the behaviour is the same when switching to the latest master branch. In the site-preview of the zuul test jobs the timezone selector works fine. I assume that this is related to some difference between development (yarn start) and a production build.",
+      "revId": "85a27e27311dd50a17825317cd831503feda9ab3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
