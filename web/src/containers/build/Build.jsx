@@ -30,7 +30,9 @@ class Build extends React.Component {
     const { build, active } = this.props
     return (
       <Panel>
-        <Panel.Heading>Build result {build.uuid}</Panel.Heading>
+        <Panel.Heading>
+          Build result {build.uuid}
+        </Panel.Heading>
         <Panel.Body>
             <div>
               <ul className="nav nav-tabs nav-tabs-pf">

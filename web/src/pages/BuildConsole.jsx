@@ -18,12 +18,12 @@ import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildIfNeeded } from '../actions/build'
-import Refreshable from '../containers/Refreshable'
+import { Fetching } from '../containers/Fetching'
 import Build from '../containers/build/Build'
 import Console from '../containers/build/Console'
 
 
-class BuildConsolePage extends Refreshable {
+class BuildConsolePage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
@@ -37,19 +37,20 @@ class BuildConsolePage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Build'
-    super.componentDidMount()
+    this.updateData()
   }
 
   render () {
     const { remoteData } = this.props
+    if (remoteData.isFetching) {
+      return <Fetching />
+    }
+
     const build = remoteData.builds[this.props.match.params.buildId]
     const hash = this.props.location.hash.substring(1).split('/')
 
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
         {build && build.output &&
          <Build build={build} active='console'>
            <Console
