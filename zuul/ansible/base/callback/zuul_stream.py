@@ -254,7 +254,7 @@ class CallbackModule(default.CallbackModule):
 
             hosts = self._get_task_hosts(task)
             for host, inventory_hostname in hosts:
-                port = LOG_STREAM_PORT
+                port = host['nodepool'].get('log_stream_port', LOG_STREAM_PORT)
                 if host in ('localhost', '127.0.0.1'):
                     # Don't try to stream from localhost
                     continue
