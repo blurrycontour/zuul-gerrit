@@ -3,10 +3,10 @@
   vars:
     workspace: /tmp/tutorial-zuul
     local: true
+    skip_quick_start: no
     run_playbooks:
-      - gate-first-patch.yaml
-      - use-zuul-jobs.yaml
       - gate-pipeline.yaml
+    zuul_tutorial_confignum: 1
   environment:
     GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
   tasks:
