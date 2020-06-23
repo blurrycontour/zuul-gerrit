@@ -1,6 +1,8 @@
 - hosts: controller
   roles:
 
+    - role: ensure-pip
+
     - role: bindep
       bindep_profile: test
       bindep_dir: src/opendev.org/zuul/zuul
