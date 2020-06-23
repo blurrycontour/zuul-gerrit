@@ -25,20 +25,13 @@
 
 - name: Copy nodepool.yaml
   copy:
-    src: ../../doc/source/examples/etc_nodepool/nodepool-quickstart.yaml
+    src: "../../doc/source/examples/etc_nodepool/{{ zuul_tutorial_config[zuul_tutorial_confignum].nodepool_file }}"
     dest: "{{ zuul_tutorial_docker_compose_dest_base_dir }}/etc_nodepool/nodepool.yaml"
 
 - name: Run docker-compose up
-  when: not local
   shell:
-    cmd: docker-compose -p zuul_tutorial up -d
-    chdir: src/opendev.org/zuul/zuul/doc/source/examples
-
-- name: Run docker-compose up
-  when: local
-  shell:
-    cmd: docker-compose -p zuul_tutorial up -d
-    chdir: ../../doc/source/examples
+    cmd: "docker-compose -f {{ zuul_tutorial_config[zuul_tutorial_confignum].compose_file }} -p zuul_tutorial up -d"
+    chdir: "{{ zuul_tutorial_docker_compose_dest_base_dir }}"
 
 - name: Print list of images
   command: docker image ls --all --digests --no-trunc
