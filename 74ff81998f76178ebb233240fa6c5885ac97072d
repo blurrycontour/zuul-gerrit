@@ -42,6 +42,30 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_e68af567",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-06-23T08:48:46Z",
+      "side": 1,
+      "message": "It\u0027d be best, yes. This is just meant as a failsafe if folks forget to supply the list themselves. But this default list is likely to not be enough, as calls requiring the authorization header would most likely be tied to PUT, POST or DELETE.",
+      "parentUuid": "bf51134e_978a49bc",
+      "range": {
+        "startLine": 73,
+        "startChar": 34,
+        "endLine": 73,
+        "endChar": 55
+      },
+      "revId": "74ff81998f76178ebb233240fa6c5885ac97072d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_17f2b970",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 7
@@ -53,6 +77,24 @@
       "writtenOn": "2020-06-22T23:54:55Z",
       "side": 1,
       "message": "If anyone else is wondering the order of decorators doesn\u0027t impact processing order. The processing order is set by cherrypy separately and that is why we don\u0027t fall through and raise a 405 for using the OPTIONS request type on this path (and others).",
+      "revId": "74ff81998f76178ebb233240fa6c5885ac97072d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_e6ef951b",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-06-23T08:48:46Z",
+      "side": 1,
+      "message": "The processing order for this specific decorator is specified line 81 when declaring the new Tool: \u0027on_start_resource\u0027, ie at the earliest",
+      "parentUuid": "bf51134e_17f2b970",
       "revId": "74ff81998f76178ebb233240fa6c5885ac97072d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
