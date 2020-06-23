@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_79df9f39",
+        "filename": ".zuul.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-23T15:01:12Z",
+      "side": 1,
+      "message": "It may be simpler to do the job rename in a follow on to the stack to separate these concerns then? Mostly these are observations around how we can make it easier to review large changes like this without having what appears to be unnecessary change included in the diff.",
+      "parentUuid": "bf51134e_77db357b",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_448641dd",
         "filename": "/COMMIT_MSG",
         "patchSetId": 22
