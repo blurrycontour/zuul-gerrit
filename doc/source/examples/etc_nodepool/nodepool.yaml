@@ -7,7 +7,7 @@ zookeeper-tls:
   ca: /var/certs/certs/cacert.pem
 
 labels:
-  - name: ubuntu-bionic
+  - name: ubuntu-focal
 
 providers:
   - name: static-vms
@@ -16,7 +16,7 @@ providers:
       - name: main
         nodes:
           - name: node
-            labels: ubuntu-bionic
-            host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjDZ9C89nUVGQ1qZzG/X0onkmcju4kWJ2uTLBdIXsy1"
+            labels: ubuntu-focal
+            host-key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOgHJYejINIKzUiuSJ2MN8uPc+dfFrZ9JH1hLWS8gI+g"
             python-path: /usr/bin/python3
             username: root
