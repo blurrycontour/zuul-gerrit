@@ -18,11 +18,11 @@ import { connect } from 'react-redux'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchJobsIfNeeded } from '../actions/jobs'
-import Refreshable from '../containers/Refreshable'
+import { Fetching } from '../containers/Fetching'
 import Jobs from '../containers/jobs/Jobs'
 
 
-class JobsPage extends Refreshable {
+class JobsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -35,17 +35,18 @@ class JobsPage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Jobs'
-    super.componentDidMount()
+    this.updateData()
   }
 
   render () {
     const { remoteData } = this.props
+    if (remoteData.isFetching) {
+      return <Fetching />
+    }
+
     const jobs = remoteData.jobs[this.props.tenant.name]
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
         {jobs && jobs.length > 0 &&
           <Jobs
               jobs={jobs}

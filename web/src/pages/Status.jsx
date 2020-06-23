@@ -27,10 +27,10 @@ import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable } from '../containers/Fetching'
 
 
-class StatusPage extends Refreshable {
+class StatusPage extends React.Component {
   static propTypes = {
     location: PropTypes.object,
     tenant: PropTypes.object,
@@ -96,7 +96,7 @@ class StatusPage extends Refreshable {
   componentDidMount () {
     document.title = 'Zuul Status'
     this.loadState()
-    super.componentDidMount()
+    this.updateData()
     window.addEventListener('storage', this.loadState)
   }
 
@@ -214,12 +214,15 @@ class StatusPage extends Refreshable {
     )
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div className="pull-right" style={{display: 'flex'}}>
-          {this.renderSpinner()}
+        <div style={{display: 'flex', float: 'right'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
           <Checkbox
             defaultChecked={autoReload}
             onChange={(e) => {this.setState({autoReload: e.target.checked})}}
-            style={{marginTop: '0px'}}>
+            style={{marginTop: '0px', marginLeft: '10px'}}>
             auto reload
           </Checkbox>
         </div>

@@ -19,10 +19,10 @@ import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchChangeIfNeeded } from '../actions/change'
 import ChangePanel from '../containers/status/ChangePanel'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable } from '../containers/Fetching'
 
 
-class ChangeStatusPage extends Refreshable {
+class ChangeStatusPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     tenant: PropTypes.object,
@@ -43,7 +43,7 @@ class ChangeStatusPage extends Refreshable {
 
   componentDidMount () {
     document.title = this.props.match.params.changeId + ' | Zuul Status'
-    super.componentDidMount()
+    this.updateData()
   }
 
   componentWillUnmount () {
@@ -58,9 +58,12 @@ class ChangeStatusPage extends Refreshable {
     const change = remoteData.change
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div><br />
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         {change && change.map((item, idx) => (
           <div className='row zuul-change-content' key={idx}>
             <ChangePanel
