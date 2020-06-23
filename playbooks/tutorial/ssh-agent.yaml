@@ -1,0 +1,9 @@
+- name: Start ssh-agent
+  command: ssh-agent
+  register: ssh_agent
+- name: Add key to ssh agent
+  shell:
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      ssh-add {{ workspace }}/id_rsa
