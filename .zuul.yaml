@@ -142,6 +142,15 @@
       run_playbooks:
         - use-zuul-jobs.yaml
 
+- job:
+    name: zuul-tutorial-gate-pipeline
+    parent: zuul-quick-start
+    description: Run the commands in the Zuul tutorials gate pipeline
+    vars:
+      run_playbooks:
+        - gate-pipeline.yaml
+      zuul_tutorial_confignum: 1
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -293,6 +302,10 @@
         - zuul-tutorial-use-zuul-jobs:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-tutorial-gate-pipeline:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 2700  # 45 minutes
         - nodepool-zuul-functional:
             voting: false
         - zuul-build-python-release
@@ -340,6 +353,10 @@
         - zuul-tutorial-use-zuul-jobs:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
+        - zuul-tutorial-gate-pipeline:
+            requires: nodepool-container-image
+            dependencies: zuul-upload-image
+            timeout: 2700  # 45 minutes
         - zuul-build-python-release
     promote:
       jobs:
