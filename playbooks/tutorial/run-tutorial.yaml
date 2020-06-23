@@ -6,12 +6,26 @@
   when: not local
 
 - block:
-    - name: Setup Tutorial Execution
-      include_role:
-        name: setup-tutorial
+    - name: Initial Setup and Quick Start
+      when: skip_quick_start is undefined or not skip_quick_start
+      block:
+        - name: Setup Tutorial Execution
+          include_role:
+            name: setup-tutorial
 
-    - name: Run quick-start tutorial
-      include_tasks: quick-start.yaml
+        - name: Run quick-start tutorial
+          include_tasks: quick-start.yaml
+
+    - name: Start ssh-agent and add existing key when skipping setup (localtest only)
+      when: skip_quick_start is defined and skip_quick_start
+      include_tasks: ssh-agent.yaml
+
+    - name: Run tutorials
+      include_tasks: "{{ tutorial_playbook_name }}"
+      when: run_playbooks is defined
+      loop: "{{ run_playbooks }}"
+      loop_control:
+        loop_var: tutorial_playbook_name
   always:
     - name: Stop ssh-agent
       shell:
