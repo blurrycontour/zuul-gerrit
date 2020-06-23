@@ -19,15 +19,18 @@ import { parse } from 'query-string'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchLogfileIfNeeded } from '../actions/logfile'
-import Refreshable from '../containers/Refreshable'
+import { Fetching } from '../containers/Fetching'
 import LogFile from '../containers/logfile/LogFile'
 
 
-class LogFilePage extends Refreshable {
+class LogFilePage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
     tenant: PropTypes.object,
+    dispatch: PropTypes.func,
+    location: PropTypes.object,
+    build: PropTypes.object,
   }
 
   state = {
@@ -45,7 +48,7 @@ class LogFilePage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Build Logfile'
-    super.componentDidMount()
+    this.updateData()
   }
 
   highlightDidUpdate = (lines) => {
@@ -108,13 +111,14 @@ class LogFilePage extends Refreshable {
 
   render () {
     const { remoteData } = this.props
+    if (remoteData.isFetching) {
+      return <Fetching />
+    }
+
     const build = this.props.build.builds[this.props.match.params.buildId]
     const severity = parse(this.props.location.search).severity
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
         {remoteData.data && <LogFile build={build} data={remoteData.data} severity={severity}/>}
       </PageSection>
     )

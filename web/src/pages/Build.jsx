@@ -18,16 +18,17 @@ import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildIfNeeded } from '../actions/build'
-import Refreshable from '../containers/Refreshable'
+import { Fetching } from '../containers/Fetching'
 import Build from '../containers/build/Build'
 import Summary from '../containers/build/Summary'
 
 
-class BuildPage extends Refreshable {
+class BuildPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    dispatch: PropTypes.func,
   }
 
   updateData = (force) => {
@@ -37,17 +38,18 @@ class BuildPage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Build'
-    super.componentDidMount()
+    this.updateData()
   }
 
   render () {
     const { remoteData } = this.props
+    if (remoteData.isFetching) {
+      return <Fetching />
+    }
+
     const build = remoteData.builds[this.props.match.params.buildId]
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
       {build &&
        <Build build={build} active='summary'>
          <Summary build={build}/>

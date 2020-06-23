@@ -64,6 +64,7 @@ import {
 } from '@patternfly/react-icons'
 
 import ErrorBoundary from './containers/ErrorBoundary'
+import { Fetching } from './containers/Fetching'
 import SelectTz from './containers/timezone/SelectTz'
 import logo from './images/logo.svg'
 import { clearError } from './actions/errors'
@@ -126,7 +127,7 @@ class App extends React.Component {
     const allRoutes = []
 
     if (info.isFetching) {
-      return (<h2>Fetching info...</h2>)
+      return <Fetching />
     }
     this.menu
       // Do not include '/tenants' route in white-label setup

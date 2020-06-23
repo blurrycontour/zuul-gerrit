@@ -20,10 +20,10 @@ import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchProjectsIfNeeded } from '../actions/projects'
-import Refreshable from '../containers/Refreshable'
+import { Fetching } from '../containers/Fetching'
 
 
-class ProjectsPage extends Refreshable {
+class ProjectsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -36,11 +36,15 @@ class ProjectsPage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Projects'
-    super.componentDidMount()
+    this.updateData()
   }
 
   render () {
     const { remoteData } = this.props
+    if (remoteData.isFetching) {
+      return <Fetching />
+    }
+
     const projects = remoteData.projects[this.props.tenant.name]
 
     if (!projects) {
@@ -86,9 +90,6 @@ class ProjectsPage extends Refreshable {
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
         <Table.PfProvider
           striped
           bordered

@@ -20,10 +20,9 @@ import 'swagger-ui/dist/swagger-ui.css'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchOpenApiIfNeeded } from '../actions/openapi'
-import Refreshable from '../containers/Refreshable'
 
 
-class OpenApiPage extends Refreshable {
+class OpenApiPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -53,9 +52,6 @@ class OpenApiPage extends Refreshable {
   render() {
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div className="pull-right" style={{display: 'flex'}}>
-          {this.renderSpinner()}
-        </div>
         <div id="swaggerContainer" />
       </PageSection>
     )

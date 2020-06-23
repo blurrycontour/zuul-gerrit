@@ -18,11 +18,11 @@ import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import Job from '../containers/job/Job'
-import Refreshable from '../containers/Refreshable'
+import { Fetching } from '../containers/Fetching'
 import { fetchJobIfNeeded } from '../actions/job'
 
 
-class JobPage extends Refreshable {
+class JobPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     tenant: PropTypes.object,
@@ -37,7 +37,7 @@ class JobPage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Job | ' + this.props.match.params.jobName
-    super.componentDidMount()
+    this.updateData()
   }
 
   componentDidUpdate (prevProps) {
@@ -49,13 +49,14 @@ class JobPage extends Refreshable {
 
   render () {
     const { remoteData } = this.props
+    if (remoteData.isFetching) {
+      return <Fetching />
+    }
+
     const tenantJobs = remoteData.jobs[this.props.tenant.name]
     const jobName = this.props.match.params.jobName
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
         {tenantJobs && tenantJobs[jobName] && <Job job={tenantJobs[jobName]} />}
       </PageSection>
     )
