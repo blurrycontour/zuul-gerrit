@@ -178,6 +178,11 @@
     description: Run the commands in the Zuul tutorial quick-start documentation.
 
 - job:
+    name: zuul-tutorial-quick-start
+    parent: zuul-tutorial
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+
+- job:
     name: zuul-tutorial-gate-your-first-patch
     parent: zuul-tutorial
     description: Run the commands in the Zuul tutorial gate your first patch documentation.
@@ -348,6 +353,7 @@
         - zuul-stream-functional-2.9
         - zuul-tox-remote
         - zuul-quick-start
+        - zuul-tutorial-quick-start
         - zuul-tutorial-gate-your-first-patch
         - zuul-tutorial-use-zuul-jobs
         - zuul-tutorial-gate-pipeline
@@ -380,6 +386,7 @@
         - zuul-stream-functional-2.9
         - zuul-tox-remote
         - zuul-quick-start
+        - zuul-tutorial-quick-start
         - zuul-tutorial-gate-your-first-patch
         - zuul-tutorial-use-zuul-jobs
         - zuul-tutorial-gate-pipeline
