@@ -1,0 +1,27 @@
+- name: Init Test1
+  include_role:
+    name: init-repository
+  vars:
+    projectname: test1
+
+- name: Copy resources in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-first/
+    dest: "{{ workspace }}/test1/"
+
+- name: Commit and upload resources in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      mv zuul.yaml .zuul.yaml
+      git add -A
+      git commit -m"Init test1 pipelines"
+      git review
+
+- include_role:
+    name: change-merged
+  vars:
+    title: "Init pipelines test1"
+    projectname: test1

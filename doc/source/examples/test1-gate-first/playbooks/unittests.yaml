@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - name: Run unittests
+      shell:
+        cmd: "sleep 60; python3 -m unittest -v hello"
+        chdir: "{{ zuul.project.src_dir }}"
