@@ -30,7 +30,9 @@
       git config gitreview.username 'user'
       git review -s
       {% else %}
+      git checkout -f master
       git reset --hard $(git log --pretty=oneline | grep "Initial commit" | awk {'print $1'} | head -1)
       git remote add gerritadmin http://admin:secret@localhost:8080/a/{{ projectname }}
       git push -f gerritadmin master
+      git fetch --all --prune
       {% endif %}
