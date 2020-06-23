@@ -118,8 +118,18 @@
       - zuul/zuul
 
 - job:
+    name: zuul-tutorial-quick-start
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+    pre-run: playbooks/tutorial/pre.yaml
+    run: playbooks/tutorial/run.yaml
+    post-run: playbooks/tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+
+- job:
     name: zuul-tutorial-gate-your-first-patch
-    parent: zuul-quick-start
+    parent: zuul-tutorial-quick-start
     description: Run the commands in the Zuul tutorial gate your first patch documentation.
     vars:
       run_playbooks:
@@ -127,7 +137,7 @@
 
 - job:
     name: zuul-tutorial-use-zuul-jobs
-    parent: zuul-quick-start
+    parent: zuul-tutorial-quick-start
     description: Run the commands in the Zuul tutorial use zuul jobs documentation.
     vars:
       run_playbooks:
@@ -135,7 +145,7 @@
 
 - job:
     name: zuul-tutorial-gate-pipeline
-    parent: zuul-quick-start
+    parent: zuul-tutorial-quick-start
     description: Run the commands in the Zuul tutorials gate pipeline
     vars:
       run_playbooks:
@@ -144,7 +154,7 @@
 
 - job:
     name: zuul-tutorial-job-secrets
-    parent: zuul-quick-start
+    parent: zuul-tutorial-quick-start
     description: Run the commands in the Zuul tutorial job secrets documentation.
     vars:
       run_playbooks:
@@ -153,7 +163,7 @@
 
 - job:
     name: zuul-tutorial-job-dependencies
-    parent: zuul-quick-start
+    parent: zuul-tutorial-quick-start
     description: Run the commands in the Zuul tutorial job dependencies documentation.
     vars:
       run_playbooks:
@@ -305,6 +315,9 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-tutorial-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
         - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-build-image
@@ -365,6 +378,9 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
+        - zuul-tutorial-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
         - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
