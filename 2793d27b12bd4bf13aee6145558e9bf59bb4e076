@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_3a2524ac",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-23T00:17:36Z",
+      "side": 1,
+      "message": "If you\u0027re curious about the type of bug this fixes:\n\n  \u003e\u003e\u003e urllib.parse.urljoin(\u0027https://foo.bar\u0027, \u0027/api/\u0027)\n  \u0027https://foo.bar/api/\u0027\n  \u003e\u003e\u003e urllib.parse.urljoin(\u0027https://foo.bar/\u0027, \u0027/api/\u0027)\n  \u0027https://foo.bar/api/\u0027\n  \u003e\u003e\u003e urllib.parse.urljoin(\u0027https://foo.bar/\u0027, \u0027api/\u0027)\n  \u0027https://foo.bar/api/\u0027\n  \u003e\u003e\u003e urllib.parse.urljoin(\u0027https://foo.bar/some/path\u0027, \u0027/api/\u0027)\n  \u0027https://foo.bar/api/\u0027\n  \u003e\u003e\u003e urllib.parse.urljoin(\u0027https://foo.bar/some/path\u0027, \u0027api/\u0027)\n  \u0027https://foo.bar/some/api/\u0027\n  \u003e\u003e\u003e urllib.parse.urljoin(\u0027https://foo.bar/some/path/\u0027, \u0027api/\u0027)\n  \u0027https://foo.bar/some/path/api/\u0027",
+      "revId": "2793d27b12bd4bf13aee6145558e9bf59bb4e076",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
