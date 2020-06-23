@@ -160,6 +160,15 @@
         - job-secrets.yaml
       zuul_tutorial_confignum: 1
 
+- job:
+    name: zuul-tutorial-job-dependencies
+    parent: zuul-quick-start
+    description: Run the commands in the Zuul tutorial job dependencies documentation.
+    vars:
+      run_playbooks:
+        - job-dependencies.yaml
+      zuul_tutorial_confignum: 1
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -319,7 +328,11 @@
         - zuul-tutorial-job-secrets:
             requires: nodepool-container-image
             dependencies: zuul-build-image
-            timeout: 3000
+            timeout: 3000  # 50 minutes
+        - zuul-tutorial-job-dependencies:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 3600  # 60 minutes
         - nodepool-zuul-functional:
             voting: false
         - zuul-build-python-release
@@ -376,6 +389,10 @@
             requires: nodepool-container-image
             dependencies: zuul-upload-image
             timeout: 3000
+        - zuul-tutorial-job-dependencies:
+            requires: nodepool-container-image
+            dependencies: zuul-upload-image
+            timeout: 3600  # 60 minutes
         - zuul-build-python-release
     promote:
       jobs:
