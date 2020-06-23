@@ -127,6 +127,16 @@
       - zuul/zuul
 
 - job:
+    name: zuul-tutorial-quick-start
+    parent: opendev-buildset-registry-consumer
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+    pre-run: playbooks/tutorial/pre.yaml
+    run: playbooks/tutorial/run.yaml
+    post-run: playbooks/tutorial/post.yaml
+    required-projects:
+      - zuul/zuul
+
+- job:
     name: zuul-tutorial-gate-your-first-patch
     parent: zuul-quick-start
     description: Run the commands in the Zuul tutorial gate your first patch documentation.
@@ -317,6 +327,9 @@
         - zuul-tox-remote:
             timeout: 2700  # 45 minutes
         - zuul-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+        - zuul-tutorial-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
         - zuul-tutorial-gate-your-first-patch:
