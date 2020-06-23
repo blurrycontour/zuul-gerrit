@@ -194,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_79a79f0c",
+        "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-23T14:53:22Z",
+      "side": 1,
+      "message": "I think we need to describe the utility here in the code. This is a really odd way to be updating a git repo. If it serves a purpose let\u0027s write that down.",
+      "parentUuid": "bf51134e_1762b9ae",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_8475f9cd",
         "filename": "playbooks/tutorial/roles/setup-tutorial/defaults/main.yaml",
         "patchSetId": 22
@@ -223,6 +241,24 @@
       "side": 1,
       "message": "In this change yes, will be useful for following tutorials.\n\nAs written in the commit message, this change also has a few elements which will be common for all follow up tutorials. If it\u0027s not used here I should have not included in this change, but it felt akward adding in the 2nd tutorials things that will be used by all tutorials.",
       "parentUuid": "bf51134e_8475f9cd",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_b9ac97ed",
+        "filename": "playbooks/tutorial/roles/setup-tutorial/defaults/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-23T14:53:22Z",
+      "side": 1,
+      "message": "It is ok to add the variable when it is first used. particularly since we seem to be adding all of the additional items in series and not in a forked set of changes.",
+      "parentUuid": "bf51134e_570d51e6",
       "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -293,6 +329,24 @@
       "side": 1,
       "message": "\"One tutorial to bring them all and in test bind them.\"\nA list has to start with a first element, doesn\u0027t it ?",
       "parentUuid": "bf51134e_44bbe170",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_79803f47",
+        "filename": "playbooks/tutorial/run-localtest-quick-start.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-23T14:53:22Z",
+      "side": 1,
+      "message": "Sure, add that first element when it is used.",
+      "parentUuid": "bf51134e_17be39d4",
       "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
