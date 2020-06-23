@@ -1,0 +1,21 @@
+- name: Stop ssh-agent
+  when: stop_ssh_agent is defined
+  shell:
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      ssh-agent -k
+
+- name: Print SSH command
+  debug:
+    msg:
+      - Use GIT_SSH_COMMAND='ssh -o UserKnownHostsFile={{ workspace }}/known_hosts'
+      - to make further test using /tmp/tutorial-zuul/test1
+  when: stop_ssh_agent is not defined
+
+- name: Print SSH command using temp id_rsa
+  debug:
+    msg:
+      - Use GIT_SSH_COMMAND='ssh -o UserKnownHostsFile={{ workspace }}/known_hosts -i {{ workspace }}/id_rsa'
+      - to make further test using /tmp/tutorial-zuul/test1
+  when: stop_ssh_agent is defined

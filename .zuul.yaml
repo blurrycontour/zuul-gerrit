@@ -117,6 +117,14 @@
     required-projects:
       - zuul/zuul
 
+- job:
+    name: zuul-tutorial-gate-your-first-patch
+    parent: zuul-quick-start
+    description: Run the commands in the Zuul tutorial gate your first patch documentation.
+    vars:
+      run_playbooks:
+        - gate-first-patch.yaml
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -262,6 +270,9 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-tutorial-gate-your-first-patch:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
         - nodepool-zuul-functional:
             voting: false
         - zuul-client-zuul-functional
@@ -302,6 +313,9 @@
         - zuul-tox-remote:
             timeout: 2700  # 45 minutes
         - zuul-quick-start:
+            requires: nodepool-container-image
+            dependencies: zuul-upload-image
+        - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
         - zuul-client-zuul-functional
