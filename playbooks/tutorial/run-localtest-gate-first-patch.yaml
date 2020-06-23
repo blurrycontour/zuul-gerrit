@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-zuul
+    local: true
+    skip_quick_start: no
+    run_playbooks:
+      - gate-first-patch.yaml
+  environment:
+    GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
+  tasks:
+    - name: Run tutorial
+      include_tasks: run-tutorial.yaml
