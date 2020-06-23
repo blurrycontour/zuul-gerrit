@@ -230,6 +230,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_012ee990",
+        "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-23T17:12:48Z",
+      "side": 1,
+      "message": "Removed from this change, will add in the next one",
+      "parentUuid": "bf51134e_79a79f0c",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_8475f9cd",
         "filename": "playbooks/tutorial/roles/setup-tutorial/defaults/main.yaml",
         "patchSetId": 22
@@ -277,6 +295,24 @@
       "side": 1,
       "message": "It is ok to add the variable when it is first used. particularly since we seem to be adding all of the additional items in series and not in a forked set of changes.",
       "parentUuid": "bf51134e_570d51e6",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_c15d1116",
+        "filename": "playbooks/tutorial/roles/setup-tutorial/defaults/main.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-23T17:12:48Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "bf51134e_b9ac97ed",
       "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -365,6 +401,24 @@
       "side": 1,
       "message": "Sure, add that first element when it is used.",
       "parentUuid": "bf51134e_17be39d4",
+      "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_2177ada2",
+        "filename": "playbooks/tutorial/run-localtest-quick-start.yaml",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-06-23T17:12:48Z",
+      "side": 1,
+      "message": "the \u0027All\u0027 file (which is not this one) is removed from this change, and will remove also for the next one as it\u0027s still identical.  I\u0027ll introduce it in the 3rd change where it is different from run-localtest-use-zuul-jobs.yaml.\nBut I don\u0027t like to do it this way. Instead of building the file  nicely, it will be introduced with already 3 elements, quickstart + 2 tutorials instead of gradually updating the file.",
+      "parentUuid": "bf51134e_79803f47",
       "revId": "54c85779bc5a078a56964d94572b2710b1f3432d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
