@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_6b25065c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-06-23T15:52:04Z",
+      "side": 1,
+      "message": "NIT - explicit in the commit msg the version of virtualenv that introduces the breakage, ie 20.0.24, for convenience",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 9,
+        "endChar": 14
+      },
+      "revId": "e09c960ed6a1a344ad2007e397302ccebce33479",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
