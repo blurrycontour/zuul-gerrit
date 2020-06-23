@@ -192,6 +192,13 @@ class AnsibleManager:
         self.default_version = default_version
 
     def install(self, upgrade=False):
+        # virtualenv sets up a shared directory of pip seed packages per
+        # python version. If we run virtualenv in parallel we can have one
+        # create the dirs but not be finished filling them with content, a
+        # second notice the dir is there so it just goes on with what it's
+        # done, and thus races leaving us with virtualenvs minus pip.
+        for a in self._supported_versions.values():
+            a._ensure_venv()
         # Note: With higher number of threads pip seems to have some race
         # leading to occasional failures during setup of all ansible
         # environments. Thus we limit the number of workers to reduce the risk
