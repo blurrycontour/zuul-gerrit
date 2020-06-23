@@ -30,8 +30,10 @@ RUN cd /tmp/src/web && yarn install -d && yarn build
 RUN assemble
 
 # The wheel install method doesn't run the setup hooks as the source based
-# installations do so we have to call zuul-manage-ansible here.
-RUN /output/install-from-bindep && zuul-manage-ansible
+# installations do so we have to call zuul-manage-ansible here. Remove
+# /root/.local/share/virtualenv after because it adds wheels into /root
+# that we don't need after the install step so are a waste of space.
+RUN /output/install-from-bindep && zuul-manage-ansible && rm -rf /root/.local/share/virtualenv
 
 RUN mkdir /tmp/openshift-install \
   && curl -L $OPENSHIFT_URL -o /tmp/openshift-install/openshift-client.tgz \
