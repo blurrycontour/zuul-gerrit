@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_0b90ca49",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 2179,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-23T15:56:23Z",
+      "side": 1,
+      "message": "This sort of breaks the model.  I think if we\u0027re going to store the reset builds, we should store the old buildsets too.",
+      "revId": "eb316dc032731475c4e4623b3894ca920debf7e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
