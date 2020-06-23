@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-zuul
+    local: true
+    skip_quick_start: no
+    run_playbooks:
+      - use-zuul-jobs.yaml
+    zuul_tutorial_confignum: 0
+  environment:
+    GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
+  tasks:
+    - name: Run tutorial
+      include_tasks: run-tutorial.yaml
