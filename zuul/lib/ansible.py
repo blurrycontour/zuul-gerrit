@@ -49,6 +49,8 @@ class ManagedAnsible:
         self.install_root = self._ansible_roots[-1]
 
     def ensure_ansible(self, upgrade=False):
+        self._ensure_venv()
+
         self.log.info('Installing ansible %s, requirements: %s, '
                       'extra packages: %s',
                       self.version, self._requirements, self.extra_packages)
@@ -74,7 +76,7 @@ class ManagedAnsible:
                                              p.stderr.decode()))
         self.log.debug('Successfully installed packages %s', requirements)
 
-    def ensure_venv(self):
+    def _ensure_venv(self):
         if self.python_path:
             self.log.debug(
                 'Virtual environment %s already existing', self.venv_path)
@@ -93,7 +95,7 @@ class ManagedAnsible:
         # We don't use directly the venv module here because its behavior is
         # broken if we're already in a virtual environment.
         cmd = [sys.executable, '-m', 'virtualenv',
-               '-p', python_executable, venv_path]
+               '-p', python_executable, '--seeder=pip', venv_path]
         p = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         if p.returncode != 0:
@@ -190,13 +192,6 @@ class AnsibleManager:
         self.default_version = default_version
 
     def install(self, upgrade=False):
-        # virtualenv sets up a shared directory of pip seed packages per
-        # python version. If we run virtualenv in parallel we can have one
-        # create the dirs but not be finished filling them with content, a
-        # second notice the dir is there so it just goes on with what it's
-        # done, and thus races leaving us with virtualenvs minus pip.
-        for a in self._supported_versions.values():
-            a.ensure_venv()
         # Note: With higher number of threads pip seems to have some race
         # leading to occasional failures during setup of all ansible
         # environments. Thus we limit the number of workers to reduce the risk
