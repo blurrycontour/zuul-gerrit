@@ -8,3 +8,4 @@ User Tutorials
    use-zuul-jobs
    the-gate-pipeline
    job-secrets
+   job-dependencies
