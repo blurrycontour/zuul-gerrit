@@ -21,7 +21,6 @@ import { fetchBuildsetIfNeeded } from '../actions/build'
 import { Fetching } from '../containers/Fetching'
 import Buildset from '../containers/build/Buildset'
 
-
 class BuildsetPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
@@ -48,6 +47,7 @@ class BuildsetPage extends React.Component {
     const buildset = remoteData.buildsets[this.props.match.params.buildsetId]
     return (
       <PageSection variant={PageSectionVariants.light}>
+        {/* TODO (felix): Empty state if no buildset? */}
         {buildset && <Buildset buildset={buildset}/>}
       </PageSection>
     )
