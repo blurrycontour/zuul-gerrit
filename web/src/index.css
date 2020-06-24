@@ -8,6 +8,10 @@ body {
   padding: 0;
 }
 
+.pf-c-title {
+    padding-bottom: 10px;
+}
+
 a.refresh {
   cursor: pointer;
   border-bottom-style: none;
@@ -28,6 +32,25 @@ a.refresh {
 .zuul-select-tz {
     /* That's the color PF4 uses for the dropdown items in the navbar */
     color: var(--pf-global--Color--dark-100);
+}
+
+/* Build Lists */
+.pf-c-data-list__item.pf-m-selectable:hover:not(.pf-m-selected),
+.pf-c-data-list__item.pf-m-selectable:focus:not(.pf-m-selected) {
+    /* Improve the hover/focus effect of selected lines */
+    --pf-c-data-list__item--before--BackgroundColor: var(
+        --pf-c-data-list__item--m-selected--before--BackgroundColor
+    );
+    font-weight: bold;
+}
+
+/*
+ * Build/Buildset result page
+ */
+.zuul-build-attributes > .pf-l-flex > * {
+    padding-bottom: var(--pf-global--spacer--sm);
+    padding-left: var(--pf-global--spacer--sm);
+    padding-right: var(--pf-global--spacer--sm);
 }
 
 /* Status page */
