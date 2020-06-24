@@ -16,6 +16,24 @@
       "revId": "cfb83779449bd64ecb4b9e0f0747c3b3e6a26b36",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_eadaa575",
+        "filename": "releasenotes/notes/mqtt-report-build-page-1780225ca98c7456.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-06-24T06:00:52Z",
+      "side": 1,
+      "message": "Yes, the log_url is very useful if you want to process/analyze the Ansible log (which we are doing). Having only an HTML page as result URL would break this use case unless we want to extract the log_url from the build\u0027s HTML page (which we don\u0027t).",
+      "parentUuid": "bf51134e_0420b7ab",
+      "revId": "cfb83779449bd64ecb4b9e0f0747c3b3e6a26b36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
