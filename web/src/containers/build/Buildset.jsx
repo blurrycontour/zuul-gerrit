@@ -15,11 +15,36 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { Panel } from 'react-bootstrap'
-import * as moment from 'moment'
-import 'moment-duration-format'
+import {
+  Card,
+  CardBody,
+  CardTitle,
+  EmptyState,
+  EmptyStateIcon,
+  EmptyStateVariant,
+  Flex,
+  FlexItem,
+  List,
+  ListItem,
+  Tab,
+  Tabs,
+  TabTitleIcon,
+  TabTitleText,
+  Title,
+} from '@patternfly/react-core'
+import {
+  BuildIcon,
+  CodeIcon,
+  CodeBranchIcon,
+  OutlinedCommentDotsIcon,
+  CubeIcon,
+  FingerprintIcon,
+  StreamIcon,
+} from '@patternfly/react-icons'
 
+import { ExternalLink } from '../../Misc'
+import BuildList from './BuildList'
+import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 
 class Buildset extends React.Component {
   static propTypes = {
@@ -27,105 +52,145 @@ class Buildset extends React.Component {
     tenant: PropTypes.object,
   }
 
-  render () {
-    const { buildset } = this.props
-    const rows = []
-    const myColumns = [
-      'change', 'project', 'branch', 'pipeline', 'result', 'message', 'event_id'
-    ]
-    const buildRows = []
-    const buildColumns = [
-      'job', 'result', 'voting', 'duration'
-    ]
-
-    myColumns.forEach(column => {
-      let label = column
-      let value = buildset[column]
-      if (column === 'change') {
-        value = (
-          <a href={buildset.ref_url}>
-            {buildset.change},{buildset.patchset}
-          </a>
-        )
-      }
-      if (column === 'event_id') {
-        label = 'event id'
-      }
-      if (value) {
-        rows.push({key: label, value: value})
-      }
-    })
-
-    if (buildset.builds) {
-      buildset.builds.forEach(build => {
-        const row = []
-        buildColumns.forEach(column => {
-          if (column === 'job') {
-            row.push(build.job_name)
-          } else if (column === 'duration') {
-            row.push(moment.duration(build.duration, 'seconds')
-                     .format('h [hr] m [min] s [sec]'))
-          } else if (column === 'voting') {
-            row.push(build.voting ? 'true' : 'false')
-          } else if (column === 'result') {
-            row.push(<Link
-                       to={this.props.tenant.linkPrefix + '/build/' + build.uuid}>
-                       {build.result}
-                     </Link>)
-          } else {
-            row.push(build[column])
-          }
-        })
-        buildRows.push(row)
-      })
+  constructor() {
+    super()
+    this.state = {
+      activeTabKey: 0,
     }
+  }
+
+  handleTabClick = (event, tabIndex) => {
+    this.setState({
+      activeTabKey: tabIndex,
+    })
+  }
+
+  render() {
+    const { buildset } = this.props
+    const { activeTabKey } = this.state
+
+    // Return the builds list or an empty state if no builds are part of the
+    // buildset.
+    const buildsTabContent = buildset.builds ? (
+      <BuildList builds={buildset.builds} />
+    ) : (
+      <EmptyState variant={EmptyStateVariant.small}>
+        <EmptyStateIcon icon={BuildIcon} />
+        <Title headingLevel="h4" size="lg">
+          This buildset does not contain any builds
+        </Title>
+      </EmptyState>
+    )
 
     return (
       <React.Fragment>
-        <Panel>
-          <Panel.Heading>Buildset result {buildset.uuid}</Panel.Heading>
-          <Panel.Body>
-            <table className="table table-striped table-bordered">
-              <tbody>
-                {rows.map(item => (
-                  <tr key={item.key}>
-                    <td>{item.key}</td>
-                    <td>{item.value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </Panel.Body>
-        </Panel>
-        {buildset.builds &&
-          <Panel>
-            <Panel.Heading>Builds</Panel.Heading>
-            <Panel.Body>
-              <table className="table table-striped table-bordered">
-                <thead>
-                  <tr>
-                    {buildColumns.map(item => (
-                      <td key={item}>{item}</td>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {buildset.builds.map((item, idx) => (
-                    <tr key={idx} className={item.result === 'SUCCESS' ? 'success': 'warning'}>
-                      {buildRows[idx].map((item, idx) => (
-                        <td key={idx}>{item}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Panel.Body>
-          </Panel>
-        }
+        <Card>
+          <CardTitle style={{ fontSize: 'var(--pf-global--FontSize--xl)' }}>
+            <BuildResultWithIcon result={buildset.result} size="md">
+              Buildset result
+            </BuildResultWithIcon>
+            <BuildResultBadge result={buildset.result} />
+          </CardTitle>
+          <CardBody>
+            <Flex>
+            <Flex flex={{ default: 'flex_1' }}>
+              <FlexItem>
+                <List style={{ listStyle: 'none' }}>
+                  {/* TODO (felix): It would be cool if we could differentiate
+                    between the SVC system (Github, Gitlab, Gerrit), so we could
+                    show the respective icon here (GithubIcon, GitlabIcon,
+                    GitIcon - AFAIK the Gerrit icon is not very popular among
+                    icon frameworks like fontawesome */}
+                  <IconProperty
+                    WrapElement={ListItem}
+                    icon={<CodeIcon />}
+                    value={
+                      <ExternalLink target={buildset.ref_url}>
+                        <strong>Change </strong>
+                        {buildset.change},{buildset.patchset}
+                      </ExternalLink>
+                    }
+                  />
+                  {/* TODO (felix): Link to project page in Zuul */}
+                  <IconProperty
+                    WrapElement={ListItem}
+                    icon={<CubeIcon />}
+                    value={
+                      <>
+                        <strong>Project </strong> {buildset.project}
+                      </>
+                    }
+                  />
+                  <IconProperty
+                    WrapElement={ListItem}
+                    icon={<CodeBranchIcon />}
+                    value={
+                      <>
+                        <strong>Branch </strong> {buildset.branch}
+                      </>
+                    }
+                  />
+                  <IconProperty
+                    WrapElement={ListItem}
+                    icon={<StreamIcon />}
+                    value={
+                      <>
+                        <strong>Pipeline </strong> {buildset.pipeline}
+                      </>
+                    }
+                  />
+                  <IconProperty
+                    WrapElement={ListItem}
+                    icon={<FingerprintIcon />}
+                    value={
+                      <span>
+                        <strong>UUID </strong> {buildset.uuid} <br />
+                        <strong>Event ID </strong> {buildset.event_id} <br />
+                      </span>
+                    }
+                  />
+                </List>
+              </FlexItem>
+              </Flex>
+              <Flex flex={{ default: 'flex_1' }}>
+              <FlexItem>
+                <List style={{ listStyle: 'none' }}>
+                  <IconProperty
+                    WrapElement={ListItem}
+                    icon={<OutlinedCommentDotsIcon />}
+                    value={
+                      <>
+                        <strong>Message:</strong>
+                        <pre>{buildset.message}</pre>
+                      </>
+                    }
+                  />
+                </List>
+              </FlexItem>
+            </Flex>
+            </Flex>
+          </CardBody>
+          <CardBody>
+            <Tabs activeKey={activeTabKey} onSelect={this.handleTabClick}>
+              <Tab
+                eventKey={0}
+                title={
+                  <>
+                    <TabTitleIcon>
+                      <BuildIcon />
+                    </TabTitleIcon>
+                    <TabTitleText>Builds</TabTitleText>
+                  </>
+                }
+              >
+                {buildsTabContent}
+              </Tab>
+            </Tabs>
+          </CardBody>
+        </Card>
       </React.Fragment>
     )
   }
 }
 
-
-export default connect(state => ({tenant: state.tenant}))(Buildset)
+export default connect((state) => ({ tenant: state.tenant }))(Buildset)
