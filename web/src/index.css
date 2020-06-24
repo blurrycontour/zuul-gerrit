@@ -31,6 +31,16 @@ a.refresh {
     color: var(--pf-global--Color--dark-100);
 }
 
+/* Build Lists */
+.pf-c-data-list__item.pf-m-selectable:hover:not(.pf-m-selected),
+.pf-c-data-list__item.pf-m-selectable:focus:not(.pf-m-selected) {
+    /* Improve the hover/focus effect of selected lines */
+    --pf-c-data-list__item--before--BackgroundColor: var(
+        --pf-c-data-list__item--m-selected--before--BackgroundColor
+    );
+    font-weight: bold;
+}
+
 /* Status page */
 .zuul-change {
     margin-bottom: 10px;
