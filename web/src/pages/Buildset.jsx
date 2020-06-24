@@ -21,7 +21,6 @@ import { fetchBuildsetIfNeeded } from '../actions/build'
 import { Fetching } from '../containers/Fetching'
 import Buildset from '../containers/build/Buildset'
 
-
 class BuildsetPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
