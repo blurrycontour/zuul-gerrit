@@ -66,7 +66,7 @@ import {
 import ErrorBoundary from './containers/ErrorBoundary'
 import { Fetching } from './containers/Fetching'
 import SelectTz from './containers/timezone/SelectTz'
-import logo from './images/logo.svg'
+import logo from './images/logo-text.svg'
 import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'

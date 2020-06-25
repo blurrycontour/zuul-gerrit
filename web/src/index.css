@@ -22,8 +22,7 @@ a.refresh {
 .zuul-brand {
     /* TODO (felix): If we can define a size in the logo.svg itself, this
        shouldn't be necessary. */
-    height: 30px;
-    width: 30px;
+    height: 40px;
 }
 
 .zuul-select-tz {
