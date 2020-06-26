@@ -62,6 +62,9 @@ ANNOTATION_LEVELS = {
     "error": "failure",
 }
 
+# Safety margin to consider an app token expired
+APP_TOKEN_REFRESH_BEFORE_SEC = 60
+
 
 def _sign_request(body, secret):
     signature = 'sha1=' + hmac.new(
@@ -990,11 +993,15 @@ class GithubConnection(BaseConnection):
                            project)
             return ''
 
-        now = datetime.datetime.now(utc)
+        # Refresh the token at least APP_TOKEN_REFRESH_BEFORE_SEC before
+        # the token actually expires. This way we don't hand out tokens
+        # shortly before they expire.
+        refresh_deadline = datetime.datetime.now(utc) - datetime.timedelta(
+            seconds=APP_TOKEN_REFRESH_BEFORE_SEC)
         token, expiry = self.installation_token_cache.get(installation_id,
                                                           (None, None))
 
-        if ((not expiry) or (not token) or (now >= expiry)):
+        if ((not expiry) or (not token) or (refresh_deadline >= expiry)):
             headers = self._get_app_auth_headers()
 
             url = "%s/app/installations/%s/access_tokens" % (
