@@ -1297,6 +1297,9 @@ class Scheduler(threading.Thread):
                 # The branch_created attribute is also true when a tag is
                 # created. Since we load config only from branches only trigger
                 # a tenant reconfiguration if the branch is set as well.
+                # branch_created is also set to True for a Gerrit connection
+                # when a branch is directly modified by a user different from
+                # zuul user to trigger a reconfiguration
                 if event.branch_created and event.branch:
                     reconfigure_tenant = True
 
