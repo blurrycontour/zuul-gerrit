@@ -230,17 +230,22 @@ class GerritEventConnector(threading.Thread):
         # This checks whether the event created or deleted a branch so
         # that Zuul may know to perform a reconfiguration on the
         # project.
+        branch_refs = 'refs/heads/'
         if (event.type == 'ref-updated' and
             ((not event.ref.startswith('refs/')) or
-             event.ref.startswith('refs/heads'))):
+             event.ref.startswith(branch_refs))):
+
+            if event.ref.startswith(branch_refs):
+                event.branch = event.ref[len(branch_refs):]
+            else:
+                event.branch = event.ref
+
             if event.oldrev == '0' * 40:
                 event.branch_created = True
-                event.branch = event.ref
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
             if event.newrev == '0' * 40:
                 event.branch_deleted = True
-                event.branch = event.ref
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
 
@@ -705,7 +710,7 @@ class GerritConnection(BaseConnection):
             # Pre 2.13 Gerrit ref-updated events don't have branch prefixes.
             project = self.source.getProject(event.project_name)
             change = Branch(project)
-            change.branch = event.ref
+            change.branch = event.branch
             change.ref = 'refs/heads/' + event.ref
             change.oldrev = event.oldrev
             change.newrev = event.newrev
@@ -715,7 +720,7 @@ class GerritConnection(BaseConnection):
             project = self.source.getProject(event.project_name)
             change = Branch(project)
             change.ref = event.ref
-            change.branch = event.ref[len('refs/heads/'):]
+            change.branch = event.branch
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
