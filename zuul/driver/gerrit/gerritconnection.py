@@ -1071,9 +1071,9 @@ class GerritConnection(BaseConnection):
             checkinfo['started'] = fmt(item.enqueue_time)
             if item.report_time:
                 checkinfo['finished'] = fmt(item.report_time)
-                url = item.formatStatusUrl()
-                if url:
-                    checkinfo['url'] = url
+            url = item.formatStatusUrl()
+            if url:
+                checkinfo['url'] = url
         if checkinfo:
             for x in range(1, 4):
                 try:
