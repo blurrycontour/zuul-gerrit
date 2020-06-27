@@ -244,10 +244,31 @@ class GerritEventConnector(threading.Thread):
                 event.branch_created = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
-            if event.newrev == '0' * 40:
+            elif event.newrev == '0' * 40:
                 event.branch_deleted = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
+            else:
+                # submitter is a mandatory dictionary for a ref-updated event
+                # but watcher generated event during test does not provide one
+                if (event.account and event.account.get('username') and
+                        event.account.get('username') != self.connection.user):
+                    # branch pushed directly to git by user other than zuul
+                    # either:
+                    # - fast-forward
+                    # - force-push rewind
+                    # - force-push delete+create
+                    # A complete list of files that were touched is needed to
+                    # decide wether to trigger reconfiguration or not as stated
+                    # by comment block for change-merged event
+                    # To avoid introducing a new flag, branch_created is used
+                    # as this + event.branch will trigger a reconfiguration by
+                    # the scheduler
+                    event.branch_created = True
+
+                    project = self.connection.source.getProject(
+                        event.project_name)
+                    self.connection._clearBranchCache(project)
 
         self._getChange(event)
         self.connection.logEvent(event)
@@ -715,6 +736,7 @@ class GerritConnection(BaseConnection):
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
+            change.files = None
         elif event.ref and event.ref.startswith('refs/heads/'):
             # From the timer trigger or Post 2.13 Gerrit
             project = self.source.getProject(event.project_name)
@@ -724,6 +746,7 @@ class GerritConnection(BaseConnection):
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
+            change.files = None
         elif event.ref:
             # catch-all ref (ie, not a branch or head)
             project = self.source.getProject(event.project_name)
@@ -1426,8 +1449,10 @@ class GerritConnection(BaseConnection):
                       (version, self.version))
 
     def refWatcherCallback(self, data):
+        self.log.debug("ZUUL data: {}".format(data))
         event = {
             'type': 'ref-updated',
+            # 'submitter': {},
             'refUpdate': {
                 'project': data['project'],
                 'refName': data['ref'],
