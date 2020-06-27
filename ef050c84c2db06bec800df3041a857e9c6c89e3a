@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_ccaea82c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1072,
+      "author": {
+        "id": 4720
+      },
+      "writtenOn": "2020-06-27T05:27:40Z",
+      "side": 1,
+      "message": "This condition means that we only write check status after the build completed? But report_checks method is called before the build is completed?",
+      "range": {
+        "startLine": 1072,
+        "startChar": 12,
+        "endLine": 1072,
+        "endChar": 32
+      },
+      "revId": "ef050c84c2db06bec800df3041a857e9c6c89e3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_2caac417",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1077,
+      "author": {
+        "id": 4720
+      },
+      "writtenOn": "2020-06-27T05:27:40Z",
+      "side": 1,
+      "message": "This condition was also true before this change, but URL wasn\u0027t set so that POST failed?",
+      "range": {
+        "startLine": 1077,
+        "startChar": 8,
+        "endLine": 1077,
+        "endChar": 21
+      },
+      "revId": "ef050c84c2db06bec800df3041a857e9c6c89e3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
