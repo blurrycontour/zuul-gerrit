@@ -242,13 +242,30 @@ class GerritEventConnector(threading.Thread):
                     event.branch = event.ref[len(branch_refs):]
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
-            if event.newrev == '0' * 40:
+            elif event.newrev == '0' * 40:
                 event.branch_deleted = True
                 event.branch = event.ref
                 if event.ref.startswith(branch_refs) :
                     event.branch = event.ref[len(branch_refs):]
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
+            else:
+                # submitter is a mandatory dictionary for a ref-updated event but
+                # watcher generated event during test does not provide one
+                if (event.account != None and
+                        event.account.get('username') != None and
+                        event.account.get('username') !=
+                        self.connection.user):
+                    # branch pushed directly to git by user other than zuul
+                    # either fast-forward or force-push
+                    event.branch_modified = True
+                    event.branch = event.ref
+                    if event.ref.startswith(branch_refs) :
+                        event.branch = event.ref[len(branch_refs):]
+
+                    project = self.connection.source.getProject(
+                        event.project_name)
+                    self.connection._clearBranchCache(project)
 
         self._getChange(event)
         self.connection.logEvent(event)
@@ -1427,8 +1444,10 @@ class GerritConnection(BaseConnection):
                       (version, self.version))
 
     def refWatcherCallback(self, data):
+        self.log.debug("ZUUL data: {}".format(data))
         event = {
             'type': 'ref-updated',
+            #'submitter': {},
             'refUpdate': {
                 'project': data['project'],
                 'refName': data['ref'],

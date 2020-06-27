@@ -1300,6 +1300,10 @@ class Scheduler(threading.Thread):
                 if event.branch_created and event.branch:
                     reconfigure_tenant = True
 
+                # Gerrit: branch direct push
+                if event.branch_modified and event.branch:
+                    reconfigure_tenant = True
+
                 # If the driver knows the branch but we don't have a config, we
                 # also need to reconfigure. This happens if a GitHub branch
                 # was just configured as protected without a push in between.
