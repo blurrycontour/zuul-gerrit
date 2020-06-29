@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_993dfebc",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-29T16:48:57Z",
+      "side": 1,
+      "message": "Note to when you implement this todo. Please check if there are some limitations. In github we learned the hard way that it truncates the file list if there are too many files.",
+      "range": {
+        "startLine": 407,
+        "startChar": 0,
+        "endLine": 408,
+        "endChar": 58
+      },
+      "revId": "68ab9fec3303ac4660e459c590011ba4f5a25188",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
