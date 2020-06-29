@@ -16,6 +16,24 @@
       "revId": "1cd778096c667c62a0b90b2176ef79ea08b53afc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_3e013806",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-06-29T15:52:15Z",
+      "side": 1,
+      "message": "It is somewhat intentional :) _ returns a Component, in order to use a component in routes.js it\u0027d have to be turned into a jsx. I thought it\u0027d be less intrusive to do the translation here.",
+      "parentUuid": "bf51134e_fb1fd2b3",
+      "revId": "1cd778096c667c62a0b90b2176ef79ea08b53afc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
