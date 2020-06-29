@@ -3831,7 +3831,7 @@ class SchedulerTestApp:
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
-    def smartReconfigure(self, command_socket=False):
+    def smartReconfigure(self, command_socket: bool=False, use_zk: bool=False):
         try:
             if command_socket:
                 command_socket = self.config.get('scheduler', 'command_socket')
@@ -3839,7 +3839,7 @@ class SchedulerTestApp:
                     s.connect(command_socket)
                     s.sendall('smart-reconfigure\n'.encode('utf8'))
             else:
-                self.sched.reconfigure(self.config, smart=True)
+                self.sched.reconfigure(self.config, smart=True, use_zk=use_zk)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 

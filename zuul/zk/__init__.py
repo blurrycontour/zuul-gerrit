@@ -15,8 +15,7 @@ import json
 import logging
 import threading
 import time
-from typing import Dict, Callable, List
-from typing import Optional
+from typing import Dict, Callable, List, Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.handlers.threading import KazooTimeoutError
@@ -26,12 +25,15 @@ import zuul.model
 from zuul.zk.connection_event import ZooKeeperConnectionEventMixin
 from zuul.lib.config import get_default
 from zuul.zk.nodepool import ZooKeeperNodepoolMixin
+from zuul.zk.unparsed_branch_config import ZooKeeperUnparsedBranchConfigMixin
 from zuul.zk.zuul import ZooKeeperZuulMixin
 
 
 class ZooKeeper(ZooKeeperNodepoolMixin,
                 ZooKeeperZuulMixin,
-                ZooKeeperConnectionEventMixin, object):
+                ZooKeeperConnectionEventMixin,
+                ZooKeeperUnparsedBranchConfigMixin,
+                object):
     '''
     Class implementing the ZooKeeper interface.
 
@@ -63,6 +65,9 @@ class ZooKeeper(ZooKeeperNodepoolMixin,
         self.lockingLock = threading.Lock()
         self.event_watchers =\
             {}  # type: Dict[str, List[Callable[[List[str]], None]]]
+        self.layout_watcher =\
+            None  # type: Optional[Callable[[str, str], None]]
+        self.watched_tenants = []  # type: List[str]
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
         # which contains raw znode data (among other details), and one for

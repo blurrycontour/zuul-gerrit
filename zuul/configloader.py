@@ -12,6 +12,7 @@
 
 import base64
 import collections
+import hashlib
 from contextlib import contextmanager
 import copy
 import itertools
@@ -31,8 +32,15 @@ import zuul.manager.independent
 import zuul.manager.supercedent
 import zuul.manager.serial
 from zuul.lib import encryption
+from zuul.lib.ansible import AnsibleManager
+from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
+from zuul.merger.client import MergeClient
+from zuul.model import SourceContext, Tenant, Abide, LoadingErrors, Project, \
+    RepoFiles, ParsedConfig, UnparsedAbideConfig, UnparsedConfig, Layout
+from zuul.zk import ZooKeeper
+from typing import Optional, Tuple
 from zuul.lib.re2util import filter_allowed_disallowed
 
 
@@ -229,7 +237,7 @@ def project_configuration_exceptions(context, accumulator):
 
 
 @contextmanager
-def early_configuration_exceptions(context):
+def early_configuration_exceptions(context: SourceContext):
     try:
         yield
     except ConfigurationSyntaxError:
@@ -1439,12 +1447,21 @@ class ParseContext(object):
 
 
 class TenantParser(object):
-    def __init__(self, connections, scheduler, merger, keystorage):
+    def __init__(self,
+                 connections: ConnectionRegistry,
+                 scheduler,  #: 'Scheduler'
+                 merger: Optional[MergeClient],
+                 keystorage: Optional[KeyStorage],
+                 zk: Optional[ZooKeeper],
+                 use_zk: bool):
+
         self.log = logging.getLogger("zuul.TenantParser")
         self.connections = connections
         self.scheduler = scheduler
         self.merger = merger
         self.keystorage = keystorage
+        self.zk = zk
+        self.use_zk = use_zk
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret')
@@ -1504,7 +1521,7 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager):
+    def fromYaml(self, abide: Abide, conf, ansible_manager) -> Tenant:
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1561,10 +1578,22 @@ class TenantParser(object):
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
         # cache.
-        self._cacheTenantYAML(abide, tenant, loading_errors)
+        clear_caches = False
+        if self.zk is not None and self.use_zk:
+            zk_layout_hash = self.zk.getLayoutHash(tenant.name)
+            tenant_layout_hash = self.scheduler\
+                .tenant_layout_hash[tenant.name] \
+                if tenant.name in self.scheduler.tenant_layout_hash else None
+            clear_caches = zk_layout_hash != tenant_layout_hash
+            self.log.debug(
+                "[COMPARE] Layout hash for %s: %s => %s (clear: %s, zk: %s)" %
+                (tenant.name, tenant_layout_hash, zk_layout_hash, clear_caches,
+                 self.use_zk))
+        self._cacheTenantYAML(abide, tenant, loading_errors, clear_caches)
 
         # Then collect the appropriate YAML based on this tenant
         # config.
+        # TODO JK: \/
         config_projects_config, untrusted_projects_config = \
             self._loadTenantYAML(abide, tenant, loading_errors)
 
@@ -1586,6 +1615,7 @@ class TenantParser(object):
 
         tenant.layout = self._parseLayout(
             tenant, parsed_config, loading_errors)
+        # /\
 
         return tenant
 
@@ -1764,84 +1794,143 @@ class TenantParser(object):
 
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors):
+    def _cacheTenantYAML(self, abide: Abide, tenant: Tenant,
+                         loading_errors: LoadingErrors,
+                         clear_caches: bool) -> None:
         jobs = []
-        for project in itertools.chain(
-                tenant.config_projects, tenant.untrusted_projects):
-            tpc = tenant.project_configs[project.canonical_name]
-            # For each branch in the repo, get the zuul.yaml for that
-            # branch.  Remember the branch and then implicitly add a
-            # branch selector to each job there.  This makes the
-            # in-repo configuration apply only to that branch.
-            branches = tenant.getProjectBranches(project)
-            for branch in branches:
-                branch_cache = abide.getUnparsedBranchCache(
-                    project.canonical_name, branch)
-                if branch_cache.isValidFor(tpc):
-                    # We already have this branch cached.
-                    continue
-                if not tpc.load_classes:
-                    # If all config classes are excluded then do not
-                    # request any getFiles jobs.
-                    continue
-                job = self.merger.getFiles(
-                    project.source.connection.connection_name,
-                    project.name, branch,
-                    files=(['zuul.yaml', '.zuul.yaml'] +
-                           list(tpc.extra_config_files)),
-                    dirs=['zuul.d', '.zuul.d'] + list(tpc.extra_config_dirs))
-                self.log.debug("Submitting cat job %s for %s %s %s" % (
-                    job, project.source.connection.connection_name,
-                    project.name, branch))
-                job.source_context = model.SourceContext(
-                    project, branch, '', False)
-                jobs.append(job)
-                branch_cache.setValidFor(tpc)
-
-        for job in jobs:
-            self.log.debug("Waiting for cat job %s" % (job,))
-            job.wait(self.merger.git_timeout)
-            if not job.updated:
-                raise Exception("Cat job %s failed" % (job,))
-            self.log.debug("Cat job %s got files %s" %
-                           (job, job.files.keys()))
-            loaded = False
-            files = sorted(job.files.keys())
-            unparsed_config = model.UnparsedConfig()
-            tpc = tenant.project_configs[
-                job.source_context.project.canonical_name]
-            for conf_root in (
-                    ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
-                    tpc.extra_config_files + tpc.extra_config_dirs):
-                for fn in files:
-                    fn_root = fn.split('/')[0]
-                    if fn_root != conf_root or not job.files.get(fn):
-                        continue
-                    # Don't load from more than one configuration in a
-                    # project-branch (unless an "extra" file/dir).
-                    if (conf_root not in tpc.extra_config_files and
-                        conf_root not in tpc.extra_config_dirs):
-                        if (loaded and loaded != conf_root):
-                            self.log.warning(
-                                "Multiple configuration files in %s" %
-                                (job.source_context,))
-                            continue
-                        loaded = conf_root
-                    # Create a new source_context so we have unique filenames.
-                    source_context = job.source_context.copy()
-                    source_context.path = fn
-                    self.log.info(
-                        "Loading configuration from %s" %
-                        (source_context,))
-                    incdata = self.loadProjectYAML(
-                        job.files[fn], source_context, loading_errors)
+        files_hash = hashlib.sha256()
+        write_lock = self.zk.getConfigWriteLock()\
+            if self.zk is not None else None
+        if write_lock is not None:
+            write_lock.acquire()
+        try:
+            for project in itertools.chain(
+                    tenant.config_projects, tenant.untrusted_projects):
+                tpc = tenant.project_configs[project.canonical_name]
+                # For each branch in the repo, get the zuul.yaml for that
+                # branch.  Remember the branch and then implicitly add a
+                # branch selector to each job there.  This makes the
+                # in-repo configuration apply only to that branch.
+                branches = tenant.getProjectBranches(project)
+                for branch in branches:
                     branch_cache = abide.getUnparsedBranchCache(
-                        source_context.project.canonical_name,
-                        source_context.branch)
-                    branch_cache.put(source_context.path, incdata)
-                    unparsed_config.extend(incdata)
+                        project.canonical_name, branch)
+                    if clear_caches:
+                        abide.clearUnparsedBranchCache(
+                            project.canonical_name, branch)
+                    elif branch_cache.isValidFor(tpc):
+                        # We already have this branch cached.
+                        continue
+                    if not tpc.load_classes:
+                        # If all config classes are excluded then do not
+                        # request any getFiles jobs.
+                        continue
+                    if self.merger is not None:
+                        job = self.merger.getFiles(
+                            project.source.connection.connection_name,
+                            project.name, branch,
+                            files=(['zuul.yaml', '.zuul.yaml'] +
+                                   list(tpc.extra_config_files)),
+                            dirs=(['zuul.d', '.zuul.d'] +
+                                  list(tpc.extra_config_dirs)))
 
-    def _loadTenantYAML(self, abide, tenant, loading_errors):
+                        self.log.debug("Submitting cat job %s for %s %s %s" % (
+                            job, project.source.connection.connection_name,
+                            project.name, branch))
+                        job.source_context = model.SourceContext(
+                            project, branch, '', False)
+                        jobs.append(job)
+                        branch_cache.setValidFor(tpc)
+                    else:
+                        self.log.warning("Merger not set")
+
+            for job in jobs:
+                self.log.debug("Waiting for cat job %s" % (job,))
+                if self.merger is not None:
+                    job.wait(self.merger.git_timeout)
+                else:
+                    self.log.warning("Not waiting - Merger not set")
+                if not job.updated:
+                    raise Exception("Cat job %s failed" % (job,))
+                self.log.debug("Cat job %s got files %s" %
+                               (job, job.files.keys()))
+                loaded = False
+                files = sorted(job.files.keys())
+                unparsed_config = model.UnparsedConfig()
+                tpc = tenant.project_configs[
+                    job.source_context.project.canonical_name]
+                for conf_root in (
+                        ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
+                        tpc.extra_config_files + tpc.extra_config_dirs):
+                    for fn in files:
+                        fn_root = fn.split('/')[0]
+                        if fn_root != conf_root or not job.files.get(fn):
+                            continue
+                        # Don't load from more than one configuration in a
+                        # project-branch (unless an "extra" file/dir).
+                        if (conf_root not in tpc.extra_config_files and
+                            conf_root not in tpc.extra_config_dirs):
+                            if loaded and loaded != conf_root:
+                                self.log.warning(
+                                    "Multiple configuration files in %s" %
+                                    (job.source_context,))
+                                continue
+                            loaded = conf_root
+                        # Create a new source_context so we have unique
+                        # filenames.
+                        source_context = job.source_context.copy()
+                        source_context.path = fn
+                        self.log.info(
+                            "Loading configuration from %s" %
+                            (source_context,))
+
+                        data = self.zk.loadConfig(tenant.name,
+                                                  source_context.project.name,
+                                                  source_context.branch,
+                                                  source_context.path,
+                                                  use_lock=False)\
+                            if self.zk is not None and self.use_zk else None
+
+                        # Forced re-config or data not in Zookeeper
+                        # TODO JK: Comparing Zookeeper with actual data makes
+                        #          the condition above obsolete
+                        if data != job.files[fn]:
+                            if data is None or not self.use_zk:
+                                data = job.files[fn]
+                            if self.zk is not None:
+                                self.zk.saveConfig(tenant.name,
+                                                   source_context.project.name,
+                                                   source_context.branch,
+                                                   source_context.path, data)
+
+                        if data is not None:
+                            files_hash.update(data.encode(encoding='UTF-8'))
+                        incdata = self.loadProjectYAML(
+                            data, source_context, loading_errors)
+                        branch_cache = abide.getUnparsedBranchCache(
+                            source_context.project.canonical_name,
+                            source_context.branch)
+                        branch_cache.put(source_context.path, incdata)
+                        unparsed_config.extend(incdata)
+
+            if self.zk is not None:
+                calc_hash = files_hash.hexdigest()
+                layout_hash = self.scheduler.tenant_layout_hash[tenant.name]\
+                    if tenant.name in self.scheduler.tenant_layout_hash\
+                    else None
+                if layout_hash != calc_hash:
+                    self.log.debug("[WRITE] Layout hash for %s: %s => %s",
+                                   tenant.name, layout_hash, calc_hash)
+                    tenant.layout_hash = calc_hash
+                    self.scheduler.tenant_layout_hash[tenant.name] = calc_hash
+                    self.zk.setLayoutHash(tenant.name, calc_hash)
+        finally:
+            if write_lock is not None:
+                write_lock.release()
+
+    def _loadTenantYAML(self, abide: Abide, tenant: Tenant,
+                        loading_errors: LoadingErrors)\
+            -> Tuple[UnparsedConfig, UnparsedConfig]:
         config_projects_config = model.UnparsedConfig()
         untrusted_projects_config = model.UnparsedConfig()
 
@@ -1873,7 +1962,11 @@ class TenantParser(object):
                     untrusted_projects_config.extend(unparsed_branch_config)
         return config_projects_config, untrusted_projects_config
 
-    def loadProjectYAML(self, data, source_context, loading_errors):
+    def loadProjectYAML(self,
+                        data,
+                        source_context: SourceContext,
+                        loading_errors: LoadingErrors) -> UnparsedConfig:
+
         config = model.UnparsedConfig()
         try:
             with early_configuration_exceptions(source_context):
@@ -2135,6 +2228,9 @@ class TenantParser(object):
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
         layout = model.Layout(tenant)
+        # layout.zk_hash = self.zk.getLayoutHash(tenant)\
+        #     if self.zk is not None else None
+        # TODO JK: hash from data and compare
         layout.loading_errors = loading_errors
         self.log.debug("Created layout id %s", layout.uuid)
 
@@ -2149,19 +2245,23 @@ class TenantParser(object):
 class ConfigLoader(object):
     log = logging.getLogger("zuul.ConfigLoader")
 
-    def __init__(self, connections, scheduler, merger, key_dir):
-        self.connections = connections
+    def __init__(self,
+                 connections: ConnectionRegistry,
+                 scheduler,  #: Scheduler
+                 merger: Optional[MergeClient],
+                 key_dir: Optional[str],
+                 zk: Optional[ZooKeeper]=None,
+                 use_zk: bool=False):
+
         self.scheduler = scheduler
         self.merger = merger
-        if key_dir:
-            self.keystorage = KeyStorage(key_dir)
-        else:
-            self.keystorage = None
-        self.tenant_parser = TenantParser(connections, scheduler,
-                                          merger, self.keystorage)
+        self.keystorage = KeyStorage(key_dir) if key_dir else None
+        self.zk = zk
+        self.tenant_parser = TenantParser(connections, scheduler, merger,
+                                          self.keystorage, zk, use_zk)
         self.admin_rule_parser = AuthorizationRuleParser()
 
-    def expandConfigPath(self, config_path):
+    def expandConfigPath(self, config_path: str) -> str:
         if config_path:
             config_path = os.path.expanduser(config_path)
         if not os.path.exists(config_path):
@@ -2169,7 +2269,8 @@ class ConfigLoader(object):
                             config_path)
         return config_path
 
-    def readConfig(self, config_path, from_script=False):
+    def readConfig(self, config_path: str, from_script: bool=False)\
+            -> UnparsedAbideConfig:
         config_path = self.expandConfigPath(config_path)
         if not from_script:
             with open(config_path) as config_file:
@@ -2219,8 +2320,9 @@ class ConfigLoader(object):
                     self.log.warning(err.error)
         return abide
 
-    def reloadTenant(self, abide, tenant, ansible_manager,
-                     unparsed_abide=None):
+    def reloadTenant(self, abide: Abide, tenant: Tenant, ansible_manager,
+                     unparsed_abide: Optional[UnparsedAbideConfig]=None)\
+            -> Abide:
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
         new_abide.admin_rules = abide.admin_rules.copy()
@@ -2254,9 +2356,12 @@ class ConfigLoader(object):
                 self.log.warning(err.error)
         return new_abide
 
-    def _loadDynamicProjectData(self, config, project,
-                                files, trusted, tenant, loading_errors,
-                                pcontext):
+    def _loadDynamicProjectData(self, config: ParsedConfig, project: Project,
+                                files: RepoFiles, trusted: bool,
+                                tenant: Tenant, loading_errors: LoadingErrors,
+                                ansible_manager: AnsibleManager,
+                                pcontext) -> None:
+
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
             branches = ['master']
@@ -2296,11 +2401,13 @@ class ConfigLoader(object):
                         fns4.append(fn)
             fns = (["zuul.yaml"] + sorted(fns1) + [".zuul.yaml"] +
                    sorted(fns2) + fns3 + sorted(fns4))
-            incdata = None
             loaded = None
             for fn in fns:
-                data = files.getFile(project.source.connection.connection_name,
-                                     project.name, branch, fn)
+                # TODO JK: Check this
+                data = files.getFile(
+                    project.source.connection.connection_name, project.name,
+                    branch, fn)
+
                 if data:
                     source_context = model.SourceContext(project, branch,
                                                          fn, trusted)
@@ -2331,11 +2438,15 @@ class ConfigLoader(object):
                     config.extend(self.tenant_parser.parseConfig(
                         tenant, incdata, loading_errors, pcontext))
 
-    def createDynamicLayout(self, tenant, files, ansible_manager,
-                            include_config_projects=False,
-                            zuul_event_id=None):
+    def createDynamicLayout(self,
+                            tenant: Tenant,
+                            files: RepoFiles,
+                            ansible_manager: AnsibleManager,
+                            include_config_projects: bool=False,
+                            scheduler=None, connections=None,
+                            zuul_event_id=None) -> Layout:
         log = get_annotated_logger(self.log, zuul_event_id)
-        pcontext = ParseContext(self.connections, self.scheduler,
+        pcontext = ParseContext(self.scheduler.connections, self.scheduler,
                                 tenant, ansible_manager)
         loading_errors = model.LoadingErrors()
         if include_config_projects:
@@ -2351,6 +2462,7 @@ class ConfigLoader(object):
                                          loading_errors, pcontext)
 
         layout = model.Layout(tenant)
+        # Layout created, set current version
         layout.loading_errors = loading_errors
         log.debug("Created layout id %s", layout.uuid)
         if not include_config_projects:
