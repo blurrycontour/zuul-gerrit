@@ -34,6 +34,24 @@
       "revId": "058a90898e2578a42581ef88d5dfe167da262fb1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_79caaaa0",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-29T16:59:23Z",
+      "side": 1,
+      "message": "So it actually is the sha. However I wonder if we should refactor event.patch_number in a followup to event.patchset to match the naming of the change.",
+      "parentUuid": "bf51134e_2877de04",
+      "revId": "058a90898e2578a42581ef88d5dfe167da262fb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
