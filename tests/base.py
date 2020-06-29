@@ -4206,6 +4206,13 @@ class ZuulTestCase(BaseTestCase):
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.delete_head(repo.heads[branch], force=True)
 
+        # Note: Before git 2.13 deleting a a ref foo/bar leaves an empty
+        # directory foo behind that will block creating the reference foo
+        # in the future. As a workaround we must clean up empty directories
+        # in .git/refs.
+        if repo.git.version_info[:2] < (2, 13):
+            zuul.merger.merger.Repo._cleanup_leaked_ref_dirs(path, None, [])
+
     def create_commit(self, project, files=None, head='master',
                       message='Creating a fake commit', **kwargs):
         path = os.path.join(self.upstream_root, project)
