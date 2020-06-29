@@ -393,6 +393,11 @@ class Repo(object):
         branch_head = repo.heads[branch]
         return branch_head.commit
 
+    def setBranchHead(self, branch, head_ref, repo=None, zuul_event_id=None):
+        if repo is None:
+            repo = self.createRepoObject(zuul_event_id)
+        repo.create_head(branch, head_ref, force=True)
+
     def hasBranch(self, branch, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
         origin = repo.remotes.origin
@@ -909,6 +914,12 @@ class Merger(object):
             return None, None
         # Store this commit as the most recent for this project-branch
         recent[key] = commit
+
+        # Ensure the local head always references the  most recent
+        # (intermediate) speculative state of a branch, so commits are not
+        # garbage collected.
+        repo.setBranchHead(item["branch"], commit)
+
         return orig_commit, commit
 
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
