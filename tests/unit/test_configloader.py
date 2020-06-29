@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import time
 from configparser import ConfigParser
 
 import fixtures
@@ -434,11 +435,13 @@ class TestSplitConfig(ZuulTestCase):
 
         log_fixture._output.truncate(0)
         add_file("common-config", "zuul.yaml")
-        self.assertIn("Multiple configuration", log_fixture.output)
+        self.assertIn("Multiple configuration in common-config/zuul.d/",
+                      log_fixture.output)
 
         log_fixture._output.truncate(0)
         add_file("org/project1", ".zuul.yaml")
-        self.assertIn("Multiple configuration", log_fixture.output)
+        self.assertIn("Multiple configuration in org/project1/.zuul.d/",
+                      log_fixture.output)
 
 
 class TestConfigConflict(ZuulTestCase):
@@ -695,3 +698,77 @@ class TestTenantExtra(TenantParserTestCase):
             dict(name='project2-job', result='SUCCESS', changes='2,1'),
             dict(name='project2-extra-file2', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+
+class TestUnparsedBranchConfigInZookeeper(TenantParserTestCase):
+    tenant_config_file = 'config/tenant-parser/extra.yaml'
+
+    def setUp(self):
+        super().setUp()
+
+    def test_extra_reconfigure(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project2-extra-file2
+                parent: common-config-job
+            - project:
+                name: org/project2
+                check:
+                  jobs:
+                    - project2-extra-file2
+            """)
+        file_dict = {'extra.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='common-config-job', result='SUCCESS', changes='2,1'),
+            dict(name='project2-job', result='SUCCESS', changes='2,1'),
+            dict(name='project2-extra-file2', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+    def test_extra_reconfigure_from_zookeeper_change(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project2-extra-file2
+                parent: common-config-job
+            - project:
+                name: org/project2
+                check:
+                  jobs:
+                    - project2-extra-file2
+            """)
+
+        self.waitUntilSettled()
+        self.assertIs(True, 'project2-extra-file' in self.scheds.first.sched
+                      .abide.tenants['tenant-one'].layout.tenant.layout.jobs)
+        self.assertIs(False, 'project2-extra-file2' in self.scheds.first.sched
+                      .abide.tenants['tenant-one'].layout.tenant.layout.jobs)
+
+        # Simulate other scheduler instance updating config in ZK
+        self.scheds.first.sched.zk.saveConfig(
+            'tenant-one', 'org/project2', 'master', 'extra.yaml', in_repo_conf)
+        self.scheds.first.sched.zk.setLayoutHash('tenant-one', 'CHANGED_HASH')
+
+        # Wait up to 10 seconds for updated layout in scheduler
+        timeout = 10
+        while timeout > 0 and 'project2-extra-file2' not in self.scheds\
+                .first.sched.abide.tenants['tenant-one'].layout.tenant.layout\
+                .jobs:
+            time.sleep(1.0)
+            timeout -= 1
+
+        self.assertIs(False, 'project2-extra-file' in self.scheds.first.sched
+                      .abide.tenants['tenant-one'].layout.tenant.layout.jobs)
+        self.assertIs(True, 'project2-extra-file2' in self.scheds.first.sched
+                      .abide.tenants['tenant-one'].layout.tenant.layout.jobs)
