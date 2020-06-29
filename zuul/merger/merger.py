@@ -909,6 +909,12 @@ class Merger(object):
             return None, None
         # Store this commit as the most recent for this project-branch
         recent[key] = commit
+
+        # Ensure the local head always references the  most recent
+        # (intermediate) speculative state of a branch, so commits are not
+        # garbage collected.
+        repo.setRef("refs/heads/{}".format(item["branch"]), commit.hexsha)
+
         return orig_commit, commit
 
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
