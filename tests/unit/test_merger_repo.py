@@ -629,3 +629,64 @@ class TestMerger(ZuulTestCase):
         self.assertEqual(read_files[3]['branch'], 'master')
         self.assertEqual(read_files[3]['files']['zuul.d/a.yaml'],
                          'a-in-project1')
+
+    def test_merge_temp_refs(self):
+        """
+        Test that the merge updates local branches in order to avoid
+        garbage collection of needed objects.
+        """
+        merger = self.executor_server.merger
+
+        parent_path = os.path.join(self.upstream_root, 'org/project')
+        parent_repo = git.Repo(parent_path)
+        parent_repo.create_head("foo/bar")
+
+        # Simple change A
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        item_a = self._item_from_fake_change(A)
+
+        # Simple change B on branch foo/bar
+        B = self.fake_gerrit.addFakeChange('org/project', 'foo/bar', 'B')
+        item_b = self._item_from_fake_change(B)
+
+        # Simple change C
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        item_c = self._item_from_fake_change(C)
+
+        # Merge A -> B -> C
+        result = merger.mergeChanges([item_a, item_b, item_c])
+        self.assertIsNotNone(result)
+
+        cache_repo = merger.getRepo('gerrit', 'org/project')
+        repo = cache_repo.createRepoObject(zuul_event_id="dummy")
+
+        # Make sure local refs are updated
+        self.assertIn("foo/bar", repo.refs)
+        self.assertEqual(repo.refs.master.commit, repo.head.commit)
+
+        # Delete the remote branch so a reset cleanes up the local branch
+        parent_repo.delete_head('foo/bar', force=True)
+
+        # Note: Before git 2.13 deleting a a ref foo/bar leaves an empty
+        # directory foo behind that will block creating the reference foo
+        # in the future. As a workaround we must clean up empty directories
+        # in .git/refs.
+        if parent_repo.git.version_info[:2] < (2, 13):
+            Repo._cleanup_leaked_ref_dirs(parent_path, None, [])
+
+        cache_repo.reset()
+        self.assertNotIn("foo/bar", repo.refs)
+
+        # Create another head 'foo' that can't be created if the 'foo/bar'
+        # branch wasn't cleaned up properly
+        parent_repo.create_head("foo")
+
+        # Change B now on branch 'foo'
+        B = self.fake_gerrit.addFakeChange('org/project', 'foo', 'B')
+        item_b = self._item_from_fake_change(B)
+
+        # Merge A -> B -> C
+        result = merger.mergeChanges([item_a, item_b, item_c])
+        self.assertIsNotNone(result)
+        self.assertIn("foo", repo.refs)
+        self.assertEqual(repo.refs.master.commit, repo.head.commit)
