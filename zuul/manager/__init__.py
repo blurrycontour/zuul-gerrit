@@ -14,11 +14,16 @@ import logging
 import textwrap
 import urllib
 from abc import ABCMeta
+from typing import List
+from typing import Optional
+from zuul.model import RefFilter
+from zuul.model import EventFilter
 
 from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import QueueItem, Layout, Pipeline
 
 
 class DynamicChangeQueueContextManager(object):
@@ -47,14 +52,14 @@ class StaticChangeQueueContextManager(object):
 class PipelineManager(metaclass=ABCMeta):
     """Abstract Base Class for enqueing and processing Changes in a Pipeline"""
 
-    def __init__(self, sched, pipeline):
+    def __init__(self, sched, pipeline: Pipeline):
         self.log = logging.getLogger("zuul.Pipeline.%s.%s" %
                                      (pipeline.tenant.name,
                                       pipeline.name,))
-        self.sched = sched
+        self.sched = sched  # Optional[Scheduler]
         self.pipeline = pipeline
-        self.event_filters = []
-        self.ref_filters = []
+        self.event_filters = []  # type: List[EventFilter]
+        self.ref_filters = []  # type: List[RefFilter]
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -544,15 +549,24 @@ class PipelineManager(metaclass=ABCMeta):
                 relevant_errors.append(err)
         return relevant_errors
 
-    def _loadDynamicLayout(self, item):
+    def _loadDynamicLayout(self, item: QueueItem) -> Optional[Layout]:
         log = get_annotated_logger(self.log, item.event)
         # Load layout
         # Late import to break an import loop
+        if self.sched is None:
+            raise Exception("PipelineManager has no Scheduler")
+        if self.sched.connections is None:
+            raise Exception("Scheduler has no Connections!")
         import zuul.configloader
         loader = zuul.configloader.ConfigLoader(
-            self.sched.connections, self.sched, None, None)
+            self.sched.connections, self.sched, None, None,
+            self.sched.zk, use_zk=True)
 
         log.debug("Loading dynamic layout")
+
+        # TODO JK: Check global layout in item.pipeline.tenant.layout
+        # item.pipeline.tenant.layout.zk_hash
+        # Reload global layout
 
         (trusted_updates, untrusted_updates) = item.includesConfigUpdates()
         build_set = item.current_build_set
@@ -802,7 +816,7 @@ class PipelineManager(metaclass=ABCMeta):
         # a change ahead, a newly generated layout for this change, or
         # None if there was an error that makes the layout unusable.
         # In the last case, it will have set the config_errors on this
-        # item, which may be picked up by the next itme.
+        # item, which may be picked up by the next item.
         if not item.layout:
             item.layout = self.getLayout(item)
         if not item.layout:

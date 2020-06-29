@@ -26,10 +26,13 @@ import threading
 import time
 import urllib
 from configparser import ConfigParser
-from typing import Dict
+from typing import Dict, Any
+from typing import Optional
+from zuul.executor.client import ExecutorClient
+from zuul.nodepool import Nodepool
 
 from zuul.lib.named_queue import NamedQueue
-from zuul.model import TriggerEvent
+from zuul.model import TriggerEvent, Project
 
 from zuul import configloader
 from zuul import model
@@ -39,12 +42,15 @@ from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
+from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
+from zuul.merger.client import MergeClient
 from zuul.model import Build, HoldRequest, Tenant
+from zuul.zk import ZooKeeper
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure',
             'pause', 'resume', 'stop',
@@ -79,10 +85,12 @@ class ReconfigureEvent(ManagementEvent):
     the path specified in the configuration.
 
     :arg ConfigParser config: the new configuration
+    :arg bool use_zk: Use zookeeper as config source
     """
-    def __init__(self, config):
-        super(ReconfigureEvent, self).__init__()
+    def __init__(self, config: ConfigParser, use_zk: bool=False):
+        super().__init__()
         self.config = config
+        self.use_zk = use_zk
 
 
 class SmartReconfigureEvent(ManagementEvent):
@@ -90,10 +98,12 @@ class SmartReconfigureEvent(ManagementEvent):
     the path specified in the configuration.
 
     :arg ConfigParser config: the new configuration
+    :arg bool use_zk: Use zookeeper as config source
     """
-    def __init__(self, config, smart=False):
+    def __init__(self, config: ConfigParser, use_zk: bool=False):
         super().__init__()
         self.config = config
+        self.use_zk = use_zk
 
 
 class TenantReconfigureEvent(ManagementEvent):
@@ -106,10 +116,12 @@ class TenantReconfigureEvent(ManagementEvent):
     :arg Branch branch: if supplied along with project, only remove the
          configuration of the specific branch from the cache
     """
-    def __init__(self, tenant, project, branch):
+    def __init__(self, tenant: Tenant, project: Project, branch: str,
+                 use_zk: bool = False):
         super(TenantReconfigureEvent, self).__init__()
         self.tenant_name = tenant.name
         self.project_branches = set([(project, branch)])
+        self.use_zk = use_zk
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -297,6 +309,8 @@ class Scheduler(threading.Thread):
                  testonly: bool=False):
 
         threading.Thread.__init__(self)
+        self.nodepool = None  # type: Optional[Nodepool]
+        self.zk = None  # type: Optional[ZooKeeper]
         self.config = config
         self.daemon = True
         self.hostname = socket.getfqdn()
@@ -319,9 +333,9 @@ class Scheduler(threading.Thread):
         self._hibernate = False
         self._stopped = False
         self._zuul_app = None
-        self.executor = None
-        self.merger = None
-        self.connections = None
+        self.executor = None  # type: Optional[ExecutorClient]
+        self.merger = None  # type: Optional[MergeClient]
+        self.connections = None  # type: Optional[ConnectionRegistry]
         self.statsd = get_statsd(self.config)
         self.rpc = rpclistener.RPCListener(self.config, self)
         self.repl = None
@@ -358,6 +372,7 @@ class Scheduler(threading.Thread):
             self.zuul_version = zuul_version.release_string
         self.last_reconfigured = None
         self.tenant_last_reconfigured = {}  # type: Dict[str, float]
+        self.tenant_layout_hash = {}  # type: Dict[str, str]
         self.use_relative_priority = False
         if self.config.has_option('scheduler', 'relative_priority'):
             if self.config.getboolean('scheduler', 'relative_priority'):
@@ -426,9 +441,16 @@ class Scheduler(threading.Thread):
             except Exception:
                 self.log.exception("Exception while processing command")
 
-    def registerConnections(self, connections, load=True):
-        # load: whether or not to trigger the onLoad for the connection. This
-        # is useful for not doing a full load during layout validation.
+    def registerConnections(self, connections: ConnectionRegistry,
+                            load: bool=True) -> None:
+        """
+        Register connections.
+
+        :param connections: Connections to register
+        :param load: Whether or not to trigger the onLoad for the connection.
+               This is useful for not doing a full load during layout
+               validation.
+        """
         self.connections = connections
         self.connections.registerScheduler(self, load)
 
@@ -438,17 +460,27 @@ class Scheduler(threading.Thread):
     def setZuulApp(self, app):
         self._zuul_app = app
 
-    def setExecutor(self, executor):
+    def setExecutor(self, executor: ExecutorClient):
         self.executor = executor
 
-    def setMerger(self, merger):
+    def setMerger(self, merger: MergeClient):
         self.merger = merger
 
     def setNodepool(self, nodepool):
         self.nodepool = nodepool
 
-    def setZooKeeper(self, zk):
+    def setZooKeeper(self, zk: ZooKeeper):
         self.zk = zk
+        self.zk.watchLayoutHashes(self.layoutHashesWatcher)
+
+    def layoutHashesWatcher(self, tenant_name: str, layout_hash: str):
+        tenant_layout_hash = self.tenant_layout_hash[tenant_name]\
+            if tenant_name in self.tenant_layout_hash else None
+        if tenant_layout_hash != layout_hash\
+                and self._zuul_app is not None:
+            self.log.debug("[TRIGGER] Layout hash for %s: %s => %s",
+                           tenant_name, tenant_layout_hash, layout_hash)
+            self._zuul_app.smartReconfigure(use_zk=True)
 
     def runStats(self):
         while not self.stats_stop.wait(self._stats_interval):
@@ -571,7 +603,9 @@ class Scheduler(threading.Thread):
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def reconfigureTenant(self, tenant, project, event):
+    def reconfigureTenant(self, tenant: Tenant,
+                          project: Project,
+                          event: Optional[Any]):
         self.log.debug("Submitting tenant reconfiguration event for "
                        "%s due to event %s in project %s",
                        tenant.name, event, project)
@@ -598,12 +632,26 @@ class Scheduler(threading.Thread):
         self.repl.stop()
         self.repl = None
 
-    def reconfigure(self, config, smart=False):
+    def reconfigure(self, config, smart=False, use_zk=False):
+        """
+        Trigger reconfiguration. By default the configuration will be read
+        from files (use_zk=False). If ZooKeeper should be used as primary
+        config source set use_zk=True.
+
+        When use_zk=True but the data are not present in ZooKeeper this will
+        fallback to loading the configuration from files.
+
+        :param config: Configuration
+        :param smart: If true, smart reconfiguration will be triggered.
+                      Otherwise, full reconfiguration will be triggered.
+        :param use_zk: Whether ZooKeeper should be used as a primary source.
+        """
+
         self.log.debug("Submitting reconfiguration event")
         if smart:
-            event = SmartReconfigureEvent(config)
+            event = SmartReconfigureEvent(config, use_zk)
         else:
-            event = ReconfigureEvent(config)
+            event = ReconfigureEvent(config, use_zk)
         self.management_event_queue.put(event)
         self.wake_event.set()
         self.log.debug("Waiting for reconfiguration")
@@ -815,28 +863,23 @@ class Scheduler(threading.Thread):
             os._exit(0)
 
     def _checkTenantSourceConf(self, config):
-        tenant_config = None
+        tenant_conf = None
         script = False
-        if self.config.has_option(
-            'scheduler', 'tenant_config'):
-            tenant_config = self.config.get(
-                'scheduler', 'tenant_config')
-        if self.config.has_option(
-            'scheduler', 'tenant_config_script'):
-            if tenant_config:
-                raise Exception(
-                    "tenant_config and tenant_config_script options "
-                    "are exclusive.")
-            tenant_config = self.config.get(
-                'scheduler', 'tenant_config_script')
+        if self.config.has_option('scheduler', 'tenant_config'):
+            tenant_conf = self.config.get('scheduler', 'tenant_config')
+            script = False
+        if self.config.has_option('scheduler', 'tenant_config_script'):
+            if tenant_conf:
+                raise Exception("tenant_config and tenant_config_script"
+                                " options are exclusive.")
+            tenant_conf = self.config.get('scheduler', 'tenant_config_script')
             script = True
-        if not tenant_config:
-            raise Exception(
-                "tenant_config or tenant_config_script option "
-                "is missing from the configuration.")
-        return tenant_config, script
+        if not tenant_conf:
+            raise Exception("tenant_config or tenant_config_script option "
+                            "is missing from the configuration.")
+        return tenant_conf, script
 
-    def _doReconfigureEvent(self, event):
+    def _doReconfigureEvent(self, event: ReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         self.layout_lock.acquire()
@@ -852,13 +895,16 @@ class Scheduler(threading.Thread):
             self.ansible_manager = AnsibleManager(
                 default_version=default_ansible_version)
 
+            if self.connections is None:
+                raise Exception("No connections registered!")
+
             for connection in self.connections.connections.values():
                 self.log.debug("Clear branch cache for: %s" % connection)
                 connection.clearBranchCache()
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self._get_key_dir(), self.zk, use_zk=event.use_zk)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
@@ -874,7 +920,7 @@ class Scheduler(threading.Thread):
         self.log.info("Full reconfiguration complete (duration: %s seconds)",
                       duration)
 
-    def _doSmartReconfigureEvent(self, event):
+    def _doSmartReconfigureEvent(self, event: SmartReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         reconfigured_tenants = []
@@ -890,9 +936,11 @@ class Scheduler(threading.Thread):
             self.ansible_manager = AnsibleManager(
                 default_version=default_ansible_version)
 
+            if self.connections is None:
+                raise Exception("No connections registered!")
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self._get_key_dir(), self.zk, use_zk=event.use_zk)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
@@ -903,11 +951,11 @@ class Scheduler(threading.Thread):
             tenant_names = {t for t in self.abide.tenants}
             tenant_names.update(self.unparsed_abide.known_tenants)
             for tenant_name in tenant_names:
-                old_tenant = [x for x in old_unparsed_abide.tenants
-                              if x['name'] == tenant_name]
-                new_tenant = [x for x in self.unparsed_abide.tenants
-                              if x['name'] == tenant_name]
-                if old_tenant == new_tenant:
+                old_tenants = [x for x in old_unparsed_abide.tenants
+                               if x['name'] == tenant_name]
+                new_tenants = [x for x in self.unparsed_abide.tenants
+                               if x['name'] == tenant_name]
+                if not event.use_zk and old_tenants == new_tenants:
                     continue
 
                 reconfigured_tenants.append(tenant_name)
@@ -928,7 +976,7 @@ class Scheduler(threading.Thread):
         self.log.info("Smart reconfiguration of tenants %s complete "
                       "(duration: %s seconds)", reconfigured_tenants, duration)
 
-    def _doTenantReconfigureEvent(self, event):
+    def _doTenantReconfigureEvent(self, event: TenantReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         self.layout_lock.acquire()
@@ -944,10 +992,14 @@ class Scheduler(threading.Thread):
                                project.canonical_name, branch)
                 self.abide.clearUnparsedBranchCache(project.canonical_name,
                                                     branch)
+
+            if self.connections is None:
+                raise Exception("No connections registered!")
+
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self._get_key_dir(), self.zk, use_zk=event.use_zk)
             abide = loader.reloadTenant(
                 self.abide, old_tenant, self.ansible_manager)
             tenant = abide.tenants[event.tenant_name]
@@ -1115,6 +1167,7 @@ class Scheduler(threading.Thread):
             for reporter in pipeline.actions:
                 reporter.postConfig()
         self.tenant_last_reconfigured[tenant.name] = time.time()
+        self.tenant_layout_hash[tenant.name] = tenant.layout_hash
         if self.statsd:
             try:
                 for pipeline in tenant.layout.pipelines.values():
@@ -1404,7 +1457,8 @@ class Scheduler(threading.Thread):
         except Exception:
             self.log.exception("Exception in management event:")
             event.exception(sys.exc_info())
-        self.management_event_queue.task_done()
+        finally:
+            self.management_event_queue.task_done()
 
     def process_result_queue(self):
         self.log.debug("Fetching result event")
