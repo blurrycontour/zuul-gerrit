@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_fb1fd2b3",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-29T15:30:25Z",
+      "side": 1,
+      "message": "Is this on purpose? It looks to me like this should either not be translated or is already translated during instanciation.",
+      "revId": "1cd778096c667c62a0b90b2176ef79ea08b53afc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
