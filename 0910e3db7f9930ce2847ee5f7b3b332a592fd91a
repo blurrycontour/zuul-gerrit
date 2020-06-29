@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_bbe8bae1",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-29T15:18:33Z",
+      "side": 1,
+      "message": "Probably needs to be 13 now.",
+      "range": {
+        "startLine": 78,
+        "startChar": 25,
+        "endLine": 78,
+        "endChar": 27
+      },
+      "revId": "0910e3db7f9930ce2847ee5f7b3b332a592fd91a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_1bd7264d",
+        "filename": "zuul/driver/sql/alembic/versions/32e28a297c3e_add_held_attribute_to_builds.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-29T15:18:33Z",
+      "side": 1,
+      "message": "This conflicts with https://review.opendev.org/633501\n\nI think the down_revision needs to be 269691d2220e now.",
+      "revId": "0910e3db7f9930ce2847ee5f7b3b332a592fd91a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
