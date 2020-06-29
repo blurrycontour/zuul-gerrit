@@ -350,13 +350,15 @@ class Repo(object):
                 else:
                     messages.append("Delete stale local ref %s" % ref)
                 repo.delete_head(ref, force=True)
+                # Cleanup temporary local ref
+                zuul_ref = "refs/zuul/heads/{}".format(ref.name)
+                Repo._deleteRef(zuul_ref, repo)
 
-        # Note: Before git 2.13 deleting a a ref foo/bar leaves an empty
+        # Note: Some delete operations of e.g. a ref foo/bar leave an empty
         # directory foo behind that will block creating the reference foo
         # in the future. As a workaround we must clean up empty directories
         # in .git/refs.
-        if repo.git.version_info[:2] < (2, 13):
-            Repo._cleanup_leaked_ref_dirs(local_path, log, messages)
+        Repo._cleanup_leaked_ref_dirs(local_path, log, messages)
 
         # Update our local heads to match the remote
         for ref in origin.refs:
@@ -909,6 +911,10 @@ class Merger(object):
             return None, None
         # Store this commit as the most recent for this project-branch
         recent[key] = commit
+
+        # Ensure the most recent commit for a branch always points to a valid
+        # ref, so it is not garbage collected.
+        repo.setRef("zuul/heads/{}".format(item["branch"]), commit.hexsha)
         return orig_commit, commit
 
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,

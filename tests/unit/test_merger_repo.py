@@ -629,3 +629,60 @@ class TestMerger(ZuulTestCase):
         self.assertEqual(read_files[3]['branch'], 'master')
         self.assertEqual(read_files[3]['files']['zuul.d/a.yaml'],
                          'a-in-project1')
+
+    def test_merge_temp_refs(self):
+        """
+        Test that the merge creates/removes temporary refs meant to avoid
+        garbage collection of used objects."""
+
+        merger = self.executor_server.merger
+        self.create_branch('org/project', 'foo/bar')
+
+        # Simple change A
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        item_a = self._item_from_fake_change(A)
+
+        # Simple change B on branch foo/bar
+        B = self.fake_gerrit.addFakeChange('org/project', 'foo/bar', 'B')
+        item_b = self._item_from_fake_change(B)
+
+        # Simple change C
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        item_c = self._item_from_fake_change(C)
+
+        # Merge A -> B -> C
+        result = merger.mergeChanges([item_a, item_b, item_c])
+        self.assertIsNotNone(result)
+
+        cache_repo = merger.getRepo('gerrit', 'org/project')
+        repo = cache_repo.createRepoObject(zuul_event_id="dummy")
+        refs = {r.path: r for r in repo.refs}
+
+        # Make sure we have the temporary Zuul refs
+        self.assertIn("refs/zuul/heads/foo/bar", refs)
+        self.assertEqual(refs["refs/zuul/heads/master"].commit,
+                         repo.head.commit)
+
+        # Delete the remote branch so a reset cleanes up the zuul ref
+        self.delete_branch('org/project', 'foo/bar')
+        cache_repo.reset()
+        refs = {r.path: r for r in repo.refs}
+        self.assertNotIn("refs/zuul/heads/foo/bar", refs)
+
+        # Create another branch foo that can't be created if the foo/bar ref
+        # wasn't cleaned up properly
+        self.create_branch('org/project', 'foo')
+
+        # Change B now on branch foo
+        B = self.fake_gerrit.addFakeChange('org/project', 'foo', 'B')
+        item_b = self._item_from_fake_change(B)
+
+        # Merge A -> B -> C
+        result = merger.mergeChanges([item_a, item_b, item_c])
+        self.assertIsNotNone(result)
+
+        # Make sure we have the temporary Zuul refs
+        refs = {r.path: r for r in repo.refs}
+        self.assertIn("refs/zuul/heads/foo", refs)
+        self.assertEqual(refs["refs/zuul/heads/master"].commit,
+                         repo.head.commit)
