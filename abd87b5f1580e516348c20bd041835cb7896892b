@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_840f6086",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1566,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2020-06-29T07:39:17Z",
+      "side": 1,
+      "message": "Please add the missing ``change`` parameter\n\n``are missing: %s, change, missing_status_checks)``",
+      "revId": "abd87b5f1580e516348c20bd041835cb7896892b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
