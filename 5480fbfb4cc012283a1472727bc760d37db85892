@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bf51134e_899c7e5e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1400,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-30T17:34:00Z",
+      "side": 1,
+      "message": "We also return early here (see comment below).",
+      "revId": "5480fbfb4cc012283a1472727bc760d37db85892",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_2ee3b8a6",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -19,6 +36,40 @@
         "endLine": 1426,
         "endChar": 28
       },
+      "revId": "5480fbfb4cc012283a1472727bc760d37db85892",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_e9a09a94",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1426,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-30T17:34:00Z",
+      "side": 1,
+      "message": "Yes it could, but I think we should leave this as-is.  If a job is aborted, it was done so at Zuul\u0027s request, so we want to end it as quickly as possible.  In other words, that is a case where we do not want to run the post playbooks.",
+      "revId": "5480fbfb4cc012283a1472727bc760d37db85892",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_c99dd658",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1439,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-06-30T17:34:00Z",
+      "side": 1,
+      "message": "See here we stop running post as well.",
       "revId": "5480fbfb4cc012283a1472727bc760d37db85892",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
