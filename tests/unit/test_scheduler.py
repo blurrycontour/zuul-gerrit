@@ -8365,3 +8365,71 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
     def test_smart_reconfiguration_command_socket(self):
         "Test that live reconfiguration works using command socket"
         self._test_smart_reconfiguration(command_socket=True)
+
+
+class TestReconfigureBranch(ZuulTestCase):
+
+    def _setupTenantReconfigureTime(self):
+        self.old = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+
+    def _createBranch(self):
+        self.create_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'stable'))
+        self.waitUntilSettled()
+
+    def _deleteBranch(self):
+        self.delete_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchDeletedEvent(
+                'org/project1', 'stable'))
+        self.waitUntilSettled()
+
+    def _expectReconfigure(self, doReconfigure):
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        if doReconfigure:
+            self.assertLess(self.old, new)
+        else:
+            self.assertEqual(self.old, new)
+        self.old = new
+
+
+class TestReconfigureBranchCreateDeleteSshHttp(TestReconfigureBranch):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+    config_file = 'zuul-gerrit-web.conf'
+
+    def test_reconfigure_cache_branch_create_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+
+class TestReconfigureBranchCreateDeleteSsh(TestReconfigureBranch):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_reconfigure_cache_branch_create_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+
+class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+    config_file = 'zuul-gerrit-no-stream.conf'
+
+    def test_reconfigure_cache_branch_create_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
