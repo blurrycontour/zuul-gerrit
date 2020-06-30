@@ -31,6 +31,7 @@ import threading
 import zuul.lib.repl
 from zuul.lib.re2util import filter_allowed_disallowed
 import zuul.model
+from zuul.model import BUILD_RESULTS
 from zuul import exceptions
 import zuul.rpcclient
 import zuul.zk
@@ -967,7 +968,7 @@ class ZuulWebAPI(object):
         if not buildsets:
             raise cherrypy.HTTPError(404, 'No buildset found')
 
-        if buildsets[0].result == 'SUCCESS':
+        if buildsets[0].result == BUILD_RESULTS.SUCCESS:
             file = 'passing.svg'
         else:
             file = 'failing.svg'

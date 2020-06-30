@@ -40,7 +40,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
-from zuul.model import Build, HoldRequest, Tenant
+from zuul.model import Build, HoldRequest, Tenant, BUILD_RESULTS
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
 
@@ -502,9 +502,10 @@ class Scheduler(threading.Thread):
                 #   <host>.<project>.<branch>.job.<job>.<result>
                 key = '%s.%s' % (
                     jobkey,
-                    'RETRY' if result is None else result
+                    BUILD_RESULTS.RETRY if result is None else result
                 )
-                if result in ['SUCCESS', 'FAILURE'] and build.start_time:
+                if result in [BUILD_RESULTS.SUCCESS,
+                              BUILD_RESULTS.FAILURE] and build.start_time:
                     dt = int((build.end_time - build.start_time) * 1000)
                     self.statsd.timing(key, dt)
                 self.statsd.incr(key)
@@ -1534,7 +1535,10 @@ class Scheduler(threading.Thread):
     def _processAutohold(self, build):
         # We explicitly only want to hold nodes for jobs if they have
         # failed / retry_limit / post_failure and have an autohold request.
-        hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
+        hold_list = [BUILD_RESULTS.FAILURE,
+                     BUILD_RESULTS.RETRY_LIMIT,
+                     BUILD_RESULTS.POST_FAILURE,
+                     BUILD_RESULTS.TIMED_OUT]
         if build.result not in hold_list:
             return
 
@@ -1739,7 +1743,7 @@ class Scheduler(threading.Thread):
                     if nodeset:
                         self.nodepool.returnNodeSet(
                             nodeset, build=build, zuul_event_id=item.event)
-                build.result = 'CANCELED'
+                build.result = BUILD_RESULTS.CANCELED
             else:
                 nodeset = buildset.getJobNodeSet(job_name)
                 if nodeset:
@@ -1750,7 +1754,7 @@ class Scheduler(threading.Thread):
                     # If final is set make sure that the job is not resurrected
                     # later by re-requesting nodes.
                     fakebuild = Build(job, None)
-                    fakebuild.result = 'CANCELED'
+                    fakebuild.result = BUILD_RESULTS.CANCELED
                     buildset.addBuild(fakebuild)
         finally:
             # Release the semaphore in any case

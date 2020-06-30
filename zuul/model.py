@@ -89,6 +89,68 @@ NODE_STATES = set([STATE_BUILDING,
                    STATE_DELETING])
 
 
+# Build results
+class _BuildResults:
+    SUCCESS = 'SUCCESS'
+    FAILURE = 'FAILURE'
+    MERGER_FAILURE = 'MERGER_FAILURE'
+    CONFIG_ERROR = 'CONFIG_ERROR'
+    SKIPPED = 'SKIPPED'
+    POST_FAILURE = 'POST_FAILURE'
+    NODE_FAILURE = 'NODE_FAILURE'
+    RETRY_LIMIT = 'RETRY_LIMIT'
+    TIMED_OUT = 'TIMED_OUT'
+    CANCELED = 'CANCELED'
+    ERROR = 'ERROR'
+    RETRY = 'RETRY'
+    DISK_FULL = 'DISK_FULL'
+    NO_JOBS = 'NO_JOBS'
+    # Gearman statuses ?
+    DISCONNECT = 'DISCONNECT'
+    ABORTED = 'ABORTED'
+    LOST = 'LOST'
+    EXCEPTION = 'EXCEPTION'
+    NO_HANDLE = 'NO_HANDLE'
+
+
+BUILD_RESULTS = _BuildResults()
+
+
+BUILD_RESULTS_SET = set([BUILD_RESULTS.SUCCESS,
+                         BUILD_RESULTS.FAILURE,
+                         BUILD_RESULTS.MERGER_FAILURE,
+                         BUILD_RESULTS.CONFIG_ERROR,
+                         BUILD_RESULTS.SKIPPED,
+                         BUILD_RESULTS.POST_FAILURE,
+                         BUILD_RESULTS.NODE_FAILURE,
+                         BUILD_RESULTS.RETRY_LIMIT,
+                         BUILD_RESULTS.TIMED_OUT,
+                         BUILD_RESULTS.CANCELED,
+                         BUILD_RESULTS.ABORTED,
+                         BUILD_RESULTS.DISCONNECT,
+                         BUILD_RESULTS.ABORTED,
+                         BUILD_RESULTS.ERROR,
+                         BUILD_RESULTS.RETRY,
+                         BUILD_RESULTS.DISK_FULL,
+                         BUILD_RESULTS.LOST,
+                         BUILD_RESULTS.EXCEPTION,
+                         BUILD_RESULTS.NO_HANDLE,
+                         BUILD_RESULTS.NO_JOBS])
+
+
+# Buildset results
+class _BUildsetResults:
+    SUCCESS = 'SUCCESS'
+    FAILURE = 'FAILURE'
+
+
+BUILDSET_RESULTS = _BUildsetResults()
+
+
+BUILDSET_RESULTS_SET = set([BUILDSET_RESULTS.SUCCESS,
+                            BUILDSET_RESULTS.FAILURE])
+
+
 class ConfigurationErrorKey(object):
     """A class which attempts to uniquely identify configuration errors
     based on their file location.  It's not perfect, but it's usually
@@ -1874,7 +1936,7 @@ class Build(object):
         self.job = job
         self.uuid = uuid
         self.url = None
-        self.result = None
+        self._result = None
         self.result_data = {}
         self.error_detail = None
         self.build_set = None
@@ -1897,8 +1959,19 @@ class Build(object):
                 (self.uuid, self.job.name, self.job.voting, self.worker))
 
     @property
+    def result(self):
+        return self._result
+
+    @result.setter
+    def result(self, value):
+        if value not in BUILD_RESULTS_SET:
+            raise TypeError('"%s" is not a valid result' % value)
+        self._result = value
+
+    @property
     def failed(self):
-        if self.result and self.result not in ['SUCCESS', 'SKIPPED']:
+        if self.result and self.result not in [BUILD_RESULTS.SUCCESS,
+                                               BUILD_RESULTS.SKIPPED]:
             return True
         return False
 
@@ -2307,9 +2380,10 @@ class QueueItem(object):
                 # If the build ran, record whether or not it was skipped
                 # and return False if the build was voting and has an
                 # unsuccessful return value
-                if build.result != 'SKIPPED':
+                if build.result != BUILD_RESULTS.SKIPPED:
                     all_jobs_skipped = False
-                if job.voting and build.result not in ['SUCCESS', 'SKIPPED']:
+                if job.voting and build.result not in [BUILD_RESULTS.SUCCESS,
+                                                       BUILD_RESULTS.SKIPPED]:
                     return False
             elif job.voting:
                 # If the build failed to run and was voting that is an
@@ -2338,7 +2412,8 @@ class QueueItem(object):
                 continue
             build = self.current_build_set.getBuild(job.name)
             if (build and build.result and
-                    build.result not in ['SUCCESS', 'SKIPPED']):
+                    build.result not in [BUILD_RESULTS.SUCCESS,
+                                         BUILD_RESULTS.SKIPPED]):
                 return True
         return False
 
@@ -2381,7 +2456,7 @@ class QueueItem(object):
             build = self.current_build_set.getBuild(job.name)
             if not build:
                 return True
-            if build.result != 'SUCCESS':
+            if build.result != BUILD_RESULTS.SUCCESS:
                 return True
 
         if not self.item_ahead:
@@ -2420,7 +2495,7 @@ class QueueItem(object):
             return data
 
         for build in builds:
-            if build.result != 'SUCCESS':
+            if build.result != BUILD_RESULTS.SUCCESS:
                 provides = [x.name for x in build.provides]
                 requirement = list(requirements.intersection(set(provides)))
                 raise RequirementsError(
@@ -2473,7 +2548,7 @@ class QueueItem(object):
                     build = self.current_build_set.getBuild(_job.name)
                     if not build:
                         return False
-                    if build.result and build.result != 'SUCCESS':
+                    if build.result and build.result != BUILD_RESULTS.SUCCESS:
                         return False
                     if not build.result and not build.paused:
                         return False
@@ -2504,7 +2579,7 @@ class QueueItem(object):
         except RequirementsError as e:
             self.warning(str(e))
             fakebuild = Build(job, None)
-            fakebuild.result = 'FAILURE'
+            fakebuild.result = BUILD_RESULTS.FAILURE
             self.addBuild(fakebuild)
             self.setResult(fakebuild)
             ret = True
@@ -2529,9 +2604,9 @@ class QueueItem(object):
         for job in self.job_graph.getJobs():
             build = self.current_build_set.getBuild(job.name)
             if build:
-                if build.result == 'SUCCESS' or build.paused:
+                if build.result == BUILD_RESULTS.SUCCESS or build.paused:
                     pass
-                elif build.result == 'SKIPPED':
+                elif build.result == BUILD_RESULTS.SKIPPED:
                     ignored_job_names.add(job.name)
                 else:  # elif build.result in ('FAILURE', 'CANCELED', ...):
                     failed_job_names.add(job.name)
@@ -2603,11 +2678,13 @@ class QueueItem(object):
         jobs_not_requested = set()
         for job in self.job_graph.getJobs():
             build = build_set.getBuild(job.name)
-            if build and (build.result == 'SUCCESS' or build.paused):
+            if build and (build.result == BUILD_RESULTS.SUCCESS
+                          or build.paused):
                 pass
-            elif build and build.result == 'SKIPPED':
+            elif build and build.result == BUILD_RESULTS.SKIPPED:
                 ignored_job_names.add(job.name)
-            elif build and build.result in ('FAILURE', 'CANCELED'):
+            elif build and build.result in (BUILD_RESULTS.FAILURE,
+                                            BUILD_RESULTS.CANCELED):
                 failed_job_names.add(job.name)
             else:
                 unexecuted_job_names.add(job.name)
@@ -2659,7 +2736,7 @@ class QueueItem(object):
         # NOTE(pabelanger): Check successful/paused jobs to see if
         # zuul_return includes zuul.child_jobs.
         build_result = build.result_data.get('zuul', {})
-        if ((build.result == 'SUCCESS' or build.paused)
+        if ((build.result == BUILD_RESULTS.SUCCESS or build.paused)
                 and 'child_jobs' in build_result):
             zuul_return = build_result.get('child_jobs', [])
             dependent_jobs = self.job_graph.getDirectDependentJobs(
@@ -2682,7 +2759,7 @@ class QueueItem(object):
                         skip, skip_soft=True)
                     skipped += to_skip
 
-        elif build.result != 'SUCCESS' and not build.paused:
+        elif build.result != BUILD_RESULTS.SUCCESS and not build.paused:
             to_skip = self.job_graph.getDependentJobsRecursively(
                 build.job.name)
             skipped += to_skip
@@ -2691,7 +2768,7 @@ class QueueItem(object):
             child_build = self.current_build_set.getBuild(job.name)
             if not child_build:
                 fakebuild = Build(job, None)
-                fakebuild.result = 'SKIPPED'
+                fakebuild.result = BUILD_RESULTS.SKIPPED
                 self.addBuild(fakebuild)
 
     def setNodeRequestFailure(self, job):
@@ -2699,7 +2776,7 @@ class QueueItem(object):
         fakebuild.start_time = time.time()
         fakebuild.end_time = time.time()
         self.addBuild(fakebuild)
-        fakebuild.result = 'NODE_FAILURE'
+        fakebuild.result = BUILD_RESULTS.NODE_FAILURE
         self.setResult(fakebuild)
 
     def setDequeuedNeedingChange(self):
@@ -2721,7 +2798,7 @@ class QueueItem(object):
     def _setAllJobsSkipped(self):
         for job in self.getJobs():
             fakebuild = Build(job, None)
-            fakebuild.result = 'SKIPPED'
+            fakebuild.result = BUILD_RESULTS.SKIPPED
             self.addBuild(fakebuild)
 
     def getNodePriority(self):
@@ -2801,7 +2878,7 @@ class QueueItem(object):
             build = self.current_build_set.getBuild(job.name)
         result = build.result
         pattern = None
-        if result == 'SUCCESS':
+        if result == BUILD_RESULTS.SUCCESS:
             if job.success_message:
                 result = job.success_message
             if job.success_url:
@@ -4647,7 +4724,7 @@ class JobTimeData(object):
 
     def add(self, elapsed, result):
         elapsed = int(elapsed)
-        if result == 'SUCCESS':
+        if result == BUILD_RESULTS.SUCCESS:
             self.success_times.append(elapsed)
             self.success_times.pop(0)
             result = 0

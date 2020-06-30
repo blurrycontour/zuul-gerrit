@@ -17,6 +17,7 @@ from abc import ABCMeta
 
 from zuul import exceptions
 from zuul import model
+from zuul.model import BUILD_RESULTS
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
 
@@ -197,7 +198,7 @@ class PipelineManager(metaclass=ABCMeta):
                     if ret:
                         report_errors.append(ret)
                 except Exception as e:
-                    item.setReportedResult('ERROR')
+                    item.setReportedResult(BUILD_RESULTS.ERROR)
                     log.exception("Exception while reporting")
                     report_errors.append(str(e))
         return report_errors
@@ -346,7 +347,7 @@ class PipelineManager(metaclass=ABCMeta):
                 item = model.QueueItem(self, change, event)
                 item.warning("Dependency cycle detected")
                 actions = self.pipeline.failure_actions
-                item.setReportedResult('FAILURE')
+                item.setReportedResult(BUILD_RESULTS.FAILURE)
                 self.sendReport(actions, item)
                 return False
 
@@ -1152,31 +1153,31 @@ class PipelineManager(metaclass=ABCMeta):
                       item.change.project, self.pipeline, item.change)
             project_in_pipeline = False
             actions = self.pipeline.no_jobs_actions
-            item.setReportedResult('NO_JOBS')
+            item.setReportedResult(BUILD_RESULTS.NO_JOBS)
         elif item.getConfigErrors():
             log.debug("Invalid config for change %s", item.change)
             # TODOv3(jeblair): consider a new reporter action for this
             actions = self.pipeline.merge_failure_actions
-            item.setReportedResult('CONFIG_ERROR')
+            item.setReportedResult(BUILD_RESULTS.CONFIG_ERROR)
         elif item.didMergerFail():
             actions = self.pipeline.merge_failure_actions
-            item.setReportedResult('MERGER_FAILURE')
+            item.setReportedResult(BUILD_RESULTS.MERGER_FAILURE)
         elif item.wasDequeuedNeedingChange():
             actions = self.pipeline.failure_actions
-            item.setReportedResult('FAILURE')
+            item.setReportedResult(BUILD_RESULTS.FAILURE)
         elif not item.getJobs():
             # We don't send empty reports with +1
             log.debug("No jobs for change %s", item.change)
             actions = self.pipeline.no_jobs_actions
-            item.setReportedResult('NO_JOBS')
+            item.setReportedResult(BUILD_RESULTS.NO_JOBS)
         elif item.didAllJobsSucceed():
             log.debug("success %s", self.pipeline.success_actions)
             actions = self.pipeline.success_actions
-            item.setReportedResult('SUCCESS')
+            item.setReportedResult(BUILD_RESULTS.SUCCESS)
             self.pipeline._consecutive_failures = 0
         else:
             actions = self.pipeline.failure_actions
-            item.setReportedResult('FAILURE')
+            item.setReportedResult(BUILD_RESULTS.FAILURE)
             self.pipeline._consecutive_failures += 1
         if project_in_pipeline and self.pipeline._disabled:
             actions = self.pipeline.disabled_actions

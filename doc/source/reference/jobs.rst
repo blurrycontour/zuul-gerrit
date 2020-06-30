@@ -953,3 +953,44 @@ A job build may have the following status:
   The test instance provider was unable to fullfill the nodeset request.
   This can happen if Nodepool is unable to provide the requested node(s)
   for the request.
+
+**MERGER_FAILURE**
+  A merge conflict was encountered and the build was canceled.
+
+**CONFIG_ERROR**
+  The change has an incorrect configuration.
+
+**TIMED_OUT**
+  The execution of an Ansible playbook timed out.
+
+**CANCELED**
+  The build was canceled.
+
+**ERROR**
+  An error occurred on the executor, or when reporting the build's status.
+
+**RETRY**
+  The build failed, but less times than the maximum number of ``retry`` attempts.
+  A new attempt was therefore scheduled after this failure.
+
+**DISK_FULL**
+  The Ansible playbook could not be executed due to a lack of storage on the executor
+  node(s).
+
+**NO_JOBS**
+  There was no job to execute.
+
+**DISCONNECT**
+  The Gearman server was disconnected.
+
+**ABORTED**
+  The executor could not fetch refs to merge from remote.
+
+**LOST**
+  The Gearman server lost the job.
+
+**EXCEPTION**
+  An unknown exception occurred.
+
+**NO_HANDLE**
+  The Gearman server did not issue a handle for the requested job in time. 

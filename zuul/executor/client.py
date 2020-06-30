@@ -25,7 +25,7 @@ from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Build
+from zuul.model import Build, BUILD_RESULTS
 
 
 class GearmanCleanup(threading.Thread):
@@ -316,7 +316,7 @@ class ExecutorClient(object):
 
         if job.name == 'noop':
             self.sched.onBuildStarted(build)
-            self.sched.onBuildCompleted(build, 'SUCCESS', {}, [])
+            self.sched.onBuildCompleted(build, BUILD_RESULTS.SUCCESS, {}, [])
             return build
 
         # Update zuul attempts after addBuild above to ensure build_set
@@ -364,14 +364,14 @@ class ExecutorClient(object):
                                    timeout=300)
         except Exception:
             log.exception("Unable to submit job to Gearman")
-            self.onBuildCompleted(gearman_job, 'EXCEPTION')
+            self.onBuildCompleted(gearman_job, BUILD_RESULTS.EXCEPTION)
             return build
 
         if not gearman_job.handle:
             log.error("No job handle was received for %s after"
                       " 300 seconds; marking as lost.",
                       gearman_job)
-            self.onBuildCompleted(gearman_job, 'NO_HANDLE')
+            self.onBuildCompleted(gearman_job, BUILD_RESULTS.NO_HANDLE)
 
         log.debug("Received handle %s for %s", gearman_job.handle, build)
 
@@ -432,13 +432,13 @@ class ExecutorClient(object):
             if result is None:
                 if (build.build_set.getTries(build.job.name) >=
                     build.job.attempts):
-                    result = 'RETRY_LIMIT'
+                    result = BUILD_RESULTS.RETRY_LIMIT
                 else:
                     build.retry = True
-            if result in ('DISCONNECT', 'ABORTED'):
+            if result in (BUILD_RESULTS.DISCONNECT, BUILD_RESULTS.ABORTED):
                 # Always retry if the executor just went away
                 build.retry = True
-            if result == 'MERGER_FAILURE':
+            if result == BUILD_RESULTS.MERGER_FAILURE:
                 # The build result MERGER_FAILURE is a bit misleading here
                 # because when we got here we know that there are no merge
                 # conflicts. Instead this is most likely caused by some
@@ -459,7 +459,7 @@ class ExecutorClient(object):
                      result, warnings)
 
             if build.retry:
-                result = 'RETRY'
+                result = BUILD_RESULTS.RETRY
 
             # If the build was canceled, we did actively cancel the job so
             # don't overwrite the result and don't retry.
@@ -501,11 +501,11 @@ class ExecutorClient(object):
 
     def onDisconnect(self, job):
         self.log.info("Gearman job %s lost due to disconnect" % job)
-        self.onBuildCompleted(job, 'DISCONNECT')
+        self.onBuildCompleted(job, BUILD_RESULTS.DISCONNECT)
 
     def onUnknownJob(self, job):
         self.log.info("Gearman job %s lost due to unknown handle" % job)
-        self.onBuildCompleted(job, 'LOST')
+        self.onBuildCompleted(job, BUILD_RESULTS.LOST)
 
     def cancelJobInQueue(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id,
@@ -523,7 +523,7 @@ class ExecutorClient(object):
             # Since this isn't otherwise going to get a build complete
             # event, send one to the scheduler so that it can unlock
             # the nodes.
-            self.sched.onBuildCompleted(build, 'CANCELED', {}, [])
+            self.sched.onBuildCompleted(build, BUILD_RESULTS.CANCELED, {}, [])
             return True
         return False
 

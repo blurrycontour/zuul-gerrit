@@ -55,6 +55,7 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
+from zuul.model import BUILD_RESULTS
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -938,7 +939,7 @@ class AnsibleJob(object):
             self.executor_server.resetProcessPool()
             self._send_aborted()
         except ExecutorError as e:
-            result_data = json.dumps(dict(result='ERROR',
+            result_data = json.dumps(dict(result=BUILD_RESULTS.ERROR,
                                           error_detail=e.args[0]))
             self.log.debug("Sending result: %s" % (result_data,))
             self.job.sendWorkComplete(result_data)
@@ -982,7 +983,7 @@ class AnsibleJob(object):
         }
 
     def _send_aborted(self):
-        result = dict(result='ABORTED')
+        result = dict(result=BUILD_RESULTS.ABORTED)
         self.job.sendWorkComplete(json.dumps(result))
 
     def _execute(self):
@@ -1152,7 +1153,7 @@ class AnsibleJob(object):
         self.job.sendWorkStatus(0, 100)
 
         result = self.runPlaybooks(args)
-        success = result == 'SUCCESS'
+        success = result == BUILD_RESULTS.SUCCESS
 
         self.runCleanupPlaybooks(success)
 
@@ -1161,7 +1162,7 @@ class AnsibleJob(object):
             self.jobdir.setup_playbook)
 
         if self.aborted_reason == self.RESULT_DISK_FULL:
-            result = 'DISK_FULL'
+            result = BUILD_RESULTS.DISK_FULL
         data = self.getResultData()
         warnings = []
         self.mapLines(merger, args, data, item_commit, warnings)
@@ -1261,11 +1262,11 @@ class AnsibleJob(object):
             # the refs we're trying to merge should be valid refs. If we
             # can't fetch them, it should resolve itself.
             self.log.exception("Could not fetch refs to merge from remote")
-            result = dict(result='ABORTED')
+            result = dict(result=BUILD_RESULTS.ABORTED)
             self.job.sendWorkComplete(json.dumps(result))
             return None
         if not ret:  # merge conflict
-            result = dict(result='MERGER_FAILURE')
+            result = dict(result=BUILD_RESULTS.MERGER_FAILURE)
             if self.executor_server.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
                 self.executor_server.statsd.incr(base_key + ".FAILURE")
@@ -1396,19 +1397,19 @@ class AnsibleJob(object):
                     playbook, ansible_timeout, self.ansible_version,
                     phase='run', index=index)
                 if job_status == self.RESULT_ABORTED:
-                    return 'ABORTED'
+                    return BUILD_RESULTS.ABORTED
                 elif job_status == self.RESULT_TIMED_OUT:
                     # Set the pre-failure flag so this doesn't get
                     # overridden by a post-failure.
                     pre_failed = True
-                    result = 'TIMED_OUT'
+                    result = BUILD_RESULTS.TIMED_OUT
                     break
                 elif job_status == self.RESULT_NORMAL:
                     success = (job_code == 0)
                     if success:
-                        result = 'SUCCESS'
+                        result = BUILD_RESULTS.SUCCESS
                     else:
-                        result = 'FAILURE'
+                        result = BUILD_RESULTS.FAILURE
                         break
                 else:
                     # The result of the job is indeterminate.  Zuul will
@@ -1421,7 +1422,7 @@ class AnsibleJob(object):
         if pause:
             self.pause()
         if self.aborted:
-            return 'ABORTED'
+            return BUILD_RESULTS.ABORTED
 
         post_timeout = args['post_timeout']
         unreachable = False
@@ -1435,7 +1436,7 @@ class AnsibleJob(object):
                 playbook, post_timeout, self.ansible_version, success,
                 phase='post', index=index)
             if post_status == self.RESULT_ABORTED:
-                return 'ABORTED'
+                return BUILD_RESULTS.ABORTED
             if post_status == self.RESULT_UNREACHABLE:
                 # In case we encounter unreachable nodes we need to return None
                 # so the job can be retried. However in the case of post
@@ -1447,7 +1448,7 @@ class AnsibleJob(object):
                 # If we encountered a pre-failure, that takes
                 # precedence over the post result.
                 if not pre_failed:
-                    result = 'POST_FAILURE'
+                    result = BUILD_RESULTS.POST_FAILURE
                 if (index + 1) == len(self.jobdir.post_playbooks):
                     self._logFinalPlaybookError()
 

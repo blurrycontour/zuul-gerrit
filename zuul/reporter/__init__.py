@@ -15,6 +15,7 @@
 import abc
 import logging
 from zuul.lib.config import get_default
+from zuul.model import BUILDSET_RESULTS
 
 
 class BaseReporter(object, metaclass=abc.ABCMeta):
@@ -202,9 +203,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             status_url=status_url)
 
     def _formatItemReportDisabled(self, item, with_jobs=True):
-        if item.current_build_set.result == 'SUCCESS':
+        if item.current_build_set.result == BUILDSET_RESULTS.SUCCESS:
             return self._formatItemReportSuccess(item)
-        elif item.current_build_set.result == 'FAILURE':
+        elif item.current_build_set.result == BUILDSET_RESULTS.FAILURE:
             return self._formatItemReportFailure(item)
         else:
             return self._formatItemReport(item)
