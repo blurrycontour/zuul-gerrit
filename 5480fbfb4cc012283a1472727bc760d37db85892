@@ -59,6 +59,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_297f32ac",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1426,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-06-30T17:59:25Z",
+      "side": 1,
+      "message": "My comment was for the whole block, in particular the self.pause() call, which used to be avoided on indeterminate state because of the return.",
+      "parentUuid": "bf51134e_e9a09a94",
+      "revId": "5480fbfb4cc012283a1472727bc760d37db85892",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_c99dd658",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
