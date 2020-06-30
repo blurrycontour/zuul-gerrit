@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_38793e93",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2127,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-06-30T14:59:20Z",
+      "side": 1,
+      "message": "Mostly I was thinking that the test will fail if it calls _authenticateGithubAPI(). That failure message may be confusing in the context of testing because why would we try to authenticate to github.com there. Instead we could override and raise with an exception that has a message that describes this should never be called. But maybe its good enough that it will fail already and we can debug from there if it happens.",
+      "parentUuid": "bf51134e_e210b752",
+      "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_d9ef3de7",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 2
