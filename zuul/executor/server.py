@@ -1388,6 +1388,7 @@ class AnsibleJob(object):
              self.cpu_times['children_user'],
              self.cpu_times['children_system']))
 
+        indeterminate = False
         if not pre_failed:
             for index, playbook in enumerate(self.jobdir.playbooks):
                 ansible_timeout = self.getAnsibleTimeout(
@@ -1412,8 +1413,9 @@ class AnsibleJob(object):
                         break
                 else:
                     # The result of the job is indeterminate.  Zuul will
-                    # run it again.
-                    return None
+                    # run it again, but let's try to upload logs first.
+                    indeterminate = True
+                    break
 
         # check if we need to pause here
         result_data = self.getResultData()
@@ -1424,7 +1426,6 @@ class AnsibleJob(object):
             return 'ABORTED'
 
         post_timeout = args['post_timeout']
-        unreachable = False
         for index, playbook in enumerate(self.jobdir.post_playbooks):
             # Post timeout operates a little differently to the main job
             # timeout. We give each post playbook the full post timeout to
@@ -1436,12 +1437,12 @@ class AnsibleJob(object):
                 phase='post', index=index)
             if post_status == self.RESULT_ABORTED:
                 return 'ABORTED'
-            if post_status == self.RESULT_UNREACHABLE:
+            if post_status != self.RESULT_NORMAL:
                 # In case we encounter unreachable nodes we need to return None
                 # so the job can be retried. However in the case of post
                 # playbooks we should still try to run all playbooks to get a
                 # chance to upload logs.
-                unreachable = True
+                indeterminate = True
             if post_status != self.RESULT_NORMAL or post_code != 0:
                 success = False
                 # If we encountered a pre-failure, that takes
@@ -1451,7 +1452,7 @@ class AnsibleJob(object):
                 if (index + 1) == len(self.jobdir.post_playbooks):
                     self._logFinalPlaybookError()
 
-        if unreachable:
+        if indeterminate:
             return None
 
         return result
