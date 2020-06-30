@@ -2440,7 +2440,7 @@ class AnsibleJob(object):
     def runAnsiblePlaybook(self, playbook, timeout, ansible_version,
                            success=None, phase=None, index=None):
         if self.executor_server.verbose:
-            verbose = '-vvv'
+            verbose = '-vvvv'
         else:
             verbose = '-v'
 
