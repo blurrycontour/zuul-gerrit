@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_e210b752",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2127,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-30T13:23:08Z",
+      "side": 1,
+      "message": "I think I don\u0027t understand the question. Can you elaborate why this should be overridden? I don\u0027t see a need to do this at first glance and generally we should try to override as few functions as possible in the tests.",
+      "parentUuid": "bf51134e_b7fdcdb2",
+      "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_d9ef3de7",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 2
@@ -65,6 +83,24 @@
       "writtenOn": "2020-06-22T23:11:17Z",
       "side": 1,
       "message": "This block reads oddly now. We\u0027ve put the logic into getGithubClientsForProjects() on line 1313, and so want to noop here. But maybe it would be better to express this as:\n\n  if not projects:\n      # We aren\u0027t in the context of a change queue....\n  # Otherwise we use the input projects list and look for changes in the supplied projects.\n\n  clients \u003d self._github_client_manager.getGithubClientsForProjects(projects)",
+      "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_22490f60",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1304,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-06-30T13:23:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_37b9bde8",
       "revId": "fc4297ce96257556c7c75ed1606e7e886c451f71",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
