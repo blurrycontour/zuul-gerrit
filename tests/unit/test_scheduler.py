@@ -3220,6 +3220,41 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.history[4].pipeline, 'check')
         self.assertEqual(self.history[5].pipeline, 'check')
 
+    def test_reconfigure_cache_branch_create_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        old = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        self.assertEqual(self.scheds.first.sched.abide.hasUnparsedBranchCache(
+            "review.example.com/org/project1", "stable"), False)
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        (trusted, project1) = tenant.getProject('org/project1')
+        self.create_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'stable'))
+        self.waitUntilSettled()
+        # reconfiguration: branch created
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        self.assertLess(old, new)
+        old = new
+        self.assertEqual(self.scheds.first.sched.abide.hasUnparsedBranchCache(
+            "review.example.com/org/project1", "stable"), True)
+
+        self.delete_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchDeletedEvent(
+                'org/project1', 'stable'))
+        self.waitUntilSettled()
+        # reconfiguration: branch with config file (cache entry) is removed
+        # the cache should be empty
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        self.assertLess(old, new)
+        self.assertEqual(self.scheds.first.sched.abide.hasUnparsedBranchCache(
+            "review.example.com/org/project1", "stable"), False)
+
     def test_reconfigure_merge(self):
         """Test that two reconfigure events are merged"""
 
