@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_d144511e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1000,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-07-01T09:33:39Z",
+      "side": 1,
+      "message": "The logic is wrong here. The safety margin needs to be added to \"now\". Also, Zuul already subtracts 2min from the expiry time.\n\nThis leaves me wondering why we are still seeing token expired exceptions.",
+      "revId": "33cf619f3fe3d76ff4441e82e4e2b6b87a50b7c8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
