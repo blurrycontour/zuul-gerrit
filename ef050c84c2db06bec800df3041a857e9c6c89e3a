@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_14407007",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1072,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-01T16:45:53Z",
+      "side": 1,
+      "message": "Correct, that may be a poorly named variable; it\u0027s the timestamp for when the build finished with a result.",
+      "revId": "ef050c84c2db06bec800df3041a857e9c6c89e3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_2caac417",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -42,6 +59,23 @@
         "endLine": 1077,
         "endChar": 21
       },
+      "revId": "ef050c84c2db06bec800df3041a857e9c6c89e3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_f444dc1d",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1077,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-01T16:45:53Z",
+      "side": 1,
+      "message": "No, we just omitted the url from the POST.  The POST succeeded because the URL is optional, but no URL was stored in Gerrit.",
       "revId": "ef050c84c2db06bec800df3041a857e9c6c89e3a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
