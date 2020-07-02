@@ -417,6 +417,7 @@ class GerritPoller(threading.Thread):
                 'change': {
                     'project': change['project'],
                     'number': change['_number'],
+                    'branch': change['branch'],
                 },
                 'patchSet': {
                     'number': rev['_number'],
@@ -712,6 +713,8 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.branch = event.ref
             change.ref = 'refs/heads/' + event.ref
+            if hasattr(event, 'branch_created') and event.branch_created:
+                change.files = self._getCommitFiles(event.project_name, event.oldrev, event.newrev)
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -721,6 +724,8 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.ref = event.ref
             change.branch = event.ref[len('refs/heads/'):]
+            if hasattr(event, 'branch_created') and event.branch_created:
+                change.files = self._getCommitFiles(event.project_name, event.oldrev, event.newrev)
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -761,6 +766,13 @@ class GerritConnection(BaseConnection):
             raise
         return change
 
+    def _getCommitFiles(self, project, oldrev, newrev):
+        files = []
+        for rev in [oldrev, newrev]:
+            if rev != "0" * 40:
+                files.extend(self.queryCommitFiles(project, rev))
+        return files
+    
     def _getDependsOnFromCommit(self, message, change, event):
         log = get_annotated_logger(self.log, event)
         records = []
@@ -1178,6 +1190,11 @@ class GerritConnection(BaseConnection):
         related = self.get('changes/%s/revisions/%s/related' % (
             number, data['current_revision']))
         return data, related
+        
+    def queryCommitFilesHTTP(self, project, commit):
+        data = self.get('projects/%s/commits/%s/files/' %
+                        (project, commit))
+        return data
 
     def queryChange(self, number, event=None):
         if self.session:
@@ -1186,6 +1203,13 @@ class GerritConnection(BaseConnection):
         else:
             data = self.queryChangeSSH(number, event=event)
             return GerritChangeData(GerritChangeData.SSH, data)
+
+    def queryCommitFiles(self, project, rev):
+        if self.session:
+            data = self.queryCommitFilesHTTP(project, rev)
+            return data
+        else:
+            return list()
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):

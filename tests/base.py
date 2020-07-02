@@ -203,12 +203,13 @@ class FakeGerritChange(object):
         self.comments = []
         self.checks = {}
         self.checks_history = []
+        change_random_sha1 = random_sha1()
         self.data = {
             'branch': branch,
             'comments': self.comments,
-            'commitMessage': subject,
+            'commitMessage': subject+"\\nChange-Id: I"+change_random_sha1,
             'createdOn': time.time(),
-            'id': 'I' + random_sha1(),
+            'id': 'I' + change_random_sha1,
             'lastUpdated': time.time(),
             'number': str(number),
             'open': status == 'NEW',
@@ -671,6 +672,7 @@ class GerritWebServer(object):
             related_re = re.compile(r'/a/changes/(.*)/revisions/(.*)/related')
             change_search_re = re.compile(r'/a/changes/\?n=500.*&q=(.*)')
             version_re = re.compile(r'/a/config/server/version')
+            commit_files_re = re.compile(r'/a/projects/(.*)/commits/(.*?)/files')
 
             def do_POST(self):
                 path = self.path
@@ -715,6 +717,9 @@ class GerritWebServer(object):
                 m = self.version_re.match(path)
                 if m:
                     return self.version()
+                m = self.commit_files_re.match(path)
+                if m:
+                    return self.commit_files(m.group(1), m.group(2))
                 self.send_response(500)
                 self.end_headers()
 
@@ -833,6 +838,11 @@ class GerritWebServer(object):
 
             def version(self):
                 self.send_data('3.0.0-some-stuff')
+                self.end_headers()
+                
+            def commit_files(self, project, commit):
+                results = fake_gerrit.queryProjectCommitFiles(project, commit, http=True)
+                self.send_data(results)
                 self.end_headers()
 
             def send_data(self, data):
@@ -989,7 +999,9 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         return event
 
     def getFakeBranchDeletedEvent(self, project, branch):
-        oldrev = '4abd38457c2da2a72d4d030219ab180ecdb04bf0'
+        path = os.path.join(self.upstream_root, project)
+        repo = git.Repo(path)
+        oldrev = repo.head.object.hexsha
         newrev = 40 * '0'
 
         event = {
@@ -1084,6 +1096,22 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
             # Query all open changes
             l = [queryMethod(change) for change in self.changes.values()]
         return l
+
+    def queryProjectCommitFiles(self, project, commit, http=False):
+        path = os.path.join(self.upstream_root, project)
+        repo = git.Repo(path)
+        treeobj = repo.commit(commit).tree
+        file_list = []
+        dir_list = []
+        stack = [treeobj]
+        while len(stack) > 0:
+            tree = stack.pop()
+            # enumerate blobs (files) at this level
+            for b in tree.blobs:
+                file_list.append(b.path)
+            for subtree in tree.trees:
+                stack.append(subtree)
+        return file_list
 
     def simpleQuerySSH(self, query, event=None):
         log = get_annotated_logger(self.log, event)
