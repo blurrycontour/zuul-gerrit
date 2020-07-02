@@ -91,6 +91,29 @@
       "revId": "5480fbfb4cc012283a1472727bc760d37db85892",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_000e5fe4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1440,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-07-02T14:30:38Z",
+      "side": 1,
+      "message": "this actually prevent POST_FAILURE to be set, is there a reason to change that test?",
+      "range": {
+        "startLine": 1440,
+        "startChar": 15,
+        "endLine": 1440,
+        "endChar": 49
+      },
+      "revId": "5480fbfb4cc012283a1472727bc760d37db85892",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
