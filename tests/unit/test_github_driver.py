@@ -1020,12 +1020,10 @@ class TestGithubDriver(ZuulTestCase):
                                           modified_files=['zuul.yaml'],
                                           expected_cat_jobs=1)
 
-        # Check if deleting that branch will not lead to a reconfiguration as
-        # this branch is not protected
         repo._delete_branch(branch)
 
         self._test_push_event_reconfigure(project, branch,
-                                          expect_reconfigure=False,
+                                          expect_reconfigure=True,
                                           old_sha=old_sha,
                                           new_sha='0' * 40,
                                           modified_files=[])

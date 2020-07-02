@@ -1290,7 +1290,7 @@ class Scheduler(threading.Thread):
                      hasattr(change, 'files') and
                      change.updatesConfig(tenant)) or
                     (event.branch_deleted and
-                     self.abide.hasUnparsedBranchCache(event.project_name,
+                     self.abide.hasUnparsedBranchCache(project.canonical_name,
                                                        event.branch))):
                     reconfigure_tenant = True
 
