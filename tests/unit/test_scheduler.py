@@ -1219,8 +1219,8 @@ class TestScheduler(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(A.queried, 2)  # Initial and isMerged
-        self.assertEqual(B.queried, 3)  # Initial A, refresh from B, isMerged
+        self.assertEqual(A.queried, 3)  # Initial and isMerged
+        self.assertEqual(B.queried, 5)  # Initial A, refresh from B, isMerged
 
     def test_can_merge(self):
         "Test whether a change is ready to merge"
@@ -3242,10 +3242,10 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.scheds.first.sched.abide.hasUnparsedBranchCache(
             "review.example.com/org/project1", "stable"), True)
 
-        self.delete_branch('org/project1', 'stable')
+        hexsha = self.delete_branch('org/project1', 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchDeletedEvent(
-                'org/project1', 'stable'))
+                'org/project1', 'stable', hexsha=hexsha))
         self.waitUntilSettled()
         # reconfiguration: branch with config file (cache entry) is removed
         # the cache should be empty
@@ -8400,3 +8400,50 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
     def test_smart_reconfiguration_command_socket(self):
         "Test that live reconfiguration works using command socket"
         self._test_smart_reconfiguration(command_socket=True)
+
+
+class TestSchedulerReconfigurationHTTP(ZuulTestCase):
+    config_file = 'zuul-gerrit-no-stream.conf'
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_cache_reconfigure_branch_create_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self.assertEqual(self.scheds.first.sched.abide.hasUnparsedBranchCache(
+            "review.example.com/org/project1", "stable"), False)
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        (trusted, project1) = tenant.getProject('org/project1')
+
+        hexsha = self.create_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'stable'))
+        self.waitUntilSettled()
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - noop
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'stable', 'A',
+                                           files=file_dict, parent=hexsha)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(self.scheds.first.sched.abide.hasUnparsedBranchCache(
+            "review.example.com/org/project1", "stable"), True)
+
+        hexsha = self.delete_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchDeletedEvent(
+                'org/project1', 'stable', hexsha=hexsha))
+        self.waitUntilSettled()
+        self.assertEqual(self.scheds.first.sched.abide.hasUnparsedBranchCache(
+            "review.example.com/org/project1", "stable"), False)
