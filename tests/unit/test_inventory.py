@@ -26,6 +26,7 @@ class TestInventoryBase(ZuulTestCase):
     config_file = 'zuul-gerrit-github.conf'
     tenant_config_file = 'config/inventory/main.yaml'
     use_gerrit = True
+    commitMessage = None
 
     def setUp(self, python_path=None):
         super(TestInventoryBase, self).setUp()
@@ -37,10 +38,12 @@ class TestInventoryBase(ZuulTestCase):
         if self.use_gerrit:
             A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
             self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.commitMessage = A.data['commitMessage']
         else:
             A = self.fake_github.openFakePullRequest(
                 'org/project3', 'master', 'A')
             self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+            self.commitMessage = 'A'
 
         self.waitUntilSettled()
 
@@ -103,7 +106,8 @@ class TestInventoryGithub(TestInventoryBase):
         self.assertIn('job', z_vars)
         self.assertIn('event_id', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
-        self.assertEqual(z_vars['message'], 'QQ==')
+        self.assertEqual(z_vars['message'], base64.b64encode(
+            self.commitMessage.encode("utf-8")).decode('utf-8'))
         self.assertEqual(z_vars['change_url'],
                          'https://github.com/org/project3/pull/1')
 
@@ -135,7 +139,8 @@ class TestInventoryPythonPath(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
-        self.assertEqual(z_vars['message'], 'QQ==')
+        self.assertEqual(z_vars['message'], base64.b64encode(
+            self.commitMessage.encode("utf-8")).decode('utf-8'))
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -162,7 +167,8 @@ class TestInventoryAutoPython(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'ansible-version28-inventory')
-        self.assertEqual(z_vars['message'], 'QQ==')
+        self.assertEqual(z_vars['message'], base64.b64encode(
+            self.commitMessage.encode("utf-8")).decode('utf-8'))
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -186,7 +192,8 @@ class TestInventoryAutoPython(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'ansible-version27-inventory')
-        self.assertEqual(z_vars['message'], 'QQ==')
+        self.assertEqual(z_vars['message'], base64.b64encode(
+            self.commitMessage.encode("utf-8")).decode('utf-8'))
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -215,7 +222,8 @@ class TestInventory(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
-        self.assertEqual(z_vars['message'], 'QQ==')
+        self.assertEqual(z_vars['message'], base64.b64encode(
+            self.commitMessage.encode("utf-8")).decode('utf-8'))
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -256,7 +264,8 @@ class TestInventory(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
         self.assertEqual(z_vars['job'], 'executor-only-inventory')
-        self.assertEqual(z_vars['message'], 'QQ==')
+        self.assertEqual(z_vars['message'], base64.b64encode(
+            self.commitMessage.encode("utf-8")).decode('utf-8'))
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -388,12 +397,12 @@ class TestAnsibleInventory(AnsibleZuulTestCase):
 
         decoded_message = base64.b64decode(
             inventory['all']['vars']['zuul']['message']).decode('utf-8')
-        self.assertEqual(decoded_message, expected_message)
+        self.assertEqual(decoded_message, A.data['commitMessage'])
 
         obtained_message = self._get_file(self.history[0],
                                           'work/logs/commit-message.txt')
 
-        self.assertEqual(obtained_message, expected_message)
+        self.assertEqual(obtained_message, A.data['commitMessage'])
 
     def test_jinja2_message_brackets(self):
         self._jinja2_message("This message has {{ jinja2 }} in it ")
