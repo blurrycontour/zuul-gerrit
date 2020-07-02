@@ -1003,6 +1003,12 @@ class PipelineManager(metaclass=ABCMeta):
             if build:
                 build_set.removeBuild(build)
 
+        # Re-set build results in case we resetted builds that were skipped
+        # not by this build/
+        for build in build_set.getBuilds():
+            if build.result:
+                build_set.item.setResult(build)
+
     def _cancelRunningBuilds(self, build_set):
         item = build_set.item
         for job in item.getJobs():

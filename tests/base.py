@@ -3616,6 +3616,10 @@ class ZuulTestCase(BaseTestCase):
     git_url_with_auth = False
     log_console_port = 19885
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fake_gerrit = None
+
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(self.config,
                                                            self.connections)

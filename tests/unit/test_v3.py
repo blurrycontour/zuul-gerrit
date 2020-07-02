@@ -5646,6 +5646,61 @@ class TestJobPause(AnsibleZuulTestCase):
 
         self.assertIn('test : SKIPPED', A.messages[0])
 
+    def test_job_pause_skipped_child_retry(self):
+        """
+        Tests that a paused job is resumed with skipped jobs and retries.
+
+        Tests that this situation won't lead to stuck buildsets.
+        1. cache pauses
+        2. skip-upload skips upload
+        3. test does a retry which resets upload which must get skipped
+           again during the reset process because of pre-test skipping it.
+
+        cache (pauses) -+
+                        |
+                        |
+                        +--> test (retries) -----------+
+                                                       |
+                                                       +--> upload (skipped)
+                                                       |
+                        +--> prepare-upload (skipped) -+
+                        |
+        skip-upload ----+
+        """
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project4', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('cache')
+        self.waitUntilSettled()
+
+        self.executor_server.release('skip-upload')
+        self.waitUntilSettled()
+
+        # Stop the job worker of test to simulate an executor restart
+        job_test = self.builds[1]
+        for job_worker in self.executor_server.job_workers.values():
+            if job_worker.job.unique == job_test.unique:
+                job_worker.stop()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # All builds must be finished by now
+        self.assertEqual(len(self.builds), 0, 'All builds must be finished')
+
+        # upload must not be run as this should have been skipped
+        self.assertHistory([
+            dict(name='skip-upload', result='SUCCESS', changes='1,1'),
+            dict(name='test', result='ABORTED', changes='1,1'),
+            dict(name='test', result='SUCCESS', changes='1,1'),
+            dict(name='cache', result='SUCCESS', changes='1,1'),
+        ])
+
 
 class TestJobPausePostFail(AnsibleZuulTestCase):
     tenant_config_file = 'config/job-pause2/main.yaml'
