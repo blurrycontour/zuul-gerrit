@@ -3244,10 +3244,10 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.scheds.first.sched.abide.hasUnparsedBranchCache(
             "review.example.com/org/project1", "stable"), True)
 
-        self.delete_branch('org/project1', 'stable')
+        hexsha = self.delete_branch('org/project1', 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchDeletedEvent(
-                'org/project1', 'stable'))
+                'org/project1', 'stable', hexsha=hexsha))
         self.waitUntilSettled()
         # reconfiguration: branch with config file (cache entry) is removed
         # the cache should be empty

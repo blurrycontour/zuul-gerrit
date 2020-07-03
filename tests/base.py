@@ -994,8 +994,8 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
-    def getFakeBranchDeletedEvent(self, project, branch):
-        oldrev = '4abd38457c2da2a72d4d030219ab180ecdb04bf0'
+    def getFakeBranchDeletedEvent(self, project, branch, hexsha):
+        oldrev = hexsha
         newrev = 40 * '0'
 
         event = {
@@ -4228,17 +4228,21 @@ class ZuulTestCase(BaseTestCase):
         f.close()
         repo.index.add([fn])
         repo.index.commit('%s commit' % branch)
+        hexsha = repo.head.commit.hexsha
 
         repo.head.reference = repo.heads['master']
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
+        return hexsha
 
     def delete_branch(self, project, branch):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         repo.head.reference = repo.heads['master']
         zuul.merger.merger.reset_repo_to_head(repo)
+        hexsha = repo.heads[branch].commit.hexsha
         repo.delete_head(repo.heads[branch], force=True)
+        return hexsha
 
     def create_commit(self, project, files=None, head='master',
                       message='Creating a fake commit', **kwargs):
