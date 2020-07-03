@@ -244,10 +244,19 @@ class GerritEventConnector(threading.Thread):
                 event.branch_created = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
-            if event.newrev == '0' * 40:
+            elif event.newrev == '0' * 40:
                 event.branch_deleted = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
+            else:
+                if (event.account and event.account.get('username') and
+                        event.account.get('username') != self.connection.user):
+                    # connection from a user different than zuul
+                    # can be a 2nd zuul connection to the same gerrit server ?
+                    event.branch_updated = True
+                else:
+                    # zuul user
+                    event.branch_updated = True
 
         self._getChange(event)
         self.connection.logEvent(event)
@@ -713,9 +722,12 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.branch = event.ref
             change.ref = 'refs/heads/' + event.ref
-            if hasattr(event, 'branch_created') and event.branch_created:
+            if (hasattr(event, 'branch_created') and event.branch_created or
+               hasattr(event, 'branch_updated') and event.branch_updated):
                 change.files = self._getCommitFiles(event.project_name,
                                                     event.oldrev, event.newrev)
+            else:
+                change.files = None
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -725,9 +737,12 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.ref = event.ref
             change.branch = event.ref[len('refs/heads/'):]
-            if hasattr(event, 'branch_created') and event.branch_created:
+            if (hasattr(event, 'branch_created') and event.branch_created or
+               hasattr(event, 'branch_updated') and event.branch_updated):
                 change.files = self._getCommitFiles(event.project_name,
                                                     event.oldrev, event.newrev)
+            else:
+                change.files = None
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -772,7 +787,10 @@ class GerritConnection(BaseConnection):
         files = []
         for rev in [oldrev, newrev]:
             if rev != "0" * 40:
-                files.extend(self.queryCommitFiles(project, rev))
+                commitfiles = self.queryCommitFiles(project, rev)
+                if not commitfiles:
+                    return None
+                files.extend(commitfiles)
         return files
 
     def _getDependsOnFromCommit(self, message, change, event):
@@ -1211,7 +1229,7 @@ class GerritConnection(BaseConnection):
             data = self.queryCommitFilesHTTP(project, rev)
             return data
         else:
-            return list()
+            return None
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):
