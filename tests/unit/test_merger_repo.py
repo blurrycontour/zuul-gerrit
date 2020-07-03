@@ -217,6 +217,22 @@ class TestMergerRepo(ZuulTestCase):
         # And now reset the repo again. This should not crash
         work_repo.reset()
 
+    def test_branch_rename(self):
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        # Clone upstream so that current head is master
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+
+        # Rename master to main in upstream repo
+        gitrepo = git.Repo(parent_path)
+        main_branch = gitrepo.create_head('main')
+        #main_branch.commit = 'HEAD'
+        gitrepo.head.reference = main_branch
+        gitrepo.delete_head(gitrepo.heads['master'], force=True)
+
+        # And now reset the repo. This should not crash
+        work_repo.reset()
+
     def test_broken_cache(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         work_repo = Repo(parent_path, self.workspace_root,
