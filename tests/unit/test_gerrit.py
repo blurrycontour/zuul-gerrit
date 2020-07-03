@@ -196,8 +196,8 @@ class TestGerritWeb(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
 
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
