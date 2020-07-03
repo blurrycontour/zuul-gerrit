@@ -63,8 +63,8 @@ class TestGerritCRD(ZuulTestCase):
                              project=B.project,
                              change_no=B.number,
                              change_id=B.data['id'])
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, url)
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, url))
 
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
@@ -132,11 +132,11 @@ class TestGerritCRD(ZuulTestCase):
         #   A
 
         # C Depends-On: A
-        C.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            C.subject, A.data['url'])
+        C.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            C.subject, A.data['url']))
         # B Depends-On: A
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['url'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['url']))
         # C git-depends on B
         C.setDependsOn(B, 1)
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
@@ -163,8 +163,8 @@ class TestGerritCRD(ZuulTestCase):
         C1.addApproval('Code-Review', 2)
 
         # A Depends-On: B+C1
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\nDepends-On: %s\n' % (
-            A.subject, B.data['url'], C1.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\nDepends-On: %s\n' % (
+            A.subject, B.data['url'], C1.data['url']))
 
         self.executor_server.hold_jobs_in_build = True
         B.addApproval('Approved', 1)
@@ -203,8 +203,8 @@ class TestGerritCRD(ZuulTestCase):
         C.addApproval('Code-Review', 2)
 
         # A Depends-On: B+C
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\nDepends-On: %s\n' % (
-            A.subject, B.data['url'], C.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\nDepends-On: %s\n' % (
+            A.subject, B.data['url'], C.data['url']))
 
         self.executor_server.hold_jobs_in_build = True
         B.addApproval('Approved', 1)
@@ -241,8 +241,8 @@ class TestGerritCRD(ZuulTestCase):
         B.addApproval('Code-Review', 2)
 
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
 
         # A and B do not share a queue, make sure that A is unable to
         # enqueue B (and therefore, A is unable to be enqueued).
@@ -283,8 +283,8 @@ class TestGerritCRD(ZuulTestCase):
         url = url_fmt.format(baseurl=B.gerrit.baseurl.rstrip('/'),
                              project=B.project,
                              change_no=B.number)
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, url)
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, url))
 
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
@@ -333,10 +333,10 @@ class TestGerritCRD(ZuulTestCase):
 
         # A -> B -> A (via commit-depends)
 
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['url']))
 
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
@@ -355,8 +355,8 @@ class TestGerritCRD(ZuulTestCase):
         B.addApproval('Code-Review', 2)
 
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
 
         B.addApproval('Approved', 1)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
@@ -400,8 +400,8 @@ class TestGerritCRD(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
 
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -510,8 +510,8 @@ class TestGerritCRD(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange(project2, 'master', 'B')
 
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -562,8 +562,8 @@ class TestGerritCRD(ZuulTestCase):
         C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C')
 
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
         # C git-depends on B
         C.setDependsOn(B, 1)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -606,11 +606,11 @@ class TestGerritCRD(ZuulTestCase):
         #   A
 
         # C Depends-On: A
-        C.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            C.subject, A.data['url'])
+        C.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            C.subject, A.data['url']))
         # B Depends-On: A
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['url'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['url']))
         # C git-depends on B
         C.setDependsOn(B, 1)
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
@@ -631,12 +631,12 @@ class TestGerritCRD(ZuulTestCase):
         C = self.fake_gerrit.addFakeChange('org/project3', 'master', 'C')
 
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
 
         # B Depends-On: C
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, C.data['url'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, C.data['url']))
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -666,8 +666,8 @@ class TestGerritCRD(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/unknown', 'master', 'D')
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
 
         # Make sure zuul has seen an event on B.
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
@@ -689,8 +689,8 @@ class TestGerritCRD(ZuulTestCase):
 
         # Create B->A
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['url'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['url']))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -699,8 +699,8 @@ class TestGerritCRD(ZuulTestCase):
 
         # Update A to add A->B (a cycle).
         A.addPatchset()
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
         self.waitUntilSettled()
 
@@ -711,7 +711,7 @@ class TestGerritCRD(ZuulTestCase):
         # should be okay.  B; A->B
 
         B.addPatchset()
-        B.data['commitMessage'] = '%s\n' % (B.subject,)
+        B.setCommitMessage('%s\n' % (B.subject))
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
         self.waitUntilSettled()
 
@@ -742,8 +742,8 @@ class TestGerritCRDAltBaseUrl(ZuulTestCase):
 
         self.assertEqual(B.data['url'], '%s/2' % self.baseurl.rstrip('/'))
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['url'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['url']))
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
