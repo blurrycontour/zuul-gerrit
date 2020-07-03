@@ -203,12 +203,13 @@ class FakeGerritChange(object):
         self.comments = []
         self.checks = {}
         self.checks_history = []
+        self.random_sha1 = random_sha1()
         self.data = {
             'branch': branch,
             'comments': self.comments,
-            'commitMessage': subject,
+            'commitMessage': subject + "\nChange-Id: I" + self.random_sha1,
             'createdOn': time.time(),
-            'id': 'I' + random_sha1(),
+            'id': 'I' + self.random_sha1,
             'lastUpdated': time.time(),
             'number': str(number),
             'open': status == 'NEW',
@@ -342,7 +343,7 @@ class FakeGerritChange(object):
         event = {"type": "patchset-created",
                  "change": {"project": self.project,
                             "branch": self.branch,
-                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "id": self.data['id'],
                             "number": str(self.number),
                             "subject": self.subject,
                             "owner": {"name": "User Name"},
@@ -355,7 +356,7 @@ class FakeGerritChange(object):
         event = {"type": "change-restored",
                  "change": {"project": self.project,
                             "branch": self.branch,
-                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "id": self.data['id'],
                             "number": str(self.number),
                             "subject": self.subject,
                             "owner": {"name": "User Name"},
@@ -369,7 +370,7 @@ class FakeGerritChange(object):
         event = {"type": "change-abandoned",
                  "change": {"project": self.project,
                             "branch": self.branch,
-                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "id": self.data['id'],
                             "number": str(self.number),
                             "subject": self.subject,
                             "owner": {"name": "User Name"},
@@ -383,7 +384,7 @@ class FakeGerritChange(object):
         event = {"type": "comment-added",
                  "change": {"project": self.project,
                             "branch": self.branch,
-                            "id": "I5459869c07352a31bfb1e7a8cac379cabfcb25af",
+                            "id": self.data['id'],
                             "number": str(self.number),
                             "subject": self.subject,
                             "owner": {"name": "User Name"},
@@ -516,6 +517,11 @@ class FakeGerritChange(object):
              }
         needed.append(d)
         other.data['neededBy'] = needed
+
+    def setCommitMessage(self, message):
+        changeId = "\nChange-Id: " + self.data['id']
+        if changeId not in message:
+            self.data['commitMessage'] = message + changeId
 
     def query(self):
         self.queried += 1
