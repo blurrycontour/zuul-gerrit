@@ -615,8 +615,8 @@ class TestBranchTemplates(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('puppet-tripleo',
                                            'stable/newton',
                                            'B')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertHistory([
@@ -808,8 +808,8 @@ class TestAllowedProjects(ZuulTestCase):
         file_dict = {'zuul.yaml': in_repo_conf1}
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B',
                                            files=file_dict)
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertHistory([
@@ -845,8 +845,8 @@ class TestAllowedProjects(ZuulTestCase):
         file_dict = {'zuul.yaml': in_repo_conf1}
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B',
                                            files=file_dict)
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertHistory([])
@@ -1425,8 +1425,8 @@ class TestInRepoConfig(ZuulTestCase):
         second_file_dict = {'.zuul.yaml': second_repo_conf}
         B = self.fake_gerrit.addFakeChange('org/project1', 'stable', 'B',
                                            files=second_file_dict)
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -1806,8 +1806,8 @@ class TestInRepoConfig(ZuulTestCase):
         file_dict = {'zuul.yaml': in_repo_conf}
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
                                            files=file_dict)
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -2126,8 +2126,8 @@ class TestInRepoConfig(ZuulTestCase):
         C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C',
                                            files=file_dict,
                                            parent='refs/changes/1/1/1')
-        C.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            C.subject, B.data['id'])
+        C.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            C.subject, B.data['id']))
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertHistory([
@@ -3628,8 +3628,8 @@ class TestRoles(RoleTestCase):
         # and used.
         A = self.fake_gerrit.addFakeChange('bare-role', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -5968,8 +5968,8 @@ class TestProvidesRequires(ZuulDBTestCase):
         self.assertEqual(len(self.builds), 1)
 
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         B.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
         self.waitUntilSettled()
@@ -6021,8 +6021,8 @@ class TestProvidesRequires(ZuulDBTestCase):
         self.assertEqual(len(self.builds), 3)
 
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.executor_server.returnData(
             'image-builder', B,
             {'zuul':
@@ -6045,8 +6045,8 @@ class TestProvidesRequires(ZuulDBTestCase):
         self.assertEqual(len(self.builds), 6)
 
         C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C')
-        C.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            C.subject, B.data['id'])
+        C.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            C.subject, B.data['id']))
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -6150,8 +6150,8 @@ class TestProvidesRequires(ZuulDBTestCase):
         ], ordered=False)
 
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.executor_server.returnData(
             'image-builder', B,
             {'zuul':
@@ -6180,8 +6180,8 @@ class TestProvidesRequires(ZuulDBTestCase):
         ], ordered=False)
 
         C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C')
-        C.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            C.subject, B.data['id'])
+        C.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            C.subject, B.data['id']))
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -6201,8 +6201,8 @@ class TestProvidesRequires(ZuulDBTestCase):
         ], ordered=False)
 
         D = self.fake_gerrit.addFakeChange('org/project3', 'master', 'D')
-        D.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            D.subject, B.data['id'])
+        D.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            D.subject, B.data['id']))
         self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -6331,8 +6331,8 @@ class TestProvidesRequires(ZuulDBTestCase):
         ], ordered=False)
 
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -6371,8 +6371,8 @@ class TestProvidesRequires(ZuulDBTestCase):
         self.assertIn('image-user : SKIPPED', A.messages[0])
 
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
-        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            B.subject, A.data['id'])
+        B.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['id']))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
