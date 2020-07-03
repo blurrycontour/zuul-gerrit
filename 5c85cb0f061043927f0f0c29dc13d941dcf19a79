@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_e331aba4",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 921,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-03T07:26:46Z",
+      "side": 1,
+      "message": "The event id should be forwarded here.",
+      "revId": "5c85cb0f061043927f0f0c29dc13d941dcf19a79",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
