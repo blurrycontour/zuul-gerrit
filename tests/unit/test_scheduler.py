@@ -1219,8 +1219,10 @@ class TestScheduler(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(A.queried, 2)  # Initial and isMerged
-        self.assertEqual(B.queried, 3)  # Initial A, refresh from B, isMerged
+        # Initial (+2) and isMerged
+        self.assertEqual(A.queried, 3)
+        # Initial A (+2), refresh from B (+2), isMerged
+        self.assertEqual(B.queried, 5)
 
     def test_can_merge(self):
         "Test whether a change is ready to merge"
@@ -3669,8 +3671,8 @@ class TestScheduler(ZuulTestCase):
         C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C')
 
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.data['id'])
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.data['id']))
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))

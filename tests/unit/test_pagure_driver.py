@@ -830,8 +830,8 @@ class TestGerritToPagureCRD(ZuulTestCase):
         A.setDependsOn(AM1, 1)
         AM1.setDependsOn(AM2, 1)
 
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.url)
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.url))
 
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
@@ -867,8 +867,8 @@ class TestGerritToPagureCRD(ZuulTestCase):
             'pagure/project2', 'master', 'B')
 
         # A Depends-On: B
-        A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
-            A.subject, B.url)
+        A.setCommitMessage('%s\n\nDepends-On: %s\n' % (
+            A.subject, B.url))
 
         self.executor_server.hold_jobs_in_build = True
 
