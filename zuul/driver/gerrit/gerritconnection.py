@@ -172,6 +172,8 @@ class GerritEventConnector(threading.Thread):
         # TODO(jlk): handle refupdated events instead of just changes
         if event.type == 'change-merged':
             event.branch_updated = True
+            event.newrev = data.get('newRev')
+            event.branch = data.get('refName')
         event.trigger_name = 'gerrit'
         change = data.get('change')
         event.project_hostname = self.connection.canonical_hostname
@@ -244,10 +246,19 @@ class GerritEventConnector(threading.Thread):
                 event.branch_created = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
-            if event.newrev == '0' * 40:
+            elif event.newrev == '0' * 40:
                 event.branch_deleted = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
+            else:
+                if (event.account and event.account.get('username') and
+                        event.account.get('username') != self.connection.user):
+                    # connection from a user different than zuul
+                    # can be a 2nd zuul connection to the same gerrit server ?
+                    event.branch_updated = True
+                else:
+                    # zuul user
+                    event.branch_updated = True
 
         self._getChange(event)
         self.connection.logEvent(event)
@@ -417,6 +428,7 @@ class GerritPoller(threading.Thread):
                 'change': {
                     'project': change['project'],
                     'number': change['_number'],
+                    'branch': change['branch'],
                 },
                 'patchSet': {
                     'number': rev['_number'],
@@ -494,6 +506,7 @@ class GerritConnection(BaseConnection):
         super(GerritConnection, self).__init__(driver, connection_name,
                                                connection_config)
         self._project_branch_cache = {}
+        self._project_branch_revision_cache = {}
         if 'server' not in self.connection_config:
             raise Exception('server is required for gerrit connections in '
                             '%s' % self.connection_name)
@@ -671,10 +684,12 @@ class GerritConnection(BaseConnection):
 
     def clearBranchCache(self):
         self._project_branch_cache = {}
+        self._project_branch_revision_cache = {}
 
     def _clearBranchCache(self, project):
         try:
             del self._project_branch_cache[project.name]
+            del self._project_branch_revision_cache[project.name]
         except KeyError:
             pass
 
@@ -712,6 +727,12 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.branch = event.ref
             change.ref = 'refs/heads/' + event.ref
+            if (hasattr(event, 'branch_created') and event.branch_created or
+               hasattr(event, 'branch_updated') and event.branch_updated):
+                change.files = self._getCommitFiles(event.project_name,
+                                                    event.oldrev, event.newrev)
+            else:
+                change.files = None
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -721,6 +742,12 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.ref = event.ref
             change.branch = event.ref[len('refs/heads/'):]
+            if (hasattr(event, 'branch_created') and event.branch_created or
+               hasattr(event, 'branch_updated') and event.branch_updated):
+                change.files = self._getCommitFiles(event.project_name,
+                                                    event.oldrev, event.newrev)
+            else:
+                change.files = None
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -760,6 +787,16 @@ class GerritConnection(BaseConnection):
                     del self._change_cache[change.number]
             raise
         return change
+
+    def _getCommitFiles(self, project, oldrev, newrev):
+        files = []
+        for rev in [oldrev, newrev]:
+            if rev != "0" * 40:
+                commitfiles = self.queryCommitFiles(project, rev)
+                if not commitfiles:
+                    return None
+                files.extend(commitfiles)
+        return files
 
     def _getDependsOnFromCommit(self, message, change, event):
         log = get_annotated_logger(self.log, event)
@@ -1010,6 +1047,14 @@ class GerritConnection(BaseConnection):
         self._project_branch_cache[project.name] = heads
         return heads
 
+    def getProjectBrancheRevision(self, project: Project, branch):
+        return self._project_branch_revision_cache.get(
+            project.name, {}).get(
+                branch, None)
+
+    def setProjectBrancheRevision(self, project: Project, branch, revision):
+        self._project_branch_revision_cache[project] = { branch: revision }
+
     def addEvent(self, data):
         return self.event_queue.put((time.time(), data))
 
@@ -1179,6 +1224,11 @@ class GerritConnection(BaseConnection):
             number, data['current_revision']))
         return data, related
 
+    def queryCommitFilesHTTP(self, project, commit):
+        data = self.get('projects/%s/commits/%s/files/' %
+                        (project, commit))
+        return data
+
     def queryChange(self, number, event=None):
         if self.session:
             data, related = self.queryChangeHTTP(number, event=event)
@@ -1186,6 +1236,13 @@ class GerritConnection(BaseConnection):
         else:
             data = self.queryChangeSSH(number, event=event)
             return GerritChangeData(GerritChangeData.SSH, data)
+
+    def queryCommitFiles(self, project, rev):
+        if self.session:
+            data = self.queryCommitFilesHTTP(project, rev)
+            return data
+        else:
+            return None
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):

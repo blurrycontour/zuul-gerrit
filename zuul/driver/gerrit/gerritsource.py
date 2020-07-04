@@ -121,6 +121,12 @@ class GerritSource(BaseSource):
     def getProjectOpenChanges(self, project):
         return self.connection.getProjectOpenChanges(project)
 
+    def getProjectBrancheRevision(self, project, branch):
+        return self.connection.getProjectBrancheRevision(project, branch)
+        
+    def setProjectBrancheRevision(self, project, branch, revision):
+        return self.connection.setProjectBrancheRevision(project, branch, revision)
+
     def getProjectBranches(self, project, tenant):
         return self.connection.getProjectBranches(project, tenant)
 

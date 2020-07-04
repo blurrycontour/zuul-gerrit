@@ -1290,14 +1290,19 @@ class Scheduler(threading.Thread):
                      hasattr(change, 'files') and
                      change.updatesConfig(tenant)) or
                     (event.branch_deleted and
-                     self.abide.hasUnparsedBranchCache(project.canonical_name,
-                                                       event.branch))):
+                     self.abide.hasUsefulUnparsedBranchCache(project.canonical_name,
+                                                       event.branch, tenant=tenant))):
                     reconfigure_tenant = True
 
                 # The branch_created attribute is also true when a tag is
                 # created. Since we load config only from branches only trigger
                 # a tenant reconfiguration if the branch is set as well.
-                if event.branch_created and event.branch:
+                if (event.branch_created and event.branch and
+                    (
+                    hasattr(change, 'files') and change.updatesConfig(tenant)
+                    or
+                    not hasattr(change, 'files')
+                    )):
                     reconfigure_tenant = True
 
                 # If the driver knows the branch but we don't have a config, we
@@ -1316,6 +1321,12 @@ class Scheduler(threading.Thread):
                     tenant.getExcludeUnprotectedBranches(project)):
 
                     reconfigure_tenant = False
+
+                if event.branch_updated or event.branch_created or event.branch_deleted:
+                    if (event.newrev == project.source.getProjectBrancheRevision(project, event.branch)):
+                        reconfigure_tenant = False
+                    else:
+                        project.source.setProjectBrancheRevision(project, event.branch, event.newrev)
 
                 if reconfigure_tenant:
                     # The change that just landed updates the config

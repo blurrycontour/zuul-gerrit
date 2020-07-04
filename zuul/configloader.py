@@ -1836,6 +1836,7 @@ class TenantParser(object):
                         source_context.branch)
                     branch_cache.put(source_context.path, incdata)
                     unparsed_config.extend(incdata)
+                    branch_cache.useful_conf = True
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()
