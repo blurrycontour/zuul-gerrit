@@ -6112,6 +6112,8 @@ For CI problems and help debugging, contact ci@example.org"""
         self.gearman_server.hold_merge_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -8439,3 +8441,136 @@ class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
         self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
+
+
+class TestSchedulerReconfigurationHTTP(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_cache_reconfigure_branch_create_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        old = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+
+        hexsha = self.create_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'stable'))
+        self.waitUntilSettled()
+
+        new = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        self.assertEqual(old, new)
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - noop
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'stable', 'A',
+                                           files=file_dict, parent=hexsha)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        new = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        self.assertLess(old, new)
+        old = new
+
+        hexsha = self.delete_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchDeletedEvent(
+                'org/project1', 'stable', oldrev=hexsha))
+        self.waitUntilSettled()
+        new = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        self.assertLess(old, new)
+
+    def test_cache_reconfigure_branch_update(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        old = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+
+        hexsha = self.create_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project1', 'stable'))
+        self.waitUntilSettled()
+        self.log.debug("\n\nZUUL after create branch stable")
+
+        new = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        self.assertEqual(old, new)
+        old = new
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - noop
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'stable', 'A',
+                                           files=file_dict, parent=hexsha)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        new = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        self.assertLess(old, new)
+        old = new
+
+        path = os.path.join(self.upstream_root, "org/project1")
+        repo = git.Repo(path)
+        treeobj = repo.heads['stable'].commit.tree
+        oldrev = repo.heads['stable'].commit.hexsha
+        file_list = []
+        stack = [treeobj]
+        while len(stack) > 0:
+            tree = stack.pop()
+            for b in tree.blobs:
+                file_list.append(b.path)
+            for subtree in tree.trees:
+                stack.append(subtree)
+
+        repo.heads['stable'].checkout()
+        repo.index.remove(file_list, working_tree=True)
+        repo.index.commit('remove zuul config file')
+        self.fake_gerrit.addEvent(self.fake_gerrit.getFakeRefUpdatedEvent(
+            'org/project1', 'stable', oldrev))
+        self.waitUntilSettled()
+        self.log.debug("\n\nZUUL CHECK SI RECONFIGURATION")
+
+        new = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        self.assertLess(old, new)
+        old = new
+
+        hexsha = self.delete_branch('org/project1', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchDeletedEvent(
+                'org/project1', 'stable', oldrev=hexsha))
+        self.waitUntilSettled()
+        self.log.debug("\n\nZUUL CHECK SI RECONFIGURATION")
+
+        new = self.scheds.first.sched.tenant_last_reconfigured.get(
+            'tenant-one', 0)
+        self.assertEqual(old, new)
