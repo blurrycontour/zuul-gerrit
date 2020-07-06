@@ -6113,9 +6113,11 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
-        gearJob = next(iter(self.scheds.first.sched.merger.jobs))
-        self.assertEqual(gearJob.complete, False)
+        gearJobs = []
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
+        for gearJob in self.scheds.first.sched.merger.jobs:
+            gearJobs.append(gearJob)
+            self.assertEqual(gearJob.complete, False)
 
         # Reconfigure while we still have an outstanding merge job
         self.gearman_server.hold_merge_jobs_in_queue = False
@@ -6128,16 +6130,18 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # Verify the merge job is still running and that the item is
         # in the pipeline
-        self.assertEqual(gearJob.complete, False)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
+        for gearJob in gearJobs:
+            self.assertEqual(gearJob.complete, False)
 
         pipeline = tenant.layout.pipelines['post']
         self.assertEqual(len(pipeline.getAllItems()), 1)
         self.gearman_server.release()
         self.waitUntilSettled()
 
-        self.assertEqual(gearJob.complete, True)
         self.assertEqual(len(self.scheds.first.sched.merger.jobs), 0)
+        for gearJob in gearJobs:
+            self.assertEqual(gearJob.complete, True)
 
     @simple_layout('layouts/parent-matchers.yaml')
     def test_parent_matchers(self):
@@ -8374,17 +8378,18 @@ class TestReconfigureBranch(ZuulTestCase):
             .get('tenant-one', 0)
 
     def _createBranch(self):
-        self.create_branch('org/project1', 'stable')
+        self.reconf_hexsha = self.create_branch(
+            self.project_reconfig, 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchCreatedEvent(
-                'org/project1', 'stable'))
+                self.project_reconfig, 'stable'))
         self.waitUntilSettled()
 
     def _deleteBranch(self):
-        self.delete_branch('org/project1', 'stable')
+        oldrev = self.delete_branch(self.project_reconfig, 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchDeletedEvent(
-                'org/project1', 'stable'))
+                self.project_reconfig, 'stable', oldrev))
         self.waitUntilSettled()
 
     def _expectReconfigure(self, doReconfigure):
@@ -8397,9 +8402,24 @@ class TestReconfigureBranch(ZuulTestCase):
         self.old = new
 
 
-class TestReconfigureBranchCreateDeleteSshHttp(TestReconfigureBranch):
+class TestReconfigureBranchCreateNoconfDeleteSshHttp(TestReconfigureBranch):
     tenant_config_file = 'config/single-tenant/main.yaml'
     config_file = 'zuul-gerrit-web.conf'
+    project_reconfig = 'org/project1'
+
+    def test_reconfigure_cache_branch_create_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(False)
+
+
+class TestReconfigureBranchCreateConfDeleteSshHttp(TestReconfigureBranch):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+    config_file = 'zuul-gerrit-web.conf'
+    project_reconfig = 'common-config'
 
     def test_reconfigure_cache_branch_create_delete(self):
         "Test that cache is updated clear on branch creation/deletion"
@@ -8412,6 +8432,7 @@ class TestReconfigureBranchCreateDeleteSshHttp(TestReconfigureBranch):
 
 class TestReconfigureBranchCreateDeleteSsh(TestReconfigureBranch):
     tenant_config_file = 'config/single-tenant/main.yaml'
+    project_reconfig = 'org/project'
 
     def test_reconfigure_cache_branch_create_delete(self):
         "Test that cache is updated clear on branch creation/deletion"
@@ -8419,17 +8440,18 @@ class TestReconfigureBranchCreateDeleteSsh(TestReconfigureBranch):
         self._createBranch()
         self._expectReconfigure(True)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
 
 class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
     tenant_config_file = 'config/single-tenant/main.yaml'
     config_file = 'zuul-gerrit-no-stream.conf'
+    project_reconfig = 'org/project'
 
     def test_reconfigure_cache_branch_create_delete(self):
         "Test that cache is updated clear on branch creation/deletion"
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
