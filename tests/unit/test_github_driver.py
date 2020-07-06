@@ -945,14 +945,16 @@ class TestGithubDriver(ZuulTestCase):
     def _test_push_event_reconfigure(self, project, branch,
                                      expect_reconfigure=False,
                                      old_sha=None, new_sha=None,
-                                     modified_files=None,
+                                     modified_files=[],
+                                     removed_files=[],
                                      expected_cat_jobs=None):
         pevent = self.fake_github.getPushEvent(
             project=project,
             ref='refs/heads/%s' % branch,
             old_rev=old_sha,
             new_rev=new_sha,
-            modified_files=modified_files)
+            modified_files=modified_files,
+            removed_files=removed_files)
 
         # record previous tenant reconfiguration time, which may not be set
         old = self.scheds.first.sched.tenant_last_reconfigured\
@@ -1020,15 +1022,13 @@ class TestGithubDriver(ZuulTestCase):
                                           modified_files=['zuul.yaml'],
                                           expected_cat_jobs=1)
 
-        # Check if deleting that branch will not lead to a reconfiguration as
-        # this branch is not protected
         repo._delete_branch(branch)
 
         self._test_push_event_reconfigure(project, branch,
-                                          expect_reconfigure=False,
+                                          expect_reconfigure=True,
                                           old_sha=old_sha,
                                           new_sha='0' * 40,
-                                          modified_files=[])
+                                          removed_files=['zuul.yaml'])
 
     # TODO(jlk): Make this a more generic test for unknown project
     @skip("Skipped for rewrite of webhook handler")

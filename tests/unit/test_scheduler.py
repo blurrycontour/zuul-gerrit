@@ -6112,19 +6112,32 @@ For CI problems and help debugging, contact ci@example.org"""
         A.setMerged()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
+
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        gearJob = next(iter(self.scheds.first.sched.merger.jobs))
+        self.assertEqual(gearJob.complete, False)
+
         # Reconfigure while we still have an outstanding merge job
+        self.gearman_server.hold_merge_jobs_in_queue = False
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        (trusted, project1) = tenant.getProject('org/project1')
         self.scheds.first.sched.reconfigureTenant(
-            self.scheds.first.sched.abide.tenants['tenant-one'], None, None)
+            self.scheds.first.sched.abide.tenants['tenant-one'],
+            project1, None)
         self.waitUntilSettled()
+
         # Verify the merge job is still running and that the item is
         # in the pipeline
+        self.assertEqual(gearJob.complete, False)
         self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
-        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+
         pipeline = tenant.layout.pipelines['post']
         self.assertEqual(len(pipeline.getAllItems()), 1)
-        self.gearman_server.hold_merge_jobs_in_queue = False
         self.gearman_server.release()
         self.waitUntilSettled()
+
+        self.assertEqual(gearJob.complete, True)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 0)
 
     @simple_layout('layouts/parent-matchers.yaml')
     def test_parent_matchers(self):
