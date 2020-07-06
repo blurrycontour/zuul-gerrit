@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_0d166cf2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-06T23:40:20Z",
+      "side": 1,
+      "message": "Technically, it is not required (but in practice is almost always there because Gerrit is so difficult to use without it).\n\nI\u0027m not opposed to this patch, but I just want to be clear what the goal is.  Is it just to make the tests more realistic?\n\nThe status quo is that we omit Change-Id when it doesn\u0027t matter, and include it when we need it, so at the moment, we are probably effectively testing all of the relevant code paths.  If we make this change, we will not notice a break where we accidentally rely on change-id being present.",
+      "revId": "c18317325c2893fe5b6934caff1f7851eeb5347e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
