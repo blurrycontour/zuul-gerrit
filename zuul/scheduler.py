@@ -1286,8 +1286,14 @@ class Scheduler(threading.Thread):
                               e.change, project.source)
                     continue
                 reconfigure_tenant = False
-                if (event.branch_updated and hasattr(change, 'files') and
-                        change.updatesConfig(tenant)):
+
+                if (event.branch_updated and
+                        (hasattr(change, 'files') and
+                         change.updatesConfig(tenant) or
+                         self.abide.hasUsefulUnparsedBranchCache(
+                             project.canonical_name,
+                             event.branch,
+                             tenant))):
                     reconfigure_tenant = True
 
                 if (event.branch_deleted and
@@ -1322,11 +1328,22 @@ class Scheduler(threading.Thread):
 
                 # If the branch is unprotected and unprotected branches
                 # are excluded from the tenant for that project skip reconfig.
+                reconfigure_protected_branch_canceled = False
                 if (reconfigure_tenant and not
-                    event.branch_protected and
-                    tenant.getExcludeUnprotectedBranches(project)):
-
+                        event.branch_protected and
+                        tenant.getExcludeUnprotectedBranches(project)):
                     reconfigure_tenant = False
+                    reconfigure_protected_branch_canceled = True
+
+                if (event.branch_updated and
+                        reconfigure_protected_branch_canceled is not True):
+                    if (event.newrev == tenant.getProjectBranchRevision(
+                            project, event.branch)):
+                        reconfigure_tenant = False
+                    else:
+                        # Do this here ? or after reconfiguration
+                        tenant.setProjectBranchRevision(
+                            project, event.branch, event.newrev)
 
                 if reconfigure_tenant:
                     # The change that just landed updates the config
