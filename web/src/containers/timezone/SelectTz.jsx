@@ -35,30 +35,12 @@ class SelectTz extends React.Component {
   handleChange = (selectedTz) => {
     const tz = selectedTz.value
 
-    this.setCookie('zuul_tz_string', tz)
+    localStorage.setItem('zuul_tz_string', tz)
     this.updateState(tz)
   }
 
-  setCookie (name, value) {
-    document.cookie = name + '=' + value + '; path=/'
-  }
-
   loadState = () => {
-    function readCookie (name, defaultValue) {
-      let nameEQ = name + '='
-      let ca = document.cookie.split(';')
-      for (let i = 0; i < ca.length; i++) {
-        let c = ca[i]
-        while (c.charAt(0) === ' ') {
-          c = c.substring(1, c.length)
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length)
-        }
-      }
-      return defaultValue
-    }
-    let tz = readCookie('zuul_tz_string', '')
+    let tz = localStorage.getItem('zuul_tz_string') || ''
     if (tz) {
       this.updateState(tz)
     }

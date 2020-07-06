@@ -78,10 +78,6 @@ class StatusPage extends Refreshable {
       this.visibilityChangeEvent, this.visibilityListener, false)
   }
 
-  setCookie (name, value, pathname) {
-    document.cookie = name + '=' + value + '; path=' + pathname
-  }
-
   updateData = (force) => {
     if (force || (this.visible && this.state.autoReload)) {
       this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
@@ -115,7 +111,7 @@ class StatusPage extends Refreshable {
   setFilter = (filter) => {
     this.filter.value = filter
     this.setState({filter: filter})
-    this.setCookie('zuul_filter_string', filter, window.location.pathname)
+    localStorage.setItem('zuul_filter_string', filter)
   }
 
   handleKeyPress = (e) => {
@@ -128,26 +124,12 @@ class StatusPage extends Refreshable {
 
   handleCheckBox = (e) => {
     this.setState({expanded: e.target.checked})
-    this.setCookie('zuul_expand_by_default', e.target.checked, '/')
+    localStorage.setItem('zuul_expand_by_default', e.target.checked)
   }
 
   loadState = () => {
-    function readCookie (name, defaultValue) {
-      let nameEQ = name + '='
-      let ca = document.cookie.split(';')
-      for (let i = 0; i < ca.length; i++) {
-        let c = ca[i]
-        while (c.charAt(0) === ' ') {
-          c = c.substring(1, c.length)
-        }
-        if (c.indexOf(nameEQ) === 0) {
-          return c.substring(nameEQ.length, c.length)
-        }
-      }
-      return defaultValue
-    }
-    let filter = readCookie('zuul_filter_string', '')
-    let expanded = readCookie('zuul_expand_by_default', false)
+    let filter = localStorage.getItem('zuul_filter_string') || ''
+    let expanded = localStorage.getItem('zuul_expand_by_default') || false
     if (typeof expanded === 'string') {
       expanded = (expanded === 'true')
     }
