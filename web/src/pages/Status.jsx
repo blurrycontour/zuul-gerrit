@@ -42,7 +42,7 @@ class StatusPage extends React.Component {
   state = {
     filter: null,
     expanded: false,
-    autoReload: true
+    autoReload: JSON.parse(localStorage.getItem('zuul_auto_reload', false)) === true
   }
 
   visibilityListener = () => {
@@ -77,10 +77,15 @@ class StatusPage extends React.Component {
     }
     document.addEventListener(
       this.visibilityChangeEvent, this.visibilityListener, false)
+    document.addEventListener(
+      'reconfig', this.updateData)
   }
 
-  updateData = (force) => {
-    if (force || (this.visible && this.state.autoReload)) {
+  updateData = (event) => {
+    if (event || (this.visible)) {
+      if (event && event.type === 'reconfig') {
+        this.setState({'autoReload': JSON.parse(localStorage.getItem('zuul_auto_reload', false)) === true})
+      }
       this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
         .then(() => {if (this.state.autoReload && this.visible) {
           this.timer = setTimeout(this.updateData, 5000)
@@ -116,6 +121,8 @@ class StatusPage extends React.Component {
     this.visible = false
     document.removeEventListener(
       this.visibilityChangeEvent, this.visibilityListener)
+    document.removeEventListener(
+      'reconfig', this.updateData)
   }
 
   setFilter = (filter) => {
@@ -185,7 +192,7 @@ class StatusPage extends React.Component {
 
   render () {
     const { remoteData } = this.props
-    const { autoReload, filter, expanded } = this.state
+    const { filter, expanded } = this.state
     const status = remoteData.status
     if (this.filter && !this.filterLoaded && filter) {
       this.filterLoaded = true
@@ -227,12 +234,6 @@ class StatusPage extends React.Component {
             isFetching={remoteData.isFetching}
             fetchCallback={this.updateData}
           />
-          <Checkbox
-            defaultChecked={autoReload}
-            onChange={(e) => {this.setState({autoReload: e.target.checked})}}
-            style={{marginTop: '0px', marginLeft: '10px'}}>
-            auto reload
-          </Checkbox>
         </div>
 
         {status && this.renderStatusHeader(status)}
@@ -253,6 +254,7 @@ class StatusPage extends React.Component {
 }
 
 export default connect(state => ({
+  autoReload: state.autoReload,
   tenant: state.tenant,
   timezone: state.timezone,
   remoteData: state.status,
