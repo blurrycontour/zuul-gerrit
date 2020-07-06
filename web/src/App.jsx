@@ -65,6 +65,7 @@ import {
 
 import ErrorBoundary from './containers/ErrorBoundary'
 import SelectTz from './containers/timezone/SelectTz'
+import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
 import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
@@ -386,6 +387,7 @@ class App extends React.Component {
           </NotificationBadge>
         }
         <SelectTz/>
+        <ConfigModal/>
       </PageHeaderTools>
     )
 
