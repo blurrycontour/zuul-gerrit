@@ -27,6 +27,7 @@ import nodes from './nodes'
 import openapi from './openapi'
 import project from './project'
 import projects from './projects'
+import preferences from './preferences'
 import status from './status'
 import tenant from './tenant'
 import tenants from './tenants'
@@ -50,6 +51,7 @@ const reducers = {
   tenant,
   tenants,
   timezone,
+  preferences,
 }
 
 export default combineReducers(reducers)

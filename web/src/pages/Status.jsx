@@ -42,7 +42,6 @@ class StatusPage extends React.Component {
   state = {
     filter: null,
     expanded: false,
-    autoReload: true
   }
 
   visibilityListener = () => {
@@ -80,9 +79,9 @@ class StatusPage extends React.Component {
   }
 
   updateData = (force) => {
-    if (force || (this.visible && this.state.autoReload)) {
+    if (force || (this.visible && this.props.preferences.autoReload)) {
       this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
-        .then(() => {if (this.state.autoReload && this.visible) {
+        .then(() => {if (this.props.preferences.autoReload && this.visible) {
           this.timer = setTimeout(this.updateData, 5000)
         }})
     }
@@ -97,14 +96,18 @@ class StatusPage extends React.Component {
     document.title = 'Zuul Status'
     this.loadState()
     if (this.props.tenant.name) {
-      this.updateData()
+      this.updateData(true)
     }
     window.addEventListener('storage', this.loadState)
   }
 
   componentDidUpdate (prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name) {
-      this.updateData()
+      this.updateData(true)
+    }
+    // If the user just enabled auto-reload
+    if (this.props.preferences.autoReload && !this.timer) {
+      this.updateData(true)
     }
   }
 
@@ -185,7 +188,7 @@ class StatusPage extends React.Component {
 
   render () {
     const { remoteData } = this.props
-    const { autoReload, filter, expanded } = this.state
+    const { filter, expanded } = this.state
     const status = remoteData.status
     if (this.filter && !this.filterLoaded && filter) {
       this.filterLoaded = true
@@ -227,12 +230,6 @@ class StatusPage extends React.Component {
             isFetching={remoteData.isFetching}
             fetchCallback={this.updateData}
           />
-          <Checkbox
-            defaultChecked={autoReload}
-            onChange={(e) => {this.setState({autoReload: e.target.checked})}}
-            style={{marginTop: '0px', marginLeft: '10px'}}>
-            auto reload
-          </Checkbox>
         </div>
 
         {status && this.renderStatusHeader(status)}
@@ -253,6 +250,7 @@ class StatusPage extends React.Component {
 }
 
 export default connect(state => ({
+  preferences: state.preferences,
   tenant: state.tenant,
   timezone: state.timezone,
   remoteData: state.status,
