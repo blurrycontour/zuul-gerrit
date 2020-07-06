@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_db49d532",
+        "filename": "web/src/index.css",
+        "patchSetId": 15
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-06T15:13:28Z",
+      "side": 1,
+      "message": "The default label font size now is 100% which makes the result labels larger than the job name fonts. To fix this we could add font-size: small here (or any other place that suits better).",
+      "revId": "0bded5951a869c31852f7df8e09a7cbf9508c72b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
