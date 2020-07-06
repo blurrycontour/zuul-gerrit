@@ -14,10 +14,12 @@
 
 import enUSTranslations from './en_US/translations.json'
 import frFRTranslations from './fr_FR/translations.json'
+import svSETranslations from './sv_SE/translations.json'
 
 const translations = {
   en_US: enUSTranslations,
   fr_FR: frFRTranslations,
+  sv_SE: svSETranslations
 }
 
 export default translations

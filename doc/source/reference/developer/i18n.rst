@@ -5,6 +5,7 @@ The Zuul dashboard supports multiple languages. In alphabetical order:
 
 * English (US)
 * Français (FR)
+* Svenska (SE)
 
 Adding a language
 -----------------
