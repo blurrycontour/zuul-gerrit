@@ -1023,7 +1023,7 @@ class TestGithubDriver(ZuulTestCase):
         repo._delete_branch(branch)
 
         self._test_push_event_reconfigure(project, branch,
-                                          expect_reconfigure=True,
+                                          expect_reconfigure=False,
                                           old_sha=old_sha,
                                           new_sha='0' * 40,
                                           modified_files=[])

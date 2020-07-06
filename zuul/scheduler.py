@@ -1286,19 +1286,30 @@ class Scheduler(threading.Thread):
                               e.change, project.source)
                     continue
                 reconfigure_tenant = False
-                if ((event.branch_updated and
-                     hasattr(change, 'files') and
-                     change.updatesConfig(tenant)) or
-                    (event.branch_deleted and
-                     self.abide.hasUnparsedBranchCache(project.canonical_name,
-                                                       event.branch))):
+                if (event.branch_updated and hasattr(change, 'files') and
+                        change.updatesConfig(tenant)):
+                    reconfigure_tenant = True
+
+                if (event.branch_deleted and
+                        self.abide.hasUsefulUnparsedBranchCache(
+                        project.canonical_name,
+                        event.branch,
+                        tenant)):
                     reconfigure_tenant = True
 
                 # The branch_created attribute is also true when a tag is
                 # created. Since we load config only from branches only trigger
                 # a tenant reconfiguration if the branch is set as well.
                 if event.branch_created and event.branch:
-                    reconfigure_tenant = True
+                    if hasattr(change, 'files'):
+                        # we were able to get files: create cache entry
+                        self.abide.getUnparsedBranchCache(
+                            project.canonical_name, event.branch)
+                    if (hasattr(change, 'files') and
+                            change.updatesConfig(tenant)):
+                        reconfigure_tenant = True
+                    elif not hasattr(change, 'files'):
+                        reconfigure_tenant = True
 
                 # If the driver knows the branch but we don't have a config, we
                 # also need to reconfigure. This happens if a GitHub branch

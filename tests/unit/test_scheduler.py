@@ -6115,9 +6115,11 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
-        gearJob = next(iter(self.scheds.first.sched.merger.jobs))
-        self.assertEqual(gearJob.complete, False)
+        gearJobs = []
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
+        for gearJob in self.scheds.first.sched.merger.jobs:
+            gearJobs.append(gearJob)
+            self.assertEqual(gearJob.complete, False)
 
         # Reconfigure while we still have an outstanding merge job
         self.gearman_server.hold_merge_jobs_in_queue = False
@@ -6130,16 +6132,18 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # Verify the merge job is still running and that the item is
         # in the pipeline
-        self.assertEqual(gearJob.complete, False)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
+        for gearJob in gearJobs:
+            self.assertEqual(gearJob.complete, False)
 
         pipeline = tenant.layout.pipelines['post']
         self.assertEqual(len(pipeline.getAllItems()), 1)
         self.gearman_server.release()
         self.waitUntilSettled()
 
-        self.assertEqual(gearJob.complete, True)
         self.assertEqual(len(self.scheds.first.sched.merger.jobs), 0)
+        for gearJob in gearJobs:
+            self.assertEqual(gearJob.complete, True)
 
     @simple_layout('layouts/parent-matchers.yaml')
     def test_parent_matchers(self):
@@ -8383,10 +8387,10 @@ class TestReconfigureBranch(ZuulTestCase):
         self.waitUntilSettled()
 
     def _deleteBranch(self):
-        self.delete_branch('org/project1', 'stable')
+        oldrev = self.delete_branch('org/project1', 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchDeletedEvent(
-                'org/project1', 'stable'))
+                'org/project1', 'stable', oldrev))
         self.waitUntilSettled()
 
     def _expectReconfigure(self, doReconfigure):
@@ -8407,9 +8411,9 @@ class TestReconfigureBranchCreateDeleteSshHttp(TestReconfigureBranch):
         "Test that cache is updated clear on branch creation/deletion"
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
 
 class TestReconfigureBranchCreateDeleteSsh(TestReconfigureBranch):
@@ -8421,7 +8425,7 @@ class TestReconfigureBranchCreateDeleteSsh(TestReconfigureBranch):
         self._createBranch()
         self._expectReconfigure(True)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
 
 class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
@@ -8432,6 +8436,6 @@ class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
         "Test that cache is updated clear on branch creation/deletion"
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)

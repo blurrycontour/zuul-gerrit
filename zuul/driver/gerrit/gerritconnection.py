@@ -712,6 +712,12 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.branch = event.ref
             change.ref = 'refs/heads/' + event.ref
+            # does gerrit provides files for oldrev ?
+            if hasattr(event, 'branch_created') and event.branch_created:
+                change.files = self.queryCommitFiles(event.project_name,
+                                                     event.newrev)
+            else:
+                change.files = None
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -721,6 +727,12 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.ref = event.ref
             change.branch = event.ref[len('refs/heads/'):]
+            # does gerrit provides files for oldrev ?
+            if hasattr(event, 'branch_created') and event.branch_created:
+                change.files = self.queryCommitFiles(event.project_name,
+                                                     event.newrev)
+            else:
+                change.files = None
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -1186,6 +1198,18 @@ class GerritConnection(BaseConnection):
         else:
             data = self.queryChangeSSH(number, event=event)
             return GerritChangeData(GerritChangeData.SSH, data)
+
+    def queryCommitFilesHTTP(self, project, commit):
+        data = self.get('projects/%s/commits/%s/files/' %
+                        (project, commit))
+        return data
+
+    def queryCommitFiles(self, project, rev):
+        if self.session:
+            data = self.queryCommitFilesHTTP(project, rev)
+            return data
+        else:
+            return None
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):
