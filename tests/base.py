@@ -677,6 +677,8 @@ class GerritWebServer(object):
             related_re = re.compile(r'/a/changes/(.*)/revisions/(.*)/related')
             change_search_re = re.compile(r'/a/changes/\?n=500.*&q=(.*)')
             version_re = re.compile(r'/a/config/server/version')
+            commit_files_re = re.compile(
+                r'/a/projects/(.*)/commits/(.*?)/files')
 
             def do_POST(self):
                 path = self.path
@@ -721,6 +723,9 @@ class GerritWebServer(object):
                 m = self.version_re.match(path)
                 if m:
                     return self.version()
+                m = self.commit_files_re.match(path)
+                if m:
+                    return self.commit_files(m.group(1), m.group(2))
                 self.send_response(500)
                 self.end_headers()
 
@@ -839,6 +844,12 @@ class GerritWebServer(object):
 
             def version(self):
                 self.send_data('3.0.0-some-stuff')
+                self.end_headers()
+
+            def commit_files(self, project, commit):
+                results = fake_gerrit.queryProjectCommitFiles(
+                    project, commit, http=True)
+                self.send_data(results)
                 self.end_headers()
 
             def send_data(self, data):
@@ -975,9 +986,11 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
-    def getFakeBranchCreatedEvent(self, project, branch):
-        path = os.path.join(self.upstream_root, project)
-        repo = git.Repo(path)
+    def getFakeBranchCreatedEvent(self, project, branch, newrev=None):
+        if newrev is None:
+            path = os.path.join(self.upstream_root, project)
+            repo = git.Repo(path)
+            newrev = repo.heads[branch].commit.hexsha
         oldrev = 40 * '0'
 
         event = {
@@ -987,15 +1000,14 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
             },
             "refUpdate": {
                 "oldRev": oldrev,
-                "newRev": repo.heads[branch].commit.hexsha,
+                "newRev": newrev,
                 "refName": 'refs/heads/' + branch,
                 "project": project,
             }
         }
         return event
 
-    def getFakeBranchDeletedEvent(self, project, branch):
-        oldrev = '4abd38457c2da2a72d4d030219ab180ecdb04bf0'
+    def getFakeBranchDeletedEvent(self, project, branch, oldrev):
         newrev = 40 * '0'
 
         event = {
@@ -1090,6 +1102,20 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
             # Query all open changes
             l = [queryMethod(change) for change in self.changes.values()]
         return l
+
+    def queryProjectCommitFiles(self, project, commit, http=False):
+        path = os.path.join(self.upstream_root, project)
+        repo = git.Repo(path)
+        treeobj = repo.commit(commit).tree
+        file_list = []
+        stack = [treeobj]
+        while len(stack) > 0:
+            tree = stack.pop()
+            for b in tree.blobs:
+                file_list.append(b.path)
+            for subtree in tree.trees:
+                stack.append(subtree)
+        return file_list
 
     def simpleQuerySSH(self, query, event=None):
         log = get_annotated_logger(self.log, event)
@@ -4235,17 +4261,21 @@ class ZuulTestCase(BaseTestCase):
         f.close()
         repo.index.add([fn])
         repo.index.commit('%s commit' % branch)
+        hexsha = repo.head.commit.hexsha
 
         repo.head.reference = repo.heads['master']
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
+        return hexsha
 
     def delete_branch(self, project, branch):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         repo.head.reference = repo.heads['master']
         zuul.merger.merger.reset_repo_to_head(repo)
+        hexsha = repo.heads[branch].commit.hexsha
         repo.delete_head(repo.heads[branch], force=True)
+        return hexsha
 
     def create_commit(self, project, files=None, head='master',
                       message='Creating a fake commit', **kwargs):
