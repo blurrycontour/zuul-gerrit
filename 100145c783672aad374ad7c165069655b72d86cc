@@ -1,0 +1,211 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_c63a9ccb",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "\"Tâches\" ?",
+      "range": {
+        "startLine": 8,
+        "startChar": 11,
+        "endLine": 8,
+        "endChar": 15
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_3b08d18f",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "Could not that be confusing since \"executor\" is also a Zuul component ?",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 22
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_bbf3419f",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "\"Séries de builds\" ?",
+      "range": {
+        "startLine": 12,
+        "startChar": 16,
+        "endLine": 12,
+        "endChar": 25
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_db02753e",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "\"sûr\"/\"non sur\" is fine, just in case here are some other possibilities:\n\"Environnement d\u0027exécution de confiance\"/\"Environnement d\u0027exécution non sûr\"/\n\"Environnement d\u0027exécution contrôlé\"/\"Environnement d\u0027exécution externe\"",
+      "range": {
+        "startLine": 52,
+        "startChar": 15,
+        "endLine": 52,
+        "endChar": 44
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_26df180d",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "Typo: \"Déconnexion\"",
+      "range": {
+        "startLine": 111,
+        "startChar": 17,
+        "endLine": 111,
+        "endChar": 29
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_e6bfe0a7",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "Some proposals:\n\"Tâche Gearman absente\"\n\"Identifiant Gearman manquant\"",
+      "range": {
+        "startLine": 114,
+        "startChar": 16,
+        "endLine": 114,
+        "endChar": 41
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_c6e57c0c",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "\"Après validation\" / \"Après approbation\" ?",
+      "range": {
+        "startLine": 171,
+        "startChar": 18,
+        "endLine": 171,
+        "endChar": 40
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_c6729c7c",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "\" ( branche forcée: %{item} )\" ?",
+      "range": {
+        "startLine": 191,
+        "startChar": 21,
+        "endLine": 191,
+        "endChar": 60
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_86a4240a",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-06T16:10:50Z",
+      "side": 1,
+      "message": "\"Journaux\" ?",
+      "range": {
+        "startLine": 234,
+        "startChar": 11,
+        "endLine": 234,
+        "endChar": 15
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
