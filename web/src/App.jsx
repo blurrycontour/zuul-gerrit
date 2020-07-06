@@ -32,6 +32,7 @@ import * as moment from 'moment'
 
 import ErrorBoundary from './containers/ErrorBoundary'
 import SelectTz from './containers/timezone/SelectTz'
+import Config from './containers/config/Config'
 import logo from './images/logo.png'
 import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
@@ -276,6 +277,9 @@ class App extends React.Component {
               )}
               <li>
               <SelectTz/>
+              </li>
+              <li>
+              <Config/>
               </li>
             </ul>
             {showErrors && this.renderConfigErrors(configErrors)}
