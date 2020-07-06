@@ -1286,8 +1286,13 @@ class Scheduler(threading.Thread):
                               e.change, project.source)
                     continue
                 reconfigure_tenant = False
-                if (event.branch_updated and hasattr(change, 'files') and
-                        change.updatesConfig(tenant)):
+                if (event.branch_updated and
+                        (hasattr(change, 'files') and
+                         change.updatesConfig(tenant) or
+                         self.abide.hasUsefulUnparsedBranchCache(
+                             project.canonical_name,
+                             event.branch,
+                             tenant))):
                     reconfigure_tenant = True
 
                 if (event.branch_deleted and
@@ -1325,8 +1330,19 @@ class Scheduler(threading.Thread):
                 if (reconfigure_tenant and not
                     event.branch_protected and
                     tenant.getExcludeUnprotectedBranches(project)):
-
                     reconfigure_tenant = False
+
+                if reconfigure_tenant and event.branch_updated:
+                    if (event.newrev == tenant.getProjectBranchRevision(
+                            project, event.branch)):
+                        reconfigure_tenant = False
+                    else:
+                        # This should not be done here, but after
+                        # reconfiguration
+                        # project.source.setProjectBranchRevision(
+                        #     project, event.branch, event.newrev)
+                        tenant.setProjectBranchRevision(
+                            project, event.branch, event.newrev)
 
                 if reconfigure_tenant:
                     # The change that just landed updates the config
