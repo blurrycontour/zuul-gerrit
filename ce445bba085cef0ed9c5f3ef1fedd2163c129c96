@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_46d20c36",
+        "filename": "web/src/locales/sv_SE/translations.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-07-06T15:57:44Z",
+      "side": 1,
+      "message": "whoops",
+      "range": {
+        "startLine": 38,
+        "startChar": 24,
+        "endLine": 38,
+        "endChar": 48
+      },
+      "revId": "ce445bba085cef0ed9c5f3ef1fedd2163c129c96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
