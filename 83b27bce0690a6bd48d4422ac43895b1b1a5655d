@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_bbd4e1bc",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-06T15:40:09Z",
+      "side": 1,
+      "message": "This can be simplified using the get_default utility function. You can see an example here: https://opendev.org/zuul/zuul/src/branch/master/zuul/executor/server.py#L2630\n\nThe type of the default defines the data type.",
+      "revId": "83b27bce0690a6bd48d4422ac43895b1b1a5655d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
