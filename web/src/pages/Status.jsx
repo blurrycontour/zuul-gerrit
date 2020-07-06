@@ -41,7 +41,7 @@ class StatusPage extends Refreshable {
   state = {
     filter: null,
     expanded: false,
-    autoReload: true
+    autoReload: JSON.parse(localStorage.getItem('zuul_auto_reload', false)) === true
   }
 
   visibilityListener = () => {
@@ -83,9 +83,11 @@ class StatusPage extends Refreshable {
   }
 
   updateData = (force) => {
-    if (force || (this.visible && this.state.autoReload)) {
+    var autoReload = JSON.parse(localStorage.getItem('zuul_auto_reload', false)) === true
+
+    if (force || (this.visible && autoReload)) {
       this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
-        .then(() => {if (this.state.autoReload && this.visible) {
+        .then(() => {if (autoReload && this.visible) {
           this.timer = setTimeout(this.updateData, 5000)
         }})
     }
@@ -100,6 +102,7 @@ class StatusPage extends Refreshable {
     document.title = 'Zuul Status'
     this.loadState()
     super.componentDidMount()
+    document.addEventListener('reconfig', this.updateData)
   }
 
   componentWillUnmount () {
@@ -110,6 +113,8 @@ class StatusPage extends Refreshable {
     this.visible = false
     document.removeEventListener(
       this.visibilityChangeEvent, this.visibilityListener)
+    document.removeEventListener(
+      'reconfig', this.updateData)
   }
 
   setFilter = (filter) => {
@@ -232,12 +237,6 @@ class StatusPage extends Refreshable {
       <React.Fragment>
         <div className="pull-right" style={{display: 'flex'}}>
           {this.renderSpinner()}
-          <Checkbox
-            defaultChecked={autoReload}
-            onChange={(e) => {this.setState({autoReload: e.target.checked})}}
-            style={{marginTop: '0px'}}>
-            auto reload
-          </Checkbox>
         </div>
 
         {status && this.renderStatusHeader(status)}
