@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_b2ab661c",
+        "filename": "web/src/containers/timezone/SelectTz.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-07-06T13:18:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_d2725a7c",
+      "revId": "7d3946136884024738e9d6324cc9a2489fcb77aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_d2f7fad3",
         "filename": "web/src/pages/Status.jsx",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2020-07-06T12:53:23Z",
       "side": 1,
       "message": "adding a storage event listener will ensure consistency between tabs, something like:\n\n  componentDidMount() {\n    window.addEventListener(\u0027storage\u0027, this.loadState)\n  }",
+      "revId": "7d3946136884024738e9d6324cc9a2489fcb77aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_52300a08",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-07-06T13:18:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_d2f7fad3",
       "revId": "7d3946136884024738e9d6324cc9a2489fcb77aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
