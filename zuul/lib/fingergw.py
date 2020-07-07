@@ -217,3 +217,6 @@ class FingerGateway(object):
         Wait on the gateway to shutdown.
         '''
         self.server_thread.join()
+
+        if self.command_socket:
+            self.command_thread.join()
