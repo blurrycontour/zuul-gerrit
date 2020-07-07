@@ -70,59 +70,61 @@ class SQLReporter(BaseReporter):
         """Create an entry into a database."""
         log = get_annotated_logger(self.log, item.event)
 
-        if not self.connection.tables_established:
-            log.warning("SQL reporter (%s) is disabled ", self)
+        try:
+            with self.connection.getSession() as db:
+                self._report(db, item)
+        except SQLConnectionNotReadyError:
+            log.warning("SQL reporter (%s) is not ready", self)
             return
 
+    def _report(self, db, item):
         event_id = None
         if item.event is not None:
             event_id = getattr(item.event, "zuul_event_id", None)
+        db_buildset = db.createBuildSet(
+            uuid=item.current_build_set.uuid,
+            tenant=item.pipeline.tenant.name,
+            pipeline=item.pipeline.name,
+            project=item.change.project.name,
+            change=getattr(item.change, 'number', None),
+            patchset=getattr(item.change, 'patchset', None),
+            ref=getattr(item.change, 'ref', ''),
+            oldrev=getattr(item.change, 'oldrev', ''),
+            newrev=getattr(item.change, 'newrev', ''),
+            branch=getattr(item.change, 'branch', ''),
+            zuul_ref=item.current_build_set.ref,
+            ref_url=item.change.url,
+            result=item.current_build_set.result,
+            event_id=event_id,
+            message=self._formatItemReport(item, with_jobs=False),
+        )
+        for job in item.getJobs():
+            build = item.current_build_set.getBuild(job.name)
+            if not build:
+                # build hasn't begun. The sql reporter can only send back
+                # stats about builds. It doesn't understand how to store
+                # information about the change.
+                continue
 
-        with self.connection.getSession() as db:
-            db_buildset = db.createBuildSet(
-                uuid=item.current_build_set.uuid,
-                tenant=item.pipeline.tenant.name,
-                pipeline=item.pipeline.name,
-                project=item.change.project.name,
-                change=getattr(item.change, 'number', None),
-                patchset=getattr(item.change, 'patchset', None),
-                ref=getattr(item.change, 'ref', ''),
-                oldrev=getattr(item.change, 'oldrev', ''),
-                newrev=getattr(item.change, 'newrev', ''),
-                branch=getattr(item.change, 'branch', ''),
-                zuul_ref=item.current_build_set.ref,
-                ref_url=item.change.url,
-                result=item.current_build_set.result,
-                event_id=event_id,
-                message=self._formatItemReport(item, with_jobs=False),
+            retry_builds = item.current_build_set.getRetryBuildsForJob(
+                job.name
             )
-            for job in item.getJobs():
-                build = item.current_build_set.getBuild(job.name)
-                if not build:
-                    # build hasn't begun. The sql reporter can only send back
-                    # stats about builds. It doesn't understand how to store
-                    # information about the change.
-                    continue
-
-                retry_builds = item.current_build_set.getRetryBuildsForJob(
-                    job.name
+            for retry_build in retry_builds:
+                self.createBuildEntry(
+                    item, job, db_buildset, retry_build, final=False
                 )
-                for retry_build in retry_builds:
-                    self.createBuildEntry(
-                        item, job, db_buildset, retry_build, final=False
-                    )
 
-                db_build = self.createBuildEntry(item, job, db_buildset, build)
+            db_build = self.createBuildEntry(item, job, db_buildset, build)
 
-                for provides in job.provides:
-                    db_build.createProvides(name=provides)
+            for provides in job.provides:
+                db_build.createProvides(name=provides)
 
-                for artifact in get_artifacts_from_result_data(
-                    build.result_data,
-                    logger=self.log):
-                    if 'metadata' in artifact:
-                        artifact['metadata'] = json.dumps(artifact['metadata'])
-                    db_build.createArtifact(**artifact)
+            for artifact in get_artifacts_from_result_data(
+                build.result_data,
+                logger=self.log):
+                if 'metadata' in artifact:
+                    artifact['metadata'] = json.dumps(artifact['metadata'])
+                db_build.createArtifact(**artifact)
 
 
 def getSchema():

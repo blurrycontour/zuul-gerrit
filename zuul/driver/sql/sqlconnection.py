@@ -30,6 +30,10 @@ ARTIFACT_TABLE = 'zuul_artifact'
 PROVIDES_TABLE = 'zuul_provides'
 
 
+class SQLConnectionNotReady(Exception):
+    pass
+
+
 class DatabaseSession(object):
 
     log = logging.getLogger("zuul.DatabaseSession")
@@ -189,11 +193,12 @@ class SQLConnection(BaseConnection):
         self.connection = None
         self.tables_established = False
         self.table_prefix = self.connection_config.get('table_prefix', '')
+        self.dburi = self.connection_config.get('dburi')
+        self._setup_models()
+        self._init()
 
+    def _init(self):
         try:
-            self.dburi = self.connection_config.get('dburi')
-            self._setup_models()
-
             # Recycle connections if they've been idle for more than 1 second.
             # MySQL connections are lightweight and thus keeping long-lived
             # connections around is not valuable.
@@ -223,6 +228,10 @@ class SQLConnection(BaseConnection):
                 "tables. Reporter %s is disabled" % self)
 
     def getSession(self):
+        if not self.tables_established:
+            self._init()
+        if not self.tables_established:
+            raise SQLConnectionNotReady()
         return DatabaseSession(self)
 
     def _migrate(self):
