@@ -57,6 +57,11 @@ class GitSource(BaseSource):
     def getProjectBranches(self, project, tenant):
         return self.connection.getProjectBranches(project, tenant)
 
+    def testReconfigureTenant(self, event, project, tenant,
+                              abide, reconfigure_tenant):
+        return self.connection.testReconfigureTenant(event, project, tenant,
+                                                     abide, reconfigure_tenant)
+
     def getGitUrl(self, project):
         return self.connection.getGitUrl(project)
 
