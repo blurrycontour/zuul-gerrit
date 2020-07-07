@@ -292,6 +292,7 @@ class FakeGerritChange(object):
              'ref': 'refs/changes/1/%s/%s' % (self.number,
                                               self.latest_patchset),
              'revision': c.hexsha,
+             'parents': [parent.hexsha for parent in c.parents],
              'uploader': {'email': 'user@example.com',
                           'name': 'User name',
                           'username': 'user'}}
@@ -400,7 +401,7 @@ class FakeGerritChange(object):
     def getChangeMergedEvent(self):
         event = {"submitter": {"name": "Jenkins",
                                "username": "jenkins"},
-                 "newRev": "29ed3b5f8f750a225c5be70235230e3a6ccb04d9",
+                 "newRev": self.patchsets[-1]['revision'],
                  "patchSet": self.patchsets[-1],
                  "change": self.data,
                  "type": "change-merged",
@@ -408,17 +409,13 @@ class FakeGerritChange(object):
         return event
 
     def getRefUpdatedEvent(self):
-        path = os.path.join(self.upstream_root, self.project)
-        repo = git.Repo(path)
-        oldrev = repo.heads[self.branch].commit.hexsha
-
         event = {
             "type": "ref-updated",
             "submitter": {
                 "name": "User Name",
             },
             "refUpdate": {
-                "oldRev": oldrev,
+                "oldRev": self.patchsets[-1]['parents'][0],
                 "newRev": self.patchsets[-1]['revision'],
                 "refName": self.branch,
                 "project": self.project,
@@ -568,10 +565,13 @@ class FakeGerritChange(object):
             if f['file'] == '/COMMIT_MSG':
                 continue
             files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
-        parent = '0000000000000000000000000000000000000000'
+        parents = self.patchsets[-1]['parents']
         if self.depends_on_change:
-            parent = self.depends_on_change.patchsets[
-                self.depends_on_patchset - 1]['revision']
+            parents.extend(self.depends_on_change.patchsets[
+                self.depends_on_patchset - 1]['revision'])
+        commit_parent = []
+        for parent in parents:
+            commit_parent.append({"commit": parent})
         revisions[rev['revision']] = {
             "kind": "REWORK",
             "_number": num,
@@ -581,9 +581,7 @@ class FakeGerritChange(object):
             "commit": {
                 "subject": self.subject,
                 "message": self.data['commitMessage'],
-                "parents": [{
-                    "commit": parent,
-                }]
+                "parents": commit_parent
             },
             "files": files
         }
@@ -981,6 +979,27 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 "oldRev": 40 * '0',
                 "newRev": newrev,
                 "refName": ref,
+                "project": project,
+            }
+        }
+        return event
+
+    def getFakeRefUpdatedEvent(self, project, branch, oldrev, newrev=None):
+        if newrev is None:
+            path = os.path.join(self.upstream_root, project)
+            repo = git.Repo(path)
+            newrev = repo.heads[branch].commit.hexsha
+
+        event = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+                "username": "user",
+            },
+            "refUpdate": {
+                "oldRev": oldrev,
+                "newRev": newrev,
+                "refName": branch,
                 "project": project,
             }
         }

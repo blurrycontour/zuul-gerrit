@@ -6112,6 +6112,14 @@ For CI problems and help debugging, contact ci@example.org"""
         self.gearman_server.hold_merge_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         A.setMerged()
+        # change-merged: scheduler will have files, no new conf, no reconfigure
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        # waitUntilSettled is mandatory between change-merged and ref-updated
+        self.waitUntilSettled()
+        # ref-updated to trigger tenant merge, without change-merge, this would
+        # trigger areconfiguration as http is not available, changed files
+        # cannot be fetched, as the commit id already triggered a
+        # reconfiguration for this project/branch, no new one is performed
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -8403,6 +8411,66 @@ class TestReconfigureBranch(ZuulTestCase):
             self.assertEqual(self.old, new)
         self.old = new
 
+    def _addConfig(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - noop
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+
+        A = self.fake_gerrit.addFakeChange(self.project_reconfig,
+                                           'stable', 'A',
+                                           files=file_dict,
+                                           parent=self.reconf_hexsha)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+        self.hexsha = A.patchsets[-1]['revision']
+
+    def _addFile(self):
+        file_dict = {'dummyfile.txt': ''}
+        A = self.fake_gerrit.addFakeChange(self.project_reconfig,
+                                           'stable', 'A',
+                                           files=file_dict,
+                                           parent=self.reconf_hexsha)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+        self.hexsha = A.patchsets[-1]['revision']
+
+    def _removeAllFiles(self):
+        path = os.path.join(self.upstream_root, self.project_reconfig)
+        repo = git.Repo(path)
+        treeobj = repo.heads['stable'].commit.tree
+        oldrev = repo.heads['stable'].commit.hexsha
+        file_list = []
+        stack = [treeobj]
+        while len(stack) > 0:
+            tree = stack.pop()
+            for b in tree.blobs:
+                file_list.append(b.path)
+            for subtree in tree.trees:
+                stack.append(subtree)
+
+        repo.heads['stable'].checkout()
+        repo.index.remove(file_list, working_tree=True)
+        repo.index.commit('remove zuul config file')
+        self.fake_gerrit.addEvent(self.fake_gerrit.getFakeRefUpdatedEvent(
+            self.project_reconfig, 'stable', oldrev))
+        self.waitUntilSettled()
+
 
 class TestReconfigureBranchCreateNoconfDeleteSshHttp(TestReconfigureBranch):
     tenant_config_file = 'config/single-tenant/main.yaml'
@@ -8417,6 +8485,38 @@ class TestReconfigureBranchCreateNoconfDeleteSshHttp(TestReconfigureBranch):
         self._deleteBranch()
         self._expectReconfigure(False)
 
+    def test_reconfigure_cache_branch_create_update_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(False)
+        self._addFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(False)
+
+    def test_reconfigure_cache_branch_create_add_conf_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(False)
+        self._addConfig()
+        self._expectReconfigure(True)
+        self._removeAllFiles()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
+
+    def test_reconfigure_cache_branch_create_add_conf_remove_conf_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(False)
+        self._addConfig()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
 
 class TestReconfigureBranchCreateConfDeleteSshHttp(TestReconfigureBranch):
     tenant_config_file = 'config/single-tenant/main.yaml'
@@ -8425,11 +8525,44 @@ class TestReconfigureBranchCreateConfDeleteSshHttp(TestReconfigureBranch):
 
     def test_reconfigure_cache_branch_create_delete(self):
         "Test that cache is updated clear on branch creation/deletion"
+
         self._setupTenantReconfigureTime()
         self._createBranch()
         self._expectReconfigure(True)
         self._deleteBranch()
         self._expectReconfigure(True)
+
+    def test_reconfigure_cache_branch_create_update_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._addFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_cache_branch_create_add_conf_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._addConfig()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_cache_branch_create_add_conf_remove_conf_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._addConfig()
+        self._expectReconfigure(True)
+        self._removeAllFiles()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
 
 
 class TestReconfigureBranchCreateDeleteSsh(TestReconfigureBranch):
@@ -8444,6 +8577,38 @@ class TestReconfigureBranchCreateDeleteSsh(TestReconfigureBranch):
         self._deleteBranch()
         self._expectReconfigure(False)
 
+    def test_reconfigure_cache_branch_create_update_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._addFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(False)
+
+    def test_reconfigure_cache_branch_create_add_conf_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._addConfig()
+        self._expectReconfigure(True)
+        self._removeAllFiles()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
+
+    def test_reconfigure_cache_branch_create_add_conf_remove_conf_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._addConfig()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
 
 class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
     tenant_config_file = 'config/single-tenant/main.yaml'
@@ -8457,3 +8622,35 @@ class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
         self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
+
+    def test_reconfigure_cache_branch_create_update_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(False)
+        self._addFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(False)
+
+    def test_reconfigure_cache_branch_create_add_conf_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(False)
+        self._addConfig()
+        self._expectReconfigure(True)
+        self._removeAllFiles()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
+
+    def test_reconfigure_cache_branch_create_add_conf_remove_conf_delete(self):
+        "Test that cache is updated clear on branch creation/deletion"
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(False)
+        self._addConfig()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)

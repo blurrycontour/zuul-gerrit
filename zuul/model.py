@@ -3381,6 +3381,7 @@ class TenantProjectConfig(object):
         self.load_classes = set()
         self.shadow_projects = set()
         self.branches = []
+        self.branches_state = {}
         # The tenant's default setting of exclude_unprotected_branches will
         # be overridden by this one if not None.
         self.exclude_unprotected_branches = None
@@ -4499,6 +4500,14 @@ class Tenant(object):
         """
         tpc = self.project_configs[project.canonical_name]
         return tpc.branches
+
+    def setProjectBranchRevision(self, project, branch, revision):
+        tpc = self.project_configs[project.canonical_name]
+        tpc.branches_state[branch] = revision
+
+    def getProjectBranchRevision(self, project, branch):
+        tpc = self.project_configs[project.canonical_name]
+        return tpc.branches_state.setdefault(branch, None)
 
     def getExcludeUnprotectedBranches(self, project):
         # Evaluate if unprotected branches should be excluded or not. The first

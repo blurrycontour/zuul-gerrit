@@ -1286,9 +1286,27 @@ class Scheduler(threading.Thread):
                               e.change, project.source)
                     continue
                 reconfigure_tenant = False
-                if (event.branch_updated and hasattr(change, 'files') and
-                        change.updatesConfig(tenant)):
-                    reconfigure_tenant = True
+
+                # files is None: updatesConfig will return True
+                # files is a list (empty or not), we can state that a
+                # reconfigure is needed or not, but there is currently
+                # no cache, so the following test block will trigger
+                # one. Avoid this by setting a flag
+                skipGithubTest = False
+
+                if event.branch_updated:
+                    # check what is added
+                    if hasattr(change, 'files'):
+                        skipGithubTest = True
+                        if change.updatesConfig(tenant):
+                            reconfigure_tenant = True
+                    # check what is removed
+                    if (self.abide.hasUsefulUnparsedBranchCache(
+                            project.canonical_name,
+                            event.branch,
+                            tenant) and event.oldrev is not None):
+                        log.debug("ZUUL RECONFIGURE UPATED REMOVE OK")
+                        reconfigure_tenant = True
 
                 if (event.branch_deleted and
                         self.abide.hasUsefulUnparsedBranchCache(
@@ -1302,31 +1320,45 @@ class Scheduler(threading.Thread):
                 # a tenant reconfiguration if the branch is set as well.
                 if event.branch_created and event.branch:
                     if hasattr(change, 'files'):
-                        # we were able to get files: create cache entry
-                        self.abide.getUnparsedBranchCache(
-                            project.canonical_name, event.branch)
-                    if (hasattr(change, 'files') and
-                            change.updatesConfig(tenant)):
-                        reconfigure_tenant = True
+                        skipGithubTest = True
+                        if change.updatesConfig(tenant):
+                            reconfigure_tenant = True
                     elif not hasattr(change, 'files'):
                         reconfigure_tenant = True
+
+                if (not event.branch_updated and
+                        not event.branch_created and
+                        not event.branch_deleted):
+                    skipGithubTest = True
 
                 # If the driver knows the branch but we don't have a config, we
                 # also need to reconfigure. This happens if a GitHub branch
                 # was just configured as protected without a push in between.
                 if (event.branch in project.source.getProjectBranches(
                         project, tenant)
-                    and not self.abide.hasUnparsedBranchCache(
-                        project.canonical_name, event.branch)):
+                        and not self.abide.hasUnparsedBranchCache(
+                            project.canonical_name, event.branch)
+                        and not skipGithubTest):
                     reconfigure_tenant = True
 
                 # If the branch is unprotected and unprotected branches
                 # are excluded from the tenant for that project skip reconfig.
+                reconfigure_protected_branch_canceled = False
                 if (reconfigure_tenant and not
-                    event.branch_protected and
-                    tenant.getExcludeUnprotectedBranches(project)):
-
+                        event.branch_protected and
+                        tenant.getExcludeUnprotectedBranches(project)):
                     reconfigure_tenant = False
+                    reconfigure_protected_branch_canceled = True
+
+                if ((event.branch_updated or event.branch_created) and
+                        reconfigure_protected_branch_canceled is not True):
+                    if (event.newrev == tenant.getProjectBranchRevision(
+                            project, event.branch)):
+                        reconfigure_tenant = False
+                    else:
+                        # Do this here ? or after reconfiguration
+                        tenant.setProjectBranchRevision(
+                            project, event.branch, event.newrev)
 
                 if reconfigure_tenant:
                     # The change that just landed updates the config
