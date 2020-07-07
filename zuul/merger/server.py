@@ -126,10 +126,10 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         connection_name = args['connection']
         project_name = args['project']
-        self._update(connection_name, project_name)
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
         with lock:
+            self._update(connection_name, project_name)
             files = self.merger.getFiles(connection_name, project_name,
                                          args['branch'], args['files'],
                                          args.get('dirs'))
@@ -180,11 +180,11 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         connection_name = args['connection']
         project_name = args['project']
-        self._update(connection_name, project_name,
-                     zuul_event_id=zuul_event_id)
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
         with lock:
+            self._update(connection_name, project_name,
+                         zuul_event_id=zuul_event_id)
             files = self.merger.getFilesChanges(
                 connection_name, project_name, args['branch'], args['tosha'],
                 zuul_event_id=zuul_event_id)
