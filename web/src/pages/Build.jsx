@@ -51,7 +51,7 @@ class BuildPage extends React.Component {
     return (
       <PageSection variant={PageSectionVariants.light}>
       {build &&
-       <Build build={build} active='summary'>
+       <Build build={build} active='results'>
          <Summary build={build}/>
        </Build>}
       </PageSection>
