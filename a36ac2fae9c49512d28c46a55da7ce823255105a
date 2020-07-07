@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_03d3d139",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-07T14:49:27Z",
+      "side": 1,
+      "message": "nit: maybe add an assert that \u0027i shouldnt be seen\u0027 is not part of the merge message.",
+      "revId": "a36ac2fae9c49512d28c46a55da7ce823255105a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_e3d5fd1c",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-07T14:49:27Z",
+      "side": 1,
+      "message": "I\u0027m thinking if we should have two line breaks between change.title and the body text since this is generally the common structure of git commit messages.",
+      "revId": "a36ac2fae9c49512d28c46a55da7ce823255105a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
