@@ -15,13 +15,13 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { BuildIcon } from '@patternfly/react-icons'
 
 import { fetchBuildIfNeeded } from '../actions/build'
+import { EmptyPage } from '../containers/Errors'
 import { Fetching } from '../containers/Fetching'
 import Build from '../containers/build/Build'
 import Console from '../containers/build/Console'
-
 
 class BuildConsolePage extends React.Component {
   static propTypes = {
@@ -33,17 +33,23 @@ class BuildConsolePage extends React.Component {
   }
 
   updateData = (force) => {
-    this.props.dispatch(fetchBuildIfNeeded(
-      this.props.tenant, this.props.match.params.buildId, null, force))
+    this.props.dispatch(
+      fetchBuildIfNeeded(
+        this.props.tenant,
+        this.props.match.params.buildId,
+        null,
+        force
+      )
+    )
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Build'
     this.updateData()
   }
 
-  render () {
-    const { remoteData } = this.props
+  render() {
+    const { remoteData, tenant } = this.props
     if (remoteData.isFetching) {
       return <Fetching />
     }
@@ -51,22 +57,30 @@ class BuildConsolePage extends React.Component {
     const build = remoteData.builds[this.props.match.params.buildId]
     const hash = this.props.location.hash.substring(1).split('/')
 
+    if (build && build.output) {
+      return (
+        <Build build={build} active="console">
+          <Console
+            output={build.output}
+            errorIds={build.errorIds}
+            displayPath={hash.length > 0 ? hash : undefined}
+          />
+        </Build>
+      )
+    }
+
     return (
-      <PageSection variant={PageSectionVariants.light}>
-        {build && build.output &&
-         <Build build={build} active='console'>
-           <Console
-             output={build.output}
-             errorIds={build.errorIds}
-             displayPath={hash.length>0?hash:undefined}
-           />
-         </Build>}
-      </PageSection>
+      <EmptyPage
+        title="This build does not exist"
+        icon={BuildIcon}
+        linkTarget={`${tenant.linkPrefix}/builds`}
+        linkText="Show all builds"
+      />
     )
   }
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   tenant: state.tenant,
   remoteData: state.build,
 }))(BuildConsolePage)

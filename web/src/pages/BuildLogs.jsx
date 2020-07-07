@@ -15,13 +15,13 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { BuildIcon } from '@patternfly/react-icons'
 
 import { fetchBuildIfNeeded } from '../actions/build'
+import { EmptyPage } from '../containers/Errors'
 import { Fetching } from '../containers/Fetching'
 import Build from '../containers/build/Build'
 import Manifest from '../containers/build/Manifest'
-
 
 class BuildLogsPage extends React.Component {
   static propTypes = {
@@ -32,34 +32,49 @@ class BuildLogsPage extends React.Component {
   }
 
   updateData = (force) => {
-    this.props.dispatch(fetchBuildIfNeeded(
-      this.props.tenant, this.props.match.params.buildId, null, force))
+    this.props.dispatch(
+      fetchBuildIfNeeded(
+        this.props.tenant,
+        this.props.match.params.buildId,
+        null,
+        force
+      )
+    )
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Build'
     this.updateData()
   }
 
-  render () {
-    const { remoteData } = this.props
+  render() {
+    const { remoteData, tenant } = this.props
     if (remoteData.isFetching) {
       return <Fetching />
     }
 
     const build = remoteData.builds[this.props.match.params.buildId]
+
+    if (build && build.manifest) {
+      return (
+        <Build build={build} active="logs">
+          <Manifest tenant={this.props.tenant} build={build} />
+        </Build>
+      )
+    }
+
     return (
-      <PageSection variant={PageSectionVariants.light}>
-        {build && build.manifest &&
-         <Build build={build} active='logs'>
-           <Manifest tenant={this.props.tenant} build={build}/>
-         </Build>}
-      </PageSection>
+      <EmptyPage
+        title="This build does not exist"
+        icon={BuildIcon}
+        linkTarget={`${tenant.linkPrefix}/builds`}
+        linkText="Show all builds"
+      />
     )
   }
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   tenant: state.tenant,
   remoteData: state.build,
 }))(BuildLogsPage)
