@@ -16,6 +16,24 @@
       "revId": "559c6da1ad62363fa7f2eba4a55f42cfb6fbb825",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_fcbd9a68",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1028,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-07T17:27:06Z",
+      "side": 1,
+      "message": "test  copied in TestGithubUnprotectedBranches",
+      "parentUuid": "bf51134e_fcc92525",
+      "revId": "559c6da1ad62363fa7f2eba4a55f42cfb6fbb825",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
