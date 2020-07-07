@@ -108,7 +108,7 @@
     parent: python27
     name: timeout
     run: playbooks/timeout.yaml
-    timeout: 10
+    timeout: 20
 
 - job:
     parent: python27
