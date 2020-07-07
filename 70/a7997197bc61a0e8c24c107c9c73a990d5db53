@@ -1,0 +1,10 @@
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Code-Review+1: Matthieu Huin <mhuin@redhat.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Tue, 07 Jul 2020 07:13:50 +0000
+Reviewed-on: https://review.opendev.org/739454
+Project: zuul/zuul
+Branch: refs/heads/master
