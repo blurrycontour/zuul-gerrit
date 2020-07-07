@@ -2801,6 +2801,7 @@ class ExecutorServer(BaseMergeServer):
         if self.process_merge_jobs:
             super().join()
         self.executor_gearworker.join()
+        self.command_thread.join()
 
     def pause(self):
         self.log.debug('Pausing')
