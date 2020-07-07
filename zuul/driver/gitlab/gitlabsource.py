@@ -71,6 +71,11 @@ class GitlabSource(BaseSource):
     def getProjectBranches(self, project, tenant):
         return self.connection.getProjectBranches(project, tenant)
 
+    def testReconfigureTenant(self, event, project, tenant,
+                              abide, reconfigure_tenant):
+        return self.connection.testReconfigureTenant(event, project, tenant,
+                                                     abide, reconfigure_tenant)
+
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
         raise NotImplementedError()
