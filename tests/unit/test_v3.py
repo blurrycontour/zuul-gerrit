@@ -5559,6 +5559,49 @@ class TestJobPause(AnsibleZuulTestCase):
             dict(name='just-pause', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    def test_job_reconfigure_resume(self):
+        """
+        Tests that a paused job is resumed after reconfiguration
+
+        Tests that a paused job is resumed after a reconfiguration removed the
+        last job which is in progress.
+        """
+        self.wait_timeout = 120
+
+        # Output extra ansible info so we might see errors.
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project4', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1, 'compile in progress')
+        self.executor_server.release('compile')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 2, 'compile and test in progress')
+
+        # Remove the test1 job.
+        self.commitConfigUpdate(
+            'org/project4',
+            'config/job-pause/git/org_project4/zuul-reconfigure.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        # The "compile" job might be paused during the waitUntilSettled
+        # call and appear settled; it should automatically resume
+        # though, so just wait for it.
+        for x in iterate_timeout(60, 'job compile finished'):
+            if not self.builds:
+                break
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='compile', result='SUCCESS', changes='1,1'),
+            dict(name='test', result='ABORTED', changes='1,1'),
+        ])
+
     def test_job_pause_skipped_child(self):
         """
         Tests that a paused job is resumed with externally skipped jobs.

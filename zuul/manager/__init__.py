@@ -294,6 +294,11 @@ class PipelineManager(metaclass=ABCMeta):
                 if item.dequeued_needing_change:
                     item.setDequeuedNeedingChange()
 
+                # It can happen that all in-flight builds have been removed
+                # which would lead to paused parent jobs not being resumed.
+                # To prevent that resume parent jobs if necessary.
+                self._resumeBuilds(item.current_build_set)
+
                 self.reportStats(item)
                 return True
             else:
