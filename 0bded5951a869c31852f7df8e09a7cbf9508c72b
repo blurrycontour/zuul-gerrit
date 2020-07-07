@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_fe447c49",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 15
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-07T05:53:58Z",
+      "side": 1,
+      "message": "Thanks, Jim. I tried it already in a follow-up change https://review.opendev.org/#/c/738033/2 but since I wasn\u0027t sure which version you would like better, I didn\u0027t squash that in this original change. However, I forgot to update the commit message accordingly, sry. If we want to go for the logo+text solution I could also use that change. I fixed the size by changing the viewport in the svg file. Not sure if that\u0027s the proper solution though.",
+      "parentUuid": "bf51134e_07764e07",
+      "revId": "0bded5951a869c31852f7df8e09a7cbf9508c72b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_db49d532",
         "filename": "web/src/index.css",
         "patchSetId": 15
