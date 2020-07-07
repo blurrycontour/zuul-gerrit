@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_fcc92525",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1028,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-07T08:11:31Z",
+      "side": 1,
+      "message": "This defeats an important part of the test case. Instead of expecting a reconfigure we should instead exclude unprotected branches in the tenant for at least this test case.",
+      "revId": "559c6da1ad62363fa7f2eba4a55f42cfb6fbb825",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
