@@ -15,13 +15,13 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { BuildIcon } from '@patternfly/react-icons'
 
 import { fetchBuildIfNeeded } from '../actions/build'
-import { Fetchable } from '../containers/Fetching'
+import { EmptyPage } from '../containers/Errors'
+import { Fetchable, Fetching } from '../containers/Fetching'
 import Build from '../containers/build/Build'
 import Manifest from '../containers/build/Manifest'
-
 
 class BuildLogsPage extends React.Component {
   static propTypes = {
@@ -32,44 +32,64 @@ class BuildLogsPage extends React.Component {
   }
 
   updateData = (force) => {
-    this.props.dispatch(fetchBuildIfNeeded(
-      this.props.tenant, this.props.match.params.buildId, null, force))
+    this.props.dispatch(
+      fetchBuildIfNeeded(
+        this.props.tenant,
+        this.props.match.params.buildId,
+        null,
+        force
+      )
+    )
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Build'
     if (this.props.tenant.name) {
       this.updateData()
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name) {
       this.updateData()
     }
   }
 
-  render () {
-    const { remoteData } = this.props
+  render() {
+    const { remoteData, tenant } = this.props
     const build = remoteData.builds[this.props.match.params.buildId]
+
+    if (!build && remoteData.isFetching) {
+      return <Fetching />
+    }
+
+    if (build && build.manifest) {
+      const fetchable = (
+        <Fetchable
+          isFetching={remoteData.isFetching}
+          fetchCallback={this.updateData}
+        />
+      )
+
+      return (
+        <Build build={build} active="logs" fetchable={fetchable}>
+          <Manifest tenant={tenant} build={build} />
+        </Build>
+      )
+    }
+
     return (
-      <PageSection variant={PageSectionVariants.light}>
-        <PageSection style={{paddingRight: '5px'}}>
-          <Fetchable
-            isFetching={remoteData.isFetching}
-            fetchCallback={this.updateData}
-          />
-        </PageSection>
-        {build && build.manifest &&
-         <Build build={build} active='logs'>
-           <Manifest tenant={this.props.tenant} build={build}/>
-         </Build>}
-      </PageSection>
+      <EmptyPage
+        title="This build does not exist"
+        icon={BuildIcon}
+        linkTarget={`${tenant.linkPrefix}/builds`}
+        linkText="Show all builds"
+      />
     )
   }
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   tenant: state.tenant,
   remoteData: state.build,
 }))(BuildLogsPage)
