@@ -946,13 +946,15 @@ class TestGithubDriver(ZuulTestCase):
                                      expect_reconfigure=False,
                                      old_sha=None, new_sha=None,
                                      modified_files=None,
+                                     removed_files=None,
                                      expected_cat_jobs=None):
         pevent = self.fake_github.getPushEvent(
             project=project,
             ref='refs/heads/%s' % branch,
             old_rev=old_sha,
             new_rev=new_sha,
-            modified_files=modified_files)
+            modified_files=modified_files,
+            removed_files=removed_files)
 
         # record previous tenant reconfiguration time, which may not be set
         old = self.scheds.first.sched.tenant_last_reconfigured\
@@ -1013,22 +1015,24 @@ class TestGithubDriver(ZuulTestCase):
         A = self.fake_github.openFakePullRequest(project, branch, 'A')
         old_sha = A.head_sha
         A.setMerged("merging A")
+        new_sha = random_sha1()
 
         self._test_push_event_reconfigure(project, branch,
                                           expect_reconfigure=True,
                                           old_sha=old_sha,
+                                          new_sha=new_sha,
                                           modified_files=['zuul.yaml'],
                                           expected_cat_jobs=1)
 
-        # Check if deleting that branch will not lead to a reconfiguration as
-        # this branch is not protected
+        # there are no exclude-unprotected-branches in the test class, so a
+        # reconfigure shall occur
         repo._delete_branch(branch)
 
         self._test_push_event_reconfigure(project, branch,
-                                          expect_reconfigure=False,
-                                          old_sha=old_sha,
+                                          expect_reconfigure=True,
+                                          old_sha=new_sha,
                                           new_sha='0' * 40,
-                                          modified_files=[])
+                                          removed_files=['zuul.yaml'])
 
     # TODO(jlk): Make this a more generic test for unknown project
     @skip("Skipped for rewrite of webhook handler")
@@ -1107,10 +1111,12 @@ class TestGithubDriver(ZuulTestCase):
         A = self.fake_github.openFakePullRequest(project, branch, 'A')
         old_sha = A.head_sha
         A.setMerged("merging A")
+        new_sha = random_sha1()
 
         self._test_push_event_reconfigure(project, branch,
                                           expect_reconfigure=False,
                                           old_sha=old_sha,
+                                          new_sha=new_sha,
                                           modified_files=['README.md'])
 
         # Check if deleting that branch is ignored as well
@@ -1118,7 +1124,7 @@ class TestGithubDriver(ZuulTestCase):
 
         self._test_push_event_reconfigure(project, branch,
                                           expect_reconfigure=False,
-                                          old_sha=old_sha,
+                                          old_sha=new_sha,
                                           new_sha='0' * 40,
                                           modified_files=['README.md'])
 
@@ -1502,6 +1508,92 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         self.assertEqual('release', zuulvars['branch'])
 
         self.assertEqual(1, len(self.history))
+
+    def _test_push_event_reconfigure(self, project, branch,
+                                     expect_reconfigure=False,
+                                     old_sha=None, new_sha=None,
+                                     modified_files=None,
+                                     removed_files=None,
+                                     expected_cat_jobs=None):
+        pevent = self.fake_github.getPushEvent(
+            project=project,
+            ref='refs/heads/%s' % branch,
+            old_rev=old_sha,
+            new_rev=new_sha,
+            modified_files=modified_files,
+            removed_files=removed_files)
+
+        # record previous tenant reconfiguration time, which may not be set
+        old = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        self.waitUntilSettled()
+
+        if expected_cat_jobs is not None:
+            # clear the gearman jobs history so we can count the cat jobs
+            # issued during reconfiguration
+            self.gearman_server.jobs_history.clear()
+
+        self.fake_github.emitEvent(pevent)
+        self.waitUntilSettled()
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+
+        if expect_reconfigure:
+            # New timestamp should be greater than the old timestamp
+            self.assertLess(old, new)
+        else:
+            # Timestamps should be equal as no reconfiguration shall happen
+            self.assertEqual(old, new)
+
+        if expected_cat_jobs is not None:
+            # Check the expected number of cat jobs here as the (empty) config
+            # of org/project should be cached.
+            cat_jobs = set([job for job in self.gearman_server.jobs_history
+                           if job.name == b'merger:cat'])
+            self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
+
+    def test_push_event_reconfigure_complex_branch(self):
+
+        branch = 'feature/somefeature'
+        project = 'org/project2'
+
+        # prepare an existing branch
+        self.create_branch(project, branch)
+
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project(project)
+        repo._create_branch(branch)
+        # TODO: fix _set_branch_protection calling the following WILL protect
+        # the branch
+        # repo._set_branch_protection(branch, False)
+
+        self.fake_github.emitEvent(
+            self.fake_github.getPushEvent(
+                project,
+                ref='refs/heads/%s' % branch))
+        self.waitUntilSettled()
+
+        A = self.fake_github.openFakePullRequest(project, branch, 'A')
+        old_sha = A.head_sha
+        A.setMerged("merging A")
+        new_sha = random_sha1()
+
+        # branch is not protected, no reconfiguration even if config file
+        self._test_push_event_reconfigure(project, branch,
+                                          expect_reconfigure=False,
+                                          old_sha=old_sha,
+                                          new_sha=new_sha,
+                                          modified_files=['zuul.yaml'],
+                                          expected_cat_jobs=0)
+
+        # branch is not protected: no reconfiguration
+        repo._delete_branch(branch)
+
+        self._test_push_event_reconfigure(project, branch,
+                                          expect_reconfigure=False,
+                                          old_sha=new_sha,
+                                          new_sha='0' * 40,
+                                          removed_files=['zuul.yaml'])
 
 
 class TestGithubWebhook(ZuulTestCase):

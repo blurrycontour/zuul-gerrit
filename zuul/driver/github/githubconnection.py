@@ -449,7 +449,6 @@ class GithubEventProcessor(object):
         event.trigger_name = 'github'
         event.project_name = base_repo.get('full_name')
         event.type = 'push'
-        event.branch_updated = True
 
         event.ref = self.body.get('ref')
         event.oldrev = self.body.get('before')
@@ -467,8 +466,10 @@ class GithubEventProcessor(object):
         # project.
         if event.oldrev == '0' * 40:
             event.branch_created = True
-        if event.newrev == '0' * 40:
+        elif event.newrev == '0' * 40:
             event.branch_deleted = True
+        else:
+            event.branch_updated = True
 
         if event.branch:
             project = self.connection.source.getProject(event.project_name)
