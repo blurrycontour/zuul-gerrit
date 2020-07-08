@@ -34,6 +34,24 @@
       "revId": "cfb83779449bd64ecb4b9e0f0747c3b3e6a26b36",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_38ca706d",
+        "filename": "releasenotes/notes/mqtt-report-build-page-1780225ca98c7456.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-07-08T12:03:58Z",
+      "side": 1,
+      "message": "I meant the build url api (which need to be computed from the html url). I remember using the log-url to be unreliable, for example when the zuul-info/inventory.yaml was not reachable, and I had to switch to the REST endpoint to get consistent build information.",
+      "parentUuid": "bf51134e_eadaa575",
+      "revId": "cfb83779449bd64ecb4b9e0f0747c3b3e6a26b36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
