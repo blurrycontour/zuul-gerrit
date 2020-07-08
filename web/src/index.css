@@ -53,6 +53,17 @@ a.refresh {
     padding-right: var(--pf-global--spacer--sm);
 }
 
+/* Make the empty state smaller for an empty artifacts list. Even the
+   smallest empty state looks to big here. */
+.zuul-empty-artifacts .pf-c-empty-state__icon {
+    font-size: 36px;
+    margin-bottom: 0;
+}
+
+.zuul-empty-artifacts .pf-c-empty-state__content > .pf-c-title.pf-m-lg {
+    font-size: 16px;
+}
+
 /* Status page */
 .zuul-change {
     margin-bottom: 10px;
