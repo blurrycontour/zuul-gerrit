@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_df7236ad",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 949,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-08T14:52:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_579d7855",
+      "revId": "7a7b3ea0e5240f380556c973862f35c3b26e49a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_37b284e7",
         "filename": "tests/unit/test_github_driver.py",
         "patchSetId": 5
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_5f5e2612",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-08T14:52:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_37b284e7",
+      "revId": "7a7b3ea0e5240f380556c973862f35c3b26e49a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_d7ba28be",
         "filename": "tests/unit/test_github_driver.py",
         "patchSetId": 5
@@ -47,6 +83,24 @@
       "writtenOn": "2020-07-08T04:40:13Z",
       "side": 1,
       "message": "Same here.",
+      "revId": "7a7b3ea0e5240f380556c973862f35c3b26e49a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_7f632add",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1511,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-08T14:52:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_d7ba28be",
       "revId": "7a7b3ea0e5240f380556c973862f35c3b26e49a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
