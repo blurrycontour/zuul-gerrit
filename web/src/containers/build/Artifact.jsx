@@ -14,10 +14,36 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { TreeView } from 'patternfly-react'
 import {
-  TreeView,
-} from 'patternfly-react'
+  BugIcon,
+  ClipboardListIcon,
+  DesktopIcon,
+  DockerIcon,
+  DownloadIcon,
+  FileArchiveIcon,
+  FilePdfIcon,
+  JsSquareIcon,
+  PythonIcon,
+} from '@patternfly/react-icons'
 
+import { IconProperty } from './Misc'
+import { ExternalLink } from '../../Misc'
+
+const ARTIFACT_ICONS = {
+  container_image: DockerIcon,
+  docs_archive: FileArchiveIcon,
+  docs_pdf: FilePdfIcon,
+  docs_site: DesktopIcon,
+  javascript_content: JsSquareIcon,
+  python_wheel: PythonIcon,
+  python_sdist: PythonIcon,
+  site: DesktopIcon,
+  unit_test_report: BugIcon,
+  zuul_manifest: ClipboardListIcon,
+}
+
+const DEFAULT_ARTIFACT_ICON = DownloadIcon
 
 class Artifact extends React.Component {
   static propTypes = {
@@ -41,35 +67,46 @@ class Artifact extends React.Component {
   }
 }
 
-class ArtifactList extends React.Component {
-  static propTypes = {
-    artifacts: PropTypes.array.isRequired
-  }
+function ArtifactList(props) {
+  const { artifacts } = props
 
-  render() {
-    const { artifacts } = this.props
+  const nodes = artifacts.map((artifact, index) => {
+    let Icon = ARTIFACT_ICONS[artifact.metadata.type]
+    if (!Icon) {
+      Icon = DEFAULT_ARTIFACT_ICON
+    }
 
-    const nodes = artifacts.map((artifact, index) => {
-      const node = {text: <a href={artifact.url}>{artifact.name}</a>,
-                    icon: null}
-      if (artifact.metadata) {
-        node['nodes']= [{text: <Artifact key={index} artifact={artifact}/>,
-                         icon: ''}]
-      }
-      return node
-    })
+    const node = {
+      text: (
+        <IconProperty
+          icon={<Icon />}
+          value={
+            <ExternalLink target={artifact.url}>{artifact.name}</ExternalLink>
+          }
+        />
+      ),
+      icon: null,
+    }
+    if (artifact.metadata) {
+      node['nodes'] = [
+        { text: <Artifact key={index} artifact={artifact} />, icon: '' },
+      ]
+    }
+    return node
+  })
 
-    return (
-      <>
-        <br/>
-        <div className="tree-view-container">
-          <TreeView
-            nodes={nodes}
-          />
-        </div>
-      </>
-    )
-  }
+  return (
+    <>
+      <br />
+      <div className="tree-view-container">
+        <TreeView nodes={nodes} />
+      </div>
+    </>
+  )
+}
+
+ArtifactList.propTypes = {
+  artifacts: PropTypes.array.isRequired,
 }
 
 export default ArtifactList
