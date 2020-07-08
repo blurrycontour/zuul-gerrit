@@ -2209,7 +2209,14 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         return pull_request
 
     def getPushEvent(self, project, ref, old_rev=None, new_rev=None,
-                     added_files=[], removed_files=[], modified_files=[]):
+                     added_files=None, removed_files=None,
+                     modified_files=None):
+        if added_files is None:
+            added_files = []
+        if removed_files is None:
+            removed_files = []
+        if modified_files is None:
+            modified_files = []
         if not old_rev:
             old_rev = '0' * 40
         if not new_rev:
