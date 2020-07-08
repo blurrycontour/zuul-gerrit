@@ -14,59 +14,110 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { TreeView } from 'patternfly-react'
 import {
-  TreeView,
-} from 'patternfly-react'
+  BugIcon,
+  ClipboardListIcon,
+  DesktopIcon,
+  DockerIcon,
+  DownloadIcon,
+  FileArchiveIcon,
+  JsSquareIcon,
+  PythonIcon,
+} from '@patternfly/react-icons'
 
+import { IconProperty } from './Misc'
+import { ExternalLink } from '../../Misc'
+
+const ARTIFACT_ICONS = {
+  container_image: DockerIcon,
+  docs_archive: FileArchiveIcon,
+  docs_site: DesktopIcon,
+  javascript_content: JsSquareIcon,
+  python_wheel: PythonIcon,
+  python_sdist: PythonIcon,
+  site: DesktopIcon,
+  unit_test_report: BugIcon,
+  zuul_manifest: ClipboardListIcon,
+}
+
+const DEFAULT_ARTIFACT_ICON = DownloadIcon
 
 class Artifact extends React.Component {
   static propTypes = {
-    artifact: PropTypes.object.isRequired
+    artifact: PropTypes.object.isRequired,
   }
 
   render() {
     const { artifact } = this.props
     return (
-      <table className="table table-striped table-bordered" style={{width:'50%'}}>
-        <tbody>
-          {Object.keys(artifact.metadata).map(key => (
-            <tr key={key}>
-              <td>{key}</td>
-              <td style={{width:'100%'}}>{artifact.metadata[key]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <>
+        <table
+          className="table table-striped table-bordered"
+          style={{ width: '50%' }}
+        >
+          <tbody>
+            {Object.keys(artifact.metadata).map((key) => (
+              <tr key={key}>
+                <td>
+                  <small>{key}</small>
+                </td>
+                <td style={{ width: '100%' }}>
+                  <small>{artifact.metadata[key]}</small>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>
     )
   }
 }
 
-class ArtifactList extends React.Component {
-  static propTypes = {
-    build: PropTypes.object.isRequired
-  }
+Artifact.propTypes = {
+  artifact: PropTypes.object.isRequired,
+}
 
-  render() {
-    const { build } = this.props
+function ArtifactList(props) {
+  const { artifacts } = props
 
-    const nodes = build.artifacts.map((artifact, index) => {
-      const node = {text: <a href={artifact.url}>{artifact.name}</a>,
-                    icon: null}
-      if (artifact.metadata) {
-        node['nodes']= [{text: <Artifact key={index} artifact={artifact}/>,
-                         icon: ''}]
-      }
-      return node
-    })
+  // TODO (felix): Empty state if no artifacts (e.g. noop build)
+  // TODO (felix): Same for results (also noop build)
 
-    return (
-      <div className="tree-view-container">
-        <TreeView
-          nodes={nodes}
+  const nodes = artifacts.map((artifact, index) => {
+    let Icon = ARTIFACT_ICONS[artifact.metadata.type]
+    if (!Icon) {
+      Icon = DEFAULT_ARTIFACT_ICON
+    }
+
+    const node = {
+      text: (
+        <IconProperty
+          icon={<Icon />}
+          value={
+            <ExternalLink target={artifact.url}>{artifact.name}</ExternalLink>
+          }
         />
-      </div>
-    )
-  }
+      ),
+      icon: null,
+    }
+    if (artifact.metadata) {
+      node['nodes'] = [
+        { text: <Artifact key={index} artifact={artifact} />, icon: '' },
+      ]
+    }
+    return node
+  })
+
+  return (
+    <div className="tree-view-container">
+      <TreeView nodes={nodes} />
+    </div>
+  )
+}
+
+ArtifactList.propTypes = {
+  artifacts: PropTypes.array.isRequired,
 }
 
 export default ArtifactList

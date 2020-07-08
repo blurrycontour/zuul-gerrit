@@ -15,6 +15,13 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import {
+  EmptyState,
+  EmptyStateIcon,
+  EmptyStateVariant,
+  Title,
+} from '@patternfly/react-core'
+import { FileArchiveIcon } from '@patternfly/react-icons'
 
 import ArtifactList from './Artifact'
 import BuildOutput from './BuildOutput'
@@ -28,13 +35,42 @@ class Summary extends React.Component {
 
   render() {
     const { build } = this.props
+    console.log(build)
+
+    const artifactsContent = build.artifacts.length ? (
+      <ArtifactList artifacts={build.artifacts} />
+    ) : (
+      <EmptyState
+        className="zuul-empty-artifacts"
+        variant={EmptyStateVariant.small}
+      >
+        <EmptyStateIcon icon={FileArchiveIcon} />
+        <Title headingLevel="h4" size="lg">
+          This build does not provide any artifacts
+        </Title>
+      </EmptyState>
+    )
+
+    const resultsContent = build.hosts ? (
+      <BuildOutput output={build.hosts} />
+    ) : (
+      <EmptyState
+        className="zuul-empty-artifacts"
+        variant={EmptyStateVariant.small}
+      >
+        <EmptyStateIcon icon={FileArchiveIcon} />
+        <Title headingLevel="h4" size="lg">
+          This build does not provide any results
+        </Title>
+      </EmptyState>
+    )
 
     return (
       <React.Fragment>
         <h3>Artifacts</h3>
-        <ArtifactList build={build} />
+        {artifactsContent}
         <h3>Results</h3>
-        {build.hosts && <BuildOutput output={build.hosts} />}
+        {resultsContent}
       </React.Fragment>
     )
   }
