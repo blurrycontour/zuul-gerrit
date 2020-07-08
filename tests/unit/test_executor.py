@@ -459,6 +459,18 @@ class TestAnsibleJob(ZuulTestCase):
                                           })[0]['host_keys']
         self.assertEqual(keys[0], '[localhost]:22022 fake-host-key')
 
+        # Test with no host keys
+        node['host_keys'] = []
+        host = self.test_job.getHostList({'nodes': [node],
+                                          'host_vars': {},
+                                          'vars': {},
+                                          'groups': [],
+                                          })[0]
+        self.assertEqual(host['host_keys'], [])
+        self.assertEqual(
+            host['host_vars']['ansible_extra_ssh_args'],
+            '-o StrictHostKeyChecking=false')
+
 
 class TestExecutorHostname(ZuulTestCase):
     config_file = 'zuul-executor-hostname.conf'
