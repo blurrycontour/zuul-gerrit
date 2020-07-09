@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_03d3add6",
+        "filename": "tests/fixtures/config/ansible/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-07-09T09:07:20Z",
+      "side": 1,
+      "message": "Due to the nature of this fix, I would add an inline comment explaining why is 20s, so we do not force someone to use\ngit blame in order to figure-out why 20 is there and not\nanother value.",
+      "range": {
+        "startLine": 111,
+        "startChar": 4,
+        "endLine": 111,
+        "endChar": 15
+      },
+      "revId": "24c29d4911668e492486cfb3e66942035ec166af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
