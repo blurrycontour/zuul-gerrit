@@ -34,6 +34,23 @@
       "revId": "e4a8662ad14735fbfa51df925454d767afdbba92",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_24850d5b",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1008,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-09T19:45:16Z",
+      "side": 1,
+      "message": "Ah right, thanks.",
+      "revId": "e4a8662ad14735fbfa51df925454d767afdbba92",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
