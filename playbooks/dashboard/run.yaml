@@ -1,4 +1,14 @@
 - hosts: all
+  pre_tasks:
+    - name: Create zuul/web/static
+      file:
+        path: '{{ zuul.project.src_dir }}/zuul/web/static'
+        state: directory
+    - name: Create symlink to zuul/web/static
+      file:
+        path: '{{ zuul.project.src_dir }}/web/static'
+        state: link
+        src: '../zuul/web/static'
   roles:
     - revoke-sudo
     - set-zuul-log-path-fact
