@@ -220,8 +220,9 @@ class FakeRepository(object):
 
     def _set_branch_protection(self, branch_name, protected=True,
                                contexts=None):
-        if not protected and branch_name in self._branch_protection_rules:
-            del self._branch_protection_rules[branch_name]
+        if not protected:
+            if branch_name in self._branch_protection_rules:
+                del self._branch_protection_rules[branch_name]
             return
 
         rule = self._branch_protection_rules[branch_name]
