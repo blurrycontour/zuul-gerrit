@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_c12fe385",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1485,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-09T18:24:20Z",
+      "side": 1,
+      "message": "This looks wrong since if exclude_unprotected is True we write a potentially wrong branch list in there.",
+      "revId": "b7fedfa4ff7eec39db517cb9326613716fe785f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
