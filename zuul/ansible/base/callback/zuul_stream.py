@@ -300,7 +300,12 @@ class CallbackModule(default.CallbackModule):
             if not self._streamers:
                 break
             streamer = self._streamers.pop()
+            t1 = time.time()
             streamer.join(30)
+            t2 = time.time()
+
+            self._log("Waiting for streamer took %f" % (t2 - t1), job=True, executor=True)
+
             if streamer.is_alive():
                 msg = "[Zuul] Log Stream did not terminate"
                 self._log(msg, job=True, executor=True)
