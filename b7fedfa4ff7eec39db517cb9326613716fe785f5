@@ -16,6 +16,24 @@
       "revId": "b7fedfa4ff7eec39db517cb9326613716fe785f5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_01cd5b30",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1485,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-09T19:13:47Z",
+      "side": 1,
+      "message": "According to [1] \"include unprotected\" should have all branches.\nWith a trace set here [2], we have the following log for TestGithubUnprotectedBranches.test_push_event_reconfigure_complex_branch (added in the parent change):\n\nexclude:{\u0027org/project3\u0027: [], \u0027org/project2\u0027: []} include:{\u0027org/common-config\u0027: [\u0027master\u0027], \u0027org/project1\u0027: [\u0027master\u0027]}\n\nproject2 and project3 are not in the \"include unprotected\" list\n\nwhen exclude_unprotected is True, only protected branches are fetched [3]\n\n\n[1] https://opendev.org/zuul/zuul/src/branch/master/zuul/driver/github/githubconnection.py#L2130-L2137\n[2] https://opendev.org/zuul/zuul/src/branch/master/zuul/driver/github/githubconnection.py#L1444\n[3] https://opendev.org/zuul/zuul/src/branch/master/zuul/driver/github/githubconnection.py#L1460-L1461",
+      "parentUuid": "bf51134e_c12fe385",
+      "revId": "b7fedfa4ff7eec39db517cb9326613716fe785f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
