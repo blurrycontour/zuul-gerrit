@@ -1482,7 +1482,10 @@ class GithubConnection(BaseConnection):
 
             branches.extend([x['name'] for x in resp.json()])
 
-        cache[project.name] = branches
+        self._project_branch_cache_include_unprotected[project.name] = branches
+        if exclude_unprotected:
+            self._project_branch_cache_exclude_unprotected[project.name] = \
+                branches
         return branches
 
     def getBranch(self, project_name, branch):
