@@ -181,21 +181,33 @@ class HostTask extends React.Component {
     if (this.state.failed) {
       ai.push(
         <ListView.InfoItem key="failed" title="Click for details">
+          <span className="task-details-icon" onClick={this.open}>
+            <Icon type='fa' name='search-plus' />
+          </span>
           <span className="task-failed" onClick={this.open}>FAILED</span>
         </ListView.InfoItem>)
     } else if (this.state.changed) {
       ai.push(
         <ListView.InfoItem key="changed" title="Click for details">
+          <span className="task-details-icon" onClick={this.open}>
+            <Icon type='fa' name='search-plus' />
+          </span>
           <span className="task-changed" onClick={this.open}>CHANGED</span>
         </ListView.InfoItem>)
     } else if (this.state.skipped) {
       ai.push(
         <ListView.InfoItem key="skipped" title="Click for details">
+          <span className="task-details-icon" onClick={this.open}>
+            <Icon type='fa' name='search-plus' />
+          </span>
           <span className="task-skipped" onClick={this.open}>SKIPPED</span>
         </ListView.InfoItem>)
     } else if (this.state.ok) {
       ai.push(
         <ListView.InfoItem key="ok" title="Click for details">
+          <span className="task-details-icon" onClick={this.open}>
+            <Icon type='fa' name='search-plus' />
+          </span>
           <span className="task-ok" onClick={this.open}>OK</span>
         </ListView.InfoItem>)
     }
