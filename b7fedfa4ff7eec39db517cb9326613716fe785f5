@@ -34,6 +34,24 @@
       "revId": "b7fedfa4ff7eec39db517cb9326613716fe785f5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_445c81ec",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1485,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-09T20:03:21Z",
+      "side": 1,
+      "message": "The _project_branch_cache_exclude_unprotected and _project_branch_cache_include_unprotected caches are independent from each other and also filled independently from each other. So they don\u0027t need to contain every project, just the projects that are used in that specific context.\n\nProject2 and project3 are not in the \"include unprotected\" because they were not used yet by a tenant that didn\u0027t exclude unprotected branches for them.\n\nRegarding this change, consider exclude_unprotected is True for tenant A. In this case we would query the filtered branch list and store them in both caches. However the list we\u0027re storing into _project_branch_cache_include_unprotected is wrong because it needs the unfiltered branch list. After that imagine we\u0027re calling this again with tenant B that doesn\u0027t exclude unprotected branches. Since we stored the filtered branch list earlier it will get a cache hit and work with an incomplete list of branches. However without this change it would face a cache miss and query the branches as well but this time unfiltered which is correct.",
+      "parentUuid": "bf51134e_01cd5b30",
+      "revId": "b7fedfa4ff7eec39db517cb9326613716fe785f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
