@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_4148f385",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 642,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-09T19:30:31Z",
+      "side": 1,
+      "message": "The regex misses a dot:\n\n  r\u0027.*I shouldnt be seen.*\u0027",
+      "revId": "6042e428dc2c949b0ae65f3f2e88cf4309064f3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
