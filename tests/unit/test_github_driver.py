@@ -1005,6 +1005,7 @@ class TestGithubDriver(ZuulTestCase):
         github = self.fake_github.getGithubClient()
         repo = github.repo_from_project(project)
         repo._create_branch(branch)
+        repo._set_branch_protection(branch, False)
 
         self.fake_github.emitEvent(
             self.fake_github.getPushEvent(
@@ -1107,6 +1108,7 @@ class TestGithubDriver(ZuulTestCase):
         github = self.fake_github.getGithubClient()
         repo = github.repo_from_project(project)
         repo._create_branch(branch)
+        repo._set_branch_protection(branch, False)
 
         A = self.fake_github.openFakePullRequest(project, branch, 'A')
         old_sha = A.head_sha
@@ -1563,9 +1565,7 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         github = self.fake_github.getGithubClient()
         repo = github.repo_from_project(project)
         repo._create_branch(branch)
-        # TODO: fix _set_branch_protection calling the following WILL protect
-        # the branch
-        # repo._set_branch_protection(branch, False)
+        repo._set_branch_protection(branch, False)
 
         self.fake_github.emitEvent(
             self.fake_github.getPushEvent(
