@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_018a7b68",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1008,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-09T18:30:10Z",
+      "side": 1,
+      "message": "Why is this necessary? I think branch protection in tests for new branches is disabled by default?",
+      "revId": "e4a8662ad14735fbfa51df925454d767afdbba92",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
