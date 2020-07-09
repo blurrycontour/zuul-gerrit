@@ -16,6 +16,24 @@
       "revId": "e4a8662ad14735fbfa51df925454d767afdbba92",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_e1c66768",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1008,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-09T18:44:55Z",
+      "side": 1,
+      "message": "It is not necessary as is, but it does test the change.\n\nWhile working on the other submited changes, I was facing strange behaviors that I coud not understand at that time. So to make sure the branch was not protected I put this and it made things worse.",
+      "parentUuid": "bf51134e_018a7b68",
+      "revId": "e4a8662ad14735fbfa51df925454d767afdbba92",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
