@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import configparser
 import gc
 import json
 import textwrap
@@ -40,6 +41,7 @@ from tests.base import (
     repack_repo,
     simple_layout,
     iterate_timeout,
+    RecordingExecutorServer,
 )
 
 
@@ -73,6 +75,27 @@ class TestSchedulerZone(ZuulTestCase):
         super(TestSchedulerZone, self).setUp()
         self.fake_nodepool.attributes = {'executor-zone': 'test-provider.vpn'}
 
+        # Create an unzoned executor
+        config = configparser.ConfigParser()
+        config.read_dict(self.config)
+        config.remove_option('executor', 'zone')
+        config.set('executor', 'command_socket',
+                   os.path.join(self.test_root, 'executor2.socket'))
+        self.executor_server_unzoned = RecordingExecutorServer(
+            config, self.connections,
+            jobdir_root=self.jobdir_root,
+            _run_ansible=self.run_ansible,
+            _test_root=self.test_root,
+            log_console_port=self.log_console_port)
+        self.executor_server_unzoned.start()
+        self.addCleanup(self._shutdown_executor)
+
+    def _shutdown_executor(self):
+        self.executor_server_unzoned.hold_jobs_in_build = False
+        self.executor_server_unzoned.release()
+        self.executor_server_unzoned.stop()
+        self.executor_server_unzoned.join()
+
     def setup_config(self, config_file: str):
         config = super(TestSchedulerZone, self).setup_config(config_file)
         config.set('executor', 'zone', 'test-provider.vpn')
@@ -80,6 +103,15 @@ class TestSchedulerZone(ZuulTestCase):
 
     def test_jobs_executed(self):
         "Test that jobs are executed and a change is merged per zone"
+
+        # Validate that the reported executor stats are correct. There must
+        # be two executors online and two accepting (one unzoned and one zoned)
+        self.assertReportedStat('zuul.executors.online', value='2', kind='g')
+        self.assertReportedStat(
+            'zuul.executors.accepting', value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.executors.test-provider_vpn.accepting', value='1', kind='g')
+
         self.gearman_server.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
