@@ -22,6 +22,30 @@
       "revId": "b0cda2f99f31822ca26a18ac30c7f67f33feb542",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_eb0ac0cf",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-10T07:03:27Z",
+      "side": 1,
+      "message": "Thanks, I will check that out",
+      "parentUuid": "bf51134e_4ff65fd9",
+      "range": {
+        "startLine": 99,
+        "startChar": 0,
+        "endLine": 99,
+        "endChar": 21
+      },
+      "revId": "b0cda2f99f31822ca26a18ac30c7f67f33feb542",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
