@@ -436,10 +436,11 @@ class Scheduler(threading.Thread):
         merge_queue = 0
         merge_running = 0
         for (name, (queued, running, registered)) in functions.items():
+            # TODO(tobiash): Add stats per zone
             if name.startswith('executor:execute'):
-                executors_accepting = registered
-                execute_queue = queued - running
-                execute_running = running
+                executors_accepting += registered
+                execute_queue += queued - running
+                execute_running += running
             if name.startswith('executor:stop'):
                 executors_online += registered
             if name == 'merger:merge':
