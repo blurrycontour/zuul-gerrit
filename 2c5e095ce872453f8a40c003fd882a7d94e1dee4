@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_44c75a13",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-10T09:46:26Z",
+      "side": 1,
+      "message": "Since we now have PF4 in place, wouldn\u0027t it make sense to directly use equivalent PF4 components for coming changes?",
+      "revId": "2c5e095ce872453f8a40c003fd882a7d94e1dee4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_e4a4ae4d",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-10T09:46:26Z",
+      "side": 1,
+      "message": "Do we need all this styling? I think the item should look similar to the others without applying any additional styling. Also, I don\u0027t think this item should be smaller (font-size: 11px) than others in the header toolbar. All in all, I think the item looks fine without these additional styles.\n\nJust noticed that the timezone selection has similar styles. But I think they are not needed anymore for the new layout using PF4 and could also be removed there.\n\nYou can check out the code for the navigation bar in the App.jsx file or the first example here https://www.patternfly.org/v4/documentation/react/demos/pagelayout#default-nav (just click on the \"JSX\" link below the preview image to show the source code). I also took this example to style the navigation bar in the initial PF4 change.",
+      "revId": "2c5e095ce872453f8a40c003fd882a7d94e1dee4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_c7408c38",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-10T09:46:26Z",
+      "side": 1,
+      "message": "I would prefer using a cog icon https://fontawesome.com/icons/cog?style\u003dsolid instead. IMHO that\u0027s the commonly used icon for a settings dialog.\n\nAlso the PF4 design guide recommends using the cog icon over the old settings icon https://www.patternfly.org/v4/design-guidelines/styles/icons (just search for \"settings\" on this site).",
+      "revId": "2c5e095ce872453f8a40c003fd882a7d94e1dee4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
