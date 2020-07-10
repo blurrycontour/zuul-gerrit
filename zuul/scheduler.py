@@ -38,7 +38,7 @@ from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
-from zuul.lib.statsd import get_statsd
+from zuul.lib.statsd import get_statsd, normalize_statsd_name
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
@@ -434,10 +434,7 @@ class Scheduler(threading.Thread):
             return
         functions = getGearmanFunctions(self.rpc.gearworker.gearman)
         functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
-        executors_accepting = 0
         executors_online = 0
-        execute_queue = 0
-        execute_running = 0
         mergers_online = 0
         merge_queue = 0
         merge_running = 0
@@ -446,6 +443,28 @@ class Scheduler(threading.Thread):
                 executors_accepting = registered
                 execute_queue = queued - running
                 execute_running = running
+                tokens = name.split(':', 2)
+                if len(tokens) == 2:
+                    # unzoned case
+                    self.statsd.gauge('zuul.executors.accepting',
+                                      executors_accepting)
+                    self.statsd.gauge('zuul.executors.jobs_running',
+                                      execute_running)
+                    self.statsd.gauge('zuul.executors.jobs_queued',
+                                      execute_queue)
+                else:
+                    # zoned case
+                    zone = tokens[2]
+                    self.statsd.gauge('zuul.executors.%s.accepting' %
+                                      normalize_statsd_name(zone),
+                                      executors_accepting)
+                    self.statsd.gauge('zuul.executors.%s.jobs_running' %
+                                      normalize_statsd_name(zone),
+                                      execute_running)
+                    self.statsd.gauge('zuul.executors.%s.jobs_queued' %
+                                      normalize_statsd_name(zone),
+                                      execute_queue)
+
             if name.startswith('executor:stop'):
                 executors_online += registered
             if name == 'merger:merge':
@@ -457,9 +476,6 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
         self.statsd.gauge('zuul.executors.online', executors_online)
-        self.statsd.gauge('zuul.executors.accepting', executors_accepting)
-        self.statsd.gauge('zuul.executors.jobs_running', execute_running)
-        self.statsd.gauge('zuul.executors.jobs_queued', execute_queue)
 
         self.statsd.gauge('zuul.scheduler.eventqueues.trigger',
                           self.trigger_event_queue.qsize())
