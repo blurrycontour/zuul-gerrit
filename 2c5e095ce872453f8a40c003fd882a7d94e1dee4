@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_4dff7d00",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-07-10T13:17:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_44c75a13",
+      "revId": "2c5e095ce872453f8a40c003fd882a7d94e1dee4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_e4a4ae4d",
         "filename": "web/src/containers/config/Config.jsx",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_2d04c914",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-07-10T13:17:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_e4a4ae4d",
+      "revId": "2c5e095ce872453f8a40c003fd882a7d94e1dee4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_c7408c38",
         "filename": "web/src/containers/config/Config.jsx",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2020-07-10T09:46:26Z",
       "side": 1,
       "message": "I would prefer using a cog icon https://fontawesome.com/icons/cog?style\u003dsolid instead. IMHO that\u0027s the commonly used icon for a settings dialog.\n\nAlso the PF4 design guide recommends using the cog icon over the old settings icon https://www.patternfly.org/v4/design-guidelines/styles/icons (just search for \"settings\" on this site).",
+      "revId": "2c5e095ce872453f8a40c003fd882a7d94e1dee4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_6d0a4120",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-07-10T13:17:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_c7408c38",
       "revId": "2c5e095ce872453f8a40c003fd882a7d94e1dee4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
