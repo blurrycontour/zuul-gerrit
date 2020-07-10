@@ -73,9 +73,7 @@ class GitlabSource(BaseSource):
             return None
         project = self.getProject(project_name)
         change = self.connection._getChange(
-            project, num,
-            patchset=mr['sha'],
-            url=url)
+            project, num, mr['sha'], url=url)
         return change
 
     def getChangesDependingOn(self, change, projects, tenant):

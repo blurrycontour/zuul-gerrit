@@ -142,9 +142,10 @@ class GitlabEventConnector(threading.Thread):
         mr = body['merge_request']
         event.title = mr['title']
         event.change_number = mr['iid']
+        # mr['last_commit']['id'] is the commit SHA
+        event.patch_number = mr['last_commit']['id']
         event.ref = "refs/merge-requests/%s/head" % event.change_number
         event.branch = mr['target_branch']
-        event.patch_number = mr['last_commit']['id']
         event.change_url = self.connection.getPullUrl(event.project_name,
                                                       event.change_number)
         event.action = 'comment'
@@ -206,7 +207,7 @@ class GitlabEventConnector(threading.Thread):
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._getChange(project,
                                            event.change_number,
-                                           patchset=event.patch_number,
+                                           event.patch_number,
                                            refresh=True,
                                            url=event.change_url,
                                            event=event)
@@ -394,7 +395,7 @@ class GitlabConnection(BaseConnection):
             self.log.info("Getting change for %s#%s" % (
                 project, event.change_number))
             change = self._getChange(
-                project, event.change_number, patchset=event.patch_number,
+                project, event.change_number, event.patch_number,
                 refresh=refresh, event=event)
             change.source_event = event
             change.is_current_patchset = (change.patchset ==
@@ -422,10 +423,10 @@ class GitlabConnection(BaseConnection):
             change.source_event = event
         return change
 
-    def _getChange(self, project, number, patchset=None,
+    def _getChange(self, project, number, patch_number=None,
                    refresh=False, url=None, event=None):
         log = get_annotated_logger(self.log, event)
-        key = (project.name, str(number), str(patchset))
+        key = (project.name, str(number), str(patch_number))
         change = self._change_cache.get(key)
         if change and not refresh:
             log.debug("Getting change from cache %s" % str(key))
@@ -434,8 +435,8 @@ class GitlabConnection(BaseConnection):
             change = MergeRequest(project.name)
             change.project = project
             change.number = number
-            # patchset is the tips commit of the PR
-            change.patchset = patchset
+            # patch_number is the tips commit SHA of the PR
+            change.patchset = patch_number
             change.url = url or self.getPullUrl(project.name, number)
             change.uris = [change.url.split('://', 1)[-1]]  # remove scheme
         self._change_cache[key] = change
