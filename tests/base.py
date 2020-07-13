@@ -1744,6 +1744,16 @@ class FakeGitlabMergeRequest(object):
         self.state = 'closed'
         self._updateTimeStamp()
 
+    def mergeMergeRequest(self):
+        self.state = 'merged'
+        self._updateTimeStamp()
+        self.merged_at = self.updated_at
+
+    def reopenMergeRequest(self):
+        self.state = 'opened'
+        self._updateTimeStamp()
+        self.merged_at = None
+
     def _addCommitInMR(self, files=[], reset=False):
         repo = self._getRepo()
         ref = repo.references[self.getMRReference()]
