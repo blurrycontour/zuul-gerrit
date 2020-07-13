@@ -475,3 +475,21 @@ class TestGitlabDriver(ZuulTestCase):
             A.getMergeRequestCommentedEvent('recheck'))
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
+
+        # Merge the MR
+        A.mergeMergeRequest()
+
+        # A recheck will not trigger the job
+        self.fake_gitlab.emitEvent(
+            A.getMergeRequestCommentedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        # Re-open the MR
+        A.reopenMergeRequest()
+
+        # A recheck will trigger the job
+        self.fake_gitlab.emitEvent(
+            A.getMergeRequestCommentedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
