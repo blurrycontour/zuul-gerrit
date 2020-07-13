@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_4c7e46e4",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-07-13T15:37:13Z",
+      "side": 1,
+      "message": "We should probably exclude the known bad set at \u003e\u003d8.1.0,\u003c8.3.1",
+      "revId": "1e16ad53ed3c9fc7595acbd5fb9731bd6dd98141",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
