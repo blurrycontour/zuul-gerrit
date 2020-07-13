@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_672ec343",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-13T16:10:58Z",
+      "side": 1,
+      "message": "I think it would be customary to name this file ExternalLink.",
+      "revId": "638c2c23d3759c459235e451e498f5790d5685b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_4733bfab",
+        "filename": "web/src/pages/Buildset.jsx",
+        "patchSetId": 11
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-13T16:10:58Z",
+      "side": 1,
+      "message": "I\u0027m a little unsure about using tabs here.  This feels like it should just be a table with a header.",
+      "revId": "638c2c23d3759c459235e451e498f5790d5685b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
