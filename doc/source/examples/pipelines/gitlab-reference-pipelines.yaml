@@ -4,6 +4,9 @@
       Newly uploaded patchsets enter this pipeline to receive an
       initial +/-1 Verified vote.
     manager: independent
+    require:
+      gitlab.com:
+        open: true
     trigger:
       gitlab.com:
         - event: gl_merge_request
