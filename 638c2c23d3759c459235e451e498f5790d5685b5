@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_738a02bf",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-13T19:34:59Z",
+      "side": 1,
+      "message": "Hm, I thought it might be useful to have a file for such miscellaneous (and small) components like this one - similar to the ones in builds/Misc.jsx. AFAIK we were using much of those in the past, but most probably I will add more like this and I think a single file suites that purpose better than one file per component. I\u0027m also open for better names. Misc was just the first thing that came to my mind.",
+      "parentUuid": "bf51134e_672ec343",
+      "revId": "638c2c23d3759c459235e451e498f5790d5685b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_4733bfab",
         "filename": "web/src/pages/Buildset.jsx",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2020-07-13T16:10:58Z",
       "side": 1,
       "message": "I\u0027m a little unsure about using tabs here.  This feels like it should just be a table with a header.",
+      "revId": "638c2c23d3759c459235e451e498f5790d5685b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_d31e6e6e",
+        "filename": "web/src/pages/Buildset.jsx",
+        "patchSetId": 11
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-13T19:34:59Z",
+      "side": 1,
+      "message": "My idea behind that was to make the buildset result page look similar to the build result page (which by now has three tabs). There is already a follow-up change for this (https://review.opendev.org/#/c/739972/) if you want to take a  look. I still have to do some work there due to rebasing but the major part is already done. Just as a side node: In the buildset result page change I\u0027m using a navigation bar rather than tabs because I didn\u0027t get the tabs to work with the special routing layout (three URL endpoints) of the build result page. However, I have already an improvement for that in place (https://review.opendev.org/#/c/740629/) which will enable us to also use tabs there.",
+      "parentUuid": "bf51134e_4733bfab",
       "revId": "638c2c23d3759c459235e451e498f5790d5685b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
