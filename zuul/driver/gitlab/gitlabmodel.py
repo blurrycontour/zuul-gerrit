@@ -155,5 +155,20 @@ class GitlabEventFilter(EventFilter):
 # The RefFilter should be understood as RequireFilter (it maps to
 # pipeline requires definition)
 class GitlabRefFilter(RefFilter):
-    def __init__(self, connection_name):
+    def __init__(self, connection_name, open=None):
         RefFilter.__init__(self, connection_name)
+        self.open = open
+
+    def __repr__(self):
+        ret = '<GitlabRefFilter connection_name: %s ' % self.connection_name
+        if self.open is not None:
+            ret += ' open: %s' % self.open
+        ret += '>'
+        return ret
+
+    def matches(self, change):
+        if self.open is not None:
+            if change.open != self.open:
+                return False
+
+        return True

@@ -167,7 +167,25 @@ As described in :attr:`pipeline.require` pipelines may specify that items meet
 certain conditions in order to be enqueued into the pipeline.  These conditions
 vary according to the source of the project in question.
 
-This driver does not support requirements.
+.. code-block:: yaml
+
+   pipeline:
+     require:
+       gitlab:
+         open: true
+
+This indicates that changes originating from the GitLab connection must have be
+in the *opened* state (not merged yet).
+
+.. attr:: pipeline.require.<gitlab source>
+
+   The dictionary passed to the GitLab pipeline `require` attribute
+   supports the following attributes:
+
+   .. attr:: open
+
+      A boolean value (``true`` or ``false``) that indicates whether
+      the Merge Request must be open in order to be enqueued.
 
 
 Reference pipelines configuration

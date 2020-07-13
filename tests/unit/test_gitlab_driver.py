@@ -456,3 +456,22 @@ class TestGitlabDriver(ZuulTestCase):
         # There should be no more changes in the queue
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         self.assertEqual(len(tenant.layout.pipelines['check'].queues), 0)
+
+    @simple_layout('layouts/requirements-gitlab.yaml', driver='gitlab')
+    def test_state_require(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project1', 'master', 'A')
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        # Close the MR
+        A.closeMergeRequest()
+
+        # A recheck will not trigger the job
+        self.fake_gitlab.emitEvent(
+            A.getMergeRequestCommentedEvent('recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))

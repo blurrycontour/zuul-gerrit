@@ -109,7 +109,10 @@ class GitlabSource(BaseSource):
         raise NotImplementedError()
 
     def getRequireFilters(self, config):
-        f = GitlabRefFilter()
+        f = GitlabRefFilter(
+            connection_name=self.connection.connection_name,
+            open=config.get('open'),
+        )
         return [f]
 
     def getRejectFilters(self, config):
@@ -121,7 +124,9 @@ class GitlabSource(BaseSource):
 
 # Require model
 def getRequireSchema():
-    require = {}
+    require = {
+        'open': bool,
+    }
     return require
 
 
