@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_56008c34",
+        "filename": "web/src/Misc.jsx",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-13T20:29:52Z",
+      "side": 1,
+      "message": "I don\u0027t mind much either way; just noting that single-file for exported items seems to be the convention.  I really don\u0027t mind for things like builds/Misc.  For something more \"global\" like this, it might be better to stick with convention?  Not a minus one.",
+      "revId": "638c2c23d3759c459235e451e498f5790d5685b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_4733bfab",
         "filename": "web/src/pages/Buildset.jsx",
         "patchSetId": 11
@@ -66,6 +83,23 @@
       "side": 1,
       "message": "My idea behind that was to make the buildset result page look similar to the build result page (which by now has three tabs). There is already a follow-up change for this (https://review.opendev.org/#/c/739972/) if you want to take a  look. I still have to do some work there due to rebasing but the major part is already done. Just as a side node: In the buildset result page change I\u0027m using a navigation bar rather than tabs because I didn\u0027t get the tabs to work with the special routing layout (three URL endpoints) of the build result page. However, I have already an improvement for that in place (https://review.opendev.org/#/c/740629/) which will enable us to also use tabs there.",
       "parentUuid": "bf51134e_4733bfab",
+      "revId": "638c2c23d3759c459235e451e498f5790d5685b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_b6fbe844",
+        "filename": "web/src/pages/Buildset.jsx",
+        "patchSetId": 11
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-13T20:29:52Z",
+      "side": 1,
+      "message": "I like the build page, including with the tabs (assuming the tab navigation fix is incorporated as well).\n\nI think it\u0027s okay to acknowledge that this is a table and not a tab, and for it to look different than the build page.  In fact, looking different helps people recognize the difference between the different pages.\n\nI think it\u0027s worth it to establish a nice table with a header for this page; we have several other tabular pages too.",
       "revId": "638c2c23d3759c459235e451e498f5790d5685b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
