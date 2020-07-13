@@ -62,15 +62,15 @@ class BuildOutput extends React.Component {
         <Panel.Body>
           {task.invocation && task.invocation.module_args &&
            task.invocation.module_args._raw_params && (
-             <strong key="cmd">
-               {task.invocation.module_args._raw_params} <br />
-             </strong>
+             <pre key="cmd" title="cmd" className={`${'cmd'}`}>
+               {task.invocation.module_args._raw_params}
+             </pre>
            )}
           {task.msg && (
-            <pre key="msg">{task.msg}</pre>
+            <pre key="msg" title="msg">{task.msg}</pre>
           )}
           {task.exception && (
-            <pre key="exc" style={{ color: 'red' }}>{task.exception}</pre>
+            <pre key="exc" style={{ color: 'red' }} title="exc">{task.exception}</pre>
           )}
           {task.stdout_lines && task.stdout_lines.length > 0 && (
             <Fragment>

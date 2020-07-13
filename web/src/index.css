@@ -316,6 +316,10 @@ details.stderr pre {
     color: #9b0000;
 }
 
+pre.cmd {
+    font-weight: bold;
+}
+
 /* Used to make the "more/less" fold,  look like a normal hyperlink */
 details.foldable summary
 {
