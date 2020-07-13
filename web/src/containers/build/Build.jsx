@@ -17,16 +17,21 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+import Summary from './Summary'
+import Manifest from './Manifest'
+import Console from './Console'
+
 class Build extends React.Component {
   static propTypes = {
     build: PropTypes.object,
     tenant: PropTypes.object,
     active: PropTypes.string,
-    children: PropTypes.object,
+    hash: PropTypes.array,
   }
 
   render () {
-    const { build, active } = this.props
+    const { build, active, hash } = this.props
+
     return (
       <div>
       <h2>Build result {build.uuid}</h2>
@@ -50,10 +55,23 @@ class Build extends React.Component {
                      Console
                    </Link>
                  </li>}
-
               </ul>
               <div>
-                {this.props.children}
+                {/* NOTE (felix): Since I'm already working on a PF4 change for
+                    this file, I don't want to change too much here for now and
+                    just make it compatible to the improved routing solution.
+                    */}
+                {active === 'summary' && <Summary build={build} />}
+                {active === 'logs' && build && build.manifest && (
+                  <Manifest tenant={this.props.tenant} build={build}/>
+                )}
+                {active === 'console' && build && build.output && (
+                  <Console
+                    output={build.output}
+                    errorIds={build.errorIds}
+                    displayPath={hash.length>0?hash:undefined}
+                  />
+                )}
               </div>
             </div>
         </div>

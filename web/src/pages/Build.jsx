@@ -20,7 +20,6 @@ import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 import { fetchBuildIfNeeded } from '../actions/build'
 import { Fetchable } from '../containers/Fetching'
 import Build from '../containers/build/Build'
-import Summary from '../containers/build/Summary'
 
 
 class BuildPage extends React.Component {
@@ -29,6 +28,8 @@ class BuildPage extends React.Component {
     remoteData: PropTypes.object,
     tenant: PropTypes.object,
     dispatch: PropTypes.func,
+    activeTab: PropTypes.string.isRequired,
+    location: PropTypes.object,
   }
 
   updateData = (force) => {
@@ -50,8 +51,9 @@ class BuildPage extends React.Component {
   }
 
   render () {
-    const { remoteData } = this.props
+    const { remoteData, activeTab, location } = this.props
     const build = remoteData.builds[this.props.match.params.buildId]
+    const hash = location.hash.substring(1).split('/')
     return (
       <PageSection variant={PageSectionVariants.light}>
         <PageSection style={{paddingRight: '5px'}}>
@@ -60,10 +62,7 @@ class BuildPage extends React.Component {
             fetchCallback={this.updateData}
           />
         </PageSection>
-      {build &&
-       <Build build={build} active='summary'>
-         <Summary build={build}/>
-       </Build>}
+        {build && <Build build={build} active={activeTab} hash={hash}/>}
       </PageSection>
     )
   }

@@ -134,13 +134,19 @@ class App extends React.Component {
       .filter(item =>
               (tenant.whiteLabel && !item.globalRoute) || !tenant.whiteLabel)
       .forEach((item, index) => {
+        // We use react-router's render function to be able to pass custom props
+        // to our route components (pages):
+        // https://reactrouter.com/web/api/Route/render-func
+        // https://learnwithparam.com/blog/how-to-pass-props-in-react-router/
         allRoutes.push(
           <Route
             key={index}
             path={
               item.globalRoute ? item.to :
                 item.noTenantPrefix ? item.to : tenant.routePrefix + item.to}
-            component={item.component}
+            render={routerProps => (
+              <item.component {...item.props} {...routerProps} />
+            )}
             exact
             />
         )
