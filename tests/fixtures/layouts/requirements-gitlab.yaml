@@ -4,6 +4,7 @@
     require:
       gitlab:
         open: true
+        merged: false
     trigger:
       gitlab:
         - event: gl_merge_request
