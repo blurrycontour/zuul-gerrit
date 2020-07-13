@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_a7429b66",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 22720
+      },
+      "writtenOn": "2020-07-13T16:46:00Z",
+      "side": 1,
+      "message": "There\u0027s no such syntax as `!\u003e` or `!\u003c`. You probably wanted `!\u003d8.1.*,!\u003d8.2.*,!\u003d8.3.0`",
+      "revId": "ffd287cafd031bbfcd0ba32e5c40cf6226c89574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
