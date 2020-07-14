@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_cb27cec6",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-14T12:17:15Z",
+      "side": 1,
+      "message": "Although this element provides an onClick handler, I think it should also be wrapped into something clickable (so it also provides the necessary pointer style - like a button).\n\nThis would be similar to the other items in the PageHeaderTools section (just without additional text and an onClick handler instead of a Link):\n\n\u003cButton variant\u003d{ButtonVariant.plain} onClick\u003d{this.handleModalToggle}\u003e\n  \u003cCogIcon /\u003e\n\u003c/Button\u003e",
+      "revId": "277dbe2d2162d53b70bb01384483b97face937ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_8b0af622",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-14T12:17:15Z",
+      "side": 1,
+      "message": "I\u0027m not sure if that\u0027s related to the way the value is looked up from the localstorage, but in my case, the switch always show the wrong value (disabled when true, enabled when false).",
+      "revId": "277dbe2d2162d53b70bb01384483b97face937ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
