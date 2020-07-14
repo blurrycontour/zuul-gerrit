@@ -59,7 +59,6 @@ class BuildPage extends React.Component {
       fetchBuildIfNeeded(
         this.props.tenant,
         this.props.match.params.buildId,
-        null,
         force
       )
     )
