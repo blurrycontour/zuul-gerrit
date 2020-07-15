@@ -39,6 +39,24 @@
       "revId": "723407e8d9bdb9797e6fb73caa78db131dae2d22",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_8050fa33",
+        "filename": "zuul/lib/fingergw.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-15T15:18:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_d60f6add",
+      "revId": "723407e8d9bdb9797e6fb73caa78db131dae2d22",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
