@@ -691,7 +691,7 @@ class TestGithubDriver(ZuulTestCase):
         # assert that single 'Reviewed-By' is in merge commit message
         self.assertThat(B.merge_message,
                         MatchesRegex(
-                            r'.*Reviewed-by: derp <derp@derp.com>.*',
+                            r'.*Reviewed-by: derp <github.user@example.com>.*',
                             re.DOTALL))
 
         C = self.fake_github.openFakePullRequest('org/project', 'master', 'C')
@@ -704,11 +704,11 @@ class TestGithubDriver(ZuulTestCase):
         # assert that multiple 'Reviewed-By's are in merge commit message
         self.assertThat(C.merge_message,
                         MatchesRegex(
-                            r'.*Reviewed-by: derp <derp@derp.com>.*',
+                            r'.*Reviewed-by: derp <github.user@example.com>.*',
                             re.DOTALL))
         self.assertThat(C.merge_message,
                         MatchesRegex(
-                            r'.*Reviewed-by: herp <herp@derp.com>.*',
+                            r'.*Reviewed-by: herp <github.user@example.com>.*',
                             re.DOTALL))
 
     @simple_layout('layouts/dependent-github.yaml', driver='github')
