@@ -2160,7 +2160,7 @@ class FakeGithubPullRequest(object):
             'state': state,
             'user': {
                 'login': user,
-                'email': user + "@derp.com",
+                'email': user + "@example.com",
             },
             'submitted_at': submitted_at,
         }))
@@ -2279,12 +2279,12 @@ class FakeGithubClientManager(GithubClientManager):
         self.github_data = None
 
     def getGithubClient(self,
-                        project=None,
+                        project_name=None,
                         user_id=None,
                         zuul_event_id=None):
 
         if self.app_id:
-            inst_id = self.installation_map.get(project)
+            inst_id = self.installation_map.get(project_name)
             client = tests.fakegithub.FakeGithubClient(
                 self.github_data, inst_id=inst_id)
         else:
