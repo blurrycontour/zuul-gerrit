@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_eef3ae07",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1621,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-15T11:15:54Z",
+      "side": 1,
+      "message": "For reviewers: This was the line that broke the initial change (project.name now vs project in the old change).",
+      "revId": "c841c09b8c296a5606f684c38bfb8ea5e585da9e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
