@@ -732,11 +732,11 @@ class GithubEventConnector:
 class GithubUser(collections.Mapping):
     log = logging.getLogger('zuul.GithubUser')
 
-    def __init__(self, username, connection, project):
+    def __init__(self, username, connection, project_name):
         self._connection = connection
         self._username = username
         self._data = None
-        self._project = project
+        self._project_name = project_name
 
     def __getitem__(self, key):
         self._init_data()
@@ -752,7 +752,7 @@ class GithubUser(collections.Mapping):
 
     def _init_data(self):
         if self._data is None:
-            github = self._connection.getGithubClient(self._project)
+            github = self._connection.getGithubClient(self._project_name)
             user = github.user(self._username)
             self.log.debug("Initialized data for user %s", self._username)
             self._data = {
@@ -972,22 +972,22 @@ class GithubConnection(BaseConnection):
 
         return headers
 
-    def _get_installation_key(self, project, inst_id=None,
+    def _get_installation_key(self, project_name, inst_id=None,
                               reprime=False):
         installation_id = inst_id
-        if project is not None:
-            installation_id = self.installation_map.get(project)
+        if project_name is not None:
+            installation_id = self.installation_map.get(project_name)
 
         if not installation_id:
             if reprime:
                 # prime installation map and try again without refreshing
                 self._prime_installation_map()
-                return self._get_installation_key(project,
+                return self._get_installation_key(project_name,
                                                   inst_id=inst_id,
                                                   reprime=False)
 
             self.log.error("No installation ID available for project %s",
-                           project)
+                           project_name)
             return ''
 
         now = datetime.datetime.now(utc)
@@ -1109,16 +1109,16 @@ class GithubConnection(BaseConnection):
         self.event_queue.task_done()
 
     def getGithubClient(self,
-                        project=None,
+                        project_name=None,
                         zuul_event_id=None):
         github = self._createGithubClient(zuul_event_id)
 
         # if you're authenticating for a project and you're an integration then
         # you need to use the installation specific token.
-        if project and self.app_id:
+        if project_name and self.app_id:
             # Call get_installation_key to ensure the token gets refresehd in
             # case it's expired.
-            token = self._get_installation_key(project)
+            token = self._get_installation_key(project_name)
 
             # Only set the auth header if we have a token. If not, just don't
             # set any auth header so we will be treated as anonymous. That's
@@ -1127,7 +1127,7 @@ class GithubConnection(BaseConnection):
             if token:
                 # To set the AppInstallationAuthToken on the github session, we
                 # also need the expiry date, but in the correct ISO format.
-                installation_id = self.installation_map.get(project)
+                installation_id = self.installation_map.get(project_name)
                 _, expiry = self.installation_token_cache.get(installation_id)
                 format_expiry = datetime.datetime.strftime(
                     expiry, "%Y-%m-%dT%H:%M:%SZ"
@@ -1145,8 +1145,8 @@ class GithubConnection(BaseConnection):
                     token, format_expiry
                 )
 
-            github._zuul_project = project
-            github._zuul_user_id = self.installation_map.get(project)
+            github._zuul_project = project_name
+            github._zuul_user_id = self.installation_map.get(project_name)
 
         # if we're using api_token authentication then use the provided token,
         # else anonymous is the best we have.
@@ -1617,11 +1617,13 @@ class GithubConnection(BaseConnection):
         reviews = {}
 
         for rev in revs:
-            user = rev.get('user').get('login')
+            login = rev.get('user').get('login')
+            user = self.getUser(login, project.name)
+
             review = {
                 'by': {
-                    'username': user,
-                    'email': rev.get('user').get('email'),
+                    'username': user.get('username'),
+                    'email': user.get('email'),
                 },
                 'grantedOn': int(time.mktime(self._ghTimestampToDate(
                                              rev.get('submitted_at')))),
@@ -1633,19 +1635,19 @@ class GithubConnection(BaseConnection):
             # Get user's rights. A user always has read to leave a review
             review['permission'] = 'read'
 
-            if user in permissions:
-                permission = permissions[user]
+            if login in permissions:
+                permission = permissions[login]
             else:
-                permission = self.getRepoPermission(project.name, user)
-                permissions[user] = permission
+                permission = self.getRepoPermission(project.name, login)
+                permissions[login] = permission
 
             if permission == 'write':
                 review['permission'] = 'write'
             if permission == 'admin':
                 review['permission'] = 'admin'
 
-            if user not in reviews:
-                reviews[user] = review
+            if login not in reviews:
+                reviews[login] = review
             else:
                 # if there are multiple reviews per user, keep the newest
                 # note that this breaks the ability to set the 'older-than'
@@ -1654,15 +1656,16 @@ class GithubConnection(BaseConnection):
                 # previous review was 'approved' or 'changes_requested', as
                 # the GitHub model does not change the vote if a comment is
                 # added after the fact. THANKS GITHUB!
-                if review['grantedOn'] > reviews[user]['grantedOn']:
-                    if (review['type'] == 'commented' and reviews[user]['type']
-                            in ('approved', 'changes_requested')):
+                if review['grantedOn'] > reviews[login]['grantedOn']:
+                    if (review['type'] == 'commented' and
+                        reviews[login]['type'] in
+                        ('approved', 'changes_requested')):
                         log.debug("Discarding comment review %s due to "
                                   "an existing vote %s" % (review,
-                                                           reviews[user]))
+                                                           reviews[login]))
                         pass
                     else:
-                        reviews[user] = review
+                        reviews[login] = review
 
         return reviews.values()
 
@@ -1704,7 +1707,7 @@ class GithubConnection(BaseConnection):
     @cachetools.cached(cache=cachetools.TTLCache(maxsize=2048, ttl=3600),
                        key=lambda self, login, project:
                        (self.connection_name, login))
-    def getUser(self, login, project):
+    def getUser(self, login, project_name):
         """
         Get a Github user
 
@@ -1712,7 +1715,7 @@ class GithubConnection(BaseConnection):
         cached. For the cache omit the project as this is only used for
         requesting the data and doesn't affect the properties of the user.
         """
-        return GithubUser(login, self, project)
+        return GithubUser(login, self, project_name)
 
     def getRepoPermission(self, project, login):
         github = self.getGithubClient(project)
