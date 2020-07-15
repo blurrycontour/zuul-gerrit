@@ -23,6 +23,7 @@ import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuilds } from '../api'
 import TableFilters from '../containers/TableFilters'
+import FilterToolbar from '../containers/Toolbar'
 
 
 class BuildsPage extends TableFilters {
@@ -170,6 +171,7 @@ class BuildsPage extends TableFilters {
     const { builds } = this.state
     return (
       <PageSection variant={PageSectionVariants.light}>
+        <FilterToolbar />
         {this.renderFilter()}
         {builds ? this.renderTable(builds) : <p>Loading...</p>}
       </PageSection>
