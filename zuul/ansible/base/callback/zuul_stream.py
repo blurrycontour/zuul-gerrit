@@ -198,11 +198,15 @@ class CallbackModule(default.CallbackModule):
         elif "[Zuul] Log not found" in line:
             # don't output this line
             return False
-        else:
+        elif " | " in line:
             ts, ln = line.split(' | ', 1)
 
             self._log("%s | %s " % (host, ln), ts=ts)
             return False
+        else:
+            self._log("%s | %s " % (host, line))
+            return False
+
 
     def _log_module_failure(self, result, result_dict):
         if 'module_stdout' in result_dict and result_dict['module_stdout']:
