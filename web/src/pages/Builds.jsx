@@ -22,49 +22,119 @@ import 'moment-duration-format'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuilds } from '../api'
-import TableFilters from '../containers/TableFilters'
+import {
+  buildQueryString,
+  FilterToolbar,
+  getFiltersFromUrl,
+  writeFiltersToUrl,
+} from '../containers/FilterToolbar'
 
-
-class BuildsPage extends TableFilters {
+class BuildsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
-    timezone: PropTypes.string
+    timezone: PropTypes.string,
+    location: PropTypes.object,
+    history: PropTypes.object,
   }
 
-  constructor () {
+  constructor(props) {
     super()
     this.prepareTableHeaders()
+    this.filterCategories = [
+      {
+        key: 'job_name',
+        title: 'Job',
+        placeholder: 'Filter by Job...',
+        type: 'search',
+      },
+      {
+        key: 'project',
+        title: 'Project',
+        placeholder: 'Filter by Project...',
+        type: 'search',
+      },
+      {
+        key: 'branch',
+        title: 'Branch',
+        placeholder: 'Filter by Branch...',
+        type: 'search',
+      },
+      {
+        key: 'pipeline',
+        title: 'Pipeline',
+        placeholder: 'Filter by Pipeline...',
+        type: 'search',
+      },
+      {
+        key: 'change',
+        title: 'Change',
+        placeholder: 'Filter by Change...',
+        type: 'search',
+      },
+      // TODO (felix): We could change the result filter to a dropdown later on
+      {
+        key: 'result',
+        title: 'Result',
+        placeholder: 'Filter by Result...',
+        type: 'search',
+      },
+      {
+        key: 'uuid',
+        title: 'Build',
+        placeholder: 'Filter by Build UUID...',
+        type: 'search',
+      },
+    ]
+
     this.state = {
       builds: null,
-      currentFilterType: this.filterTypes[0],
-      activeFilters: [],
-      currentValue: ''
+      filters: getFiltersFromUrl(props.location, this.filterCategories),
     }
   }
 
   updateData = (filters) => {
-    let queryString = ''
-    if (filters) {
-      filters.forEach(item => queryString += '&' + item.key + '=' + item.value)
-    }
+    // When building the filter query for the API we can't rely on the location
+    // search parameters. Although, we've updated them in theu URL directly
+    // they always have the same value in here (the values when the page was
+    // first loaded). Most probably that's the case because the location is
+    // passed as prop and doesn't change since the page itself wasn't
+    // re-rendered.
+    const queryString = buildQueryString(filters)
     this.setState({builds: null})
     fetchBuilds(this.props.tenant.apiPrefix, queryString).then(response => {
       this.setState({builds: response.data})
     })
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Builds'
     if (this.props.tenant.name) {
-      this.updateData(this.getFilterFromUrl())
+      this.updateData(this.state.filters)
     }
   }
 
-  componentDidUpdate (prevProps) {
-    if (this.props.tenant.name !== prevProps.tenant.name ||
-        this.props.timezone !== prevProps.timezone) {
-      this.updateData(this.getFilterFromUrl())
+  componentDidUpdate(prevProps) {
+    const { filters } = this.state
+    if (
+      this.props.tenant.name !== prevProps.tenant.name ||
+      this.props.timezone !== prevProps.timezone
+    ) {
+      this.updateData(filters)
     }
+  }
+
+  handleFilterChange = (filters) => {
+    const { location, history } = this.props
+    // We must update the URL parameters before the state. Otherwise, the URL
+    // will always be one filter selection behind the state. But as the URL
+    // reflects our state this should be ok.
+    writeFiltersToUrl(filters, location, history)
+    this.updateData(filters)
+    this.setState(() => {
+      return {
+        filters: filters,
+      }
+    })
   }
 
   prepareTableHeaders() {
@@ -167,14 +237,21 @@ class BuildsPage extends TableFilters {
   }
 
   render() {
-    const { builds } = this.state
+    const { builds, filters } = this.state
     return (
       <PageSection variant={PageSectionVariants.light}>
-        {this.renderFilter()}
+        <FilterToolbar
+          filterCategories={this.filterCategories}
+          onFilterChange={this.handleFilterChange}
+          filters={filters}
+        />
         {builds ? this.renderTable(builds) : <p>Loading...</p>}
       </PageSection>
     )
   }
 }
 
-export default connect(state => ({tenant: state.tenant, timezone: state.timezone}))(BuildsPage)
+export default connect((state) => ({
+  tenant: state.tenant,
+  timezone: state.timezone,
+}))(BuildsPage)

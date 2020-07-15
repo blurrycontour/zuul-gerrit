@@ -20,31 +20,79 @@ import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildsets } from '../api'
-import TableFilters from '../containers/TableFilters'
+import {
+  buildQueryString,
+  FilterToolbar,
+  getFiltersFromUrl,
+  writeFiltersToUrl,
+} from '../containers/FilterToolbar'
 
 
-class BuildsetsPage extends TableFilters {
+class BuildsetsPage extends React.Component {
   static propTypes = {
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    location: PropTypes.object,
+    history: PropTypes.object,
   }
 
-  constructor () {
+  constructor (props) {
     super()
-
     this.prepareTableHeaders()
+    this.filterCategories = [
+      {
+        key: 'project',
+        title: 'Project',
+        placeholder: 'Filter by Project...',
+        type: 'search',
+      },
+      {
+        key: 'branch',
+        title: 'Branch',
+        placeholder: 'Filter by Branch...',
+        type: 'search',
+      },
+      {
+        key: 'pipeline',
+        title: 'Pipeline',
+        placeholder: 'Filter by Pipeline...',
+        type: 'search',
+      },
+      {
+        key: 'change',
+        title: 'Change',
+        placeholder: 'Filter by Change...',
+        type: 'search',
+      },
+      // TODO (felix): We could change the result filter to a dropdown later on
+      {
+        key: 'result',
+        title: 'Result',
+        placeholder: 'Filter by Result...',
+        type: 'search',
+      },
+      {
+        key: 'uuid',
+        title: 'Buildset',
+        placeholder: 'Filter by Buildset UUID...',
+        type: 'search',
+      },
+    ]
+
     this.state = {
       buildsets: null,
-      currentFilterType: this.filterTypes[0],
-      activeFilters: [],
-      currentValue: ''
+      filters: getFiltersFromUrl(props.location, this.filterCategories),
     }
+
   }
 
   updateData = (filters) => {
-    let queryString = ''
-    if (filters) {
-      filters.forEach(item => queryString += '&' + item.key + '=' + item.value)
-    }
+    // When building the filter query for the API we can't rely on the location
+    // search parameters. Although, we've updated them in the updateUrl() method
+    // they always have the same value in here (the values when the page was
+    // first loaded). Most probably that's the case because the location is
+    // passed as prop and doesn't change since the page itself wasn't
+    // re-rendered.
+    const queryString = buildQueryString(filters)
     this.setState({buildsets: null})
     fetchBuildsets(this.props.tenant.apiPrefix, queryString).then(response => {
       this.setState({buildsets: response.data})
@@ -54,14 +102,29 @@ class BuildsetsPage extends TableFilters {
   componentDidMount () {
     document.title = 'Zuul Buildsets'
     if (this.props.tenant.name) {
-      this.updateData(this.getFilterFromUrl())
+      this.updateData(this.state.filters)
     }
   }
 
   componentDidUpdate (prevProps) {
+    const { filters } = this.state
     if (this.props.tenant.name !== prevProps.tenant.name) {
-      this.updateData(this.getFilterFromUrl())
+      this.updateData(filters)
     }
+  }
+
+  handleFilterChange = (filters) => {
+    const { location, history } = this.props
+    // We must update the URL parameters before the state. Otherwise, the URL
+    // will always be one filter selection behind the state. But as the URL
+    // reflects our state this should be ok.
+    writeFiltersToUrl(filters, location, history)
+    this.updateData(filters)
+    this.setState(() => {
+      return {
+        filters: filters,
+      }
+    })
   }
 
   prepareTableHeaders() {
@@ -150,10 +213,14 @@ class BuildsetsPage extends TableFilters {
   }
 
   render() {
-    const { buildsets } = this.state
+    const { buildsets, filters } = this.state
     return (
       <PageSection variant={PageSectionVariants.light}>
-        {this.renderFilter()}
+        <FilterToolbar
+          filterCategories={this.filterCategories}
+          onFilterChange={this.handleFilterChange}
+          filters={filters}
+        />
         {buildsets ? this.renderTable(buildsets) : <p>Loading...</p>}
       </PageSection>
     )
