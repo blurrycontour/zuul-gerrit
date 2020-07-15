@@ -41,8 +41,8 @@ class ErrorResponse:
 class FakeUser(object):
     def __init__(self, login):
         self.login = login
-        self.name = "Github User"
-        self.email = "github.user@example.com"
+        self.name = login
+        self.email = '%s@example.com' % login
         self.html_url = 'https://example.com/%s' % login
 
 
