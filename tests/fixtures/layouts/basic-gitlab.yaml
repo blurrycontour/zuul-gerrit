@@ -16,9 +16,11 @@
     success:
       gitlab:
         comment: True
+        approval: True
     failure:
       gitlab:
         comment: True
+        approval: False
 
 - pipeline:
     name: post

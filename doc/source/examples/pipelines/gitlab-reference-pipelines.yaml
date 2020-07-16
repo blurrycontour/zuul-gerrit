@@ -19,14 +19,17 @@
     success:
       gitlab.com:
         comment: true
+        approval: true
       sqlreporter:
     failure:
       gitlab.com:
         comment: true
+        approval: false
       sqlreporter:
     start:
       gitlab.com:
         comment: true
+        approval: false
       sqlreporter:
 
 - pipeline:

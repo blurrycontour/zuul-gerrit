@@ -128,10 +128,13 @@ class GitlabEventConnector(threading.Thread):
         event.patch_number = attrs['last_commit']['id']
         event.change_url = self.connection.getPullUrl(event.project_name,
                                                       event.change_number)
-        if event.created_at == event.updated_at:
+        if attrs['action'] == 'open':
             event.action = 'opened'
-        else:
+        elif attrs['action'] == 'update':
             event.action = 'changed'
+        else:
+            # Do not handle other merge_request action for now.
+            return None
         event.type = 'gl_merge_request'
         return event
 
@@ -292,6 +295,26 @@ class GitlabAPIClient():
             self.baseurl + path, params=params,
             zuul_event_id=zuul_event_id)
         self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        return resp[0]
+
+    # https://docs.gitlab.com/ee/api/merge_request_approvals.html#approve-merge-request
+    def approve_mr(self, project_name, number, approve=True,
+                   zuul_event_id=None):
+        approve = 'approve' if approve else 'unapprove'
+        path = "/projects/%s/merge_requests/%s/%s" % (
+            quote_plus(project_name), number, approve)
+        params = {}
+        resp = self.post(
+            self.baseurl + path, params=params,
+            zuul_event_id=zuul_event_id)
+        try:
+            self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        except GitlabAPIClientException:
+            # approve and unapprove endpoint could return code 401 whether the
+            # actual state of the Merge Request approval. Two call on approve
+            # endpoint the second call return 401.
+            if resp[1] != 401:
+                raise
         return resp[0]
 
 
@@ -489,6 +512,13 @@ class GitlabConnection(BaseConnection):
         self.gl_client.comment_mr(
             project_name, number, message, zuul_event_id=event)
         log.info("Commented on MR %s#%s", project_name, number)
+
+    def approveMR(self, project_name, number, approve, event=None):
+        log = get_annotated_logger(self.log, event)
+        self.gl_client.approve_mr(
+            project_name, number, approve, zuul_event_id=event)
+        log.info(
+            "Set approval: %s on MR %s#%s", approve, project_name, number)
 
 
 class GitlabWebController(BaseWebController):

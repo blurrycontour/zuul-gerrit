@@ -29,6 +29,7 @@ class GitlabReporter(BaseReporter):
     def __init__(self, driver, connection, pipeline, config=None):
         super(GitlabReporter, self).__init__(driver, connection, config)
         self._create_comment = self.config.get('comment', True)
+        self._approval = self.config.get('approval', None)
 
     def report(self, item):
         """Report on an event."""
@@ -42,15 +43,26 @@ class GitlabReporter(BaseReporter):
         if hasattr(item.change, 'number'):
             if self._create_comment:
                 self.addMRComment(item)
+            if self._approval is not None:
+                self.setApproval(item)
 
-    def addMRComment(self, item, comment=None):
+    def addMRComment(self, item):
         log = get_annotated_logger(self.log, item.event)
-        message = comment or self._formatItemReport(item)
+        message = self._formatItemReport(item)
         project = item.change.project.name
-        pr_number = item.change.number
+        mr_number = item.change.number
         log.debug('Reporting change %s, params %s, message: %s',
                   item.change, self.config, message)
-        self.connection.commentMR(project, pr_number, message,
+        self.connection.commentMR(project, mr_number, message,
+                                  event=item.event)
+
+    def setApproval(self, item):
+        log = get_annotated_logger(self.log, item.event)
+        project = item.change.project.name
+        mr_number = item.change.number
+        log.debug('Reporting change %s, params %s, approval: %s',
+                  item.change, self.config, self._approval)
+        self.connection.approveMR(project, mr_number, self._approval,
                                   event=item.event)
 
     def mergePull(self, item):
@@ -63,5 +75,6 @@ class GitlabReporter(BaseReporter):
 def getSchema():
     gitlab_reporter = v.Schema({
         'comment': bool,
+        'approval': bool,
     })
     return gitlab_reporter
