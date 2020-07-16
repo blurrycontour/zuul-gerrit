@@ -8,12 +8,12 @@ services:
     ports:
       - "8080:8080"
       - "29418:29418"
-    command: |
+    entrypoint: |
       /bin/sh -c '\
-        git config -f /var/gerrit/etc/gerrit.config gerrit.canonicalWebUrl http://localhost:8080/ && \
-        git config -f /var/gerrit/etc/gerrit.config gerrit.ui POLYGERRIT && \
+        /entrypoint.sh init
+        git config -f /var/gerrit/etc/jgit.config protocol.version 2 && \
+        git config -f /var/gerrit/etc/gerrit.config gerrit.canonicalWebUrl http://localhost:8080 && \
         git config -f /var/gerrit/etc/gerrit.config sendemail.enable false && \
-        git config -f /var/gerrit/etc/gerrit.config noteDb.changes.autoMigrate true && \
         /var/gerrit/bin/gerrit.sh run'
   gerritconfig:
     image: zuul/zuul-executor
@@ -31,7 +31,7 @@ services:
       - "../../../tools/:/var/zuul-tools/:z"
     # NOTE(pabelanger): Be sure to update this line each time we change the
     # default version of ansible for Zuul.
-    command: "/usr/local/lib/zuul/ansible/2.8/bin/ansible-playbook /var/playbooks/setup.yaml"
+    command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/playbooks/setup.yaml"
   zk:
     image: zookeeper
     hostname: examples_zk_1.examples_default

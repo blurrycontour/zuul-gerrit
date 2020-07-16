@@ -1,0 +1,10 @@
+---
+- hosts: all
+  vars:
+    workspace: /tmp/tutorial-zuul
+    local: false
+  environment:
+    GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
+  tasks:
+    - name: Run tutorial
+      include_tasks: run-tutorial.yaml

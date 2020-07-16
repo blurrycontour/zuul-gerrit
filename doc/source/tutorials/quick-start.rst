@@ -35,22 +35,23 @@ Before you start, ensure that some needed packages are installed.
 
    sudo yum install epel-release
    sudo yum update
-   sudo yum install docker docker-compose git python-pip
-   sudo pip install git-review
+   sudo yum install docker git python-pip
+   sudo pip install git-review docker-compose
 
    # Fedora:
 
-   sudo dnf install docker docker-compose git git-review
+   sudo dnf install docker git
+   sudo python3 -m pip install git-review docker-compose
 
    # OpenSuse:
 
-   sudo zypper install docker docker-compose git
-   sudo python3 -m pip install git-review
+   sudo zypper install docker git
+   sudo python3 -m pip install git-review docker-compose
 
    # Ubuntu / Debian:
 
-   sudo apt-get install docker-compose docker.io git python3-pip
-   sudo python3 -m pip install git-review
+   sudo apt-get install docker.io git python3-pip
+   sudo python3 -m pip install git-review docker-compose
 
    # Start and Enable the docker service on Fedora / CentOS
    # Red Hat / OpenSuse / Ubuntu / Debian:
@@ -71,7 +72,7 @@ docker-compose in order to start Zuul, Nodepool and Gerrit.
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   sudo -E docker-compose up
+   sudo -E docker-compose -p zuul_tutorial up
 
 For reference, the files in that directory are also `browsable on the web
 <https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples>`_.
