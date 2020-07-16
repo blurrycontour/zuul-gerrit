@@ -23,6 +23,16 @@
         approval: False
 
 - pipeline:
+    name: check-approval
+    manager: independent
+    trigger:
+      gitlab:
+        - event: gl_merge_request
+          action:
+            - approved
+            - unapproved
+
+- pipeline:
     name: post
     post-review: true
     manager: independent
@@ -61,12 +71,19 @@
     name: project-tag-job
     run: playbooks/project-tag.yaml
 
+- job:
+    name: project-test-approval
+    run: playbooks/project-test-approval.yaml
+
 - project:
     name: org/project
     check:
       jobs:
         - project-test1
         - project-test2
+    check-approval:
+      jobs:
+        - project-test-approval
     post:
       jobs:
         - project-post-job

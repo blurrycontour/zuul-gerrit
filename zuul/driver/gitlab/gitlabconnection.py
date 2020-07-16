@@ -132,6 +132,8 @@ class GitlabEventConnector(threading.Thread):
             event.action = 'opened'
         elif attrs['action'] == 'update':
             event.action = 'changed'
+        elif attrs['action'] in ('approved', 'unapproved'):
+            event.action = attrs['action']
         else:
             # Do not handle other merge_request action for now.
             return None
