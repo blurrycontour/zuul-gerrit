@@ -1986,6 +1986,7 @@ class BuildSet(object):
     builders check out.
 
     """
+    log = logging.getLogger("zuul.BuildSet")
     # Merge states:
     NEW = 1
     PENDING = 2
@@ -2017,6 +2018,7 @@ class BuildSet(object):
         self.files = RepoFiles()
         self.repo_state = {}
         self.tries = {}
+        self.log.debug("ZUUL MODEL BuildSet {}".format(item.change.files))
         if item.change.files is not None:
             self.files_state = self.COMPLETE
         else:
@@ -3064,7 +3066,7 @@ class QueueItem(object):
 
 class Ref(object):
     """An existing state of a Project."""
-
+    log = logging.getLogger("zuul.Ref")
     def __init__(self, project):
         self.project = project
         self.ref = None
@@ -3080,19 +3082,23 @@ class Ref(object):
         pname = None
         if self.project and self.project.name:
             pname = self.project.name
+        if self.files:
+            files = len(self.files)
+        else:
+            files = 'vide'
         if self.newrev == '0000000000000000000000000000000000000000':
-            rep = '<%s 0x%x %s deletes %s from %s' % (
+            rep = '<%s 0x%x %s deletes %s from %s files:%s>' % (
                 type(self).__name__, id(self), pname,
-                self.ref, self.oldrev)
+                self.ref, self.oldrev, files)
         elif self.oldrev == '0000000000000000000000000000000000000000':
-            rep = '<%s 0x%x %s creates %s on %s>' % (
+            rep = '<%s 0x%x %s creates %s on %s files:%s>' % (
                 type(self).__name__, id(self), pname,
-                self.ref, self.newrev)
+                self.ref, self.newrev, files)
         else:
             # Catch all
-            rep = '<%s 0x%x %s %s updated %s..%s>' % (
+            rep = '<%s 0x%x %s %s updated %s..%s files:%s>' % (
                 type(self).__name__, id(self), pname,
-                self.ref, self.oldrev, self.newrev)
+                self.ref, self.oldrev, self.newrev, files)
         return rep
 
     def equals(self, other):
@@ -3111,12 +3117,15 @@ class Ref(object):
     def updatesConfig(self, tenant):
         tpc = tenant.project_configs.get(self.project.canonical_name)
         if tpc is None:
+            self.log.debug("ZUUL updatesConfig TPC None")
             return False
         if self.files is None:
+            self.log.debug("ZUUL updatesConfig FILES None")
             # If self.files is None we don't know if this change updates the
             # config so assume it does as this is a safe default if we don't
             # know.
             return True
+        self.log.debug("ZUUL updatesConfig FILES {}".format(self.files))
         for fn in self.files:
             if fn == 'zuul.yaml':
                 return True
@@ -3224,7 +3233,7 @@ class Change(Branch):
         pname = None
         if self.project and self.project.name:
             pname = self.project.name
-        return '<Change 0x%x %s %s>' % (id(self), pname, self._id())
+        return '<Change 0x%x proj:%s branch:%s %s>' % (id(self), pname, self.branch, self._id())
 
     def equals(self, other):
         if self.number == other.number and self.patchset == other.patchset:
@@ -3308,6 +3317,8 @@ class TriggerEvent(object):
         # For logging
         self.zuul_event_id = None
         self.timestamp = None
+        self.need_files_update = False
+        self.files = None
 
     @property
     def canonical_project_name(self):
@@ -3318,6 +3329,9 @@ class TriggerEvent(object):
 
     def isChangeAbandoned(self):
         return False
+    
+    def needFilesUpdate(self):
+        return self.need_files_update
 
     def _repr(self):
         flags = [str(self.type)]
@@ -4357,6 +4371,7 @@ class SemaphoreHandler(object):
 
 
 class Tenant(object):
+    log = logging.getLogger("zuul.Tenant")
     def __init__(self, name):
         self.name = name
         self.max_nodes_per_job = 5
@@ -4532,6 +4547,7 @@ class Tenant(object):
 
 class UnparsedBranchCache(object):
     """Cache information about a single branch"""
+    log = logging.getLogger("zuul.UnparsedBranchCache")
     def __init__(self):
         self.load_skipped = True
         self.extra_files_searched = set()
@@ -4559,6 +4575,7 @@ class UnparsedBranchCache(object):
         self.extra_dirs_searched |= set(tpc.extra_config_dirs)
 
     def put(self, path, config):
+        self.log.debug("ZUUL UnparsedBranchCache put files path:{} config:{}".format(path, config))
         self.files[path] = config
 
     def get(self, tpc):
@@ -4581,39 +4598,64 @@ class UnparsedBranchCache(object):
                     fns4.append(fn)
         fns = (["zuul.yaml"] + sorted(fns1) + [".zuul.yaml"] +
                sorted(fns2) + fns3 + sorted(fns4))
+        self.log.debug("ZUUL UnparsedBranchCache fns:{}".format(fns))
         for fn in fns:
             data = self.files.get(fn)
             if data is not None:
                 ret.extend(data)
+                self.log.debug("ZUUL UnparsedBranchCache on set useful_conf {}".format(fn))
                 self.useful_conf[tpc] = True
+            else:
+                self.log.debug("ZUUL UnparsedBranchCache data None pour {}".format(fn))
         return ret
 
 
 class Abide(object):
+    log = logging.getLogger("zuul.Abide")
     def __init__(self):
         self.admin_rules = OrderedDict()
         self.tenants = OrderedDict()
         # project -> branch -> UnparsedBranchCache
         self.unparsed_project_branch_cache = {}
+        self.tenant_project_branch_cache = {}
 
     def hasUnparsedBranchCache(self, canonical_project_name, branch):
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(
             canonical_project_name, {})
         cache = project_branch_cache.get(branch)
+        
         if cache is None:
+            self.log.debug("ZUUL hasUnparsedBranchCache CACHE None {} {}".format(canonical_project_name, branch))
             return False
+        self.log.debug("ZUUL hasUnparsedBranchCache CACHE is not None {} {} {}".format(canonical_project_name, branch, cache))
         return True
 
+    def setProjectBranchRevision(self, tenant, canonical_project_name, branch, revision):
+        if tenant.name not in self.tenant_project_branch_cache:
+            self.tenant_project_branch_cache[tenant.name] = {}
+        if canonical_project_name not in self.tenant_project_branch_cache[tenant.name]:
+            self.tenant_project_branch_cache[tenant.name][canonical_project_name] = {}
+        self.tenant_project_branch_cache[tenant.name][canonical_project_name][branch] = revision
+        self.log.debug("ZUUL setProjectBranchRevision {} {} {} {}".format(tenant.name, canonical_project_name, branch, revision))
+
+    def getProjectBranchRevision(self, tenant, canonical_project_name, branch):
+        self.log.debug("ZUUL getProjectBranchRevision {} {} {}".format(tenant.name, canonical_project_name, branch))
+        return self.tenant_project_branch_cache.get(tenant.name, {}).get(canonical_project_name,{}).get(branch, None)
+
     def hasUsefulBranchCache(self,
-                                     canonical_project_name,
-                                     branch, tenant):
+                             canonical_project_name,
+                             branch, tenant):
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(
             canonical_project_name, {})
         cache = project_branch_cache.get(branch)
         if cache is not None:
             tpc = tenant.project_configs[canonical_project_name]
+            self.log.debug("ZUUL hasUsefulBranchCache CACHE is not None {} {} {} {}".format(canonical_project_name, branch, tenant, cache))
+            self.log.debug("ZUUL hasUsefulBranchCache CACHE {}".format(cache.hasUsefulConf(tpc)))
             cache.get(tpc)
+            self.log.debug("ZUUL hasUsefulBranchCache CACHE {}".format(cache.hasUsefulConf(tpc)))
             return cache.hasUsefulConf(tpc)
+        self.log.debug("ZUUL hasUsefulBranchCache CACHE None {} {} {}".format(canonical_project_name, branch, tenant))
         return False
 
     def getUnparsedBranchCache(self, canonical_project_name, branch):
@@ -4621,15 +4663,17 @@ class Abide(object):
             canonical_project_name, {})
         cache = project_branch_cache.get(branch)
         if cache is not None:
+            self.log.debug("ZUUL getUnparsedBranchCache CACHE exists {} {} {}".format(canonical_project_name, branch, cache))
             return cache
         project_branch_cache[branch] = UnparsedBranchCache()
+        self.log.debug("ZUUL getUnparsedBranchCache CACHE NEW {} {} {}".format(canonical_project_name, branch, project_branch_cache[branch]))
         return project_branch_cache[branch]
 
     def clearUnparsedBranchCache(self, canonical_project_name, branch=None):
         if canonical_project_name in self.unparsed_project_branch_cache:
             project_branch_cache = \
                 self.unparsed_project_branch_cache[canonical_project_name]
-
+            self.log.debug("ZUUL getUnparsedBranchCache CACHE DEL {} {} {}".format(canonical_project_name, branch, project_branch_cache))
             if branch in project_branch_cache:
                 del project_branch_cache[branch]
 
@@ -4695,7 +4739,7 @@ class TimeDataBase(object):
         self.root = root
 
     def _getTD(self, build):
-        if hasattr(build.build_set.item.change, 'branch'):
+        if hasattr(build.build_set.item.change, 'branch') and build.build_set.item.change.branch:
             branch = build.build_set.item.change.branch
         else:
             branch = ''

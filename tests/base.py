@@ -181,9 +181,9 @@ class FakeGerritChange(object):
     categories = {'Approved': ('Approved', -1, 1),
                   'Code-Review': ('Code-Review', -2, 2),
                   'Verified': ('Verified', -2, 2)}
-
+    log = logging.getLogger("zuul.FakeGerritChange")
     def __init__(self, gerrit, number, project, branch, subject,
-                 status='NEW', upstream_root=None, files={},
+                 status='NEW', upstream_root=None, files=None,
                  parent=None):
         self.gerrit = gerrit
         self.source = gerrit
@@ -199,10 +199,12 @@ class FakeGerritChange(object):
         self.depends_on_patchset = None
         self.needed_by_changes = []
         self.fail_merge = False
+        self.merged_hexsha = None
         self.messages = []
         self.comments = []
         self.checks = {}
         self.checks_history = []
+        self.files = files if files is not None else {}
         self.data = {
             'branch': branch,
             'comments': self.comments,
@@ -230,6 +232,7 @@ class FakeGerritChange(object):
     def addFakeChangeToRepo(self, msg, files, large, parent):
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
+        self.log.debug("PPPPPPPPPAAAAAAAAAAARRRREEEEEENNNNNTTTTT {}".format(parent))
         if parent is None:
             parent = 'refs/tags/init'
         ref = GerritChangeReference.create(
@@ -291,6 +294,7 @@ class FakeGerritChange(object):
              'ref': 'refs/changes/1/%s/%s' % (self.number,
                                               self.latest_patchset),
              'revision': c.hexsha,
+             'parents': [parent.hexsha for parent in c.parents],
              'uploader': {'email': 'user@example.com',
                           'name': 'User name',
                           'username': 'user'}}
@@ -397,9 +401,14 @@ class FakeGerritChange(object):
         return event
 
     def getChangeMergedEvent(self):
+        if self.merged_hexsha is not None:
+            newrev = self.merged_hexsha
+        else:
+            newrev = self.patchsets[-1]['revision']
+
         event = {"submitter": {"name": "Jenkins",
                                "username": "jenkins"},
-                 "newRev": "29ed3b5f8f750a225c5be70235230e3a6ccb04d9",
+                 "newRev": newrev,
                  "patchSet": self.patchsets[-1],
                  "change": self.data,
                  "type": "change-merged",
@@ -407,18 +416,18 @@ class FakeGerritChange(object):
         return event
 
     def getRefUpdatedEvent(self):
-        path = os.path.join(self.upstream_root, self.project)
-        repo = git.Repo(path)
-        oldrev = repo.heads[self.branch].commit.hexsha
-
+        if self.merged_hexsha is not None:
+            newrev = self.merged_hexsha
+        else:
+            newrev = self.patchsets[-1]['revision']
         event = {
             "type": "ref-updated",
             "submitter": {
                 "name": "User Name",
             },
             "refUpdate": {
-                "oldRev": oldrev,
-                "newRev": self.patchsets[-1]['revision'],
+                "oldRev": self.patchsets[-1]['parents'][0],
+                "newRev": newrev,
                 "refName": self.branch,
                 "project": self.project,
             }
@@ -529,6 +538,7 @@ class FakeGerritChange(object):
         return json.loads(json.dumps(self.data))
 
     def queryHTTP(self):
+        self.log.debug("QUERY HTTPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
         self.queried += 1
         labels = {}
         for cat in self.categories:
@@ -562,10 +572,14 @@ class FakeGerritChange(object):
             if f['file'] == '/COMMIT_MSG':
                 continue
             files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
-        parent = '0000000000000000000000000000000000000000'
+        parents = self.patchsets[-1]['parents']
         if self.depends_on_change:
-            parent = self.depends_on_change.patchsets[
-                self.depends_on_patchset - 1]['revision']
+            parents.append(self.depends_on_change.patchsets[
+                self.depends_on_patchset - 1]['revision'])
+        commit_parents = []
+        for parent in parents:
+            commit_parents.append({"commit": parent})
+
         revisions[rev['revision']] = {
             "kind": "REWORK",
             "_number": num,
@@ -575,9 +589,7 @@ class FakeGerritChange(object):
             "commit": {
                 "subject": self.subject,
                 "message": self.data['commitMessage'],
-                "parents": [{
-                    "commit": parent,
-                }]
+                "parents": commit_parents
             },
             "files": files
         }
@@ -631,7 +643,7 @@ class FakeGerritChange(object):
         if (self.depends_on_change and
                 self.depends_on_change.data['status'] != 'MERGED'):
             return
-        if self.fail_merge:
+        if self.fail_merge or self.data['status'] == 'MERGED':
             return
         self.data['status'] = 'MERGED'
         self.open = False
@@ -643,6 +655,9 @@ class FakeGerritChange(object):
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.merge('-s', 'resolve', self.patchsets[-1]['ref'])
         repo.heads[self.branch].commit = repo.head.commit
+        
+        self.merged_hexsha = repo.head.commit.hexsha
+        self.log.debug("CHANGE MERGED branch:{} oldrev:{} newrev:{}".format(self.branch, self.patchsets[-1]['parents'][0], self.merged_hexsha))
 
     def setReported(self):
         self.reported += 1
@@ -821,7 +836,7 @@ class GerritWebServer(object):
                 self.end_headers()
 
             def get_changes(self, query):
-                self.log.debug("simpleQueryHTTP: %s", query)
+                self.log.debug("ZUUUUUL simpleQueryHTTP: %s", query)
                 query = urllib.parse.unquote(query)
                 fake_gerrit.queries.append(query)
                 results = []
@@ -833,6 +848,7 @@ class GerritWebServer(object):
                                 results.append(r)
                 else:
                     results = fake_gerrit._simpleQuery(query, http=True)
+                self.log.debug("ZUUUUUL RRRRRRRRRRRREEEEEEEEEZZZZZZZZZZZZ: {}".format(results))
                 self.send_data(results)
                 self.end_headers()
 
@@ -904,6 +920,8 @@ class FakeGerritRefWatcher(gitwatcher.GitWatcher):
         # Set the event so tests can confirm that the watcher has run
         # after they changed something.
         self.connection._ref_watcher_event.set()
+        #time.sleep(1)
+        #return True
         return r
 
 
@@ -975,6 +993,27 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 "oldRev": 40 * '0',
                 "newRev": newrev,
                 "refName": ref,
+                "project": project,
+            }
+        }
+        return event
+
+    def getFakeRefUpdatedEvent(self, project, branch, oldrev, newrev=None):
+        if newrev is None:
+            path = os.path.join(self.upstream_root, project)
+            repo = git.Repo(path)
+            newrev = repo.heads[branch].commit.hexsha
+
+        event = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+                "username": "user",
+            },
+            "refUpdate": {
+                "oldRev": oldrev,
+                "newRev": newrev,
+                "refName": branch,
                 "project": project,
             }
         }
@@ -1090,6 +1129,10 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 msg = msg[1:-1]
             l = [queryMethod(change) for change in self.changes.values()
                  if msg in change.data['commitMessage']]
+        elif query.startswith('status:merged'):
+            self.log.debug("QUERY:{}".format(query))
+            l = [queryMethod(change) for change in self.changes.values()
+                 if change.data['status'] == 'MERGED']
         else:
             # Query all open changes
             l = [queryMethod(change) for change in self.changes.values()]
@@ -1528,12 +1571,13 @@ class FakePagureConnection(pagureconnection.PagureConnection):
         repo_path = os.path.join(self.upstream_root, project)
         repo = git.Repo(repo_path)
         headsha = repo.head.commit.hexsha
+        parentsha = repo.head.commit.parents[0].hexsha
         data = {
             'msg': {
                 'project_fullname': project,
                 'branch': 'master',
                 'end_commit': headsha,
-                'old_commit': '1' * 40,
+                'old_commit': parentsha,
             },
             'msg_id': str(uuid.uuid4()),
             'timestamp': 1427459070,
@@ -2769,12 +2813,14 @@ class FakeGearmanServer(gear.Server):
         released.
 
     """
+    log = logging.getLogger("zuul.FakeGearmanServer")
 
     def __init__(self, use_ssl=False):
         self.hold_jobs_in_queue = False
         self.hold_merge_jobs_in_queue = False
         self.jobs_history = []
         if use_ssl:
+            self.log.debug("ZUUL use_ssl 1")
             ssl_ca = os.path.join(FIXTURE_DIR, 'gearman/root-ca.pem')
             ssl_cert = os.path.join(FIXTURE_DIR, 'gearman/server.pem')
             ssl_key = os.path.join(FIXTURE_DIR, 'gearman/server.key')
@@ -3730,7 +3776,7 @@ class ZuulTestCase(BaseTestCase):
         self.log.info("Gearman server on port %s" %
                       (self.gearman_server.port,))
         if self.use_ssl:
-            self.log.info('SSL enabled for gearman')
+            self.log.info('ZUUL SSL enabled for gearman')
             self.config.set(
                 'gearman', 'ssl_ca',
                 os.path.join(FIXTURE_DIR, 'gearman/root-ca.pem'))
@@ -3820,6 +3866,7 @@ class ZuulTestCase(BaseTestCase):
 
         def registerGithubProjects(con):
             path = self.config.get('scheduler', 'tenant_config')
+            self.log.debug("============================================= {}".format(os.path.join(FIXTURE_DIR, path)))
             with open(os.path.join(FIXTURE_DIR, path)) as f:
                 tenant_config = yaml.safe_load(f.read())
             for tenant in tenant_config:
@@ -3970,6 +4017,7 @@ class ZuulTestCase(BaseTestCase):
 
         files = {}
         path = os.path.join(FIXTURE_DIR, path)
+        self.log.debug("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa {}".format(path))
         with open(path) as f:
             data = f.read()
             layout = yaml.safe_load(data)
@@ -4014,6 +4062,7 @@ class ZuulTestCase(BaseTestCase):
         self.init_repo('org/common-config')
         self.addCommitToRepo('org/common-config', 'add content from fixture',
                              files, branch='master', tag='init')
+        self.log.debug("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb {}".format(files))
 
         return True
 
@@ -4245,7 +4294,7 @@ class ZuulTestCase(BaseTestCase):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         fn = os.path.join(path, commit_filename)
-
+        self.log.debug("ZUUL on cree une branch a {}".format(repo.head.commit.hexsha))
         branch_head = repo.create_head(branch)
         repo.head.reference = branch_head
         f = open(fn, 'a')
@@ -4257,6 +4306,7 @@ class ZuulTestCase(BaseTestCase):
         repo.head.reference = repo.heads['master']
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
+        self.log.debug("ZUUL on obtient un commit {}".format(repo.heads['master'].commit.hexsha))
 
     def delete_branch(self, project, branch):
         path = os.path.join(self.upstream_root, project)
@@ -4273,7 +4323,7 @@ class ZuulTestCase(BaseTestCase):
         repo = git.Repo(path)
         repo.head.reference = repo.heads[head]
         repo.head.reset(index=True, working_tree=True)
-
+        oldrev = repo.head.commit.hexsha
         files = files or {"README": "creating fake commit\n"}
         for name, content in files.items():
             file_name = os.path.join(path, name)

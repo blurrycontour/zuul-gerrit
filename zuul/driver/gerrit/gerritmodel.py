@@ -170,6 +170,18 @@ class GerritTriggerEvent(TriggerEvent):
         if self.approvals:
             ret += ' ' + ', '.join(
                 ['%s:%s' % (a['type'], a['value']) for a in self.approvals])
+
+        ret += ' oldrev:'
+        if hasattr(self, 'oldrev') and self.oldrev:
+            ret += self.oldrev
+        else:
+            ret += 'None'
+
+        ret += ' newrev:'
+        if hasattr(self, 'newrev') and self.newrev:
+            ret += self.newrev
+        else:
+            ret += 'None'
         ret += '>'
 
         return ret

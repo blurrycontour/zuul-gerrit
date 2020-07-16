@@ -550,10 +550,16 @@ class Repo(object):
         log = get_annotated_logger(self.log, zuul_event_id)
         ret = {}
         repo = self.createRepoObject(zuul_event_id)
+        #self.log.debug("====================== branch:{} commit:{} ==========".format(branch, commit))
         if branch:
+            self.log.debug("====================== branch:{} {} ==========".format(branch, repo.heads[branch].commit.hexsha))
             tree = repo.heads[branch].commit.tree
+            commit_hexsha = repo.heads[branch].commit.hexsha
         else:
-            tree = repo.commit(commit).tree
+            self.log.debug("====================== commit:{}  ==========".format(commit))
+            commit_obj = repo.commit(commit)
+            tree = commit_obj.tree
+            commit_hexsha = commit_obj.hexsha
         for fn in files:
             if fn in tree:
                 if tree[fn].type != 'blob':
@@ -570,7 +576,7 @@ class Repo(object):
                     if blob.path.endswith(".yaml"):
                         ret[blob.path] = blob.data_stream.read().decode(
                             'utf-8')
-        return ret
+        return (ret, commit_hexsha)
 
     def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
@@ -586,6 +592,37 @@ class Repo(object):
         else:
             files.update(head.stats.files.keys())
         return list(files)
+
+    def getFilesChangesRevision(self, oldrev=None, newrev=None, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("GGGGGGGGGIIIIIIIIIIIITTTTTTTTTTTTTTTTTTTTTTTT DIFF git diff {} {}".format(oldrev, newrev))
+
+        repo = self.createRepoObject(zuul_event_id)
+        
+        self.fetch(newrev, zuul_event_id=zuul_event_id)
+        head = repo.commit(
+            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+
+        if oldrev != (40 * '0'):
+            self.fetch(oldrev, zuul_event_id=zuul_event_id)
+            head = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+
+            commit_diff = repo.git.execute(["git", "diff", "--name-only", oldrev, newrev])
+            log = get_annotated_logger(self.log, zuul_event_id)
+            files = commit_diff.split('\n')
+            log.debug("GGGGGGGGGIIIIIIIIIIIITTTTTTTTTTTTTTTTTTTTTTTT DIFF git diff {} {} files:{}".format(oldrev, newrev, files))
+        else:
+            files = []
+            stack = [head.tree]
+            while len(stack) > 0:
+                tree = stack.pop()
+                for b in tree.blobs:
+                    files.append(b.path)
+                for subtree in tree.trees:
+                    stack.append(subtree)
+            log.debug("GGGGGGGGGIIIIIIIIIIIITTTTTTTTTTTTTTTTTTTTTTTT NEWREV {} files:{}".format(newrev, files))
+        return files
 
     def deleteRemote(self, remote, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
@@ -896,7 +933,7 @@ class Merger(object):
                     return None
                 if files or dirs:
                     repo = self.getRepo(item['connection'], item['project'])
-                    repo_files = repo.getFiles(files, dirs, commit=commit)
+                    (repo_files, revision) = repo.getFiles(files, dirs, commit=commit)
                     read_files.append(dict(
                         connection=item['connection'],
                         project=item['project'],
@@ -968,6 +1005,7 @@ class Merger(object):
         return (True, repo_state, item_in_branches)
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[]):
+        self.log.debug("getFilesgetFilesgetFilesgetFilesgetFilesgetFilesgetFilesgetFilesgetFilesgetFiles")
         repo = self.getRepo(connection_name, project_name)
         return repo.getFiles(files, dirs, branch=branch)
 
@@ -976,3 +1014,9 @@ class Merger(object):
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
         return repo.getFilesChanges(branch, tosha, zuul_event_id=zuul_event_id)
+
+    def getFilesChangesRevision(self, connection_name, project_name, newrev,
+                        oldrev, zuul_event_id=None):
+        repo = self.getRepo(connection_name, project_name,
+                            zuul_event_id=zuul_event_id)
+        return repo.getFilesChangesRevision(oldrev, newrev, zuul_event_id=zuul_event_id)

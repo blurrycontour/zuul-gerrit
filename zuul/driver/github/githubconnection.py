@@ -471,6 +471,11 @@ class GithubEventProcessor(object):
         else:
             event.branch_updated = True
 
+        self.log.debug("ZUUL GITHUB debug delele branch {} {} {}".format(
+            event.branch,
+            self.connection.source.getProject(event.project_name),
+            event.branch_deleted
+            ))
         if event.branch:
             project = self.connection.source.getProject(event.project_name)
             if event.branch_deleted:
@@ -1186,6 +1191,8 @@ class GithubConnection(BaseConnection):
             elif event.ref and event.ref.startswith('refs/heads/'):
                 change = Branch(project)
                 change.branch = event.ref[len('refs/heads/'):]
+                if hasattr(event, 'files'):
+                    change.files = event.files
             else:
                 change = Ref(project)
             change.ref = event.ref
@@ -1443,6 +1450,7 @@ class GithubConnection(BaseConnection):
 
     def getProjectBranches(self, project, tenant):
         exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
+        self.log.debug("ZUUL GITHUB getProjectBranches exclude:>>{}<< include:>>{}<<".format(self._project_branch_cache_exclude_unprotected, self._project_branch_cache_include_unprotected))
         if exclude_unprotected:
             cache = self._project_branch_cache_exclude_unprotected
         else:
@@ -1484,6 +1492,38 @@ class GithubConnection(BaseConnection):
 
         cache[project.name] = branches
         return branches
+
+    def testReconfigureTenant(self, event, project, tenant,
+                              abide, reconfigure_tenant):
+        event.need_files_update = False
+        # SPECIFIC TEST 1
+        self.log.debug("ZUUL RECONFIGURE TEST GITHUB {} {} {}".format(
+            event.branch,
+            project.source.getProjectBranches(
+                project, tenant),
+            not abide.hasUnparsedBranchCache(
+                    project.canonical_name, event.branch),
+            ))
+        # If the driver knows the branch but we don't have a config, we
+        # also need to reconfigure. This happens if a GitHub branch
+        # was just configured as protected without a push in between.
+        if (event.branch in self.getProjectBranches(
+                project, tenant)
+                and not abide.hasUnparsedBranchCache(
+                    project.canonical_name, event.branch)):
+            self.log.debug("ZUUL RECONFIGURE GITHUB OK")
+            reconfigure_tenant = True
+
+        # SPECIFIC TEST 2
+        # If the branch is unprotected and unprotected branches
+        # are excluded from the tenant for that project skip reconfig.
+        if (reconfigure_tenant and not
+                event.branch_protected and
+                tenant.getExcludeUnprotectedBranches(project)):
+            self.log.debug("ZUUL RECONFIGURE ANNULATION")
+            reconfigure_tenant = False
+
+        return reconfigure_tenant
 
     def getBranch(self, project_name, branch):
         github = self.getGithubClient(project_name)

@@ -1761,24 +1761,30 @@ class TenantParser(object):
         return config_projects, untrusted_projects
 
     def _cacheTenantYAML(self, abide, tenant, loading_errors):
+        self.log.debug("ZUUL _cacheTenantYAML ENTRY")
         jobs = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
+            #self.log.debug("ZUUL _cacheTenantYAML 1")
             tpc = tenant.project_configs[project.canonical_name]
             # For each branch in the repo, get the zuul.yaml for that
             # branch.  Remember the branch and then implicitly add a
             # branch selector to each job there.  This makes the
             # in-repo configuration apply only to that branch.
+            self.log.debug("ZUUL _cacheTenantYAML 1 project:{} tpc:{}".format(project, tpc))
             branches = tenant.getProjectBranches(project)
             for branch in branches:
+                self.log.debug("ZUUL _cacheTenantYAML 2 branch:{}".format(branch))
                 branch_cache = abide.getUnparsedBranchCache(
                     project.canonical_name, branch)
                 if branch_cache.isValidFor(tpc):
                     # We already have this branch cached.
+                    self.log.debug("ZUUL _cacheTenantYAML 21 continue")
                     continue
                 if not tpc.load_classes:
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
+                    self.log.debug("ZUUL _cacheTenantYAML 22 continue")
                     continue
                 job = self.merger.getFiles(
                     project.source.connection.connection_name,
@@ -1791,10 +1797,12 @@ class TenantParser(object):
                     project.name, branch))
                 job.source_context = model.SourceContext(
                     project, branch, '', False)
+                self.log.debug("ZUUL _cacheTenantYAML 3 append job:{}".format(job))
                 jobs.append(job)
                 branch_cache.setValidFor(tpc)
 
         for job in jobs:
+            self.log.debug("ZUUL _cacheTenantYAML 10 job".format(job))
             self.log.debug("Waiting for cat job %s" % (job,))
             job.wait(self.merger.git_timeout)
             if not job.updated:
@@ -1803,13 +1811,22 @@ class TenantParser(object):
                            (job, job.files.keys()))
             loaded = False
             files = sorted(job.files.keys())
+            abide.setProjectBranchRevision(
+                tenant,
+                job.source_context.project.canonical_name,
+                job.source_context.branch,
+                job.revision,
+            )
+            self.log.debug("ZUUL _cacheTenantYAML 10 files:{}".format(files))
             unparsed_config = model.UnparsedConfig()
             tpc = tenant.project_configs[
                 job.source_context.project.canonical_name]
             for conf_root in (
                     ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
                     tpc.extra_config_files + tpc.extra_config_dirs):
+                self.log.debug("ZUUL _cacheTenantYAML 11")
                 for fn in files:
+                    self.log.debug("ZUUL _cacheTenantYAML 12  fn:{}".format(fn))
                     fn_root = fn.split('/')[0]
                     if fn_root != conf_root or not job.files.get(fn):
                         continue
@@ -1836,8 +1853,11 @@ class TenantParser(object):
                         source_context.branch)
                     branch_cache.put(source_context.path, incdata)
                     unparsed_config.extend(incdata)
+                    self.log.debug("ZUUL _cacheTenantYAML 12 end")
+        self.log.debug("ZUUL _cacheTenantYAML EXIT")
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
+        self.log.debug("ZUUL _loadTenantYAML ENTRY")
         config_projects_config = model.UnparsedConfig()
         untrusted_projects_config = model.UnparsedConfig()
 
@@ -1855,9 +1875,12 @@ class TenantParser(object):
 
                 config_projects_config.extend(unparsed_branch_config)
 
+        self.log.debug("ZUUL _loadTenantYAML 1")
         for project in tenant.untrusted_projects:
             branches = tenant.getProjectBranches(project)
+            self.log.debug("ZUUL _loadTenantYAML 2")
             for branch in branches:
+                self.log.debug("ZUUL _loadTenantYAML 3")
                 branch_cache = abide.getUnparsedBranchCache(
                     project.canonical_name, branch)
                 tpc = tenant.project_configs[project.canonical_name]
@@ -2222,6 +2245,8 @@ class ConfigLoader(object):
         new_abide.admin_rules = abide.admin_rules.copy()
         new_abide.unparsed_project_branch_cache = \
             abide.unparsed_project_branch_cache
+        new_abide.tenant_project_branch_cache = \
+            abide.tenant_project_branch_cache
 
         if unparsed_abide:
             # We got a new unparsed abide so re-load the tenant completely.
@@ -2229,6 +2254,8 @@ class ConfigLoader(object):
             # from the abide.
             if tenant.name not in unparsed_abide.known_tenants:
                 del new_abide.tenants[tenant.name]
+                if tenant.name in new_abide.tenant_project_branch_cache:
+                    del new_abide.tenant_project_branch_cache[tenant.name]
                 return new_abide
 
             unparsed_config = next(t for t in unparsed_abide.tenants
