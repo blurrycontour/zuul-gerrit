@@ -114,6 +114,7 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertThat(
             A.notes[1]['body'],
             MatchesRegex(r'.*project-test2.*SUCCESS.*', re.DOTALL))
+        self.assertTrue(A.approved)
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_updated(self):

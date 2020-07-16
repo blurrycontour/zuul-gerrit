@@ -159,6 +159,12 @@ is taken from the pipeline.
       Boolean value that determines if the reporter should add a
       comment to the pipeline status to the GitLab Merge Request.
 
+   .. attr:: approval
+
+      Bolean value that determines whether to report *approve* or *unapprove*
+      into the merge request approval system. To set an approval the Zuul user
+      must be a *Developer* or *Maintainer* project's member. If not set approval
+      won't be reported.
 
 Requirements Configuration
 --------------------------

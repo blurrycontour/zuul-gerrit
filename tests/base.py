@@ -1680,6 +1680,18 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             mr = self._get_mr(match)
             mr.addNote(params['body'])
 
+        match = re.match(
+            r'.+/projects/(.+)/merge_requests/(\d+)/approve$', url)
+        if match:
+            mr = self._get_mr(match)
+            mr.approved = True
+
+        match = re.match(
+            r'.+/projects/(.+)/merge_requests/(\d+)/unapprove$', url)
+        if match:
+            mr = self._get_mr(match)
+            mr.approved = False
+
         return {}, 200, "", "POST"
 
 
@@ -1713,6 +1725,7 @@ class FakeGitlabMergeRequest(object):
         self.url = "https://%s/%s/merge_requests/%s" % (
             self.gitlab.server, self.project, self.number)
         self.is_merged = False
+        self.approved = False
         self.mr_ref = self._createMRRef()
         self._addCommitInMR(files=files)
 
@@ -1787,7 +1800,7 @@ class FakeGitlabMergeRequest(object):
     def _updateTimeStamp(self):
         self.updated_at = datetime.datetime.now()
 
-    def getMergeRequestOpenedEvent(self):
+    def getMergeRequestOpenedEvent(self, action='open'):
         name = 'gl_merge_request'
         data = {
             'object_kind': 'merge_request',
@@ -1802,14 +1815,15 @@ class FakeGitlabMergeRequest(object):
                     '%Y-%m-%d %H:%M:%S UTC'),
                 'iid': self.number,
                 'target_branch': self.branch,
-                'last_commit': {'id': self.sha}
+                'last_commit': {'id': self.sha},
+                'action': action
             },
         }
         return (name, data)
 
     def getMergeRequestUpdatedEvent(self):
         self.addCommit()
-        return self.getMergeRequestOpenedEvent()
+        return self.getMergeRequestOpenedEvent(action='update')
 
     def getMergeRequestCommentedEvent(self, note):
         self.addNote(note)
