@@ -1909,7 +1909,8 @@ class FakeGithubPullRequest(object):
 
     def __init__(self, github, number, project, branch,
                  subject, upstream_root, files=[], number_of_commits=1,
-                 writers=[], body=None, body_text=None, draft=False):
+                 writers=[], body=None, body_text=None, draft=False,
+                 base_sha=None):
         """Creates a new PR with several commits.
         Sends an event about opened PR."""
         self.github = github
@@ -1936,7 +1937,7 @@ class FakeGithubPullRequest(object):
         self.merge_message = None
         self.state = 'open'
         self.url = 'https://%s/%s/pull/%s' % (github.server, project, number)
-        self._createPRRef()
+        self._createPRRef(base_sha=base_sha)
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
@@ -2103,10 +2104,11 @@ class FakeGithubPullRequest(object):
         repo_path = os.path.join(self.upstream_root, self.project)
         return git.Repo(repo_path)
 
-    def _createPRRef(self):
+    def _createPRRef(self, base_sha=None):
+        base_sha = base_sha or 'refs/tags/init'
         repo = self._getRepo()
         GithubChangeReference.create(
-            repo, self.getPRReference(), 'refs/tags/init')
+            repo, self.getPRReference(), base_sha)
 
     def _addCommitToRepo(self, files=[], reset=False):
         repo = self._getRepo()
@@ -2354,11 +2356,13 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.zuul_web_port = port
 
     def openFakePullRequest(self, project, branch, subject, files=[],
-                            body=None, body_text=None, draft=False):
+                            body=None, body_text=None, draft=False,
+                            base_sha=None):
         self.pr_number += 1
         pull_request = FakeGithubPullRequest(
             self, self.pr_number, project, branch, subject, self.upstream_root,
-            files=files, body=body, body_text=body_text, draft=draft)
+            files=files, body=body, body_text=body_text, draft=draft,
+            base_sha=base_sha)
         self.pull_requests[self.pr_number] = pull_request
         return pull_request
 

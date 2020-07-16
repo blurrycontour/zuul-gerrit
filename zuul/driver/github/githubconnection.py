@@ -1660,16 +1660,25 @@ class GithubConnection(BaseConnection):
         issues = list(github.search_issues(sha))
 
         log.debug('Got PR on project %s for sha %s', project_name, sha)
-        if len(issues) > 1:
-            raise Exception('Multiple pulls found with head sha %s' % sha)
-
         if len(issues) == 0:
             return None
 
-        pr_body = self._getChange(
-            project, issues.pop().issue.number, sha, event=event).pr
-        self._sha_pr_cache.update(project_name, pr_body)
-        return pr_body
+        # Github returns all issues that contain the sha, not only the ones
+        # with that sha as head_sha so we need to get and update all those
+        # changes and then filter for the head sha before we can error out
+        # with multiple pulls found.
+        found_pr_body = None
+        for item in issues:
+            pr_body = self._getChange(
+                project, item.issue.number, sha, event=event).pr
+            self._sha_pr_cache.update(project_name, pr_body)
+            if pr_body['head']['sha'] == sha:
+                if found_pr_body:
+                    raise Exception(
+                        'Multiple pulls found with head sha %s' % sha)
+                found_pr_body = pr_body
+
+        return found_pr_body
 
     def getPullReviews(self, pr_obj, project, number, event):
         log = get_annotated_logger(self.log, event)
