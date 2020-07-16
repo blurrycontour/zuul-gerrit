@@ -1,5 +1,5 @@
 - pipeline:
-    name: gitlab-check
+    name: check
     description: |
       Newly uploaded patchsets enter this pipeline to receive an
       initial +/-1 Verified vote.
@@ -50,7 +50,7 @@
     post-review: true
     manager: independent
     trigger:
-      gitlab:
+      gitlab.com:
         - event: gl_push
           ref: ^refs/tags/.*$
     success:
