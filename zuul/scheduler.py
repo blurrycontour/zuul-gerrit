@@ -100,10 +100,13 @@ class TenantReconfigureEvent(ManagementEvent):
     :arg Branch branch: if supplied along with project, only remove the
          configuration of the specific branch from the cache
     """
-    def __init__(self, tenant, project, branch):
+    def __init__(self, tenant, project, branch, newrev):
         super(TenantReconfigureEvent, self).__init__()
         self.tenant_name = tenant.name
         self.project_branches = set([(project, branch)])
+        self.project_branches_revision = {
+            project.canonical_name: {branch: newrev}
+        }
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -119,6 +122,12 @@ class TenantReconfigureEvent(ManagementEvent):
         if self.tenant_name != other.tenant_name:
             raise Exception("Can not merge events from different tenants")
         self.project_branches |= other.project_branches
+        # update revision to the latest event
+        for k, v in other.project_branches_revision.items():
+            if k in self.project_branches_revision:
+                self.project_branches_revision[k].update(v)
+            else:
+                self.project_branches_revision[k] = v
 
 
 class PromoteEvent(ManagementEvent):
@@ -543,7 +552,8 @@ class Scheduler(threading.Thread):
                        "%s due to event %s in project %s",
                        tenant.name, event, project)
         branch = event.branch if event is not None else None
-        event = TenantReconfigureEvent(tenant, project, branch)
+        newrev = event.newrev if event is not None else None
+        event = TenantReconfigureEvent(tenant, project, branch, newrev)
         self.management_event_queue.put(event)
         self.wake_event.set()
 
@@ -920,6 +930,14 @@ class Scheduler(threading.Thread):
             tenant = abide.tenants[event.tenant_name]
             self._reconfigureTenant(tenant)
             self.abide = abide
+            self.abide.setProjectBranchRevision(
+                tenant,
+                project.canonical_name,
+                branch,
+                event.project_branches_revision[project.canonical_name][
+                    branch
+                ],
+            )
         finally:
             self.layout_lock.release()
         duration = round(time.monotonic() - start, 3)
@@ -1271,7 +1289,6 @@ class Scheduler(threading.Thread):
         self.log.debug("Fetching trigger event")
         event = self.trigger_event_queue.get()
         log = get_annotated_logger(self.log, event.zuul_event_id)
-        log.debug("Processing trigger event %s" % event)
         try:
             full_project_name = ('/'.join([event.project_hostname,
                                            event.project_name]))
@@ -1285,68 +1302,81 @@ class Scheduler(threading.Thread):
                     log.debug("Unable to get change %s from source %s",
                               e.change, project.source)
                     continue
-                reconfigure_tenant = False
 
-                if (event.branch_updated and hasattr(change, 'files') and
-                        change.updatesConfig(tenant)):
-                    reconfigure_tenant = True
-
-                if (event.branch_deleted and
-                        self.abide.hasUsefulBranchCache(
-                            project.canonical_name,
-                            event.branch,
-                            tenant)):
-                    reconfigure_tenant = True
-
-                # The branch_created attribute is also true when a tag is
-                # created. Since we load config only from branches only trigger
-                # a tenant reconfiguration if the branch is set as well.
-                if event.branch_created and event.branch:
-                    if hasattr(change, 'files'):
-                        if change.updatesConfig(tenant):
-                            reconfigure_tenant = True
-                        else:
-                            # create cache to avoid triggering a reconfigure in
-                            # the block bellow
-                            self.abide.getUnparsedBranchCache(
-                                project.canonical_name,
-                                event.branch)
-                    elif not hasattr(change, 'files'):
-                        reconfigure_tenant = True
-
-                # If the driver knows the branch but we don't have a config, we
-                # also need to reconfigure. This happens if a GitHub branch
-                # was just configured as protected without a push in between.
-                if (event.branch in project.source.getProjectBranches(
-                        project, tenant)
-                    and not self.abide.hasUnparsedBranchCache(
-                        project.canonical_name, event.branch)):
-                    reconfigure_tenant = True
-
-                # If the branch is unprotected and unprotected branches
-                # are excluded from the tenant for that project skip reconfig.
-                if (reconfigure_tenant and not
-                    event.branch_protected and
-                    tenant.getExcludeUnprotectedBranches(project)):
-
-                    reconfigure_tenant = False
-
-                if reconfigure_tenant:
+                if self._testReconfigure(tenant, event, change, project):
                     # The change that just landed updates the config
                     # or a branch was just created or deleted.  Clear
                     # out cached data for this project and perform a
                     # reconfiguration.
                     self.reconfigureTenant(tenant, change.project, event)
+                else:
+                    if event.need_files_update:
+                        self.merger.getFilesChangesRevision(
+                            project.source.connection.connection_name,
+                            project.name,
+                            event.branch,
+                            build_set=event,
+                            event=event,
+                        )
                 for pipeline in tenant.layout.pipelines.values():
                     if event.isPatchsetCreated():
                         pipeline.manager.removeOldVersionsOfChange(
                             change, event)
                     elif event.isChangeAbandoned():
                         pipeline.manager.removeAbandonedChange(change, event)
-                    if pipeline.manager.eventMatches(event, change):
+                    if (pipeline.manager.eventMatches(event, change) and
+                        not event.need_files_update):
                         pipeline.manager.addChange(change, event)
         finally:
             self.trigger_event_queue.task_done()
+
+    def _testReconfigure(self, tenant, event, change, project):
+        reconfigure_tenant = False
+
+        if event.branch_created or event.branch_updated:
+            reconfigure_tenant = self._testReconfigureFiles(
+                change, tenant, project, event
+            )
+        elif event.branch_deleted:
+            reconfigure_tenant = self._testReconfigureRemove(
+                change, tenant, project, event
+            )
+
+        reconfigure_tenant = project.source.testReconfigureTenant(
+            event, project, tenant, self.abide, reconfigure_tenant
+        )
+        if reconfigure_tenant:
+            event.need_files_update = False
+        return reconfigure_tenant
+
+    def _testReconfigureFiles(self, change, tenant, project, event):
+        reconfigure_tenant = False
+        if event.branch:
+            if hasattr(change, 'files') and change.files is not None:
+                if event.newrev != self.abide.getProjectBranchRevision(
+                        tenant, project, event.branch):
+                    if change.updatesConfig(tenant):
+                        reconfigure_tenant = True
+                    else:
+                        # only save newrev if we don't reconfigure
+                        # all tenant/project/branch are cached during
+                        # reconfiguration
+                        self.abide.setProjectBranchRevision(
+                            tenant, project, event.branch, event.newrev)
+            else:
+                if event.newrev != self.abide.getProjectBranchRevision(
+                        tenant, project, event.branch):
+                    # not able to get files, trigger fileschange
+                    event.need_files_update = True
+                else:
+                    change.files = []
+        return reconfigure_tenant
+
+    def _testReconfigureRemove(self, change, tenant, project, event):
+        # check what is removed
+        return self.abide.hasUsefulBranchCache(
+            project.canonical_name, event.branch, tenant
+        )
 
     def process_management_queue(self):
         self.log.debug("Fetching management event")
@@ -1605,15 +1635,22 @@ class Scheduler(threading.Thread):
 
     def _doFilesChangesCompletedEvent(self, event):
         build_set = event.build_set
-        if build_set is not build_set.item.current_build_set:
-            self.log.warning("Build set %s is not current", build_set)
-            return
-        pipeline = build_set.item.pipeline
-        if not pipeline:
-            self.log.warning("Build set %s is not associated with a pipeline",
-                             build_set)
-            return
-        pipeline.manager.onFilesChangesCompleted(event)
+        if isinstance(build_set, model.TriggerEvent):
+            zevent = build_set
+            zevent.files = event.files
+            zevent.need_files_update = False
+            self.addEvent(zevent)
+        else:
+            if build_set is not build_set.item.current_build_set:
+                self.log.warning("Build set %s is not current", build_set)
+                return
+            pipeline = build_set.item.pipeline
+            if not pipeline:
+                self.log.warning(
+                    "Build set %s is not associated with a pipeline", build_set
+                )
+                return
+            pipeline.manager.onFilesChangesCompleted(event)
 
     def _doNodesProvisionedEvent(self, event):
         request = event.request
