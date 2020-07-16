@@ -179,6 +179,19 @@
         - job-dependencies.yaml
       zuul_tutorial_confignum: 1
 
+- job:
+    name: zuul-tutorial-blob
+    parent: zuul-tutorial-quick-start
+    description: One tutorial to bring them all and in tests bind them
+    vars:
+      run_playbooks:
+        - gate-first-patch.yaml
+        - job-dependencies.yaml
+        - use-zuul-jobs.yaml
+        - use-zuul-jobs.yaml
+        - job-dependencies.yaml
+      zuul_tutorial_confignum: 1
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -346,6 +359,10 @@
             requires: nodepool-container-image
             dependencies: zuul-build-image
             timeout: 3600  # 60 minutes
+        - zuul-tutorial-blob:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 7200  # 120 minutes
         - nodepool-zuul-functional:
             voting: false
         - zuul-build-python-release
