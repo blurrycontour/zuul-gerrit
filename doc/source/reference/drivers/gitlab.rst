@@ -124,6 +124,14 @@ the following options.
 
          Comment added to merge request.
 
+      .. value:: approved
+
+         Merge request approved.
+
+      .. value:: unapproved
+
+         Merge request unapproved.
+
    .. attr:: comment
 
       This is only used for ``gl_merge_request`` and ``comment`` actions.  It
