@@ -132,6 +132,10 @@ the following options.
 
          Merge request unapproved.
 
+      .. value:: labeled
+
+         Merge request labeled.
+
    .. attr:: comment
 
       This is only used for ``gl_merge_request`` and ``comment`` actions.  It
@@ -140,6 +144,12 @@ the following options.
       string the trigger is matched.  ``comment: retrigger`` will
       match when comments containing 'retrigger' somewhere in the
       comment text are added to a merge request.
+
+   .. attr:: labels
+
+      This is only used for ``gl_merge_request`` and ``labeled`` actions.  It
+      accepts a string or a list of strings that are searched into the list
+      of labels set to the merge request.
 
    .. attr:: ref
 
