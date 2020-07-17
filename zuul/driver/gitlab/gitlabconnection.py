@@ -130,8 +130,18 @@ class GitlabEventConnector(threading.Thread):
                                                     event.change_number)
         if attrs['action'] == 'open':
             event.action = 'opened'
-        elif attrs['action'] == 'update':
+        elif attrs['action'] == 'update' and "labels" not in body:
             event.action = 'changed'
+        elif attrs['action'] == 'update' and "labels" in body:
+            event.action = 'labeled'
+            previous_labels = [
+                label["title"] for
+                label in body["changes"]["labels"]["previous"]]
+            current_labels = [
+                label["title"] for
+                label in body["changes"]["labels"]["current"]]
+            new_labels = set(current_labels) - set(previous_labels)
+            event.labels = new_labels
         elif attrs['action'] in ('approved', 'unapproved'):
             event.action = attrs['action']
         else:
