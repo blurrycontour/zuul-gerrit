@@ -1670,6 +1670,14 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
         if match:
             return [{'name': 'master'}], 200, "", "GET"
 
+        match = re.match(
+            r'.+/projects/(.+)/merge_requests/(\d+)/approvals$', url)
+        if match:
+            mr = self._get_mr(match)
+            return {
+                'approvals_left': 0 if mr.approved else 1,
+            }, 200, "", "GET"
+
     def post(self, url, params=None, zuul_event_id=None):
 
         self.log.info(
@@ -1829,9 +1837,11 @@ class FakeGitlabMergeRequest(object):
         return self.getMergeRequestEvent(action='update')
 
     def getMergeRequestApprovedEvent(self):
+        self.approved = True
         return self.getMergeRequestEvent(action='approved')
 
     def getMergeRequestUnapprovedEvent(self):
+        self.approved = False
         return self.getMergeRequestEvent(action='unapproved')
 
     def getMergeRequestCommentedEvent(self, note):
