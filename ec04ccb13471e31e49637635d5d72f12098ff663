@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_a925025f",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-17T16:14:29Z",
+      "side": 1,
+      "message": "I think for the use case of \"recreate a build that failed in the gate\" it\u0027s important to have the exact merge state of the projects.  Zuul has that from the mergers (the mergers tell the executors exactly what to do), so we can expose that.",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_28da7ee8",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 6
@@ -301,6 +318,23 @@
       "side": 1,
       "message": "I think just --post won\u0027t work in our environment because we have a stack of base jobs using post playbooks. I like the idea about the \u0027--post \u003cmatcher\u003e\u0027. In think this should be an option that can be repeated to make it possible to select the post playbooks that are interesting to the user (same with --pre \u003cmatcher\u003e\u0027.",
       "parentUuid": "ff570b3c_5eda0c17",
+      "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_892abe29",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-17T16:14:29Z",
+      "side": 1,
+      "message": "I think the matcher idea could work, but uniquely identifying a post playbook may be tricky.  Most of ours are named \"post.yaml\".  They would probably need to be fully qualified with the name of the repo and the path.\n\nStill, I think specifying that you want to run everything except the log collection is a common enough use case that it should be easy, and adding \"--post\" 9 times for the 9 playbooks that you do want to run just to avoid running the 10th doesn\u0027t sound easy.  So if we do that, we may want to also have an inverse option, so a user could just say \"--no-post opendev.org/base-jobs/playbooks/base/logs.yaml\".\n\nFurther, it seems that if we\u0027re specifying the full path, we probably don\u0027t need to distinguish between pre and post?  Maybe we can just say \"--no-playbook\"?  It\u0027s unlikely that the same playbook would be used in both pre and post.  At least, no more likely than the same playbook showing up twice in pre or post.\n\nFinally, maybe we could have an option to list the playbooks with numeric indexes.  So you could say \"zuul-runner --list-playbooks\" and it would print out:\n\n0: opendev.org/base-jobs/playbooks/pre.yaml\n...\n10: opendev.org/base-jobs/playbooks/post.yaml\n\nWe could then say \"--no-playbook 10\" or \"--no-playbook -1\", or \"--playbook 1..9\".",
       "revId": "ec04ccb13471e31e49637635d5d72f12098ff663",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
