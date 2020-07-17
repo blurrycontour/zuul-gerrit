@@ -162,6 +162,21 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual('check-approval', zuulvars['pipeline'])
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_labeled(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestLabeledEvent(
+            labels=('label1', 'label2')))
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestLabeledEvent(
+            labels=('gateit', )))
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_updated_builds_aborted(self):
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
