@@ -511,3 +511,25 @@ class TestGitlabDriver(ZuulTestCase):
             A.getMergeRequestCommentedEvent('recheck'))
         self.waitUntilSettled()
         self.assertEqual(2, len(self.history))
+
+    @simple_layout('layouts/requirements-gitlab.yaml', driver='gitlab')
+    def test_approval_require(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project2', 'master', 'A')
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        A.approved = True
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        A.approved = False
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
