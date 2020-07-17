@@ -1808,7 +1808,7 @@ class FakeGitlabMergeRequest(object):
     def _updateTimeStamp(self):
         self.updated_at = datetime.datetime.now()
 
-    def getMergeRequestEvent(self, action):
+    def getMergeRequestEvent(self, action, include_labels=False):
         name = 'gl_merge_request'
         data = {
             'object_kind': 'merge_request',
@@ -1827,6 +1827,14 @@ class FakeGitlabMergeRequest(object):
                 'action': action
             },
         }
+        if include_labels:
+            data['labels'] = [{'title': label} for label in self.labels]
+            data['changes'] = {
+                'labels': {
+                    'previous': [],
+                    'current': data['labels']
+                }
+            }
         return (name, data)
 
     def getMergeRequestOpenedEvent(self):
@@ -1843,6 +1851,10 @@ class FakeGitlabMergeRequest(object):
     def getMergeRequestUnapprovedEvent(self):
         self.approved = False
         return self.getMergeRequestEvent(action='unapproved')
+
+    def getMergeRequestLabeledEvent(self, labels):
+        self.labels = labels
+        return self.getMergeRequestEvent(action='update', include_labels=True)
 
     def getMergeRequestCommentedEvent(self, note):
         self.addNote(note)
