@@ -126,8 +126,8 @@ class GitlabEventConnector(threading.Thread):
         event.ref = "refs/merge-requests/%s/head" % event.change_number
         event.branch = attrs['target_branch']
         event.patch_number = attrs['last_commit']['id']
-        event.change_url = self.connection.getPullUrl(event.project_name,
-                                                      event.change_number)
+        event.change_url = self.connection.getMRUrl(event.project_name,
+                                                    event.change_number)
         if attrs['action'] == 'open':
             event.action = 'opened'
         elif attrs['action'] == 'update':
@@ -151,8 +151,8 @@ class GitlabEventConnector(threading.Thread):
         event.patch_number = mr['last_commit']['id']
         event.ref = "refs/merge-requests/%s/head" % event.change_number
         event.branch = mr['target_branch']
-        event.change_url = self.connection.getPullUrl(event.project_name,
-                                                      event.change_number)
+        event.change_url = self.connection.getMRUrl(event.project_name,
+                                                    event.change_number)
         event.action = 'comment'
         event.type = 'gl_merge_request'
         return event
@@ -319,6 +319,15 @@ class GitlabAPIClient():
                 raise
         return resp[0]
 
+    # https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
+    def get_mr_approvals_status(self, project_name, number,
+                                zuul_event_id=None):
+        path = "/projects/%s/merge_requests/%s/approvals" % (
+            quote_plus(project_name), number)
+        resp = self.get(self.baseurl + path, zuul_event_id=zuul_event_id)
+        self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        return resp[0]
+
 
 class GitlabConnection(BaseConnection):
     driver_name = 'gitlab'
@@ -408,7 +417,7 @@ class GitlabConnection(BaseConnection):
             url += '/tree/%s' % sha
         return url
 
-    def getPullUrl(self, project, number):
+    def getMRUrl(self, project, number):
         return '%s/%s/merge_requests/%s' % (self.baseurl, project, number)
 
     def getGitUrl(self, project):
@@ -462,7 +471,7 @@ class GitlabConnection(BaseConnection):
             change.number = number
             # patch_number is the tips commit SHA of the MR
             change.patchset = patch_number
-            change.url = url or self.getPullUrl(project.name, number)
+            change.url = url or self.getMRUrl(project.name, number)
             change.uris = [change.url.split('://', 1)[-1]]  # remove scheme
         self._change_cache[key] = change
         try:
@@ -478,7 +487,7 @@ class GitlabConnection(BaseConnection):
     def _updateChange(self, change, event):
         log = get_annotated_logger(self.log, event)
         log.info("Updating change from Gitlab %s" % change)
-        change.mr = self.getPull(
+        change.mr = self.getMR(
             change.project.name, change.number, event=event)
         change.ref = "refs/merge-requests/%s/head" % change.number
         change.branch = change.mr['target_branch']
@@ -492,6 +501,7 @@ class GitlabConnection(BaseConnection):
         change.is_merged = change.mr['merged_at'] is not None
         # Can be "can_be_merged"
         change.merge_status = change.mr['merge_status']
+        change.approved = change.mr['approved']
         change.message = change.mr['description']
         change.labels = change.mr['labels']
         change.updated_at = int(datetime.strptime(
@@ -503,10 +513,14 @@ class GitlabConnection(BaseConnection):
 
         return change
 
-    def getPull(self, project_name, number, event=None):
+    def getMR(self, project_name, number, event=None):
         log = get_annotated_logger(self.log, event)
         mr = self.gl_client.get_mr(project_name, number, zuul_event_id=event)
         log.info('Got MR %s#%s', project_name, number)
+        mr_approval_status = self.gl_client.get_mr_approvals_status(
+            project_name, number, zuul_event_id=event)
+        log.info('Got MR approval status %s#%s', project_name, number)
+        mr['approved'] = mr_approval_status['approvals_left'] == 0
         return mr
 
     def commentMR(self, project_name, number, message, event=None):
