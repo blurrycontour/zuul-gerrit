@@ -117,3 +117,9 @@ class BaseSource(object, metaclass=abc.ABCMeta):
     def getRejectFilters(self, config):
         """Return a list of ChangeFilters for the scheduler to match against.
         """
+
+    def testReconfigureTenant(self, event, project, tenant,
+                              abide, reconfigure_tenant):
+        """ Call driver specific method to check if a reconfigure is needed
+        """
+        return reconfigure_tenant

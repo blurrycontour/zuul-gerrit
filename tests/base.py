@@ -199,6 +199,7 @@ class FakeGerritChange(object):
         self.depends_on_patchset = None
         self.needed_by_changes = []
         self.fail_merge = False
+        self.merged_hexsha = None
         self.messages = []
         self.comments = []
         self.checks = {}
@@ -291,6 +292,7 @@ class FakeGerritChange(object):
              'ref': 'refs/changes/1/%s/%s' % (self.number,
                                               self.latest_patchset),
              'revision': c.hexsha,
+             'parents': [parent.hexsha for parent in c.parents],
              'uploader': {'email': 'user@example.com',
                           'name': 'User name',
                           'username': 'user'}}
@@ -397,9 +399,14 @@ class FakeGerritChange(object):
         return event
 
     def getChangeMergedEvent(self):
+        if self.merged_hexsha is not None:
+            newrev = self.merged_hexsha
+        else:
+            newrev = self.patchsets[-1]['revision']
+
         event = {"submitter": {"name": "Jenkins",
                                "username": "jenkins"},
-                 "newRev": "29ed3b5f8f750a225c5be70235230e3a6ccb04d9",
+                 "newRev": newrev,
                  "patchSet": self.patchsets[-1],
                  "change": self.data,
                  "type": "change-merged",
@@ -407,18 +414,18 @@ class FakeGerritChange(object):
         return event
 
     def getRefUpdatedEvent(self):
-        path = os.path.join(self.upstream_root, self.project)
-        repo = git.Repo(path)
-        oldrev = repo.heads[self.branch].commit.hexsha
-
+        if self.merged_hexsha is not None:
+            newrev = self.merged_hexsha
+        else:
+            newrev = self.patchsets[-1]['revision']
         event = {
             "type": "ref-updated",
             "submitter": {
                 "name": "User Name",
             },
             "refUpdate": {
-                "oldRev": oldrev,
-                "newRev": self.patchsets[-1]['revision'],
+                "oldRev": self.patchsets[-1]['parents'][0],
+                "newRev": newrev,
                 "refName": self.branch,
                 "project": self.project,
             }
@@ -562,10 +569,14 @@ class FakeGerritChange(object):
             if f['file'] == '/COMMIT_MSG':
                 continue
             files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
-        parent = '0000000000000000000000000000000000000000'
+        parents = self.patchsets[-1]['parents']
         if self.depends_on_change:
-            parent = self.depends_on_change.patchsets[
-                self.depends_on_patchset - 1]['revision']
+            parents.append(self.depends_on_change.patchsets[
+                self.depends_on_patchset - 1]['revision'])
+        commit_parents = []
+        for parent in parents:
+            commit_parents.append({"commit": parent})
+
         revisions[rev['revision']] = {
             "kind": "REWORK",
             "_number": num,
@@ -575,9 +586,7 @@ class FakeGerritChange(object):
             "commit": {
                 "subject": self.subject,
                 "message": self.data['commitMessage'],
-                "parents": [{
-                    "commit": parent,
-                }]
+                "parents": commit_parents
             },
             "files": files
         }
@@ -631,7 +640,7 @@ class FakeGerritChange(object):
         if (self.depends_on_change and
                 self.depends_on_change.data['status'] != 'MERGED'):
             return
-        if self.fail_merge:
+        if self.fail_merge or self.data['status'] == 'MERGED':
             return
         self.data['status'] = 'MERGED'
         self.open = False
@@ -643,6 +652,8 @@ class FakeGerritChange(object):
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.merge('-s', 'resolve', self.patchsets[-1]['ref'])
         repo.heads[self.branch].commit = repo.head.commit
+
+        self.merged_hexsha = repo.head.commit.hexsha
 
     def setReported(self):
         self.reported += 1
@@ -980,6 +991,27 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
+    def getFakeRefUpdatedEvent(self, project, branch, oldrev, newrev=None):
+        if newrev is None:
+            path = os.path.join(self.upstream_root, project)
+            repo = git.Repo(path)
+            newrev = repo.heads[branch].commit.hexsha
+
+        event = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+                "username": "user",
+            },
+            "refUpdate": {
+                "oldRev": oldrev,
+                "newRev": newrev,
+                "refName": branch,
+                "project": project,
+            }
+        }
+        return event
+
     def getFakeBranchCreatedEvent(self, project, branch):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
@@ -1090,6 +1122,20 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 msg = msg[1:-1]
             l = [queryMethod(change) for change in self.changes.values()
                  if msg in change.data['commitMessage']]
+        elif query.startswith('status:merged'):
+            l = []
+            for change in self.changes.values():
+                if change.data['status'] == 'MERGED':
+                    age_re = re.compile('-age:([0-9]+)s')
+                    age = age_re.search(query)
+                    if age:
+                        changeHttp = queryMethod(change)
+                        now = time.time()
+                        if (int(now - changeHttp["updated"])
+                                <= int(age.group(1))):
+                            l.append(queryMethod(change))
+                    else:
+                        l.append(queryMethod(change))
         else:
             # Query all open changes
             l = [queryMethod(change) for change in self.changes.values()]
@@ -1528,12 +1574,13 @@ class FakePagureConnection(pagureconnection.PagureConnection):
         repo_path = os.path.join(self.upstream_root, project)
         repo = git.Repo(repo_path)
         headsha = repo.head.commit.hexsha
+        parentsha = repo.head.commit.parents[0].hexsha
         data = {
             'msg': {
                 'project_fullname': project,
                 'branch': 'master',
                 'end_commit': headsha,
-                'old_commit': '1' * 40,
+                'old_commit': parentsha,
             },
             'msg_id': str(uuid.uuid4()),
             'timestamp': 1427459070,

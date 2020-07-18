@@ -171,7 +171,12 @@ class GerritEventConnector(threading.Thread):
         # But we do not yet get files changed data for pure refupdate events.
         # TODO(jlk): handle refupdated events instead of just changes
         if event.type == 'change-merged':
-            event.branch_updated = True
+            # when http only, querying a merged change doesn't give the sha of
+            # branch, so do not set branch_updated, only rely on ref-updated.
+            # could be "solved" by using gerrit events-log plugin
+            if self.connection.enable_stream_events:
+                event.branch_updated = True
+            event.newrev = data.get('newRev')
         event.trigger_name = 'gerrit'
         change = data.get('change')
         event.project_hostname = self.connection.canonical_hostname
@@ -227,6 +232,10 @@ class GerritEventConnector(threading.Thread):
                         "from Gerrit. Can not get account information." %
                         (event.type,))
 
+        event.updated = data.get('lastUpdated')
+        if event.updated is None:
+            event.updated = data.get('updated')
+
         # This checks whether the event created or deleted a branch so
         # that Zuul may know to perform a reconfiguration on the
         # project.
@@ -244,14 +253,30 @@ class GerritEventConnector(threading.Thread):
                 event.branch_created = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
-            if event.newrev == '0' * 40:
+            elif event.newrev == '0' * 40:
                 event.branch_deleted = True
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._clearBranchCache(project)
+            else:
+                # LOOK FOR CHANGE-MERGED
+                if not self._lookForChangeMerged(event):
+                    event.branch_updated = True
+                event.files = None
 
         self._getChange(event)
         self.connection.logEvent(event)
         self.connection.sched.addEvent(event)
+
+    def _lookForChangeMerged(self, ref_updated_event):
+        found = False
+        with self.connection.event_queue.mutex:
+            for item in self.connection.event_queue.queue:
+                (ts, data) = item
+                if (data.get('type') == "change-merged" and
+                        data.get('newRev') == ref_updated_event.newrev):
+                    found = True
+                    break
+        return found
 
     def _getChange(self, event):
         # Grab the change if we are managing the project or if it exists in the
@@ -417,7 +442,9 @@ class GerritPoller(threading.Thread):
                 'change': {
                     'project': change['project'],
                     'number': change['_number'],
+                    'branch': change['branch'],
                 },
+                'newRev': change['current_revision'],
                 'patchSet': {
                     'number': rev['_number'],
                 }}
@@ -439,17 +466,17 @@ class GerritPoller(threading.Thread):
 
     def _poll_merged_changes(self):
         try:
-            now = datetime.datetime.utcnow()
+            now = time.time()
             age = self.last_merged_poll
             if age:
                 # Allow an extra 4 seconds for request time
-                age = int(math.ceil((now - age).total_seconds())) + 4
+                age = int(math.ceil((now - age)))
             changes = self.connection.simpleQueryHTTP(
                 "status:merged -age:%ss" % (age,))
-            self.last_merged_poll = now
             for change in changes:
                 event = self._makeChangeMergedEvent(change)
                 self.connection.addEvent(event)
+            self.last_merged_poll = now
         except Exception:
             self.log.exception("Exception on Gerrit poll with %s:",
                                self.connection.connection_name)
@@ -712,9 +739,10 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.branch = event.ref
             change.ref = 'refs/heads/' + event.ref
-            if hasattr(event, 'branch_created') and event.branch_created:
-                change.files = self.queryCommitFiles(event.project_name,
-                                                     event.newrev)
+            if hasattr(event, 'files') and event.files is not None:
+                change.files = event.files
+            elif hasattr(event, 'branch_created') and event.branch_created:
+                change.files = self.queryCommitFiles(event)
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -724,9 +752,10 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.ref = event.ref
             change.branch = event.ref[len('refs/heads/'):]
-            if hasattr(event, 'branch_created') and event.branch_created:
-                change.files = self.queryCommitFiles(event.project_name,
-                                                     event.newrev)
+            if hasattr(event, 'files') and event.files is not None:
+                change.files = event.files
+            elif hasattr(event, 'branch_created') and event.branch_created:
+                change.files = self.queryCommitFiles(event)
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -909,7 +938,7 @@ class GerritConnection(BaseConnection):
 
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)
-        if not change.number:
+        if not hasattr(change, 'number') or not change.number:
             self.log.debug("Change has no number; considering it merged")
             # Good question.  It's probably ref-updated, which, ah,
             # means it's merged.
@@ -967,7 +996,7 @@ class GerritConnection(BaseConnection):
 
     def canMerge(self, change, allow_needs, event=None):
         log = get_annotated_logger(self.log, event)
-        if not change.number:
+        if not hasattr(change, 'number') or not change.number:
             log.debug("Change has no number; considering it merged")
             # Good question.  It's probably ref-updated, which, ah,
             # means it's merged.
@@ -1194,16 +1223,17 @@ class GerritConnection(BaseConnection):
             return GerritChangeData(GerritChangeData.SSH, data)
 
     def queryCommitFilesHTTP(self, project, commit):
-        data = self.get('projects/%s/commits/%s/files/' %
-                        (project, commit))
+        data = None
+        if commit is not None and commit != (40 * '0'):
+            data = self.get('projects/%s/commits/%s/files/' %
+                            (project, commit))
         return data
 
-    def queryCommitFiles(self, project, rev):
+    def queryCommitFiles(self, event):
+        files = None
         if self.session:
-            data = self.queryCommitFilesHTTP(project, rev)
-            return data
-        else:
-            return None
+            files = self.queryCommitFilesHTTP(event.project_name, event.newrev)
+        return files
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):

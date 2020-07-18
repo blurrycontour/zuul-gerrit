@@ -14,6 +14,7 @@
 
 import os
 import textwrap
+import time
 from unittest import mock
 
 import tests.base
@@ -491,7 +492,9 @@ class TestPolling(ZuulTestCase):
                   jobs:
                     - test-job2
             """)
-
+        while 'org/project' not in self.connections.connections[
+                'gerrit'].ref_watcher_thread.projects_refs:
+            time.sleep(0.1)
         file_dict = {'.zuul.yaml': in_repo_conf}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)
