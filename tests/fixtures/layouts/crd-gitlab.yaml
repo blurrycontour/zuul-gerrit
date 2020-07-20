@@ -6,6 +6,20 @@
         - event: gl_merge_request
           action: opened
 
+- pipeline:
+    name: gate
+    manager: dependent
+    require:
+      gitlab:
+        approved: true
+    trigger:
+      gitlab:
+        - event: gl_merge_request
+          action: opened
+    success:
+      gitlab:
+        merge: true
+
 - job:
     name: base
     parent: null
@@ -19,6 +33,14 @@
     name: project2-test
     run: playbooks/project2-test.yaml
 
+- job:
+    name: project3-test
+    run: playbooks/project3-test.yaml
+
+- job:
+    name: project4-test
+    run: playbooks/project4-test.yaml
+
 - project:
     name: org/project1
     check:
@@ -30,3 +52,17 @@
     check:
       jobs:
         - project2-test
+
+- project:
+    name: org/project3
+    gate:
+      queue: cogated
+      jobs:
+        - project3-test
+
+- project:
+    name: org/project4
+    gate:
+      queue: cogated
+      jobs:
+        - project4-test
