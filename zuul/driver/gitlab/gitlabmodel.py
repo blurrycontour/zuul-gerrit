@@ -25,6 +25,7 @@ class MergeRequest(Change):
         super(MergeRequest, self).__init__(project)
         self.updated_at = None
         self.approved = None
+        self.labels = None
 
     def __repr__(self):
         r = ['<Change 0x%x' % id(self)]
@@ -42,6 +43,8 @@ class MergeRequest(Change):
             r.append('state: open')
         if self.approved:
             r.append('approval: approved')
+        if self.labels:
+            r.append('labels: %s' % ', '.join(self.labels))
         return ' '.join(r) + '>'
 
     def isUpdateOf(self, other):
@@ -158,11 +161,13 @@ class GitlabEventFilter(EventFilter):
 # The RefFilter should be understood as RequireFilter (it maps to
 # pipeline requires definition)
 class GitlabRefFilter(RefFilter):
-    def __init__(self, connection_name, open=None, merged=None, approved=None):
+    def __init__(self, connection_name, open=None, merged=None, approved=None,
+                 labels=[]):
         RefFilter.__init__(self, connection_name)
         self.open = open
         self.merged = merged
         self.approved = approved
+        self.labels = labels
 
     def __repr__(self):
         ret = '<GitlabRefFilter connection_name: %s ' % self.connection_name
@@ -172,6 +177,8 @@ class GitlabRefFilter(RefFilter):
             ret += ' merged: %s' % self.merged
         if self.approved is not None:
             ret += ' approved: %s' % self.approved
+        if self.labels:
+            ret += ' labels: %s' % ', '.join(self.labels)
         ret += '>'
         return ret
 
@@ -186,6 +193,10 @@ class GitlabRefFilter(RefFilter):
 
         if self.approved is not None:
             if change.approved != self.approved:
+                return False
+
+        if self.labels:
+            if not set(change.labels).intersection(set(self.labels)):
                 return False
 
         return True
