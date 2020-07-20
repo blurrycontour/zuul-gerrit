@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_36ee5bb4",
+        "filename": "zuul/driver/gitlab/gitlabmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-07-20T09:41:28Z",
+      "side": 1,
+      "message": "I guess both are bools and mutually exclusive, would it be an option to merge those parameters to one enum/string?",
+      "range": {
+        "startLine": 158,
+        "startChar": 39,
+        "endLine": 158,
+        "endChar": 62
+      },
+      "revId": "7f931a85a0a717842177034066f0aaa50069bfee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_d6e71fac",
+        "filename": "zuul/driver/gitlab/gitlabsource.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-07-20T09:41:28Z",
+      "side": 1,
+      "message": "Same as before, possible combinations:\n- not open and not merged: CLOSED?\n- not open and merged: OPEN\n- open and not merged: MERGED\n\nOr am I wrong here?",
+      "range": {
+        "startLine": 129,
+        "startChar": 8,
+        "endLine": 130,
+        "endChar": 23
+      },
+      "revId": "7f931a85a0a717842177034066f0aaa50069bfee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
