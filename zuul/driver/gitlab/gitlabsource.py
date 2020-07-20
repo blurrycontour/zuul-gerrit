@@ -20,6 +20,7 @@ from zuul.model import Project
 from zuul.source import BaseSource
 
 from zuul.driver.gitlab.gitlabmodel import GitlabRefFilter
+from zuul.driver.util import scalar_or_list, to_list
 
 
 class GitlabSource(BaseSource):
@@ -114,6 +115,7 @@ class GitlabSource(BaseSource):
             open=config.get('open'),
             merged=config.get('merged'),
             approved=config.get('approved'),
+            labels=to_list(config.get('labels')),
         )
         return [f]
 
@@ -130,6 +132,7 @@ def getRequireSchema():
         'open': bool,
         'merged': bool,
         'approved': bool,
+        'labels': scalar_or_list(str)
     }
     return require
 

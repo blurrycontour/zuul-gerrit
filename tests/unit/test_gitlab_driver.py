@@ -548,3 +548,19 @@ class TestGitlabDriver(ZuulTestCase):
         self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
+
+    @simple_layout('layouts/requirements-gitlab.yaml', driver='gitlab')
+    def test_label_require(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project3', 'master', 'A')
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        A.labels = ['gateit', 'prio:low']
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
