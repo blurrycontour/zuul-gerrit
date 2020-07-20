@@ -42,12 +42,16 @@ class GitlabSource(BaseSource):
         raise NotImplementedError()
 
     def isMerged(self, change, head=None):
-        """Determine if change is merged."""
-        raise NotImplementedError()
+        """Determine if change is merge."""
+        if not change.number:
+            return True
+        return change.is_merged
 
     def canMerge(self, change, allow_needs, event=None):
         """Determine if change can merge."""
-        raise NotImplementedError()
+        if not change.number:
+            return True
+        return self.connection.canMerge(change, allow_needs, event=event)
 
     def postConfig(self):
         """Called after configuration has been processed."""
@@ -78,7 +82,8 @@ class GitlabSource(BaseSource):
         return change
 
     def getChangesDependingOn(self, change, projects, tenant):
-        raise NotImplementedError()
+        return self.connection.getChangesDependingOn(
+            change, projects, tenant)
 
     def getCachedChanges(self):
         return list(self.connection._change_cache.values())

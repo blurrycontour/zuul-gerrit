@@ -564,3 +564,80 @@ class TestGitlabDriver(ZuulTestCase):
         self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
+
+    @simple_layout('layouts/merging-gitlab.yaml', driver='gitlab')
+    def test_merge_action_in_independent(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project1', 'master', 'A')
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual(1, len(self.history))
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test').result)
+        self.assertEqual('merged', A.state)
+
+    @simple_layout('layouts/merging-gitlab.yaml', driver='gitlab')
+    def test_merge_action_in_dependent(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project2', 'master', 'A')
+        A.merge_status = 'cannot_be_merged'
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        # canMerge is not validated
+        self.assertEqual(0, len(self.history))
+
+        # Set Merge request can be merged
+        A.merge_status = 'can_be_merged'
+        self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+        # canMerge is validated
+        self.assertEqual(1, len(self.history))
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test').result)
+        self.assertEqual('merged', A.state)
+
+    @simple_layout('layouts/crd-gitlab.yaml', driver='gitlab')
+    def test_crd_dependent(self):
+
+        # Create a change in project3 that a project4 change will depend on
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project3', 'master', 'A')
+        A.approved = True
+
+        # Create a change B that sets the dependency on A
+        msg = "Depends-On: %s" % A.url
+        B = self.fake_gitlab.openFakeMergeRequest(
+            'org/project4', 'master', 'B', description=msg)
+
+        # Emit B opened event
+        event = B.getMergeRequestOpenedEvent()
+        self.fake_gitlab.emitEvent(event)
+        self.waitUntilSettled()
+
+        # B cannot be merged (not approved)
+        self.assertEqual(0, len(self.history))
+
+        # Approve B
+        B.approved = True
+        # And send the event
+        self.fake_gitlab.emitEvent(event)
+        self.waitUntilSettled()
+
+        # The changes for the job from project4 should include the project3
+        # PR content
+        changes = self.getJobFromHistory(
+            'project4-test', 'org/project4').changes
+
+        self.assertEqual(changes, "%s,%s %s,%s" % (A.number,
+                                                   A.sha,
+                                                   B.number,
+                                                   B.sha))
+
+        self.assertTrue(A.is_merged)
+        self.assertTrue(B.is_merged)
