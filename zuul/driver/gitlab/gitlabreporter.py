@@ -12,12 +12,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import time
 import logging
 import voluptuous as v
 
 from zuul.reporter import BaseReporter
 from zuul.lib.logutil import get_annotated_logger
 from zuul.driver.gitlab.gitlabsource import GitlabSource
+from zuul.exceptions import MergeFailure
 
 
 class GitlabReporter(BaseReporter):
@@ -30,6 +32,7 @@ class GitlabReporter(BaseReporter):
         super(GitlabReporter, self).__init__(driver, connection, config)
         self._create_comment = self.config.get('comment', True)
         self._approval = self.config.get('approval', None)
+        self._merge = self.config.get('merge', False)
 
     def report(self, item):
         """Report on an event."""
@@ -45,6 +48,11 @@ class GitlabReporter(BaseReporter):
                 self.addMRComment(item)
             if self._approval is not None:
                 self.setApproval(item)
+            if self._merge:
+                self.mergeMR(item)
+                if not item.change.is_merged:
+                    msg = self._formatItemReportMergeFailure(item)
+                    self.addMRComment(item, msg)
 
     def addMRComment(self, item):
         log = get_annotated_logger(self.log, item.event)
@@ -65,8 +73,24 @@ class GitlabReporter(BaseReporter):
         self.connection.approveMR(project, mr_number, self._approval,
                                   event=item.event)
 
-    def mergePull(self, item):
-        raise NotImplementedError()
+    def mergeMR(self, item):
+        project = item.change.project.name
+        mr_number = item.change.number
+
+        for i in [1, 2]:
+            try:
+                self.connection.mergeMR(project, mr_number)
+                item.change.is_merged = True
+                return
+            except MergeFailure:
+                self.log.exception(
+                    'Merge attempt of change %s  %s/2 failed.' %
+                    (item.change, i), exc_info=True)
+                if i == 1:
+                    time.sleep(2)
+        self.log.warning(
+            'Merge of change %s failed after 2 attempts, giving up' %
+            item.change)
 
     def getSubmitAllowNeeds(self):
         return []
@@ -76,5 +100,6 @@ def getSchema():
     gitlab_reporter = v.Schema({
         'comment': bool,
         'approval': bool,
+        'merge': bool,
     })
     return gitlab_reporter
