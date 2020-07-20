@@ -84,17 +84,17 @@ class GitlabTriggerEvent(TriggerEvent):
 
 class GitlabEventFilter(EventFilter):
     def __init__(
-            self, trigger, types=[], actions=[],
-            comments=[], refs=[], labels=[], ignore_deletes=True):
+            self, trigger, types=None, actions=None,
+            comments=None, refs=None, labels=None, ignore_deletes=True):
         super(GitlabEventFilter, self).__init__(self)
-        self._types = types
-        self.types = [re.compile(x) for x in types]
-        self.actions = actions
-        self._comments = comments
-        self.comments = [re.compile(x) for x in comments]
-        self._refs = refs
-        self.refs = [re.compile(x) for x in refs]
-        self.labels = labels
+        self._types = types or []
+        self.types = [re.compile(x) for x in self._types]
+        self.actions = actions or []
+        self._comments = comments or []
+        self.comments = [re.compile(x) for x in self._comments]
+        self._refs = refs or []
+        self.refs = [re.compile(x) for x in self._refs]
+        self.labels = labels or []
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
@@ -162,12 +162,12 @@ class GitlabEventFilter(EventFilter):
 # pipeline requires definition)
 class GitlabRefFilter(RefFilter):
     def __init__(self, connection_name, open=None, merged=None, approved=None,
-                 labels=[]):
+                 labels=None):
         RefFilter.__init__(self, connection_name)
         self.open = open
         self.merged = merged
         self.approved = approved
-        self.labels = labels
+        self.labels = labels or []
 
     def __repr__(self):
         ret = '<GitlabRefFilter connection_name: %s ' % self.connection_name
