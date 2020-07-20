@@ -221,6 +221,10 @@ in the *opened* state (not merged yet).
       A boolean value (``true`` or ``false``) that indicates whether
       the Merge Request must be approved or not in order to be enqueued.
 
+   .. attr:: labels
+
+      if present, the list of labels a Merge Request must have.
+
 
 Reference pipelines configuration
 ---------------------------------
