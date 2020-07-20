@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_d48c3830",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-07-20T10:26:44Z",
+      "side": 1,
+      "message": "MR",
+      "range": {
+        "startLine": 438,
+        "startChar": 57,
+        "endLine": 438,
+        "endChar": 59
+      },
+      "revId": "304f7d87b4af4c5f82e76c5e78c101d7b5bd6c0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
