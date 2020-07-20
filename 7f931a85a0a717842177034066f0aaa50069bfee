@@ -45,6 +45,30 @@
       "revId": "7f931a85a0a717842177034066f0aaa50069bfee",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_fd5cbfee",
+        "filename": "zuul/driver/gitlab/gitlabsource.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-07-20T13:49:34Z",
+      "side": 1,
+      "message": "Yes, I\u0027m following the same conventions as in the others drivers. But I think also a state requirement would be more concise. Let\u0027s see what the other think about this. Then I could work on a followup change to refactor this requirement.",
+      "parentUuid": "bf51134e_d6e71fac",
+      "range": {
+        "startLine": 129,
+        "startChar": 8,
+        "endLine": 130,
+        "endChar": 23
+      },
+      "revId": "7f931a85a0a717842177034066f0aaa50069bfee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
