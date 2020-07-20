@@ -84,16 +84,26 @@ class GitlabTriggerEvent(TriggerEvent):
 
 class GitlabEventFilter(EventFilter):
     def __init__(
-            self, trigger, types=[], actions=[],
-            comments=[], refs=[], labels=[], ignore_deletes=True):
+            self, trigger, types=None, actions=None,
+            comments=None, refs=None, labels=None, ignore_deletes=True):
         super(GitlabEventFilter, self).__init__(self)
+        if types is None:
+            types = []
         self._types = types
         self.types = [re.compile(x) for x in types]
+        if actions is None:
+            actions = []
         self.actions = actions
+        if comments is None:
+            comments = []
         self._comments = comments
         self.comments = [re.compile(x) for x in comments]
+        if refs is None:
+            refs = []
         self._refs = refs
         self.refs = [re.compile(x) for x in refs]
+        if labels is None:
+            labels = []
         self.labels = labels
         self.ignore_deletes = ignore_deletes
 
@@ -162,11 +172,13 @@ class GitlabEventFilter(EventFilter):
 # pipeline requires definition)
 class GitlabRefFilter(RefFilter):
     def __init__(self, connection_name, open=None, merged=None, approved=None,
-                 labels=[]):
+                 labels=None):
         RefFilter.__init__(self, connection_name)
         self.open = open
         self.merged = merged
         self.approved = approved
+        if labels is None:
+            labels = []
         self.labels = labels
 
     def __repr__(self):
