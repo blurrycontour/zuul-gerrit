@@ -18,6 +18,7 @@ import textwrap
 from tests.base import AnsibleZuulTestCase, FIXTURE_DIR
 
 ERROR_ACCESS_OUTSIDE = "Accessing files from outside the working dir"
+ERROR_LOCAL_CODE = "Executing local code is prohibited"
 ERROR_SYNC_TO_OUTSIDE = "Syncing files to outside the working dir"
 ERROR_SYNC_FROM_OUTSIDE = "Syncing files from outside the working dir"
 ERROR_SYNC_RSH = "Using custom synchronize rsh is prohibited"
@@ -175,6 +176,8 @@ class FunctionalActionModulesMixIn:
 
     def test_shell_module(self):
         self._run_job('shell-good', 'SUCCESS')
+        self._run_job('shell-localhost', 'FAILURE', ERROR_LOCAL_CODE)
+        self._run_job('shell-delegate', 'FAILURE', ERROR_LOCAL_CODE)
 
     def test_synchronize_module(self):
         self._run_job('synchronize-good', 'SUCCESS')
