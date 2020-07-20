@@ -1,0 +1,7 @@
+- hosts: localhost
+  tasks:
+    - name: Local shell task with python exception
+      command: echo foo
+      args:
+        chdir: /local-shelltask/somewhere/that/does/not/exist
+      failed_when: false

@@ -1,0 +1,12 @@
+- hosts: all
+  tasks:
+    - name: Normal shell
+      delegate_to: localhost
+      shell: echo 123
+
+    - name: Shell with executable
+      delegate_to: localhost
+      shell: |
+        echo 123
+      args:
+        executable: /bin/bash

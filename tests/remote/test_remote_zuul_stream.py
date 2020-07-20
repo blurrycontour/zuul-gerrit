@@ -32,7 +32,7 @@ class FunctionalZuulStreamMixIn:
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
         self.assertIsNotNone(ansible_remote)
 
-    def _run_job(self, job_name):
+    def _run_job(self, job_name, create=True):
         # Keep the jobdir around so we can inspect contents if an
         # assert fails. It will be cleaned up anyway as it is contained
         # in a tmp dir which gets cleaned up after the test.
@@ -40,32 +40,40 @@ class FunctionalZuulStreamMixIn:
 
         # Output extra ansible info so we might see errors.
         self.executor_server.verbose = True
-        conf = textwrap.dedent(
-            """
-            - job:
-                name: {job_name}
-                run: playbooks/{job_name}.yaml
-                ansible-version: {version}
-                vars:
-                  test_console_port: {console_port}
-                roles:
-                  - zuul: org/common-config
-                nodeset:
-                  nodes:
-                    - name: compute1
-                      label: whatever
-                    - name: controller
-                      label: whatever
+        if create:
+            conf = textwrap.dedent(
+                """
+                - job:
+                    name: {job_name}
+                    run: playbooks/{job_name}.yaml
+                    ansible-version: {version}
+                    vars:
+                      test_console_port: {console_port}
+                    roles:
+                      - zuul: org/common-config
+                    nodeset:
+                      nodes:
+                        - name: compute1
+                          label: whatever
+                        - name: controller
+                          label: whatever
 
-            - project:
-                check:
-                  jobs:
-                    - {job_name}
-            """.format(
-                job_name=job_name,
-                version=self.ansible_version,
-                console_port=self.log_console_port))
-
+                - project:
+                    check:
+                      jobs:
+                        - {job_name}
+                """.format(
+                    job_name=job_name,
+                    version=self.ansible_version,
+                    console_port=self.log_console_port))
+        else:
+            conf = textwrap.dedent(
+                """
+                - project:
+                    check:
+                      jobs:
+                        - {job_name}
+                """.format(job_name=job_name))
         file_dict = {'zuul.yaml': conf}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)
@@ -141,9 +149,6 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine(r'compute1 \| failed_in_loop2', text)
             self.assertLogLine(r'compute1 \| ok: Item: failed_in_loop2 '
                                r'Result: 1', text)
-            self.assertLogLine(r'localhost \| .*No such file or directory: .*'
-                               r'\'/local-shelltask/somewhere/'
-                               r'that/does/not/exist\'', text)
             self.assertLogLine(r'compute1 \| .*No such file or directory: .*'
                                r'\'/remote-shelltask/somewhere/'
                                r'that/does/not/exist\'', text)
@@ -159,6 +164,18 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine(
                 r'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
                 r'org/project/playbooks/command.yaml@master]', text)
+
+        # Run a pre-defined job that is defined in a trusted repo to test
+        # localhost tasks.
+        job = self._run_job('command-localhost', create=False)
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'SUCCESS')
+
+            text = self._get_job_output(build)
+            self.assertLogLine(r'localhost \| .*No such file or directory: .*'
+                               r'\'/local-shelltask/somewhere/'
+                               r'that/does/not/exist\'', text)
 
     def test_module_exception(self):
         job = self._run_job('module_failure_exception')
@@ -260,9 +277,6 @@ class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
             self.assertLogLine(r'compute1 \| failed_in_loop2', text)
             self.assertLogLine(r'compute1 \| ok: Item: failed_in_loop2 '
                                r'Result: 1', text)
-            self.assertLogLine(r'localhost \| .*No such file or directory: .*'
-                               r'\'/local-shelltask/somewhere/'
-                               r'that/does/not/exist\'', text)
             self.assertLogLine(r'compute1 \| .*No such file or directory: .*'
                                r'\'/remote-shelltask/somewhere/'
                                r'that/does/not/exist\'', text)
@@ -280,6 +294,18 @@ class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
             self.assertLogLine(
                 r'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
                 r'org/project/playbooks/command.yaml@master]', text)
+
+        # Run a pre-defined job that is defined in a trusted repo to test
+        # localhost tasks.
+        job = self._run_job('command-localhost', create=False)
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'SUCCESS')
+
+            text = self._get_job_output(build)
+            self.assertLogLine(r'localhost \| .*No such file or directory: .*'
+                               r'\'/local-shelltask/somewhere/'
+                               r'that/does/not/exist\'', text)
 
 
 class TestZuulStream29(TestZuulStream28):
