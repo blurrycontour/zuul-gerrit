@@ -16,6 +16,24 @@
       "revId": "63722ae9249347058fa10af6c2f72f48c1296782",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_ddfc5b0e",
+        "filename": "zuul/driver/gitlab/gitlabmodel.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-07-20T13:33:29Z",
+      "side": 1,
+      "message": "Thanks ! I provided a followup change to fix all of them (in gitlab changes) in one shot: https://review.opendev.org/741938/",
+      "parentUuid": "bf51134e_f4d33cd4",
+      "revId": "63722ae9249347058fa10af6c2f72f48c1296782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
