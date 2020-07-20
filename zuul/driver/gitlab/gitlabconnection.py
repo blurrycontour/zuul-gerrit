@@ -282,6 +282,15 @@ class GitlabAPIClient():
             ret.status_code, ret.text))
         return ret.json(), ret.status_code, ret.url, 'POST'
 
+    def put(self, url, params=None, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.info(
+            "Put on resource %s, params (%s) ..." % (url, params))
+        ret = self.session.put(url, data=params, headers=self.headers)
+        log.debug("PUT returned (code: %s): %s" % (
+            ret.status_code, ret.text))
+        return ret.json(), ret.status_code, ret.url, 'PUT'
+
     # https://docs.gitlab.com/ee/api/merge_requests.html#get-single-mr
     def get_mr(self, project_name, number, zuul_event_id=None):
         path = "/projects/%s/merge_requests/%s" % (
@@ -335,6 +344,15 @@ class GitlabAPIClient():
         path = "/projects/%s/merge_requests/%s/approvals" % (
             quote_plus(project_name), number)
         resp = self.get(self.baseurl + path, zuul_event_id=zuul_event_id)
+        self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        return resp[0]
+
+    # https://docs.gitlab.com/ee/api/merge_requests.html#accept-mr
+    def merge_mr(self, project_name, number,
+                 zuul_event_id=None):
+        path = "/projects/%s/merge_requests/%s/merge" % (
+            quote_plus(project_name), number)
+        resp = self.put(self.baseurl + path, zuul_event_id=zuul_event_id)
         self._manage_error(*resp, zuul_event_id=zuul_event_id)
         return resp[0]
 
@@ -508,7 +526,7 @@ class GitlabConnection(BaseConnection):
         change.files = None
         change.title = change.mr['title']
         change.open = change.mr['state'] == 'opened'
-        change.is_merged = change.mr['merged_at'] is not None
+        change.is_merged = change.mr['state'] == 'merged'
         # Can be "can_be_merged"
         change.merge_status = change.mr['merge_status']
         change.approved = change.mr['approved']
@@ -522,6 +540,13 @@ class GitlabConnection(BaseConnection):
             self.sched.onChangeUpdated(change, event)
 
         return change
+
+    def canMerge(self, change, allow_needs, event=None):
+        log = get_annotated_logger(self.log, event)
+        can_merge = True if change.merge_status == "can_be_merged" else False
+        log.info('Check MR %s#%s mergeability can_merge: %s',
+                 change.project.name, change.number, can_merge)
+        return can_merge
 
     def getMR(self, project_name, number, event=None):
         log = get_annotated_logger(self.log, event)
@@ -545,6 +570,19 @@ class GitlabConnection(BaseConnection):
             project_name, number, approve, zuul_event_id=event)
         log.info(
             "Set approval: %s on MR %s#%s", approve, project_name, number)
+
+    def getChangesDependingOn(self, change, projects, tenant):
+        """ Reverse lookup of MR depending on this one
+        """
+        # TODO(fbo): Further research to implement this lookup:
+        # https://docs.gitlab.com/ee/api/search.html#scope-merge_requests
+        # Will be done in a folloup commit
+        return []
+
+    def mergeMR(self, project_name, number, event=None):
+        log = get_annotated_logger(self.log, event)
+        self.gl_client.merge_mr(project_name, number, zuul_event_id=event)
+        log.info("Merged MR %s#%s", project_name, number)
 
 
 class GitlabWebController(BaseWebController):

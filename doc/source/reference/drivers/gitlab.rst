@@ -184,6 +184,15 @@ is taken from the pipeline.
       must be a *Developer* or *Maintainer* project's member. If not set approval
       won't be reported.
 
+   .. attr:: merge
+      :default: false
+
+      Boolean value that determines if the reporter should merge the
+      Merge Request. To merge a Merge Request the Zuul user must be a *Developer* or
+      *Maintainer* project's member. In case of *developer*, the *Allowed to merge*
+      setting in *protected branches* must be set to *Developers + Maintainers*.
+
+
 Requirements Configuration
 --------------------------
 

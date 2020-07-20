@@ -1704,6 +1704,18 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
 
         return {}, 200, "", "POST"
 
+    def put(self, url, params=None, zuul_event_id=None):
+
+        self.log.info(
+            "Put on resource %s, params (%s) ..." % (url, params))
+
+        match = re.match(r'.+/projects/(.+)/merge_requests/(\d+)/merge$', url)
+        if match:
+            mr = self._get_mr(match)
+            mr.mergeMergeRequest()
+
+        return {}, 200, "", "PUT"
+
 
 class GitlabChangeReference(git.Reference):
     _common_path_default = "refs/merge-requests"
@@ -1729,12 +1741,12 @@ class FakeGitlabMergeRequest(object):
         self.merged_at = None
         self.sha = None
         self.state = 'opened'
+        self.is_merged = False
         self.merge_status = 'can_be_merged'
         self.labels = []
         self.notes = []
         self.url = "https://%s/%s/merge_requests/%s" % (
             self.gitlab.server, self.project, self.number)
-        self.is_merged = False
         self.approved = False
         self.mr_ref = self._createMRRef()
         self._addCommitInMR(files=files)
@@ -1769,6 +1781,7 @@ class FakeGitlabMergeRequest(object):
 
     def mergeMergeRequest(self):
         self.state = 'merged'
+        self.is_merged = True
         self._updateTimeStamp()
         self.merged_at = self.updated_at
 
