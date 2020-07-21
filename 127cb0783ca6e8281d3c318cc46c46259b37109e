@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_8d7bc027",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-07-21T15:06:05Z",
+      "side": 1,
+      "message": "I think this is why it has the shebang. Would it be better to chmod +x the file instead?",
+      "revId": "127cb0783ca6e8281d3c318cc46c46259b37109e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_0d8df029",
+        "filename": "zuul/ansible/base/library/zuul_console.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-07-21T15:06:05Z",
+      "side": 1,
+      "message": "See comment in the other file.",
+      "revId": "127cb0783ca6e8281d3c318cc46c46259b37109e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
