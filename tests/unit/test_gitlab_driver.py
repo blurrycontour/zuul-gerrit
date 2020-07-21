@@ -177,6 +177,16 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual(1, len(self.history))
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_merged(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestMergedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+        self.assertHistory([{'name': 'project-promote'}])
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_updated_builds_aborted(self):
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')

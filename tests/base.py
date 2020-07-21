@@ -1859,6 +1859,10 @@ class FakeGitlabMergeRequest(object):
         self.addCommit()
         return self.getMergeRequestEvent(action='update')
 
+    def getMergeRequestMergedEvent(self):
+        self.mergeMergeRequest()
+        return self.getMergeRequestEvent(action='merge')
+
     def getMergeRequestApprovedEvent(self):
         self.approved = True
         return self.getMergeRequestEvent(action='approved')

@@ -130,6 +130,8 @@ class GitlabEventConnector(threading.Thread):
                                                     event.change_number)
         if attrs['action'] == 'open':
             event.action = 'opened'
+        elif attrs['action'] == 'merge':
+            event.action = 'merged'
         elif attrs['action'] == 'update' and "labels" not in body:
             event.action = 'changed'
         elif attrs['action'] == 'update' and "labels" in body:

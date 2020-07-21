@@ -66,6 +66,27 @@
       sqlreporter:
 
 - pipeline:
+    name: promote
+    post-review: true
+    manager: supercedent
+    precedence: high
+    require:
+      gitlab.com:
+        merged: true
+    trigger:
+       gitlab.com:
+         - event: gl_merge_request
+           action: merged
+    success:
+      gitlab.com:
+        comment: true
+      sqlreporter:
+    failure:
+      gitlab.com:
+        comment: true
+      sqlreporter:
+
+- pipeline:
     name: post
     post-review: true
     manager: independent
