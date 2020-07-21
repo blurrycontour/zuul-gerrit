@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_1b8d292a",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-07-21T14:29:39Z",
+      "side": 1,
+      "message": "The default value for this is {a}. https://www.patternfly.org/v4/documentation/react/components/page has more info.",
+      "range": {
+        "startLine": 399,
+        "startChar": 8,
+        "endLine": 399,
+        "endChar": 21
+      },
+      "revId": "4c99dd353f1f678413aaf47995eee057e1dddff9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
