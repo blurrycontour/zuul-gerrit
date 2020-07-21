@@ -5921,6 +5921,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_nodepool.pause()
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -8381,10 +8382,10 @@ class TestReconfigureBranch(ZuulTestCase):
         self.waitUntilSettled()
 
     def _deleteBranch(self):
-        self.delete_branch('org/project1', 'stable')
+        revision = self.delete_branch('org/project1', 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchDeletedEvent(
-                'org/project1', 'stable'))
+                'org/project1', 'stable', revision))
         self.waitUntilSettled()
 
     def _expectReconfigure(self, doReconfigure):

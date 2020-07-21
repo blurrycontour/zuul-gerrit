@@ -373,8 +373,8 @@ class TestExecutorRepos(ZuulTestCase):
         upstream = self.getUpstreamRepos(projects)
 
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
-        event = A.getRefUpdatedEvent()
         A.setMerged()
+        event = A.getRefUpdatedEvent()
         A_commit = str(upstream[p1].commit('master'))
         self.log.debug("A commit: %s" % A_commit)
 
@@ -815,6 +815,7 @@ class TestExecutorFacts(AnsibleZuulTestCase):
     def test_datetime_fact(self):
         self.executor_server.keep_jobdir = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
         self.waitUntilSettled()
 
@@ -837,6 +838,7 @@ class TestAnsibleCallbackConfigs(AnsibleZuulTestCase):
     def test_ansible_callback_config(self):
         self.executor_server.keep_jobdir = True
         A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
+        A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
         self.waitUntilSettled()
 
@@ -880,6 +882,7 @@ class TestExecutorEnvironment(AnsibleZuulTestCase):
                                     'TEST_VAR': 'not-empty'})
     def test_zuul_environment_filter(self):
         A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
+        A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
         self.waitUntilSettled()
 

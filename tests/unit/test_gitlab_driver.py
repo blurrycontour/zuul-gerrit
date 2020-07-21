@@ -250,7 +250,7 @@ class TestGitlabDriver(ZuulTestCase):
     def test_ref_deleted(self):
 
         event = self.fake_gitlab.getPushEvent(
-            'org/project', 'stable-1.0', after='0' * 40)
+            'org/project', branch='stable-1.0', after='0' * 40)
         self.fake_gitlab.emitEvent(event)
         self.waitUntilSettled()
         self.assertEqual(0, len(self.history))
@@ -332,13 +332,16 @@ class TestGitlabDriver(ZuulTestCase):
             }}
         ]
         playbook = "- hosts: all\n  tasks: []"
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        currentrev = repo.heads['master'].commit.hexsha
         self.create_commit(
             'org/project',
             {'.zuul.yaml': yaml.dump(zuul_yaml),
              'job.yaml': playbook},
             message='Add InRepo configuration'
         )
-        event = self.fake_gitlab.getPushEvent('org/project')
+        event = self.fake_gitlab.getPushEvent('org/project', before=currentrev)
         self.fake_gitlab.emitEvent(event)
         self.waitUntilSettled()
 
