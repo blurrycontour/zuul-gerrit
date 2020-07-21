@@ -16,6 +16,24 @@
       "revId": "9080761bca7dc157137bb2ca3e83fa5502a1fdfb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_97c0e52c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-07-21T20:20:22Z",
+      "side": 1,
+      "message": "i also see this on the (great!) new UI @ https://review.opendev.org/#/c/739972/\n\nhttps://5774566e1f56f60010d7-9f324d44a8b8b4bcaa74562bb2dc2591.ssl.cf5.rackcdn.com/739972/9/check/zuul-build-dashboard-opendev/c7164a6/npm/html/t/opendev/build/224e374646604857b02f716941142982",
+      "parentUuid": "bf51134e_3797593d",
+      "revId": "9080761bca7dc157137bb2ca3e83fa5502a1fdfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
