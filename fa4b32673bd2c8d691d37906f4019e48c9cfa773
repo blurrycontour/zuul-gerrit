@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_005adf81",
+        "filename": "zuul/driver/gitlab/gitlabmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-07-21T06:51:27Z",
+      "side": 1,
+      "message": "nit: one could also write more concise:\n\n    self._types \u003d [] if types is None else types",
+      "range": {
+        "startLine": 90,
+        "startChar": 8,
+        "endLine": 92,
+        "endChar": 27
+      },
+      "revId": "fa4b32673bd2c8d691d37906f4019e48c9cfa773",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
