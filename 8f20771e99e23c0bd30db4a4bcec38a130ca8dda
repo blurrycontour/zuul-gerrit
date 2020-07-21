@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_30f647fb",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-07-21T15:26:45Z",
+      "side": 1,
+      "message": "I guess if _process_event() raises an exception we won\u0027t reach this now, right? So we\u0027ll return None, in effect?",
+      "revId": "8f20771e99e23c0bd30db4a4bcec38a130ca8dda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
