@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_80d548ba",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-07-21T14:10:43Z",
+      "side": 1,
+      "message": "This mismatch between build/12345|builds/ and log/foo.txt|logs/ has bugged me as someone that will update urls and hit enter to navigate in some cases. I know this is completely out of the scope of this change, but maybe we should consider changing the paths as well?",
+      "revId": "3ef75401d56520a56040fe774aa1306ce4920639",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
