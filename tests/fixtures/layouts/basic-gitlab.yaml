@@ -44,6 +44,15 @@
             - gateit
 
 - pipeline:
+    name: promote
+    manager: independent
+    trigger:
+      gitlab:
+        - event: gl_merge_request
+          action:
+            - merged
+
+- pipeline:
     name: post
     post-review: true
     manager: independent
@@ -90,6 +99,10 @@
     name: project-test-labeled
     run: playbooks/project-test-labeled.yaml
 
+- job:
+    name: project-promote
+    run: playbooks/project-promote.yaml
+
 - project:
     name: org/project
     check:
@@ -102,6 +115,9 @@
     check-labeled:
       jobs:
         - project-test-labeled
+    promote:
+      jobs:
+        - project-promote
     post:
       jobs:
         - project-post-job

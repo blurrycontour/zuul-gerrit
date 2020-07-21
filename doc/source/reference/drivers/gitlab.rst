@@ -120,6 +120,10 @@ the following options.
 
          Merge request synchronized.
 
+      .. value:: merged
+
+         Merge request merged.
+
       .. value:: comment
 
          Comment added to merge request.
