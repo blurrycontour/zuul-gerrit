@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_3797593d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-07-21T20:14:46Z",
+      "side": 1,
+      "message": "https://imgur.com/a/KcrbuAy\n\nis an example of what I see.  I edited this up to 16px in the debugger and it doesn\u0027t do it any more, it\u0027s consistently the same size.",
+      "revId": "9080761bca7dc157137bb2ca3e83fa5502a1fdfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
