@@ -16,6 +16,24 @@
       "revId": "152762646703139b21db8ca0892c8913686a2ace",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_c6a0dc94",
+        "filename": "tools/find-untrusted-exec.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-07-22T16:18:12Z",
+      "side": 1,
+      "message": "Indeed, that was to skip the openstack tenant which takes too long to get builds. Next PS adds more check and fix pep8.",
+      "parentUuid": "bf51134e_c6cd7c87",
+      "revId": "152762646703139b21db8ca0892c8913686a2ace",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
