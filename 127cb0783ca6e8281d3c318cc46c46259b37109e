@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_6f8bb51d",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-07-22T06:54:08Z",
+      "side": 1,
+      "message": "If you put the shebang back consider \"/usr/bin/env pythonX\" maybe?",
+      "parentUuid": "bf51134e_8d7bc027",
+      "revId": "127cb0783ca6e8281d3c318cc46c46259b37109e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_0d8df029",
         "filename": "zuul/ansible/base/library/zuul_console.py",
         "patchSetId": 3
