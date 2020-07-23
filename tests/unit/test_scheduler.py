@@ -8562,7 +8562,7 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -8578,7 +8578,7 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(True)
 
@@ -8627,7 +8627,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -8649,11 +8649,11 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -8669,7 +8669,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(True)
 
@@ -8679,7 +8679,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._changeAddConfig()
         self._expectReconfigure(True)
         self._directRemoveAllFiles()
@@ -8743,9 +8743,9 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         self._createBranch()
         self._expectReconfigure(False)
         self._changeAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -8759,9 +8759,9 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         self._createBranch()
         self._expectReconfigure(True)
         self._changeAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(True)
 
