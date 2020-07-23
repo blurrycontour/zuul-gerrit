@@ -8950,24 +8950,36 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
         self._test_smart_reconfiguration(command_socket=True)
 
 
-class TestReconfigureBranch(ZuulTestCase):
+class TestTenantReconfiguration(ZuulTestCase):
+    project_reconfig = 'org/project'
+    add_counter = 0
 
     def _setupTenantReconfigureTime(self):
         self.old = self.scheds.first.sched.tenant_layout_state.get(
             'tenant-one', EMPTY_LAYOUT_STATE)
 
     def _createBranch(self):
-        self.create_branch('org/project1', 'stable')
-        self.fake_gerrit.addEvent(
-            self.fake_gerrit.getFakeBranchCreatedEvent(
-                'org/project1', 'stable'))
+        if self.scheds.first.connections.connections[
+                'gerrit'].enable_stream_events is True:
+            self.create_branch(self.project_reconfig, 'stable')
+            self.fake_gerrit.addEvent(
+                self.fake_gerrit.getFakeBranchCreatedEvent(
+                    self.project_reconfig, 'stable'))
+        else:
+            self.waitForPoll('gerrit-ref')
+            self.create_branch(self.project_reconfig, 'stable')
+            self.waitForPoll('gerrit-ref')
         self.waitUntilSettled()
 
     def _deleteBranch(self):
-        revision = self.delete_branch('org/project1', 'stable')
-        self.fake_gerrit.addEvent(
-            self.fake_gerrit.getFakeBranchDeletedEvent(
-                'org/project1', 'stable', revision))
+        revision = self.delete_branch(self.project_reconfig, 'stable')
+        if self.scheds.first.connections.connections[
+                'gerrit'].enable_stream_events is True:
+            self.fake_gerrit.addEvent(
+                self.fake_gerrit.getFakeBranchDeletedEvent(
+                    self.project_reconfig, 'stable', revision))
+        else:
+            self.waitForPoll('gerrit-ref')
         self.waitUntilSettled()
 
     def _expectReconfigure(self, doReconfigure):
@@ -8979,41 +8991,413 @@ class TestReconfigureBranch(ZuulTestCase):
             self.assertEqual(self.old, new)
         self.old = new
 
+    def _changeAdd(self, branch=None, config=True):
+        if branch is None:
+            branch = 'stable'
 
-class TestReconfigureBranchCreateDeleteSshHttp(TestReconfigureBranch):
+        if config:
+            in_repo_conf = textwrap.dedent(
+                """
+                - project:
+                    check:
+                      jobs:
+                        - noop
+                """)
+            in_repo_conf = in_repo_conf + os.linesep + "# " \
+                + str(self.add_counter)
+            file_dict = {'.zuul.yaml': in_repo_conf}
+        else:
+            file_dict = {'dummyfile.txt': str(self.add_counter)}
+        self.add_counter = self.add_counter + 1
+
+        A = self.fake_gerrit.addFakeChange(self.project_reconfig,
+                                           branch, 'A',
+                                           files=file_dict)
+        if self.scheds.first.connections.connections[
+                'gerrit'].enable_stream_events is True:
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled()
+            A.setMerged()
+            self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+            self.waitUntilSettled()
+            self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        else:
+            self.waitForPoll('gerrit')
+            A.setMerged()
+            self.waitForPoll('gerrit')
+        self.waitUntilSettled()
+
+    def _directAdd(self, config=True):
+        if self.scheds.first.connections.connections[
+                'gerrit'].enable_stream_events is not True:
+            self.waitForPoll('gerrit-ref')
+        path = os.path.join(self.upstream_root, self.project_reconfig)
+        repo = git.Repo(path)
+        oldrev = repo.heads['stable'].commit.hexsha
+        repo.heads['stable'].checkout()
+
+        if config:
+            newfile = os.path.join(self.upstream_root, self.project_reconfig,
+                                   '.zuul.yaml')
+            content = textwrap.dedent(
+                """
+                - project:
+                    check:
+                      jobs:
+                        - noop
+                """)
+            content = content + os.linesep + "# " + str(self.add_counter)
+        else:
+            newfile = os.path.join(self.upstream_root, self.project_reconfig,
+                                   'file.txt')
+            content = str(self.add_counter)
+        self.add_counter = self.add_counter + 1
+
+        with open(newfile, 'w') as f:
+            f.write(content)
+        repo.index.add(newfile)
+
+        newrev = repo.index.commit('add file.txt').hexsha
+        if self.scheds.first.connections.connections[
+                'gerrit'].enable_stream_events is True:
+            self.fake_gerrit.addEvent(self.fake_gerrit.getFakeRefUpdatedEvent(
+                self.project_reconfig, 'stable', oldrev, newrev))
+        else:
+            self.waitForPoll('gerrit-ref')
+        self.waitUntilSettled()
+
+    def _directRemoveAllFiles(self):
+        if self.scheds.first.connections.connections[
+                'gerrit'].enable_stream_events is not True:
+            self.waitForPoll('gerrit-ref')
+        path = os.path.join(self.upstream_root, self.project_reconfig)
+        repo = git.Repo(path)
+        treeobj = repo.heads['stable'].commit.tree
+        oldrev = repo.heads['stable'].commit.hexsha
+        file_list = []
+        stack = [treeobj]
+        while len(stack) > 0:
+            tree = stack.pop()
+            for b in tree.blobs:
+                file_list.append(b.path)
+            for subtree in tree.trees:
+                stack.append(subtree)
+
+        repo.heads['stable'].checkout()
+        repo.index.remove(file_list, working_tree=True)
+        repo.index.commit('remove zuul config file')
+        if self.scheds.first.connections.connections[
+                'gerrit'].enable_stream_events is True:
+            self.fake_gerrit.addEvent(self.fake_gerrit.getFakeRefUpdatedEvent(
+                self.project_reconfig, 'stable', oldrev))
+        else:
+            self.waitForPoll('gerrit-ref')
+        self.waitUntilSettled()
+
+    def _changeAddFile(self):
+        self._changeAdd(config=False)
+
+    def _changeAddConfig(self, branch=None):
+        self._changeAdd(branch, config=True)
+
+    def _directAddFile(self):
+        self._directAdd(config=False)
+
+    def _directAddConfig(self):
+        self._directAdd(config=True)
+
+
+class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
     tenant_config_file = 'config/single-tenant/main.yaml'
     config_file = 'zuul-gerrit-web.conf'
 
-    def test_reconfigure_cache_branch_create_delete(self):
-        "Test that cache is updated clear on branch creation/deletion"
+    def test_reconfigure_create_delete(self):
+        '''
+        Test tenant reconfiguration create/delete
+        '''
         self._setupTenantReconfigureTime()
         self._createBranch()
         self._expectReconfigure(True)
         self._deleteBranch()
         self._expectReconfigure(True)
 
+    def test_reconfigure_create_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
 
-class TestReconfigureBranchCreateDeleteSsh(TestReconfigureBranch):
+    def test_reconfigure_create_update_delete(self):
+        '''
+        Test tenant reconfiguration create/change/direct/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._changeAddFile()
+        self._expectReconfigure(False)
+        self._directAddFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_update_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/change/direct/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._changeAddFile()
+        self._expectReconfigure(False)
+        self._directAddFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_addconf_delete(self):
+        '''
+        Test tenant reconfiguration create/change/removeall/directconf/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._changeAddConfig()
+        self._expectReconfigure(True)
+        self._directRemoveAllFiles()
+        self._expectReconfigure(False)
+        self._directAddConfig()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_addconf_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/change/removeall/directconf/
+        delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._changeAddConfig()
+        self._expectReconfigure(True)
+        self._directRemoveAllFiles()
+        self._expectReconfigure(False)
+        self._directAddConfig()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+
+class TestTenantReconfigurationSsh(TestTenantReconfiguration):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
-    def test_reconfigure_cache_branch_create_delete(self):
-        "Test that cache is updated clear on branch creation/deletion"
+    def test_reconfigure_create_delete(self):
+        '''
+        Test tenant reconfiguration create/delete
+        '''
         self._setupTenantReconfigureTime()
         self._createBranch()
         self._expectReconfigure(True)
         self._deleteBranch()
         self._expectReconfigure(True)
 
+    def test_reconfigure_create_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
 
-class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
+    def test_reconfigure_create_update_delete(self):
+        '''
+        Test tenant reconfiguration create/change/direct/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._changeAddFile()
+        self._expectReconfigure(False)
+        self._directAddFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_update_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/change/direct/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._changeAddFile()
+        self._expectReconfigure(False)
+        self._directAddFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_addconf_delete(self):
+        '''
+        Test tenant reconfiguration create/change/removeall/directconf/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._changeAddConfig()
+        self._expectReconfigure(True)
+        self._directRemoveAllFiles()
+        self._expectReconfigure(False)
+        self._directAddConfig()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_addconf_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/change/removeall/directconf/
+        delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._changeAddConfig()
+        self._expectReconfigure(True)
+        self._directRemoveAllFiles()
+        self._expectReconfigure(False)
+        self._directAddConfig()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+
+class TestTenantReconfigurationHttp(TestTenantReconfiguration):
     tenant_config_file = 'config/single-tenant/main.yaml'
     config_file = 'zuul-gerrit-no-stream.conf'
 
-    def test_reconfigure_cache_branch_create_delete(self):
-        "Test that cache is updated clear on branch creation/deletion"
+    def test_reconfigure_create_delete(self):
+        '''
+        Test tenant reconfiguration create/delete
+        '''
         self._setupTenantReconfigureTime()
         self._createBranch()
         self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_update_delete(self):
+        '''
+        Test tenant reconfiguration create/change/direct/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self.scheds.first.connections.connections[
+            'gerrit']._stop_ref_watcher_thread()
+        self._changeAddFile()
+        self._expectReconfigure(False)
+        self.scheds.first.connections.connections[
+            'gerrit']._start_ref_watcher_thread()
+        self.waitForPoll('gerrit-ref')
+        self._directAddFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_update_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/change/direct/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self.scheds.first.connections.connections[
+            'gerrit']._stop_ref_watcher_thread()
+        self._changeAddFile()
+        self._expectReconfigure(False)
+        self.scheds.first.connections.connections[
+            'gerrit']._start_ref_watcher_thread()
+        self.waitForPoll('gerrit-ref')
+        self._directAddFile()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_addconf_delete(self):
+        '''
+        Test tenant reconfiguration create/change/removeall/directconf/delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._createBranch()
+        self._expectReconfigure(True)
+        self.scheds.first.connections.connections[
+            'gerrit']._stop_ref_watcher_thread()
+        self._changeAddConfig()
+        self._expectReconfigure(True)
+        self.scheds.first.connections.connections[
+            'gerrit']._start_ref_watcher_thread()
+        self.waitForPoll('gerrit-ref')
+        self._directRemoveAllFiles()
+        self._expectReconfigure(False)
+        self._directAddConfig()
+        self._expectReconfigure(False)
+        self._deleteBranch()
+        self._expectReconfigure(True)
+
+    def test_reconfigure_create_addconf_delete_conf(self):
+        '''
+        Test tenant reconfiguration conf/create/change/removeall/directconf/
+        delete
+        '''
+        self._setupTenantReconfigureTime()
+        self._changeAddConfig('master')
+        self._expectReconfigure(True)
+        self._createBranch()
+        self._expectReconfigure(True)
+        self.scheds.first.connections.connections[
+            'gerrit']._stop_ref_watcher_thread()
+        self._changeAddConfig()
+        self._expectReconfigure(True)
+        self.scheds.first.connections.connections[
+            'gerrit']._start_ref_watcher_thread()
+        self.waitForPoll('gerrit-ref')
+        self._directRemoveAllFiles()
+        self._expectReconfigure(False)
+        self._directAddConfig()
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(True)
 
