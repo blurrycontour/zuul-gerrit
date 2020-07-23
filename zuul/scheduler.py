@@ -1351,13 +1351,23 @@ class Scheduler(threading.Thread):
             reconfigure_tenant = True
 
         if event.branch_created:
-            reconfigure_tenant = True
+            if hasattr(change, 'files'):
+                if change.updatesConfig(tenant):
+                    reconfigure_tenant = True
+                else:
+                    # create cache to avoid triggering a reconfigure in
+                    # the block bellow
+                    self.abide.getUnparsedBranchCache(
+                        project.canonical_name,
+                        event.branch)
+            else:
+                reconfigure_tenant = True
 
         return reconfigure_tenant
 
     def _testReconfigureRemove(self, change, tenant, project, event):
-        return self.abide.hasUnparsedBranchCache(project.canonical_name,
-                                                 event.branch)
+        return self.abide.hasUsefulBranchCache(project.canonical_name,
+                                               event.branch, tenant)
 
     def process_management_queue(self):
         self.log.debug("Fetching management event")
