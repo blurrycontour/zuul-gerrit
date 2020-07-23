@@ -3304,6 +3304,7 @@ class TriggerEvent(object):
         # For logging
         self.zuul_event_id = None
         self.timestamp = None
+        self.need_files_update = None
 
     @property
     def canonical_project_name(self):

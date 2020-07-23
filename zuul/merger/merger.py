@@ -656,6 +656,33 @@ class Repo(object):
             files.update(head.stats.files.keys())
         return list(files)
 
+    def getFilesChangesRevision(self, oldrev=None, newrev=None,
+                                zuul_event_id=None):
+        repo = self.createRepoObject(zuul_event_id)
+
+        self.fetch(newrev, zuul_event_id=zuul_event_id)
+        head = repo.commit(
+            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+
+        if oldrev != (40 * '0'):
+            self.fetch(oldrev, zuul_event_id=zuul_event_id)
+            head = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+
+            commit_diff = repo.git.execute(["git", "diff", "--name-only",
+                                            oldrev, newrev])
+            files = commit_diff.split('\n')
+        else:
+            files = []
+            stack = [head.tree]
+            while len(stack) > 0:
+                tree = stack.pop()
+                for b in tree.blobs:
+                    files.append(b.path)
+                for subtree in tree.trees:
+                    stack.append(subtree)
+        return files
+
     def deleteRemote(self, remote, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
         repo.delete_remote(repo.remotes[remote])
@@ -1058,3 +1085,10 @@ class Merger(object):
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
         return repo.getFilesChanges(branch, tosha, zuul_event_id=zuul_event_id)
+
+    def getFilesChangesRevision(self, connection_name, project_name, newrev,
+                                oldrev, zuul_event_id=None):
+        repo = self.getRepo(connection_name, project_name,
+                            zuul_event_id=zuul_event_id)
+        return repo.getFilesChangesRevision(oldrev, newrev,
+                                            zuul_event_id=zuul_event_id)

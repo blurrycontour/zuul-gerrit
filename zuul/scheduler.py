@@ -1328,6 +1328,9 @@ class Scheduler(threading.Thread):
                     continue
                 try:
                     change = project.source.getChange(event)
+                    # set change.files here are in every driver ?
+                    if change.files is None and hasattr(event, 'files'):
+                        change.files = event.files
                 except exceptions.ChangeNotFound as e:
                     log.debug("Unable to get change %s from source %s",
                               e.change, project.source)
@@ -1339,13 +1342,23 @@ class Scheduler(threading.Thread):
                     # out cached data for this project and perform a
                     # reconfiguration.
                     self.reconfigureTenant(tenant, change.project, event)
+                else:
+                    if event.need_files_update:
+                        self.merger.getFilesChangesRevision(
+                            project.source.connection.connection_name,
+                            project.name,
+                            event.branch,
+                            build_set=event,
+                            event=event,
+                        )
                 for pipeline in tenant.layout.pipelines.values():
                     if event.isPatchsetCreated():
                         pipeline.manager.removeOldVersionsOfChange(
                             change, event)
                     elif event.isChangeAbandoned():
                         pipeline.manager.removeAbandonedChange(change, event)
-                    if pipeline.manager.eventMatches(event, change):
+                    if (pipeline.manager.eventMatches(event, change) and
+                        event.need_files_update is not True):
                         pipeline.manager.addChange(change, event)
         finally:
             self.trigger_event_queue.task_done()
@@ -1362,13 +1375,14 @@ class Scheduler(threading.Thread):
 
         reconfigure_tenant = project.source.testReconfigureTenant(
             event, project, tenant, self.abide, reconfigure_tenant)
-
+        if reconfigure_tenant:
+            event.need_files_update = False
         return reconfigure_tenant
 
     def _testReconfigureFiles(self, change, tenant, project, event):
         reconfigure_tenant = False
 
-        if hasattr(change, 'files'):
+        if hasattr(change, 'files') and change.files is not None:
             if change.updatesConfig(tenant):
                 if event.newrev != self.abide.getProjectBranchRevision(
                         tenant, project, event.branch):
@@ -1379,16 +1393,14 @@ class Scheduler(threading.Thread):
                 # reconfiguration
                 self.abide.setProjectBranchRevision(
                     tenant, project, event.branch, event.newrev)
-
-                # create cache to avoid triggering a reconfigure in
-                # github specific tenant reconfigure test
-                self.abide.getUnparsedBranchCache(
-                    project.canonical_name,
-                    event.branch)
         else:
             if event.newrev != self.abide.getProjectBranchRevision(
                     tenant, project, event.branch):
-                reconfigure_tenant = True
+                if event.need_files_update is None:
+                    # not able to get files, trigger fileschange
+                    event.need_files_update = True
+                elif event.need_files_update is False:
+                    reconfigure_tenant = True
 
         return reconfigure_tenant
 
@@ -1653,15 +1665,22 @@ class Scheduler(threading.Thread):
 
     def _doFilesChangesCompletedEvent(self, event):
         build_set = event.build_set
-        if build_set is not build_set.item.current_build_set:
-            self.log.warning("Build set %s is not current", build_set)
-            return
-        pipeline = build_set.item.pipeline
-        if not pipeline:
-            self.log.warning("Build set %s is not associated with a pipeline",
-                             build_set)
-            return
-        pipeline.manager.onFilesChangesCompleted(event)
+        if isinstance(build_set, model.TriggerEvent):
+            triggerEvent = build_set
+            triggerEvent.files = event.files
+            triggerEvent.need_files_update = False
+            self.addEvent(triggerEvent)
+        else:
+            if build_set is not build_set.item.current_build_set:
+                self.log.warning("Build set %s is not current", build_set)
+                return
+            pipeline = build_set.item.pipeline
+            if not pipeline:
+                self.log.warning(
+                    "Build set %s is not associated with a pipeline", build_set
+                )
+                return
+            pipeline.manager.onFilesChangesCompleted(event)
 
     def _doNodesProvisionedEvent(self, event):
         request = event.request
