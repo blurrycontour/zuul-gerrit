@@ -491,7 +491,7 @@ class TestPolling(ZuulTestCase):
                   jobs:
                     - test-job2
             """)
-
+        self.waitForPoll('gerrit-ref')
         file_dict = {'.zuul.yaml': in_repo_conf}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
                                            files=file_dict)

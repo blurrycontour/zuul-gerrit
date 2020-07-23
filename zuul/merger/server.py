@@ -130,11 +130,13 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
         with lock:
-            files = self.merger.getFiles(connection_name, project_name,
-                                         args['branch'], args['files'],
-                                         args.get('dirs'))
+            (files, revision) = self.merger.getFiles(
+                connection_name, project_name,
+                args['branch'], args['files'],
+                args.get('dirs'))
         result = dict(updated=True,
-                      files=files)
+                      files=files,
+                      revision=revision)
         job.sendWorkComplete(json.dumps(result))
 
     def merge(self, job):
