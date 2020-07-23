@@ -6111,6 +6111,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.gearman_server.hold_merge_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -8436,9 +8437,9 @@ class TestReconfigureBranch(ZuulTestCase):
             self.waitUntilSettled()
             self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         else:
-            self.waitForPoll('gerrit')
+            self.waitForPoll('gerrit-ref')
             A.setMerged()
-            self.waitForPoll('gerrit')
+            self.waitForPoll('gerrit-ref')
         self.waitUntilSettled()
 
     def _addFile(self):
@@ -8458,9 +8459,9 @@ class TestReconfigureBranch(ZuulTestCase):
             self.waitUntilSettled()
             self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         else:
-            self.waitForPoll('gerrit')
+            self.waitForPoll('gerrit-ref')
             A.setMerged()
-            self.waitForPoll('gerrit')
+            self.waitForPoll('gerrit-ref')
         self.waitUntilSettled()
 
     def _removeAllFiles(self):
@@ -8544,9 +8545,9 @@ class TestReconfigureBranchSshHttp(TestReconfigureBranch):
         self._addConfig()
         self._expectReconfigure(True)
         self._removeAllFiles()
-        self._expectReconfigure(False)
-        self._deleteBranch()
         self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_add_conf_delete_conf(self):
         "Test that ..."
@@ -8558,9 +8559,9 @@ class TestReconfigureBranchSshHttp(TestReconfigureBranch):
         self._addConfig()
         self._expectReconfigure(True)
         self._removeAllFiles()
-        self._expectReconfigure(False)
-        self._deleteBranch()
         self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_add_conf_remove_conf_delete(self):
         "Test that ..."
@@ -8636,9 +8637,9 @@ class TestReconfigureBranchSsh(TestReconfigureBranch):
         self._addConfig()
         self._expectReconfigure(True)
         self._removeAllFiles()
-        self._expectReconfigure(False)
-        self._deleteBranch()
         self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_add_conf_delete_conf(self):
         "Test that ..."
@@ -8650,9 +8651,9 @@ class TestReconfigureBranchSsh(TestReconfigureBranch):
         self._addConfig()
         self._expectReconfigure(True)
         self._removeAllFiles()
-        self._expectReconfigure(False)
-        self._deleteBranch()
         self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_add_conf_remove_conf_delete(self):
         "Test that ..."
@@ -8704,11 +8705,8 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         self._setupTenantReconfigureTime()
         self._createBranch()
         self._expectReconfigure(False)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addFile()
-        self._expectReconfigure(False)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
-        self.waitForPoll('gerrit-ref')
+        self._expectReconfigure(True)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -8719,11 +8717,8 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         self._expectReconfigure(True)
         self._createBranch()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addFile()
-        self._expectReconfigure(False)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
-        self.waitForPoll('gerrit-ref')
+        self._expectReconfigure(True)
         self._deleteBranch()
         self._expectReconfigure(True)
 
@@ -8732,15 +8727,12 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         self._setupTenantReconfigureTime()
         self._createBranch()
         self._expectReconfigure(False)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addConfig()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
-        self.waitForPoll('gerrit-ref')
         self._removeAllFiles()
-        self._expectReconfigure(False)
-        self._deleteBranch()
         self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_add_conf_delete_conf(self):
         "Test that ..."
@@ -8749,26 +8741,20 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         self._expectReconfigure(True)
         self._createBranch()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addConfig()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
-        self.waitForPoll('gerrit-ref')
         self._removeAllFiles()
-        self._expectReconfigure(False)
-        self._deleteBranch()
         self._expectReconfigure(True)
+        self._deleteBranch()
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_add_conf_remove_conf_delete(self):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
         self._expectReconfigure(False)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addConfig()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
-        self.waitForPoll('gerrit-ref')
         self._deleteBranch()
         self._expectReconfigure(True)
 
@@ -8779,10 +8765,7 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         self._expectReconfigure(True)
         self._createBranch()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addConfig()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
-        self.waitForPoll('gerrit-ref')
         self._deleteBranch()
         self._expectReconfigure(True)
