@@ -419,6 +419,8 @@ class GitlabConnection(BaseConnection):
             change.url = self.getGitwebUrl(project, sha=event.newrev)
 
             change.files = None
+            if hasattr(event, 'files'):
+                change.files = event.files
 
             change.source_event = event
         return change

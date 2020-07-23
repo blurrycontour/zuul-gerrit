@@ -79,6 +79,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             'merger:cat': self.cat,
             'merger:refstate': self.refstate,
             'merger:fileschanges': self.fileschanges,
+            'merger:fileschangesrev': self.fileschangesrev,
         }
         self.merger_gearworker = ZuulGearWorker(
             'Zuul Merger',
@@ -189,6 +190,25 @@ class BaseMergeServer(metaclass=ABCMeta):
         with lock:
             files = self.merger.getFilesChanges(
                 connection_name, project_name, args['branch'], args['tosha'],
+                zuul_event_id=zuul_event_id)
+        result = dict(updated=True,
+                      files=files)
+        result['zuul_event_id'] = zuul_event_id
+        job.sendWorkComplete(json.dumps(result))
+
+    def fileschangesrev(self, job):
+        args = json.loads(job.arguments)
+        zuul_event_id = args.get('zuul_event_id')
+
+        connection_name = args['connection']
+        project_name = args['project']
+        self._update(connection_name, project_name,
+                     zuul_event_id=zuul_event_id)
+
+        lock = self.repo_locks.getRepoLock(connection_name, project_name)
+        with lock:
+            files = self.merger.getFilesChangesRevision(
+                connection_name, project_name, args['newrev'], args['oldrev'],
                 zuul_event_id=zuul_event_id)
         result = dict(updated=True,
                       files=files)
