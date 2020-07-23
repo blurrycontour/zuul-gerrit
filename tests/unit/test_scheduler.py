@@ -6221,7 +6221,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
         gearJob = next(iter(self.scheds.first.sched.merger.jobs))
         self.assertEqual(gearJob.complete, False)
 
@@ -6237,7 +6237,7 @@ For CI problems and help debugging, contact ci@example.org"""
         # Verify the merge job is still running and that the item is
         # in the pipeline
         self.assertEqual(gearJob.complete, False)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
 
         pipeline = tenant.layout.pipelines['post']
         self.assertEqual(len(pipeline.getAllItems()), 1)
@@ -8884,9 +8884,9 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         '''
@@ -8906,13 +8906,13 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
         self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         '''
@@ -8936,7 +8936,7 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._changeAddConfig()
         self._expectReconfigure(True)
         self._directRemoveAllFiles()
@@ -8977,7 +8977,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         self._createBranch()
         self._expectReconfigure(True)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         '''
@@ -9003,7 +9003,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         self._directAddFile()
         self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         '''
@@ -9067,9 +9067,9 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         '''
@@ -9089,7 +9089,7 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self.scheds.first.connections.connections[
             'gerrit']._stop_ref_watcher_thread()
         self._changeAddFile()
@@ -9100,7 +9100,7 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         self._directAddFile()
         self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         '''
@@ -9129,7 +9129,7 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self.scheds.first.connections.connections[
             'gerrit']._stop_ref_watcher_thread()
         self._changeAddConfig()
