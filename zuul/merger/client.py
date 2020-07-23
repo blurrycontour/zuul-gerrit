@@ -185,9 +185,11 @@ class MergeClient(object):
         job.updated = data.get('updated', False)
         commit = data.get('commit')
         files = data.get('files', {})
+        revision = data.get('revision', None)
         repo_state = data.get('repo_state', {})
         item_in_branches = data.get('item_in_branches', [])
         job.files = files
+        job.revision = revision
         log.info("Merge %s complete, merged: %s, updated: %s, "
                  "commit: %s, branches: %s", job, merged, job.updated, commit,
                  item_in_branches)
