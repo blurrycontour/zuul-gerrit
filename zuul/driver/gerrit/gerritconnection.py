@@ -395,6 +395,7 @@ class GerritPoller(threading.Thread):
         self.last_merged_poll = 0
         self._stopped = False
         self._stop_event = threading.Event()
+        self._polled_change_merged = []
 
     def _makePendingCheckEvent(self, change, uuid, check):
         return {'type': 'pending-check',
@@ -448,8 +449,12 @@ class GerritPoller(threading.Thread):
                 "status:merged -age:%ss" % (age,))
             self.last_merged_poll = now
             for change in changes:
-                event = self._makeChangeMergedEvent(change)
-                self.connection.addEvent(event)
+                if change['_number'] not in self._polled_change_merged:
+                    event = self._makeChangeMergedEvent(change)
+                    self.connection.addEvent(event)
+                    self._polled_change_merged.append(change['_number'])
+            if len(changes) == 0:
+                self._polled_change_merged.clear()
         except Exception:
             self.log.exception("Exception on Gerrit poll with %s:",
                                self.connection.connection_name)
