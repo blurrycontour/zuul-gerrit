@@ -683,6 +683,8 @@ class PagureConnection(BaseConnection):
             # Explicitly set files to None and let the pipelines processor
             # call the merger asynchronuously
             change.files = None
+            if hasattr(event, 'files'):
+                change.files = event.files
 
             change.source_event = event
 
