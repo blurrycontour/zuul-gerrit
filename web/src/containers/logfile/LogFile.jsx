@@ -49,7 +49,18 @@ class LogFile extends React.Component {
     severity: PropTypes.string
   }
 
-  render () {
+    keyPressed(event) {
+        console.log("Pressed key " + event.KeyCode)
+    }
+
+    componentDidMount() {
+        document.addEventListener("keydown", this.keyPressed, false);
+    }
+    componentWillUnmount() {
+        document.removeEventListener("keydown", this.keyPressed, false);
+    }
+
+   render () {
     const { build, data, severity } = this.props
     return (
       <React.Fragment>
