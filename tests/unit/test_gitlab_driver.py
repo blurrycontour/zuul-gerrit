@@ -232,8 +232,8 @@ class TestGitlabDriver(ZuulTestCase):
         self.waitUntilSettled()
         new = self.scheds.first.sched.tenant_last_reconfigured.get(
             'tenant-one', 0)
-        # New timestamp should be greater than the old timestamp
-        self.assertLess(old, new)
+        # No added config, no reconfiguration
+        self.assertEqual(old, new)
         self.assertEqual(1, len(self.history))
         self.assertEqual(
             'SUCCESS',
