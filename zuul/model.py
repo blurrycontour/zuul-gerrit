@@ -3070,7 +3070,7 @@ class Ref(object):
         self.ref = None
         self.oldrev = None
         self.newrev = None
-        self.files = []
+        self.files = None
 
     def _id(self):
         return self.newrev
@@ -3172,6 +3172,7 @@ class Tag(Ref):
         super(Tag, self).__init__(project)
         self.tag = None
         self.containing_branches = []
+        self.files = []
 
 
 class Change(Branch):
@@ -4544,6 +4545,10 @@ class UnparsedBranchCache(object):
         self.extra_files_searched = set()
         self.extra_dirs_searched = set()
         self.files = {}
+        self.useful_conf = {}
+
+    def hasUsefulConf(self, tpc):
+        return self.useful_conf.get(tpc, False)
 
     def isValidFor(self, tpc):
         """Return True if this has valid cache results for the extra
@@ -4588,6 +4593,7 @@ class UnparsedBranchCache(object):
             data = self.files.get(fn)
             if data is not None:
                 ret.extend(data)
+                self.useful_conf[tpc] = True
         return ret
 
 
@@ -4605,6 +4611,16 @@ class Abide(object):
         if cache is None:
             return False
         return True
+
+    def hasUsefulBranchCache(self, canonical_project_name, branch, tenant):
+        project_branch_cache = self.unparsed_project_branch_cache.setdefault(
+            canonical_project_name, {})
+        cache = project_branch_cache.get(branch)
+        if cache is not None:
+            tpc = tenant.project_configs[canonical_project_name]
+            cache.get(tpc)
+            return cache.hasUsefulConf(tpc)
+        return False
 
     def getUnparsedBranchCache(self, canonical_project_name, branch):
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(
