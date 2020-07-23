@@ -257,6 +257,7 @@ class GerritEventConnector(threading.Thread):
                 # LOOK FOR CHANGE-MERGED
                 if not self._lookForChangeMerged(event):
                     event.branch_updated = True
+                event.files = None
 
         self._getChange(event)
         self.connection.logEvent(event)
@@ -739,7 +740,9 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.branch = event.ref
             change.ref = 'refs/heads/' + event.ref
-            if hasattr(event, 'branch_created') and event.branch_created:
+            if hasattr(event, 'files') and event.files is not None:
+                change.files = event.files
+            elif hasattr(event, 'branch_created') and event.branch_created:
                 change.files = self.queryCommitFiles(event)
             change.oldrev = event.oldrev
             change.newrev = event.newrev
@@ -750,7 +753,9 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.ref = event.ref
             change.branch = event.ref[len('refs/heads/'):]
-            if hasattr(event, 'branch_created') and event.branch_created:
+            if hasattr(event, 'files') and event.files is not None:
+                change.files = event.files
+            elif hasattr(event, 'branch_created') and event.branch_created:
                 change.files = self.queryCommitFiles(event)
             change.oldrev = event.oldrev
             change.newrev = event.newrev
@@ -934,7 +939,7 @@ class GerritConnection(BaseConnection):
 
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)
-        if not change.number:
+        if not hasattr(change, 'number') or not change.number:
             self.log.debug("Change has no number; considering it merged")
             # Good question.  It's probably ref-updated, which, ah,
             # means it's merged.
@@ -992,7 +997,7 @@ class GerritConnection(BaseConnection):
 
     def canMerge(self, change, allow_needs, event=None):
         log = get_annotated_logger(self.log, event)
-        if not change.number:
+        if not hasattr(change, 'number') or not change.number:
             log.debug("Change has no number; considering it merged")
             # Good question.  It's probably ref-updated, which, ah,
             # means it's merged.
