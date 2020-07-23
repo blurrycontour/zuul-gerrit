@@ -1309,39 +1309,8 @@ class Scheduler(threading.Thread):
                     log.debug("Unable to get change %s from source %s",
                               e.change, project.source)
                     continue
-                reconfigure_tenant = False
-                if ((event.branch_updated and
-                     hasattr(change, 'files') and
-                     change.updatesConfig(tenant)) or
-                    (event.branch_deleted and
-                     self.abide.hasUnparsedBranchCache(project.canonical_name,
-                                                       event.branch))):
-                    reconfigure_tenant = True
 
-                # The branch_created attribute is also true when a tag is
-                # created. Since we load config only from branches only trigger
-                # a tenant reconfiguration if the branch is set as well.
-                if event.branch_created and event.branch:
-                    reconfigure_tenant = True
-
-                # If the driver knows the branch but we don't have a config, we
-                # also need to reconfigure. This happens if a GitHub branch
-                # was just configured as protected without a push in between.
-                if (event.branch in project.source.getProjectBranches(
-                        project, tenant)
-                    and not self.abide.hasUnparsedBranchCache(
-                        project.canonical_name, event.branch)):
-                    reconfigure_tenant = True
-
-                # If the branch is unprotected and unprotected branches
-                # are excluded from the tenant for that project skip reconfig.
-                if (reconfigure_tenant and not
-                    event.branch_protected and
-                    tenant.getExcludeUnprotectedBranches(project)):
-
-                    reconfigure_tenant = False
-
-                if reconfigure_tenant:
+                if self._testReconfigure(tenant, event, change, project):
                     # The change that just landed updates the config
                     # or a branch was just created or deleted.  Clear
                     # out cached data for this project and perform a
@@ -1357,6 +1326,38 @@ class Scheduler(threading.Thread):
                         pipeline.manager.addChange(change, event)
         finally:
             self.trigger_event_queue.task_done()
+
+    def _testReconfigure(self, tenant, event, change, project):
+        reconfigure_tenant = False
+
+        if (event.branch_created and event.branch) or event.branch_updated:
+            reconfigure_tenant = self._testReconfigureFiles(
+                change, tenant, project, event)
+        elif event.branch_deleted:
+            reconfigure_tenant = self._testReconfigureRemove(
+                change, tenant, project, event)
+
+        reconfigure_tenant = project.source.testReconfigureTenant(
+            event, project, tenant, self.abide, reconfigure_tenant)
+
+        return reconfigure_tenant
+
+    def _testReconfigureFiles(self, change, tenant, project, event):
+        reconfigure_tenant = False
+
+        if (event.branch_updated and
+                hasattr(change, 'files') and
+                change.updatesConfig(tenant)):
+            reconfigure_tenant = True
+
+        if event.branch_created:
+            reconfigure_tenant = True
+
+        return reconfigure_tenant
+
+    def _testReconfigureRemove(self, change, tenant, project, event):
+        return self.abide.hasUnparsedBranchCache(project.canonical_name,
+                                                 event.branch)
 
     def process_management_queue(self):
         self.log.debug("Fetching management event")
