@@ -172,6 +172,7 @@ class GerritEventConnector(threading.Thread):
         # TODO(jlk): handle refupdated events instead of just changes
         if event.type == 'change-merged':
             event.branch_updated = True
+            event.newrev = data.get('newRev')
         event.trigger_name = 'gerrit'
         change = data.get('change')
         event.project_hostname = self.connection.canonical_hostname
@@ -418,7 +419,9 @@ class GerritPoller(threading.Thread):
                 'change': {
                     'project': change['project'],
                     'number': change['_number'],
+                    'branch': change['branch'],
                 },
+                'newRev': change['current_revision'],
                 'patchSet': {
                     'number': rev['_number'],
                 }}
@@ -717,6 +720,8 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.branch = event.ref
             change.ref = 'refs/heads/' + event.ref
+            if hasattr(event, 'branch_created') and event.branch_created:
+                change.files = self.queryCommitFiles(event)
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -726,6 +731,8 @@ class GerritConnection(BaseConnection):
             change = Branch(project)
             change.ref = event.ref
             change.branch = event.ref[len('refs/heads/'):]
+            if hasattr(event, 'branch_created') and event.branch_created:
+                change.files = self.queryCommitFiles(event)
             change.oldrev = event.oldrev
             change.newrev = event.newrev
             change.url = self._getWebUrl(project, sha=event.newrev)
@@ -1191,6 +1198,19 @@ class GerritConnection(BaseConnection):
         else:
             data = self.queryChangeSSH(number, event=event)
             return GerritChangeData(GerritChangeData.SSH, data)
+
+    def queryCommitFilesHTTP(self, project, commit):
+        data = None
+        if commit is not None and commit != (40 * '0'):
+            data = self.get('projects/%s/commits/%s/files/' %
+                            (project, commit))
+        return data
+
+    def queryCommitFiles(self, event):
+        files = None
+        if self.session:
+            files = self.queryCommitFilesHTTP(event.project_name, event.newrev)
+        return files
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):
