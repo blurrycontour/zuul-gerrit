@@ -981,6 +981,27 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
+    def getFakeRefUpdatedEvent(self, project, branch, oldrev, newrev=None):
+        if newrev is None:
+            path = os.path.join(self.upstream_root, project)
+            repo = git.Repo(path)
+            newrev = repo.heads[branch].commit.hexsha
+
+        event = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+                "username": "user",
+            },
+            "refUpdate": {
+                "oldRev": oldrev,
+                "newRev": newrev,
+                "refName": 'refs/heads/' + branch,
+                "project": project,
+            }
+        }
+        return event
+
     def getFakeBranchCreatedEvent(self, project, branch):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
