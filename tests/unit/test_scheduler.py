@@ -6114,7 +6114,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
         gearJob = next(iter(self.scheds.first.sched.merger.jobs))
         self.assertEqual(gearJob.complete, False)
 
@@ -6130,7 +6130,7 @@ For CI problems and help debugging, contact ci@example.org"""
         # Verify the merge job is still running and that the item is
         # in the pipeline
         self.assertEqual(gearJob.complete, False)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
 
         pipeline = tenant.layout.pipelines['post']
         self.assertEqual(len(pipeline.getAllItems()), 1)
@@ -8500,9 +8500,9 @@ class TestReconfigureBranchSshHttp(TestReconfigureBranch):
         "Test that cache is updated clear on branch creation/deletion"
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         "Test that cache is updated clear on branch creation/deletion"
@@ -8518,11 +8518,11 @@ class TestReconfigureBranchSshHttp(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._addFile()
         self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         "Test that ..."
@@ -8540,7 +8540,7 @@ class TestReconfigureBranchSshHttp(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._addConfig()
         self._expectReconfigure(True)
         self._removeAllFiles()
@@ -8566,7 +8566,7 @@ class TestReconfigureBranchSshHttp(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._addConfig()
         self._expectReconfigure(True)
         self._deleteBranch()
@@ -8594,7 +8594,7 @@ class TestReconfigureBranchSsh(TestReconfigureBranch):
         self._createBranch()
         self._expectReconfigure(True)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         "Test that cache is updated clear on branch creation/deletion"
@@ -8614,7 +8614,7 @@ class TestReconfigureBranchSsh(TestReconfigureBranch):
         self._addFile()
         self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         "Test that ..."
@@ -8685,9 +8685,9 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         "Test that cache is updated clear on branch creation/deletion"
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         "Test that cache is updated clear on branch creation/deletion"
@@ -8703,14 +8703,14 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addFile()
         self._expectReconfigure(False)
         self.connections.connections['gerrit']._start_ref_watcher_thread()
         self.waitForPoll('gerrit-ref')
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         "Test that ..."
@@ -8731,7 +8731,7 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addConfig()
         self._expectReconfigure(True)
@@ -8763,7 +8763,7 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self.connections.connections['gerrit']._stop_ref_watcher_thread()
         self._addConfig()
         self._expectReconfigure(True)
