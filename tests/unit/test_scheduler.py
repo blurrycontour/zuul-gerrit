@@ -8593,7 +8593,7 @@ class TestReconfigureBranchSsh(TestReconfigureBranch):
         "Test that cache is updated clear on branch creation/deletion"
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -8611,7 +8611,7 @@ class TestReconfigureBranchSsh(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._addFile()
         self._expectReconfigure(False)
         self._deleteBranch()
@@ -8633,7 +8633,7 @@ class TestReconfigureBranchSsh(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._addConfig()
         self._expectReconfigure(True)
         self._removeAllFiles()
@@ -8659,7 +8659,7 @@ class TestReconfigureBranchSsh(TestReconfigureBranch):
         "Test that ..."
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._addConfig()
         self._expectReconfigure(True)
         self._deleteBranch()
@@ -8718,7 +8718,7 @@ class TestReconfigureBranchHttp(TestReconfigureBranch):
         self._createBranch()
         self._expectReconfigure(True)
         self._addFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(True)
 
