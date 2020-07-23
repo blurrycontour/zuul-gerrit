@@ -6114,7 +6114,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
         gearJob = next(iter(self.scheds.first.sched.merger.jobs))
         self.assertEqual(gearJob.complete, False)
 
@@ -6130,7 +6130,7 @@ For CI problems and help debugging, contact ci@example.org"""
         # Verify the merge job is still running and that the item is
         # in the pipeline
         self.assertEqual(gearJob.complete, False)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
 
         pipeline = tenant.layout.pipelines['post']
         self.assertEqual(len(pipeline.getAllItems()), 1)
@@ -8377,7 +8377,7 @@ class TestTenantReconfiguration(ZuulTestCase):
             .get('tenant-one', 0)
 
     def _createBranch(self):
-        if self.connections.connections[
+        if self.scheds.first.connections.connections[
                 'gerrit'].enable_stream_events is True:
             self.create_branch(self.project_reconfig, 'stable')
             self.fake_gerrit.addEvent(
@@ -8391,7 +8391,7 @@ class TestTenantReconfiguration(ZuulTestCase):
 
     def _deleteBranch(self):
         revision = self.delete_branch(self.project_reconfig, 'stable')
-        if self.connections.connections[
+        if self.scheds.first.connections.connections[
                 'gerrit'].enable_stream_events is True:
             self.fake_gerrit.addEvent(
                 self.fake_gerrit.getFakeBranchDeletedEvent(
@@ -8431,7 +8431,7 @@ class TestTenantReconfiguration(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange(self.project_reconfig,
                                            branch, 'A',
                                            files=file_dict)
-        if self.connections.connections[
+        if self.scheds.first.connections.connections[
                 'gerrit'].enable_stream_events is True:
             self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
             self.waitUntilSettled()
@@ -8446,7 +8446,7 @@ class TestTenantReconfiguration(ZuulTestCase):
         self.waitUntilSettled()
 
     def _directAdd(self, config=True):
-        if self.connections.connections[
+        if self.scheds.first.connections.connections[
                 'gerrit'].enable_stream_events is not True:
             self.waitForPoll('gerrit-ref')
         path = os.path.join(self.upstream_root, self.project_reconfig)
@@ -8476,7 +8476,7 @@ class TestTenantReconfiguration(ZuulTestCase):
         repo.index.add(newfile)
 
         newrev = repo.index.commit('add file.txt').hexsha
-        if self.connections.connections[
+        if self.scheds.first.connections.connections[
                 'gerrit'].enable_stream_events is True:
             self.fake_gerrit.addEvent(self.fake_gerrit.getFakeRefUpdatedEvent(
                 self.project_reconfig, 'stable', oldrev, newrev))
@@ -8485,7 +8485,7 @@ class TestTenantReconfiguration(ZuulTestCase):
         self.waitUntilSettled()
 
     def _directRemoveAllFiles(self):
-        if self.connections.connections[
+        if self.scheds.first.connections.connections[
                 'gerrit'].enable_stream_events is not True:
             self.waitForPoll('gerrit-ref')
         path = os.path.join(self.upstream_root, self.project_reconfig)
@@ -8504,7 +8504,7 @@ class TestTenantReconfiguration(ZuulTestCase):
         repo.heads['stable'].checkout()
         repo.index.remove(file_list, working_tree=True)
         repo.index.commit('remove zuul config file')
-        if self.connections.connections[
+        if self.scheds.first.connections.connections[
                 'gerrit'].enable_stream_events is True:
             self.fake_gerrit.addEvent(self.fake_gerrit.getFakeRefUpdatedEvent(
                 self.project_reconfig, 'stable', oldrev))
@@ -8535,9 +8535,9 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         '''
@@ -8557,13 +8557,13 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
         self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         '''
@@ -8587,7 +8587,7 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._changeAddConfig()
         self._expectReconfigure(True)
         self._directRemoveAllFiles()
@@ -8628,7 +8628,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         self._createBranch()
         self._expectReconfigure(True)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         '''
@@ -8654,7 +8654,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         self._directAddFile()
         self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         '''
@@ -8718,9 +8718,9 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_delete_conf(self):
         '''
@@ -8740,16 +8740,18 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
+        self._expectReconfigure(False)
+        self.scheds.first.connections.connections[
+            'gerrit']._stop_ref_watcher_thread()
         self._changeAddFile()
         self._expectReconfigure(False)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
+        self.scheds.first.connections.connections[
+            'gerrit']._start_ref_watcher_thread()
         self.waitForPoll('gerrit-ref')
         self._directAddFile()
         self._expectReconfigure(False)
         self._deleteBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
 
     def test_reconfigure_create_update_delete_conf(self):
         '''
@@ -8760,10 +8762,12 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         self._expectReconfigure(True)
         self._createBranch()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
+        self.scheds.first.connections.connections[
+            'gerrit']._stop_ref_watcher_thread()
         self._changeAddFile()
         self._expectReconfigure(False)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
+        self.scheds.first.connections.connections[
+            'gerrit']._start_ref_watcher_thread()
         self.waitForPoll('gerrit-ref')
         self._directAddFile()
         self._expectReconfigure(False)
@@ -8776,11 +8780,13 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
+        self._expectReconfigure(False)
+        self.scheds.first.connections.connections[
+            'gerrit']._stop_ref_watcher_thread()
         self._changeAddConfig()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
+        self.scheds.first.connections.connections[
+            'gerrit']._start_ref_watcher_thread()
         self.waitForPoll('gerrit-ref')
         self._directRemoveAllFiles()
         self._expectReconfigure(False)
@@ -8799,10 +8805,12 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         self._expectReconfigure(True)
         self._createBranch()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._stop_ref_watcher_thread()
+        self.scheds.first.connections.connections[
+            'gerrit']._stop_ref_watcher_thread()
         self._changeAddConfig()
         self._expectReconfigure(True)
-        self.connections.connections['gerrit']._start_ref_watcher_thread()
+        self.scheds.first.connections.connections[
+            'gerrit']._start_ref_watcher_thread()
         self.waitForPoll('gerrit-ref')
         self._directRemoveAllFiles()
         self._expectReconfigure(False)
