@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_eb01446c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-07-24T08:29:23Z",
+      "side": 1,
+      "message": "can this be private, i.e. \"__polled_change_merged\"",
+      "range": {
+        "startLine": 398,
+        "startChar": 13,
+        "endLine": 398,
+        "endChar": 34
+      },
+      "revId": "3ccebe555e9e5d43313447e4ed4b851bb37161c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
