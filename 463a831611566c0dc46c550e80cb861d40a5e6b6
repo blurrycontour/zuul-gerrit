@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_8866c750",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1309,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-24T14:30:38Z",
+      "side": 1,
+      "message": "here",
+      "range": {
+        "startLine": 1309,
+        "startChar": 8,
+        "endLine": 1309,
+        "endChar": 50
+      },
+      "revId": "463a831611566c0dc46c550e80cb861d40a5e6b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_e8cca335",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1330,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-24T14:30:38Z",
+      "side": 1,
+      "message": "and there",
+      "range": {
+        "startLine": 1329,
+        "startChar": 8,
+        "endLine": 1330,
+        "endChar": 37
+      },
+      "revId": "463a831611566c0dc46c550e80cb861d40a5e6b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
