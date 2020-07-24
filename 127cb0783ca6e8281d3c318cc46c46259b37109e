@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_1aa83cd7",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-24T13:09:06Z",
+      "side": 1,
+      "message": "As this is an ansible module (more precise a fork of the according module of ansible) we probably want to stick to the style ansible uses which is not-executable and with shebang.\n\nIs it possible for you to ignore specific files or folders like the ansible folder?",
+      "parentUuid": "bf51134e_6f8bb51d",
+      "revId": "127cb0783ca6e8281d3c318cc46c46259b37109e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_0d8df029",
         "filename": "zuul/ansible/base/library/zuul_console.py",
         "patchSetId": 3
