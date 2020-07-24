@@ -140,9 +140,19 @@ class ZuulRESTClient(object):
         self._check_status(req)
         return req.json()
 
-    def promote(self, *args, **kwargs):
-        raise NotImplementedError(
-            'This action is unsupported by the REST API')
+    def promote(self, tenant, pipeline, change_ids):
+        if not self.auth_token:
+            raise Exception('Auth Token required')
+        args = {
+            "pipeline": pipeline,
+            "changes": change_ids,
+        }
+        url = urllib.parse.urljoin(
+            self.base_url,
+            'tenant/%s/promote' % tenant)
+        req = self.session.post(url, json=args)
+        self._check_status(req)
+        return req.json()
 
     def get_running_jobs(self, *args, **kwargs):
         raise NotImplementedError(

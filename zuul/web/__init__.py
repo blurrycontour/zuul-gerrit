@@ -372,6 +372,37 @@ class ZuulWebAPI(object):
         return result
 
     @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options(allowed_methods=['POST', ])
+    def promote(self, tenant, pipeline, changes):
+        basic_error = self._basic_auth_header_check()
+        if basic_error is not None:
+            return basic_error
+        if cherrypy.request.method != 'POST':
+            raise cherrypy.HTTPError(405)
+        # AuthN/AuthZ
+        claims, token_error = self._auth_token_check()
+        if token_error is not None:
+            return token_error
+        self.is_authorized(claims, tenant)
+        msg = 'User "%s" requesting "%s" on %s/%s'
+        self.log.info(
+            msg % (claims['__zuul_uid_claim'], 'promote',
+                   tenant, pipeline, changes))
+
+        job = self.rpc.submitJob('zuul:promote',
+                                 {
+                                     'tenant': tenant,
+                                     'pipeline': pipeline,
+                                     'change_ids': changes,
+                                 })
+        result = not job.failure
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return result
+
+    @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def autohold_list(self, tenant, *args, **kwargs):
         # we don't use json_in because a payload is not mandatory with GET
@@ -563,6 +594,7 @@ class ZuulWebAPI(object):
             'autohold_delete': '/api/tenant/{tenant}/autohold/{request_id}',
             'enqueue': '/api/tenant/{tenant}/project/{project:.*}/enqueue',
             'dequeue': '/api/tenant/{tenant}/project/{project:.*}/dequeue',
+            'promote': '/api/tenant/{tenant}/promote',
         }
 
     @cherrypy.expose
