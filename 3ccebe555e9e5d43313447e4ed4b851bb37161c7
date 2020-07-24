@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf51134e_08abd7d5",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1301,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-24T14:11:21Z",
+      "side": 0,
+      "message": "Can you point me to the place where tag creations are filtered out in the new implementation? I don\u0027t find it however this is very important (see https://review.opendev.org/726213).",
+      "range": {
+        "startLine": 1297,
+        "startChar": 0,
+        "endLine": 1301,
+        "endChar": 45
+      },
+      "revId": "3ccebe555e9e5d43313447e4ed4b851bb37161c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
