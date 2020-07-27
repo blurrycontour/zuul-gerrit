@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_fcf7a1f4",
+        "filename": "web/src/actions/preferences.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "This defines a method that we can dispatch at any time to set a preference.  We could define individual methods for each preference (eg \"setAutoReloadPreference\"), but I think it may be simpler to just have one generic method with a key/value pair.\n\nWe might improve this by making the keys constant.\n\nWe could also improve it by just passing a dictionary.  Considering that it\u0027s looking like we may only ever dispatch this method when we hit the save button on the dialog, and at that point, we may want to update multiple preferences, that would probably be a good enhancement to make.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_5cdccd73",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "This default shouldn\u0027t ever be used (because of the resetState below), but it\u0027s here just in case.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_3cd91983",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "This should update the state of this dialog to match what\u0027s in the redux store whenever the dialog is opened or closed.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_9ce66544",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "-1: These two lines should probably be reversed for clarity, however, the effect is the same regardless due to how setState works.  Pretend that\u0027s the case for now.  This dispatches the setPreference method with the current state in this modal (ie, the users new preferences), and then closes the modal.  Of course the close method will then reset the state of this modal to what\u0027s in the redux store.\n\nNow, why does this work even though these two lines are in the wrong order (it looks like we reset the state before we update it)?  It\u0027s because React doesn\u0027t actually update the state of this object until after all of this has completed.  So the state update emitted by setState in handleModalToggle-\u003eresetState doesn\u0027t take effect until after this method returns.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_7ce39134",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "This maps the \u0027preferences\u0027 key in the redux store to the \u0027preferences\u0027 prop in this dialog.  Here\u0027s what this line looks like with metasyntactic variables:\n\n   A: state.B,\n\nThat means: this.props.A \u003c- store.B\n\nOur store is defined in store.js and reducers/index.js via the combineReducers call.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_bcd6c94e",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "This just reverts back to the current production code.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_1ccc15bb",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "The current production code defaults to having the box checked, so effectively you always end up with the first load happening before the user can uncheck the box.  The new system can end up with a blank page because the user disabled updates.  To compensate, always perform an initial load.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_fcd04153",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "This is called when the redux store is updated.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_5cc5ed8d",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "Again, this makes the redux preferences store available on this.props.preferences.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_3cc2b986",
+        "filename": "web/src/reducers/index.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "This is the redux store.  We\u0027re adding a preferences key to it.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_9cbf85fa",
+        "filename": "web/src/reducers/preferences.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "This loads all of the preferences, and sets up default values if they don\u0027t exist yet.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_7cbc3105",
+        "filename": "web/src/reducers/preferences.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 1,
+      "message": "Update the preference, and persist the new values to disk.",
+      "revId": "3bee1cb4328a8994666b1aaa4790437b57c47d4b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

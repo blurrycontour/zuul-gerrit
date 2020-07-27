@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_dcd1fd59",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-27T23:27:50Z",
+      "side": 0,
+      "message": "We don\u0027t need this anymore since we can get it from the redux store.",
+      "revId": "24c0117655788a81b3d2cbb32fd2d6b1930acc78",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
