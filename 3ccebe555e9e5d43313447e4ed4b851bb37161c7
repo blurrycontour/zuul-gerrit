@@ -22,6 +22,30 @@
       "revId": "3ccebe555e9e5d43313447e4ed4b851bb37161c7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_32a9547b",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-07-27T10:46:09Z",
+      "side": 1,
+      "message": "It already is flagged as with a single \u0027_\u0027, and is consistent with other variables of the class. Looking at name mangling \"self.__\" in the code, it would make it one of the very few variables named like that.",
+      "parentUuid": "bf51134e_eb01446c",
+      "range": {
+        "startLine": 398,
+        "startChar": 13,
+        "endLine": 398,
+        "endChar": 34
+      },
+      "revId": "3ccebe555e9e5d43313447e4ed4b851bb37161c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
