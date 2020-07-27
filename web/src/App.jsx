@@ -405,7 +405,7 @@ class App extends React.Component {
     return (
       <React.Fragment>
         {errors.length > 0 && this.renderErrors(errors)}
-        <Page header={pageHeader}>
+        <Page header={pageHeader} mainTabIndex={null}>
           <Drawer isExpanded={showErrors}>
             <DrawerContent panelContent={drawerPanelContent}>
               <DrawerContentBody>

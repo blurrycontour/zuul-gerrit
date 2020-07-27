@@ -1,5 +1,6 @@
 #root {
-    /* This is needed to make the navigation bar fixed on top */
+    /* This is needed to make the navigation bar fixed on top and allow the
+       Drawer to scroll independently of the main page */
     height: 100%;
 }
 
