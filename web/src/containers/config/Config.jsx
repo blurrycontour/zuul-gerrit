@@ -21,31 +21,38 @@ import {
   Switch
 } from '@patternfly/react-core'
 import { CogIcon } from '@patternfly/react-icons'
+import { setPreference } from '../../actions/preferences'
 
 class ConfigModal extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       isModalOpen: false,
-      autoReload: JSON.parse(localStorage.getItem('zuul_auto_reload', false)) === true
-    }
+      autoReload: false,
+     }
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
         isModalOpen: !isModalOpen
       }))
+      this.resetState()
     }
 
     this.handleSave = () => {
-        this.handleModalToggle()
-        localStorage.setItem('zuul_auto_reload', this.state.autoReload)
-        document.dispatchEvent(new Event('reconfig'))
-      }
+      this.handleModalToggle()
+      this.props.dispatch(setPreference('autoReload', this.state.autoReload))
+    }
 
     this.handleAutoReload = () => {
       this.setState(({ autoReload }) => ({
         autoReload: !autoReload
       }))
     }
+  }
+
+  resetState() {
+    this.setState({
+      autoReload: this.props.preferences.autoReload,
+    })
   }
 
   render() {
@@ -89,5 +96,5 @@ class ConfigModal extends React.Component {
 }
 
 export default connect(state => ({
-    autoReload: state.autoReload,
+    preferences: state.preferences,
   }))(ConfigModal)
