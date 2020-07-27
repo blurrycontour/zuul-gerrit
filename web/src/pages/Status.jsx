@@ -42,7 +42,6 @@ class StatusPage extends React.Component {
   state = {
     filter: null,
     expanded: false,
-    autoReload: JSON.parse(localStorage.getItem('zuul_auto_reload', false)) === true
   }
 
   visibilityListener = () => {
@@ -77,17 +76,12 @@ class StatusPage extends React.Component {
     }
     document.addEventListener(
       this.visibilityChangeEvent, this.visibilityListener, false)
-    document.addEventListener(
-      'reconfig', this.updateData)
   }
 
-  updateData = (event) => {
-    if (event || (this.visible)) {
-      if (event && event.type === 'reconfig') {
-        this.setState({'autoReload': JSON.parse(localStorage.getItem('zuul_auto_reload', false)) === true})
-      }
+  updateData = (force) => {
+    if (force || (this.visible && this.props.preferences.autoReload)) {
       this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
-        .then(() => {if (this.state.autoReload && this.visible) {
+        .then(() => {if (this.props.preferences.autoReload && this.visible) {
           this.timer = setTimeout(this.updateData, 5000)
         }})
     }
@@ -102,14 +96,18 @@ class StatusPage extends React.Component {
     document.title = 'Zuul Status'
     this.loadState()
     if (this.props.tenant.name) {
-      this.updateData()
+      this.updateData(true)
     }
     window.addEventListener('storage', this.loadState)
   }
 
   componentDidUpdate (prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name) {
-      this.updateData()
+      this.updateData(true)
+    }
+    // If the user just enabled auto-reload
+    if (this.props.preferences.autoReload && !this.timer) {
+      this.updateData(true)
     }
   }
 
@@ -121,8 +119,6 @@ class StatusPage extends React.Component {
     this.visible = false
     document.removeEventListener(
       this.visibilityChangeEvent, this.visibilityListener)
-    document.removeEventListener(
-      'reconfig', this.updateData)
   }
 
   setFilter = (filter) => {
@@ -254,7 +250,7 @@ class StatusPage extends React.Component {
 }
 
 export default connect(state => ({
-  autoReload: state.autoReload,
+  preferences: state.preferences,
   tenant: state.tenant,
   timezone: state.timezone,
   remoteData: state.status,
