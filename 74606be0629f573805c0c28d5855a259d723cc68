@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_c160ff35",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-07-27T18:36:26Z",
+      "side": 1,
+      "message": "python3.7 is not available on ubuntu focal: https://packages.ubuntu.com/search?suite\u003dfocal\u0026arch\u003dany\u0026searchon\u003dnames\u0026keywords\u003dpython3.7",
+      "revId": "74606be0629f573805c0c28d5855a259d723cc68",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
