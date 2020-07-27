@@ -275,14 +275,8 @@ class CallbackModule(default.CallbackModule):
                     continue
                 if play_vars[host].get('ansible_connection') in ('kubectl', ):
                     # Stream from the forwarded port on kubectl conns
-                    port = play_vars[host]['zuul']['resources'][
-                        inventory_hostname].get('stream_port')
-                    if port is None:
-                        self._log("[Zuul] Kubectl and socat must be installed "
-                                  "on the Zuul executor for streaming output "
-                                  "from pods")
-                        continue
-                    ip = '127.0.0.1'
+                    # TEMPORIRLY DISABLED
+                    continue
 
                 log_id = "%s-%s" % (
                     task._uuid, paths._sanitize_filename(inventory_hostname))

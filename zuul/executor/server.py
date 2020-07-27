@@ -1971,21 +1971,8 @@ class AnsibleJob(object):
                     # Add the real pod name to the resources_var
                     all_vars['zuul']['resources'][
                         node['name'][0]]['pod'] = data['pod']
-                    fwd = KubeFwd(zuul_event_id=self.zuul_event_id,
-                                  build=self.job.unique,
-                                  kubeconfig=self.jobdir.kubeconfig,
-                                  context=data['context_name'],
-                                  namespace=data['namespace'],
-                                  pod=data['pod'])
-                    try:
-                        fwd.start()
-                        self.port_forwards.append(fwd)
-                        all_vars['zuul']['resources'][
-                            node['name'][0]]['stream_port'] = fwd.port
-                    except Exception:
-                        self.log.exception("Unable to start port forward:")
-                        self.log.error("Kubectl and socat are required for "
-                                       "streaming logs")
+                    # kubectl port forwarding for log streaming:
+                    # TEMPORARILY DISABLED
 
         # Remove resource node from nodes list
         for node in resources_nodes:
