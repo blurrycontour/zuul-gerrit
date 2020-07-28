@@ -42,8 +42,18 @@ then
     mkdir -p zuul/web/static
     ln -sfn ../zuul/web/static web/build
     pushd web/
-        yarn install
+        if [[ -n "${YARN_REGISTRY}" ]]
+        then
+            echo "Using yarn registry: ${YARN_REGISTRY}"
+            sed -i "s#https://registry.yarnpkg.com#${YARN_REGISTRY}#" yarn.lock
+        fi
+        yarn install --verbose
         yarn build
+        if [[ -n "${YARN_REGISTRY}" ]]
+        then
+            echo "Resetting yarn registry"
+            sed -i "s#${YARN_REGISTRY}#https://registry.yarnpkg.com#" yarn.lock
+        fi
     popd
 fi
 pip install $*

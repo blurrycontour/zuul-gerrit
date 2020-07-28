@@ -238,22 +238,20 @@
               - playbooks/zuul-migrate/.*
             nodeset: ubuntu-xenial
             timeout: 4800  # 80 minutes
-            vars:
+            vars: &zuul_tox_vars
                 test_setup_environment:
                     ZUUL_TEST_ROOT: /tmp/zuul-test
+                    YARN_REGISTRY: "https://{{ mirror_fqdn }}:4443/registry.npmjs"
                 tox_environment:
                     ZUUL_TEST_ROOT: /tmp/zuul-test
+                    YARN_REGISTRY: "https://{{ mirror_fqdn }}:4443/registry.npmjs"
         - tox-py38:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
             timeout: 4800  # 80 minutes
             nodeset: ubuntu-bionic
-            vars:
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
+            vars: *zuul_tox_vars
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
@@ -290,22 +288,14 @@
               - playbooks/zuul-migrate/.*
             nodeset: ubuntu-xenial
             timeout: 4800  # 80 minutes
-            vars:
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
+            vars: *zuul_tox_vars
         - tox-py38:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
             timeout: 4800  # 80 minutes
             nodeset: ubuntu-bionic
-            vars:
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
+            vars: *zuul_tox_vars
         - zuul-build-dashboard
         - nodejs-run-lint:
             vars:
