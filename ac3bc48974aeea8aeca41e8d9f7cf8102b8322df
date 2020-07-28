@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_cb04871a",
+        "filename": "zuul/driver/gitlab/gitlabmodel.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-28T16:59:47Z",
+      "side": 1,
+      "message": "For the record, I think mutable defaults are fine in cases like this where we know the lifecycle of the variables.  I wouldn\u0027t have asked for this change.  But in general it\u0027s obviously better, so I don\u0027t object to it either.  Having said that, since the entire goal of this change is to avoid human programming errors, we should endeavor to avoid creating a new type of error by creating a wall of text that is difficult to read and verify.  How about we use this form instead:\n\nself._types \u003d types or []\n\nThat seems more readable to me and therefore easier to verify.",
+      "revId": "ac3bc48974aeea8aeca41e8d9f7cf8102b8322df",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
