@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_a86de399",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-07-28T07:26:18Z",
+      "side": 1,
+      "message": "nit: chance",
+      "revId": "bf579352b6b229cf0a5502da829ac02f3f165b31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
