@@ -72,6 +72,27 @@ import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
 
+class FocusDiv extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.focusDiv = React.createRef();
+    }
+
+    componentDidMount() {
+        this.focusDiv.current.focus();
+        console.log("DID FOCUS!");
+    }
+
+    render(props) {
+        return (
+            <div ref={this.focusDiv} tabIndex={0}>
+              {this.props.children}
+            </div>
+        );
+    }
+}
+
 class App extends React.Component {
   static propTypes = {
     errors: PropTypes.array,
@@ -410,7 +431,9 @@ class App extends React.Component {
             <DrawerContent panelContent={drawerPanelContent}>
               <DrawerContentBody>
                 <ErrorBoundary>
-                  {this.renderContent()}
+                  <FocusDiv>
+                    {this.renderContent()}
+                  </FocusDiv>
                 </ErrorBoundary>
               </DrawerContentBody>
             </DrawerContent>
