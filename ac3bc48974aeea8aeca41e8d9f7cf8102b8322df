@@ -16,6 +16,24 @@
       "revId": "ac3bc48974aeea8aeca41e8d9f7cf8102b8322df",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_df671351",
+        "filename": "zuul/driver/gitlab/gitlabmodel.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-07-29T10:12:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_cb04871a",
+      "revId": "ac3bc48974aeea8aeca41e8d9f7cf8102b8322df",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
