@@ -16,6 +16,24 @@
       "revId": "cd484d7240d3b007ffa804231f3787f8c49eb923",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_bf833fcc",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-07-29T10:11:43Z",
+      "side": 1,
+      "message": "Yes that\u0027s correct. That could be implemented in a followup patch but I did not work on it yet.",
+      "parentUuid": "9f560f44_ae120157",
+      "revId": "cd484d7240d3b007ffa804231f3787f8c49eb923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
