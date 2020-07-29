@@ -16,6 +16,24 @@
       "revId": "044910964a8acb16faf7914938f4b3bd6c268fcb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_9f38fb3d",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-07-29T10:11:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_ab279312",
+      "revId": "044910964a8acb16faf7914938f4b3bd6c268fcb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
