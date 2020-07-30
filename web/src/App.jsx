@@ -89,6 +89,11 @@ class App extends React.Component {
     showErrors: false,
   }
 
+  // This ref is used to focus the main content on initial page load or when the
+  // Drawer is closed. This is necessary to allow scrolling via keys (spacebar,
+  // pageup/down, arrow keys, ...).
+  contentRef = React.createRef()
+
   renderMenu() {
     const { tenant } = this.props
     if (tenant.name) {
@@ -152,6 +157,11 @@ class App extends React.Component {
         {allRoutes}
       </Switch>
     )
+  }
+
+  componentDidMount() {
+    // Focus the main content on initial page load
+    this.contentRef.current && this.contentRef.current.focus()
   }
 
   componentDidUpdate() {
@@ -409,6 +419,10 @@ class App extends React.Component {
           <Drawer isExpanded={showErrors}>
             <DrawerContent panelContent={drawerPanelContent}>
               <DrawerContentBody>
+              <span
+                tabIndex={0}
+                ref={this.contentRef}
+              ></span>
                 <ErrorBoundary>
                   {this.renderContent()}
                 </ErrorBoundary>
