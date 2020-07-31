@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_c450c360",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-31T07:38:30Z",
+      "side": 1,
+      "message": "This doesn\u0027t look like a correct logger namespace for model.py. Is this a debugging leftover?",
+      "revId": "83971b79ba0694b703a23b31039b026c3331542b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
