@@ -16,9 +16,10 @@ import io
 import json
 import logging
 import os
+import sys
 import textwrap
 import gc
-from unittest import skip
+from unittest import skip, skipIf
 
 import paramiko
 
@@ -1457,11 +1458,13 @@ class TestInRepoConfig(ZuulTestCase):
                          "A should report failure")
         self.assertIn('not a list', A.messages[0],
                       "A should have a syntax error reported")
+        self.assertIn('job: foo', A.messages[0],
+                      "A should display the failing list")
 
     def test_yaml_dict_error(self):
         in_repo_conf = textwrap.dedent(
             """
-            - job
+            - job_not_a_dict
             """)
 
         file_dict = {'.zuul.yaml': in_repo_conf}
@@ -1476,6 +1479,8 @@ class TestInRepoConfig(ZuulTestCase):
                          "A should report failure")
         self.assertIn('not a dictionary', A.messages[0],
                       "A should have a syntax error reported")
+        self.assertIn('job_not_a_dict', A.messages[0],
+                      "A should list the bad key")
 
     def test_yaml_duplicate_key_error(self):
         in_repo_conf = textwrap.dedent(
@@ -1517,6 +1522,41 @@ class TestInRepoConfig(ZuulTestCase):
                          "A should report failure")
         self.assertIn('has more than one key', A.messages[0],
                       "A should have a syntax error reported")
+        self.assertIn("job: null\n  name: project-test2", A.messages[0],
+                      "A should have the failing section displayed")
+
+    # This is non-deterministic without default dict ordering, which
+    # happended with python 3.7.
+    @skipIf(sys.version_info < (3, 7), "non-deterministic on < 3.7")
+    def test_yaml_error_truncation_message(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+              name: project-test2
+              this: is
+              a: long
+              set: of
+              keys: that
+              should: be
+              truncated: ok
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertIn('has more than one key', A.messages[0],
+                      "A should have a syntax error reported")
+        self.assertIn("job: null\n  name: project-test2", A.messages[0],
+                      "A should have the failing section displayed")
+        self.assertIn("...", A.messages[0],
+                      "A should have the failing section truncated")
 
     def test_yaml_unknown_error(self):
         in_repo_conf = textwrap.dedent(
@@ -1537,6 +1577,8 @@ class TestInRepoConfig(ZuulTestCase):
                          "A should report failure")
         self.assertIn('not recognized', A.messages[0],
                       "A should have a syntax error reported")
+        self.assertIn('foobar:\n    foo: bar', A.messages[0],
+                      "A should report the bad keys")
 
     def test_invalid_job_secret_var_name(self):
         in_repo_conf = textwrap.dedent(
