@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_1688241d",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-31T13:40:15Z",
+      "side": 1,
+      "message": "\"Actions\" ?",
+      "parentUuid": "9f560f44_33b73af9",
+      "range": {
+        "startLine": 8,
+        "startChar": 11,
+        "endLine": 8,
+        "endChar": 15
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_3b08d18f",
         "filename": "web/src/locales/fr_FR/translations.json",
         "patchSetId": 10
@@ -96,6 +120,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_365d687a",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-31T13:40:15Z",
+      "side": 1,
+      "message": "\u0027Agents\u0027 or \u0027Instances\u0027 ?",
+      "parentUuid": "9f560f44_53cbce70",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 22
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_bbf3419f",
         "filename": "web/src/locales/fr_FR/translations.json",
         "patchSetId": 10
@@ -131,6 +179,30 @@
       "side": 1,
       "message": "to me \"série\" implies that the builds are in sequence. I\u0027d suggest \"Résultats\" if it wasn\u0027t so vague...",
       "parentUuid": "bf51134e_bbf3419f",
+      "range": {
+        "startLine": 12,
+        "startChar": 16,
+        "endLine": 12,
+        "endChar": 25
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_96bb940c",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-31T13:40:15Z",
+      "side": 1,
+      "message": "\u0027builds multiples\u0027 or \u0027builds composés\u0027 ?",
+      "parentUuid": "9f560f44_5390ee4e",
       "range": {
         "startLine": 12,
         "startChar": 16,
