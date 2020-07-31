@@ -17,6 +17,91 @@
       "revId": "d877da9e69c69bc53242b95698ca176901d01b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_0f01226c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 867,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-31T20:29:39Z",
+      "side": 1,
+      "message": "I think we can \"fire and forget\" here.  We don\u0027t need to wait until reporting is complete to do anything else.",
+      "revId": "d877da9e69c69bc53242b95698ca176901d01b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_ef030e72",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 887,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-31T20:29:39Z",
+      "side": 1,
+      "message": "I\u0027d suggest omitting the previous context here, so that when someone reads this comment they don\u0027t have to try to understand the previous history.  We only need to talk about the case now.  Just saying that we can\u0027t rely on item_ahead_merged until the report is no longer pending seems good explanation.",
+      "revId": "d877da9e69c69bc53242b95698ca176901d01b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_4ffafa74",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 934,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-31T20:29:39Z",
+      "side": 1,
+      "message": "Similarly, just say we have to wait until reporting is complete before we can proceed.",
+      "revId": "d877da9e69c69bc53242b95698ca176901d01b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_2ff50684",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-31T20:29:39Z",
+      "side": 1,
+      "message": "Camelcase these 2 methods.",
+      "revId": "d877da9e69c69bc53242b95698ca176901d01b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_8ff41288",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-31T20:29:39Z",
+      "side": 1,
+      "message": "I\u0027m not a fan of id(self) here; I worry about how that can change over reconfigurations, etc.\n\nInstead, I think we should treat this exactly like we do merges -- make a UUID each time we dispatch a report, and index the result by that.\n\nThis also has me thinking, we need to make sure we have a test for a reconfiguration during a pending report.",
+      "revId": "d877da9e69c69bc53242b95698ca176901d01b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
