@@ -13,6 +13,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import urllib
 from collections import defaultdict
 
 import github3.exceptions
@@ -581,12 +582,22 @@ class FakeGithubSession(object):
 
     def post(self, url, data=None, headers=None, params=None, json=None):
 
+        # Handle graphql
         if json and json.get('query'):
             query = json.get('query')
             variables = json.get('variables')
             result = self.schema.execute(
                 query, variables=variables, context=self.client._data)
             return FakeResponse({'data': result.data}, 200)
+
+        # Handle creating comments
+        match = re.match(r'.+/repos/(.+)/issues/(\d+)/comments$', url)
+        if match:
+            project, pr_number = match.groups()
+            project = urllib.parse.unquote(project)
+            pull_request = self.client._data.pull_requests[int(pr_number)]
+            pull_request.addComment(json['body'])
+            return FakeResponse(None, 200)
 
         return FakeResponse(None, 404)
 
