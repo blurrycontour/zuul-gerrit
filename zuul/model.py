@@ -26,6 +26,7 @@ import urllib.parse
 import textwrap
 import types
 import itertools
+import yaml
 
 import jsonpath_rw
 
@@ -3510,81 +3511,103 @@ class ProjectMetadata(object):
         self.default_branch = None
 
 
-class ConfigItemNotListError(Exception):
-    def __init__(self):
-        message = textwrap.dedent("""\
-        Configuration file is not a list.  Each zuul.yaml configuration
-        file must be a list of items, for example:
+# TODO(ianw) : this would clearly be better if it recorded the
+# original file and made line-relative comments, however the contexts
+# the subclasses are raised in don't have that info currently, so this
+# is a best-effort to show you something that clues you into the
+# error.
+class ConfigItemErrorException(Exception):
+    def __init__(self, conf):
+        super(ConfigItemErrorException, self).__init__(
+            self.message + self._generate_extract(conf))
 
-        - job:
-            name: foo
+    def _generate_extract(self, conf):
+        context = textwrap.dedent("""\
 
-        - project:
-            name: bar
+        The incorrect values are around:
 
-        Ensure that every item starts with "- " so that it is parsed as a
-        YAML list.
         """)
-        super(ConfigItemNotListError, self).__init__(message)
+        # Not sorting the keys makes it look closer to what is in the
+        # file and works best with >= Python 3.7 where dicts are
+        # ordered by default.  If this is a foreign config file or
+        # something the dump might be really long; hence the
+        # truncation.
+        extract = yaml.dump(conf, sort_keys=False)
+        lines = extract.split('\n')
+        if len(lines) > 5:
+            lines = lines[0:4]
+            lines.append('...')
+
+        return context + '\n'.join(lines)
 
 
-class ConfigItemNotDictError(Exception):
-    def __init__(self):
-        message = textwrap.dedent("""\
-        Configuration item is not a dictionary.  Each zuul.yaml
-        configuration file must be a list of dictionaries, for
-        example:
+class ConfigItemNotListError(ConfigItemErrorException):
+    message = textwrap.dedent("""\
+    Configuration file is not a list.  Each zuul.yaml configuration
+    file must be a list of items, for example:
 
-        - job:
-            name: foo
+    - job:
+        name: foo
 
-        - project:
-            name: bar
+    - project:
+        name: bar
 
-        Ensure that every item in the list is a dictionary with one
-        key (in this example, 'job' and 'project').
-        """)
-        super(ConfigItemNotDictError, self).__init__(message)
+    Ensure that every item starts with "- " so that it is parsed as a
+    YAML list.
+    """)
 
 
-class ConfigItemMultipleKeysError(Exception):
-    def __init__(self):
-        message = textwrap.dedent("""\
-        Configuration item has more than one key.  Each zuul.yaml
-        configuration file must be a list of dictionaries with a
-        single key, for example:
+class ConfigItemNotDictError(ConfigItemErrorException):
+    message = textwrap.dedent("""\
+    Configuration item is not a dictionary.  Each zuul.yaml
+    configuration file must be a list of dictionaries, for
+    example:
 
-        - job:
-            name: foo
+    - job:
+        name: foo
 
-        - project:
-            name: bar
+    - project:
+        name: bar
 
-        Ensure that every item in the list is a dictionary with only
-        one key (in this example, 'job' and 'project').  This error
-        may be caused by insufficient indentation of the keys under
-        the configuration item ('name' in this example).
-        """)
-        super(ConfigItemMultipleKeysError, self).__init__(message)
+    Ensure that every item in the list is a dictionary with one
+    key (in this example, 'job' and 'project').
+    """)
 
 
-class ConfigItemUnknownError(Exception):
-    def __init__(self):
-        message = textwrap.dedent("""\
-        Configuration item not recognized.  Each zuul.yaml
-        configuration file must be a list of dictionaries, for
-        example:
+class ConfigItemMultipleKeysError(ConfigItemErrorException):
+    message = textwrap.dedent("""\
+    Configuration item has more than one key.  Each zuul.yaml
+    configuration file must be a list of dictionaries with a
+    single key, for example:
 
-        - job:
-            name: foo
+    - job:
+        name: foo
 
-        - project:
-            name: bar
+    - project:
+        name: bar
 
-        The dictionary keys must match one of the configuration item
-        types recognized by zuul (for example, 'job' or 'project').
-        """)
-        super(ConfigItemUnknownError, self).__init__(message)
+    Ensure that every item in the list is a dictionary with only
+    one key (in this example, 'job' and 'project').  This error
+    may be caused by insufficient indentation of the keys under
+    the configuration item ('name' in this example).
+    """)
+
+
+class ConfigItemUnknownError(ConfigItemErrorException):
+    message = textwrap.dedent("""\
+    Configuration item not recognized.  Each zuul.yaml
+    configuration file must be a list of dictionaries, for
+    example:
+
+    - job:
+        name: foo
+
+    - project:
+        name: bar
+
+    The dictionary keys must match one of the configuration item
+    types recognized by zuul (for example, 'job' or 'project').
+    """)
 
 
 class UnparsedAbideConfig(object):
@@ -3606,13 +3629,13 @@ class UnparsedAbideConfig(object):
             return
 
         if not isinstance(conf, list):
-            raise ConfigItemNotListError()
+            raise ConfigItemNotListError(conf)
 
         for item in conf:
             if not isinstance(item, dict):
-                raise ConfigItemNotDictError()
+                raise ConfigItemNotDictError(item)
             if len(item.keys()) > 1:
-                raise ConfigItemMultipleKeysError()
+                raise ConfigItemMultipleKeysError(item)
             key, value = list(item.items())[0]
             if key == 'tenant':
                 self.tenants.append(value)
@@ -3621,7 +3644,7 @@ class UnparsedAbideConfig(object):
             elif key == 'admin-rule':
                 self.admin_rules.append(value)
             else:
-                raise ConfigItemUnknownError()
+                raise ConfigItemUnknownError(item)
 
 
 class UnparsedConfig(object):
@@ -3682,13 +3705,13 @@ class UnparsedConfig(object):
             return
 
         if not isinstance(conf, list):
-            raise ConfigItemNotListError()
+            raise ConfigItemNotListError(conf)
 
         for item in conf:
             if not isinstance(item, dict):
-                raise ConfigItemNotDictError()
+                raise ConfigItemNotDictError(item)
             if len(item.keys()) > 1:
-                raise ConfigItemMultipleKeysError()
+                raise ConfigItemMultipleKeysError(item)
             key, value = list(item.items())[0]
             if key == 'project':
                 self.projects.append(value)
@@ -3707,7 +3730,7 @@ class UnparsedConfig(object):
             elif key == 'pragma':
                 self.pragmas.append(value)
             else:
-                raise ConfigItemUnknownError()
+                raise ConfigItemUnknownError(item)
 
 
 class ParsedConfig(object):
