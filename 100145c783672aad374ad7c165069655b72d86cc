@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_33b73af9",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "I fear it might be mistaken for ansible playbook tasks",
+      "parentUuid": "bf51134e_c63a9ccb",
+      "range": {
+        "startLine": 8,
+        "startChar": 11,
+        "endLine": 8,
+        "endChar": 15
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_3b08d18f",
         "filename": "web/src/locales/fr_FR/translations.json",
         "patchSetId": 10
@@ -36,6 +60,30 @@
       "writtenOn": "2020-07-06T16:10:50Z",
       "side": 1,
       "message": "Could not that be confusing since \"executor\" is also a Zuul component ?",
+      "range": {
+        "startLine": 10,
+        "startChar": 12,
+        "endLine": 10,
+        "endChar": 22
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_53cbce70",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "I agree, but I thought \"Noeuds\" was weird for a french person. It\u0027s also hard to translate \"Nodeset\".",
+      "parentUuid": "bf51134e_3b08d18f",
       "range": {
         "startLine": 10,
         "startChar": 12,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_5390ee4e",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "to me \"série\" implies that the builds are in sequence. I\u0027d suggest \"Résultats\" if it wasn\u0027t so vague...",
+      "parentUuid": "bf51134e_bbf3419f",
+      "range": {
+        "startLine": 12,
+        "startChar": 16,
+        "endLine": 12,
+        "endChar": 25
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_db02753e",
         "filename": "web/src/locales/fr_FR/translations.json",
         "patchSetId": 10
@@ -82,6 +154,30 @@
       "writtenOn": "2020-07-06T16:10:50Z",
       "side": 1,
       "message": "\"sûr\"/\"non sur\" is fine, just in case here are some other possibilities:\n\"Environnement d\u0027exécution de confiance\"/\"Environnement d\u0027exécution non sûr\"/\n\"Environnement d\u0027exécution contrôlé\"/\"Environnement d\u0027exécution externe\"",
+      "range": {
+        "startLine": 52,
+        "startChar": 15,
+        "endLine": 52,
+        "endChar": 44
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_1388361d",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_db02753e",
       "range": {
         "startLine": 52,
         "startChar": 15,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_737ed219",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_26df180d",
+      "range": {
+        "startLine": 111,
+        "startChar": 17,
+        "endLine": 111,
+        "endChar": 29
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_e6bfe0a7",
         "filename": "web/src/locales/fr_FR/translations.json",
         "patchSetId": 10
@@ -128,6 +248,30 @@
       "writtenOn": "2020-07-06T16:10:50Z",
       "side": 1,
       "message": "Some proposals:\n\"Tâche Gearman absente\"\n\"Identifiant Gearman manquant\"",
+      "range": {
+        "startLine": 114,
+        "startChar": 16,
+        "endLine": 114,
+        "endChar": 41
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b3786a2a",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_e6bfe0a7",
       "range": {
         "startLine": 114,
         "startChar": 16,
@@ -163,6 +307,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_d3923e4b",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_c6e57c0c",
+      "range": {
+        "startLine": 171,
+        "startChar": 18,
+        "endLine": 171,
+        "endChar": 40
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_c6729c7c",
         "filename": "web/src/locales/fr_FR/translations.json",
         "patchSetId": 10
@@ -186,6 +354,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_339a9a62",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_c6729c7c",
+      "range": {
+        "startLine": 191,
+        "startChar": 21,
+        "endLine": 191,
+        "endChar": 60
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_86a4240a",
         "filename": "web/src/locales/fr_FR/translations.json",
         "patchSetId": 10
@@ -197,6 +389,30 @@
       "writtenOn": "2020-07-06T16:10:50Z",
       "side": 1,
       "message": "\"Journaux\" ?",
+      "range": {
+        "startLine": 234,
+        "startChar": 11,
+        "endLine": 234,
+        "endChar": 15
+      },
+      "revId": "100145c783672aad374ad7c165069655b72d86cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_139dd658",
+        "filename": "web/src/locales/fr_FR/translations.json",
+        "patchSetId": 10
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-07-31T12:45:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_86a4240a",
       "range": {
         "startLine": 234,
         "startChar": 11,
