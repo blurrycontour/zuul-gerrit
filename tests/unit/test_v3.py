@@ -1457,11 +1457,13 @@ class TestInRepoConfig(ZuulTestCase):
                          "A should report failure")
         self.assertIn('not a list', A.messages[0],
                       "A should have a syntax error reported")
+        self.assertIn('job: foo', A.messages[0],
+                      "A should display the failing list")
 
     def test_yaml_dict_error(self):
         in_repo_conf = textwrap.dedent(
             """
-            - job
+            - job_not_a_dict
             """)
 
         file_dict = {'.zuul.yaml': in_repo_conf}
@@ -1476,6 +1478,8 @@ class TestInRepoConfig(ZuulTestCase):
                          "A should report failure")
         self.assertIn('not a dictionary', A.messages[0],
                       "A should have a syntax error reported")
+        self.assertIn('job_not_a_dict', A.messages[0],
+                      "A should list the bad key")
 
     def test_yaml_duplicate_key_error(self):
         in_repo_conf = textwrap.dedent(
@@ -1517,6 +1521,8 @@ class TestInRepoConfig(ZuulTestCase):
                          "A should report failure")
         self.assertIn('has more than one key', A.messages[0],
                       "A should have a syntax error reported")
+        self.assertIn("job: null\n  name: project-test2", A.messages[0],
+                      "A should have the failing section displayed")
 
     def test_yaml_unknown_error(self):
         in_repo_conf = textwrap.dedent(
@@ -1537,6 +1543,8 @@ class TestInRepoConfig(ZuulTestCase):
                          "A should report failure")
         self.assertIn('not recognized', A.messages[0],
                       "A should have a syntax error reported")
+        self.assertIn('foobar:\n    foo: bar', A.messages[0],
+                      "A should report the bad keys")
 
     def test_invalid_job_secret_var_name(self):
         in_repo_conf = textwrap.dedent(
