@@ -127,9 +127,10 @@ class ConfigurationErrorKey(object):
     def __eq__(self, other):
         if not isinstance(other, ConfigurationErrorKey):
             return False
+        log = logging.getLogger("zuul.test")
+        log.debug("**** %s %s %s" % (self.context, self.mark, self.error_text))
         return (self.context == other.context and
-                self.mark.line == other.mark.line and
-                self.mark.snippet == other.mark.snippet and
+                self.mark == other.mark and
                 self.error_text == other.error_text)
 
 

@@ -346,6 +346,10 @@ class ZuulMark(object):
             column=self.column + 1,
         )
 
+    def __eq__(self, other):
+        return (self.line == other.line and
+                self.snippet == other.snippet)
+
 
 class ZuulSafeLoader(yaml.SafeLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
