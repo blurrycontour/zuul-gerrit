@@ -3753,7 +3753,7 @@ class ParsedConfig(object):
                 self.projects_by_regex.setdefault(regex, []).extend(projects)
             return
         else:
-            raise ConfigItemUnknownError()
+            raise TypeError()
 
 
 class Layout(object):
