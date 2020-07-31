@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_d02eb4f8",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-31T12:08:03Z",
+      "side": 1,
+      "message": "267:82  error  Strings must use singlequote  quotes",
+      "revId": "4fe301c5a165bb935dc6afbb69566e4ef09d14e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
