@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_efedce8b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-31T20:41:33Z",
+      "side": 1,
+      "message": "If you put in a very large playbook, would it output the entire playbook here?\n\nI intentionally did not want to be so spammy with these error messages.  We do quote some code when there\u0027s a Zuul config error because we can extract the relevant part, but that\u0027s not the case here, where the error is something that we don\u0027t understand.\n\nMaybe we could include +/- 5 raw lines.\n\nHowever, I think a better approach would be to rely on inline comments.  Both Gerrit and Github are able to leave line comments for Zuul config errors.  Maybe we can update ConfigItem errors to include file information so that they can leave file comments.",
+      "revId": "654cc2fb1b4fc5413858c5eb8b1116366e69340e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
