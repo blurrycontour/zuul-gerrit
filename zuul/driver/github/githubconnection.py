@@ -1814,11 +1814,11 @@ class GithubConnection(BaseConnection):
     def commentPull(self, project, pr_number, message, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         github = self.getGithubClient(project, zuul_event_id=zuul_event_id)
-        owner, proj = project.split('/')
-        repository = github.repository(owner, proj)
-        pull_request = repository.issue(pr_number)
-        pull_request.create_comment(message)
-        log.debug("Commented on PR %s/%s#%s", owner, proj, pr_number)
+        url = github.session.build_url('repos', project,
+                                       'issues', str(pr_number), 'comments')
+        resp = github.session.post(url, json={'body': message})
+        resp.raise_for_status()
+        log.debug("Commented on PR %s#%s", project, pr_number)
 
     def mergePull(self, project, pr_number, commit_message='', sha=None,
                   method='merge', zuul_event_id=None):

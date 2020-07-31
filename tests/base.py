@@ -2414,12 +2414,6 @@ class FakeGithubConnection(githubconnection.GithubConnection):
     def real_getGitUrl(self, project):
         return super(FakeGithubConnection, self).getGitUrl(project)
 
-    def commentPull(self, project, pr_number, message, zuul_event_id=None):
-        # record that this got reported
-        self.github_data.reports.append((project, pr_number, 'comment'))
-        pull_request = self.pull_requests[int(pr_number)]
-        pull_request.addComment(message)
-
     def setCommitStatus(self, project, sha, state, url='', description='',
                         context='default', user='zuul', zuul_event_id=None):
         # record that this got reported and call original method
