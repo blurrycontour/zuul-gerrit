@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_ea73fcaf",
+        "filename": "tests/base.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2272,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-07-31T21:10:53Z",
+      "side": 1,
+      "message": "I wish I\u0027d seen this earlier.  This use of mutable defaults is perfectly fine:\n\n1) It\u0027s a test case.\n2) It doesn\u0027t mutate the data.\n\nI\u0027m not going to ask you to change this again, but I do think we should not have asked you to change it in the first place.\n\nAlso, the next time you do want to avoid mutable defaults, this is a more concise way of doing it:\n\n  added_files \u003d added_files or None",
+      "revId": "3cae84145a621f37ec7e37425121bb7b0a4f0e72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
