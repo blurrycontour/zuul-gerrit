@@ -16,6 +16,24 @@
       "revId": "9bf307e7e07b4dd911a4e369f6063172e5cfc371",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b05a204c",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-07-31T12:26:51Z",
+      "side": 1,
+      "message": "The last sentence suggests that there is no default.",
+      "parentUuid": "9f560f44_6b5c5b7e",
+      "revId": "9bf307e7e07b4dd911a4e369f6063172e5cfc371",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
