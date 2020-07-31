@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_ea493c8b",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-31T22:41:20Z",
+      "side": 1,
+      "message": "s/Bolean/Boolean/",
+      "range": {
+        "startLine": 164,
+        "startChar": 6,
+        "endLine": 164,
+        "endChar": 12
+      },
+      "revId": "b1494db03ee8a11ad8e22d6de90b24ca3384aa18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_c59b8bc6",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-31T22:41:20Z",
+      "side": 1,
+      "message": "Should not that be logged (with debug level) ?",
+      "range": {
+        "startLine": 136,
+        "startChar": 11,
+        "endLine": 136,
+        "endChar": 63
+      },
+      "revId": "b1494db03ee8a11ad8e22d6de90b24ca3384aa18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_25c1a781",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-31T22:41:20Z",
+      "side": 1,
+      "message": "Should not the \"sha\" parameter added in order to avoid to approve a MR which has been updated meanwhile ?",
+      "range": {
+        "startLine": 306,
+        "startChar": 17,
+        "endLine": 306,
+        "endChar": 19
+      },
+      "revId": "b1494db03ee8a11ad8e22d6de90b24ca3384aa18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_057f4367",
+        "filename": "zuul/driver/gitlab/gitlabreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-07-31T22:41:20Z",
+      "side": 1,
+      "message": "Isn\u0027t \"None\" extraneous ?",
+      "range": {
+        "startLine": 32,
+        "startChar": 53,
+        "endLine": 32,
+        "endChar": 57
+      },
+      "revId": "b1494db03ee8a11ad8e22d6de90b24ca3384aa18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
