@@ -264,9 +264,11 @@ class App extends React.Component {
             this.setState({showErrors: false})
           }}
           >
-          <NotificationDrawerListItemHeader title={error} variant="danger" />
+          <NotificationDrawerListItemHeader title={item.source_context.project + " | " + ctxPath} variant="danger" />
           <NotificationDrawerListItemBody>
-              {item.source_context.project} | {ctxPath}
+            <pre>
+              {error}
+            </pre>
           </NotificationDrawerListItemBody>
         </NotificationDrawerListItem>
       )
