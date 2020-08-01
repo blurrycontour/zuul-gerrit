@@ -18,6 +18,8 @@ import { connect } from 'react-redux'
 import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { _, t } from '../locales/utils'
+
 import { fetchLabelsIfNeeded } from '../actions/labels'
 import { Fetchable, Fetching } from '../containers/Fetching'
 
@@ -34,7 +36,7 @@ class LabelsPage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Labels'
+    document.title = t('Zuul Labels')
     if (this.props.tenant.name) {
       this.updateData()
     }
@@ -54,7 +56,7 @@ class LabelsPage extends React.Component {
       return <Fetching />
     }
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading>{_(value)}</Table.Heading>
     const cellFormat = value => <Table.Cell>{value}</Table.Cell>
     const columns = []
     const myColumns = ['name']

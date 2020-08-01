@@ -18,6 +18,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Filter, FormControl, Toolbar } from 'patternfly-react'
 
+import { _ } from '../locales/utils'
 
 class TableFilters extends React.Component {
   static propTypes = {
@@ -208,7 +209,7 @@ class TableFilters extends React.Component {
         </div>
         {activeFilters && activeFilters.length > 0 && (
           <Toolbar.Results>
-            <Filter.ActiveLabel>{'Active Filters:'}</Filter.ActiveLabel>
+            <Filter.ActiveLabel>{_('Active Filters:')}</Filter.ActiveLabel>
             <Filter.List>
               {activeFilters.map((item, index) => {
                 return (
@@ -225,7 +226,7 @@ class TableFilters extends React.Component {
             <Button onClick={e => {
               e.preventDefault()
               this.clearFilters()
-            }}>Clear All Filters</Button>
+            }}>{_('Clear All Filters')}</Button>
             </Toolbar.Results>
         )}
       </React.Fragment>

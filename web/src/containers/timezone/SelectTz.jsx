@@ -16,6 +16,9 @@ import Select from 'react-select'
 import moment from 'moment-timezone'
 import { OutlinedClockIcon } from '@patternfly/react-icons'
 import { connect } from 'react-redux'
+
+import { t } from '../../locales/utils'
+
 import { setTimezoneAction } from '../../actions/timezone'
 
 class SelectTz extends React.Component {
@@ -102,8 +105,8 @@ class SelectTz extends React.Component {
             value={this.state.currentValue}
             onChange={this.handleChange}
             options={this.state.availableTz}
-            noOptionsMessage={() => 'No api found'}
-            placeholder={'Select Tz'}
+            noOptionsMessage={() => t('No api found')}
+            placeholder={t('Select Tz')}
             defaultValue={this.state.defaultValue}
             theme={(theme) => ({
               ...theme,

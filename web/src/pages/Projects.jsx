@@ -19,6 +19,8 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { _, t } from '../locales/utils'
+
 import { fetchProjectsIfNeeded } from '../actions/projects'
 import { Fetchable, Fetching } from '../containers/Fetching'
 
@@ -35,7 +37,7 @@ class ProjectsPage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Projects'
+    document.title = t('Zuul Projects')
     if (this.props.tenant.name) {
       this.updateData()
     }
@@ -59,7 +61,7 @@ class ProjectsPage extends React.Component {
       return <Fetching />
     }
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading>{_(value)}</Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
     const cellProjectFormat = (value, row) => (
@@ -74,6 +76,8 @@ class ProjectsPage extends React.Component {
           builds
         </Link>
       </Table.Cell>)
+      const cellTypeFormat = (value) => (
+        <Table.Cell title={t(value)} >{value}</Table.Cell>)
     const columns = []
     const myColumns = ['name', 'connection', 'type', 'last builds']
     myColumns.forEach(column => {
@@ -81,6 +85,9 @@ class ProjectsPage extends React.Component {
       let prop = column
       if (column === 'name') {
         formatter = cellProjectFormat
+      }
+      if (column === 'type') {
+        formatter = cellTypeFormat
       }
       if (column === 'connection') {
         prop = 'connection_name'

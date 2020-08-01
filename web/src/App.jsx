@@ -63,9 +63,12 @@ import {
   UsersIcon,
 } from '@patternfly/react-icons'
 
+import { _, t } from './locales/utils'
+
 import ErrorBoundary from './containers/ErrorBoundary'
 import { Fetching } from './containers/Fetching'
 import SelectTz from './containers/timezone/SelectTz'
+import LanguageSelector from './containers/LanguageSwitcher'
 import logo from './images/logo.svg'
 import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
@@ -101,7 +104,7 @@ class App extends React.Component {
                   to={tenant.linkPrefix + item.to}
                   activeClassName="pf-c-nav__link pf-m-current"
                 >
-                  {item.title}
+                  {_(item.title)}
                 </NavLink>
               </NavItem>
             ))}
@@ -223,6 +226,7 @@ class App extends React.Component {
     })
   }
 
+  // TODO translate errors?
   renderErrors = (errors) => {
     return (
       <ToastNotificationList>
@@ -277,8 +281,8 @@ class App extends React.Component {
         <NotificationDrawer>
           <NotificationDrawerHeader
             count={errors.length}
-            title="Config Errors"
-            unreadText="error(s)"
+            title={t('Config Errors')}
+            unreadText={t('errorCount', {count: errors.length})}
           >
             <DrawerActions>
               <DrawerCloseButton onClick={this.handleDrawerClose} />
@@ -302,13 +306,13 @@ class App extends React.Component {
 
     const kebabDropdownItems = [
       <DropdownItem key="api" onClick={event => this.handleApiLink(event)}>
-        <CodeIcon /> API
+        <CodeIcon /> {_('API')}
       </DropdownItem>,
       <DropdownItem
         key="documentation"
         onClick={event => this.handleDocumentationLink(event)}
       >
-        <BookIcon /> Documentation
+        <BookIcon /> {_('Documentation')}
       </DropdownItem>,
     ]
 
@@ -318,7 +322,7 @@ class App extends React.Component {
           key="tenant"
           onClick={event => this.handleTenantLink(event)}
         >
-          <UsersIcon /> Tenant
+          <UsersIcon /> {_('Tenant')}
         </DropdownItem>
       )
     }
@@ -333,7 +337,7 @@ class App extends React.Component {
           <PageHeaderToolsItem>
             <Link to='/openapi'>
               <Button variant={ButtonVariant.plain}>
-                <CodeIcon /> API
+                <CodeIcon /> {_('API')}
               </Button>
             </Link>
           </PageHeaderToolsItem>
@@ -344,7 +348,7 @@ class App extends React.Component {
               target='_blank'
             >
               <Button variant={ButtonVariant.plain}>
-                <BookIcon /> Documentation
+                <BookIcon /> {_('Documentation')}
               </Button>
             </a>
           </PageHeaderToolsItem>
@@ -352,7 +356,7 @@ class App extends React.Component {
             <PageHeaderToolsItem>
               <Link to={tenant.defaultRoute}>
                 <Button variant={ButtonVariant.plain}>
-                  <strong>Tenant</strong> {tenant.name}
+                  <strong>{_('Tenant')}</strong> {tenant.name}
                 </Button>
               </Link>
             </PageHeaderToolsItem>
@@ -375,7 +379,7 @@ class App extends React.Component {
         {configErrors.length > 0 &&
           <NotificationBadge
             isRead={false}
-            aria-label="Notifications"
+            aria-label={t('Notifications')}
             onClick={(e) => {
               e.preventDefault()
               this.setState({showErrors: !this.state.showErrors})
@@ -385,6 +389,7 @@ class App extends React.Component {
           </NotificationBadge>
         }
         <SelectTz/>
+        <LanguageSelector />
       </PageHeaderTools>
     )
 
@@ -392,7 +397,7 @@ class App extends React.Component {
     const logoUrl = tenant.name ? tenant.defaultRoute : '/'
     const pageHeader = (
       <PageHeader
-        logo={<Brand src={logo} alt='Zuul logo' className="zuul-brand" />}
+        logo={<Brand src={logo} alt={t('Zuul logo')} className="zuul-brand" />}
         logoProps={{to: logoUrl}}
         logoComponent={Link}
         headerTools={pageHeaderTools}

@@ -30,6 +30,8 @@ import {
   SearchPlusIcon,
 } from '@patternfly/react-icons'
 
+import { _, t } from '../../locales/utils'
+
 import {
   hasInterestingKeys,
   findLoopLabel,
@@ -62,7 +64,7 @@ class TaskOutput extends React.Component {
       <div key='results'>
         {interesting_results.length>0 &&
          <React.Fragment>
-           <h5 key='results-header'>results</h5>
+           <h5 key='results-header'>{_('results')}</h5>
            {interesting_results.map((idx) => (
              <div className='zuul-console-task-result' key={idx}>
                <h4 key={idx}>{idx}: {findLoopLabel(value[idx])}</h4>
@@ -185,35 +187,35 @@ class HostTask extends React.Component {
     const ai = []
     if (this.state.failed) {
       ai.push(
-        <ListView.InfoItem key="failed" title="Click for details">
+        <ListView.InfoItem key="failed" title={t('Click for details')}>
           <span className="task-details-icon" onClick={this.open}>
             <SearchPlusIcon />
           </span>
-          <span className="task-failed" onClick={this.open}>FAILED</span>
+          <span className="task-failed" onClick={this.open}>{_('ansibleTasksStatus.FAILED')}</span>
         </ListView.InfoItem>)
     } else if (this.state.changed) {
       ai.push(
-        <ListView.InfoItem key="changed" title="Click for details">
+        <ListView.InfoItem key="changed" title={t('Click for details')}>
           <span className="task-details-icon" onClick={this.open}>
             <SearchPlusIcon />
           </span>
-          <span className="task-changed" onClick={this.open}>CHANGED</span>
+          <span className="task-changed" onClick={this.open}>{_('ansibleTasksStatus.CHANGED')}</span>
         </ListView.InfoItem>)
     } else if (this.state.skipped) {
       ai.push(
-        <ListView.InfoItem key="skipped" title="Click for details">
+        <ListView.InfoItem key="skipped" title={t('Click for details')}>
           <span className="task-details-icon" onClick={this.open}>
             <SearchPlusIcon />
           </span>
-          <span className="task-skipped" onClick={this.open}>SKIPPED</span>
+          <span className="task-skipped" onClick={this.open}>{_('ansibleTasksStatus.SKIPPED')}</span>
         </ListView.InfoItem>)
     } else if (this.state.ok) {
       ai.push(
-        <ListView.InfoItem key="ok" title="Click for details">
+        <ListView.InfoItem key="ok" title={t('Click for details')}>
           <span className="task-details-icon" onClick={this.open}>
             <SearchPlusIcon />
           </span>
-          <span className="task-ok" onClick={this.open}>OK</span>
+          <span className="task-ok" onClick={this.open}>{_('ansibleTasksStatus.OK')}</span>
         </ListView.InfoItem>)
     }
     ai.push(
@@ -286,7 +288,7 @@ class HostTask extends React.Component {
             <Modal.Title>{hostname}
               <span className="zuul-console-modal-header-link">
                 <a href={'#'+makeTaskPath(taskPath)}>
-                  <Icon type="fa" name="link" title="Permalink" />
+                  <Icon type="fa" name="link" title={t('Permalink')} />
                 </a>
               </span>
             </Modal.Title>
@@ -319,11 +321,11 @@ class PlayBook extends React.Component {
     const ai = []
     if (playbook.trusted) {
       ai.push(
-        <ListView.InfoItem key="trusted" title="This playbook runs in a trusted execution context, which permits executing code on the Zuul executor and allows access to all Ansible features.">
+        <ListView.InfoItem key="trusted" title={t('trustedContext')}>
           <span className="additionalinfo-icon">
             <InfoCircleIcon />
           </span>
-          Trusted
+          {_('Trusted')}
         </ListView.InfoItem>
       )
     }
@@ -333,14 +335,16 @@ class PlayBook extends React.Component {
         stacked={true}
         additionalInfo={ai}
         initExpanded={expand}
-        heading={playbook.phase[0].toUpperCase() + playbook.phase.slice(1) + ' playbook'}
+        heading={t('playbookPhase',
+                   {phase: playbook.phase[0].toUpperCase() + playbook.phase.slice(1)})
+                }
         description={playbook.playbook}
       >
           {playbook.plays.map((play, idx) => (
             <React.Fragment key={idx}>
               <Row key='play'>
                 <Col sm={12}>
-                  <strong>Play: {play.play.name}</strong>
+                  <strong>{_('play', {playname: play.play.name})}</strong>
                 </Col>
               </Row>
               {play.tasks.map((task, idx2) => (

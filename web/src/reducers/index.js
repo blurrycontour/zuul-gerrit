@@ -18,6 +18,7 @@ import configErrors from './configErrors'
 import change from './change'
 import errors from './errors'
 import build from './build'
+import { i18nReducer } from 'react-redux-i18n'
 import info from './info'
 import job from './job'
 import jobs from './jobs'
@@ -38,6 +39,7 @@ const reducers = {
   configErrors,
   errors,
   info,
+  i18n: i18nReducer,
   job,
   jobs,
   labels,

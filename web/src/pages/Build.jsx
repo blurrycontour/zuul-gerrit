@@ -36,6 +36,8 @@ import {
   PollIcon,
 } from '@patternfly/react-icons'
 
+import { _, t } from '../locales/utils'
+
 import { fetchBuildIfNeeded } from '../actions/build'
 import { EmptyPage } from '../containers/Errors'
 import { Fetchable, Fetching } from '../containers/Fetching'
@@ -67,7 +69,7 @@ class BuildPage extends React.Component {
   }
 
   componentDidMount() {
-    document.title = 'Zuul Build'
+    document.title = t('Zuul Build')
     if (this.props.tenant.name) {
       this.updateData()
     }
@@ -118,10 +120,10 @@ class BuildPage extends React.Component {
     if (!build) {
       return (
         <EmptyPage
-          title="This build does not exist"
+          title={t('This build does not exist')}
           icon={BuildIcon}
           linkTarget={`${tenant.linkPrefix}/builds`}
-          linkText="Show all builds"
+          linkText={t('Show all builds')}
         />
       )
     }
@@ -142,7 +144,7 @@ class BuildPage extends React.Component {
         <EmptyState variant={EmptyStateVariant.small}>
           <EmptyStateIcon icon={PollIcon} />
           <Title headingLevel="h4" size="lg">
-            This build does not provide any results
+            {_('This build does not provide any results')}
           </Title>
         </EmptyState>
       )
@@ -153,7 +155,7 @@ class BuildPage extends React.Component {
       <EmptyState variant={EmptyStateVariant.small}>
         <EmptyStateIcon icon={FileArchiveIcon} />
         <Title headingLevel="h4" size="lg">
-          This build does not provide any artifacts
+          {_('This build does not provide any artifacts')}
         </Title>
       </EmptyState>
     )
@@ -167,7 +169,7 @@ class BuildPage extends React.Component {
         <EmptyState variant={EmptyStateVariant.small}>
           <EmptyStateIcon icon={FileCodeIcon} />
           <Title headingLevel="h4" size="lg">
-            This build does not provide any logs
+            {_('This build does not provide any logs')}
           </Title>
         </EmptyState>
       )
@@ -185,7 +187,7 @@ class BuildPage extends React.Component {
         <EmptyState variant={EmptyStateVariant.small}>
           <EmptyStateIcon icon={TerminalIcon} />
           <Title headingLevel="h4" size="lg">
-            This build does not provide any console information
+            {_('This build does not provide any console information')}
           </Title>
         </EmptyState>
       )
@@ -213,7 +215,7 @@ class BuildPage extends React.Component {
                   <TabTitleIcon>
                     <PollIcon />
                   </TabTitleIcon>
-                  <TabTitleText>Results</TabTitleText>
+                  <TabTitleText>{_('Results')}</TabTitleText>
                 </>
               }
             >
@@ -226,7 +228,7 @@ class BuildPage extends React.Component {
                   <TabTitleIcon>
                     <FileArchiveIcon />
                   </TabTitleIcon>
-                  <TabTitleText>Artifacts</TabTitleText>
+                  <TabTitleText>{_('Artifacts')}</TabTitleText>
                 </>
               }
             >
@@ -239,7 +241,7 @@ class BuildPage extends React.Component {
                   <TabTitleIcon>
                     <FileCodeIcon />
                   </TabTitleIcon>
-                  <TabTitleText>Logs</TabTitleText>
+                  <TabTitleText>{_('Logs')}</TabTitleText>
                 </>
               }
             >
@@ -252,7 +254,7 @@ class BuildPage extends React.Component {
                   <TabTitleIcon>
                     <TerminalIcon />
                   </TabTitleIcon>
-                  <TabTitleText>Console</TabTitleText>
+                  <TabTitleText>{_('Console')}</TabTitleText>
                 </>
               }
             >

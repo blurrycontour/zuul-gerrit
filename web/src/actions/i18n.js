@@ -1,4 +1,4 @@
-// Copyright 2018 Red Hat, Inc
+// Copyright 2020 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,21 +12,12 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { applyMiddleware, createStore } from 'redux'
-import thunk from 'redux-thunk'
-import {
-  setLocale,
-  loadTranslations,
-  syncTranslationWithStore,
-} from 'react-redux-i18n'
+import { setLocale } from 'react-redux-i18n'
+import { supportedLocales, fallbackLocale } from '../locales/config'
 
-import translations from './locales/translations'
-import appReducers from './reducers'
-
-const store = createStore(appReducers, applyMiddleware(thunk))
-
-syncTranslationWithStore(store)
-store.dispatch(loadTranslations(translations))
-store.dispatch(setLocale('en'))
-
-export default store
+export function setLocaleWithFallback(desiredLocale) {
+  const finalLocale = Object.keys(supportedLocales).includes(desiredLocale)
+    ? desiredLocale
+    : fallbackLocale
+  return dispatch => dispatch(setLocale(finalLocale))
+}

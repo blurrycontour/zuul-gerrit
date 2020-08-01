@@ -22,6 +22,7 @@
     "react-height": "^3.0.0",
     "react-json-view": "^1.19.1",
     "react-redux": "<7.1.1",
+    "react-redux-i18n": "1.9.3",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "react-scripts": "3.4.1",
@@ -50,7 +51,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "lint": "eslint --ext .js --ext .jsx src"
+    "lint": "eslint --ext .js --ext .jsx src",
+    "update-translation": "python ../tools/localize_web_UI.py --path ./src --lang "
   },
   "browserslist": [
     ">0.2%",

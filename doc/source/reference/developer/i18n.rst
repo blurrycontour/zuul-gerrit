@@ -1,0 +1,118 @@
+Zuul internationalization
+=========================
+
+The Zuul dashboard supports multiple languages. In alphabetical order:
+
+* English (US)
+
+Adding a language
+-----------------
+
+If you are fluent in a language, you can add support for it in Zuul by following
+these steps.
+
+#. Create a new locale folder in web/src/locales. It should be named after the
+   international, four-letter language code of the new language.
+#. Copy web/src/locales/fr_FR/translations.json (or any existing translation file you
+   want to use as a base) into the new folder.
+#. Translate all the strings!
+#. Import your new JSON file in web/src/locales/translations.js, following the existing
+   model for already supported languages.
+#. In web/src/locales/config.js, add your language to ``supportedLocales``.
+#. Add your language at the top of this document.
+
+Commit and submit for review.
+
+Adding new strings
+------------------
+
+In the React application
+........................
+
+Two helper functions, ``_`` and ``t``, can be imported from ``locale/utils``. These
+make translation handling fairly transparent for the developer.
+
+``_`` returns a translated Component that gets updated automatically when a user changes
+the language setting. This should be used in rendering functions, nested inside
+other components or HTML tags. Example:
+
+.. code-block:: javascript
+
+   render (
+       [...]
+       <FormGroup controlId='jobs-flatten'>
+         &nbsp; {_('Flatten list')} &nbsp;
+       [...]
+   )
+
+``t`` can be used to translate any string that cannot be nested into a component,
+for example properties within a component or HTML tag. Example:
+
+.. code-block:: javascript
+
+   <FormControl
+       type='text'
+       placeholder={t('job name')}
+       defaultValue={filter}
+       inputRef={i => this.filter = i}
+       onKeyPress={this.handleKeyPress} />
+
+In the worst case scenario, using ``t`` will *always* work.
+
+Many examples covering most use cases, like templating and plurals, can be found
+in the dashboard's source code.
+
+In translations.json files
+..........................
+
+A yarn script can be used to help update existing translations.json files with
+the new translated strings, or generate a new translations.json file from another
+locale:
+
+.. code-block:: shell
+
+   yarn update-translation <language-code>
+
+where ``language-code`` is an existing locale. The script generates a pseudo-JSON
+object. Once completed, overwrite the existing translations.json file with the
+updated values.
+
+Under the hood
+--------------
+
+Translating is done with the **react-redux-i18n** library.
+More details on how to work with react-redux-i18n can be found on the project's
+`repository`_ , and in this `tutorial`_.
+
+.. _repository: https://github.com/artisavotins/react-redux-i18n
+.. _tutorial: https://phrase.com/blog/posts/react-redux-tutorial-internationalization-with-react-i18n-redux/
+
+Adding translations in a language you don't know
+------------------------------------------------
+
+If you are adding a new feature to the Zuul dashboard, chances are you might
+not be able to translate the extra text in every language supported by Zuul.
+As long as the english version of the extra text is correct, missing translations
+should *never* prevent a feature from being merged. It is however advised to
+notify known Zuul translators, so that they can work with you on the translation
+of your feature in their language.
+
+Unofficial list of Zuul dashboard translators
+---------------------------------------------
+
+Feel free to add these people to your reviews if you need help with a specific
+language translation:
+
+-
+
+Known limitations
+-----------------
+
+Strings translated using the `t` method are not refreshed when the user selects
+a language. A simple workaround is to switch to another page in the dashboard,
+then come back.
+
+TODO
+----
+
+Localize durations. There is probably support for this in the Moment library.

@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import { Panel } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
+import { _ } from '../../locales/utils'
 
 function updateSelection (event) {
   const lines = window.location.hash.substring(1).split('-').map(Number)
@@ -54,16 +55,16 @@ class LogFile extends React.Component {
     return (
       <React.Fragment>
         <Panel>
-          <Panel.Heading>Build result {build.uuid}</Panel.Heading>
+          <Panel.Heading>{_('buildResult', {uuid: build.uuid})}</Panel.Heading>
           <Panel.Body>
-            <Link to="?">All</Link>&nbsp;
-            <Link to="?severity=1">Debug</Link>&nbsp;
-            <Link to="?severity=2">Info</Link>&nbsp;
-            <Link to="?severity=3">Warning</Link>&nbsp;
-            <Link to="?severity=4">Error</Link>&nbsp;
-            <Link to="?severity=5">Trace</Link>&nbsp;
-            <Link to="?severity=6">Audit</Link>&nbsp;
-            <Link to="?severity=7">Critical</Link>&nbsp;
+              <Link to="?">{_('All')}</Link>&nbsp;
+              <Link to="?severity=1">{_('Debug')}</Link>&nbsp;
+              <Link to="?severity=2">{_('Info')}</Link>&nbsp;
+              <Link to="?severity=3">{_('Warning')}</Link>&nbsp;
+              <Link to="?severity=4">{_('Error')}</Link>&nbsp;
+              <Link to="?severity=5">{_('Trace')}</Link>&nbsp;
+              <Link to="?severity=6">{_('Audit')}</Link>&nbsp;
+              <Link to="?severity=7">{_('Critical')}</Link>&nbsp;
           </Panel.Body>
         </Panel>
         <pre className="zuul-log-output">
