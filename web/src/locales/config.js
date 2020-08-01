@@ -14,6 +14,7 @@
 
 export const supportedLocales = {
   en_US: 'English (US)',
+  fr_FR: 'Français (FR)',
 }
 
 export const fallbackLocale = 'en_US'

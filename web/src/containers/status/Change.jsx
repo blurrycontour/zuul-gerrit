@@ -49,7 +49,7 @@ class Change extends React.Component {
       iconTitle = t('Waiting until closer to head of queue to start jobs')
     } else if (change.live !== true) {
       iconGlyph =  'pficon pficon-info'
-      iconTitle = 'Dependent change required for testing'
+      iconTitle = t('Dependent change required for testing')
     } else if (change.failing_reasons &&
                change.failing_reasons.length > 0) {
       let reason = change.failing_reasons.join(', ')

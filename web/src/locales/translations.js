@@ -13,9 +13,11 @@
 // under the License.
 
 import enUSTranslations from './en_US/translations.json'
+import frFRTranslations from './fr_FR/translations.json'
 
 const translations = {
   en_US: enUSTranslations,
+  fr_FR: frFRTranslations,
 }
 
 export default translations
