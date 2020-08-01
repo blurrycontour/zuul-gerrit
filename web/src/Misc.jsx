@@ -17,10 +17,10 @@ import PropTypes from 'prop-types'
 import { ExternalLinkAltIcon } from '@patternfly/react-icons'
 
 function ExternalLink(props) {
-  const { target } = props
+  const { target, title } = props
 
   return (
-    <a href={target}>
+    <a href={target} title={title}>
       <span>
         {props.children}
         {/* As we want the icon to be smaller than "sm", we have to specify the

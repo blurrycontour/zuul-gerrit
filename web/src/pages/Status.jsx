@@ -25,6 +25,8 @@ import {
 } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { _, t } from '../locales/utils'
+
 import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'
 import { Fetchable } from '../containers/Fetching'
@@ -94,7 +96,7 @@ class StatusPage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Status'
+    document.title = t('Zuul Status')
     this.loadState()
     if (this.props.tenant.name) {
       this.updateData()
@@ -156,17 +158,20 @@ class StatusPage extends React.Component {
   }
 
   renderStatusHeader (status) {
+    let teq_len = status.trigger_event_queue ?
+                  status.trigger_event_queue.length :
+                  '0'
+    let meq_len = status.management_event_queue ?
+                  status.management_event_queue.length :
+                  '0'
+    let req_len = status.result_event_queue ?
+                  status.result_event_queue.length :
+                  '0'
     return (
       <p>
-        Queue lengths: <span>{status.trigger_event_queue ?
-                              status.trigger_event_queue.length : '0'
-          }</span> events,&nbsp;
-        <span>{status.management_event_queue ?
-              status.management_event_queue.length : '0'
-          }</span> management events,&nbsp;
-        <span>{status.result_event_queue ?
-              status.result_event_queue.length : '0'
-          }</span> results.
+        Queue lengths: <span>{teq_len}</span> {_('events', {count: teq_len})},&nbsp;
+        <span>{meq_len}</span> {_('management_events', {count: meq_len})},&nbsp;
+        <span>{req_len}</span> {_('results', {count: req_len})}.
       </p>
     )
   }
@@ -174,9 +179,9 @@ class StatusPage extends React.Component {
   renderStatusFooter (status) {
     return (
       <React.Fragment>
-        <p>Zuul version: <span>{status.zuul_version}</span></p>
+        <p>{_('Zuul version: ')}<span>{status.zuul_version}</span></p>
         {status.last_reconfigured ? (
-          <p>Last reconfigured: <span>
+          <p>{_('Last reconfigured: ')}<span>
               {moment.utc(status.last_reconfigured).tz(this.props.timezone).format('llll')}
           </span></p>) : ''}
       </React.Fragment>
@@ -196,7 +201,7 @@ class StatusPage extends React.Component {
         <FormGroup controlId='status'>
           <FormControl
             type='text'
-            placeholder='change or project name'
+            placeholder={t('change or project name')}
             defaultValue={filter}
             inputRef={i => this.filter = i}
             onKeyPress={this.handleKeyPress} />
@@ -206,14 +211,14 @@ class StatusPage extends React.Component {
               onClick={() => {this.setFilter('')}}
               style={{cursor: 'pointer', zIndex: 10, pointerEvents: 'auto'}}
               >
-              <Icon type='pf' title='Clear filter' name='delete' />
+              <Icon type='pf' title={t('Clear filter')} name='delete' />
               &nbsp;
             </span>
           </FormControl.Feedback>
             )}
         </FormGroup>
         <FormGroup controlId='status'>
-          &nbsp; Expand by default:&nbsp;
+          &nbsp; {_('Expand by default')}:&nbsp;
           <Checkbox
             defaultChecked={expanded}
             onChange={this.handleCheckBox} />
@@ -231,7 +236,7 @@ class StatusPage extends React.Component {
             defaultChecked={autoReload}
             onChange={(e) => {this.setState({autoReload: e.target.checked})}}
             style={{marginTop: '0px', marginLeft: '10px'}}>
-            auto reload
+            {_('auto reload')}
           </Checkbox>
         </div>
 

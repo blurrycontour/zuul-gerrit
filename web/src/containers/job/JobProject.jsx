@@ -15,6 +15,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { _ } from '../../locales/utils'
+
 
 class JobProject extends React.Component {
   static propTypes = {
@@ -27,9 +29,9 @@ class JobProject extends React.Component {
       <span>
         {project.project_name}
         {project.override_branch && (
-        ' ( override-branch: ' + project.override_branch + ')')}
+        _('overrideBranch', {item: project.override_branch}) )}
         {project.override_checkout && (
-        ' ( override-checkout: ' + project.override_checkout+ ')')}
+        _('overrideCheckout', {item: project.override_checkout}) )}
       </span>
     )
   }

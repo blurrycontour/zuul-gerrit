@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom'
 import * as moment from 'moment'
 import 'moment-duration-format'
 
+import { _, t } from '../../locales/utils'
 
 class ChangePanel extends React.Component {
   static propTypes = {
@@ -163,17 +164,17 @@ class ChangePanel extends React.Component {
   renderTimer (change) {
     let remainingTime
     if (change.remaining_time === null) {
-      remainingTime = 'unknown'
+      remainingTime = _('unknown')
     } else {
       remainingTime = this.time(change.remaining_time)
     }
     return (
       <React.Fragment>
-        <small title='Remaining Time' className='time'>
+        <small title={t('Remaining Time')} className='time'>
           {remainingTime}
         </small>
         <br />
-        <small title='Elapsed Time' className='time'>
+        <small title={t('Elapsed Time')} className='time'>
           {this.enqueueTime(change.enqueue_time)}
         </small>
       </React.Fragment>
@@ -194,7 +195,7 @@ class ChangePanel extends React.Component {
       className = 'progress-bar-striped progress-bar-animated'
     }
     if (remaining !== null) {
-      title = 'Estimated time remaining: ' + moment.duration(remaining).format({
+      title = t('Estimated time remaining: ') + moment.duration(remaining).format({
         template: 'd [days] h [hours] m [minutes] s [seconds]',
         largest: 2,
         minValue: 30,
@@ -240,31 +241,29 @@ class ChangePanel extends React.Component {
     }
 
     return (
-      <span className={'zuul-job-result label ' + className}>{result}</span>
+      <span className={'zuul-job-result label ' + className}>{_(result)}</span>
     )
   }
 
   renderJob (job) {
     const { tenant } = this.props
     let job_name = job.name
-    if (job.tries > 1) {
-      job_name = job_name + ' (' + job.tries + '. attempt)'
-    }
+    let job_tries = _('jobTries', {count: job.tries})
     let name = ''
     if (job.result !== null) {
-      name = <a className='zuul-job-name' href={job.report_url}>{job_name}</a>
+      name = <a className='zuul-job-name' href={job.report_url}>{job_name}{job.tries > 1 ? job_tries : ''}</a>
     } else if (job.url !== null) {
       let url = job.url
       if (job.url.match('stream/')) {
         const to = (
           tenant.linkPrefix + '/' + job.url
         )
-        name = <Link className='zuul-job-name' to={to}>{job_name}</Link>
+        name = <Link className='zuul-job-name' to={to}>{job_name}{job.tries > 1 ? job_tries : ''}</Link>
       } else {
-        name = <a className='zuul-job-name' href={url}>{job_name}</a>
+        name = <a className='zuul-job-name' href={url}>{job_name}{job.tries > 1 ? job_tries : ''}</a>
       }
     } else {
-      name = <span className='zuul-job-name'>{job_name}</span>
+      name = <span className='zuul-job-name'>{job_name}{job.tries > 1 ? job_tries : ''}</span>
     }
     let resultBar
     let result = this.jobStrResult(job)
@@ -280,7 +279,7 @@ class ChangePanel extends React.Component {
         {name}
         {resultBar}
         {job.voting === false ? (
-          <small className='zuul-non-voting-desc'> (non-voting)</small>) : ''}
+          <small className='zuul-non-voting-desc'> {_('(non-voting)')}</small>) : ''}
         <div style={{clear: 'both'}} />
       </span>)
   }

@@ -25,6 +25,8 @@ import {
 } from '@patternfly/react-core'
 import { BuildIcon } from '@patternfly/react-icons'
 
+import { _, t } from '../locales/utils'
+
 import { fetchBuildsetIfNeeded } from '../actions/build'
 import { EmptyPage } from '../containers/Errors'
 import { Fetchable, Fetching } from '../containers/Fetching'
@@ -50,7 +52,7 @@ class BuildsetPage extends React.Component {
   }
 
   componentDidMount() {
-    document.title = 'Zuul Buildset'
+    document.title = t('Zuul Buildset')
     if (this.props.tenant.name) {
       this.updateData()
     }
@@ -77,10 +79,10 @@ class BuildsetPage extends React.Component {
       // identify the error here?
       return (
         <EmptyPage
-          title="This buildset does not exist"
+          title={t('This buildset does not exist')}
           icon={BuildIcon}
           linkTarget={`${tenant.linkPrefix}/buildsets`}
-          linkText="Show all buildsets"
+          linkText={t('Show all buildsets')}
         />
       )
     }
@@ -98,7 +100,7 @@ class BuildsetPage extends React.Component {
         <EmptyState variant={EmptyStateVariant.small}>
           <EmptyStateIcon icon={BuildIcon} />
           <Title headingLevel="h4" size="lg">
-            This buildset does not contain any builds
+            {_('This buildset does not contain any builds')}
           </Title>
         </EmptyState>
       </>
@@ -124,7 +126,7 @@ class BuildsetPage extends React.Component {
                 verticalAlign: '-0.1em',
               }}
             />{' '}
-            Builds
+            {_('Builds')}
           </Title>
           {buildsContent}
         </PageSection>

@@ -22,6 +22,8 @@ import {
   Icon,
 } from 'patternfly-react'
 
+import { _ } from '../../locales/utils'
+
 import SourceContext from '../SourceContext'
 import Nodeset from './Nodeset'
 import Role from './Role'
@@ -71,7 +73,7 @@ class JobVariant extends React.Component {
           {status.map((item, idx) => (
             <div key={idx} className="list-view-pf-additional-info-item">
               <Icon type='pf' name={item.icon} />
-              {item.name}
+              {_(item.name)}
             </div>
           ))}
       </div>
@@ -88,8 +90,8 @@ class JobVariant extends React.Component {
       'nodeset', 'variables', 'override_checkout',
     ]
     jobInfos.forEach(key => {
-      let label = key
       let value = variant[key]
+      let label = key === 'override_checkout' ? 'override checkout' : key
 
       if (label === 'context' && value) {
         value = (
@@ -101,7 +103,7 @@ class JobVariant extends React.Component {
       if (label === 'builds') {
         value = (
           <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + variant.name}>
-            build history
+            {_('build history')}
           </Link>
         )
       }
@@ -155,15 +157,20 @@ class JobVariant extends React.Component {
           </ReactHeight>
         )
       }
-      rows.push({label: label, value: value})
+      rows.push({label: _(label), value: value})
     })
     const jobInfosList = [
       'required_projects', 'dependencies', 'files', 'irrelevant_files', 'roles'
     ]
     jobInfosList.forEach(key => {
       let label = key
+      if (key === 'irrelevant_files') {
+        label = 'irrelevant files'
+      }
+      if (key === 'required_projects') {
+        label = 'required projects'
+      }
       let values = variant[key]
-
       if (values.length === 0) {
         return
       }
@@ -177,7 +184,7 @@ class JobVariant extends React.Component {
               item = <Role role={value} />
             } else if (label === 'dependencies') {
               if (value['soft']) {
-                item = value['name'] + ' (soft)'
+                item = _('softDependency', {dependency: value['name']})
               } else {
                 item = value['name']
               }
@@ -192,7 +199,7 @@ class JobVariant extends React.Component {
           })}
         </ul>
       )
-      rows.push({label: label, value: items})
+      rows.push({label: _(label), value: items})
     })
     return (
       <div>

@@ -19,8 +19,11 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { _, t } from '../locales/utils'
+
 import { fetchBuildsets } from '../api'
 import TableFilters from '../containers/TableFilters'
+import { Fetching } from '../containers/Fetching'
 
 
 class BuildsetsPage extends TableFilters {
@@ -52,7 +55,7 @@ class BuildsetsPage extends TableFilters {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Buildsets'
+    document.title = t('Zuul Buildsets')
     if (this.props.tenant.name) {
       this.updateData(this.getFilterFromUrl())
     }
@@ -65,7 +68,7 @@ class BuildsetsPage extends TableFilters {
   }
 
   prepareTableHeaders() {
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading>{_(value)}</Table.Heading>
     const cellFormat = (value) => <Table.Cell>{value}</Table.Cell>
     const linkChangeFormat = (value, rowdata) => (
       <Table.Cell>
@@ -79,7 +82,7 @@ class BuildsetsPage extends TableFilters {
       </Table.Cell>
     )
     const linkBuildsetFormat = (value, rowdata) => (
-      <Table.Cell>
+      <Table.Cell title={t(value)}>
         <Link
           to={this.props.tenant.linkPrefix +
               '/buildset/' + rowdata.rowData.uuid}>
@@ -112,8 +115,8 @@ class BuildsetsPage extends TableFilters {
       if (column !== 'builds') {
         this.filterTypes.push({
           id: prop,
-          title: label,
-          placeholder: 'Filter by ' + label,
+          title: t(label),
+          placeholder: t('Filter by', {filter: t(label)}),
           filterType: 'text',
         })
       }
@@ -121,8 +124,8 @@ class BuildsetsPage extends TableFilters {
     // Add buildset filter at the end
     this.filterTypes.push({
       id: 'uuid',
-      title: 'Buildset',
-      placeholder: 'Filter by Buildset UUID',
+      title: t('Buildset'),
+      placeholder: t('Filter by Buildset UUID'),
       filterType: 'text',
     })
   }
@@ -154,7 +157,7 @@ class BuildsetsPage extends TableFilters {
     return (
       <PageSection variant={PageSectionVariants.light}>
         {this.renderFilter()}
-        {buildsets ? this.renderTable(buildsets) : <p>Loading...</p>}
+        {buildsets ? this.renderTable(buildsets) : <Fetching />}
       </PageSection>
     )
   }

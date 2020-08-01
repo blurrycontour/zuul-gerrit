@@ -19,6 +19,7 @@ import SwaggerUi from 'swagger-ui'
 import 'swagger-ui/dist/swagger-ui.css'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { t } from '../locales/utils'
 import { fetchOpenApiIfNeeded } from '../actions/openapi'
 
 
@@ -34,7 +35,7 @@ class OpenApiPage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = 'Zuul API'
+    document.title = t('Zuul API')
     this.updateData()
   }
 

@@ -19,3 +19,4 @@ Zuul, though advanced users may find it interesting.
    javascript
    specs/index
    releasenotes
+   i18n
