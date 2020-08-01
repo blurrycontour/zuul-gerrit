@@ -25,6 +25,8 @@ import {
   StreamIcon,
 } from '@patternfly/react-icons'
 
+import { _ } from '../../locales/utils'
+
 import { ExternalLink } from '../../Misc'
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 
@@ -35,7 +37,7 @@ function Buildset(props) {
     <>
       <Title headingLevel="h2">
         <BuildResultWithIcon result={buildset.result} size="md">
-          Buildset result
+          {_('Buildset result')}
         </BuildResultWithIcon>
         <BuildResultBadge result={buildset.result} />
         {fetchable}
@@ -59,7 +61,7 @@ function Buildset(props) {
                   icon={<CodeIcon />}
                   value={
                     <ExternalLink target={buildset.ref_url}>
-                      <strong>Change </strong>
+                      <strong>{_('Change')} </strong>
                       {buildset.change},{buildset.patchset}
                     </ExternalLink>
                   }
@@ -71,7 +73,7 @@ function Buildset(props) {
                 icon={<CubeIcon />}
                 value={
                   <>
-                    <strong>Project </strong> {buildset.project}
+                    <strong>{_('Project')} </strong> {buildset.project}
                   </>
                 }
               />
@@ -80,7 +82,7 @@ function Buildset(props) {
                 icon={<CodeBranchIcon />}
                 value={
                   <>
-                    <strong>Branch </strong> {buildset.branch}
+                    <strong>{_('Branch')} </strong> {buildset.branch}
                   </>
                 }
               />
@@ -89,7 +91,7 @@ function Buildset(props) {
                 icon={<StreamIcon />}
                 value={
                   <>
-                    <strong>Pipeline </strong> {buildset.pipeline}
+                    <strong>{_('Pipeline')} </strong> {buildset.pipeline}
                   </>
                 }
               />
@@ -98,8 +100,8 @@ function Buildset(props) {
                 icon={<FingerprintIcon />}
                 value={
                   <span>
-                    <strong>UUID </strong> {buildset.uuid} <br />
-                    <strong>Event ID </strong> {buildset.event_id} <br />
+                    <strong>{_('UUID')} </strong> {buildset.uuid} <br />
+                    <strong>{_('Event ID')} </strong> {buildset.event_id} <br />
                   </span>
                 }
               />
@@ -114,7 +116,7 @@ function Buildset(props) {
                 icon={<OutlinedCommentDotsIcon />}
                 value={
                   <>
-                    <strong>Message:</strong>
+                    <strong>{_('Message:')}</strong>
                     <pre>{buildset.message}</pre>
                   </>
                 }

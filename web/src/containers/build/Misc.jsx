@@ -22,6 +22,9 @@ import {
   TimesIcon,
 } from '@patternfly/react-icons'
 
+import { _, t } from '../../locales/utils'
+
+
 const RESULT_ICON_CONFIGS = {
   SUCCESS: {
     icon: CheckIcon,
@@ -86,7 +89,7 @@ function BuildResult(props) {
   const iconConfig = RESULT_ICON_CONFIGS[result] || DEFAULT_RESULT_ICON_CONFIG
   const color = colored ? iconConfig.color : 'inherit'
 
-  return <span style={{ color: color }}>{result}</span>
+  return <span style={{ color: color }} title={result}>{_(result)}</span>
 }
 
 BuildResult.propTypes = {
@@ -106,8 +109,9 @@ function BuildResultBadge(props) {
         marginLeft: 'var(--pf-global--spacer--sm)',
         verticalAlign: '0.15em',
       }}
+      title={result}
     >
-      {result}
+      {_(result)}
     </Label>
   )
 }
@@ -138,6 +142,7 @@ function BuildResultWithIcon(props) {
           marginRight: 'var(--pf-global--spacer--sm)',
           verticalAlign: verticalAlign,
         }}
+        title={t(result)}
       />
       {props.children}
     </span>

@@ -19,6 +19,8 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { _, t } from '../locales/utils'
+
 import { Fetching } from '../containers/Fetching'
 import { fetchTenantsIfNeeded } from '../actions/tenants'
 
@@ -34,7 +36,7 @@ class TenantsPage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Tenants'
+    document.title = t('Zuul Tenants')
     this.updateData()
   }
 
@@ -48,7 +50,7 @@ class TenantsPage extends React.Component {
     }
 
     const tenants = remoteData.tenants
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading>{_(value)}</Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
     const columns = []
@@ -71,15 +73,15 @@ class TenantsPage extends React.Component {
     })
     tenants.forEach(tenant => {
       tenant.status = (
-        <Link to={'/t/' + tenant.name + '/status'}>Status</Link>)
+        <Link to={'/t/' + tenant.name + '/status'}>{_('Status')}</Link>)
       tenant.projects_link = (
-        <Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)
+        <Link to={'/t/' + tenant.name + '/projects'}>{_('Projects')}</Link>)
       tenant.jobs = (
-        <Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)
+        <Link to={'/t/' + tenant.name + '/jobs'}>{_('Jobs')}</Link>)
       tenant.builds = (
-        <Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)
+        <Link to={'/t/' + tenant.name + '/builds'}>{_('Builds')}</Link>)
       tenant.buildsets = (
-        <Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)
+        <Link to={'/t/' + tenant.name + '/buildsets'}>{_('Buildsets')}</Link>)
     })
     return (
       <PageSection variant={PageSectionVariants.light}>

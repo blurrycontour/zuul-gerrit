@@ -20,6 +20,8 @@ import {
 } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { _ } from '../locales/utils'
+
 import { fetchConfigErrorsAction } from '../actions/configErrors'
 
 class ConfigErrorsPage extends React.Component {
@@ -41,7 +43,7 @@ class ConfigErrorsPage extends React.Component {
           {/* Lint warning jsx-a11y/anchor-is-valid */}
           {/* eslint-disable-next-line */}
           <a className="refresh" onClick={() => {this.updateData()}}>
-            <Icon type="fa" name="refresh" /> refresh&nbsp;&nbsp;
+            <Icon type="fa" name="refresh" /> {_('refresh')}&nbsp;&nbsp;
           </a>
         </div>
         <div className="pull-left">

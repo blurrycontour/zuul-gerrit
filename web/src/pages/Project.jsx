@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { t } from '../locales/utils'
+
 import Project from '../containers/project/Project'
 import { fetchProjectIfNeeded } from '../actions/project'
 import { Fetchable } from '../containers/Fetching'
@@ -36,7 +38,7 @@ class ProjectPage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Project | ' + this.props.match.params.projectName
+    document.title = t('projectPageTitle', {projectName: this.props.match.params.projectName})
     if (this.props.tenant.name) {
       this.updateData()
     }

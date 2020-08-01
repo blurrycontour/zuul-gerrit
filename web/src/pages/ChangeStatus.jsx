@@ -17,6 +17,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { t } from '../locales/utils'
+
 import { fetchChangeIfNeeded } from '../actions/change'
 import ChangePanel from '../containers/status/ChangePanel'
 import { Fetchable } from '../containers/Fetching'
@@ -42,7 +44,7 @@ class ChangeStatusPage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = this.props.match.params.changeId + ' | Zuul Status'
+    document.title = t('changeStatusPageTitle', {changeId: this.props.match.params.changeId})
     if (this.props.tenant.name) {
       this.updateData()
     }

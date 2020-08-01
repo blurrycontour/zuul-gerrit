@@ -27,6 +27,8 @@ import { OutlinedClockIcon } from '@patternfly/react-icons'
 import 'moment-duration-format'
 import * as moment from 'moment'
 
+import { _ } from '../../locales/utils'
+
 import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
 
 class BuildList extends React.Component {
@@ -84,7 +86,7 @@ class BuildList extends React.Component {
                         size="sm"
                       >
                         {build.job_name}
-                        {!build.voting && ' (non-voting)'}
+                        {!build.voting && ' ' + _('(non-voting)')}
                       </BuildResultWithIcon>
                     </DataListCell>,
                     <DataListCell key={`${build.uuid}-time`}>
