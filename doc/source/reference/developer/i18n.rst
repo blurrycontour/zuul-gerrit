@@ -4,6 +4,7 @@ Zuul internationalization
 The Zuul dashboard supports multiple languages. In alphabetical order:
 
 * English (US)
+* Français (FR)
 
 Adding a language
 -----------------
@@ -13,9 +14,13 @@ these steps.
 
 #. Create a new locale folder in web/src/locales. It should be named after the
    international, four-letter language code of the new language.
-#. Copy web/src/locales/fr_FR/translations.json (or any existing translation file you
-   want to use as a base) into the new folder.
-#. Translate all the strings!
+#. Generate a pseudo-JSON file from the english translation:
+
+   .. code-block:: shell
+
+      yarn update-translation en_US > translation.json
+
+#. Translate all the strings and move the JSON file to the newly created locale folder.
 #. Import your new JSON file in web/src/locales/translations.js, following the existing
    model for already supported languages.
 #. In web/src/locales/config.js, add your language to ``supportedLocales``.
@@ -103,7 +108,10 @@ Unofficial list of Zuul dashboard translators
 Feel free to add these people to your reviews if you need help with a specific
 language translation:
 
--
+French
+......
+
+* Matthieu HUIN <mhuin@redhat.com>
 
 Known limitations
 -----------------

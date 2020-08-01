@@ -169,7 +169,7 @@ class StatusPage extends React.Component {
                   '0'
     return (
       <p>
-        Queue lengths: <span>{teq_len}</span> {_('events', {count: teq_len})},&nbsp;
+        {_('Queue lengths: ')}<span>{teq_len}</span> {_('events', {count: teq_len})},&nbsp;
         <span>{meq_len}</span> {_('management_events', {count: meq_len})},&nbsp;
         <span>{req_len}</span> {_('results', {count: req_len})}.
       </p>
