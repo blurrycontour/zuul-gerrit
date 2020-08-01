@@ -18,6 +18,8 @@ import PropTypes from 'prop-types'
 import { parse } from 'query-string'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { t } from '../locales/utils'
+
 import { fetchLogfileIfNeeded } from '../actions/logfile'
 import { Fetching } from '../containers/Fetching'
 import LogFile from '../containers/logfile/LogFile'
@@ -47,7 +49,7 @@ class LogFilePage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Build Logfile'
+    document.title = t('Zuul Build Logfile')
     if (this.props.tenant.name) {
       this.updateData()
     }

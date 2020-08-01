@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { t } from '../locales/utils'
+
 import Job from '../containers/job/Job'
 import { Fetchable } from '../containers/Fetching'
 import { fetchJobIfNeeded } from '../actions/job'
@@ -36,7 +38,7 @@ class JobPage extends React.Component {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Job | ' + this.props.match.params.jobName
+    document.title = t('jobPageTitle', {jobName: this.props.match.params.jobName})
     if (this.props.tenant.name) {
       this.updateData()
     }

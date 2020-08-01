@@ -25,6 +25,8 @@ import * as fit from 'xterm/lib/addons/fit/fit'
 import * as weblinks from 'xterm/lib/addons/webLinks/webLinks'
 import * as search from 'xterm/lib/addons/search/search'
 
+import { _, t } from '../locales/utils'
+
 import { getStreamUrl } from '../api'
 
 Terminal.applyAddon(fit)
@@ -89,7 +91,7 @@ class StreamPage extends React.Component {
     if (logfile) {
       params.logfile = logfile
     }
-    document.title = 'Zuul Stream | ' + params.uuid.slice(0, 7)
+    document.title = t('streamPageTitle', {id: params.uuid.slice(0, 7)})
 
     const term = new Terminal()
 
@@ -127,7 +129,7 @@ class StreamPage extends React.Component {
       },
       onclose: e => {
        console.log('onclose', e)
-       this.onMessage('\n--- END OF STREAM ---\n')
+       this.onMessage(t('\n--- END OF STREAM ---\n'))
       },
       onerror: e => {
        console.log('onerror:', e)
@@ -182,20 +184,20 @@ class StreamPage extends React.Component {
           <FormGroup controlId='stream'>
             <FormControl
               type='text'
-              placeholder='search'
+              placeholder={t('search')}
               onKeyPress={this.handleKeyPress}
             />
-            &nbsp; Use regex:&nbsp;
+            &nbsp; {_('Use regex:')}&nbsp;
             <Checkbox
               checked={this.state.searchRegex}
               onChange={this.handleCheckBoxRegex}>
             </Checkbox>
-            &nbsp; Case sensitive:&nbsp;
+            &nbsp; {_('Case sensitive:')}&nbsp;
             <Checkbox
               checked={this.state.searchCaseSensitive}
               onChange={this.handleCheckBoxCaseSensitive}>
             </Checkbox>
-            &nbsp; Whole word:&nbsp;
+            &nbsp; {_('Whole word:')}&nbsp;
             <Checkbox
               checked={this.state.searchWholeWord}
               onChange={this.handleCheckBoxWholeWord}>

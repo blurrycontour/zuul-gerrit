@@ -23,6 +23,8 @@ import {
   Spinner,
 } from '@patternfly/react-core'
 
+import { _ } from '../locales/utils'
+
 import { SyncIcon } from '@patternfly/react-icons'
 
 function Fetchable(props) {
@@ -43,7 +45,7 @@ function Fetchable(props) {
         onClick={() => {fetchCallback({force: true})}}
         style={{textDecoration: 'none'}}
       >
-        refresh
+        {_('refresh')}
       </Button>
     )
   }
@@ -65,7 +67,7 @@ function Fetching() {
     <EmptyState variant={EmptyStateVariant.small}>
       <Spinner />
       <Title headingLevel="h4" size="lg">
-        Fetching info...
+        {_('Fetching Info')}...
       </Title>
     </EmptyState>
   )

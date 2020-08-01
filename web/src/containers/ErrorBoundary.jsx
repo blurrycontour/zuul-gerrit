@@ -15,6 +15,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { _ } from '../locales/utils'
 
 class ErrorBoundary extends React.Component {
   static propTypes = {
@@ -33,7 +34,7 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      return <h1>Something went wrong.</h1>
+      return <h1>{_('Something went wrong.')}</h1>
     }
 
     return this.props.children

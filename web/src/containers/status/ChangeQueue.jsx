@@ -15,6 +15,8 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 
+import { _ } from '../../locales/utils'
+
 import Change from './Change'
 
 
@@ -45,7 +47,7 @@ class ChangeQueue extends React.Component {
     })
     return (
       <div className="change-queue" data-zuul-pipeline={pipeline}>
-        <p>Queue: <abbr title={queue.name}>{shortName}</abbr></p>
+        <p>{_('Queue: ')}<abbr title={queue.name}>{shortName}</abbr></p>
         {changesList}
       </div>)
   }

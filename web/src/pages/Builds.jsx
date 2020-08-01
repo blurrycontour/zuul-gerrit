@@ -21,8 +21,11 @@ import * as moment from 'moment-timezone'
 import 'moment-duration-format'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
+import { _, t } from '../locales/utils'
+
 import { fetchBuilds } from '../api'
 import TableFilters from '../containers/TableFilters'
+import { Fetching } from '../containers/Fetching'
 
 
 class BuildsPage extends TableFilters {
@@ -54,7 +57,7 @@ class BuildsPage extends TableFilters {
   }
 
   componentDidMount () {
-    document.title = 'Zuul Builds'
+    document.title = t('Zuul Builds')
     if (this.props.tenant.name) {
       this.updateData(this.getFilterFromUrl())
     }
@@ -68,11 +71,11 @@ class BuildsPage extends TableFilters {
   }
 
   prepareTableHeaders() {
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
+    const headerFormat = value => <Table.Heading>{_(value)}</Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
     const linkBuildFormat = (value, rowdata) => (
-      <Table.Cell>
+      <Table.Cell title={t(value)}>
         <Link to={this.props.tenant.linkPrefix + '/build/' + rowdata.rowData.uuid}>{value}</Link>
       </Table.Cell>
     )
@@ -129,8 +132,8 @@ class BuildsPage extends TableFilters {
           && prop !== 'log_url' && prop !== 'uuid') {
         this.filterTypes.push({
           id: prop,
-          title: label,
-          placeholder: 'Filter by ' + label,
+          title: t(label),
+          placeholder: t('Filter by', {filter: t(label)}),
           filterType: 'text',
         })
       }
@@ -138,8 +141,8 @@ class BuildsPage extends TableFilters {
     // Add build filter at the end
     this.filterTypes.push({
       id: 'uuid',
-      title: 'Build',
-      placeholder: 'Filter by Build UUID',
+      title: t('Build'),
+      placeholder: t('Filter by Build UUID'),
       filterType: 'text',
     })
   }
@@ -171,7 +174,7 @@ class BuildsPage extends TableFilters {
     return (
       <PageSection variant={PageSectionVariants.light}>
         {this.renderFilter()}
-        {builds ? this.renderTable(builds) : <p>Loading...</p>}
+        {builds ? this.renderTable(builds) : <Fetching />}
       </PageSection>
     )
   }

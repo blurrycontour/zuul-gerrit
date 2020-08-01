@@ -17,9 +17,15 @@ import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import { Panel } from 'react-bootstrap'
 import {
-  Icon,
   ListView,
 } from 'patternfly-react'
+import {
+  OkIcon,
+  AddCircleOIcon,
+  ErrorCircleOIcon,
+} from '@patternfly/react-icons'
+
+import { t } from '../../locales/utils'
 
 
 class BuildOutput extends React.Component {
@@ -35,16 +41,16 @@ class BuildOutput extends React.Component {
             key={host}
             heading={host}
             additionalInfo={[
-              <ListView.InfoItem key="ok" title="Task OK">
-                <Icon type='pf' name='info' />
+              <ListView.InfoItem key="ok" title={t('Task OK')}>
+                <OkIcon color='green'/>
                 <strong>{values.ok}</strong>
               </ListView.InfoItem>,
-              <ListView.InfoItem key="changed" title="Task changed">
-                <Icon type='pf' name='ok' />
+              <ListView.InfoItem key="changed" title={t('Task changed')}>
+                <AddCircleOIcon color='orange'/>
                 <strong>{values.changed}</strong>
               </ListView.InfoItem>,
-              <ListView.InfoItem key="fail" title="Task failure">
-                <Icon type='pf' name='error-circle-o' />
+              <ListView.InfoItem key="fail" title={t('Task failure')}>
+                <ErrorCircleOIcon color='red'/>
                 <strong>{values.failures}</strong>
               </ListView.InfoItem>
             ]}

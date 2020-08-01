@@ -39,6 +39,8 @@ import {
 import * as moment from 'moment'
 import 'moment-duration-format'
 
+import { _, t } from '../../locales/utils'
+
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 import { ExternalLink } from '../../Misc'
 
@@ -59,7 +61,7 @@ function Build(props) {
           colored={build.voting}
           size="md"
         >
-          {build.job_name} {!build.voting && ' (non-voting)'}
+          {build.job_name} {!build.voting && ' ' + _('(non-voting)')}
         </BuildResultWithIcon>
         <BuildResultBadge result={build.result} />
         {fetchable}
@@ -81,7 +83,7 @@ function Build(props) {
                   icon={<CodeIcon />}
                   value={
                     <ExternalLink target={build.ref_url}>
-                      <strong>Change </strong>
+                      <strong>{_('Change')} </strong>
                       {build.change},{build.patchset}
                     </ExternalLink>
                   }
@@ -93,7 +95,7 @@ function Build(props) {
                 icon={<CubeIcon />}
                 value={
                   <>
-                    <strong>Project </strong> {build.project}
+                    <strong>{_('Project')} </strong> {build.project}
                   </>
                 }
               />
@@ -102,7 +104,7 @@ function Build(props) {
                 icon={<CodeBranchIcon />}
                 value={
                   <>
-                    <strong>Branch </strong> {build.branch}
+                    <strong>{_('Branch')} </strong> {build.branch}
                   </>
                 }
               />
@@ -111,7 +113,7 @@ function Build(props) {
                 icon={<StreamIcon />}
                 value={
                   <>
-                    <strong>Pipeline </strong> {build.pipeline}
+                    <strong>{_('Pipeline')} </strong> {build.pipeline}
                   </>
                 }
               />
@@ -120,8 +122,8 @@ function Build(props) {
                 icon={<FingerprintIcon />}
                 value={
                   <span>
-                    <strong>UUID </strong> {build.uuid} <br />
-                    <strong>Event ID </strong> {build.event_id} <br />
+                    <strong>{_('UUID')} </strong> {build.uuid} <br />
+                    <strong>{_('Event ID')} </strong> {build.event_id} <br />
                   </span>
                 }
               />
@@ -136,13 +138,13 @@ function Build(props) {
                 icon={<OutlinedCalendarAltIcon />}
                 value={
                   <span>
-                    <strong>Started at </strong>
+                    <strong>{_('Started at')} </strong>
                     {moment
                       .utc(build.start_time)
                       .tz(timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
                     <br />
-                    <strong>Completed at </strong>
+                    <strong>{_('Completed at')} </strong>
                     {moment
                       .utc(build.end_time)
                       .tz(timezone)
@@ -155,7 +157,7 @@ function Build(props) {
                 icon={<OutlinedClockIcon />}
                 value={
                   <>
-                    <strong>Took </strong>
+                    <strong>{_('Took')} </strong>
                     {moment
                       .duration(build.duration, 'seconds')
                       .format('h [hr] m [min] s [sec]')}
@@ -173,7 +175,7 @@ function Build(props) {
                 icon={<BookIcon />}
                 value={
                   <Link to={tenant.linkPrefix + '/job/' + build.job_name}>
-                    View job documentation
+                    {_('View job documentation')}
                   </Link>
                 }
               />
@@ -189,9 +191,9 @@ function Build(props) {
                       '&project=' +
                       build.project
                     }
-                    title="See previous runs of this job inside current project."
+                    title={t('See previous runs of this job inside current project.')}
                   >
-                    View build history
+                    {_('View build history')}
                   </Link>
                 }
               />
@@ -209,7 +211,7 @@ function Build(props) {
                         tenant.linkPrefix + '/buildset/' + build.buildset.uuid
                       }
                     >
-                      View buildset result
+                      {_('View buildset result')}
                     </Link>
                   }
                 />
@@ -219,14 +221,14 @@ function Build(props) {
                 icon={<FileCodeIcon />}
                 value={
                   build.log_url ? (
-                    <ExternalLink target={build.log_url}>View log</ExternalLink>
+                    <ExternalLink target={build.log_url}>{_('View log')}</ExternalLink>
                   ) : (
                     <span
                       style={{
                         color: 'var(--pf-global--disabled-color--100)',
                       }}
                     >
-                      No log available
+                      {_('No log available')}
                     </span>
                   )
                 }
