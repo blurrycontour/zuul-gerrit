@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from typing import Dict, Any
 
 import gear
 import json
@@ -108,12 +109,21 @@ class ZuulGearmanClient(gear.Client):
                     self.__zuul_gearman.onUnknownJob(job)
 
 
+class ZuulZookeeperJobHandler(object):
+    def __init__(self, log):
+        self.log = log
+
+    def __call__(self, uuid: str, data: Dict[str, Any]):
+        self.log.debug("Job %s: %s" % (uuid, json.dumps(data)))
+
+
 class ExecutorClient(object):
     log = logging.getLogger("zuul.ExecutorClient")
 
-    def __init__(self, config, sched):
+    def __init__(self, config, sched, zk):
         self.config = config
         self.sched = sched
+        self.zk = zk
         self.builds = {}
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
 
@@ -196,6 +206,7 @@ class ExecutorClient(object):
             job.name))
 
         params = dict()
+        params['unique'] = uuid
         params['job'] = job.name
         params['timeout'] = job.timeout
         params['post_timeout'] = job.post_timeout
@@ -358,8 +369,16 @@ class ExecutorClient(object):
             precedence = gear.PRECEDENCE_HIGH
         elif pipeline.precedence == zuul.model.PRECEDENCE_LOW:
             precedence = gear.PRECEDENCE_LOW
+        else:
+            precedence = gear.PRECEDENCE_NORMAL
 
         try:
+            # TODO JK: First identifying places where gearman needs to be
+            # replaced with zookeeper
+            build.__zk_node = self.zk.submitJob(
+                uuid, params, precedence=pipeline.precedence,
+                watcher=ZuulZookeeperJobHandler(self.log))
+
             self.gearman.submitJob(gearman_job, precedence=precedence,
                                    timeout=300)
         except Exception:
@@ -412,6 +431,7 @@ class ExecutorClient(object):
             log.debug("Canceled running build")
             return True
         log.error("Unable to cancel build")
+        return False
 
     def onBuildCompleted(self, job, result=None):
         if job.unique in self.meta_jobs:
@@ -540,6 +560,8 @@ class ExecutorClient(object):
         log.debug("Submitting stop job: %s", stop_job)
         self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
                                timeout=300)
+
+        self.zk.cancelBuildRequest(build.__zk_node)
         return True
 
     def resumeBuild(self, build):
@@ -555,6 +577,8 @@ class ExecutorClient(object):
         log.debug("Submitting resume job: %s", stop_job)
         self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
                                timeout=300)
+
+        self.zk.resumeBuildRequest(build.__zk_node)
 
     def lookForLostBuilds(self):
         self.log.debug("Looking for lost builds")

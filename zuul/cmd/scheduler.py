@@ -139,12 +139,12 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         self.sched = zuul.scheduler.Scheduler(self.config)
 
-        gearman = zuul.executor.client.ExecutorClient(self.config, self.sched)
+        zookeeper = zuul.zk.connect_zookeeper(self.config)
+        gearman = zuul.executor.client.ExecutorClient(self.config, self.sched,
+                                                      zookeeper)
         self.sched.setZuulApp(self)
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-
-        zookeeper = zuul.zk.connect_zookeeper(self.config)
 
         self.configure_connections()
         self.sched.setExecutor(gearman)

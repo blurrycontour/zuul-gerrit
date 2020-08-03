@@ -167,8 +167,7 @@ class ZooKeeperNodepoolMixin:
             path = self.HOLD_REQUEST_ROOT + "/" + request.id
             self.client.set(path, request.serialize())
 
-    def _markHeldNodesAsUsed(self,
-                             request: zuul.model.HoldRequest):
+    def _markHeldNodesAsUsed(self, request: zuul.model.HoldRequest):
         """
         Changes the state for each held node for the hold request to 'used'.
 
