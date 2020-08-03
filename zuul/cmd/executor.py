@@ -100,11 +100,11 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         zookeeper = connect_zookeeper(self.config)
 
         ExecutorServer = zuul.executor.server.ExecutorServer
-        self.executor = ExecutorServer(self.config, self.connections,
+        self.executor = ExecutorServer(self.config, zookeeper,
+                                       self.connections,
                                        jobdir_root=self.job_dir,
                                        keep_jobdir=self.args.keep_jobdir,
                                        log_streaming_port=self.finger_port)
-        self.executor.setZookeeper(zookeeper)
         self.executor.start()
 
         if self.args.nodaemon:
