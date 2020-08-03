@@ -1,5 +1,7 @@
 :title: Github Checks API
 
+.. default-domain:: zuul
+
 Github Checks API
 =================
 

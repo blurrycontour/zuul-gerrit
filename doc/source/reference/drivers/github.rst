@@ -2,6 +2,8 @@
 
 .. _github_driver:
 
+.. default-domain:: zuul
+
 GitHub
 ======
 
@@ -349,25 +351,50 @@ itself. Status name, description, and context is taken from the pipeline.
    attributes:
 
    .. attr:: status
+      :type: str
+      :default: None
 
-      String value (``pending``, ``success``, ``failure``) that the
-      reporter should set as the commit status on github.
+      Report status via the Github `status API
+      <https://docs.github.com/v3/repos/statuses/>`__.  Set to one of
+
+      * ``pending``
+      * ``success``
+      * ``failure``
+
+      This is usually mutually exclusive with a value set in
+      :attr:`pipeline.<reporter>.<github source>.check`, since this
+      reports similar results via a different API.  This API is older
+      and results do not show up on the "checks" tab in the Github UI.
+      It is recommended to use `check` unless you have a specific
+      reason to use the status API.
 
    .. TODO support role markup in :default: so we can xref
       :attr:`web.status_url` below
 
    .. attr:: status-url
-      :default: web.status_url or the empty string
+      :default: link to the build status page
+      :type: string
 
-      String value for a link url to set in the github
-      status. Defaults to the zuul server status_url, or the empty
-      string if that is unset.
+      URL to set in the Github status.
+
+      Defaults to a link to the build status or results page.  This
+      should probably be left blank unless there is a specific reason
+      to override it.
 
    .. attr:: check
+      :type: string
 
-      If the reporter should utilize github's checks API to set the commit
-      status, this must be set to ``in_progress``, ``success``, ``failure``
-      or ``cancelled`` (depending on which status the reporter should report).
+      Report status via the Github `checks API
+      <https://docs.github.com/v3/checks/>`__.  Set to one of
+
+      * ``in_progress``
+      * ``success``
+      * ``failure``
+      *  ``cancelled``
+
+      This is usually mutually exclusive with a value set in
+      :attr:`pipeline.<reporter>.<github source>.status`, since this
+      reports similar results via a different API.
 
    .. attr:: comment
       :default: true
