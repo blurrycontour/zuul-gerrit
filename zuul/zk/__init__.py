@@ -23,12 +23,16 @@ from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
+from zuul.zk.builds import ZooKeeperBuildsMixin
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepoolMixin
 from zuul.zk.zuul import ZooKeeperZuulMixin
 
 
-class ZooKeeper(ZooKeeperNodepoolMixin, ZooKeeperZuulMixin, object):
+class ZooKeeper(ZooKeeperNodepoolMixin,
+                ZooKeeperZuulMixin,
+                ZooKeeperBuildsMixin,
+                object):
     '''
     Class implementing the ZooKeeper interface.
 

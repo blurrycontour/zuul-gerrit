@@ -3762,12 +3762,13 @@ class SchedulerTestApp:
 
         self.sched.registerConnections(self.connections)
 
-        executor_client = zuul.executor.client.ExecutorClient(
-            self.config, self.sched)
-        merge_client = RecordingMergeClient(self.config, self.sched)
-        nodepool = zuul.nodepool.Nodepool(self.sched)
         zk = zuul.zk.ZooKeeper(enable_cache=True)
         zk.connect(self.zk_config, timeout=30.0)
+
+        executor_client = zuul.executor.client.ExecutorClient(
+            self.config, self.sched, zk)
+        merge_client = RecordingMergeClient(self.config, self.sched)
+        nodepool = zuul.nodepool.Nodepool(self.sched)
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
@@ -3938,17 +3939,23 @@ class ZuulTestCase(BaseTestCase):
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(
-            self.config, self.scheds.first.connections)
+            self.config, self.zk, self.scheds.first.connections)
         self.merge_server.start()
 
     def setUp(self):
         super(ZuulTestCase, self).setUp()
 
-        self.setupZK()
+        zk_chroot_fixture = self.useFixture(ChrootedKazooFixture(self.id()))
+        self.zk_config = '%s:%s%s' % (
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot)
         self.fake_nodepool = FakeNodepool(
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot)
+        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
+        self.zk.connect(self.zk_config, timeout=30.0)
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4055,7 +4062,7 @@ class ZuulTestCase(BaseTestCase):
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
-            self.config, executor_connections,
+            self.config, self.zk, executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
@@ -4266,14 +4273,6 @@ class ZuulTestCase(BaseTestCase):
         with open(os.path.join(FIXTURE_DIR, 'ssh.pem')) as i:
             with open(private_key_file, 'w') as o:
                 o.write(i.read())
-
-    def setupZK(self):
-        self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id()))
-        self.zk_config = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
