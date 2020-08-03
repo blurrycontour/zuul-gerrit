@@ -16,6 +16,24 @@
       "revId": "3cae84145a621f37ec7e37425121bb7b0a4f0e72",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_7c196d20",
+        "filename": "tests/base.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2272,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-08-03T05:23:41Z",
+      "side": 1,
+      "message": "I don\u0027t think it is ever fine to use mutable defaults. Just because it isn\u0027t mutated at the moment doesn\u0027t meant that it won\u0027t be in the future. I\u0027ve been bitten by this more than once in other code bases and it was a PITA to debug.\n\nTest cases should IMHO adhere to the same standards as the production code.",
+      "parentUuid": "9f560f44_ea73fcaf",
+      "revId": "3cae84145a621f37ec7e37425121bb7b0a4f0e72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
