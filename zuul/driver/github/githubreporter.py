@@ -128,12 +128,7 @@ class GithubReporter(BaseReporter):
             sha = item.change.newrev
         state = self._commit_status
 
-        url_pattern = self.config.get('status-url')
-        if not url_pattern:
-            sched_config = self.connection.sched.config
-            if sched_config.has_option('web', 'status_url'):
-                url_pattern = sched_config.get('web', 'status_url')
-        url = item.formatUrlPattern(url_pattern) if url_pattern else ''
+        url = item.formatStatusUrl()
 
         description = '%s status: %s' % (item.pipeline.name,
                                          self._commit_status)
