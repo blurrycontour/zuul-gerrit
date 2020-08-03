@@ -481,6 +481,7 @@ class PipelineManager(metaclass=ABCMeta):
                 self.sched.nodepool.useNodeSet(
                     nodeset, build_set=item.current_build_set,
                     event=item.event)
+            #
                 self.sched.executor.execute(
                     job, item, self.pipeline,
                     build_set.dependent_changes,

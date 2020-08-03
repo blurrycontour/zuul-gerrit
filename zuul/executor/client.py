@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from typing import Dict, Any
 
 import gear
 import json
@@ -108,24 +109,23 @@ class ZuulGearmanClient(gear.Client):
                     self.__zuul_gearman.onUnknownJob(job)
 
 
+class ZuulZookeeperJobHandler(object):
+    def __init__(self, log):
+        self.log = log
+
+    def __call__(self, uuid: str, data: Dict[str, Any]):
+        self.log.debug("Job %s: %s" % (uuid, json.dumps(data)))
+
+
 class ExecutorClient(object):
     log = logging.getLogger("zuul.ExecutorClient")
 
-    def __init__(self, config, sched):
+    def __init__(self, config, sched, zk):
         self.config = config
         self.sched = sched
+        self.zk = zk
         self.builds = {}
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
-
-        server = config.get('gearman', 'server')
-        port = get_default(self.config, 'gearman', 'port', 4730)
-        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-        self.gearman = ZuulGearmanClient(self)
-        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
-                               keepalive=True, tcp_keepidle=60,
-                               tcp_keepintvl=30, tcp_keepcnt=5)
 
         self.cleanup_thread = GearmanCleanup(self)
         self.cleanup_thread.start()
@@ -134,7 +134,6 @@ class ExecutorClient(object):
         self.log.debug("Stopping")
         self.cleanup_thread.stop()
         self.cleanup_thread.join()
-        self.gearman.shutdown()
         self.log.debug("Stopped")
 
     def execute(self, job, item, pipeline, dependent_changes=[],
@@ -196,6 +195,7 @@ class ExecutorClient(object):
             job.name))
 
         params = dict()
+        params['unique'] = uuid
         params['job'] = job.name
         params['timeout'] = job.timeout
         params['post_timeout'] = job.post_timeout
@@ -324,58 +324,57 @@ class ExecutorClient(object):
         attempts = build.build_set.getTries(job.name)
         zuul_params['attempts'] = attempts
 
-        functions = getGearmanFunctions(self.gearman)
-        function_name = 'executor:execute'
-        # Because all nodes belong to the same provider, region and
-        # availability zone we can get executor_zone from only the first
-        # node.
-        executor_zone = None
-        if nodes and nodes[0].get('attributes'):
-            executor_zone = nodes[0]['attributes'].get('executor-zone')
+        # functions = getGearmanFunctions(self.gearman)
+        # function_name = 'executor:execute'
+        # # Because all nodes belong to the same provider, region and
+        # # availability zone we can get executor_zone from only the first
+        # # node.
+        # executor_zone = None
+        # if nodes and nodes[0].get('attributes'):
+        #     executor_zone = nodes[0]['attributes'].get('executor-zone')
+        #
+        # if executor_zone:
+        #     _fname = '%s:%s' % (
+        #         function_name,
+        #         executor_zone)
+        #     if _fname in functions:
+        #         function_name = _fname
+        #     else:
+        #         self.log.warning(
+        #             "Job requested '%s' zuul-executor zone, but no "
+        #             "zuul-executors found for this zone; ignoring zone "
+        #             "request" % executor_zone)
 
-        if executor_zone:
-            _fname = '%s:%s' % (
-                function_name,
-                executor_zone)
-            if _fname in functions:
-                function_name = _fname
-            else:
-                self.log.warning(
-                    "Job requested '%s' zuul-executor zone, but no "
-                    "zuul-executors found for this zone; ignoring zone "
-                    "request" % executor_zone)
+        # gearman_job = gear.TextJob(
+        #     function_name, json_dumps(params), unique=uuid)
 
-        gearman_job = gear.TextJob(
-            function_name, json_dumps(params), unique=uuid)
-
-        build.__gearman_job = gearman_job
-        build.__gearman_worker = None
+        # build.__gearman_job = gearman_job
+        # build.__gearman_worker = None
         self.builds[uuid] = build
 
-        if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:
-            precedence = gear.PRECEDENCE_NORMAL
-        elif pipeline.precedence == zuul.model.PRECEDENCE_HIGH:
-            precedence = gear.PRECEDENCE_HIGH
-        elif pipeline.precedence == zuul.model.PRECEDENCE_LOW:
-            precedence = gear.PRECEDENCE_LOW
-
         try:
-            self.gearman.submitJob(gearman_job, precedence=precedence,
-                                   timeout=300)
+            # TODO JK: First identifying places where gearman needs to be
+            # replaced with zookeeper
+            build.__zk_node = self.zk.submitJob(
+                uuid, params, precedence=pipeline.precedence,
+                watcher=ZuulZookeeperJobHandler(self.log))
+
         except Exception:
-            log.exception("Unable to submit job to Gearman")
-            self.onBuildCompleted(gearman_job, 'EXCEPTION')
+            # TODO: Handle correctly
+            log.exception("Unable to submit job")
+            # self.onBuildCompleted(gearman_job, 'EXCEPTION')
             return build
 
-        if not gearman_job.handle:
-            log.error("No job handle was received for %s after"
-                      " 300 seconds; marking as lost.",
-                      gearman_job)
-            self.onBuildCompleted(gearman_job, 'NO_HANDLE')
-
-        log.debug("Received handle %s for %s", gearman_job.handle, build)
-
-        return build
+        # TODO: Check if still needed
+        # if not gearman_job.handle:
+        #     log.error("No job handle was received for %s after"
+        #               " 300 seconds; marking as lost.",
+        #               gearman_job)
+        #     self.onBuildCompleted(gearman_job, 'NO_HANDLE')
+        #
+        # log.debug("Received handle %s for %s", gearman_job.handle, build)
+        #
+        # return build
 
     def cancel(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id,
@@ -412,6 +411,7 @@ class ExecutorClient(object):
             log.debug("Canceled running build")
             return True
         log.error("Unable to cancel build")
+        return False
 
     def onBuildCompleted(self, job, result=None):
         if job.unique in self.meta_jobs:
@@ -540,6 +540,8 @@ class ExecutorClient(object):
         log.debug("Submitting stop job: %s", stop_job)
         self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
                                timeout=300)
+
+        self.zk.cancelBuildRequest(build.__zk_node)
         return True
 
     def resumeBuild(self, build):
@@ -555,6 +557,8 @@ class ExecutorClient(object):
         log.debug("Submitting resume job: %s", stop_job)
         self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
                                timeout=300)
+
+        self.zk.resumeBuildRequest(build.__zk_node)
 
     def lookForLostBuilds(self):
         self.log.debug("Looking for lost builds")

@@ -2537,10 +2537,10 @@ class ExecutorServer(BaseMergeServer):
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
 
-    def __init__(self, config, connections=None, jobdir_root=None,
+    def __init__(self, config, zk, connections, jobdir_root=None,
                  keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT,
                  log_console_port=DEFAULT_STREAM_PORT):
-        super().__init__(config, 'executor', connections)
+        super().__init__(config, 'executor', zk, connections)
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -2674,25 +2674,6 @@ class ExecutorServer(BaseMergeServer):
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
 
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-
-        self.executor_jobs = {
-            "executor:resume:%s" % self.hostname: self.resumeJob,
-            "executor:stop:%s" % self.hostname: self.stopJob,
-            function_name: self.executeJob,
-        }
-
-        self.executor_gearworker = ZuulGearWorker(
-            'Zuul Executor Server',
-            'zuul.ExecutorServer.ExecuteWorker',
-            'executor',
-            self.config,
-            self.executor_jobs,
-            worker_class=ExecutorExecuteWorker,
-            worker_args=[self])
-
         # Used to offload expensive operations to different processes
         self.process_worker = None
 
@@ -2716,8 +2697,6 @@ class ExecutorServer(BaseMergeServer):
             self.log.warning('Multiprocessing context has already been set')
         self.process_worker = ProcessPoolExecutor()
 
-        self.executor_gearworker.start()
-
         self.log.debug("Starting command processor")
         self.command_socket.start()
         self.command_thread = threading.Thread(target=self.runCommand,
@@ -2740,25 +2719,6 @@ class ExecutorServer(BaseMergeServer):
         self.governor_thread.start()
         self.disk_accountant.start()
 
-    def register_work(self):
-        if self._running:
-            self.accepting_work = True
-            function_name = 'executor:execute'
-            if self.zone:
-                function_name += ':%s' % self.zone
-            self.executor_gearworker.gearman.registerFunction(function_name)
-            # TODO(jeblair): Update geard to send a noop after
-            # registering for a job which is in the queue, then remove
-            # this API violation.
-            self.executor_gearworker.gearman._sendGrabJobUniq()
-
-    def unregister_work(self):
-        self.accepting_work = False
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-        self.executor_gearworker.gearman.unRegisterFunction(function_name)
-
     def stop(self):
         self.log.debug("Stopping")
         self.disk_accountant.stop()
@@ -2769,7 +2729,6 @@ class ExecutorServer(BaseMergeServer):
         # Stop accepting new jobs
         if self.merger_gearworker is not None:
             self.merger_gearworker.gearman.setFunctions([])
-        self.executor_gearworker.gearman.setFunctions([])
         # Tell the executor worker to abort any jobs it just accepted,
         # and grab the list of currently running job workers.
         with self.run_lock:
@@ -2802,7 +2761,6 @@ class ExecutorServer(BaseMergeServer):
         # gearman workers.
         if self.process_merge_jobs:
             super().stop()
-        self.executor_gearworker.stop()
 
         if self.process_worker is not None:
             self.process_worker.shutdown()
@@ -2822,8 +2780,8 @@ class ExecutorServer(BaseMergeServer):
             update_thread.join()
         if self.process_merge_jobs:
             super().join()
-        self.executor_gearworker.join()
         self.command_thread.join()
+        # TODO: Join zk watcher thread
 
     def pause(self):
         self.log.debug('Pausing')
@@ -3003,6 +2961,7 @@ class ExecutorServer(BaseMergeServer):
                 if not ok:
                     self.log.info(
                         "Unregistering due to {}".format(message))
+                    # TODO: handle via start_jobs flag
                     self.unregister_work()
                     break
         else:
@@ -3017,6 +2976,7 @@ class ExecutorServer(BaseMergeServer):
             if reregister:
                 self.log.info("Re-registering as job is within its limits "
                               "{}".format(", ".join(limits)))
+                # TODO" handle via start_jobs flag
                 self.register_work()
         if self.statsd:
             base_key = 'zuul.executor.{hostname}'

@@ -37,6 +37,7 @@ class ZuulGearWorker:
         self.ssl_cert = get_default(config, 'gearman', 'ssl_cert')
         self.ssl_ca = get_default(config, 'gearman', 'ssl_ca')
 
+        # self.zk =
         self.gearman = None
         self.jobs = jobs
 
@@ -78,6 +79,9 @@ class ZuulGearWorker:
     def _run(self):
         while self._running:
             try:
+                # TODO JK: First identifying places where gearman needs to be
+                # replaced with zookeeper
+                # next_job = self.zk.getNextJob()  # noqa
                 job = self.gearman.getJob()
                 try:
                     if job.name not in self.jobs:
