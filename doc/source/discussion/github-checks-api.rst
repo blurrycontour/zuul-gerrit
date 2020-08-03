@@ -3,46 +3,64 @@
 Github Checks API
 =================
 
-Using the `Github Checks API`_ to report job results back to a PR provides
-some additional features compared to the status API like file comments and
-custom actions. The latter one could be used to e.g. cancel a running
-build.
+Github provides two distinct methods for reporting results; a "checks"
+and a "status" API.
+
+The `checks API`_ provides some additional features compared to the
+`status API`_ like file comments and custom actions (e.g. cancel a
+running build).
+
+Either can be chosen when configuring Zuul to report for your Github
+project.  However, there are some considerations to take into account
+when choosing the API.
 
 Design decisions
------------------
+----------------
 
-The github checks API consists mainly of two entities: `Check Suites`_ and
-`Check Runs`_. Check suites are a collection of check runs for a specific
-commit and summarize their status and conclusion.
+The Github checks API defines the concepts of `Check Suites`_ and
+`Check Runs`_.  *Check suites* are a collection of *check runs* for a
+specific commit and summarize a final status
 
-Following this description, one might think that the check suite is a
-perfect mapping for a pipeline execution in zuul and a check run could map
-to a single job execution that is part of the pipeline run. Unfortunately,
-there are a few restrictions that don't allow this kind of mapping.
+A priori the check suite appears to be a good mapping for a pipeline
+execution in Zuul, where a check run maps to a single job execution
+that is part of the pipeline run.  Unfortunately, there are a few
+problematic restrictions mapping between Github and Zuul concepts.
 
-First of all, check suites are completely managed by Github. Apart from
-creating a check suite for a commit SHA, we can't do anything with it.
-The current status, duration and the conclusion are all calculated and
-set by Github automatically whenever an included check run is updated.
+Github check suites are opaque and the current status, duration and
+the overall conclusion are all calculated and set automatically
+whenever an included check run is updated.  Most importantly, there
+can only be one check suite per commit SHA, per app.  Thus there is no
+facility for for Zuul to create multiple check suite results for a
+change, e.g. one check suite for each pipeline such as check and gate.
 
-There can only be one check suite per commit sha per app. Thus, even if
-we could update the check suite, we wouldn't be able to create one check
-suite for each pipeline, e.g. check and gate.
+The Github check suite thus does not map well to Zuul's concept of
+multiple pipelines for a single change.  Since a check suite is unique
+and global for the change, it can not be used to flag the status of
+arbitrary pipelines.  This makes the check suite API insufficient for
+recording details that Zuul needs such as "the check pipeline has
+passed but the gate pipeline has failed".
 
-When configuring the branch protection in Github, only a check run can
-be selected as required status check. Having each job as a dedicated
-check run would result in a huge list of status checks one would have to
-enable to make the branch protection work. Additionally, we would then
-loose some of Zuul's features like non-voting jobs and it would break
-Zuul's gating capabilities as they are working on a pipeline level, not on
-a job level.
+Another issue is that Zuul only reports on the results of the whole
+pipeline, not individual jobs.  Reporting each Zuul job as a separate
+check is problematic for a number of reasons.
 
-Zuul can only report the whole buildset, but no individual jobs. With
-that we wouldn't be able to update individual check runs on a job level.
+Zuul often runs the same job for the same change multiple times; for
+example in the check and gate pipeline.  There is no facility for
+these runs to be reported differently in the single check suite for
+the Github change.
 
-Having said the above, the only possible integration of the checks API is
-on a pipeline level, so each pipeline execution maps to a check run in
-Github.
+When configuring branch protection in Github, only a *check run* can
+be selected as required status check.  This is in conflict with
+managing jobs in pipelines with Zuul.  For example, to implement
+branch protection on GitHub would mean listing each job as a dedicated
+check, leading to a check run list that is not kept in sync with the
+project's Zuul pipeline configuration.  Additionally, you loose some
+of Zuul's features like non-voting jobs as Github branch protections
+has no concept of a non-voting job.
+
+Thus Zuul can integrate with the checks API, but only at a pipeline
+level.  Each pipeline execution will map to a check-run result
+reported to Github.
 
 Behaviour in Zuul
 -----------------
@@ -99,16 +117,16 @@ Re-run
   Github emits a webhook event with type ``check_run`` and action
   ``rerequested`` for the specific check run.
 
-Zuul will handle all events except for the `Re-run all checks` event as
-this is not suitable for the Zuul workflow as it doesn't make sense to
-trigger all pipelines to run simultaniously.
+Zuul will handle all events except for the `Re-run all checks` event;
+it does not make sense in the Zuul model to trigger all pipelines to
+run simultaneously.
 
-The drawback here is, that we are not able to customize those events in Github.
-Github will always say "You have successfully requested ..." although we aren't
-listening to the event at all. Therefore, it might be a solution to handle the
-`Re-run all checks` event in Zuul similar to `Re-run failed checks` just to
-not do anything while Github makes the user believe an action was really
-triggered.
+These events are unable to be customized in Github.  Github will
+always report "You have successfully requested ..." despite nothing
+listening to the event.  Therefore, it might be a solution to handle
+the `Re-run all checks` event in Zuul similar to `Re-run failed
+checks` just to not do anything while Github makes the user believe an
+action was really triggered.
 
 
 File comments (annotations)
@@ -142,7 +160,7 @@ Restrictions and Recommendations
 --------------------------------
 
 Although both the checks API and the status API can be activated for a
-Github reporter at the same time, it's not recommmended to do so as this might
+Github reporter at the same time, it's not recommended to do so as this might
 result in multiple status checks to be reported to the PR for the same pipeline
 execution (which would result in duplicated entries in the status section below
 the comments of a PR).
@@ -164,7 +182,8 @@ as required, Github will still show it in the list of required status checks
 - even if it didn't run yet - just not in the check suite.
 
 
-.. _Github Checks API: https://developer.github.com/v3/checks/
-.. _Check Suites: https://developer.github.com/v3/checks/suites/
-.. _Check Runs: https://developer.github.com/v3/checks/runs/
+.. _checks API: https://docs.github.com/v3/checks/
+.. _status API: https://docs.github.com/v3/repos/statuses/
+.. _Check Suites: https://docs.github.com/v3/checks/suites/
+.. _Check Runs: https://docs.github.com/v3/checks/runs/
 .. _status checks: https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-status-checks#types-of-status-checks-on-github
