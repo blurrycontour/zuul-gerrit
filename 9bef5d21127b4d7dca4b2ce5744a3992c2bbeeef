@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_655a6383",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-04T08:29:51Z",
+      "side": 1,
+      "message": "This reminds me that https://review.opendev.org/709135 needs reviews. Until the merge of that this doesn\u0027t work with zuul.",
+      "range": {
+        "startLine": 10,
+        "startChar": 53,
+        "endLine": 11,
+        "endChar": 13
+      },
+      "revId": "9bef5d21127b4d7dca4b2ce5744a3992c2bbeeef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
