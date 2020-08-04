@@ -22,6 +22,40 @@
       "revId": "9bef5d21127b4d7dca4b2ce5744a3992c2bbeeef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_f1cd9131",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-04T13:26:57Z",
+      "side": 1,
+      "message": "nit: for for",
+      "revId": "9bef5d21127b4d7dca4b2ce5744a3992c2bbeeef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_91053549",
+        "filename": "doc/source/discussion/github-checks-api.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-04T13:26:57Z",
+      "side": 1,
+      "message": "\"...nothing is listening\", or?",
+      "revId": "9bef5d21127b4d7dca4b2ce5744a3992c2bbeeef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
