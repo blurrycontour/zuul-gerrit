@@ -309,6 +309,7 @@ class Scheduler(threading.Thread):
         self.connections = None
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
+        self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
         self.repl = None
         self.stats_thread = threading.Thread(target=self.runStats)
         self.stats_thread.daemon = True
@@ -369,6 +370,7 @@ class Scheduler(threading.Thread):
         self.command_thread.start()
 
         self.rpc.start()
+        self.rpc_slow.start()
         self.stats_thread.start()
 
     def stop(self):
@@ -379,6 +381,8 @@ class Scheduler(threading.Thread):
         self.stats_thread.join()
         self.rpc.stop()
         self.rpc.join()
+        self.rpc_slow.stop()
+        self.rpc_slow.join()
         self.stop_repl()
         self._command_running = False
         self.command_socket.stop()
@@ -428,6 +432,7 @@ class Scheduler(threading.Thread):
         if not self.statsd:
             return
         functions = getGearmanFunctions(self.rpc.gearworker.gearman)
+        functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
         executors_accepting = 0
         executors_online = 0
         execute_queue = 0

@@ -16,6 +16,7 @@
 import json
 import logging
 import time
+from abc import ABCMeta
 
 from zuul import model
 from zuul.connection import BaseConnection
@@ -24,48 +25,24 @@ from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
 
 
-class RPCListener(object):
-    log = logging.getLogger("zuul.RPCListener")
+class RPCListenerBase(metaclass=ABCMeta):
+    log = logging.getLogger("zuul.RPCListenerBase")
+    thread_name = 'zuul-rpc-gearman-worker'
+    functions = []
 
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
 
         self.jobs = {}
-        functions = [
-            'autohold',
-            'autohold_delete',
-            'autohold_info',
-            'autohold_list',
-            'allowed_labels_get',
-            'dequeue',
-            'enqueue',
-            'enqueue_ref',
-            'promote',
-            'get_admin_tenants',
-            'get_running_jobs',
-            'get_job_log_stream_address',
-            'tenant_list',
-            'tenant_sql_connection',
-            'status_get',
-            'job_get',
-            'job_list',
-            'project_get',
-            'project_list',
-            'project_freeze_jobs',
-            'pipeline_list',
-            'key_get',
-            'config_errors_list',
-            'connection_list',
-            'authorize_user',
-        ]
-        for func in functions:
+
+        for func in self.functions:
             f = getattr(self, 'handle_%s' % func)
             self.jobs['zuul:%s' % func] = f
         self.gearworker = ZuulGearWorker(
             'Zuul RPC Listener',
-            'zuul.RPCListener',
-            'zuul-rpc-gearman-worker',
+            self.log.name,
+            self.thread_name,
             self.config,
             self.jobs)
 
@@ -80,6 +57,17 @@ class RPCListener(object):
     def join(self):
         self.gearworker.join()
 
+
+class RPCListenerSlow(RPCListenerBase):
+    log = logging.getLogger("zuul.RPCListenerSlow")
+    thread_name = 'zuul-rpc-slow-gearman-worker'
+    functions = [
+        'dequeue',
+        'enqueue',
+        'enqueue_ref',
+        'promote',
+    ]
+
     def handle_dequeue(self, job):
         args = json.loads(job.arguments)
         tenant_name = args['tenant']
@@ -93,77 +81,6 @@ class RPCListener(object):
         except Exception as e:
             job.sendWorkException(str(e).encode('utf8'))
             return
-        job.sendWorkComplete()
-
-    def handle_autohold_info(self, job):
-        args = json.loads(job.arguments)
-        request_id = args['request_id']
-        try:
-            data = self.sched.autohold_info(request_id)
-        except Exception as e:
-            job.sendWorkException(str(e).encode('utf8'))
-            return
-        job.sendWorkComplete(json.dumps(data))
-
-    def handle_autohold_delete(self, job):
-        args = json.loads(job.arguments)
-        request_id = args['request_id']
-        try:
-            self.sched.autohold_delete(request_id)
-        except Exception as e:
-            job.sendWorkException(str(e).encode('utf8'))
-            return
-        job.sendWorkComplete()
-
-    def handle_autohold_list(self, job):
-        data = self.sched.autohold_list()
-        job.sendWorkComplete(json.dumps(data))
-
-    def handle_autohold(self, job):
-        args = json.loads(job.arguments)
-        params = {}
-
-        tenant = self.sched.abide.tenants.get(args['tenant'])
-        if tenant:
-            params['tenant_name'] = args['tenant']
-        else:
-            error = "Invalid tenant: %s" % args['tenant']
-            job.sendWorkException(error.encode('utf8'))
-            return
-
-        (trusted, project) = tenant.getProject(args['project'])
-        if project:
-            params['project_name'] = project.canonical_name
-        else:
-            error = "Invalid project: %s" % args['project']
-            job.sendWorkException(error.encode('utf8'))
-            return
-
-        if args['change'] and args['ref']:
-            job.sendWorkException("Change and ref can't be both used "
-                                  "for the same request")
-
-        if args['change']:
-            # Convert change into ref based on zuul connection
-            ref_filter = project.source.getRefForChange(args['change'])
-        elif args['ref']:
-            ref_filter = "%s" % args['ref']
-        else:
-            ref_filter = ".*"
-
-        params['job_name'] = args['job']
-        params['ref_filter'] = ref_filter
-        params['reason'] = args['reason']
-
-        if args['count'] < 0:
-            error = "Invalid count: %d" % args['count']
-            job.sendWorkException(error.encode('utf8'))
-            return
-
-        params['count'] = args['count']
-        params['node_hold_expiration'] = args['node_hold_expiration']
-
-        self.sched.autohold(**params)
         job.sendWorkComplete()
 
     def _common_enqueue(self, job):
@@ -251,6 +168,116 @@ class RPCListener(object):
         pipeline_name = args['pipeline']
         change_ids = args['change_ids']
         self.sched.promote(tenant_name, pipeline_name, change_ids)
+        job.sendWorkComplete()
+
+
+class RPCListener(RPCListenerBase):
+    log = logging.getLogger("zuul.RPCListener")
+    thread_name = 'zuul-rpc-gearman-worker'
+    functions = [
+        'autohold',
+        'autohold_delete',
+        'autohold_info',
+        'autohold_list',
+        'allowed_labels_get',
+        'get_admin_tenants',
+        'get_running_jobs',
+        'get_job_log_stream_address',
+        'tenant_list',
+        'tenant_sql_connection',
+        'status_get',
+        'job_get',
+        'job_list',
+        'project_get',
+        'project_list',
+        'project_freeze_jobs',
+        'pipeline_list',
+        'key_get',
+        'config_errors_list',
+        'connection_list',
+        'authorize_user',
+    ]
+
+    def start(self):
+        self.gearworker.start()
+
+    def stop(self):
+        self.log.debug("Stopping")
+        self.gearworker.stop()
+        self.log.debug("Stopped")
+
+    def join(self):
+        self.gearworker.join()
+
+    def handle_autohold_info(self, job):
+        args = json.loads(job.arguments)
+        request_id = args['request_id']
+        try:
+            data = self.sched.autohold_info(request_id)
+        except Exception as e:
+            job.sendWorkException(str(e).encode('utf8'))
+            return
+        job.sendWorkComplete(json.dumps(data))
+
+    def handle_autohold_delete(self, job):
+        args = json.loads(job.arguments)
+        request_id = args['request_id']
+        try:
+            self.sched.autohold_delete(request_id)
+        except Exception as e:
+            job.sendWorkException(str(e).encode('utf8'))
+            return
+        job.sendWorkComplete()
+
+    def handle_autohold_list(self, job):
+        data = self.sched.autohold_list()
+        job.sendWorkComplete(json.dumps(data))
+
+    def handle_autohold(self, job):
+        args = json.loads(job.arguments)
+        params = {}
+
+        tenant = self.sched.abide.tenants.get(args['tenant'])
+        if tenant:
+            params['tenant_name'] = args['tenant']
+        else:
+            error = "Invalid tenant: %s" % args['tenant']
+            job.sendWorkException(error.encode('utf8'))
+            return
+
+        (trusted, project) = tenant.getProject(args['project'])
+        if project:
+            params['project_name'] = project.canonical_name
+        else:
+            error = "Invalid project: %s" % args['project']
+            job.sendWorkException(error.encode('utf8'))
+            return
+
+        if args['change'] and args['ref']:
+            job.sendWorkException("Change and ref can't be both used "
+                                  "for the same request")
+
+        if args['change']:
+            # Convert change into ref based on zuul connection
+            ref_filter = project.source.getRefForChange(args['change'])
+        elif args['ref']:
+            ref_filter = "%s" % args['ref']
+        else:
+            ref_filter = ".*"
+
+        params['job_name'] = args['job']
+        params['ref_filter'] = ref_filter
+        params['reason'] = args['reason']
+
+        if args['count'] < 0:
+            error = "Invalid count: %d" % args['count']
+            job.sendWorkException(error.encode('utf8'))
+            return
+
+        params['count'] = args['count']
+        params['node_hold_expiration'] = args['node_hold_expiration']
+
+        self.sched.autohold(**params)
         job.sendWorkComplete()
 
     def handle_get_running_jobs(self, job):
