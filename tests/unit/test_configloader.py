@@ -397,6 +397,11 @@ class TestSplitConfig(ZuulTestCase):
         self.assertIn('project1-project2-integration',
                       project1_config[0].pipelines['check'].job_list.jobs)
 
+        # This check ensures the .zuul.ignore flag file is working in
+        # the config directory.
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 0)
+
     def test_dynamic_split_config(self):
         in_repo_conf = textwrap.dedent(
             """
