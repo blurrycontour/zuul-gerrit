@@ -16,6 +16,24 @@
       "revId": "654cc2fb1b4fc5413858c5eb8b1116366e69340e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_22068fcf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-05T03:38:16Z",
+      "side": 1,
+      "message": "I agree a better approach is to get inline comments, but it seems to me to a large refactor to get these values in context; I can\u0027t immediately see how to keep the association since this is all working on bits of config that has been parsed and is now a regular dict/list etc.\n\nThe latest revision takes the approach of trimming the lines as suggested, which might be a compromise position.",
+      "parentUuid": "9f560f44_efedce8b",
+      "revId": "654cc2fb1b4fc5413858c5eb8b1116366e69340e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
