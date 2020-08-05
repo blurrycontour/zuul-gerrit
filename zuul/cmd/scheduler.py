@@ -27,6 +27,7 @@ import zuul.nodepool
 import zuul.scheduler
 import zuul.zk
 import zuul.zk.nodepool
+import zuul.zk.connection_event
 
 
 class Scheduler(zuul.cmd.ZuulDaemonApp):
@@ -146,6 +147,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         zk_client = zuul.zk.ZooKeeperClient()
         zk_nodepool = zuul.zk.nodepool.ZooKeeperNodepool(zk_client)
+        zk_connection_event = zuul.zk.connection_event\
+            .ZooKeeperConnectionEvent(zk_client)
         zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts', None)
         if not zookeeper_hosts:
             raise Exception("The zookeeper hosts config value is required")
@@ -165,7 +168,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.sched.setExecutor(gearman)
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zk_client, zk_nodepool)
+        self.sched.setZooKeeper(zk_client, zk_nodepool, zk_connection_event)
 
         self.log.info('Starting scheduler')
         try:

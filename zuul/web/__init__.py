@@ -38,6 +38,7 @@ from zuul import exceptions
 import zuul.rpcclient
 import zuul.zk
 import zuul.zk.nodepool
+import zuul.zk.connection_event
 from zuul.rpcclient import RPCClient
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
@@ -1187,6 +1188,8 @@ class ZuulWeb(object):
                                         ssl_key, ssl_cert, ssl_ca,
                                         client_id='Zuul Web Server')
         self.zk_client = zuul.zk.ZooKeeperClient()
+        self.zk_connection_event = zuul.zk.connection_event\
+            .ZooKeeperConnectionEvent(self.zk_client)
         if not zk_hosts:
             raise Exception("Zookeeper is required!")
         self.zk_client.connect(hosts=zk_hosts, read_only=True,
