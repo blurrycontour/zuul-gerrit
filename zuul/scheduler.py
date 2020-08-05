@@ -20,16 +20,15 @@ import logging
 import os
 import pickle
 import re
-import queue
 import socket
 import sys
 import threading
 import time
 import urllib
 from configparser import ConfigParser
-from queue import Queue
-from typing import Any
 from typing import Dict
+
+from zuul.lib.named_queue import NamedQueue
 
 from zuul import configloader
 from zuul import model
@@ -337,8 +336,8 @@ class Scheduler(threading.Thread):
         # self.triggers['connection_name'] = triggerObject
         self.triggers = dict()  # type: Dict[str, TriggerEvent]
 
-        self.trigger_event_queue = queue.Queue()  # type: Queue[Any]
-        self.result_event_queue = queue.Queue()  # type: Queue[Any]
+        self.trigger_event_queue = NamedQueue('SchedulerTriggerEventQueue')
+        self.result_event_queue = NamedQueue('SchedulerResultEventQueue')
         self.management_event_queue = zuul.lib.queue.MergedQueue()
         self.abide = model.Abide()
         self.unparsed_abide = model.UnparsedAbideConfig()
