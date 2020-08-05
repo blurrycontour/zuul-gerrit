@@ -15,22 +15,20 @@
 import logging
 import hmac
 import hashlib
-import queue
 import threading
 import time
 import re
 import json
+from typing import List
 import requests
 import cherrypy
-import traceback
+import kazoo.exceptions
 import voluptuous as v
-
-import gear
 
 from zuul.connection import BaseConnection
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.named_queue import NamedQueue
 from zuul.web.handler import BaseWebController
-from zuul.lib.config import get_default
 from zuul.model import Ref, Branch, Tag
 from zuul.lib import dependson
 
@@ -100,92 +98,75 @@ def _sign_request(body, secret):
     return signature, body
 
 
-class PagureGearmanWorker(object):
-    """A thread that answers gearman requests"""
-    log = logging.getLogger("zuul.PagureGearmanWorker")
+class PagureZookeeperWorker(threading.Thread):
+    """A thread that observes zookeper node for changes"""
+    log = logging.getLogger("zuul.PagureZookeeperWorker")
 
     def __init__(self, connection):
-        self.config = connection.sched.config
-        self.connection = connection
-        self.thread = threading.Thread(target=self._run,
-                                       name='pagure-gearman-worker')
-        self._running = False
-        handler = "pagure:%s:payload" % self.connection.connection_name
-        self.jobs = {
-            handler: self.handle_payload,
-        }
+        threading.Thread.__init__(self)
+        self.__stopped = False
+        self.__connection = connection  # PagureConnection
+        self.__zk = connection.sched.zk  # ZooKeeper
+        self.lock = threading.Lock()
+        # Watching events provides an additional wake-up call but since only
+        # one event get processed at a time the thread loop assures that
+        # all events get processed.
 
-    def _run(self):
-        while self._running:
-            try:
-                job = self.gearman.getJob()
+    def start(self) -> None:
+        self.__zk.connection_event.watch(self.__connection.connection_name,
+                                         self.__eventWatcher)
+        super().start()
+
+    def run(self) -> None:
+        """
+        In case an event gets lost, e.g. in case the ZK lock in
+        #__eventWatcher was not able to be acquired, this provides an
+        additional check for new events in ZK
+        """
+        while not self.__stopped:
+            if self.__zk.connection_event.has_events(
+                    self.__connection.connection_name):
+                self.__eventWatcher(["EXPLICIT_TRIGGER"])
+            time.sleep(1)
+
+    def stop(self) -> None:
+        self.__stopped = True
+        self.__zk.connection_event.unwatch(self.__connection.connection_name)
+
+    def __eventWatcher(self, children: List[str]) -> None:
+        with self.lock:
+            if len(children) > 0:
+                self.log.debug("Changed events: %s" % children)
                 try:
-                    if job.name not in self.jobs:
-                        self.log.exception("Exception while running job")
-                        job.sendWorkException(
-                            traceback.format_exc().encode('utf8'))
-                        continue
-                    output = self.jobs[job.name](json.loads(job.arguments))
-                    job.sendWorkComplete(json.dumps(output))
-                except Exception:
-                    self.log.exception("Exception while running job")
-                    job.sendWorkException(
-                        traceback.format_exc().encode('utf8'))
-            except gear.InterruptedError:
-                pass
-            except Exception:
-                self.log.exception("Exception while getting job")
+                    self.__processEvent()
+                except kazoo.exceptions.LockTimeout:
+                    self.log.warning("Could not acquire lock")
 
-    def handle_payload(self, args):
-        payload = args["payload"]
+    def __processEvent(self) -> None:
+        with self.__zk.connection_event.pop(
+                self.__connection.connection_name) as events:
+            for event in events:
+                payload = event["payload"]
 
-        self.log.info(
-            "Pagure Webhook Received (id: %(msg_id)s, topic: %(topic)s)" % (
-                payload))
+                self.log.info(
+                    "Pagure Webhook Received (id: %(msg_id)s, topic:"
+                    " %(topic)s)" % payload)
 
-        try:
-            self.__dispatch_event(payload)
-            output = {'return_code': 200}
-        except Exception:
-            output = {'return_code': 503}
-            self.log.exception("Exception handling Pagure event:")
+                try:
+                    self.__dispatch_event(payload)
+                except Exception as e:
+                    self.log.exception(
+                        "Exception handling Pagure event:", e)
 
-        return output
-
-    def __dispatch_event(self, payload):
+    def __dispatch_event(self, payload) -> None:
         event = payload['topic']
         try:
             self.log.info("Dispatching event %s" % event)
-            self.connection.addEvent(payload, event)
+            self.__connection.addEvent(payload, event)
         except Exception as err:
             message = 'Exception dispatching event: %s' % str(err)
             self.log.exception(message)
             raise Exception(message)
-
-    def start(self):
-        self._running = True
-        server = self.config.get('gearman', 'server')
-        port = get_default(self.config, 'gearman', 'port', 4730)
-        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-        self.gearman = gear.TextWorker('Zuul Pagure Connector')
-        self.log.debug("Connect to gearman")
-        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca)
-        self.log.debug("Waiting for server")
-        self.gearman.waitForServer()
-        self.log.debug("Registering")
-        for job in self.jobs:
-            self.gearman.registerFunction(job)
-        self.thread.start()
-
-    def stop(self):
-        self._running = False
-        self.gearman.stopWaitingForJobs()
-        # We join here to avoid whitelisting the thread -- if it takes more
-        # than 5s to stop in tests, there's a problem.
-        self.thread.join(timeout=5)
-        self.gearman.shutdown()
 
 
 class PagureEventConnector(threading.Thread):
@@ -540,18 +521,18 @@ class PagureConnection(BaseConnection):
             'source_whitelist', '').split(',')
         self.webhook_tokens = {}
         self.source = driver.getSource(self)
-        self.event_queue = queue.Queue()
+        self.event_queue = NamedQueue('PagureEventQueue<%s>' % connection_name)
         self.metadata_notif = re.compile(
             r"^\*\*Metadata Update", re.MULTILINE)
         self.sched = None
 
     def onLoad(self):
         self.log.info('Starting Pagure connection: %s' % self.connection_name)
-        self.gearman_worker = PagureGearmanWorker(self)
+        self.zookeeper_worker = PagureZookeeperWorker(self)
         self.log.info('Starting event connector')
         self._start_event_connector()
-        self.log.info('Starting GearmanWorker')
-        self.gearman_worker.start()
+        self.log.info('Starting ZookeeperWorker')
+        self.zookeeper_worker.start()
 
     def _start_event_connector(self):
         self.pagure_event_connector = PagureEventConnector(self)
@@ -563,8 +544,9 @@ class PagureConnection(BaseConnection):
             self.pagure_event_connector.join()
 
     def onStop(self):
-        if hasattr(self, 'gearman_worker'):
-            self.gearman_worker.stop()
+        if hasattr(self, 'zookeeper_worker'):
+            self.zookeeper_worker.stop()
+        if hasattr(self, 'pagure_event_connector'):
             self._stop_event_connector()
 
     def addEvent(self, data, event=None):
@@ -923,11 +905,10 @@ class PagureWebController(BaseWebController):
                 "Payload origin IP address whitelisted. Skip verify")
 
         json_payload = json.loads(body.decode('utf-8'))
-        job = self.zuul_web.rpc.submitJob(
-            'pagure:%s:payload' % self.connection.connection_name,
-            {'payload': json_payload})
-
-        return json.loads(job.data[0])
+        data = {'payload': json_payload}
+        self.zuul_web.zk.connection_event.push(
+            self.connection.connection_name, data)
+        return data
 
 
 def getSchema():
