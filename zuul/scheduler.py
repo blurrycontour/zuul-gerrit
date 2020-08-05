@@ -34,6 +34,8 @@ from typing import Optional, Dict, TYPE_CHECKING, Callable, Any
 from statsd import StatsClient
 
 
+from zuul.lib.named_queue import NamedQueue
+
 from zuul import configloader
 from zuul import exceptions
 from zuul import version as zuul_version
@@ -54,6 +56,7 @@ from zuul.nodepool import Nodepool
 from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
 from zuul.zk import ZooKeeperClient
+from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
@@ -341,10 +344,12 @@ class Scheduler(threading.Thread):
         self.triggers: Dict[str, BaseTrigger] = dict()
         self.config: ConfigParser = config
         self.zk_client: ZooKeeperClient = zk_client
+        self.zk_connection_event: ZooKeeperConnectionEvent =\
+            ZooKeeperConnectionEvent(zk_client)
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
 
-        self.trigger_event_queue: Queue = Queue()
-        self.result_event_queue: Queue = Queue()
+        self.trigger_event_queue: Queue = NamedQueue('TriggerEventQueue')
+        self.result_event_queue: Queue = NamedQueue('ResultEventQueue')
         self.management_event_queue: MergedQueue = MergedQueue()
         self.abide: Abide = Abide()
         self.unparsed_abide: UnparsedAbideConfig = UnparsedAbideConfig()

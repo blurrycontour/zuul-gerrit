@@ -172,9 +172,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         :param HoldRequest request: Object representing the hold request.
         """
-        if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
-
         if request.id is None:
             path = self.kazoo_client.create(
                 self.HOLD_REQUEST_ROOT + "/",
@@ -249,9 +246,6 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         :param HoldRequest request: Object representing the hold request.
         """
-        if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
-
         if not self._markHeldNodesAsUsed(request):
             self.log.info("Unable to delete hold request %s because "
                           "not all nodes marked as USED.", request.id)
