@@ -21,7 +21,6 @@ import math
 import logging
 import paramiko
 import pprint
-import queue
 import re
 import re2
 import requests
@@ -42,6 +41,7 @@ from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.named_queue import NamedQueue
 from zuul.model import Ref, Tag, Branch, Project
 
 # HTTP timeout in seconds
@@ -513,7 +513,7 @@ class GerritConnection(BaseConnection):
         self.watcher_thread = None
         self.poller_thread = None
         self.ref_watcher_thread = None
-        self.event_queue = queue.Queue()
+        self.event_queue = NamedQueue('GerritEventQueue<%s>' % connection_name)
         self.client = None
         self.watched_checkers = []
         self.project_checker_map = {}
