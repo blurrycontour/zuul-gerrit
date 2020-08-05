@@ -27,7 +27,6 @@ import itertools
 import json
 import logging
 import os
-import queue
 import random
 import re
 from logging import Logger
@@ -80,6 +79,7 @@ from zuul.driver.gitlab import GitlabDriver
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.lib.connections import ConnectionRegistry
+from zuul.lib.named_queue import NamedQueue
 from psutil import Popen
 
 import tests.fakegithub
@@ -1104,7 +1104,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         super(FakeGerritConnection, self).__init__(driver, connection_name,
                                                    connection_config)
 
-        self.event_queue = queue.Queue()
+        self.event_queue = NamedQueue('FakeGerritConnectionEventQueue')
         self.fixture_dir = os.path.join(FIXTURE_DIR, 'gerrit')
         self.change_number = 0
         self.changes = changes_db
@@ -1665,10 +1665,9 @@ class FakePagureConnection(pagureconnection.PagureConnection):
                 % (self.zuul_web_port, self.connection_name),
                 data=payload, headers=headers)
         else:
-            job = self.rpcclient.submitJob(
-                'pagure:%s:payload' % self.connection_name,
-                {'payload': payload})
-            return json.loads(job.data[0])
+            data = {'payload': payload}
+            self.sched.zk.pushConnectionEvent(self.connection_name, data)
+            return data
 
     def openFakePullRequest(self, project, branch, subject, files=[],
                             initial_comment=None):
@@ -1767,10 +1766,9 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
                 % (self.zuul_web_port, self.connection_name),
                 data=payload, headers=headers)
         else:
-            job = self.rpcclient.submitJob(
-                'gitlab:%s:payload' % self.connection_name,
-                {'payload': payload})
-            return json.loads(job.data[0])
+            data = {'payload': payload}
+            self.sched.zk.pushConnectionEvent(self.connection_name, data)
+            return data
 
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
@@ -2524,10 +2522,9 @@ class FakeGithubConnection(githubconnection.GithubConnection):
                 % (self.zuul_web_port, self.connection_name),
                 json=data, headers=headers)
         else:
-            job = self.rpcclient.submitJob(
-                'github:%s:payload' % self.connection_name,
-                {'headers': headers, 'body': data})
-            return json.loads(job.data[0])
+            data = {'headers': headers, 'body': data}
+            self.sched.zk.pushConnectionEvent(self.connection_name, data)
+            return data
 
     def addProject(self, project):
         # use the original method here and additionally register it in the
@@ -3404,7 +3401,7 @@ class ChrootedKazooFixture(fixtures.Fixture):
                               for x in range(8))
 
         rand_test_path = '%s_%s_%s' % (random_bits, os.getpid(), self.test_id)
-        self.zookeeper_chroot = "/nodepool_test/%s" % rand_test_path
+        self.zookeeper_chroot = "/test/%s" % rand_test_path
 
         self.addCleanup(self._cleanup)
 
@@ -3760,19 +3757,20 @@ class SchedulerTestApp:
             git_url_with_auth, add_cleanup)
         self.connections.configure(self.config, source_only=source_only)
 
+        zk = zuul.zk.ZooKeeper(enable_cache=True)
+        zk.connect(self.zk_config, timeout=30.0)
+        self.sched.setZooKeeper(zk)
+
         self.sched.registerConnections(self.connections)
 
         executor_client = zuul.executor.client.ExecutorClient(
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk = zuul.zk.ZooKeeper(enable_cache=True)
-        zk.connect(self.zk_config, timeout=30.0)
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
         self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zk)
 
         self.sched.start()
         executor_client.gearman.waitForServer()
@@ -4617,7 +4615,7 @@ class ZuulTestCase(BaseTestCase):
                 return False
         return True
 
-    def __eventQueuesEmpty(self, matcher) -> Generator[bool, None, None]:
+    def __eventQueuesEmpty(self, matcher=None) -> Generator[bool, None, None]:
         for event_queue in self.__event_queues(matcher):
             yield event_queue.empty()
 
@@ -4625,9 +4623,39 @@ class ZuulTestCase(BaseTestCase):
         for app in self.scheds.filter(matcher):
             if not app.sched._paused:
                 for event_queue in app.event_queues:
+                    self.log.debug('__eventQueuesJoin[%s]: %s: %s',
+                                   app.sched.name, event_queue,
+                                   event_queue.qsize())
                     event_queue.join()
         for event_queue in self.additional_event_queues:
+            self.log.debug('__eventQueuesJoin[additional]: %s: %s',
+                           event_queue, event_queue.qsize())
             event_queue.join()
+
+    def __areZookeeperEventQueuesEmpty(self, matcher=None) -> bool:
+        for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
+            for connection in list(sched.connections.connections.values()):
+                if sched.zk.hasConnectionEvents(connection.connection_name,
+                                                keepLocked=True):
+                    return False
+        return True
+
+    def __acquireZookeeperWorkerLocks(self, matcher=None):
+        for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
+            for connection in list(sched.connections.connections.values()):
+                if hasattr(connection, 'zookeeper_worker'):
+                    connection.zookeeper_worker.lock.acquire()
+
+    def __releaseZookeeperWorkerLocks(self, matcher=None):
+        for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
+            for connection in list(sched.connections.connections.values()):
+                if hasattr(connection, 'zookeeper_worker'):
+                    connection.zookeeper_worker.lock.release()
+
+    def __releaseZookeeperLockingLocks(self, matcher=None):
+        for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
+            if sched.zk.lockingLock.locked():
+                sched.zk.lockingLock.release()
 
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
@@ -4637,27 +4665,19 @@ class ZuulTestCase(BaseTestCase):
             i = i + 1
             if time.time() - start > self.wait_timeout:
                 self.log.error("Timeout waiting for Zuul to settle")
-                self.log.error("Queue status:")
-                for event_queue in self.__event_queues(matcher):
-                    self.log.error("  %s: %s" %
-                                   (event_queue, event_queue.empty()))
-                self.log.error("All builds waiting: %s" %
-                               (self.__areAllBuildsWaiting(matcher),))
-                self.log.error("All merge jobs waiting: %s" %
-                               (self.__areAllMergeJobsWaiting(matcher),))
-                self.log.error("All builds reported: %s" %
-                               (self.__haveAllBuildsReported(matcher),))
-                self.log.error("All requests completed: %s" %
-                               (self.__areAllNodeRequestsComplete(matcher),))
-                self.log.error("All event queues empty: %s" %
-                               (all(self.__eventQueuesEmpty(matcher)),))
-                for app in self.scheds.filter(matcher):
-                    self.log.error("[Sched: %s] Merge client jobs: %s" %
-                                   (app.sched, app.sched.merger.jobs,))
+                self.__logQueueStatus(
+                    self.log.error, matcher,
+                    self.__areZookeeperEventQueuesEmpty(matcher),
+                    self.__areAllMergeJobsWaiting(matcher),
+                    self.__haveAllBuildsReported(matcher),
+                    self.__areAllBuildsWaiting(matcher),
+                    self.__areAllNodeRequestsComplete(matcher),
+                    all(self.__eventQueuesEmpty(matcher)))
                 raise Exception("Timeout waiting for Zuul to settle")
 
             # Make sure no new events show up while we're checking
             self.executor_server.lock.acquire()
+            self.__acquireZookeeperWorkerLocks(matcher)
 
             # have all build states propogated to zuul?
             if self.__haveAllBuildsReported(matcher):
@@ -4666,11 +4686,32 @@ class ZuulTestCase(BaseTestCase):
                 self.__eventQueuesJoin(matcher)
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.acquire())
-                if (self.__areAllMergeJobsWaiting(matcher) and
-                    self.__haveAllBuildsReported(matcher) and
-                    self.__areAllBuildsWaiting(matcher) and
-                    self.__areAllNodeRequestsComplete(matcher) and
-                    all(self.__eventQueuesEmpty(matcher))):
+                self.log.debug("Scheduler run handler: Locked")
+
+                areZookeeperEventQueuesEmpty = self\
+                    .__areZookeeperEventQueuesEmpty(matcher)
+                areAllMergeJobsWaiting = self\
+                    .__areAllMergeJobsWaiting(matcher)
+                haveAllBuildsReported = self\
+                    .__haveAllBuildsReported(matcher)
+                areAllBuildsWaiting = self.__areAllBuildsWaiting(matcher)
+                areAllNodeRequestsComplete = self\
+                    .__areAllNodeRequestsComplete(matcher)
+                allEventQueuesEmpty = all(self.__eventQueuesEmpty(matcher))
+                self.__releaseZookeeperLockingLocks(matcher)
+
+                self.__logQueueStatus(
+                    self.log.debug, matcher, areZookeeperEventQueuesEmpty,
+                    areAllMergeJobsWaiting, haveAllBuildsReported,
+                    areAllBuildsWaiting, areAllNodeRequestsComplete,
+                    allEventQueuesEmpty)
+
+                if (areZookeeperEventQueuesEmpty and
+                        areAllMergeJobsWaiting and
+                        haveAllBuildsReported and
+                        areAllBuildsWaiting and
+                        areAllNodeRequestsComplete and
+                        allEventQueuesEmpty):
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
                     # when locked the run handler and checked that the
@@ -4678,6 +4719,8 @@ class ZuulTestCase(BaseTestCase):
                     # report that we are settled.
                     self.scheds.execute(
                         lambda app: app.sched.run_handler_lock.release())
+                    self.log.debug("Scheduler run handler: Released (1)")
+                    self.__releaseZookeeperWorkerLocks(matcher)
                     self.executor_server.lock.release()
                     self.log.debug("...settled after %.3f ms / %s loops (%s)",
                                    time.time() - start, i, msg)
@@ -4685,8 +4728,27 @@ class ZuulTestCase(BaseTestCase):
                     return
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.release())
+                self.log.debug("Scheduler run handler: Released (2)")
+            self.__releaseZookeeperWorkerLocks(matcher)
             self.executor_server.lock.release()
             self.scheds.execute(lambda app: app.sched.wake_event.wait(0.1))
+
+    def __logQueueStatus(self, logger, matcher, areZookeeperEventQueuesEmpty,
+                         areAllMergeJobsWaiting, haveAllBuildsReported,
+                         areAllBuildsWaiting, areAllNodeRequestsComplete,
+                         allEventQueuesEmpty):
+        logger("Queue status:")
+        for event_queue in self.__event_queues(matcher):
+            self.log.debug("  %s: %s" % (event_queue, event_queue.empty()))
+        logger("All ZK event queues empty: %s" % areZookeeperEventQueuesEmpty)
+        logger("All merge jobs waiting: %s" % areAllMergeJobsWaiting)
+        logger("All builds reported: %s" % haveAllBuildsReported)
+        logger("All builds waiting: %s" % areAllBuildsWaiting)
+        logger("All requests completed: %s" % areAllNodeRequestsComplete)
+        logger("All event queues empty: %s" % allEventQueuesEmpty)
+        for app in self.scheds.filter(matcher):
+            logger("[Sched: %s] Merge client jobs: %s" %
+                   (app.sched, app.sched.merger.jobs))
 
     def waitForPoll(self, poller, timeout=30):
         self.log.debug("Wait for poll on %s", poller)
