@@ -18,7 +18,8 @@ import logging
 import os
 import socket
 import threading
-import queue
+
+from zuul.lib.named_queue import NamedQueue
 
 
 class CommandSocket(object):
@@ -27,7 +28,7 @@ class CommandSocket(object):
     def __init__(self, path):
         self.running = False
         self.path = path
-        self.queue = queue.Queue()
+        self.queue = NamedQueue('CommandSocketQueue')
 
     def start(self):
         self.running = True
