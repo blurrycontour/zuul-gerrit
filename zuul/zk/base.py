@@ -9,15 +9,16 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 import logging
+import threading
 import time
-from typing import Callable
-from typing import List
-from typing import Optional
+from contextlib import contextmanager
+from typing import Callable, Generator, List, Optional
 
 from kazoo.client import KazooClient, KazooState
+from kazoo.exceptions import LockTimeout
 from kazoo.handlers.threading import KazooTimeoutError
+from kazoo.recipe.lock import Lock
 
 from zuul.zk.exceptions import NoClientException
 
@@ -33,6 +34,7 @@ class ZooKeeperClient(object):
         Initialize the ZooKeeper base client object.
         '''
         self.client = None  # type: Optional[KazooClient]
+        self.locking_lock = threading.Lock()
         self._last_retry_log = 0  # type: int
         self.on_connect_listeners = []  # type: List[Callable[[], None]]
         self.on_disconnect_listeners = []
@@ -130,6 +132,77 @@ class ZooKeeperClient(object):
         '''
         if self.client is not None:
             self.client.set_hosts(hosts=hosts)
+
+    def acquireLock(self, lock: Lock, keep_locked: bool = False,
+                    blocking: bool = True, timeout: float = 10.0) -> bool:
+        """
+        Acquires a ZK lock.
+
+        Acquiring the ZK lock is wrapped with a threading lock. There are 2
+        reasons for this "locking" lock:
+
+        1) in production to prevent simultaneous acquisition of ZK locks
+           from different threads, which may fail,
+        2) in tests to prevent events being popped or pushed while waiting
+           for scheduler to settle.
+
+        The parameter keep_locked should be only set to True in the waiting
+        to settle. This will allow multiple entry and lock of different
+        connection in one scheduler instance from test thread and at the same
+        time block lock request from runtime threads.
+        If set to True, the lockingLock needs to be unlocked manually
+        afterwards.
+
+        :param lock: ZK lock to acquire
+        :param keep_locked: Whether to keep the locking (threading) lock locked
+        :param blocking: Block until lock is obtained or return immediately.
+        :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
+        """
+
+        if not keep_locked or not self.locking_lock.locked():
+            self.locking_lock.acquire()
+
+        try:  # Make sure request does not hang
+            return lock.acquire(blocking=blocking, timeout=timeout)
+        except LockTimeout:
+            self.log.debug("Could not acquire lock %s" % lock.path)
+            raise
+        finally:
+            if not keep_locked and self.locking_lock.locked():
+                self.locking_lock.release()
+
+    @contextmanager
+    def withLock(self, lock: Lock, blocking: bool = True,
+                 timeout: float = 10.0) -> Generator[Lock, None, None]:
+        """
+        Context manager to use for acquiring ZK locks.
+
+        See "#acquireLock(...)" for details.
+
+        :param lock: ZK lock to acquire
+        :param blocking: Block until lock is obtained or return immediately.
+        :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
+        """
+        try:
+            self.acquireLock(lock, blocking=blocking, timeout=timeout)
+            self.log.debug("ZK Lock %s locked", lock.path)
+            yield lock
+        finally:
+            self.releaseLock(lock)
+            self.log.debug("ZK Lock %s released", lock.path)
+
+    def releaseLock(self, lock: Lock) -> None:
+        """
+        Releases a lock if it exists.
+
+        This existence check may be necessary in scenarios where a locked node,
+        or its parent, is deleted and then unlocked. Unlocking a node will
+        create the node again.
+
+        :param lock: Lock to unlock
+        """
+        if self.client and self.client.exists(lock.path):
+            lock.release()
 
 
 class ZooKeeperBase(object):
