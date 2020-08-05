@@ -32,17 +32,16 @@ import threading
 from zuul import exceptions
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.commandsocket import CommandSocket
-from zuul.rpcclient import RPCClient
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.lib.repl import REPLServer
 import zuul.model
-import zuul.rpcclient
-from zuul.zk import ZooKeeperClient
+from zuul.rpcclient import RPCClient
+from zuul.zk import ZooKeeperConnection, ZooKeeperClient
+from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
 
-from zuul.zk import ZooKeeperConnection
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -1239,6 +1238,7 @@ class ZuulWeb(object):
             hosts=zk_hosts, read_only=True, timeout=zk_timeout,
             tls_cert=zk_tls_cert, tls_key=zk_tls_key, tls_ca=zk_tls_ca
         ).connect()
+        self.zk_connection_event = ZooKeeperConnectionEvent(self.zk_client)
 
         self.connections: ConnectionRegistry = connections
         self.authenticators: AuthenticatorRegistry = authenticators
