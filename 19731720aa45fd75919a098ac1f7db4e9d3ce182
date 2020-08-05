@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_bb25a6c4",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-05T09:25:08Z",
+      "side": 1,
+      "message": "Should we use pre here? E.g. the unknown projects error is one line which is hard to read by horizontal scolling in the drawer.",
+      "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
