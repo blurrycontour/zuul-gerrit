@@ -34,6 +34,24 @@
       "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_6d77c6a1",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-05T22:27:28Z",
+      "side": 1,
+      "message": "Another thought is that it is often mixed content, with strings you\u0027d want \u003cp\u003e and then bits of yaml etc you\u0027d actually want formatted as \u003cpre\u003e\n\nYou could maybe do something like gerrit where normal text is \u003cp\u003e and then if it\u0027s indented by a space it gets \u003cpre\u003e?\n\nlike\n  \n  this looks\n  like code\n\nbut this doesn\u0027t",
+      "parentUuid": "9f560f44_2d1aee6d",
+      "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
