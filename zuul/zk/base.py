@@ -9,15 +9,17 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
 import logging
+import threading
 import time
 from typing import Callable
 from typing import List
 from typing import Optional
 
 from kazoo.client import KazooClient, KazooState
+from kazoo.exceptions import LockTimeout
 from kazoo.handlers.threading import KazooTimeoutError
+from kazoo.recipe.lock import Lock
 
 from zuul.zk.exceptions import NoClientException
 
@@ -33,6 +35,7 @@ class ZooKeeperClient(object):
         Initialize the ZooKeeper base client object.
         '''
         self.client = None  # type: Optional[KazooClient]
+        self.locking_lock = threading.Lock()
         self._last_retry_log = 0  # type: int
         self.on_connect_listeners = []  # type: List[Callable[[], None]]
         self.on_disconnect_listeners = []
@@ -130,6 +133,67 @@ class ZooKeeperClient(object):
         '''
         if self.client is not None:
             self.client.set_hosts(hosts=hosts)
+
+    def acquireLock(self, lock: Lock, keep_locked: bool=False):
+        """
+        Acquires a ZK lock.
+
+        Acquiring the ZK lock is wrapped with a threading lock. There are 2
+        reasons for this "locking" lock:
+
+        1) in production to prevent simultaneous acquisition of ZK locks
+           from different threads, which may fail,
+        2) in tests to prevent events being popped or pushed while waiting
+           for scheduler to settle.
+
+        The parameter keep_locked should be only set to True in the waiting
+        to settle. This will allow multiple entry and lock of different
+        connection in one scheduler instance from test thread and at the same
+        time block lock request from runtime threads.
+        If set to True, the lockingLock needs to be unlocked manually
+        afterwards.
+
+        :param lock: ZK lock to acquire
+        :param keep_locked: Whether to keep the locking (threading) lock locked
+        """
+
+        if not keep_locked or not self.locking_lock.locked():
+            self.locking_lock.acquire()
+        locked = False
+        try:
+            while not locked:
+                try:  # Make sure request does not hang
+                    lock.acquire(timeout=10.0)
+                    locked = True
+                except LockTimeout:
+                    self.log.debug("Could not acquire lock %s" % lock.path)
+                    raise
+        finally:
+            if not keep_locked and self.locking_lock.locked():
+                self.locking_lock.release()
+
+    def withLock(self, lock: Lock):
+        """
+        Context manager to use for acquiring ZK locks.
+
+        See "#acquireLock(...)" for details.
+
+        :param lock: ZK lock to acquire
+        """
+        class LockWrapper:
+            def __init__(self, client: ZooKeeperClient, l: Lock):
+                self.client = client
+                self.lock = l
+                pass
+
+            def __enter__(self):
+                self.client.acquireLock(self.lock)
+                self.client.log.debug("ZK Lock %s locked", self.lock.path)
+
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                self.lock.release()
+                self.client.log.debug("ZK Lock %s released", self.lock.path)
+        return LockWrapper(self, lock)
 
 
 class ZooKeeperBase(object):

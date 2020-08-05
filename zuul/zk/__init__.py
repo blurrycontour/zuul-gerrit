@@ -14,6 +14,7 @@ from typing import Optional
 from kazoo.client import KazooClient
 
 from zuul.zk.base import ZooKeeperClient
+from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.exceptions import NoClientException
 from zuul.zk.nodepool import ZooKeeperNodepool
 
@@ -38,6 +39,7 @@ class ZooKeeper(object):
             objects (e.g., HoldRequests).
         """
         self.client = ZooKeeperClient()
+        self.connection_event = ZooKeeperConnectionEvent(self.client)
         self.nodepool = ZooKeeperNodepool(self.client,
                                           enable_cache=enable_cache)
 
