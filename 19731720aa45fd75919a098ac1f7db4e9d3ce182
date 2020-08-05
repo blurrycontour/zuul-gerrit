@@ -16,6 +16,24 @@
       "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_2d1aee6d",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-05T22:19:07Z",
+      "side": 1,
+      "message": "The values have embedded newlines ... so if we don\u0027t use pre we would need to parse them into individual \u003cp\u003e\u0027s to get it to look right?  maybe react has some magic to do that",
+      "parentUuid": "9f560f44_bb25a6c4",
+      "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
