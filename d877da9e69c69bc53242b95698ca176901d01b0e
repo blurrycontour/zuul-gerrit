@@ -102,6 +102,24 @@
       "revId": "d877da9e69c69bc53242b95698ca176901d01b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_800cb3ec",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-05T07:34:09Z",
+      "side": 1,
+      "message": "Ack, report uuid makes sense here.",
+      "parentUuid": "9f560f44_8ff41288",
+      "revId": "d877da9e69c69bc53242b95698ca176901d01b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
