@@ -10,14 +10,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import logging
+import threading
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
-from typing import Optional, Any, List, Callable
+from contextlib import contextmanager
+from typing import Optional, List, Callable, Generator, Dict, Union, Any
 
 from kazoo.client import KazooClient
+from kazoo.exceptions import LockTimeout, ConnectionClosedError, \
+    ConnectionLossException
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
+from kazoo.recipe.lock import Lock
 
 from zuul.lib.config import get_default
 from zuul.zk.exceptions import NoClientException
@@ -34,6 +39,8 @@ class ZooKeeperClient(object):
         Initialize the ZooKeeper base client object.
         """
         self.client: Optional[KazooClient] = None
+        self.locking_lock: threading.Lock = threading.Lock()
+        self._election_locks: Dict[str, Lock] = {}
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners: List[Callable[[], None]] = []
@@ -132,6 +139,121 @@ class ZooKeeperClient(object):
         """
         if self.client is not None:
             self.client.set_hosts(hosts=hosts)
+
+    def acquireLock(self, lock: Lock, keep_locked: bool = False,
+                    blocking: bool = True, timeout: float = 10.0) -> bool:
+        """
+        Acquires a ZK lock.
+
+        Acquiring the ZK lock is wrapped with a threading lock. There are 2
+        reasons for this "locking" lock:
+
+        1) in production to prevent simultaneous acquisition of ZK locks
+           from different threads, which may fail,
+        2) in tests to prevent events being popped or pushed while waiting
+           for scheduler to settle.
+
+        The parameter keep_locked should be only set to True in the waiting
+        to settle. This will allow multiple entry and lock of different
+        connection in one scheduler instance from test thread and at the same
+        time block lock request from runtime threads.
+        If set to True, the lockingLock needs to be unlocked manually
+        afterwards.
+
+        :param lock: ZK lock to acquire
+        :param keep_locked: Whether to keep the locking (threading) lock locked
+        :param blocking: Block until lock is obtained or return immediately.
+        :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
+        """
+
+        if not keep_locked or not self.locking_lock.locked():
+            self.locking_lock.acquire(timeout=timeout)
+
+        try:  # Make sure request does not hang
+            return lock.acquire(blocking=blocking, timeout=timeout)
+        except LockTimeout:
+            self.log.debug("Could not acquire lock %s" % lock.path)
+            raise
+        finally:
+            if not keep_locked and self.locking_lock.locked():
+                self.locking_lock.release()
+
+    @contextmanager
+    def withLock(self, lock: Lock, blocking: bool = True,
+                 timeout: float = 10.0) -> Generator[Lock, None, None]:
+        """
+        Context manager to use for acquiring ZK locks.
+
+        See "#acquireLock(...)" for details.
+
+        :param lock: ZK lock to acquire
+        :param blocking: Block until lock is obtained or return immediately.
+        :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
+        """
+        locked = False
+        try:
+            self.acquireLock(lock, blocking=blocking, timeout=timeout)
+            locked = True
+            self.log.debug("ZK Lock %s locked", lock.path)
+            yield lock
+        finally:
+            if locked:
+                self.releaseLock(lock)
+            self.log.debug("ZK Lock %s released", lock.path)
+
+    def releaseLock(self, lock: Lock) -> None:
+        """
+        Releases a lock if it exists.
+
+        This existence check may be necessary in scenarios where a locked node,
+        or its parent, is deleted and then unlocked. Unlocking a node will
+        create the node again.
+
+        :param lock: Lock to unlock
+        """
+        if self.client and self.client.exists(lock.path):
+            lock.release()
+
+    def election(self, path: str, func: Callable[[], Optional[bool]],
+                 repeat: Union[bool, Callable[[], bool]] = False) -> None:
+        """
+        An extended version of kazoo.recipe.election.Election to provide
+        a simple interface for (repeatable) function calls.
+
+        :param path: The election path to use.
+        :param func: A function to be called if/when the election is won.
+                     The provided function may return a boolean in which case
+                     if "repeatable" is True and True is returned the loop will
+                     be exited.
+        :param repeat: Whether the function should be called in an infinite
+                       loop. This may be a function which will be evaluated
+                       each loop.
+        """
+        lock = self._election_locks.get(path)
+        if not lock:
+            lock = self._election_locks[path] = Lock(self.client, path)
+
+        while True:
+            try:
+                with lock:
+                    # Check in-expensively if we still have the lock
+                    # and didn't loose connection
+                    while self.connected and lock.is_acquired:
+                        interrupt = func()
+                        if interrupt is True:
+                            return
+
+                        if callable(repeat) and not repeat() \
+                                or repeat is False:
+                            return
+
+            except ConnectionLossException:
+                self.log.warning("Election: Connection to ZK lost")
+            except ConnectionClosedError:
+                self.log.warning("Election: Connection to ZK closed")
+
+            if callable(repeat) and not repeat() or repeat is False:
+                return
 
 
 class ZooKeeperBase(metaclass=ABCMeta):
