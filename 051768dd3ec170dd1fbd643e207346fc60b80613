@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_9507ce82",
+        "filename": "zuul/zk/launcher.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-05T11:44:25Z",
+      "side": 1,
+      "message": "I think this might still fit fine into the nodepool file as it\u0027s only used there?",
+      "revId": "051768dd3ec170dd1fbd643e207346fc60b80613",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
