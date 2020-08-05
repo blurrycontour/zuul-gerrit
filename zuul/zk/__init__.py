@@ -9,12 +9,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+from zuul.zk.connection_event import ZooKeeperConnectionEventMixin
 from zuul.zk.nodepool import ZooKeeperNodepoolMixin
-from zuul.zk.zuul import ZooKeeperZuulMixin
 
 
-class ZooKeeper(ZooKeeperNodepoolMixin, ZooKeeperZuulMixin):
+class ZooKeeper(ZooKeeperConnectionEventMixin, ZooKeeperNodepoolMixin):
     '''
     Class implementing the ZooKeeper interface.
 

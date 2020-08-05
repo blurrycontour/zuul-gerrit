@@ -12,11 +12,14 @@
 
 import json
 import logging
+import threading
 import time
 from typing import Optional
 
 from kazoo.client import KazooClient, KazooState
+from kazoo.exceptions import LockTimeout
 from kazoo.handlers.threading import KazooTimeoutError
+from kazoo.recipe.lock import Lock
 
 
 class ZooKeeperBase(object):
@@ -36,6 +39,7 @@ class ZooKeeperBase(object):
         self._became_lost = False  # type: bool
         self._last_retry_log = 0  # type: int
         self.enable_cache = enable_cache  # type: bool
+        self.lockingLock = threading.Lock()
 
     def _dictToStr(self, data):
         return json.dumps(data).encode('utf8')
@@ -138,3 +142,41 @@ class ZooKeeperBase(object):
         '''
         if self.client is not None:
             self.client.set_hosts(hosts=hosts)
+
+    def acquireLock(self, lock: Lock, keep_locked: bool=False):
+        """
+        Acquires a ZK lock.
+
+        Acquiring the ZK lock is wrapped with a threading lock. There are 2
+        reasons for this "locking" lock:
+
+        1) in production to prevent simultaneous acquisition of ZK locks
+           from different threads, which may fail,
+        2) in tests to prevent events being popped or pushed while waiting
+           for scheduler to settle.
+
+        The parameter keep_locked should be only set to True in the waiting
+        to settle. This will allow multiple entry and lock of different
+        connection in one scheduler instance from test thread and at the same
+        time block lock request from runtime threads.
+        If set to True, the lockingLock needs to be unlocked manually
+        afterwards.
+
+        :param lock: ZK lock to acquire
+        :param keep_locked: Whether to keep the locking (threading) lock locked
+        """
+
+        if not keep_locked or not self.lockingLock.locked():
+            self.lockingLock.acquire()
+        locked = False
+        try:
+            while not locked:
+                try:  # Make sure request does not hang
+                    lock.acquire(timeout=10.0)
+                    locked = True
+                except LockTimeout:
+                    self.log.debug("Could not acquire lock %s" % lock.path)
+                    raise
+        finally:
+            if not keep_locked and self.lockingLock.locked():
+                self.lockingLock.release()
