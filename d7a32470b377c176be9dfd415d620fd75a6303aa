@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_d58026c2",
+        "filename": "zuul/zk.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-05T11:49:51Z",
+      "side": 1,
+      "message": "nit: The changes in this file look unrelated and might fit better into the zk preparation change?",
+      "revId": "d7a32470b377c176be9dfd415d620fd75a6303aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
