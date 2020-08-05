@@ -20,13 +20,14 @@ import logging
 import os
 import pickle
 import re
-import queue
 import socket
 import sys
 import threading
 import time
 import traceback
 import urllib
+
+from zuul.lib.named_queue import NamedQueue
 
 from zuul import configloader
 from zuul import model
@@ -324,8 +325,8 @@ class Scheduler(threading.Thread):
         self.triggers = dict()
         self.config = config
 
-        self.trigger_event_queue = queue.Queue()
-        self.result_event_queue = queue.Queue()
+        self.trigger_event_queue = NamedQueue('SchedulerTriggerEventQueue')
+        self.result_event_queue = NamedQueue('SchedulerResultEventQueue')
         self.management_event_queue = zuul.lib.queue.MergedQueue()
         self.abide = model.Abide()
         self.unparsed_abide = model.UnparsedAbideConfig()
@@ -419,9 +420,10 @@ class Scheduler(threading.Thread):
     def setNodepool(self, nodepool):
         self.nodepool = nodepool
 
-    def setZooKeeper(self, zk_client, zk_nodepool):
+    def setZooKeeper(self, zk_client, zk_nodepool, zk_connection_event):
         self.zk_client = zk_client
         self.zk_nodepool = zk_nodepool
+        self.zk_connection_event = zk_connection_event
 
     def runStats(self):
         while not self.stats_stop.wait(self._stats_interval):
