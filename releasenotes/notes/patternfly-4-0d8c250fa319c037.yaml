@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    We are currently improving the Zuul web dashboard and migrating it to
+    Patternfly 4.
