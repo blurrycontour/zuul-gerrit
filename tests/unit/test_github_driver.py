@@ -567,10 +567,10 @@ class TestGithubDriver(ZuulTestCase):
         self.waitUntilSettled()
 
         # there should only be one report, a status
-        self.assertEqual(1, len(self.fake_github.reports))
+        self.assertEqual(1, len(self.fake_github.github_data.reports))
         # Verify the user/context/state of the status
         status = ('zuul', 'tenant-one/push-reporting', 'pending')
-        self.assertEqual(status, self.fake_github.reports[0][-1])
+        self.assertEqual(status, self.fake_github.github_data.reports[0][-1])
 
         # free the executor, allow the build to finish
         self.executor_server.hold_jobs_in_build = False
@@ -578,10 +578,10 @@ class TestGithubDriver(ZuulTestCase):
         self.waitUntilSettled()
 
         # Now there should be a second report, the success of the build
-        self.assertEqual(2, len(self.fake_github.reports))
+        self.assertEqual(2, len(self.fake_github.github_data.reports))
         # Verify the user/context/state of the status
         status = ('zuul', 'tenant-one/push-reporting', 'success')
-        self.assertEqual(status, self.fake_github.reports[-1][-1])
+        self.assertEqual(status, self.fake_github.github_data.reports[-1][-1])
 
         # now make a PR which should also comment
         self.executor_server.hold_jobs_in_build = True
@@ -591,7 +591,7 @@ class TestGithubDriver(ZuulTestCase):
 
         # Now there should be a four reports, a new comment
         # and status
-        self.assertEqual(4, len(self.fake_github.reports))
+        self.assertEqual(4, len(self.fake_github.github_data.reports))
         self.executor_server.release()
         self.waitUntilSettled()
 
@@ -1277,7 +1277,7 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual(2, len(self.history))
 
         # now check if the merge was done via rebase
-        merges = [report for report in self.fake_github.reports
+        merges = [report for report in self.fake_github.github_data.reports
                   if report[2] == 'merge']
         assert(len(merges) == 1 and merges[0][3] == 'squash')
 

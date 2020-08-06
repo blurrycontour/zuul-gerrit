@@ -478,7 +478,8 @@ class FakePull(object):
         pr = self._fake_pull_request
 
         # record that this got reported
-        conn.reports.append((pr.project, pr.number, 'merge', merge_method))
+        conn.github_data.reports.append(
+            (pr.project, pr.number, 'merge', merge_method))
         if conn.merge_failure:
             raise Exception('Unknown merge failure')
         if conn.merge_not_allowed_count > 0:
@@ -612,6 +613,7 @@ class FakeGithubData(object):
     def __init__(self, pull_requests):
         self.pull_requests = pull_requests
         self.repos = {}
+        self.reports = []
 
 
 class FakeGithubClient(object):
