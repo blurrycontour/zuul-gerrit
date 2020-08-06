@@ -33,6 +33,23 @@
       "revId": "362a6d120cef0d3c5fac4206edb76333600553d1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_ea360551",
+        "filename": "doc/source/reference/drivers/github.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-06T23:08:59Z",
+      "side": 1,
+      "message": "nit: extra space",
+      "revId": "362a6d120cef0d3c5fac4206edb76333600553d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
