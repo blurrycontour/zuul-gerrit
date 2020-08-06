@@ -455,6 +455,13 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.executors.jobs_running', execute_running)
         self.statsd.gauge('zuul.executors.jobs_queued', execute_queue)
 
+        self.statsd.gauge('zuul.scheduler.eventqueues.trigger',
+                          self.trigger_event_queue.qsize())
+        self.statsd.gauge('zuul.scheduler.eventqueues.result',
+                          self.result_event_queue.qsize())
+        self.statsd.gauge('zuul.scheduler.eventqueues.management',
+                          self.management_event_queue.qsize())
+
     def addEvent(self, event):
         self.trigger_event_queue.put(event)
         self.wake_event.set()
