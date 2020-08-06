@@ -369,6 +369,15 @@ class KubeFwd(object):
             if self.fwd:
                 self.fwd.kill()
                 self.fwd.wait()
+
+                # clear stdout buffer before its gone to not miss out on
+                # potential connection errors
+                fwd_stdout = [line.decode('utf8') for line in self.fwd.stdout]
+                self.log.debug(
+                    "Rest of kubectl port forward output was: %s",
+                    "\n".join(fwd_stdout)
+                )
+
                 self.fwd = None
         except Exception:
             self.log.exception('Unable to stop kubectl port-forward:')
