@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_8a4e69be",
+        "filename": "tests/base.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2070,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-06T23:15:35Z",
+      "side": 1,
+      "message": "In test_github_driver.py it seems to change all these to \"example.com\" but here it remains setting them as \"derp.com\"\n\nMaybe I\u0027m the herp-derp but can you explain the different accounts, because I get lost?",
+      "range": {
+        "startLine": 2070,
+        "startChar": 16,
+        "endLine": 2070,
+        "endChar": 44
+      },
+      "revId": "51536f422bce88f1a3629780a911cb534e11bdc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
