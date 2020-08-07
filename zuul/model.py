@@ -474,6 +474,7 @@ class Freezable(object):
         super(Freezable, self).__setattr__('_frozen', False)
 
     def freeze(self):
+        return
         """Make this object immutable"""
         def _freezelist(l):
             for i, v in enumerate(l):
@@ -504,6 +505,7 @@ class Freezable(object):
 
     @staticmethod
     def thaw(data):
+        return data
         """Thaw the supplied dictionary"""
         def _thawlist(l):
             l = list(l)
