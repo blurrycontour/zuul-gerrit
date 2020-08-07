@@ -6,7 +6,7 @@ is managed using Javascript toolchains. It is intended to be served by zuul-web
 directly from zuul/web/static in the simple case, or to be published to
 an alternate static web location, such as an Apache server.
 
-The web dashboard is written in `React`_ and `Patternfly`_ and is
+The web dashboard is written in `React`_ and `PatternFly`_ and is
 managed by `create-react-app`_ and `yarn`_ which in turn both assume a
 functioning and recent `nodejs`_ installation.
 
@@ -104,27 +104,51 @@ conflicts is to first resolve the conflicts, if any, in ``package.json``. Then:
 Which causes yarn to discard the ``yarn.lock`` file, recalculate the
 dependencies and write new content.
 
-React Components
-----------------
+React Components and Styling
+----------------------------
 
 Each page is a React Component. For instance the status.html page code is
-``web/src/pages/status.jsx``.
+``web/src/pages/status.jsx``. It's usually a good way to not put too much markup
+in those page components, and create different components for this instead. This
+way, the page component can deal with the logic like reloading data if needed or
+evaluating URL parameters and the child components can deal with the markup.
+Thus, you will find a lot of components in the ``web/src/containers`` directory
+that mainly deal with the markup.
 
 Mapping of pages/urls to components can be found in the route list in
 ``web/src/routes.js``.
 
-Here are some useful documentation about the different libraries:
+The best thing to get started is to check out the libraries that glue everything
+together. Those are `React`__, `react-router`_ and `Redux`_.
 
-- https://reactjs.org/docs/getting-started.html
-- https://reacttraining.com/react-router/web/guides/philosophy
-- https://react-bootstrap.github.io/components/forms/
-- https://redux.js.org/introduction/coreconcepts
-- https://www.patternfly.org/pattern-library/
-- https://rawgit.com/patternfly/patternfly-react/gh-pages/
+.. _React-getting-started: https://reactjs.org/docs/getting-started.html
 
-The gh-pages are built from storybook present in the patternfly-react
-repository. Sometime the 'View Info' is not enough and using grep in the
-repository may yield better documentation.
+__ React-getting-started_
+
+For the visual part we are using `PatternFly`_. For a list of available
+PatternFly React components, take a look at the `Components`_ section in their
+documentation. If a single component is not enough, you could also take a
+look at the `Demos`_ sections which provides some more advanced examples
+incoorporating multiple components and their interaction.
+
+If you are unsure which component you should use for your purpose, you might
+want to check out the `Usage and behaviour`_ section in their design guidelines.
+
+There is also a list of available `icons`_ including some recommendations on
+when to use which icon. In case you don't find an appropriate icon there, you
+could check out the `FontAwesome Free`_ icons, as most of the are included in
+PatternFly. To find out if an icon is available, simply try to import it from
+the ``@patternfly/react-icons`` package.
+
+For example if you want to use the `address-book`_ icon (which is not listed in
+the PatternFly icon list) you can import it via the following statement:
+
+.. code-block:: javascript
+
+   import { AddressBookIcon } from '@patternfly/react-icons'
+
+Please note that the spelling of the icon name changes to CamelCase and is
+always extended by ``Icon``.
 
 Development
 -----------
@@ -195,8 +219,16 @@ As long as `yarn`_ is installed, the installation of zuul will run
 .. _devtool: https://webpack.js.org/configuration/devtool/#devtool
 .. _nodeenv: https://pypi.org/project/nodeenv
 .. _React: https://reactjs.org/
-.. _Patternfly: https://www.patternfly.org/
+.. _react-router: https://reactrouter.com/web/guides/philosophy
+.. _Redux: https://redux.js.org/introduction/core-concepts
+.. _PatternFly: https://www.patternfly.org/
 .. _create-react-app: https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/template/README.md
+.. _Components: https://www.patternfly.org/v4/documentation/react/components/aboutmodal
+.. _Demos: https://www.patternfly.org/v4/documentation/react/demos/bannerdemo
+.. _Usage and behaviour: https://www.patternfly.org/v4/design-guidelines/usage-and-behavior/about-modal
+.. _icons: https://www.patternfly.org/v4/design-guidelines/styles/icons
+.. _FontAwesome Free: https://fontawesome.com/icons?d=gallery&m=free
+.. _address-book: https://fontawesome.com/icons/address-book?style=solid
 
 By default, zuul-web provides a Progressive Web Application but does
 not run a Service Worker. For deployers who would like to enable one,
