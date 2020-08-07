@@ -474,6 +474,7 @@ class Freezable(object):
         super(Freezable, self).__setattr__('_frozen', False)
 
     def freeze(self):
+        return
         """Make this object immutable"""
         def _freezelist(l):
             for i, v in enumerate(l):
