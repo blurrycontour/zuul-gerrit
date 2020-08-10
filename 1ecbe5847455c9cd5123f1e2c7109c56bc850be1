@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_c6731ee6",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-10T13:32:13Z",
+      "side": 1,
+      "message": "This stands out to me because we\u0027ve got a separate save action which saves the state as is. Looking at render() is the !autoReload here correct? the isChecked value seems to be set to autoReload so we\u0027ll invert this value? Shouldn\u0027t we take the non inverted value to reflect the check state instead?",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 57,
+        "endChar": 31
+      },
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
