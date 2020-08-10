@@ -171,6 +171,7 @@ class CallbackModule(default.CallbackModule):
                     done = self._log_streamline(
                         host, line.decode("utf-8", "backslashreplace"))
                     if done:
+                        s.close()
                         return
                 else:
                     more = s.recv(4096)
