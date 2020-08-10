@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf51134e_b60636cd",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-10T08:23:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_cb27cec6",
+      "revId": "277dbe2d2162d53b70bb01384483b97face937ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf51134e_667cf771",
         "filename": "web/src/containers/config/Config.jsx",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2020-07-14T12:28:13Z",
       "side": 1,
       "message": "nit 1: A React.Fragment should only be used in case you don\u0027t want to wrap the components/tags into another component/tag (e.g. a div). That\u0027s sometimes necessary to provide a single output element for render() functions. I think in this it\u0027s ok to wrap everything in a div.\n\nnit 2: For me the focus marker of the switch is cut at the bottom. Maybe you could fix this by adding a slight padding-bottom (10px) to the wrapper div. I would assume that PF4 deals with that by itself but that doesn\u0027t seem to be the case (at least on my machine :D )",
+      "revId": "277dbe2d2162d53b70bb01384483b97face937ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf51134e_b62f563d",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-10T08:23:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_667cf771",
       "revId": "277dbe2d2162d53b70bb01384483b97face937ca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
