@@ -132,55 +132,60 @@ class CallbackModule(default.CallbackModule):
     def _read_log(self, host, ip, port, log_id, task_name, hosts):
         self._log("[%s] Starting to log %s for task %s"
                   % (host, log_id, task_name), job=False, executor=True)
-        while True:
-            try:
-                s = socket.create_connection((ip, port), 5)
-                # Disable the socket timeout after we have successfully
-                # connected to accomodate the fact that jobs may not be writing
-                # logs continously. Without this we can easily trip the 5
-                # second timeout.
-                s.settimeout(None)
-            except socket.timeout:
-                self._log(
-                    "Timeout exception waiting for the logger. "
-                    "Please check connectivity to [%s:%s]"
-                    % (ip, port), executor=True)
-                self._log_streamline(
-                    "localhost",
-                    "Timeout exception waiting for the logger. "
-                    "Please check connectivity to [%s:%s]"
-                    % (ip, port))
-                return
-            except Exception:
-                self._log("[%s] Waiting on logger" % host,
-                          executor=True, debug=True)
-                time.sleep(0.1)
-                continue
-            msg = "%s\n" % log_id
-            s.send(msg.encode("utf-8"))
-            buff = s.recv(4096)
-            buffering = True
-            while buffering:
-                if b'\n' in buff:
-                    (line, buff) = buff.split(b'\n', 1)
-                    # We can potentially get binary data here. In order to
-                    # being able to handle that use the backslashreplace
-                    # error handling method. This decodes unknown utf-8
-                    # code points to escape sequences which exactly represent
-                    # the correct data without throwing a decoding exception.
-                    done = self._log_streamline(
-                        host, line.decode("utf-8", "backslashreplace"))
-                    if done:
-                        return
-                else:
-                    more = s.recv(4096)
-                    if not more:
-                        buffering = False
+        try:
+            while True:
+                try:
+                    s = socket.create_connection((ip, port), 5)
+                    # Disable the socket timeout after we have successfully
+                    # connected to accomodate the fact that jobs may not be writing
+                    # logs continously. Without this we can easily trip the 5
+                    # second timeout.
+                    s.settimeout(None)
+                except socket.timeout:
+                    self._log(
+                        "Timeout exception waiting for the logger. "
+                        "Please check connectivity to [%s:%s]"
+                        % (ip, port), executor=True)
+                    self._log_streamline(
+                        "localhost",
+                        "Timeout exception waiting for the logger. "
+                        "Please check connectivity to [%s:%s]"
+                        % (ip, port))
+                    return
+                except Exception:
+                    self._log("[%s] Waiting on logger" % host,
+                            executor=True, debug=True)
+                    time.sleep(0.1)
+                    continue
+                msg = "%s\n" % log_id
+                s.send(msg.encode("utf-8"))
+                buff = s.recv(4096)
+                buffering = True
+                while buffering:
+                    if b'\n' in buff:
+                        (line, buff) = buff.split(b'\n', 1)
+                        # We can potentially get binary data here. In order to
+                        # being able to handle that use the backslashreplace
+                        # error handling method. This decodes unknown utf-8
+                        # code points to escape sequences which exactly represent
+                        # the correct data without throwing a decoding exception.
+                        done = self._log_streamline(
+                            host, line.decode("utf-8", "backslashreplace"))
+                        if done:
+                            return
                     else:
-                        buff += more
-            if buff:
-                self._log_streamline(
-                    host, buff.decode("utf-8", "backslashreplace"))
+                        more = s.recv(4096)
+                        if not more:
+                            buffering = False
+                        else:
+                            buff += more
+                if buff:
+                    self._log_streamline(
+                        host, buff.decode("utf-8", "backslashreplace"))
+        finally:
+            if s:
+                s.shutdown(socket.SHUT_RDWR)
+                s.close()
 
     def _log_streamline(self, host, line):
         if "[Zuul] Task exit code" in line:
