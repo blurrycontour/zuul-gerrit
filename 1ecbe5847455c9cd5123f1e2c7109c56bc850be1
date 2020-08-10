@@ -46,6 +46,81 @@
       "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_d7b0e645",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-10T15:31:14Z",
+      "side": 1,
+      "message": "@Clark: Maybe as explanation in case this is the confusing part: The this.setState(({ autoReload }) extracts the autoReload value from the previous state. That\u0027s why we need to use autoReload: !autoReload in the next line to toggle the value and cause a state update.\n\nThe longer version for this statement would be\nthis.setState(prevState \u003d\u003e {\n  autoReload: !prevState.autoReload,\n})\n\nAnother (shorter) version would be \n\nthis.setState({\n  autoReload: !this.state.autoReload,\n})\n\nMaybe we could switch to one of those versions which IMHO make it clearer where the autoReload value comes from.",
+      "parentUuid": "9f560f44_f12eda89",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 57,
+        "endChar": 31
+      },
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b7c29283",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 10
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-10T15:31:14Z",
+      "side": 1,
+      "message": "Are there other possibilities to close the modal or only this button? In case there are others, I would prefer to really close it here (e.g. implement something like this.handleModalClose) and not rely on the toggle as this then might come out of sync depending on which actions where taken in the UI.",
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_576216af",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 10
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-10T15:31:14Z",
+      "side": 1,
+      "message": "Is there any specific reason why we enforce the upload here? This looks like we are now not taking the autoReload setting in account.\n\nThe same applies for the componentDidMount() function, although this is only called once in the beginning, so it might be OK to enforce an initial loading there. Still, previously this wasn\u0027t necessary, so I\u0027m wondering why it\u0027s necessary now?",
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b7f572cd",
+        "filename": "web/src/reducers/preferences.js",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-10T15:31:14Z",
+      "side": 1,
+      "message": "nit: Indentation looks wrong here",
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
