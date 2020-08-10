@@ -107,6 +107,23 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_e94d4e3b",
+        "filename": "web/src/pages/Status.jsx",
+        "patchSetId": 10
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-10T18:14:01Z",
+      "side": 1,
+      "message": "This runs when the user just switched tenants.  The intent of disabling auto-update is to avoid wasting bandwidth.  If the user actively changes what they\u0027re looking at, we should show them new, correct data, not old data from the wrong tenant.",
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_b7f572cd",
         "filename": "web/src/reducers/preferences.js",
         "patchSetId": 10
