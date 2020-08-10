@@ -22,6 +22,30 @@
       "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_f12eda89",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 10
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-10T13:42:07Z",
+      "side": 1,
+      "message": "handlerAutoReload is called when you click the toggle button, which always switches old status. AFAIK that is how a toggle is supposed to work.",
+      "parentUuid": "9f560f44_c6731ee6",
+      "range": {
+        "startLine": 57,
+        "startChar": 8,
+        "endLine": 57,
+        "endChar": 31
+      },
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
