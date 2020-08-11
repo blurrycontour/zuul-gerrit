@@ -15,8 +15,6 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildsets } from '../api'
@@ -26,7 +24,7 @@ import {
   getFiltersFromUrl,
   writeFiltersToUrl,
 } from '../containers/FilterToolbar'
-
+import BuildsetTable from '../containers/build/BuildsetTable'
 
 class BuildsetsPage extends React.Component {
   static propTypes = {
@@ -35,9 +33,8 @@ class BuildsetsPage extends React.Component {
     history: PropTypes.object,
   }
 
-  constructor (props) {
+  constructor(props) {
     super()
-    this.prepareTableHeaders()
     this.filterCategories = [
       {
         key: 'project',
@@ -79,10 +76,10 @@ class BuildsetsPage extends React.Component {
     ]
 
     this.state = {
-      buildsets: null,
+      buildsets: [],
+      fetching: false,
       filters: getFiltersFromUrl(props.location, this.filterCategories),
     }
-
   }
 
   updateData = (filters) => {
@@ -93,20 +90,25 @@ class BuildsetsPage extends React.Component {
     // passed as prop and doesn't change since the page itself wasn't
     // re-rendered.
     const queryString = buildQueryString(filters)
-    this.setState({buildsets: null})
-    fetchBuildsets(this.props.tenant.apiPrefix, queryString).then(response => {
-      this.setState({buildsets: response.data})
-    })
+    this.setState({ fetching: true })
+    fetchBuildsets(this.props.tenant.apiPrefix, queryString).then(
+      (response) => {
+        this.setState({
+          buildsets: response.data,
+          fetching: false,
+        })
+      }
+    )
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Buildsets'
     if (this.props.tenant.name) {
       this.updateData(this.state.filters)
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     const { filters } = this.state
     if (this.props.tenant.name !== prevProps.tenant.name) {
       this.updateData(filters)
@@ -127,93 +129,17 @@ class BuildsetsPage extends React.Component {
     })
   }
 
-  prepareTableHeaders() {
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = (value) => <Table.Cell>{value}</Table.Cell>
-    const linkChangeFormat = (value, rowdata) => (
-      <Table.Cell>
-        <a href={rowdata.rowData.ref_url}>
-          {value ?
-           rowdata.rowData.change + ',' + rowdata.rowData.patchset :
-           rowdata.rowData.newrev ?
-             rowdata.rowData.newrev.substr(0, 7) :
-           rowdata.rowData.branch}
-        </a>
-      </Table.Cell>
-    )
-    const linkBuildsetFormat = (value, rowdata) => (
-      <Table.Cell>
-        <Link
-          to={this.props.tenant.linkPrefix +
-              '/buildset/' + rowdata.rowData.uuid}>
-          {value}
-        </Link>
-      </Table.Cell>
-    )
-    this.columns = []
-    this.filterTypes = []
-    const myColumns = [
-      'project',
-      'branch',
-      'pipeline',
-      'change',
-      'result']
-    myColumns.forEach(column => {
-      let prop = column
-      let formatter = cellFormat
-      if (column === 'change') {
-        formatter = linkChangeFormat
-      } else if (column === 'result') {
-        formatter = linkBuildsetFormat
-      }
-      const label = column.charAt(0).toUpperCase() + column.slice(1)
-      this.columns.push({
-        header: {label: label, formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
-      if (column !== 'builds') {
-        this.filterTypes.push({
-          id: prop,
-          title: label,
-          placeholder: 'Filter by ' + label,
-          filterType: 'text',
-        })
-      }
-    })
-    // Add buildset filter at the end
-    this.filterTypes.push({
-      id: 'uuid',
-      title: 'Buildset',
-      placeholder: 'Filter by Buildset UUID',
-      filterType: 'text',
-    })
-  }
-
-  renderTable (buildsets) {
-    return (
-      <Table.PfProvider
-        striped
-        bordered
-        columns={this.columns}
-      >
-        <Table.Header/>
-        <Table.Body
-          rows={buildsets}
-          rowKey='uuid'
-          onRow={(row) => {
-            switch (row.result) {
-              case 'SUCCESS':
-                return { className: 'success' }
-              default:
-                return { className: 'warning' }
-            }
-          }} />
-      </Table.PfProvider>)
+  handleClearFilters = () => {
+    // Delete the values for each filter category
+    const filters = this.filterCategories.reduce((filterDict, category) => {
+      filterDict[category.key] = []
+      return filterDict
+    }, {})
+    this.handleFilterChange(filters)
   }
 
   render() {
-    const { buildsets, filters } = this.state
+    const { buildsets, fetching, filters } = this.state
     return (
       <PageSection variant={PageSectionVariants.light}>
         <FilterToolbar
@@ -221,10 +147,14 @@ class BuildsetsPage extends React.Component {
           onFilterChange={this.handleFilterChange}
           filters={filters}
         />
-        {buildsets ? this.renderTable(buildsets) : <p>Loading...</p>}
+        <BuildsetTable
+          buildsets={buildsets}
+          fetching={fetching}
+          onClearFilters={this.handleClearFilters}
+        />
       </PageSection>
     )
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(BuildsetsPage)
+export default connect((state) => ({ tenant: state.tenant }))(BuildsetsPage)

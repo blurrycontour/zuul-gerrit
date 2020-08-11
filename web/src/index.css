@@ -38,14 +38,80 @@ a.refresh {
     margin-left: var(--pf-global--spacer--md);
 }
 
-/* Build Lists */
+/*
+ * Build Lists and Tables
+ */
+
+/* Improve the hover effect of selected lines in the selectable data list*/
 .pf-c-data-list__item.pf-m-selectable:hover:not(.pf-m-selected),
 .pf-c-data-list__item.pf-m-selectable:focus:not(.pf-m-selected) {
-    /* Improve the hover/focus effect of selected lines */
     --pf-c-data-list__item--before--BackgroundColor: var(
         --pf-c-data-list__item--m-selected--before--BackgroundColor
     );
     font-weight: bold;
+}
+
+.zuul-build-list:hover a {
+    text-decoration: none;
+}
+
+/* Keep the normal font-size for compact tables */
+.zuul-build-table td {
+    font-size: var(--pf-global--FontSize--md);
+}
+
+/* Use the same hover effect on table rows like for the selectable data list */
+.zuul-build-table tbody tr:hover {
+    box-shadow: var(--pf-global--BoxShadow--sm-top),
+      var(--pf-global--BoxShadow--sm-bottom);
+}
+
+@media screen and (max-width: 768px) {
+    /* For the small-screen table layout the before element is already used to
+       show the column names. Thus, we fall back to the border to show the hover
+       effect. The drawback with that is, that we can't show a nice transition.
+       */
+    .zuul-build-table tbody tr:hover {
+        border-left-color: var(--pf-global--active-color--100);
+        border-left-width: var(--pf-global--BorderWidth--lg);
+        border-left-style: solid;
+        /* Compensate the border width with a negative margin */
+        margin-left: -3px;
+    }
+}
+
+@media screen and (min-width: 769px) {
+    /* For the larger screens (normal table layout) we can use the before
+       element on the first table cell to show the same hover effect like for
+       the data list */
+    .zuul-build-table tbody tr td:first-child::before {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: var(--pf-global--BorderWidth--lg);
+        content: "";
+        background-color: transparent;
+        transition: var(--pf-global--Transition);
+    }
+
+    .zuul-build-table tbody tr:hover td:first-child::before {
+        background-color: var(--pf-global--active-color--100);
+    }
+}
+
+/* Make a link stretch the whole parent element (in this case the whole table
+   cell) */
+.zuul-stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: auto;
+    content: "";
+    background-color: rgba(0,0,0,0);
 }
 
 /*
