@@ -1510,6 +1510,11 @@
   dependencies:
     "@types/node" ">= 8"
 
+"@patternfly/patternfly@4.31.4":
+  version "4.31.4"
+  resolved "https://registry.yarnpkg.com/@patternfly/patternfly/-/patternfly-4.31.4.tgz#010f40582af2cd5164c7553bd51eb3ed493fae97"
+  integrity sha512-8QXlVnRtUfJdtafo1qS+BC1tB+AXCLmAHyS7F4uW/tDhFcvN/F5CEpEYz1QvG92bWv2ypWwAqTrDDqYdiYyk+g==
+
 "@patternfly/react-core@^4.18.5":
   version "4.18.5"
   resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-4.18.5.tgz#465ee3be0e58f7fdead9644ed2667f18eff0d684"
@@ -1523,20 +1528,61 @@
     tippy.js "5.1.2"
     tslib "^1.11.1"
 
+"@patternfly/react-core@^4.40.3":
+  version "4.40.3"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-core/-/react-core-4.40.3.tgz#8e6f8507b42434fe81690113e679d9d4656ea202"
+  integrity sha512-PdVbFibOGOwzJku06gZTa67nxw8l6khLgQ+xR3r4KzKdngudfTq2IZHgjy0IeVelfwQDRNbXz556Mf5osQEnyg==
+  dependencies:
+    "@patternfly/react-icons" "^4.7.1"
+    "@patternfly/react-styles" "^4.7.1"
+    "@patternfly/react-tokens" "^4.9.3"
+    focus-trap "4.0.2"
+    react-dropzone "9.0.0"
+    tippy.js "5.1.2"
+    tslib "^1.11.1"
+
 "@patternfly/react-icons@^4.3.5":
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/@patternfly/react-icons/-/react-icons-4.3.5.tgz#b98c5af80f4729e6203c8e799ace2f57308b3b9a"
   integrity sha512-+GublxpFXR+y/5zygf9q00/LvIvso8jr0mxZGhVxsKmi2dUu7xAvN+T+5vjS9fiMbXf7WXsSPXST/UTiBIVTdQ==
+
+"@patternfly/react-icons@^4.7.1":
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-icons/-/react-icons-4.7.1.tgz#e5ebf45c25c9cd6c6b338a3421b7bc423034a90d"
+  integrity sha512-k5x47dzMvjtLpskJiU1PqF6UQcUHHbicnFl4hKFj3OKeYFm+Z3S+1ToXa47JZIbfOt2gdMsEKdT4cJ50N4hNsw==
 
 "@patternfly/react-styles@^4.3.4":
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/@patternfly/react-styles/-/react-styles-4.3.4.tgz#ba62f983f1bd2586d2878d8a38912442ebca85e8"
   integrity sha512-d5W5G9g7sr7DthGPFiF6Oa33w8JFJ+ocLZDogyZcS1Oq0BJJX8j+hZNXZfhXxmHoXufxQL6RJ4dOyoa2zEZUvA==
 
+"@patternfly/react-styles@^4.7.1":
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-styles/-/react-styles-4.7.1.tgz#f2f134cbe9968e66699d89b7830085d4f2d7ecea"
+  integrity sha512-/oWfSoDC+iQdOEEiv1tQP1wz3OHhm07H+xd/T3wKNBYsEn1hXtvfa4e5xHo6SqzyhutdbvwAzkMPlaVXORjEyw==
+
+"@patternfly/react-table@^4.15.4":
+  version "4.15.4"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-table/-/react-table-4.15.4.tgz#2479257810277a770212f509bdaf77ff819afbaa"
+  integrity sha512-K5dnCDiUMfz46fE/Dun0ZFUBOOcSSfVww4VS0anN4UjNbaAw1ZrOJxcueRKQYTrSvvpXAMdR8SJUtClIKZO0kw==
+  dependencies:
+    "@patternfly/patternfly" "4.31.4"
+    "@patternfly/react-core" "^4.40.3"
+    "@patternfly/react-icons" "^4.7.1"
+    "@patternfly/react-styles" "^4.7.1"
+    "@patternfly/react-tokens" "^4.9.3"
+    lodash "^4.17.19"
+    tslib "^1.11.1"
+
 "@patternfly/react-tokens@^4.4.4":
   version "4.4.4"
   resolved "https://registry.yarnpkg.com/@patternfly/react-tokens/-/react-tokens-4.4.4.tgz#4a6fc7234908343087ccbc8e1ae53336d7fc7311"
   integrity sha512-vhDBtwkp1PTAqXDjAsUPRf/ewBh2Asong8MPr9ZGeXAeOULW8creW7GJx+JZX9eaEJMA3ESMeZ6wZ5j/yyWMGQ==
+
+"@patternfly/react-tokens@^4.9.3":
+  version "4.9.3"
+  resolved "https://registry.yarnpkg.com/@patternfly/react-tokens/-/react-tokens-4.9.3.tgz#22fd375dc7caaa7eee7dca204f93e6a772e933ce"
+  integrity sha512-6eMPPj2v7ORmhrL9PkOT+8AjCmZ3itZXr2kswTugzElqOOUbnc6WOZJ3N/+sPTew2Kp72JxBrec6Da9kzjCqew==
 
 "@semantic-release/commit-analyzer@^6.1.0":
   version "6.3.3"
@@ -8895,6 +8941,11 @@ lodash@4.17.15, "lodash@>=3.5 <5", lodash@^4.17.10, lodash@^4.17.11, lodash@^4.1
   version "4.17.15"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
   integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
+
+lodash@^4.17.19:
+  version "4.17.19"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.19.tgz#e48ddedbe30b3321783c5b4301fbd353bc1e4a4b"
+  integrity sha512-JNvd8XER9GQX0v2qJgsaN/mzFCNA5BRe/j8JN9d+tWyGLSodKQHKFicdwNYzWwI3wjRnaKPsGj1XkBjx/F96DQ==
 
 loglevel@^1.6.6:
   version "1.6.8"
