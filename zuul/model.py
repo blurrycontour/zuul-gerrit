@@ -2422,6 +2422,11 @@ class QueueItem(object):
             return self.bundle.started_reporting
         return False
 
+    def cannotMergeBundle(self):
+        if self.bundle:
+            return self.bundle.cannot_merge
+        return False
+
     def didMergerFail(self):
         return self.current_build_set.unable_to_merge
 
@@ -3171,6 +3176,7 @@ class Bundle:
         self.items = []
         self.started_reporting = False
         self.failed_reporting = False
+        self.cannot_merge = False
 
     def __repr__(self):
         return '<Bundle 0x{:x} {}'.format(id(self), self.items)
