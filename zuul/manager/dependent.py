@@ -50,8 +50,23 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         source = change.project.source
         if not source.canMerge(change, self.getSubmitAllowNeeds(),
                                event=event):
-            log.debug("Change %s can not merge, ignoring", change)
+            log.debug("Change %s can not merge", change)
             return False
+        return True
+
+    def canMergeCycle(self, bundle):
+        """Check if the cycle still fulfills the pipeline's ready criteria."""
+        for item in bundle.items:
+            source = item.change.project.source
+            if not source.canMerge(
+                item.change,
+                self.getSubmitAllowNeeds(),
+                event=item.event,
+                refresh=True,
+            ):
+                log = get_annotated_logger(self.log, item.event)
+                log.debug("Change %s can no longer be merged", item.change)
+                return False
         return True
 
     def enqueueChangesBehind(self, change, event, quiet, ignore_requirements,
