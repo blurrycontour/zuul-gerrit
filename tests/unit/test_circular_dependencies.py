@@ -1264,3 +1264,34 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.assertFalse(C.is_merged)
         self.assertFalse(X.is_merged)
         self.assertFalse(Y.is_merged)
+
+    def test_cycle_failed_reporting(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
+        B = self.fake_github.openFakePullRequest("gh/project1", "master", "B")
+        A.addReview('derp', 'APPROVED')
+        B.addReview('derp', 'APPROVED')
+        B.addLabel("approved")
+
+        # A <-> B
+        A.body = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.url
+        )
+        B.body = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.url
+        )
+
+        self.fake_github.emitEvent(A.addLabel("approved"))
+        self.waitUntilSettled()
+
+        # Change draft status of A so it can no longer merge.
+        A.draft = True
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.comments), 2)
+        self.assertEqual(len(B.comments), 2)
+        self.assertFalse(A.is_merged)
+        self.assertFalse(B.is_merged)
