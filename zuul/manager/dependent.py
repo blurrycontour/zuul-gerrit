@@ -50,7 +50,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         source = change.project.source
         if not source.canMerge(change, self.getSubmitAllowNeeds(),
                                event=event):
-            log.debug("Change %s can not merge, ignoring", change)
+            log.debug("Change %s can not merge", change)
             return False
         return True
 
