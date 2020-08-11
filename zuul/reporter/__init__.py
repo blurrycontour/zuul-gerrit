@@ -175,7 +175,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         return msg
 
     def _formatItemReportFailure(self, item, with_jobs=True):
-        if item.dequeued_needing_change:
+        if item.cannotMergeBundle():
+            msg = 'This change is part of a bundle that failed to merge.\n'
+        elif item.dequeued_needing_change:
             msg = 'This change depends on a change that failed to merge.\n'
         elif item.isBundleFailing():
             msg = 'This change is part of a bundle that failed.\n'

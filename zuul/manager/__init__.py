@@ -486,6 +486,15 @@ class PipelineManager(metaclass=ABCMeta):
             queue_config.allow_circular_dependencies
         )
 
+    def canMergeCycle(self, bundle):
+        """Check if the cycle still fulfills the pipeline's ready criteria."""
+        for item in bundle.items:
+            if not self.isChangeReadyToBeEnqueued(item.change, item.event):
+                log = get_annotated_logger(self.log, item.event)
+                log.debug("Change %s can longer be merged", item.change)
+                return False
+        return True
+
     def updateBundle(self, item, change_queue, cycle):
         if not cycle:
             return
@@ -1086,6 +1095,19 @@ class PipelineManager(metaclass=ABCMeta):
             can_report = can_report and (
                 item.isBundleFailing() or item.didBundleFinish()
             )
+            # Before starting to merge the cycle items, make sure they
+            # can still be merged, to reduce the chance of a partial merge.
+            if (
+                can_report
+                and not item.bundle.started_reporting
+                and not self.canMergeCycle(item.bundle)
+            ):
+                item.bundle.cannot_merge = True
+                failing_reasons.append("cycle can not be merged")
+                log.debug(
+                    "Dequeuing item %s because cycle can no longer merge",
+                    item
+                )
             item.bundle.started_reporting = can_report
 
         if can_report:
@@ -1098,7 +1120,10 @@ class PipelineManager(metaclass=ABCMeta):
                              "item ahead, %s, failed to merge" %
                              (item_behind.change, item))
                     self.cancelJobs(item_behind)
-                if item.bundle and not item.isBundleFailing():
+                # Only re-reported items in the cycle when we encounter a merge
+                # failure for a successful bundle.
+                if (item.bundle and not (
+                        item.isBundleFailing() or item.cannotMergeBundle())):
                     item.bundle.failed_reporting = True
                     self.reportProcessedBundleItems(item)
             self.dequeueItem(item)
@@ -1377,6 +1402,10 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("No jobs for change %s", item.change)
             actions = self.pipeline.no_jobs_actions
             item.setReportedResult('NO_JOBS')
+        elif item.cannotMergeBundle():
+            log.debug("Bundle can not be merged")
+            actions = self.pipeline.failure_actions
+            item.setReportedResult("FAILURE")
         elif item.isBundleFailing():
             log.debug("Bundle is failing")
             actions = self.pipeline.failure_actions
