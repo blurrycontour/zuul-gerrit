@@ -69,6 +69,24 @@
       "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_0b404407",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-13T23:15:18Z",
+      "side": 1,
+      "message": "https://imgur.com/a/CCZ68fk is the result of pre-wrap ... TBH I\u0027m not sure if it\u0027s better than sideways scrolling because wrapped yaml is pretty annoying.  But if that\u0027s the preference I\u0027ll update it.",
+      "parentUuid": "9f560f44_9076413e",
+      "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
