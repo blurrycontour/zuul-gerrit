@@ -87,6 +87,24 @@
       "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_6b73c04e",
+        "filename": "web/src/App.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-13T23:49:55Z",
+      "side": 1,
+      "message": "the other suggestion was to widen the box.  AFAICS the options for the box width from\n\nhttps://www.patternfly.org/2020.08/documentation/core/components/drawer#usage\n\nare 25%, 33%, 50%, 66%, 75% and 100% ...\n\ni don\u0027t think with zoom levels it guarantees anything, but i guess making it wider would help",
+      "parentUuid": "9f560f44_0b404407",
+      "revId": "19731720aa45fd75919a098ac1f7db4e9d3ce182",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
