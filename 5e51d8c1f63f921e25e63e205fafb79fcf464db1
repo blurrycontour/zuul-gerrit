@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_a76236d7",
+        "filename": "releasenotes/notes/patternfly-4-0d8c250fa319c037.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-13T13:21:42Z",
+      "side": 1,
+      "message": "I am not sure that release notes should contain \"WIP\" message. Maybe \"Migrated (most-of) Zuul web dashboard to PF4.\" would be more appropriate?",
+      "range": {
+        "startLine": 4,
+        "startChar": 11,
+        "endLine": 4,
+        "endChar": 31
+      },
+      "revId": "5e51d8c1f63f921e25e63e205fafb79fcf464db1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
