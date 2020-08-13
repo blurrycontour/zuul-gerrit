@@ -1,0 +1,10 @@
+Code-Review+2: Ian Wienand <iwienand@redhat.com>
+Code-Review+1: Felix Edel <felix.edel@bmw.de>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: Tobias Henkel <tobias.henkel@bmw.de>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 13 Aug 2020 14:26:19 +0000
+Reviewed-on: https://review.opendev.org/744570
+Project: zuul/zuul
+Branch: refs/heads/master
