@@ -49,6 +49,23 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_82a72050",
+        "filename": "releasenotes/notes/change-queue-project-790553bd212b50eb.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-13T14:51:45Z",
+      "side": 1,
+      "message": "I like Tobias\u0027s idea -- I think it will be too confusing for users to have this set in both places, so we should clean it up.",
+      "revId": "1e80381ac46b8ad68a163b77e65b10ab05ee9f3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_07e162ff",
         "filename": "tests/fixtures/layouts/template-project-queue.yaml",
         "patchSetId": 21
