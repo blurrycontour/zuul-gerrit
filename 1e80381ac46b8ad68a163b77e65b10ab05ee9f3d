@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "9f560f44_e760ae38",
+        "filename": "releasenotes/notes/change-queue-project-790553bd212b50eb.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-08-13T13:47:43Z",
+      "side": 1,
+      "message": "It doesn\u0027t seems too much work to support both settings, would it possible to keep the backward compatibility?\n\nI worry that we don\u0027t have good tools for operator to know if upgrading to the version that removes the setting is safe or not.",
+      "range": {
+        "startLine": 5,
+        "startChar": 58,
+        "endLine": 6,
+        "endChar": 44
+      },
+      "revId": "1e80381ac46b8ad68a163b77e65b10ab05ee9f3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_07e162ff",
         "filename": "tests/fixtures/layouts/template-project-queue.yaml",
         "patchSetId": 21
