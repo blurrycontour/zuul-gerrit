@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_30f495cf",
+        "filename": "doc/source/reference/developer/javascript.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-13T21:55:51Z",
+      "side": 1,
+      "message": "s/way/idea/ I think?  Also, \"to not put\" is a split infinitive, should be \"not to put\".  I proposed a followup to fix these and some other nits in https://review.opendev.org/746232",
+      "revId": "11833ddeac6f0682e8069fbc4f6158011a8d6249",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
