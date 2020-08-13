@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_07e162ff",
+        "filename": "tests/fixtures/layouts/template-project-queue.yaml",
+        "patchSetId": 21
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-13T13:32:56Z",
+      "side": 1,
+      "message": "PS21 Adds a test case that specifies the queue at project level while the project snippet doesn\u0027t directly specify gate jobs.",
+      "revId": "1e80381ac46b8ad68a163b77e65b10ab05ee9f3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
