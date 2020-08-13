@@ -191,6 +191,9 @@ function FilterToolbar(props) {
               {renderFilterDropdown()}
             </ToolbarGroup>
           </ToolbarToggleGroup>
+          <ToolbarItem variant="pagination">
+            {props.pagination}
+          </ToolbarItem>
         </ToolbarContent>
       </Toolbar>
     </>

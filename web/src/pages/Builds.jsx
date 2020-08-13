@@ -16,7 +16,11 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import 'moment-duration-format'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import {
+  Pagination,
+  PageSection,
+  PageSectionVariants,
+} from '@patternfly/react-core'
 
 import { fetchBuilds } from '../api'
 import {
@@ -87,17 +91,26 @@ class BuildsPage extends React.Component {
       builds: [],
       fetching: false,
       filters: getFiltersFromUrl(props.location, this.filterCategories),
+      page: 1,
+      // TODO (felix): Should we make this configurable?
+      perPage: 50,
+      total: 200,
     }
   }
 
-  updateData = (filters) => {
+  updateData = (filters, page, perPage) => {
     // When building the filter query for the API we can't rely on the location
     // search parameters. Although, we've updated them in theu URL directly
     // they always have the same value in here (the values when the page was
     // first loaded). Most probably that's the case because the location is
     // passed as prop and doesn't change since the page itself wasn't
     // re-rendered.
-    const queryString = buildQueryString(filters)
+    let queryString = buildQueryString(filters)
+    // Add pagination parameters to queryString for API request
+    const skip = (page - 1) * perPage
+    queryString += '&skip=' + skip + '&limit=' + perPage
+    console.log(queryString)
+
     this.setState({ fetching: true })
     // TODO (felix): What happens in case of a broken network connection? Is the
     // fetching shows infinitely or can we catch this and show an erro state in
@@ -111,32 +124,38 @@ class BuildsPage extends React.Component {
   }
 
   componentDidMount() {
+    const { filters, page, perPage } = this.state
     document.title = 'Zuul Builds'
     if (this.props.tenant.name) {
-      this.updateData(this.state.filters)
+      this.updateData(filters, page, perPage)
     }
   }
 
   componentDidUpdate(prevProps) {
-    const { filters } = this.state
+    const { filters, page, perPage } = this.state
     if (
       this.props.tenant.name !== prevProps.tenant.name ||
       this.props.timezone !== prevProps.timezone
     ) {
-      this.updateData(filters)
+      this.updateData(filters, page, perPage)
     }
   }
 
   handleFilterChange = (filters) => {
     const { location, history } = this.props
+    const { perPage } = this.state
+    // Reset pagination to first page since we don't know how many results we
+    // will get.
+    const page = 1
     // We must update the URL parameters before the state. Otherwise, the URL
     // will always be one filter selection behind the state. But as the URL
     // reflects our state this should be ok.
     writeFiltersToUrl(filters, location, history)
-    this.updateData(filters)
+    this.updateData(filters, page, perPage)
     this.setState(() => {
       return {
         filters: filters,
+        page: 1,
       }
     })
   }
@@ -150,14 +169,51 @@ class BuildsPage extends React.Component {
     this.handleFilterChange(filters)
   }
 
+  handlePageChange = (pageNumber, perPage) => {
+    const { filters } = this.state
+    console.log(
+      'handlePageChange(pageNumber=' + pageNumber + ', perPage=' + perPage + ')'
+    )
+    const skip = (pageNumber - 1) * perPage
+    console.log('skip = (' + pageNumber + ' - 1) * ' + perPage + ' = ' + skip)
+
+    this.updateData(filters, pageNumber, perPage)
+    // TODO (felix): Update data with the page parameters
+    this.setState({
+      page: pageNumber,
+      perPage: perPage,
+    })
+  }
+
   render() {
-    const { builds, fetching, filters } = this.state
+    const { builds, fetching, filters, page, perPage, total } = this.state
+
+    const pagination = (
+      <Pagination
+        isCompact
+        itemCount={total}
+        page={page}
+        perPage={perPage}
+        onSetPage={(_, pageNumber, perPage) =>
+          this.handlePageChange(pageNumber, perPage)
+        }
+        onPerPageSelect={(_, perPage, pageNumber) =>
+          this.handlePageChange(pageNumber, perPage)
+        }
+      />
+    )
+
     return (
       <PageSection variant={PageSectionVariants.light}>
         <FilterToolbar
           filterCategories={this.filterCategories}
           onFilterChange={this.handleFilterChange}
           filters={filters}
+          pagination={pagination}
+          /*
+          showPagination={true}
+          page={page}
+          perPage={perPage}*/
         />
         <BuildTable
           builds={builds}
