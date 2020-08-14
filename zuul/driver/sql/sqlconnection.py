@@ -105,14 +105,18 @@ class DatabaseSession(object):
         q = self.listFilter(q, build_table.c.final, final)
         q = self.listFilter(q, provides_table.c.name, provides)
 
+        # Calculate the total number of builds for the provided filters before
+        # applying any limit or offset.
+        total = q.count()
+
         q = q.order_by(build_table.c.id.desc()).\
             limit(limit).\
             offset(offset)
 
         try:
-            return q.all()
+            return q.all(), total
         except sqlalchemy.orm.exc.NoResultFound:
-            return []
+            return [], 0
 
     def createBuildSet(self, *args, **kw):
         bs = self.connection.buildSetModel(*args, **kw)
@@ -143,14 +147,18 @@ class DatabaseSession(object):
         q = self.listFilter(q, buildset_table.c.uuid, uuid)
         q = self.listFilter(q, buildset_table.c.result, result)
 
+        # Calculate the total number of builds for the provided filters before
+        # applying any limit or offset.
+        total = q.count()
+
         q = q.order_by(buildset_table.c.id.desc()).\
             limit(limit).\
             offset(offset)
 
         try:
-            return q.all()
+            return q.all(), total
         except sqlalchemy.orm.exc.NoResultFound:
-            return []
+            return [], 0
 
     def getBuildset(self, tenant, uuid):
         """Get one buildset with its builds"""
