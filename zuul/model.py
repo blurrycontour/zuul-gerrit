@@ -2403,7 +2403,7 @@ class QueueItem(object):
             sql_driver = self.pipeline.manager.sched.connections.drivers['sql']
             conn = sql_driver.tenant_connections.get(self.pipeline.tenant.name)
             if conn:
-                builds = conn.getBuilds(
+                builds, _ = conn.getBuilds(
                     tenant=self.pipeline.tenant.name,
                     project=self.change.project.name,
                     pipeline=self.pipeline.name,

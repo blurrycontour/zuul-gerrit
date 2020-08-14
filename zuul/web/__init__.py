@@ -41,6 +41,8 @@ cherrypy.tools.websocket = WebSocketTool()
 
 COMMANDS = ['stop', 'repl', 'norepl']
 
+API_VERSION_HEADER = "Zuul-Api-Version"
+
 
 class SaveParamsTool(cherrypy.Tool):
     """
@@ -943,7 +945,7 @@ class ZuulWebAPI(object):
         if final is not None:
             final = final.lower() == "true"
 
-        builds = connection.getBuilds(
+        builds, total_builds = connection.getBuilds(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, node_name=node_name,
@@ -951,6 +953,16 @@ class ZuulWebAPI(object):
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
+
+        req_headers = cherrypy.request.headers
+
+        # Return the new result format if the Zuul-Api-Version header is set.
+        if req_headers.get(API_VERSION_HEADER) == "v2":
+            return {
+                "builds": [self.buildToDict(b, b.buildset) for b in builds],
+                "total_builds": total_builds,
+            }
+
         return [self.buildToDict(b, b.buildset) for b in builds]
 
     @cherrypy.expose
@@ -959,7 +971,7 @@ class ZuulWebAPI(object):
     def build(self, tenant, uuid):
         connection = self._get_connection(tenant)
 
-        data = connection.getBuilds(tenant=tenant, uuid=uuid, limit=1)
+        data, _ = connection.getBuilds(tenant=tenant, uuid=uuid, limit=1)
         if not data:
             raise cherrypy.HTTPError(404, "Build not found")
         data = self.buildToDict(data[0], data[0].buildset)
@@ -998,7 +1010,7 @@ class ZuulWebAPI(object):
     def badge(self, tenant, project=None, pipeline=None, branch=None):
         connection = self._get_connection(tenant)
 
-        buildsets = connection.getBuildsets(
+        buildsets, _ = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline,
             branch=branch, limit=1)
         if not buildsets:
@@ -1021,7 +1033,7 @@ class ZuulWebAPI(object):
                   uuid=None, result=None, limit=50, skip=0):
         connection = self._get_connection(tenant)
 
-        buildsets = connection.getBuildsets(
+        buildsets, total_buildsets = connection.getBuildsets(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, result=result,
@@ -1029,6 +1041,15 @@ class ZuulWebAPI(object):
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
+
+        req_headers = cherrypy.request.headers
+        # Return the new result format if the Zuul-Api-Version header is set.
+        if req_headers.get(API_VERSION_HEADER) == "v2":
+            return {
+                "buildsets": [self.buildsetToDict(b) for b in buildsets],
+                "total_buildsets": total_buildsets,
+            }
+
         return [self.buildsetToDict(b) for b in buildsets]
 
     @cherrypy.expose

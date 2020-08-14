@@ -1147,6 +1147,19 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
         builds = self.get_url("api/tenant/tenant-one/builds").json()
         self.assertEqual(len(builds), 6)
 
+        api_v2_headers = {"Zuul-Api-Version": "v2"}
+        builds_v2 = self.get_url(
+            "api/tenant/tenant-one/builds", headers=api_v2_headers
+        ).json()
+        self.assertEqual(len(builds_v2["builds"]), 6)
+        self.assertEqual(builds_v2["total_builds"], 6)
+
+        builds_v2_filtered = self.get_url(
+            "api/tenant/tenant-one/builds?skip=2", headers=api_v2_headers
+        ).json()
+        self.assertEqual(len(builds_v2_filtered["builds"]), 4)
+        self.assertEqual(builds_v2_filtered["total_builds"], 6)
+
         uuid = builds[0]['uuid']
         build = self.get_url("api/tenant/tenant-one/build/%s" % uuid).json()
         self.assertEqual(build['job_name'], builds[0]['job_name'])
@@ -1205,6 +1218,13 @@ class TestBuildInfo(ZuulDBTestCase, BaseTestWeb):
         buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
         self.assertEqual(2, len(buildsets))
         project_bs = [x for x in buildsets if x["project"] == "org/project"][0]
+
+        api_v2_headers = {"Zuul-Api-Version": "v2"}
+        buildsets_v2 = self.get_url(
+            "api/tenant/tenant-one/buildsets", headers=api_v2_headers
+        ).json()
+        self.assertEqual(len(buildsets_v2["buildsets"]), 2)
+        self.assertEqual(buildsets_v2["total_buildsets"], 2)
 
         buildset = self.get_url(
             "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
