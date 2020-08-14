@@ -105,12 +105,16 @@ class DatabaseSession(object):
         q = self.listFilter(q, build_table.c.final, final)
         q = self.listFilter(q, provides_table.c.name, provides)
 
+        # Calculate the total number of builds for the provided filters before
+        # applying any limit or offset.
+        total = q.count()
+
         q = q.order_by(build_table.c.id.desc()).\
             limit(limit).\
             offset(offset)
 
         try:
-            return q.all()
+            return q.all(), total
         except sqlalchemy.orm.exc.NoResultFound:
             return []
 

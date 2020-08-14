@@ -936,14 +936,14 @@ class ZuulWebAPI(object):
     def builds(self, tenant, project=None, pipeline=None, change=None,
                branch=None, patchset=None, ref=None, newrev=None,
                uuid=None, job_name=None, voting=None, node_name=None,
-               result=None, final=None, limit=50, skip=0):
+               result=None, final=None, limit=50, skip=0, api_version="v1"):
         connection = self._get_connection(tenant)
 
         # If final is None, we return all builds, both final and non-final
         if final is not None:
             final = final.lower() == "true"
 
-        builds = connection.getBuilds(
+        builds, total_builds = connection.getBuilds(
             tenant=tenant, project=project, pipeline=pipeline, change=change,
             branch=branch, patchset=patchset, ref=ref, newrev=newrev,
             uuid=uuid, job_name=job_name, voting=voting, node_name=node_name,
@@ -951,6 +951,20 @@ class ZuulWebAPI(object):
 
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
+
+        # TODO (felix): Not sure if this GET parameter is the best way to do
+        # this. In case more changes to the API are coming, especially when
+        # further improving the frontend, something like a versioned API
+        # would be better:
+        # https://developer.atlassian.com/cloud/jira/platform/rest/v3/intro/
+        # Another idea would be to set a http header instead (similar to what
+        # Github does with its "beta feature flags")
+        if api_version == "v2":
+            return {
+                "builds": [self.buildToDict(b, b.buildset) for b in builds],
+                "total_builds": total_builds,
+            }
+
         return [self.buildToDict(b, b.buildset) for b in builds]
 
     @cherrypy.expose
