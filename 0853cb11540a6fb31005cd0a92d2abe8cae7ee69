@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_14e85c14",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2020-08-14T14:53:14Z",
+      "side": 1,
+      "message": "you might want to return a tuple here as well",
+      "revId": "0853cb11540a6fb31005cd0a92d2abe8cae7ee69",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
