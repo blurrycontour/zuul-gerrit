@@ -16,6 +16,24 @@
       "revId": "a95d1200168c02c28e0a6c9d53afcda53a1cf659",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_1494ca43",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2020-08-17T14:27:12Z",
+      "side": 1,
+      "message": "I thought the default value was None, will it raise such exception?",
+      "parentUuid": "9f560f44_28e1b72b",
+      "revId": "a95d1200168c02c28e0a6c9d53afcda53a1cf659",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
