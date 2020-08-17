@@ -1174,12 +1174,6 @@ class GithubConnection(BaseConnection):
 
         self.sched = None
 
-        # The regex is based on the connection host. We do not yet support
-        # cross-connection dependency gathering
-        self.depends_on_re = re.compile(
-            r"^Depends-On: https://%s/.+/.+/pull/[0-9]+$" % self.server,
-            re.MULTILINE | re.IGNORECASE)
-
         self.graphql_client = GraphQLClient(
             '%s/graphql' % self._github_client_manager.api_base_url)
 
