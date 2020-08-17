@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_28e1b72b",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-08-17T10:05:08Z",
+      "side": 1,
+      "message": "I think you should also have a default here as this will raise an exception for e.g. tag/branch changes.",
+      "revId": "a95d1200168c02c28e0a6c9d53afcda53a1cf659",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
