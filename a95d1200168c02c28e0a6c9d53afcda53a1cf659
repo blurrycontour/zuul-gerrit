@@ -34,6 +34,24 @@
       "revId": "a95d1200168c02c28e0a6c9d53afcda53a1cf659",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_f49cb65c",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-08-17T14:32:27Z",
+      "side": 1,
+      "message": "Yes, getattr() will raise AttributeError in case the attribute is missing. I think you might confuse that with dict.get() were you get None in case the key doesn\u0027t exist.",
+      "parentUuid": "9f560f44_1494ca43",
+      "revId": "a95d1200168c02c28e0a6c9d53afcda53a1cf659",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
