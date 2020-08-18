@@ -15,8 +15,7 @@ import json
 import logging
 import threading
 import time
-from typing import Dict, Callable, List
-from typing import Optional
+from typing import Dict, Callable, List, Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.handlers.threading import KazooTimeoutError
@@ -25,13 +24,16 @@ from kazoo.recipe.cache import TreeCache
 import zuul.model
 from zuul.zk.connection_event import ZooKeeperConnectionEventMixin
 from zuul.lib.config import get_default
+from zuul.zk.builds import ZooKeeperBuildsMixin
 from zuul.zk.nodepool import ZooKeeperNodepoolMixin
 from zuul.zk.zuul import ZooKeeperZuulMixin
 
 
 class ZooKeeper(ZooKeeperNodepoolMixin,
                 ZooKeeperZuulMixin,
-                ZooKeeperConnectionEventMixin, object):
+                ZooKeeperConnectionEventMixin,
+                ZooKeeperBuildsMixin,
+                object):
     '''
     Class implementing the ZooKeeper interface.
 
@@ -72,6 +74,9 @@ class ZooKeeper(ZooKeeperNodepoolMixin,
         self._hold_request_tree = None  # type: Optional[TreeCache]
         self._cached_hold_requests =\
             {}  # type: Optional[Dict[str, zuul.model.HoldRequest]]
+
+        self.node_watchers =\
+            {}  # type: Dict[str, List[Callable[[List[str]], None]]]
 
     def _dictToStr(self, data):
         return json.dumps(data).encode('utf8')
