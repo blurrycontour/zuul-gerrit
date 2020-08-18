@@ -4602,6 +4602,7 @@ class Abide(object):
         self.tenants = OrderedDict()
         # project -> branch -> UnparsedBranchCache
         self.unparsed_project_branch_cache = {}
+        self.tenant_project_branch_cache = {}
 
     def hasUnparsedBranchCache(self, canonical_project_name, branch):
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(
@@ -4610,6 +4611,29 @@ class Abide(object):
         if cache is None:
             return False
         return True
+
+    def setProjectBranchRevision(
+        self, tenant, canonical_project_name, branch, revision
+    ):
+        if tenant.name not in self.tenant_project_branch_cache:
+            self.tenant_project_branch_cache[tenant.name] = {}
+        if (
+            canonical_project_name
+            not in self.tenant_project_branch_cache[tenant.name]
+        ):
+            self.tenant_project_branch_cache[tenant.name][
+                canonical_project_name
+            ] = {}
+        self.tenant_project_branch_cache[tenant.name][canonical_project_name][
+            branch
+        ] = revision
+
+    def getProjectBranchRevision(self, tenant, canonical_project_name, branch):
+        return (
+            self.tenant_project_branch_cache.get(tenant.name, {})
+            .get(canonical_project_name, {})
+            .get(branch, None)
+        )
 
     def hasUsefulBranchCache(self, canonical_project_name, branch, tenant):
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(

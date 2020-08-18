@@ -132,13 +132,13 @@ class BaseMergeServer(metaclass=ABCMeta):
         try:
             self._update(connection_name, project_name)
             with lock:
-                files = self.merger.getFiles(connection_name, project_name,
+                (files, revision) = self.merger.getFiles(connection_name, project_name,
                                              args['branch'], args['files'],
                                              args.get('dirs'))
         except Exception:
             result = dict(update=False)
         else:
-            result = dict(updated=True, files=files)
+            result = dict(updated=True, files=files, revision=revision)
 
         job.sendWorkComplete(json.dumps(result))
 
