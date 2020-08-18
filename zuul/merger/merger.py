@@ -618,8 +618,11 @@ class Repo(object):
         repo = self.createRepoObject(zuul_event_id)
         if branch:
             tree = repo.heads[branch].commit.tree
+            commit_hexsha = repo.heads[branch].commit.hexsha
         else:
-            tree = repo.commit(commit).tree
+            commit_obj = repo.commit(commit)
+            tree = commit_obj.tree
+            commit_hexsha = commit_obj.hexsha
         for fn in files:
             if fn in tree:
                 if tree[fn].type != 'blob':
@@ -636,7 +639,7 @@ class Repo(object):
                     if blob.path.endswith(".yaml"):
                         ret[blob.path] = blob.data_stream.read().decode(
                             'utf-8')
-        return ret
+        return (ret, commit_hexsha)
 
     def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
@@ -975,7 +978,8 @@ class Merger(object):
                     return None
                 if files or dirs:
                     repo = self.getRepo(item['connection'], item['project'])
-                    repo_files = repo.getFiles(files, dirs, commit=commit)
+                    (repo_files, revision) = repo.getFiles(files, dirs,
+                                                           commit=commit)
                     read_files.append(dict(
                         connection=item['connection'],
                         project=item['project'],

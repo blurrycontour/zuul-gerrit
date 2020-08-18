@@ -101,10 +101,13 @@ class TenantReconfigureEvent(ManagementEvent):
     :arg Branch branch: if supplied along with project, only remove the
          configuration of the specific branch from the cache
     """
-    def __init__(self, tenant, project, branch):
+    def __init__(self, tenant, project, branch, newrev):
         super(TenantReconfigureEvent, self).__init__()
         self.tenant_name = tenant.name
         self.project_branches = set([(project, branch)])
+        self.project_branches_revision = {
+            project.canonical_name: {branch: newrev}
+        }
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -120,6 +123,12 @@ class TenantReconfigureEvent(ManagementEvent):
         if self.tenant_name != other.tenant_name:
             raise Exception("Can not merge events from different tenants")
         self.project_branches |= other.project_branches
+        # update revision to the latest event
+        for k, v in other.project_branches_revision.items():
+            if k in self.project_branches_revision:
+                self.project_branches_revision[k].update(v)
+            else:
+                self.project_branches_revision[k] = v
 
 
 class PromoteEvent(ManagementEvent):
@@ -573,7 +582,8 @@ class Scheduler(threading.Thread):
                        "%s due to event %s in project %s",
                        tenant.name, event, project)
         branch = event.branch if event is not None else None
-        event = TenantReconfigureEvent(tenant, project, branch)
+        newrev = event.newrev if event is not None else None
+        event = TenantReconfigureEvent(tenant, project, branch, newrev)
         self.management_event_queue.put(event)
         self.wake_event.set()
 
@@ -950,6 +960,14 @@ class Scheduler(threading.Thread):
             tenant = abide.tenants[event.tenant_name]
             self._reconfigureTenant(tenant)
             self.abide = abide
+            self.abide.setProjectBranchRevision(
+                tenant,
+                project.canonical_name,
+                branch,
+                event.project_branches_revision[project.canonical_name][
+                    branch
+                ],
+            )
         finally:
             self.layout_lock.release()
         duration = round(time.monotonic() - start, 3)
@@ -1351,22 +1369,26 @@ class Scheduler(threading.Thread):
     def _testReconfigureFiles(self, change, tenant, project, event):
         reconfigure_tenant = False
 
-        if (event.branch_updated and
-                hasattr(change, 'files') and
-                change.updatesConfig(tenant)):
-            reconfigure_tenant = True
-
-        if event.branch_created:
-            if hasattr(change, 'files'):
-                if change.updatesConfig(tenant):
+        if hasattr(change, 'files'):
+            if change.updatesConfig(tenant):
+                if event.newrev != self.abide.getProjectBranchRevision(
+                        tenant, project, event.branch):
                     reconfigure_tenant = True
-                else:
-                    # create cache to avoid triggering a reconfigure in
-                    # the block bellow
-                    self.abide.getUnparsedBranchCache(
-                        project.canonical_name,
-                        event.branch)
             else:
+                # only save newrev if we don't reconfigure.
+                # all tenant/project/branch are cached during
+                # reconfiguration
+                self.abide.setProjectBranchRevision(
+                    tenant, project, event.branch, event.newrev)
+
+                # create cache to avoid triggering a reconfigure in
+                # github specific tenant reconfigure test
+                self.abide.getUnparsedBranchCache(
+                    project.canonical_name,
+                    event.branch)
+        else:
+            if event.newrev != self.abide.getProjectBranchRevision(
+                    tenant, project, event.branch):
                 reconfigure_tenant = True
 
         return reconfigure_tenant
