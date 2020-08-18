@@ -1544,7 +1544,6 @@ class TenantParser(object):
             source_context = model.ProjectContext(tpc.project)
             with project_configuration_exceptions(source_context,
                                                   loading_errors):
-                self._getProjectBranches(tenant, tpc)
                 self._resolveShadowProjects(tenant, tpc)
 
         # Set default ansible version
@@ -1773,16 +1772,16 @@ class TenantParser(object):
             # branch.  Remember the branch and then implicitly add a
             # branch selector to each job there.  This makes the
             # in-repo configuration apply only to that branch.
-            branches = tenant.getProjectBranches(project)
+            if not tpc.load_classes:
+                branches = []
+            else:
+                self._getProjectBranches(tenant, tpc)
+                branches = tenant.getProjectBranches(project)
             for branch in branches:
                 branch_cache = abide.getUnparsedBranchCache(
                     project.canonical_name, branch)
                 if branch_cache.isValidFor(tpc):
                     # We already have this branch cached.
-                    continue
-                if not tpc.load_classes:
-                    # If all config classes are excluded then do not
-                    # request any getFiles jobs.
                     continue
                 job = self.merger.getFiles(
                     project.source.connection.connection_name,
@@ -1860,7 +1859,11 @@ class TenantParser(object):
                 config_projects_config.extend(unparsed_branch_config)
 
         for project in tenant.untrusted_projects:
-            branches = tenant.getProjectBranches(project)
+            tpc = tenant.project_configs.get(project.canonical_name)
+            if not tpc.load_classes:
+                branches = []
+            else:
+                branches = tenant.getProjectBranches(project)
             for branch in branches:
                 branch_cache = abide.getUnparsedBranchCache(
                     project.canonical_name, branch)
