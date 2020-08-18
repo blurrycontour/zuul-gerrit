@@ -36,7 +36,6 @@ import git
 from urllib.parse import urlsplit
 
 from zuul.lib.ansible import AnsibleManager
-from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
@@ -54,6 +53,7 @@ from zuul.executor.sensors.pause import PauseSensor
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
+from zuul.zk.zookeeper_worker import ZookeeperBuildJobWorker
 from zuul.merger.server import BaseMergeServer, RepoLocks
 
 BUFFER_LINES_FOR_SYNTAX = 200
@@ -2537,10 +2537,10 @@ class ExecutorServer(BaseMergeServer):
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
 
-    def __init__(self, config, connections=None, jobdir_root=None,
+    def __init__(self, config, zk, connections, jobdir_root=None,
                  keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT,
                  log_console_port=DEFAULT_STREAM_PORT):
-        super().__init__(config, 'executor', connections)
+        super().__init__(config, 'executor', zk, connections)
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -2674,24 +2674,27 @@ class ExecutorServer(BaseMergeServer):
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
 
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-
-        self.executor_jobs = {
-            "executor:resume:%s" % self.hostname: self.resumeJob,
-            "executor:stop:%s" % self.hostname: self.stopJob,
-            function_name: self.executeJob,
-        }
-
-        self.executor_gearworker = ZuulGearWorker(
-            'Zuul Executor Server',
-            'zuul.ExecutorServer.ExecuteWorker',
-            'executor',
-            self.config,
-            self.executor_jobs,
-            worker_class=ExecutorExecuteWorker,
-            worker_args=[self])
+        # function_name = 'executor:execute'
+        # if self.zone:
+        #     function_name += ':%s' % self.zone
+        #
+        # self.executor_jobs = {
+        #     "executor:resume:%s" % self.hostname: self.resumeJob,
+        #     "executor:stop:%s" % self.hostname: self.stopJob,
+        #     function_name: self.executeJob,
+        # }
+        #
+        # self.executor_gearworker = ZuulGearWorker(
+        #     'Zuul Executor Server',
+        #     'zuul.ExecutorServer.ExecuteWorker',
+        #     'executor',
+        #     self.config,
+        #     self.executor_jobs,
+        #     worker_class=ExecutorExecuteWorker,
+        #     worker_args=[self])
+        self.zookeeper_build_job_worker = ZookeeperBuildJobWorker(
+            zk, executor=self.executeJob, resume=self.resumeJob,
+            stop=self.stopJob)
 
         # Used to offload expensive operations to different processes
         self.process_worker = None
@@ -2716,7 +2719,8 @@ class ExecutorServer(BaseMergeServer):
             self.log.warning('Multiprocessing context has already been set')
         self.process_worker = ProcessPoolExecutor()
 
-        self.executor_gearworker.start()
+        # self.executor_gearworker.start()
+        self.zookeeper_build_job_worker.start()
 
         self.log.debug("Starting command processor")
         self.command_socket.start()
@@ -2740,24 +2744,24 @@ class ExecutorServer(BaseMergeServer):
         self.governor_thread.start()
         self.disk_accountant.start()
 
-    def register_work(self):
-        if self._running:
-            self.accepting_work = True
-            function_name = 'executor:execute'
-            if self.zone:
-                function_name += ':%s' % self.zone
-            self.executor_gearworker.gearman.registerFunction(function_name)
-            # TODO(jeblair): Update geard to send a noop after
-            # registering for a job which is in the queue, then remove
-            # this API violation.
-            self.executor_gearworker.gearman._sendGrabJobUniq()
-
-    def unregister_work(self):
-        self.accepting_work = False
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-        self.executor_gearworker.gearman.unRegisterFunction(function_name)
+    # def register_work(self):
+    #     if self._running:
+    #         self.accepting_work = True
+    #         function_name = 'executor:execute'
+    #         if self.zone:
+    #             function_name += ':%s' % self.zone
+    #         self.executor_gearworker.gearman.registerFunction(function_name)
+    #         # TODO(jeblair): Update geard to send a noop after
+    #         # registering for a job which is in the queue, then remove
+    #         # this API violation.
+    #         self.executor_gearworker.gearman._sendGrabJobUniq()
+    #
+    # def unregister_work(self):
+    #     self.accepting_work = False
+    #     function_name = 'executor:execute'
+    #     if self.zone:
+    #         function_name += ':%s' % self.zone
+    #     self.executor_gearworker.gearman.unRegisterFunction(function_name)
 
     def stop(self):
         self.log.debug("Stopping")
@@ -2769,7 +2773,7 @@ class ExecutorServer(BaseMergeServer):
         # Stop accepting new jobs
         if self.merger_gearworker is not None:
             self.merger_gearworker.gearman.setFunctions([])
-        self.executor_gearworker.gearman.setFunctions([])
+        # self.executor_gearworker.gearman.setFunctions([])
         # Tell the executor worker to abort any jobs it just accepted,
         # and grab the list of currently running job workers.
         with self.run_lock:
@@ -2802,7 +2806,8 @@ class ExecutorServer(BaseMergeServer):
         # gearman workers.
         if self.process_merge_jobs:
             super().stop()
-        self.executor_gearworker.stop()
+        # self.executor_gearworker.stop()
+        self.zookeeper_build_job_worker.stop()
 
         if self.process_worker is not None:
             self.process_worker.shutdown()
@@ -2822,7 +2827,8 @@ class ExecutorServer(BaseMergeServer):
             update_thread.join()
         if self.process_merge_jobs:
             super().join()
-        self.executor_gearworker.join()
+        # self.executor_gearworker.join()
+        self.zookeeper_build_job_worker.stop()
         self.command_thread.join()
 
     def pause(self):
@@ -2988,22 +2994,22 @@ class ExecutorServer(BaseMergeServer):
             except Exception:
                 self.log.exception("Exception in governor thread:")
 
-    def manageLoad(self):
+    def manageLoad(self) -> None:
         ''' Apply some heuristics to decide whether or not we should
             be asking for more jobs '''
         with self.governor_lock:
             return self._manageLoad()
 
-    def _manageLoad(self):
+    def _manageLoad(self) -> None:
 
         if self.accepting_work:
             # Don't unregister if we don't have any active jobs.
             for sensor in self.sensors:
                 ok, message = sensor.isOk()
                 if not ok:
-                    self.log.info(
-                        "Unregistering due to {}".format(message))
-                    self.unregister_work()
+                    self.log.info("Unregistering due to {}".format(message))
+                    # TODO: handle via start_jobs flag
+                    self.accepting_work = False
                     break
         else:
             reregister = True
@@ -3017,7 +3023,9 @@ class ExecutorServer(BaseMergeServer):
             if reregister:
                 self.log.info("Re-registering as job is within its limits "
                               "{}".format(", ".join(limits)))
-                self.register_work()
+                # TODO" handle via start_jobs flag
+                if self._running:
+                    self.accepting_work = True
         if self.statsd:
             base_key = 'zuul.executor.{hostname}'
             for sensor in self.sensors:
