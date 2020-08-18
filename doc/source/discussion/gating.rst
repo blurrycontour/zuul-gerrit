@@ -253,7 +253,15 @@ on a GitHub pull request (PR #4) might have the following footer::
 
   Depends-On: https://github.com/example/test/pull/4
 
-And a change which depends on a Gerrit change (change number 3)::
+.. note::
+
+   For Github the ``Depends-On:`` footer must be in the *Pull Request*
+   description, which is separate and often different to the commit
+   message (i.e. the text submitted with ``git commit``).  This is in
+   contrast to Gerrit where the change description is always the
+   commit message.
+
+A change which depends on a Gerrit change (change number 3)::
 
   Depends-On: https://review.example.com/3
 
