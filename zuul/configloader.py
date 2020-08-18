@@ -1807,6 +1807,12 @@ class TenantParser(object):
                            (job, job.files.keys()))
             loaded = False
             files = sorted(job.files.keys())
+            abide.setProjectBranchRevision(
+                tenant,
+                job.source_context.project.canonical_name,
+                job.source_context.branch,
+                job.revision,
+            )
             unparsed_config = model.UnparsedConfig()
             tpc = tenant.project_configs[
                 job.source_context.project.canonical_name]
@@ -2226,6 +2232,8 @@ class ConfigLoader(object):
         new_abide.admin_rules = abide.admin_rules.copy()
         new_abide.unparsed_project_branch_cache = \
             abide.unparsed_project_branch_cache
+        new_abide.tenant_project_branch_cache = \
+            abide.tenant_project_branch_cache
 
         if unparsed_abide:
             # We got a new unparsed abide so re-load the tenant completely.
@@ -2233,6 +2241,8 @@ class ConfigLoader(object):
             # from the abide.
             if tenant.name not in unparsed_abide.known_tenants:
                 del new_abide.tenants[tenant.name]
+                if tenant.name in new_abide.tenant_project_branch_cache:
+                    del new_abide.tenant_project_branch_cache[tenant.name]
                 return new_abide
 
             unparsed_config = next(t for t in unparsed_abide.tenants
