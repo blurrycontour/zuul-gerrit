@@ -86,6 +86,24 @@
       "revId": "277dbe2d2162d53b70bb01384483b97face937ca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_4b4b3386",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-18T13:05:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_8b0af622",
+      "revId": "277dbe2d2162d53b70bb01384483b97face937ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
