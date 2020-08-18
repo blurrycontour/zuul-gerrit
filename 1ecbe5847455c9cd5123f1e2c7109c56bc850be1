@@ -114,6 +114,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_d0440b1c",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 10
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-18T13:05:23Z",
+      "side": 1,
+      "message": "Yes, ESC also works but is documented to call onClose. I am not aware of other methods.",
+      "parentUuid": "9f560f44_b7c29283",
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_576216af",
         "filename": "web/src/pages/Status.jsx",
         "patchSetId": 10
@@ -177,6 +195,24 @@
       "writtenOn": "2020-08-10T15:31:14Z",
       "side": 1,
       "message": "nit: Indentation looks wrong here",
+      "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_8b6c2b09",
+        "filename": "web/src/reducers/preferences.js",
+        "patchSetId": 10
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-18T13:05:23Z",
+      "side": 1,
+      "message": "Fixed in follow-up",
+      "parentUuid": "9f560f44_b7f572cd",
       "revId": "1ecbe5847455c9cd5123f1e2c7109c56bc850be1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
