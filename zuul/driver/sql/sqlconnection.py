@@ -49,9 +49,11 @@ class DatabaseSession(object):
         self.session().close()
         self.session = None
 
-    def listFilter(self, query, column, value):
+    def listFilter(self, query, column, value, regex=False):
         if value is None:
             return query
+        if regex:
+            return query.filter(column.op("regexp")(value))
         if isinstance(value, list) or isinstance(value, tuple):
             return query.filter(column.in_(value))
         return query.filter(column == value)
@@ -98,7 +100,7 @@ class DatabaseSession(object):
         q = self.listFilter(q, buildset_table.c.newrev, newrev)
         q = self.listFilter(q, buildset_table.c.event_id, event_id)
         q = self.listFilter(q, build_table.c.uuid, uuid)
-        q = self.listFilter(q, build_table.c.job_name, job_name)
+        q = self.listFilter(q, build_table.c.job_name, job_name, regex=True)
         q = self.listFilter(q, build_table.c.voting, voting)
         q = self.listFilter(q, build_table.c.node_name, node_name)
         q = self.listFilter(q, build_table.c.result, result)
