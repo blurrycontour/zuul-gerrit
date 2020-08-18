@@ -16,6 +16,24 @@
       "revId": "7f964960704367bfe5b113d3570460e60964e31e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_609bb665",
+        "filename": "doc/source/howtos/rest_api_examples.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-08-18T08:27:01Z",
+      "side": 1,
+      "message": "No, that\u0027s fair. There are sporadic nods to the franchise in tests but not in the doc AFAICT. I\u0027ll change that",
+      "parentUuid": "9f560f44_8861e33c",
+      "revId": "7f964960704367bfe5b113d3570460e60964e31e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
