@@ -5,27 +5,48 @@
       initial check status.
     manager: independent
     trigger:
-      github.com:
+      github:
+        # Run this pipeline on new/changed pull requests
         - event: pull_request
           action:
             - opened
             - changed
             - reopened
+        # Run in response to a pull request comment "recheck"
         - event: pull_request
           action: comment
           comment: (?i)^\s*recheck\s*$
+        # When using the checks API to report results, failed runs
+        # will have a "re-run" button which emits this event.
+        - event: check_run
     start:
-      github.com:
-        status: 'pending'
-        status-url: "https://zuul.zuul-ci.org/zuul/status.html"
+      github:
+        check: 'in_progress'
         comment: false
+        # It is recommended to use the checks API for consistency with
+        # other common CI tools that integrate with Github.  Results
+        # will appear on the "checks" tab of PR and changes.  There is
+        # generally no need to have Zuul leave comments when using the
+        # checks API.
+        #
+        # The older status API appears inline with the PR and can be
+        # enabled by uncommenting the "status:" in the various
+        # sections below.  You should choose one or the other
+        # depending on project preferences.
+        #
+        #status: 'pending'
+        #comment: false
     success:
-      github.com:
-        status: 'success'
+      github:
+        check: 'success'
+        comment: false
+        #status: 'success'
       sqlreporter:
     failure:
-      github.com:
-        status: 'failure'
+      github:
+        check: 'failure'
+        comment: false
+        #status: 'failure'
       sqlreporter:
 
 - pipeline:
@@ -38,7 +59,7 @@
     precedence: high
     supercedes: check
     require:
-      github.com:
+      github:
         review:
           # Require an approval from user with write access (e.g. core-reviewer)
           - permission: write
@@ -48,7 +69,7 @@
         open: True
         current-patchset: True
     trigger:
-      github.com:
+      github:
         - event: pull_request_review
           action: submitted
           state: approved
@@ -69,20 +90,22 @@
           label:
             - gate
     start:
-      github.com:
-        status: 'pending'
-        status-url: "https://zuul.zuul-ci.org/zuul/status.html"
+      github:
+        check: 'in_progress'
         comment: false
+        #status: 'pending'
     success:
-      github.com:
-        status: 'success'
+      github:
+        check: 'success'
+        comment: false
+        #status: 'success'
         merge: true
-        comment: true
       sqlreporter:
     failure:
-      github.com:
-        status: 'failure'
-        comment: true
+      github:
+        check: 'failure'
+        #status: 'failure'
+        comment: false
       sqlreporter:
     window-floor: 20
     window-increase-factor: 2
@@ -94,7 +117,7 @@
     manager: independent
     precedence: low
     trigger:
-      github.com:
+      github:
         - event: push
           ref: ^refs/heads/.*$
     success:
@@ -109,7 +132,7 @@
     precedence: high
     post-review: True
     trigger:
-      github.com:
+      github:
         - event: push
           ref: ^refs/tags/.*$
     success:

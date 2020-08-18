@@ -151,16 +151,17 @@ following contents:
            - event: pull_request
              action: comment
              comment: (?i)^\s*recheck\s*$
+           - event: check_run
        start:
          github:
-           status: pending
+           check: pending
            comment: false
        success:
          github:
-           status: 'success'
+           check: 'success'
        failure:
          github:
-           status: 'failure'
+           check: 'failure'
 
 Merge that commit into the repository.
 
