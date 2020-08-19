@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_1dae8a97",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-19T11:19:37Z",
+      "side": 1,
+      "message": "Context: It\u0027s always the name of the connection so actually deployment dependent.\n\nI agree we should align that with the connection name used in the howtos (which is indeed just github).",
+      "revId": "549a5782a5b71ac33f2231ea087a94216549941d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_fd2d9646",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-19T11:19:37Z",
+      "side": 1,
+      "message": "This is unreleased yet. I wonder if we should update the docs due to this already.",
+      "revId": "549a5782a5b71ac33f2231ea087a94216549941d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
