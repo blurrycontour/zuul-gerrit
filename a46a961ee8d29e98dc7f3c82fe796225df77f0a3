@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_56da97e8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-19T21:21:42Z",
+      "side": 1,
+      "message": "Not a minus one: When we started the API, we explicitly decided not to make any compatability guarantees.  It would be okay to go ahead and change both the front and backend right now.  I would be okay with that if you wanted to update the change for it.  However, that would make it difficult to test this change with the live dashboard jobs, so if you want to keep this as written, that\u0027s okay with me too.  But I think we should remove the compatability immediately afterwords.\n\nIf folks thing we now want to start maintaining multiple versions of the API indefinitely, then I think that needs a mailing list discussion.  However, I would object to that.  That seems an easy way to accumulate technical debt indefinitely and I think we have better things to do with our limited time.",
+      "revId": "a46a961ee8d29e98dc7f3c82fe796225df77f0a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_36d563b8",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-19T21:21:42Z",
+      "side": 1,
+      "message": "Is this going to run the SQL query twice?  If so, I\u0027m a bit worried about performance.\n\nMinus one to make sure this is investigated.",
+      "revId": "a46a961ee8d29e98dc7f3c82fe796225df77f0a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
