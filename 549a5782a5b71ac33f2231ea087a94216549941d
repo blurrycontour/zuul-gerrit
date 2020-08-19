@@ -33,6 +33,40 @@
       "revId": "549a5782a5b71ac33f2231ea087a94216549941d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_16a5bf04",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-19T20:57:25Z",
+      "side": 1,
+      "message": "The docs should match the code (we have versioned docs if we need the docs for a release).",
+      "revId": "549a5782a5b71ac33f2231ea087a94216549941d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_f6a76b0a",
+        "filename": "doc/source/examples/pipelines/github-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-19T20:57:25Z",
+      "side": 1,
+      "message": "nit if you respin: s/but/by/",
+      "revId": "549a5782a5b71ac33f2231ea087a94216549941d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
