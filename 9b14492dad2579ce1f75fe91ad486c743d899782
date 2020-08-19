@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_4c3e8829",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 27
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-19T23:32:23Z",
+      "side": 1,
+      "message": "Why are you making these changes?",
+      "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_2c39943e",
+        "filename": "doc/source/examples/etc_zuul/zuul.conf",
+        "patchSetId": 27
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-19T23:32:23Z",
+      "side": 1,
+      "message": "We shouldn\u0027t need to set status_url anymore.  That may have changed since you wrote this patch.",
+      "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_8c48a0cc",
+        "filename": "doc/source/examples/httpd.conf",
+        "patchSetId": 27
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-19T23:32:23Z",
+      "side": 1,
+      "message": "This shouldn\u0027t be necessary for the tutorial.  Are you adding it because you feel it\u0027s a good thing to have for someone who might run a production system based on the tutorial?",
+      "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_6c438cb0",
+        "filename": "doc/source/tutorials/quick-start.rst",
+        "patchSetId": 27
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-19T23:32:23Z",
+      "side": 1,
+      "message": "I don\u0027t think we should install docke-compose with pip.  Global install via pip can really mess up a system.  In fact, at this point we may be able to move git-review to a package installation.",
+      "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
