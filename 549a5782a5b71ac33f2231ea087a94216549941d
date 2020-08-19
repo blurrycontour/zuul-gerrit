@@ -67,6 +67,23 @@
       "revId": "549a5782a5b71ac33f2231ea087a94216549941d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_cc2d7847",
+        "filename": "doc/source/examples/pipelines/github-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-19T23:10:10Z",
+      "side": 1,
+      "message": "actually this is wrong and should be \"in_progress\" ... i\u0027ll respin",
+      "revId": "549a5782a5b71ac33f2231ea087a94216549941d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
