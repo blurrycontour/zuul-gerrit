@@ -52,6 +52,24 @@
       "revId": "3ee553b04aa97c8934f3b2ab8374268c88269283",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_f80764c8",
+        "filename": "releasenotes/notes/scoping_REST_API-866574c4d73c577a.yaml",
+        "patchSetId": 16
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-08-19T11:03:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf51134e_53d27a5d",
+      "revId": "3ee553b04aa97c8934f3b2ab8374268c88269283",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
