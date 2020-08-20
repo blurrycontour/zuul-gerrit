@@ -15,6 +15,7 @@
 
 from contextlib import contextmanager
 from urllib.parse import urlsplit, urlunsplit, urlparse
+import hashlib
 import logging
 import os
 import re
@@ -321,6 +322,12 @@ class Repo(object):
                 os.rmdir(root)
 
     @staticmethod
+    def refNameToZuulRef(ref_name: str):
+        return "refs/zuul/{}".format(
+            hashlib.sha1(ref_name.encode("utf-8")).hexdigest()
+        )
+
+    @staticmethod
     def _reset(local_path, env, log=None):
         messages = []
         repo = Repo._createRepoObject(local_path, env)
@@ -342,6 +349,7 @@ class Repo(object):
             raise Exception("Couldn't detach HEAD to any existing commit")
 
         # Delete local heads that no longer exist on the remote end
+        zuul_refs_to_keep = ["refs/zuul/fetch"]
         remote_heads = {r.remote_head for r in origin.refs}
         for ref in repo.heads:
             if ref.name not in remote_heads:
@@ -350,6 +358,18 @@ class Repo(object):
                 else:
                     messages.append("Delete stale local ref %s" % ref)
                 repo.delete_head(ref, force=True)
+            else:
+                zuul_refs_to_keep.append(Repo.refNameToZuulRef(ref.name))
+
+        # Delete local zuul refs when the related branch no longer exists
+        for ref in (r for r in repo.refs if r.path.startswith("refs/zuul/")):
+            if ref.path in zuul_refs_to_keep:
+                continue
+            if log:
+                log.debug("Delete stale Zuul ref %s", ref)
+            else:
+                messages.append("Delete stale Zuul ref {}".format(ref))
+            Repo._deleteRef(ref.path, repo)
 
         # Note: Before git 2.13 deleting a a ref foo/bar leaves an empty
         # directory foo behind that will block creating the reference foo
@@ -911,10 +931,15 @@ class Merger(object):
         # Store this commit as the most recent for this project-branch
         recent[key] = commit
 
-        # Ensure the local head always references the  most recent
+        # Make sure to have a local ref that points to the  most recent
         # (intermediate) speculative state of a branch, so commits are not
-        # garbage collected.
-        repo.setBranchHead(item["branch"], commit, zuul_event_id=zuul_event_id)
+        # garbage collected. The branch name is hashed to not have any issues
+        # with branche names containing slashes.
+        # In order prevent issues with Git garbage collection between merger
+        # and executor jobs, we create refs in "refs/zuul" instead of updating
+        # local branch heads.
+        repo.setRef(Repo.refNameToZuulRef(item["branch"]),
+                    commit.hexsha, zuul_event_id=zuul_event_id)
 
         return orig_commit, commit
 
