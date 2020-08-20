@@ -52,9 +52,8 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('merger', 'log_config')
 
         zookeeper = zuul.zk.connect_zookeeper(self.config)
-        self.merger = zuul.merger.server.MergeServer(self.config,
+        self.merger = zuul.merger.server.MergeServer(self.config, zookeeper,
                                                      self.connections)
-        self.merger.setZookeeper(zookeeper)
         self.merger.start()
 
         if self.args.nodaemon:
