@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_e0103dab",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-20T06:19:40Z",
+      "side": 1,
+      "message": "If we don\u0027t make any compatibility guarantees, I\u0027m fine to ditch this header field. I just came up with this in the first place because I thought you wanted to have the API compatible :D\n\nRegarding the live dashboard test: This is - even if I keep it like this - only testable once the change is deployed to the zuul instances that serve as API for the live dashboard, or? Thus, even if we keep it like that, the follow-up change for the frontend https://review.opendev.org/#/c/746463/ cannot immediately be tested in the live dashboard.\n\nSo I\u0027m fine with removing this part and I would rather not start a discussion about compatibility or not if you don\u0027t have a guarantee for it ;-)",
+      "parentUuid": "9f560f44_56da97e8",
+      "revId": "a46a961ee8d29e98dc7f3c82fe796225df77f0a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_36d563b8",
         "filename": "zuul/driver/sql/sqlconnection.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2020-08-19T21:21:42Z",
       "side": 1,
       "message": "Is this going to run the SQL query twice?  If so, I\u0027m a bit worried about performance.\n\nMinus one to make sure this is investigated.",
+      "revId": "a46a961ee8d29e98dc7f3c82fe796225df77f0a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_40276913",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-20T06:19:40Z",
+      "side": 1,
+      "message": "Good point, I will investigate this.",
+      "parentUuid": "9f560f44_36d563b8",
       "revId": "a46a961ee8d29e98dc7f3c82fe796225df77f0a3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
