@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_da635419",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1050,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-20T21:44:07Z",
+      "side": 1,
+      "message": "Nit why not keep the keyword arg here? We keep it for inst_id on the next line.",
+      "range": {
+        "startLine": 1050,
+        "startChar": 55,
+        "endLine": 1050,
+        "endChar": 59
+      },
+      "revId": "d9706e3269719e13acd1526cd787bd163a4da70f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_1a6aeceb",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1240,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-20T21:44:07Z",
+      "side": 1,
+      "message": "Should this one be renamed as well?",
+      "range": {
+        "startLine": 1240,
+        "startChar": 24,
+        "endLine": 1240,
+        "endChar": 37
+      },
+      "revId": "d9706e3269719e13acd1526cd787bd163a4da70f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_fa6e18fe",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1243,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-20T21:44:07Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 1243,
+        "startChar": 25,
+        "endLine": 1243,
+        "endChar": 32
+      },
+      "revId": "d9706e3269719e13acd1526cd787bd163a4da70f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
