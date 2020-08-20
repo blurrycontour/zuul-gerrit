@@ -118,7 +118,9 @@ class Pipeline extends React.Component {
     return (
       <div className="pf-c-content zuul-pipeline col-sm-6 col-md-4">
         <div className="zuul-pipeline-header">
-          <h3>{pipeline.name} <Badge>{count}</Badge></h3>
+          <h3 style={{fontWeight: 'var(--pf-global--FontWeight--bold)'}}>
+            {pipeline.name} <Badge>{count}</Badge>
+          </h3>
           {pipeline.description ? (
             <small>
               <p>{pipeline.description.split(/\r?\n\r?\n/)}</p>
