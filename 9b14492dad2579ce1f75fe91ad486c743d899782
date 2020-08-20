@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_5b68f885",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 27
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-08-20T09:28:23Z",
+      "side": 1,
+      "message": "Some old parameters are useless:\n- Default UI is POLYGERRIT [1]\n- Gerrit 3.X database is NoteDB [2]\n\nnice feature to have:\n- Git protocol v2 [3]\n\nto correctly execute the container with expected argument \"command\" shall be modified to \"entrypoint\" otherwise it can\u0027t work. Gerrit docker image is not built to allow passing argument using \"command\"\n\n[1] https://gitenterprise.me/2019/05/20/gerrit-v3-0-is-here/ \"Then in 2018 with v2.16 the PolyGerrit UI became the “default” interface and thus renamed just “Gerrit” UI.\"\n[2] https://gerrit-review.googlesource.com/Documentation/note-db.html#_current_status\n[3] https://gitenterprise.me/2020/05/15/gerrit-goes-git-v2/",
+      "parentUuid": "9f560f44_4c3e8829",
+      "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_2c39943e",
         "filename": "doc/source/examples/etc_zuul/zuul.conf",
         "patchSetId": 27
@@ -30,6 +48,24 @@
       "writtenOn": "2020-08-19T23:32:23Z",
       "side": 1,
       "message": "We shouldn\u0027t need to set status_url anymore.  That may have changed since you wrote this patch.",
+      "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_e737b2fd",
+        "filename": "doc/source/examples/etc_zuul/zuul.conf",
+        "patchSetId": 27
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-08-20T09:28:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_2c39943e",
       "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_27afeae3",
+        "filename": "doc/source/examples/httpd.conf",
+        "patchSetId": 27
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-08-20T09:28:23Z",
+      "side": 1,
+      "message": "When checking build results, firefox reported this error: \"Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:8000/2/2/1/check/testjob/71c18c3/job-output.json.gz. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing).\"",
+      "parentUuid": "9f560f44_8c48a0cc",
+      "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_6c438cb0",
         "filename": "doc/source/tutorials/quick-start.rst",
         "patchSetId": 27
@@ -64,6 +118,24 @@
       "writtenOn": "2020-08-19T23:32:23Z",
       "side": 1,
       "message": "I don\u0027t think we should install docke-compose with pip.  Global install via pip can really mess up a system.  In fact, at this point we may be able to move git-review to a package installation.",
+      "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_c710ae03",
+        "filename": "doc/source/tutorials/quick-start.rst",
+        "patchSetId": 27
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-08-20T09:28:23Z",
+      "side": 1,
+      "message": "A recent docker-compose for test is required (see commit message), I had an error with patchset 9, fixed in patchset 10 because the packaged version for ubuntu-bionic is too old.\nTo be coherent with tests, and if a reader wants to execute run-localtest-***.yaml, it\u0027s best to have a working docker-compose, otherwise there will be errors when \"docker logs ***\" are executed.",
+      "parentUuid": "9f560f44_6c438cb0",
       "revId": "9b14492dad2579ce1f75fe91ad486c743d899782",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
