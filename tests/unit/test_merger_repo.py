@@ -14,6 +14,7 @@
 # under the License.
 
 import datetime
+import hashlib
 import logging
 import os
 
@@ -647,7 +648,7 @@ class TestMerger(ZuulTestCase):
 
     def test_merge_temp_refs(self):
         """
-        Test that the merge updates local branches in order to avoid
+        Test that the merge updates local zuul refs in order to avoid
         garbage collection of needed objects.
         """
         merger = self.executor_server.merger
@@ -675,9 +676,11 @@ class TestMerger(ZuulTestCase):
         cache_repo = merger.getRepo('gerrit', 'org/project')
         repo = cache_repo.createRepoObject(zuul_event_id="dummy")
 
-        # Make sure local refs are updated
-        self.assertIn("foo/bar", repo.refs)
-        self.assertEqual(repo.refs.master.commit, repo.head.commit)
+        # Make sure zuul refs are updated
+        foobar_hash_ref = hashlib.sha1(b"foo/bar").hexdigest()
+        master_hash_ref = hashlib.sha1(b"master").hexdigest()
+        self.assertIn(foobar_hash_ref, repo.refs)
+        self.assertEqual(repo.refs[master_hash_ref].commit, repo.head.commit)
 
         # Delete the remote branch so a reset cleanes up the local branch
         parent_repo.delete_head('foo/bar', force=True)
@@ -690,7 +693,7 @@ class TestMerger(ZuulTestCase):
             Repo._cleanup_leaked_ref_dirs(parent_path, None, [])
 
         cache_repo.reset()
-        self.assertNotIn("foo/bar", repo.refs)
+        self.assertNotIn(foobar_hash_ref, repo.refs)
 
         # Create another head 'foo' that can't be created if the 'foo/bar'
         # branch wasn't cleaned up properly
@@ -703,5 +706,6 @@ class TestMerger(ZuulTestCase):
         # Merge A -> B -> C
         result = merger.mergeChanges([item_a, item_b, item_c])
         self.assertIsNotNone(result)
-        self.assertIn("foo", repo.refs)
-        self.assertEqual(repo.refs.master.commit, repo.head.commit)
+        foo_hash_ref = hashlib.sha1(b"foo").hexdigest()
+        self.assertIn(foo_hash_ref, repo.refs)
+        self.assertEqual(repo.refs[master_hash_ref].commit, repo.head.commit)
