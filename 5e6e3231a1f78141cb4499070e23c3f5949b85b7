@@ -33,6 +33,57 @@
       "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_5b42b3ac",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-20T13:11:12Z",
+      "side": 1,
+      "message": "Just a dump idea: Maybe use the CodeIcon instead? In most cases the independent (check) pipeline is used as first instance when developing a change, right? Also for other use cases like release/tags and post this should be ok.\n\nBut maybe now I understand why you chose the flask in the first place :D",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_9bcc4b36",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-20T13:11:12Z",
+      "side": 1,
+      "message": "I don\u0027t know about this one as I\u0027ve never used the serial pipeline. But the first thing that comes in my mind when reading the description is something that reflects \"parallel\" or \"concurrent\" or \"one-after-another\".",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_1b92fb57",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-20T13:11:12Z",
+      "side": 1,
+      "message": "Maybe we could use the StreamIcon as default one https://fontawesome.com/icons/stream?style\u003dsolid? As this is also the icon I used for the pipeline in other places",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
