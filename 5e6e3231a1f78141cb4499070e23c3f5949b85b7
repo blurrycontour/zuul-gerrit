@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_3b6a5fb2",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-20T12:45:02Z",
+      "side": 1,
+      "message": "I know that you are already haunted by all the rebasing due to my PF4 changes, but you might now use the icons from @patternfly/react-icons ;-)",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_9b528b12",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-20T12:45:02Z",
+      "side": 1,
+      "message": "I think it would make sense to define a dictionary here, that contains all necessary attributes as value whereby the key is the same as pipeline.manager. This way, you could simply look up the value from the dictionary without a lot of if/else branches in renderPipelineIcon(). I used this approach here https://opendev.org/zuul/zuul/src/branch/master/web/src/containers/build/Misc.jsx#L25 and here https://review.opendev.org/#/c/739973/7/web/src/containers/build/Artifact.jsx (line 33). The default value could be defined in a different variable that is used if the key wasn\u0027t found in the dictionary.",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
