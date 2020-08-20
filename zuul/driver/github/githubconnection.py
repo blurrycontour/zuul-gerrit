@@ -429,7 +429,8 @@ class GithubEventProcessor(object):
                 # unprotected branches, we might need to check whether the
                 # branch is now protected.
                 if hasattr(event, "branch") and event.branch:
-                    b = self.connection.getBranch(project.name, event.branch)
+                    b = self.connection.getBranch(
+                        project.name, event.branch, event=event)
                     if b is not None:
                         branch_protected = b.get('protected')
                         self.connection.checkBranchCache(
@@ -1549,8 +1550,8 @@ class GithubConnection(BaseConnection):
         cache[project.name] = branches
         return branches
 
-    def getBranch(self, project_name, branch):
-        github = self.getGithubClient(project_name)
+    def getBranch(self, project_name, branch, event=None):
+        github = self.getGithubClient(project_name, zuul_event_id=event)
 
         # Note that we directly use a web request here because if we use the
         # github3.py api directly we need a repository object which needs
