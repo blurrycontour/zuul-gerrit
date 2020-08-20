@@ -647,7 +647,7 @@ class TestMerger(ZuulTestCase):
 
     def test_merge_temp_refs(self):
         """
-        Test that the merge updates local branches in order to avoid
+        Test that the merge updates local zuul refs in order to avoid
         garbage collection of needed objects.
         """
         merger = self.executor_server.merger
@@ -671,13 +671,26 @@ class TestMerger(ZuulTestCase):
         # Merge A -> B -> C
         result = merger.mergeChanges([item_a, item_b, item_c])
         self.assertIsNotNone(result)
+        merge_state = result[3]
 
         cache_repo = merger.getRepo('gerrit', 'org/project')
         repo = cache_repo.createRepoObject(zuul_event_id="dummy")
 
-        # Make sure local refs are updated
-        self.assertIn("foo/bar", repo.refs)
-        self.assertEqual(repo.refs.master.commit, repo.head.commit)
+        # Make sure zuul refs are updated
+        foobar_zuul_ref = Repo.refNameToZuulRef("foo/bar")
+        master_zuul_ref = Repo.refNameToZuulRef("master")
+        ref_map = {r.path: r for r in repo.refs}
+        self.assertIn(foobar_zuul_ref, ref_map)
+        self.assertIn(master_zuul_ref, ref_map)
+
+        self.assertEqual(
+            ref_map[master_zuul_ref].commit.hexsha,
+            merge_state[("gerrit", "org/project", "master")]
+        )
+        self.assertEqual(
+            ref_map[foobar_zuul_ref].commit.hexsha,
+            merge_state[("gerrit", "org/project", "foo/bar")]
+        )
 
         # Delete the remote branch so a reset cleanes up the local branch
         parent_repo.delete_head('foo/bar', force=True)
@@ -690,7 +703,7 @@ class TestMerger(ZuulTestCase):
             Repo._cleanup_leaked_ref_dirs(parent_path, None, [])
 
         cache_repo.reset()
-        self.assertNotIn("foo/bar", repo.refs)
+        self.assertNotIn(foobar_zuul_ref, [r.path for r in repo.refs])
 
         # Create another head 'foo' that can't be created if the 'foo/bar'
         # branch wasn't cleaned up properly
@@ -703,5 +716,18 @@ class TestMerger(ZuulTestCase):
         # Merge A -> B -> C
         result = merger.mergeChanges([item_a, item_b, item_c])
         self.assertIsNotNone(result)
-        self.assertIn("foo", repo.refs)
-        self.assertEqual(repo.refs.master.commit, repo.head.commit)
+        merge_state = result[3]
+
+        foo_zuul_ref = Repo.refNameToZuulRef("foo")
+        ref_map = {r.path: r for r in repo.refs}
+
+        self.assertIn(foo_zuul_ref, ref_map)
+        self.assertIn(master_zuul_ref, ref_map)
+        self.assertEqual(
+            ref_map[master_zuul_ref].commit.hexsha,
+            merge_state[("gerrit", "org/project", "master")]
+        )
+        self.assertEqual(
+            ref_map[foo_zuul_ref].commit.hexsha,
+            merge_state[("gerrit", "org/project", "foo")]
+        )
