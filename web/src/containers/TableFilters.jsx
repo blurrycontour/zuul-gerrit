@@ -188,7 +188,7 @@ class TableFilters extends React.Component {
         placeholder={currentFilterType.placeholder}
         onChange={e => this.updateCurrentValue(e)}
         onKeyPress={e => this.onValueKeyPress(e)}
-        />
+      />
     )
   }
 
@@ -202,7 +202,7 @@ class TableFilters extends React.Component {
               filterTypes={this.filterTypes}
               currentFilterType={currentFilterType}
               onFilterTypeSelected={this.selectFilterType}
-              />
+            />
             {this.renderFilterInput()}
           </Filter>
         </div>
@@ -216,17 +216,17 @@ class TableFilters extends React.Component {
                     key={index}
                     onRemove={this.removeFilter}
                     filterData={item}
-                    >
+                  >
                     {item.label}
                   </Filter.Item>
                 )
               })}
-          </Filter.List>
+            </Filter.List>
             <Button onClick={e => {
               e.preventDefault()
               this.clearFilters()
             }}>Clear All Filters</Button>
-            </Toolbar.Results>
+          </Toolbar.Results>
         )}
       </React.Fragment>
     )

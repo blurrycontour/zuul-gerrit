@@ -41,44 +41,44 @@ export default (state = {
   buildsets: {},
 }, action) => {
   switch (action.type) {
-  case BUILD_FETCH_REQUEST:
-  case BUILDSET_FETCH_REQUEST:
-    return update(state, {$merge: {isFetching: true}})
-  case BUILD_FETCH_SUCCESS:
-    state.builds = update(
-      state.builds, {$merge: {[action.buildId]: action.build}})
-    return update(state, {$merge: {isFetching: false}})
-  case BUILDSET_FETCH_SUCCESS:
-    return update(state, {$merge: {
-      isFetching: false,
-      buildsets: update(state.buildsets, {$merge: {
-        [action.buildsetId]: action.buildset}})
-    }})
-  case BUILD_FETCH_FAIL:
-  case BUILDSET_FETCH_FAIL:
-    return update(state, {$merge: {isFetching: false}})
+    case BUILD_FETCH_REQUEST:
+    case BUILDSET_FETCH_REQUEST:
+      return update(state, {$merge: {isFetching: true}})
+    case BUILD_FETCH_SUCCESS:
+      state.builds = update(
+        state.builds, {$merge: {[action.buildId]: action.build}})
+      return update(state, {$merge: {isFetching: false}})
+    case BUILDSET_FETCH_SUCCESS:
+      return update(state, {$merge: {
+        isFetching: false,
+        buildsets: update(state.buildsets, {$merge: {
+          [action.buildsetId]: action.buildset}})
+      }})
+    case BUILD_FETCH_FAIL:
+    case BUILDSET_FETCH_FAIL:
+      return update(state, {$merge: {isFetching: false}})
 
-  case BUILD_OUTPUT_REQUEST:
-    return update(state, {$merge: {isFetchingOutput: true}})
-  case BUILD_OUTPUT_SUCCESS:
-    state.builds = update(
-      state.builds, {[action.buildId]: {$merge: {errorIds: action.errorIds,
-                                                 hosts: action.hosts,
-                                                 output: action.output}}})
-    return update(state, {$merge: {isFetchingOutput: false}})
-  case BUILD_OUTPUT_FAIL:
-    return update(state, {$merge: {isFetchingOutput: false}})
+    case BUILD_OUTPUT_REQUEST:
+      return update(state, {$merge: {isFetchingOutput: true}})
+    case BUILD_OUTPUT_SUCCESS:
+      state.builds = update(
+        state.builds, {[action.buildId]: {$merge: {errorIds: action.errorIds,
+          hosts: action.hosts,
+          output: action.output}}})
+      return update(state, {$merge: {isFetchingOutput: false}})
+    case BUILD_OUTPUT_FAIL:
+      return update(state, {$merge: {isFetchingOutput: false}})
 
-  case BUILD_MANIFEST_REQUEST:
-    return update(state, {$merge: {isFetchingManifest: true}})
-  case BUILD_MANIFEST_SUCCESS:
-    state.builds = update(
-      state.builds, {[action.buildId]: {$merge: {manifest: action.manifest}}})
-    return update(state, {$merge: {isFetchingManifest: false}})
-  case BUILD_MANIFEST_FAIL:
-    return update(state, {$merge: {isFetchingManifest: false}})
+    case BUILD_MANIFEST_REQUEST:
+      return update(state, {$merge: {isFetchingManifest: true}})
+    case BUILD_MANIFEST_SUCCESS:
+      state.builds = update(
+        state.builds, {[action.buildId]: {$merge: {manifest: action.manifest}}})
+      return update(state, {$merge: {isFetchingManifest: false}})
+    case BUILD_MANIFEST_FAIL:
+      return update(state, {$merge: {isFetchingManifest: false}})
 
-  default:
-    return state
+    default:
+      return state
   }
 }

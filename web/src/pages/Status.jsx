@@ -163,14 +163,14 @@ class StatusPage extends React.Component {
     return (
       <p>
         Queue lengths: <span>{status.trigger_event_queue ?
-                              status.trigger_event_queue.length : '0'
-          }</span> events,&nbsp;
+          status.trigger_event_queue.length : '0'
+        }</span> events,&nbsp;
         <span>{status.management_event_queue ?
-              status.management_event_queue.length : '0'
-          }</span> management events,&nbsp;
+          status.management_event_queue.length : '0'
+        }</span> management events,&nbsp;
         <span>{status.result_event_queue ?
-              status.result_event_queue.length : '0'
-          }</span> results.
+          status.result_event_queue.length : '0'
+        }</span> results.
       </p>
     )
   }
@@ -181,7 +181,7 @@ class StatusPage extends React.Component {
         <p>Zuul version: <span>{status.zuul_version}</span></p>
         {status.last_reconfigured ? (
           <p>Last reconfigured: <span>
-              {moment.utc(status.last_reconfigured).tz(this.props.timezone).format('llll')}
+            {moment.utc(status.last_reconfigured).tz(this.props.timezone).format('llll')}
           </span></p>) : ''}
       </React.Fragment>
     )
@@ -204,17 +204,17 @@ class StatusPage extends React.Component {
             defaultValue={filter}
             inputRef={i => this.filter = i}
             onKeyPress={this.handleKeyPress} />
-            {filter && (
-          <FormControl.Feedback>
-            <span
-              onClick={() => {this.setFilter('')}}
-              style={{cursor: 'pointer', zIndex: 10, pointerEvents: 'auto'}}
+          {filter && (
+            <FormControl.Feedback>
+              <span
+                onClick={() => {this.setFilter('')}}
+                style={{cursor: 'pointer', zIndex: 10, pointerEvents: 'auto'}}
               >
-              <Icon type='pf' title='Clear filter' name='delete' />
+                <Icon type='pf' title='Clear filter' name='delete' />
               &nbsp;
-            </span>
-          </FormControl.Feedback>
-            )}
+              </span>
+            </FormControl.Feedback>
+          )}
         </FormGroup>
         <FormGroup controlId='status'>
           &nbsp; Expand by default:&nbsp;
@@ -242,7 +242,7 @@ class StatusPage extends React.Component {
               filter={filter}
               expanded={expanded}
               key={item.name}
-              />
+            />
           ))}
         </div>
         {status && this.renderStatusFooter(status)}

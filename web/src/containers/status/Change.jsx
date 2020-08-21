@@ -51,9 +51,9 @@ class Change extends React.Component {
       }
     }
     const icon = (
-        <span
-          className={'zuul-build-status ' + iconGlyph}
-          title={iconTitle} />
+      <span
+        className={'zuul-build-status ' + iconGlyph}
+        title={iconTitle} />
     )
     if (change.live) {
       return (

@@ -34,11 +34,11 @@ export default (state = {
 }, action) => {
   let newstate
   switch (action.type) {
-  case PREFERENCE_SET:
-    newstate = update(state, {$merge: {[action.key]: action.value}})
-    localStorage.setItem('preferences', JSON.stringify(newstate))
-    return newstate
-  default:
-    return state
+    case PREFERENCE_SET:
+      newstate = update(state, {$merge: {[action.key]: action.value}})
+      localStorage.setItem('preferences', JSON.stringify(newstate))
+      return newstate
+    default:
+      return state
   }
 }
