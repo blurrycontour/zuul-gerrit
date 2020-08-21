@@ -53,7 +53,7 @@ class Nodeset extends React.Component {
                 {groups.length > 0 && ' (' + groups.map(item => (item)) + ') '}
               </span>
             </li>)
-          })}
+        })}
       </ul>
     )
     return (

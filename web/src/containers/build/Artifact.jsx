@@ -51,10 +51,10 @@ class ArtifactList extends React.Component {
 
     const nodes = build.artifacts.map((artifact, index) => {
       const node = {text: <a href={artifact.url}>{artifact.name}</a>,
-                    icon: null}
+        icon: null}
       if (artifact.metadata) {
         node['nodes']= [{text: <Artifact key={index} artifact={artifact}/>,
-                         icon: ''}]
+          icon: ''}]
       }
       return node
     })

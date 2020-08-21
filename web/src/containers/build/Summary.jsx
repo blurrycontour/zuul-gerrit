@@ -52,13 +52,13 @@ class Summary extends React.Component {
         label = 'job'
         value = (
           <React.Fragment>
-          <Link to={this.props.tenant.linkPrefix + '/job/' + value}>
-            {value}
-          </Link>
-          <span> &mdash; </span>
-          <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + value + '&project=' + build.project} title="See previous runs of this job inside current project.">
-            build history
-          </Link>
+            <Link to={this.props.tenant.linkPrefix + '/job/' + value}>
+              {value}
+            </Link>
+            <span> &mdash; </span>
+            <Link to={this.props.tenant.linkPrefix + '/builds?job_name=' + value + '&project=' + build.project} title="See previous runs of this job inside current project.">
+              build history
+            </Link>
           </React.Fragment>
         )
       }
@@ -80,8 +80,8 @@ class Summary extends React.Component {
         value = moment.utc(value).tz(this.props.timezone).format('YYYY-MM-DD HH:mm:ss')
       }
       if (column === 'duration') {
-          value = moment.duration(value, 'seconds')
-            .format('h [hr] m [min] s [sec]')
+        value = moment.duration(value, 'seconds')
+          .format('h [hr] m [min] s [sec]')
       }
       if (value && (column === 'log_url' || column === 'ref_url')) {
         value = <a href={value}>{value}</a>

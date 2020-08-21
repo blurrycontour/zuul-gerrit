@@ -87,7 +87,7 @@ class Job extends React.Component {
                   variant={job[variantIdx]}
                   descriptionMaxHeight={descriptionMaxHeight}
                   parent={this}
-                  />
+                />
               </TabPane>
             </TabContent>
           </div>

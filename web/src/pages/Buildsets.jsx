@@ -71,10 +71,10 @@ class BuildsetsPage extends TableFilters {
       <Table.Cell>
         <a href={rowdata.rowData.ref_url}>
           {value ?
-           rowdata.rowData.change + ',' + rowdata.rowData.patchset :
-           rowdata.rowData.newrev ?
-             rowdata.rowData.newrev.substr(0, 7) :
-           rowdata.rowData.branch}
+            rowdata.rowData.change + ',' + rowdata.rowData.patchset :
+            rowdata.rowData.newrev ?
+              rowdata.rowData.newrev.substr(0, 7) :
+              rowdata.rowData.branch}
         </a>
       </Table.Cell>
     )

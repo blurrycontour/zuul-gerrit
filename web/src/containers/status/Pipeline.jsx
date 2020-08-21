@@ -95,7 +95,7 @@ class Pipeline extends React.Component {
       changes.forEach(change => {
         filters.forEach(changeFilter => {
           if (changeFilter && (
-              (change.project && change.project.indexOf(changeFilter) !== -1) ||
+            (change.project && change.project.indexOf(changeFilter) !== -1) ||
               (change.id && change.id.indexOf(changeFilter) !== -1))) {
             found = true
             return
@@ -127,17 +127,17 @@ class Pipeline extends React.Component {
             </small>) : ''}
         </div>
         {pipeline.change_queues.filter(item => item.heads.length > 0)
-         .filter(item => (!filter || (
-           filter.indexOf(pipeline.name) !== -1 ||
+          .filter(item => (!filter || (
+            filter.indexOf(pipeline.name) !== -1 ||
              this.filterQueue(item, filter)
-         )))
+          )))
           .map(changeQueue => (
             <ChangeQueue
               queue={changeQueue}
               expanded={expanded}
               pipeline={pipeline.name}
               key={changeQueue.uuid}
-              />
+            />
           ))}
       </div>
     )

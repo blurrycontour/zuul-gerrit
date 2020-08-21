@@ -125,7 +125,7 @@ class App extends React.Component {
     this.menu
       // Do not include '/tenants' route in white-label setup
       .filter(item =>
-              (tenant.whiteLabel && !item.globalRoute) || !tenant.whiteLabel)
+        (tenant.whiteLabel && !item.globalRoute) || !tenant.whiteLabel)
       .forEach((item, index) => {
         // We use react-router's render function to be able to pass custom props
         // to our route components (pages):
@@ -141,9 +141,9 @@ class App extends React.Component {
               <item.component {...item.props} {...routerProps} />
             )}
             exact
-            />
+          />
         )
-    })
+      })
     if (tenant.defaultRoute)
       allRoutes.push(
         <Redirect from='*' to={tenant.defaultRoute} key='default-route' />
@@ -228,16 +228,16 @@ class App extends React.Component {
     return (
       <ToastNotificationList>
         {errors.map(error => (
-         <TimedToastNotification
-             key={error.id}
-             type='error'
-             onDismiss={() => {this.props.dispatch(clearError(error.id))}}
-             >
-           <span title={moment.utc(error.date).tz(this.props.timezone).format()}>
-               <strong>{error.text}</strong> ({error.status})&nbsp;
-                   {error.url}
-             </span>
-         </TimedToastNotification>
+          <TimedToastNotification
+            key={error.id}
+            type='error'
+            onDismiss={() => {this.props.dispatch(clearError(error.id))}}
+          >
+            <span title={moment.utc(error.date).tz(this.props.timezone).format()}>
+              <strong>{error.text}</strong> ({error.status})&nbsp;
+              {error.url}
+            </span>
+          </TimedToastNotification>
         ))}
       </ToastNotificationList>
     )
@@ -264,10 +264,10 @@ class App extends React.Component {
             history.push(this.props.tenant.linkPrefix + '/config-errors')
             this.setState({showErrors: false})
           }}
-          >
+        >
           <NotificationDrawerListItemHeader title={error} variant="danger" />
           <NotificationDrawerListItemBody>
-              {item.source_context.project} | {ctxPath}
+            {item.source_context.project} | {ctxPath}
           </NotificationDrawerListItemBody>
         </NotificationDrawerListItem>
       )

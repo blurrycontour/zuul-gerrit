@@ -34,47 +34,47 @@ class Build extends React.Component {
 
     return (
       <div>
-      <h2>Build result {build.uuid}</h2>
-            <div>
-              <ul className="nav nav-tabs nav-tabs-pf">
-                <li className={active==='summary'?'active':undefined}>
-                  <Link to={this.props.tenant.linkPrefix + '/build/' + build.uuid}>
-                    Summary
-                  </Link>
-                </li>
-                {build.manifest &&
-                 <li className={active==='logs'?'active':undefined}>
-                   <Link to={this.props.tenant.linkPrefix + '/build/' + build.uuid + '/logs'}>
-                     Logs
-                   </Link>
-                 </li>}
-                {build.output &&
-                 <li className={active==='console'?'active':undefined}>
-                   <Link
-                     to={this.props.tenant.linkPrefix + '/build/' + build.uuid + '/console'}>
-                     Console
-                   </Link>
-                 </li>}
-              </ul>
-              <div>
-                {/* NOTE (felix): Since I'm already working on a PF4 change for
-                    this file, I don't want to change too much here for now and
-                    just make it compatible to the improved routing solution.
-                    */}
-                {active === 'summary' && <Summary build={build} />}
-                {active === 'logs' && build && build.manifest && (
-                  <Manifest tenant={this.props.tenant} build={build}/>
-                )}
-                {active === 'console' && build && build.output && (
-                  <Console
-                    output={build.output}
-                    errorIds={build.errorIds}
-                    displayPath={hash.length>0?hash:undefined}
-                  />
-                )}
-              </div>
-            </div>
+        <h2>Build result {build.uuid}</h2>
+        <div>
+          <ul className="nav nav-tabs nav-tabs-pf">
+            <li className={active==='summary'?'active':undefined}>
+              <Link to={this.props.tenant.linkPrefix + '/build/' + build.uuid}>
+                Summary
+              </Link>
+            </li>
+            {build.manifest &&
+              <li className={active==='logs'?'active':undefined}>
+                <Link to={this.props.tenant.linkPrefix + '/build/' + build.uuid + '/logs'}>
+                  Logs
+                </Link>
+              </li>}
+            {build.output &&
+              <li className={active==='console'?'active':undefined}>
+                <Link
+                  to={this.props.tenant.linkPrefix + '/build/' + build.uuid + '/console'}>
+                  Console
+                </Link>
+              </li>}
+          </ul>
+          <div>
+            {/* NOTE (felix): Since I'm already working on a PF4 change for
+                this file, I don't want to change too much here for now and
+                just make it compatible to the improved routing solution.
+                */}
+            {active === 'summary' && <Summary build={build} />}
+            {active === 'logs' && build && build.manifest && (
+              <Manifest tenant={this.props.tenant} build={build}/>
+            )}
+            {active === 'console' && build && build.output && (
+              <Console
+                output={build.output}
+                errorIds={build.errorIds}
+                displayPath={hash.length>0?hash:undefined}
+              />
+            )}
+          </div>
         </div>
+      </div>
     )
   }
 }
