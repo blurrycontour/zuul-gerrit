@@ -54,7 +54,7 @@ const shouldFetchLabels = (tenant, state) => {
 
 export const fetchLabelsIfNeeded = (tenant, force) => (
   dispatch, getState) => {
-    if (force || shouldFetchLabels(tenant, getState())) {
-      return dispatch(fetchLabels(tenant))
-    }
+  if (force || shouldFetchLabels(tenant, getState())) {
+    return dispatch(fetchLabels(tenant))
+  }
 }
