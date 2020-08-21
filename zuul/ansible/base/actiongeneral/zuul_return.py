@@ -16,6 +16,7 @@
 import os
 import json
 import tempfile
+from copy import deepcopy
 
 from ansible.plugins.action import ActionBase
 
@@ -42,17 +43,50 @@ def merge_data(dict_a, dict_b):
     """
     Merge dict_a into dict_b, handling any special cases for zuul variables
     """
-    artifacts_a = dict_a.get('zuul', {}).get('artifacts', [])
-    if not isinstance(artifacts_a, list):
-        artifacts_a = []
-    artifacts_b = dict_b.get('zuul', {}).get('artifacts', [])
-    if not isinstance(artifacts_b, list):
-        artifacts_b = []
-    artifacts = artifacts_a + artifacts_b
+    artifacts = merge_artifacts(dict_a, dict_b)
+    file_comments = merge_file_comments(dict_a, dict_b)
     merge_dict(dict_a, dict_b)
     if artifacts:
         dict_b.setdefault('zuul', {})['artifacts'] = artifacts
+    if file_comments:
+        dict_b.setdefault("zuul", {})["file_comments"] = file_comments
     return dict_b
+
+
+def merge_artifacts(dict_a, dict_b):
+    """Merge artifacts from both dictionary
+
+    The artifacts from both dictionaries will be merged (additive) into a new
+    list.
+    """
+    artifacts_a = dict_a.get('zuul', {}).get("artifacts", [])
+    if not isinstance(artifacts_a, list):
+        artifacts_a = []
+    artifacts_b = dict_b.get('zuul', {}).get("artifacts", [])
+    if not isinstance(artifacts_b, list):
+        artifacts_b = []
+    artifacts = artifacts_a + artifacts_b
+    return artifacts
+
+
+def merge_file_comments(dict_a, dict_b):
+    """Merge file_comments from both dictionary.
+
+    File comments applied to the same line and/or file will be added to the
+    existing ones.
+    """
+    file_comments_a = dict_a.get('zuul', {}).get("file_comments", {})
+    if not isinstance(file_comments_a, dict):
+        file_comments_a = {}
+    file_comments_b = dict_b.get('zuul', {}).get("file_comments", {})
+    if not isinstance(file_comments_b, dict):
+        file_comments_b = {}
+    # Merge all comments for each file from b into a. In case a contains
+    # comments for the same file, both are merged and not overriden.
+    file_comments = deepcopy(file_comments_b)
+    for key, value in file_comments_a.items():
+        file_comments.setdefault(key, []).extend(value)
+    return file_comments
 
 
 def set_value(path, new_data, new_file):
