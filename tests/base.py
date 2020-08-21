@@ -3021,7 +3021,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.log.debug("Done releasing builds %s (%s)" %
                        (regex, len(builds)))
 
-    def executeJob(self, job):
+    def _executeJob(self, job):
         build = FakeBuild(self, job)
         job.build = build
         self.running_builds.append(build)
@@ -3031,7 +3031,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         job.arguments = json.dumps(args)
         super(RecordingExecutorServer, self).executeJob(job)
 
-    def stopJob(self, job):
+    def _stopJob(self, job):
         self.log.debug("handle stop")
         parameters = json.loads(job.arguments)
         uuid = parameters['uuid']
@@ -3810,8 +3810,11 @@ class SchedulerTestApp:
 
         self.sched.registerConnections(self.connections)
 
+        zk = zuul.zk.ZooKeeper(enable_cache=True)
+        zk.connect(self.zk_config, timeout=30.0)
+
         executor_client = zuul.executor.client.ExecutorClient(
-            self.config, self.sched)
+            self.config, self.sched, zk)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
 
@@ -3820,7 +3823,6 @@ class SchedulerTestApp:
         self.sched.setNodepool(nodepool)
 
         self.sched.start()
-        executor_client.gearman.waitForServer()
         if not self.sched._paused:
             self.sched.reconfigure(self.config)
         self.sched.wakeUp()
@@ -3983,17 +3985,23 @@ class ZuulTestCase(BaseTestCase):
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(
-            self.config, self.scheds.first.connections)
+            self.config, self.zk, self.scheds.first.connections)
         self.merge_server.start()
 
     def setUp(self):
         super(ZuulTestCase, self).setUp()
 
-        self.setupZK()
+        zk_chroot_fixture = self.useFixture(ChrootedKazooFixture(self.id()))
+        self.zk_config = '%s:%s%s' % (
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot)
         self.fake_nodepool = FakeNodepool(
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot)
+        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
+        self.zk.connect(self.zk_config, timeout=30.0)
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4100,7 +4108,7 @@ class ZuulTestCase(BaseTestCase):
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
-            self.config, executor_connections,
+            self.config, self.zk, executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
@@ -4311,14 +4319,6 @@ class ZuulTestCase(BaseTestCase):
         with open(os.path.join(FIXTURE_DIR, 'ssh.pem')) as i:
             with open(private_key_file, 'w') as o:
                 o.write(i.read())
-
-    def setupZK(self):
-        self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id()))
-        self.zk_config = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
@@ -4559,9 +4559,9 @@ class ZuulTestCase(BaseTestCase):
     def __haveAllBuildsReported(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
             executor_client = app.sched.executor
-            # See if Zuul is waiting on a meta job to complete
-            if executor_client.meta_jobs:
-                return False
+            # # See if Zuul is waiting on a meta job to complete
+            # if executor_client.meta_jobs:
+            #     return False
             # Find out if every build that the worker has completed has been
             # reported back to Zuul.  If it hasn't then that means a Gearman
             # event is still in transit and the system is not stable.
@@ -4573,10 +4573,10 @@ class ZuulTestCase(BaseTestCase):
                 # It hasn't been reported yet.
                 return False
             # Make sure that none of the worker connections are in GRAB_WAIT
-            worker = self.executor_server.executor_gearworker.gearman
-            for connection in worker.active_connections:
-                if connection.state == 'GRAB_WAIT':
-                    return False
+            # worker = self.executor_server.executor_gearworker.gearman
+            # for connection in worker.active_connections:
+            #     if connection.state == 'GRAB_WAIT':
+            #         return False
         return True
 
     def __areAllBuildsWaiting(self, matcher) -> bool:
@@ -4587,6 +4587,8 @@ class ZuulTestCase(BaseTestCase):
             for build in builds:
                 seen_builds.add(build.uuid)
                 client_job = None
+                # TODO: Check zk queue
+                continue
                 for conn in executor_client.gearman.active_connections:
                     for j in conn.related_jobs.values():
                         if j.unique == build.uuid:

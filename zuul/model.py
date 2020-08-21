@@ -18,6 +18,8 @@ import copy
 import json
 import logging
 import os
+from typing import Optional
+
 import re2
 import struct
 import time
@@ -1890,6 +1892,7 @@ class Build(object):
         self.node_name = None
         self.nodeset = None
         self.zuul_event_id = zuul_event_id
+        self.zookeeper_node = None  # type: Optional[str]
 
     def __repr__(self):
         return ('<Build %s of %s voting:%s on %s>' %
