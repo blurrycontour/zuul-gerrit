@@ -62,10 +62,10 @@ class BuildOutput extends React.Component {
         <Panel.Body>
           {task.invocation && task.invocation.module_args &&
            task.invocation.module_args._raw_params && (
-             <strong key="cmd">
-               {task.invocation.module_args._raw_params} <br />
-             </strong>
-           )}
+            <strong key="cmd">
+              {task.invocation.module_args._raw_params} <br />
+            </strong>
+          )}
           {task.msg && (
             <pre key="msg">{task.msg}</pre>
           )}
@@ -80,23 +80,23 @@ class BuildOutput extends React.Component {
                     {task.stdout_lines.slice(0, -max_lines).join('\n')}
                   </pre>
                 </details>)}
-            <pre key="stdout" title="stdout">
-              {task.stdout_lines.slice(-max_lines).join('\n')}
+              <pre key="stdout" title="stdout">
+                {task.stdout_lines.slice(-max_lines).join('\n')}
               </pre>
-              </Fragment>
+            </Fragment>
           )}
           {task.stderr_lines && task.stderr_lines.length > 0 && (
             <Fragment>
               {task.stderr_lines.length > max_lines && (
-                  <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
-                    <pre key="stderr" title="stderr">
-                      {task.stderr_lines.slice(0, -max_lines).join('\n')}
-                    </pre>
-                  </details>
-                )}
-            <pre key="stderr" title="stderr">
-              {task.stderr_lines.slice(-max_lines).join('\n')}
-            </pre>
+                <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
+                  <pre key="stderr" title="stderr">
+                    {task.stderr_lines.slice(0, -max_lines).join('\n')}
+                  </pre>
+                </details>
+              )}
+              <pre key="stderr" title="stderr">
+                {task.stderr_lines.slice(-max_lines).join('\n')}
+              </pre>
             </Fragment>
           )}
         </Panel.Body>
@@ -111,9 +111,9 @@ class BuildOutput extends React.Component {
         <br />
         <div key="tasks">
           {Object.entries(output)
-           .filter(([, values]) => values.failed.length > 0)
-           .map(([host, values]) => (values.failed.map(failed => (
-             this.renderFailedTask(host, failed)))))}
+            .filter(([, values]) => values.failed.length > 0)
+            .map(([host, values]) => (values.failed.map(failed => (
+              this.renderFailedTask(host, failed)))))}
         </div>
         <div key="hosts">
           {this.renderHosts(output)}
