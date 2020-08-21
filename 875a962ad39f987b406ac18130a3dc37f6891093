@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_62953e87",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 680,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-08-21T05:23:30Z",
+      "side": 1,
+      "message": "Using just the \"name\" [0] of the ref I can simply do assertIn(). Otherwise I\u0027d have to walk the ref list myself and check the \"path\".\n\nThinking about it a bit more it might be indeed better for clarity to use the full path for the assert.\n\n[0] https://github.com/gitpython-developers/GitPython/blob/master/git/refs/reference.py#L87",
+      "parentUuid": "9f560f44_55dd576e",
+      "range": {
+        "startLine": 680,
+        "startChar": 41,
+        "endLine": 680,
+        "endChar": 48
+      },
+      "revId": "875a962ad39f987b406ac18130a3dc37f6891093",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_75e05b27",
         "filename": "tests/unit/test_merger_repo.py",
         "patchSetId": 2
@@ -70,6 +94,30 @@
       "writtenOn": "2020-08-20T21:59:13Z",
       "side": 1,
       "message": "Is it worth a comment that this is a named ref to FETCH_HEAD? (at least that is what it appears to be).",
+      "range": {
+        "startLine": 352,
+        "startChar": 29,
+        "endLine": 352,
+        "endChar": 46
+      },
+      "revId": "875a962ad39f987b406ac18130a3dc37f6891093",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_e2d78e4a",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-08-21T05:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_b5a033f6",
       "range": {
         "startLine": 352,
         "startChar": 29,
