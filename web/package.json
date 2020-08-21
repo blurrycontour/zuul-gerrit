@@ -50,7 +50,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "lint": "eslint --ext .js --ext .jsx src"
+    "lint": "eslint --ext .js --ext .jsx src",
+    "lint-fix": "eslint --ext .js --ext .jsx --fix src"
   },
   "browserslist": [
     ">0.2%",

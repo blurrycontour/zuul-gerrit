@@ -68,12 +68,12 @@ class JobVariant extends React.Component {
 
     return (
       <div className="list-view-pf-additional-info">
-          {status.map((item, idx) => (
-            <div key={idx} className="list-view-pf-additional-info-item">
-              <Icon type='pf' name={item.icon} />
-              {item.name}
-            </div>
-          ))}
+        {status.map((item, idx) => (
+          <div key={idx} className="list-view-pf-additional-info-item">
+            <Icon type='pf' name={item.icon} />
+            {item.name}
+          </div>
+        ))}
       </div>
     )
   }
@@ -145,10 +145,10 @@ class JobVariant extends React.Component {
         }
         value = (
           <ReactHeight onHeightReady={height => {
-              if (height > descriptionMaxHeight) {
-                this.props.parent.setState({descriptionMaxHeight: height})
-              }
-            }}>
+            if (height > descriptionMaxHeight) {
+              this.props.parent.setState({descriptionMaxHeight: height})
+            }
+          }}>
             <div style={style}>
               {value}
             </div>

@@ -60,8 +60,8 @@ class JobsPage extends React.Component {
         </PageSection>
         {jobs && jobs.length > 0 &&
           <Jobs
-              jobs={jobs}
-              />}
+            jobs={jobs}
+          />}
       </PageSection>
     )
   }

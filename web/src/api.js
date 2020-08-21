@@ -98,7 +98,7 @@ const apiUrl = getZuulUrl()
 
 function getStreamUrl (apiPrefix) {
   const streamUrl = (apiUrl + apiPrefix)
-        .replace(/(http)(s)?:\/\//, 'ws$2://') + 'console-stream'
+    .replace(/(http)(s)?:\/\//, 'ws$2://') + 'console-stream'
   // console.log('Stream url is ', streamUrl)
   return streamUrl
 }
