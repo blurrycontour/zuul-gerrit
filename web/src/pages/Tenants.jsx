@@ -64,15 +64,15 @@ class TenantsPage extends React.Component {
     const tenants = remoteData.tenants.map((tenant) => {
       return {
         cells: [
-        {title: (<b>{tenant.name}</b>)},
-        {title: (<Link to={'/t/' + tenant.name + '/status'}>Status</Link>)},
-        {title: (<Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)},
-        {title: (<Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)},
-        {title: (<Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)},
-        {title: (<Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)},
-        tenant.projects,
-        tenant.queue
-      ]}})
+          {title: (<b>{tenant.name}</b>)},
+          {title: (<Link to={'/t/' + tenant.name + '/status'}>Status</Link>)},
+          {title: (<Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)},
+          {title: (<Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)},
+          {title: (<Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)},
+          {title: (<Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)},
+          tenant.projects,
+          tenant.queue
+        ]}})
     const columns = [
       {
         title: <IconProperty icon={<HomeIcon />} value="Name"/>,
@@ -117,9 +117,9 @@ class TenantsPage extends React.Component {
           rows={tenants}
           className="zuul-tenant-table"
         >
-        <TableHeader />
-        <TableBody />
-      </Table>
+          <TableHeader />
+          <TableBody />
+        </Table>
       </PageSection>
     )
   }

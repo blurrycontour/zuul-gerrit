@@ -27,9 +27,9 @@ class JobProject extends React.Component {
       <span>
         {project.project_name}
         {project.override_branch && (
-        ' ( override-branch: ' + project.override_branch + ')')}
+          ' ( override-branch: ' + project.override_branch + ')')}
         {project.override_checkout && (
-        ' ( override-checkout: ' + project.override_checkout+ ')')}
+          ' ( override-checkout: ' + project.override_checkout+ ')')}
       </span>
     )
   }

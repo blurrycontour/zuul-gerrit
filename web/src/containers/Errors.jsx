@@ -44,10 +44,10 @@ function EmptyPage(props) {
 }
 
 EmptyPage.propTypes = {
-    title: PropTypes.string.isRequired,
-    icon: PropTypes.func.isRequired,
-    linkTarget: PropTypes.string.isRequired,
-    linkText: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.func.isRequired,
+  linkTarget: PropTypes.string.isRequired,
+  linkText: PropTypes.string.isRequired,
 }
 
 export { EmptyPage }

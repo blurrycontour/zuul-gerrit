@@ -59,8 +59,8 @@ const shouldFetchJob = (tenant, jobname, state) => {
 
 export const fetchJobIfNeeded = (tenant, jobname, force) => (
   dispatch, getState) => {
-    if (force || shouldFetchJob(tenant, jobname, getState())) {
-      return dispatch(fetchJob(tenant, jobname))
-    }
-    return Promise.resolve()
+  if (force || shouldFetchJob(tenant, jobname, getState())) {
+    return dispatch(fetchJob(tenant, jobname))
+  }
+  return Promise.resolve()
 }

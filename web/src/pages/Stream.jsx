@@ -126,11 +126,11 @@ class StreamPage extends React.Component {
         console.log('Stop Attempting!', e)
       },
       onclose: e => {
-       console.log('onclose', e)
-       this.onMessage('\n--- END OF STREAM ---\n')
+        console.log('onclose', e)
+        this.onMessage('\n--- END OF STREAM ---\n')
       },
       onerror: e => {
-       console.log('onerror:', e)
+        console.log('onerror:', e)
       }
     })
 

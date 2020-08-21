@@ -53,8 +53,8 @@ const shouldFetchChange = state => {
 
 export const fetchChangeIfNeeded = (tenant, change, force) => (
   dispatch, getState) => {
-    if (force || shouldFetchChange(getState())) {
-      return dispatch(fetchChange(tenant, change))
-    }
-    return Promise.resolve()
+  if (force || shouldFetchChange(getState())) {
+    return dispatch(fetchChange(tenant, change))
+  }
+  return Promise.resolve()
 }

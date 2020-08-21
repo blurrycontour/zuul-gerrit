@@ -117,11 +117,11 @@ class JobsList extends React.Component {
       let filters = filter.replace(/ +/g, ',').split(',')
       for (let job of jobs) {
         filters.forEach(jobFilter => {
-         if (jobFilter && (
-              (job.name.indexOf(jobFilter) !== -1) ||
+          if (jobFilter && (
+            (job.name.indexOf(jobFilter) !== -1) ||
               (job.description && job.description.indexOf(jobFilter) !== -1))) {
             getNode(job, !filtered)
-         }
+          }
         })
       }
     }
@@ -171,7 +171,7 @@ class JobsList extends React.Component {
               <FormControl.Feedback>
                 <span
                   onClick={() => {this.setState({filter: ''})
-                                 this.filter.value = ''}}
+                    this.filter.value = ''}}
                   style={{cursor: 'pointer', zIndex: 10, pointerEvents: 'auto'}}
                 >
                   <Icon type='pf' title='Clear filter' name='delete' />

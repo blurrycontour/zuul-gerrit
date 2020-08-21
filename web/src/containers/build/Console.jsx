@@ -228,9 +228,9 @@ class HostTask extends React.Component {
     let duration = moment.duration(
       moment(task.task.duration.end).diff(task.task.duration.start)
     ).format({
-        template: 'h [hr] m [min] s [sec]',
-        largest: 2,
-        minValue: 1,
+      template: 'h [hr] m [min] s [sec]',
+      largest: 2,
+      minValue: 1,
     })
 
     ai.push(
@@ -273,7 +273,7 @@ class HostTask extends React.Component {
           }
         </ListView.Item>
         <Modal key='modal' show={this.state.showModal} onHide={this.close}
-               dialogClassName="zuul-console-task-detail">
+          dialogClassName="zuul-console-task-detail">
           <Modal.Header>
             <button
               className="close"
@@ -336,27 +336,27 @@ class PlayBook extends React.Component {
         heading={playbook.phase[0].toUpperCase() + playbook.phase.slice(1) + ' playbook'}
         description={playbook.playbook}
       >
-          {playbook.plays.map((play, idx) => (
-            <React.Fragment key={idx}>
-              <Row key='play'>
-                <Col sm={12}>
-                  <strong>Play: {play.play.name}</strong>
-                </Col>
-              </Row>
-              {play.tasks.map((task, idx2) => (
-                Object.entries(task.hosts).map(([hostname, host]) => (
-                  <Row key={idx2+hostname}>
-                    <Col sm={12}>
-                      <HostTask hostname={hostname}
-                                taskPath={taskPath.concat([
-                                  idx.toString(), idx2.toString(), hostname])}
-                                displayPath={displayPath} task={task} host={host}
-                                errorIds={errorIds}/>
-                    </Col>
-                  </Row>
-                ))))}
-            </React.Fragment>
-          ))}
+        {playbook.plays.map((play, idx) => (
+          <React.Fragment key={idx}>
+            <Row key='play'>
+              <Col sm={12}>
+                <strong>Play: {play.play.name}</strong>
+              </Col>
+            </Row>
+            {play.tasks.map((task, idx2) => (
+              Object.entries(task.hosts).map(([hostname, host]) => (
+                <Row key={idx2+hostname}>
+                  <Col sm={12}>
+                    <HostTask hostname={hostname}
+                      taskPath={taskPath.concat([
+                        idx.toString(), idx2.toString(), hostname])}
+                      displayPath={displayPath} task={task} host={host}
+                      errorIds={errorIds}/>
+                  </Col>
+                </Row>
+              ))))}
+          </React.Fragment>
+        ))}
       </ListView.Item>
     )
   }
@@ -377,7 +377,7 @@ class Console extends React.Component {
         <ListView key="playbooks" className="zuul-console">
           {output.map((playbook, idx) => (
             <PlayBook key={idx} playbook={playbook} taskPath={[idx.toString()]}
-                      displayPath={displayPath} errorIds={errorIds}/>))}
+              displayPath={displayPath} errorIds={errorIds}/>))}
         </ListView>
       </React.Fragment>
     )

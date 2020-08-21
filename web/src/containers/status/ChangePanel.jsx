@@ -203,7 +203,7 @@ class ChangePanel extends React.Component {
 
     return (
       <div className='progress zuul-job-result'
-            title={title}>
+        title={title}>
         <div className={'progress-bar ' + className}
           role='progressbar'
           aria-valuenow={progressPercent}
@@ -306,7 +306,7 @@ class ChangePanel extends React.Component {
     const header = (
       <div className='panel panel-default zuul-change'>
         <div className='panel-heading zuul-patchset-header'
-             onClick={this.onClick}>
+          onClick={this.onClick}>
           <div className='row'>
             <div className='col-xs-8'>
               <span className='change_project'>{change.project}</span>

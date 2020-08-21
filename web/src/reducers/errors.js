@@ -30,7 +30,7 @@ export default (state = [], action) => {
   switch (action.type) {
     case ADD_ERROR:
       if (state.filter(error => (
-            error.url === action.error.url &&
+        error.url === action.error.url &&
             error.status === action.error.status)).length > 0)
         return state
       action.error.id = action.id

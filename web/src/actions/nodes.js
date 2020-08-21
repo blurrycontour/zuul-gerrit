@@ -57,7 +57,7 @@ const shouldFetchNodes = (tenant, state) => {
 
 export const fetchNodesIfNeeded = (tenant, force) => (
   dispatch, getState) => {
-    if (force || shouldFetchNodes(tenant, getState())) {
-      return dispatch(fetchNodes(tenant))
-    }
+  if (force || shouldFetchNodes(tenant, getState())) {
+    return dispatch(fetchNodes(tenant))
+  }
 }

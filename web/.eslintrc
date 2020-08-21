@@ -3,6 +3,8 @@ plugins:
   - standard
   - jest
 rules:
+  # SwitchCase value is a multiplicator of configured indentation value (2)
+  indent: ["error", 2, {"SwitchCase": 1}]
   no-var: error
   no-console: off
   semi: [error, never]

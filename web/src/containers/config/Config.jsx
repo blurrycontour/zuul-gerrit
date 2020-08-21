@@ -39,7 +39,7 @@ class ConfigModal extends React.Component {
     this.state = {
       isModalOpen: false,
       autoReload: false,
-     }
+    }
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
         isModalOpen: !isModalOpen
@@ -73,7 +73,7 @@ class ConfigModal extends React.Component {
           variant={ButtonVariant.plain}
           key="cog"
           onClick={this.handleModalToggle}>
-           <CogIcon />
+          <CogIcon />
         </Button>
         <Modal
           variant={ModalVariant.small}
@@ -88,23 +88,23 @@ class ConfigModal extends React.Component {
               Cancel
             </Button>
           ]}
-          >
-            <div>
-              <p key="info">User configurable settings are saved in browser local storage only.</p>
-              <Switch
-                key="autoreload"
-                id="autoreload"
-                label="Auto reload status page"
-                isChecked={autoReload}
-                onChange={this.handleAutoReload}
-              />
-            </div>
+        >
+          <div>
+            <p key="info">User configurable settings are saved in browser local storage only.</p>
+            <Switch
+              key="autoreload"
+              id="autoreload"
+              label="Auto reload status page"
+              isChecked={autoReload}
+              onChange={this.handleAutoReload}
+            />
+          </div>
         </Modal>
-        </React.Fragment>
+      </React.Fragment>
     )
   }
 }
 
 export default connect(state => ({
-    preferences: state.preferences,
-  }))(ConfigModal)
+  preferences: state.preferences,
+}))(ConfigModal)

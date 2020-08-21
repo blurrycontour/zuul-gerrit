@@ -16,24 +16,24 @@ import * as React from 'react'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 import {
-    Card,
-    CardBody,
-    CardHeader,
-    DataList,
-    DataListItem,
-    DataListItemRow,
-    DataListItemCells,
-    DataListCell,
-    Label,
-    Flex,
-    FlexItem,
+  Card,
+  CardBody,
+  CardHeader,
+  DataList,
+  DataListItem,
+  DataListItemRow,
+  DataListItemCells,
+  DataListCell,
+  Label,
+  Flex,
+  FlexItem,
 } from '@patternfly/react-core'
 
 import {
-    CheckCircleIcon,
-    InfoCircleIcon,
-    TimesIcon,
-    TimesCircleIcon,
+  CheckCircleIcon,
+  InfoCircleIcon,
+  TimesIcon,
+  TimesCircleIcon,
 } from '@patternfly/react-icons'
 
 class BuildOutput extends React.Component {
@@ -42,59 +42,59 @@ class BuildOutput extends React.Component {
   }
 
   renderHosts (hosts) {
-      return (
-        <Card>
-          <CardHeader>
-            <strong>Task run summary</strong>
-          </CardHeader>
-          <CardBody>
-            <DataList aria-label="Build Results">
-              {Object.entries(hosts).map(([host, values]) => (
-                <DataListItem key={host} aria-label="Host">
-                  <DataListItemRow>
-                    <DataListItemCells
-                      dataListCells={[
-                        <DataListCell key={host + '.name'}>{host} </DataListCell>,
-                        <DataListCell key={host + '.data'}>
-                          <Flex>
-                            <FlexItem>
-                              <Label color="green" icon={<CheckCircleIcon />}>{values.ok} OK</Label>
-                            </FlexItem>
-                            <FlexItem>
-                              <Label color="orange" icon={<InfoCircleIcon />}>{values.changed} changed</Label>
-                            </FlexItem>
-                            <FlexItem>
-                              <Label color="red" icon={<TimesCircleIcon />}>{values.failures} failed</Label>
-                            </FlexItem>
-                          </Flex>
-                        </DataListCell>
-                      ]}
-                    />
-                  </DataListItemRow>
-                </DataListItem>
-              ))}
-            </DataList>
-          </CardBody>
-        </Card>
-      )
+    return (
+      <Card>
+        <CardHeader>
+          <strong>Task run summary</strong>
+        </CardHeader>
+        <CardBody>
+          <DataList aria-label="Build Results">
+            {Object.entries(hosts).map(([host, values]) => (
+              <DataListItem key={host} aria-label="Host">
+                <DataListItemRow>
+                  <DataListItemCells
+                    dataListCells={[
+                      <DataListCell key={host + '.name'}>{host} </DataListCell>,
+                      <DataListCell key={host + '.data'}>
+                        <Flex>
+                          <FlexItem>
+                            <Label color="green" icon={<CheckCircleIcon />}>{values.ok} OK</Label>
+                          </FlexItem>
+                          <FlexItem>
+                            <Label color="orange" icon={<InfoCircleIcon />}>{values.changed} changed</Label>
+                          </FlexItem>
+                          <FlexItem>
+                            <Label color="red" icon={<TimesCircleIcon />}>{values.failures} failed</Label>
+                          </FlexItem>
+                        </Flex>
+                      </DataListCell>
+                    ]}
+                  />
+                </DataListItemRow>
+              </DataListItem>
+            ))}
+          </DataList>
+        </CardBody>
+      </Card>
+    )
   }
 
   renderFailedTask (host, task) {
     const max_lines = 42
     return (
       <Card key={host + task.zuul_log_id}>
-          <CardHeader>
-            <TimesIcon style={{ color: 'var(--pf-global--danger-color--100)' }}/>
+        <CardHeader>
+          <TimesIcon style={{ color: 'var(--pf-global--danger-color--100)' }}/>
             &nbsp;Task&nbsp;<strong>{task.name}</strong>&nbsp;
             failed running on host&nbsp;<strong>{host}</strong>
-          </CardHeader>
+        </CardHeader>
         <CardBody>
           {task.invocation && task.invocation.module_args &&
            task.invocation.module_args._raw_params && (
-             <pre key="cmd" title="cmd" className={`${'cmd'}`}>
-               {task.invocation.module_args._raw_params}
-             </pre>
-           )}
+            <pre key="cmd" title="cmd" className={`${'cmd'}`}>
+              {task.invocation.module_args._raw_params}
+            </pre>
+          )}
           {task.msg && (
             <pre key="msg" title="msg">{task.msg}</pre>
           )}
@@ -109,23 +109,23 @@ class BuildOutput extends React.Component {
                     {task.stdout_lines.slice(0, -max_lines).join('\n')}
                   </pre>
                 </details>)}
-            <pre key="stdout" title="stdout">
-              {task.stdout_lines.slice(-max_lines).join('\n')}
+              <pre key="stdout" title="stdout">
+                {task.stdout_lines.slice(-max_lines).join('\n')}
               </pre>
-              </Fragment>
+            </Fragment>
           )}
           {task.stderr_lines && task.stderr_lines.length > 0 && (
             <Fragment>
               {task.stderr_lines.length > max_lines && (
-                  <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
-                    <pre key="stderr" title="stderr">
-                      {task.stderr_lines.slice(0, -max_lines).join('\n')}
-                    </pre>
-                  </details>
-                )}
-            <pre key="stderr" title="stderr">
-              {task.stderr_lines.slice(-max_lines).join('\n')}
-            </pre>
+                <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
+                  <pre key="stderr" title="stderr">
+                    {task.stderr_lines.slice(0, -max_lines).join('\n')}
+                  </pre>
+                </details>
+              )}
+              <pre key="stderr" title="stderr">
+                {task.stderr_lines.slice(-max_lines).join('\n')}
+              </pre>
             </Fragment>
           )}
         </CardBody>
@@ -137,11 +137,11 @@ class BuildOutput extends React.Component {
     const { output } = this.props
     return (
       <React.Fragment>
-          {this.renderHosts(output)}
-          {Object.entries(output)
-           .filter(([, values]) => values.failed.length > 0)
-           .map(([host, values]) => (values.failed.map(failed => (
-             this.renderFailedTask(host, failed)))))}
+        {this.renderHosts(output)}
+        {Object.entries(output)
+          .filter(([, values]) => values.failed.length > 0)
+          .map(([host, values]) => (values.failed.map(failed => (
+            this.renderFailedTask(host, failed)))))}
       </React.Fragment>
     )
   }
