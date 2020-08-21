@@ -19,7 +19,7 @@ export function fetchConfigErrorsAction (tenant) {
     return fetchConfigErrors(tenant.apiPrefix)
       .then(response => {
         dispatch({type: 'FETCH_CONFIGERRORS_SUCCESS',
-                  errors: response.data})
+          errors: response.data})
       })
       .catch(error => {
         throw (error)

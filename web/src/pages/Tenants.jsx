@@ -88,12 +88,12 @@ class TenantsPage extends React.Component {
           bordered
           hover
           columns={columns}
-          >
+        >
           <Table.Header/>
           <Table.Body
             rows={tenants}
             rowKey="name"
-            />
+          />
         </Table.PfProvider>
       </PageSection>
     )

@@ -20,8 +20,8 @@ import { setTimezoneAction } from '../../actions/timezone'
 
 class SelectTz extends React.Component {
    static propTypes = {
-      dispatch: PropTypes.func
-  }
+     dispatch: PropTypes.func
+   }
 
   state = {
     availableTz: moment.tz.names().map(item => ({value: item, label: item})),
@@ -94,27 +94,27 @@ class SelectTz extends React.Component {
       })
     }
     return (
-        <div style={containerStyles}>
+      <div style={containerStyles}>
         <OutlinedClockIcon/>
         <Select
-            className="zuul-select-tz"
-            styles={customStyles}
-            value={this.state.currentValue}
-            onChange={this.handleChange}
-            options={this.state.availableTz}
-            noOptionsMessage={() => 'No api found'}
-            placeholder={'Select Tz'}
-            defaultValue={this.state.defaultValue}
-            theme={(theme) => ({
-              ...theme,
-              borderRadius: 0,
-              spacing: {
+          className="zuul-select-tz"
+          styles={customStyles}
+          value={this.state.currentValue}
+          onChange={this.handleChange}
+          options={this.state.availableTz}
+          noOptionsMessage={() => 'No api found'}
+          placeholder={'Select Tz'}
+          defaultValue={this.state.defaultValue}
+          theme={(theme) => ({
+            ...theme,
+            borderRadius: 0,
+            spacing: {
               ...theme.spacing,
-                baseUnit: 2,
-              },
-            })}
-          />
-        </div>
+              baseUnit: 2,
+            },
+          })}
+        />
+      </div>
     )
   }
 }
