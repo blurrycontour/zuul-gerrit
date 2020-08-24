@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_84631e1a",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-24T10:53:33Z",
+      "side": 1,
+      "message": "Please avoid inline css. Make use of classes to implement the same style change. Likely this is doable without adding any new class.",
+      "range": {
+        "startLine": 121,
+        "startChar": 35,
+        "endLine": 121,
+        "endChar": 69
+      },
+      "revId": "4ab621f5f9aea6e68bfba3c885566018ae119e73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
