@@ -842,6 +842,22 @@ Here is an example of two job definitions:
       are in the docs directory.  A regular expression or list of
       regular expressions.
 
+   .. attr:: always-files
+
+      This is a positive match like **files**, however on job
+      inheritance children will *append* matches to this list, rather
+      than override.  This is a regular expression or list of regular
+      expressions.
+
+      For example; this can be useful if child jobs use **files** to
+      restrict themselves to run on updates to only relevant files,
+      however all child jobs should be triggered if a common library
+      whose version is specified in a header file or similar on disk
+      is modified.  In this case, a parent job could add this common
+      file to ``always-files`` and all child jobs would run when the
+      library version was increased without each child job having to
+      explicitly match on the file itself.
+
    .. attr:: match-on-config-updates
       :default: true
 

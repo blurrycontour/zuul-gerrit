@@ -1212,6 +1212,8 @@ class Job(ConfigObject):
             override_branch=None,
             override_checkout=None,
             post_review=None,
+            _always_files=(),
+            always_file_matcher=None,
         )
 
         # These are generally internal attributes which are not
@@ -1247,6 +1249,7 @@ class Job(ConfigObject):
         d['override_checkout'] = self.override_checkout
         d['files'] = self._files
         d['irrelevant_files'] = self._irrelevant_files
+        d['always_files'] = self._always_files
         d['variant_description'] = self.variant_description
         if self.source_context:
             d['source_context'] = self.source_context.toDict()
@@ -1443,6 +1446,13 @@ class Job(ConfigObject):
             matchers.append(change_matcher.FileMatcher(fn))
         self.irrelevant_file_matcher = change_matcher.MatchAllFiles(matchers)
 
+    def setAlwaysFileMatcher(self, files):
+        self._always_files = files
+        matchers = []
+        for fn in files:
+            matchers.append(change_matcher.FileMatcher(fn))
+        self.always_file_matcher = change_matcher.MatchAnyFiles(matchers)
+
     def updateVariables(self, other_vars, other_extra_vars, other_host_vars,
                         other_group_vars):
         if other_vars is not None:
@@ -1577,7 +1587,8 @@ class Job(ConfigObject):
                 if k not in set(['pre_run', 'run', 'post_run', 'cleanup_run',
                                  'roles', 'variables', 'extra_variables',
                                  'host_variables', 'group_variables',
-                                 'required_projects', 'allowed_projects']):
+                                 'required_projects', 'allowed_projects',
+                                 'always_files']):
                     setattr(self, k, other._get(k))
 
         # Don't set final above so that we don't trip an error halfway
@@ -1635,6 +1646,10 @@ class Job(ConfigObject):
                 if not pb.source_context.trusted:
                     self.post_review = True
 
+        if other._get('always_files'):
+            self._always_files = self._always_files + other._get('always_files')
+            self.setAlwaysFileMatcher(self._always_files)
+
         if other._get('run') is not None:
             other_run = self.freezePlaybooks(other.run, layout)
             self.run = other_run
@@ -1686,7 +1701,16 @@ class Job(ConfigObject):
         return True
 
     def changeMatchesFiles(self, change):
+        has_matcher_but_no_match = False
+
         if self.file_matcher and not self.file_matcher.matches(change):
+            has_matcher_but_no_match = True
+
+        if (self.always_file_matcher and not
+            self.always_file_matcher.matches(change)):
+            has_matcher_but_no_match = True
+
+        if has_matcher_but_no_match:
             return False
 
         # NB: This is a negative match.

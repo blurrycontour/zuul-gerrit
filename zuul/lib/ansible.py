@@ -284,6 +284,7 @@ class AnsibleManager:
         return result
 
     def getAnsibleCommand(self, version, command='ansible-playbook'):
+        return "/"
         ansible = self._getAnsible(version)
         venv_path = ansible.venv_path
         if not venv_path:
