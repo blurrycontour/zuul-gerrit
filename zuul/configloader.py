@@ -615,8 +615,9 @@ class JobParser(object):
                       'tags': to_list(str),
                       'branches': to_list(str),
                       'files': to_list(str),
-                      'secrets': to_list(vs.Any(secret, str)),
                       'irrelevant-files': to_list(str),
+                      'always-files': to_list(str),
+                      'secrets': to_list(vs.Any(secret, str)),
                       # validation happens in NodeSetParser
                       'nodeset': vs.Any(dict, str),
                       'timeout': int,
@@ -935,6 +936,8 @@ class JobParser(object):
             job.setFileMatcher(as_list(conf['files']))
         if 'irrelevant-files' in conf:
             job.setIrrelevantFileMatcher(as_list(conf['irrelevant-files']))
+        if 'always-files' in conf:
+            job.always_files = as_list(conf['always-files'])
         job.freeze()
         return job
 
