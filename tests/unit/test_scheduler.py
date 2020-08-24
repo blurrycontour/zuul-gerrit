@@ -3006,6 +3006,21 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(set(['project-test-nomatch-starts-empty',
                               'project-test-nomatch-starts-full']), run_jobs)
 
+    @simple_layout('layouts/always-inheritance.yaml')
+    def test_always_files_inherited(self):
+        files = {'parent_make_it_run': 'make it run\n'}
+
+        change = self.fake_gerrit.addFakeChange('org/project',
+                                                'master',
+                                                'test always-files',
+                                                files=files)
+        self.fake_gerrit.addEvent(change.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        run_jobs = set([build.name for build in self.history])
+
+        self.assertEqual(set(['project-test-always-files']), run_jobs)
+
     @simple_layout('layouts/job-vars.yaml')
     def test_inherited_job_variables(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
