@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_781f8f6b",
+        "filename": "web/.eslintrc",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-24T06:19:03Z",
+      "side": 1,
+      "message": "Any specific reason why we enforce 1-space indentation for switch statements? I would just use 2-space indentation for those as well. First, I find it a little weird to have a 1-space indentation at all and second, I don\u0027t think we should treat switch statements different to the rest?",
+      "revId": "f3dc8280730a4d94f043b54a73f567143c9c1a4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
