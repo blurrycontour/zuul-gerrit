@@ -16,6 +16,24 @@
       "revId": "f3dc8280730a4d94f043b54a73f567143c9c1a4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_db5695ce",
+        "filename": "web/.eslintrc",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-24T06:53:16Z",
+      "side": 1,
+      "message": "Felix, please read the docs at https://eslint.org/docs/rules/indent\n\n1 does not mean number of spaces, it means enforce indentation of switch cases, it will use the value defined for normal indents (2).",
+      "parentUuid": "9f560f44_781f8f6b",
+      "revId": "f3dc8280730a4d94f043b54a73f567143c9c1a4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
