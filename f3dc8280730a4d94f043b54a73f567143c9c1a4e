@@ -34,6 +34,24 @@
       "revId": "f3dc8280730a4d94f043b54a73f567143c9c1a4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_de6cc3d1",
+        "filename": "web/.eslintrc",
+        "patchSetId": 2
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-08-24T08:10:23Z",
+      "side": 1,
+      "message": "I would prefer adding a comment here to clarify what the {\"SwitchCase\": 1} is doing. I took me some time, but according to the eslint documentation it\u0027s a factor that\u0027s applied to the indentation of switch-case statements based on the default indentation (2 in our case). Thus, the 1 here means 1x2\u003d2 spaces indentation.",
+      "parentUuid": "9f560f44_db5695ce",
+      "revId": "f3dc8280730a4d94f043b54a73f567143c9c1a4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
