@@ -1230,11 +1230,9 @@ class Job(ConfigObject):
             queued=False,
         )
 
-        self.inheritable_attributes = {}
-        self.inheritable_attributes.update(self.context_attributes)
-        self.inheritable_attributes.update(self.execution_attributes)
         self.attributes = {}
-        self.attributes.update(self.inheritable_attributes)
+        self.attributes.update(self.context_attributes)
+        self.attributes.update(self.execution_attributes)
         self.attributes.update(self.other_attributes)
 
         self.name = name
