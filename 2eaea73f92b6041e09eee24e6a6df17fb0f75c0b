@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_3e7dfab1",
+        "filename": "web/.eslintrc",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-08-24T13:43:24Z",
+      "side": 1,
+      "message": "nit: I guess it means ... of configured...",
+      "revId": "2eaea73f92b6041e09eee24e6a6df17fb0f75c0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
