@@ -1,0 +1,10 @@
+Code-Review+2: Ian Wienand <iwienand@redhat.com>
+Code-Review+1: Sorin Sbarnea (zbr) <ssbarnea@redhat.com>
+Code-Review+2: James E. Blair <corvus@inaugust.com>
+Workflow+1: James E. Blair <corvus@inaugust.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 24 Aug 2020 18:30:41 +0000
+Reviewed-on: https://review.opendev.org/747363
+Project: zuul/zuul
+Branch: refs/heads/master
