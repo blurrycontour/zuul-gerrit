@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Jobs can use ``always-files`` to provide file-matchers that are
+    inherited by child jobs.
