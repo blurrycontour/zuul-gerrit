@@ -1,0 +1,130 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_2fb021dd",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-24T20:32:36Z",
+      "side": 1,
+      "message": "Is this setdefault necessary? The init method on the ChangesDatabase type sets a default value of {}.",
+      "range": {
+        "startLine": 207,
+        "startChar": 45,
+        "endLine": 207,
+        "endChar": 55
+      },
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_efde290f",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-24T20:32:36Z",
+      "side": 1,
+      "message": "Is this setdefault necessary? The init method on the ChangesDatabase type sets a default value of {}.",
+      "range": {
+        "startLine": 263,
+        "startChar": 45,
+        "endLine": 263,
+        "endChar": 55
+      },
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_2fe5c1dc",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-24T20:32:36Z",
+      "side": 1,
+      "message": "Is this setdefault necessary? The init method on the ChangesDatabase type sets a default value of {}.",
+      "range": {
+        "startLine": 287,
+        "startChar": 45,
+        "endLine": 287,
+        "endChar": 55
+      },
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_6fd21902",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-24T20:32:36Z",
+      "side": 1,
+      "message": "Is this setdefault necessary? The init method on the ChangesDatabase type sets a default value of {}.",
+      "range": {
+        "startLine": 309,
+        "startChar": 45,
+        "endLine": 309,
+        "endChar": 55
+      },
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_eff1096d",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 4100,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-24T20:32:36Z",
+      "side": 1,
+      "message": "I wonder if we need an aggregation object just to bundle up all of these required resource objects. Then we can do something like:\n\n  self.test_resource_objects \u003d TestResourceObjects(self.config, self.changes, ..., self.git_url_with_auth, self.addCleanup)\n  executor_connections \u003d TestConnectionRegistry(self.test_resource_objects)\n  self.scheds \u003d SchedulerTestManager()\n  self.scheds.create(self.test_resource_objects)\n\nThen in test_web.py do similar for the ZuulWebFixture:\n\n  ZuulWebFixture(self.test_resource_objects)\n\nThis is a bit hand wavy, it just seems we\u0027ve got a bunch of common resources we need in places and that may simplify test setup methods.",
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_6ffb3978",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 4461,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-24T20:32:36Z",
+      "side": 1,
+      "message": "Perhaps put the thread name here so that the thread names, ids, and tracebacks are all grouped together.",
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
