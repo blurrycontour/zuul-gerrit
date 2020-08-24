@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_6fe859e1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 1275,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-24T20:11:33Z",
+      "side": 1,
+      "message": "Would it make sense to replace the sleep and check with another threading.Event.wait()? Then the resume command can set that event?\n\nTaking this idea further I wonder if we can use wake_event for handling pauses. I wouldn\u0027t worry about that in this change, but maybe something to think about as a follow on?",
+      "revId": "c28137b8340cdf9c824b8c678f16b69d7a18e4d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
