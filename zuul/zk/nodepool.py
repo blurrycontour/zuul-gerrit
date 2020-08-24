@@ -12,9 +12,11 @@
 
 import json
 import time
+from typing import Dict
 from typing import TYPE_CHECKING, Optional
 
 from kazoo.exceptions import NoNodeError, LockTimeout
+from kazoo.recipe.cache import TreeCache
 from kazoo.recipe.cache import TreeEvent
 from kazoo.recipe.lock import Lock
 
@@ -28,6 +30,34 @@ class ZooKeeperNodepoolMixin:
     NODEPOOL_REQUEST_ROOT = '/nodepool/requests'
     NODEPOOL_REQUEST_LOCK_ROOT = "/nodepool/requests-lock"
     HOLD_REQUEST_ROOT = '/zuul/hold-requests'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # The caching model we use is designed around handing out model
+        # data as objects. To do this, we use two caches: one is a TreeCache
+        # which contains raw znode data (among other details), and one for
+        # storing that data serialized as objects. This allows us to return
+        # objects from the APIs, and avoids calling the methods to serialize
+        # the data into objects more than once.
+        self.__hold_request_tree = None  # type: Optional[TreeCache]
+        self.__cached_hold_requests =\
+            {}  # type: Dict[str, zuul.model.HoldRequest]
+
+    def _startCaching(self):
+        if TYPE_CHECKING:  # IDE type checking support
+            from zuul.zk import ZooKeeper
+            assert isinstance(self, ZooKeeper)
+        if self.enable_cache:
+            self.__hold_request_tree = TreeCache(self.client,
+                                                 self.HOLD_REQUEST_ROOT)
+            self.__hold_request_tree.listen_fault(self._cacheFaultListener)
+            self.__hold_request_tree.listen(self._holdRequestCacheListener)
+            self.__hold_request_tree.start()
+
+    def _stopCaching(self):
+        if self.__hold_request_tree is not None:
+            self.__hold_request_tree.close()
+            self.__hold_request_tree = None
 
     def __bytesToDict(self, data):
         return json.loads(data.decode('utf8'))
@@ -336,7 +366,7 @@ class ZooKeeperNodepoolMixin:
 
                 # Perform an in-place update of the already cached request
                 d = self.__bytesToDict(event.event_data.data)
-                old_request = self._cached_hold_requests.get(request_id)
+                old_request = self.__cached_hold_requests.get(request_id)
                 if old_request:
                     if event.event_data.stat.version <= old_request.stat\
                             .version:
@@ -348,11 +378,11 @@ class ZooKeeperNodepoolMixin:
                     request = zuul.model.HoldRequest.fromDict(d)
                     request.id = request_id
                     request.stat = event.event_data.stat
-                    self._cached_hold_requests[request_id] = request
+                    self.__cached_hold_requests[request_id] = request
 
             elif event.event_type == TreeEvent.NODE_REMOVED:
                 try:
-                    del self._cached_hold_requests[request_id]
+                    del self.__cached_hold_requests[request_id]
                 except KeyError:
                     pass
         except Exception:

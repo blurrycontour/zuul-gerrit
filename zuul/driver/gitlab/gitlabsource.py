@@ -84,7 +84,7 @@ class GitlabSource(BaseSource):
     def getCachedChanges(self):
         return list(self.connection._change_cache.values())
 
-    def getProject(self, name):
+    def getProject(self, name) -> Project:
         p = self.connection.getProject(name)
         if not p:
             p = Project(name, self)

@@ -112,7 +112,7 @@ class GerritSource(BaseSource):
             for y in list(x.values()):
                 yield y
 
-    def getProject(self, name):
+    def getProject(self, name) -> Project:
         p = self.connection.getProject(name)
         if not p:
             p = Project(name, self)

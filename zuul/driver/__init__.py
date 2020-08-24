@@ -14,6 +14,8 @@
 
 import abc
 
+from zuul.source import BaseSource
+
 
 class Driver(object, metaclass=abc.ABCMeta):
     """A Driver is an extension component of Zuul that supports
@@ -171,7 +173,7 @@ class SourceInterface(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def getSource(self, connection):
+    def getSource(self, connection) -> BaseSource:
         """Create and return a new Source object.
 
         This method is required by the interface.
