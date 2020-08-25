@@ -14,11 +14,15 @@ import logging
 import textwrap
 import urllib
 from abc import ABCMeta
+from typing import List
 
 from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import EventFilter
+from zuul.model import Job, Pipeline
+from zuul.model import RefFilter
 
 
 class DynamicChangeQueueContextManager(object):
@@ -47,14 +51,14 @@ class StaticChangeQueueContextManager(object):
 class PipelineManager(metaclass=ABCMeta):
     """Abstract Base Class for enqueing and processing Changes in a Pipeline"""
 
-    def __init__(self, sched, pipeline):
+    def __init__(self, sched, pipeline: Pipeline):
         self.log = logging.getLogger("zuul.Pipeline.%s.%s" %
                                      (pipeline.tenant.name,
                                       pipeline.name,))
         self.sched = sched
-        self.pipeline = pipeline
-        self.event_filters = []
-        self.ref_filters = []
+        self.pipeline = pipeline  # type: Pipeline
+        self.event_filters = []  # type: List[EventFilter]
+        self.ref_filters = []  # type: List[RefFilter]
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -470,7 +474,7 @@ class PipelineManager(metaclass=ABCMeta):
             build_set.setJobNodeRequest(job.name, req)
         return True
 
-    def _executeJobs(self, item, jobs):
+    def _executeJobs(self, item, jobs: List[Job]) -> None:
         log = get_annotated_logger(self.log, item.event)
         log.debug("Executing jobs for change %s", item.change)
         build_set = item.current_build_set
@@ -481,6 +485,7 @@ class PipelineManager(metaclass=ABCMeta):
                 self.sched.nodepool.useNodeSet(
                     nodeset, build_set=item.current_build_set,
                     event=item.event)
+            #
                 self.sched.executor.execute(
                     job, item, self.pipeline,
                     build_set.dependent_changes,
@@ -504,7 +509,7 @@ class PipelineManager(metaclass=ABCMeta):
             return False
 
         jobs = item.findJobsToRun(
-            item.pipeline.tenant.semaphore_handler)
+            item.pipeline.tenant.semaphore_handler)  # type: List[Job]
         if jobs:
             self._executeJobs(item, jobs)
 
