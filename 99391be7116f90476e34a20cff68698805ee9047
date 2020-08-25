@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_623983f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-25T16:09:41Z",
+      "side": 1,
+      "message": "That is one of the top used modules and there are no plans to change its behavior. We should not cripple the user experice just because ansible team did not provide identical return values for all modules.\n\nIf this was about a 3rd party module or one of those moved to ansible-collections I would have understood, but this is \"core\" and failing to install some packages is clearly not an uncommon issue.\n\nAlso, it should be noted that the proposed implementation does not change the UI for modules not returning failures, it only expose it when present.",
+      "parentUuid": "ff570b3c_a1fdebb2",
+      "revId": "99391be7116f90476e34a20cff68698805ee9047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_a11ccbc1",
         "filename": "web/src/containers/build/BuildOutput.jsx",
         "patchSetId": 1
