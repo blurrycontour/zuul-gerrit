@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_23eb1a78",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-25T06:28:33Z",
+      "side": 1,
+      "message": "You mean replacing it with: \n    self.changes.gerrit_changes_dbs[config[\u0027server\u0027]] \u003d {}\n\nThis would change the value under the key `config[\u0027server\u0027]` even if it already exists.",
+      "parentUuid": "9f560f44_2fb021dd",
+      "range": {
+        "startLine": 207,
+        "startChar": 45,
+        "endLine": 207,
+        "endChar": 55
+      },
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_efde290f",
         "filename": "tests/base.py",
         "patchSetId": 25
@@ -105,6 +129,24 @@
       "writtenOn": "2020-08-24T20:32:36Z",
       "side": 1,
       "message": "I wonder if we need an aggregation object just to bundle up all of these required resource objects. Then we can do something like:\n\n  self.test_resource_objects \u003d TestResourceObjects(self.config, self.changes, ..., self.git_url_with_auth, self.addCleanup)\n  executor_connections \u003d TestConnectionRegistry(self.test_resource_objects)\n  self.scheds \u003d SchedulerTestManager()\n  self.scheds.create(self.test_resource_objects)\n\nThen in test_web.py do similar for the ZuulWebFixture:\n\n  ZuulWebFixture(self.test_resource_objects)\n\nThis is a bit hand wavy, it just seems we\u0027ve got a bunch of common resources we need in places and that may simplify test setup methods.",
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_c3905ef0",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 4100,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-25T06:28:33Z",
+      "side": 1,
+      "message": "Yes, the (Test)Connection registry bundles all the connections and their drivers. I would probably not bundle everything in one resource bundle object but maybe type/purpose specific bundles (e.g. this connection registry). But open to change that (maybe in a different change?)",
+      "parentUuid": "9f560f44_eff1096d",
       "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
