@@ -54,6 +54,23 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_a007fc81",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-26T16:32:02Z",
+      "side": 1,
+      "message": "I\u0027m pretty sure I\u0027m missing something -- I just don\u0027t see why that\u0027s the case.  Why doesn\u0027t it configure on start if it\u0027s paused?  If there\u0027s a line that says \"if not paused\", can you point me to it?",
+      "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_206becb6",
         "filename": "zuul/scheduler.py",
         "patchSetId": 28
@@ -83,6 +100,23 @@
       "side": 1,
       "message": "I am trying to hide internal variables not to be exposed outside if i touch them anyway. Double underscore \u003d private, single underscore \u003d protected (exposed).",
       "parentUuid": "9f560f44_206becb6",
+      "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_800ab886",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-08-26T16:32:02Z",
+      "side": 1,
+      "message": "I understand the difference, but don\u0027t understand the policy change here.  Typically one would use double underscores if they wanted to protect a truly internal variable from access by an unfriendly subclass, or if they expected multiple subclasess to need the same variable name.  But I can\u0027t see that happening here, so I think we should stick with single underscores as we typically do.",
       "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
