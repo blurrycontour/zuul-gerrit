@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_85f48a5c",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-26T16:04:09Z",
+      "side": 1,
+      "message": "One undescore \u003d protected\nTwo undescores \u003d private\n\nE.g. https://www.tutorialsteacher.com/python/private-and-protected-access-modifiers-in-python",
+      "parentUuid": "9f560f44_5afb6d45",
+      "range": {
+        "startLine": 282,
+        "startChar": 14,
+        "endLine": 282,
+        "endChar": 15
+      },
+      "revId": "44f34fd6f07216f26571b738e0d743c24b5da923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_fa51a163",
         "filename": "zuul/nodepool.py",
         "patchSetId": 2
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_c59fa2ff",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-26T16:04:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_fa51a163",
+      "revId": "44f34fd6f07216f26571b738e0d743c24b5da923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_9a634542",
         "filename": "zuul/nodepool.py",
         "patchSetId": 2
@@ -53,6 +95,30 @@
       "writtenOn": "2020-08-26T15:33:16Z",
       "side": 1,
       "message": "Should drop the self. so that we log with the annotated logger.",
+      "range": {
+        "startLine": 325,
+        "startChar": 16,
+        "endLine": 325,
+        "endChar": 21
+      },
+      "revId": "44f34fd6f07216f26571b738e0d743c24b5da923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_258adebd",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-26T16:04:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_9a634542",
       "range": {
         "startLine": 325,
         "startChar": 16,
