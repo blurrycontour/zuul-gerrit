@@ -307,24 +307,22 @@ class Nodepool(object):
             except Exception:
                 self.log.exception("Error unlocking node:")
 
-    def lockNodeSet(self, nodeset, request_id):
-        self._lockNodes(nodeset.getNodes(), request_id)
-
-    def _lockNodes(self, nodes, request_id):
+    def __lockNodeSet(self, request):
         # Try to lock all of the supplied nodes.  If any lock fails,
         # try to unlock any which have already been locked before
         # re-raising the error.
+        log = get_annotated_logger(self.log, request.event_id)
         locked_nodes = []
         try:
-            for node in nodes:
-                if node.allocated_to != request_id:
+            for node in request.nodeset.getNodes():
+                if node.allocated_to != request.id:
                     raise Exception("Node %s allocated to %s, not %s" %
-                                    (node.id, node.allocated_to, request_id))
-                self.log.debug("Locking node %s" % (node,))
+                                    (node.id, node.allocated_to, request.id))
+                log.debug("Locking node %s" % (node,))
                 self.sched.zk.lockNode(node, timeout=30)
                 locked_nodes.append(node)
         except Exception:
-            self.log.exception("Error locking nodes:")
+            log.exception("Error locking nodes:")
             self._unlockNodes(locked_nodes)
             raise
 
@@ -417,7 +415,7 @@ class Nodepool(object):
         if request.fulfilled:
             # If the request suceeded, try to lock the nodes.
             try:
-                self.lockNodeSet(request.nodeset, request.id)
+                self.__lockNodeSet(request)
                 locked = True
             except Exception:
                 log.exception("Error locking nodes:")
