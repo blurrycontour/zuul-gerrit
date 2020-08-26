@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_e543c66a",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-26T16:07:04Z",
+      "side": 1,
+      "message": "Ya the name mangling is something I tend to avoid unless there is an explicit need for it. I guess if we want to be really explicit about not making things easily accessible this is fine.",
+      "parentUuid": "9f560f44_85f48a5c",
+      "range": {
+        "startLine": 282,
+        "startChar": 14,
+        "endLine": 282,
+        "endChar": 15
+      },
+      "revId": "44f34fd6f07216f26571b738e0d743c24b5da923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_fa51a163",
         "filename": "zuul/nodepool.py",
         "patchSetId": 2
