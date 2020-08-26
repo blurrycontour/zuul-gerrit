@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_5afb6d45",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-26T15:33:16Z",
+      "side": 1,
+      "message": "Why do we convert all of these private functions to double underscore functions?",
+      "range": {
+        "startLine": 282,
+        "startChar": 14,
+        "endLine": 282,
+        "endChar": 15
+      },
+      "revId": "44f34fd6f07216f26571b738e0d743c24b5da923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_fa51a163",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-26T15:33:16Z",
+      "side": 1,
+      "message": "Consider moving this into the exception handler as we don\u0027t log outside of the exception handler.",
+      "revId": "44f34fd6f07216f26571b738e0d743c24b5da923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_9a634542",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-08-26T15:33:16Z",
+      "side": 1,
+      "message": "Should drop the self. so that we log with the annotated logger.",
+      "range": {
+        "startLine": 325,
+        "startChar": 16,
+        "endLine": 325,
+        "endChar": 21
+      },
+      "revId": "44f34fd6f07216f26571b738e0d743c24b5da923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
