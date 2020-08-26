@@ -279,7 +279,7 @@ class Nodepool(object):
                 except Exception:
                     log.exception("Exception storing node %s "
                                   "while unlocking:", node)
-        self._unlockNodes(nodeset.getNodes())
+        self.__unlockNodes(nodeset.getNodes(), zuul_event_id=zuul_event_id)
 
         # When returning a nodeset we need to update the gauges if we have a
         # build. Further we calculate resource*duration and increment their
@@ -297,23 +297,25 @@ class Nodepool(object):
                 self.emitStatsResourceCounters(
                     tenant, project_name, resources, duration)
 
-    def unlockNodeSet(self, nodeset):
-        self._unlockNodes(nodeset.getNodes())
+    def unlockNodeSet(self, nodeset, zuul_event_id=None):
+        self.__unlockNodes(nodeset.getNodes(), zuul_event_id)
 
-    def _unlockNodes(self, nodes):
+    def __unlockNodes(self, nodes, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         for node in nodes:
             try:
                 self.sched.zk.unlockNode(node)
             except Exception:
-                self.log.exception("Error unlocking node:")
+                log.exception("Error unlocking node: %s" % node)
 
-    def lockNodeSet(self, nodeset, request_id):
-        self._lockNodes(nodeset.getNodes(), request_id)
+    def lockNodeSet(self, nodeset, request_id, zuul_event_id=None):
+        self.__lockNodes(nodeset.getNodes(), request_id, zuul_event_id)
 
-    def _lockNodes(self, nodes, request_id):
+    def __lockNodes(self, nodes, request_id, zuul_event_id=None):
         # Try to lock all of the supplied nodes.  If any lock fails,
         # try to unlock any which have already been locked before
         # re-raising the error.
+        log = get_annotated_logger(self.log, zuul_event_id)
         locked_nodes = []
         try:
             for node in nodes:
@@ -324,8 +326,8 @@ class Nodepool(object):
                 self.sched.zk.lockNode(node, timeout=30)
                 locked_nodes.append(node)
         except Exception:
-            self.log.exception("Error locking nodes:")
-            self._unlockNodes(locked_nodes)
+            log.exception("Error locking nodes:")
+            self.__unlockNodes(locked_nodes, zuul_event_id)
             raise
 
     def _updateNodeRequest(self, request, deleted):
@@ -417,7 +419,8 @@ class Nodepool(object):
         if request.fulfilled:
             # If the request suceeded, try to lock the nodes.
             try:
-                self.lockNodeSet(request.nodeset, request.id)
+                self.lockNodeSet(request.nodeset, request.id,
+                                 zuul_event_id=request.event_id)
                 locked = True
             except Exception:
                 log.exception("Error locking nodes:")
@@ -435,5 +438,6 @@ class Nodepool(object):
             # nodes, unlock the nodes since we're not going to use
             # them.
             if locked:
-                self.unlockNodeSet(request.nodeset)
+                self.unlockNodeSet(request.nodeset,
+                                   zuul_event_id=request.event_id)
         return True
