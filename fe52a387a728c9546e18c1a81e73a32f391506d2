@@ -138,6 +138,24 @@
       "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_40f6e05e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-26T16:41:54Z",
+      "side": 1,
+      "message": "I was coming from the point: hide what you can and make it visible if needed. Since \"protected\" properties, methods are actually accessible as public, not only from a subclass. It also makes it bit easier to navigate the code when not as much things are visible. I would actually consider this \"stopped\" property to be truly internal variable. But sure, I can change that back.",
+      "parentUuid": "9f560f44_800ab886",
+      "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
