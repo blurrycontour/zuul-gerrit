@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_e080d4c1",
+        "filename": "tests/unit/test_multi_scheduler.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-26T16:37:19Z",
+      "side": 1,
+      "message": "Because was supposed to test multiple schedulers.\n\nE.g.: \n  self.scheds.first.sched.pause(),\n  self.scheds.second.sched.resume(),\n  etc.\n\n\nNow, there are tests only for one but others should follow",
+      "parentUuid": "9f560f44_e06d74cc",
+      "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_c07030a7",
         "filename": "zuul/scheduler.py",
         "patchSetId": 28
