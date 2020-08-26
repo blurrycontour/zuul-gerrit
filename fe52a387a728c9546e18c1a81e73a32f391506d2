@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_60c7a465",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-26T16:26:02Z",
+      "side": 1,
+      "message": "When the scheduler is started in paused mode it does not configure as the comment sais. That\u0027s why it is done explicitly here. Maybe I am missing something?",
+      "parentUuid": "9f560f44_c07030a7",
+      "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_206becb6",
         "filename": "zuul/scheduler.py",
         "patchSetId": 28
@@ -47,6 +65,24 @@
       "writtenOn": "2020-08-26T16:12:33Z",
       "side": 1,
       "message": "Why the changes to double underscores?",
+      "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_00cce886",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-26T16:26:02Z",
+      "side": 1,
+      "message": "I am trying to hide internal variables not to be exposed outside if i touch them anyway. Double underscore \u003d private, single underscore \u003d protected (exposed).",
+      "parentUuid": "9f560f44_206becb6",
       "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
