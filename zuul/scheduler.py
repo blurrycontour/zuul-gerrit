@@ -25,7 +25,9 @@ import sys
 import threading
 import time
 import urllib
+from typing import Dict
 
+from zuul.executor.client import ExecutorClient
 from zuul.lib.named_queue import NamedQueue
 
 from zuul import configloader
@@ -314,7 +316,7 @@ class Scheduler(threading.Thread):
         self._hibernate = False
         self._stopped = False
         self._zuul_app = None
-        self.executor = None
+        self.executor = None  # type: Optional[ExecutorClient]
         self.merger = None
         self.connections = None
         self.statsd = get_statsd(config)
@@ -442,8 +444,8 @@ class Scheduler(threading.Thread):
     def setZuulApp(self, app):
         self._zuul_app = app
 
-    def setExecutor(self, executor):
-        self.executor = executor
+    def setExecutor(self, executor_client: ExecutorClient):
+        self.executor = executor_client
 
     def setMerger(self, merger):
         self.merger = merger
