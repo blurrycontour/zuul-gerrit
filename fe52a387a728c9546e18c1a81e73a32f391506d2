@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_86f3e608",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 28
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-27T08:48:45Z",
+      "side": 1,
+      "message": "The location is in tests/base.py:3627. The problem is that the extra condition in the tests/base.py if remove will trigger reconfiguration on start (even in paused state) and then in theory this condition is not needed.\n\nBut, at line 655 in here in the #reconfigure method the \"event.wait()\" will block when scheduler is started in paused mode. Therefore, if scheduler is started in paused state #reconfigure shall not be triggered before it is resumed. Then #reconfigure should be triggered when #resume is called in case no reconfiguration was triggered yet.",
+      "parentUuid": "9f560f44_a007fc81",
+      "revId": "fe52a387a728c9546e18c1a81e73a32f391506d2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_206becb6",
         "filename": "zuul/scheduler.py",
         "patchSetId": 28
