@@ -16,6 +16,24 @@
       "revId": "199ab56e157af413974d135bfbe34b731113b654",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_8083ceca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-27T07:27:02Z",
+      "side": 1,
+      "message": "This change doe NOT change the log format in any way.\n\nHow logs are processed is unrelated to this change and stripping ANSI out when uploading is one of the easiest logstash filters possible.\n\nmutate {\n  gsub \u003d\u003e [\"message\", \"\\x1B\\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]\", \"\"]\n}\n\nAFAIK, At this moment Zuul is the *only* CI/CD system that does not correctly display ANSI correctly.\n\nIn fact it does display ANSI in live/streaming console, that being the only place where it already works but most users do not even known about it.\n\nI really hope we are not going down a path that does prefer to cripple the UX -\u003e so less people use the service -\u003e we avoid scalability issues.",
+      "parentUuid": "9f560f44_792f563e",
+      "revId": "199ab56e157af413974d135bfbe34b731113b654",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
