@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import operator
 import os
 import textwrap
 from unittest import mock
@@ -247,9 +248,24 @@ class TestFileComments(AnsibleZuulTestCase):
         self.assertEqual(self.getJobFromHistory('file-comments-error').result,
                          'SUCCESS')
         self.assertEqual(len(A.comments), 6)
-        comments = sorted(A.comments, key=lambda x: x['line'])
+        comments = sorted(A.comments, key=lambda x: (x['file'], x['line']))
         self.assertEqual(
             comments[0],
+            {
+                'file': 'otherfile.txt',
+                'line': 21,
+                'message': 'This is a much longer message.\n\n'
+                'With multiple paragraphs.\n',
+                'reviewer': {
+                    'email': 'zuul@example.com',
+                    'name': 'Zuul',
+                    'username': 'jenkins'
+                },
+            },
+        )
+
+        self.assertEqual(
+            comments[1],
             {
                 "file": "path/to/file.py",
                 "line": 2,
@@ -263,7 +279,7 @@ class TestFileComments(AnsibleZuulTestCase):
         )
 
         self.assertEqual(
-            comments[1],
+            comments[2],
             {
                 "file": "path/to/file.py",
                 "line": 21,
@@ -279,23 +295,18 @@ class TestFileComments(AnsibleZuulTestCase):
             },
         )
 
-        self.assertEqual(comments[2],
-                         {'file': 'otherfile.txt',
-                          'line': 21,
-                          'message': 'This is a much longer message.\n\n'
-                          'With multiple paragraphs.\n',
-                          'reviewer': {'email': 'zuul@example.com',
-                                       'name': 'Zuul',
-                                       'username': 'jenkins'}}
-        )
-
-        self.assertEqual(comments[3],
-                         {'file': 'path/to/file.py',
-                          'line': 42,
-                          'message': 'line too long',
-                          'reviewer': {'email': 'zuul@example.com',
-                                       'name': 'Zuul',
-                                       'username': 'jenkins'}}
+        self.assertEqual(
+            comments[3],
+            {
+                'file': 'path/to/file.py',
+                'line': 42,
+                'message': 'line too long',
+                'reviewer': {
+                    'email': 'zuul@example.com',
+                    'name': 'Zuul',
+                    'username': 'jenkins'
+                },
+            },
         )
 
         self.assertEqual(
