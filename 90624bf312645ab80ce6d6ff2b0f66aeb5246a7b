@@ -16,6 +16,24 @@
       "revId": "90624bf312645ab80ce6d6ff2b0f66aeb5246a7b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_602f9a3e",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-08-27T06:50:13Z",
+      "side": 1,
+      "message": "There is no subclass of Nodepool as far as I can see. I was trying to make explicit that this is an internal method. Since a \"protected\" can (and often is) called as a public method, making it harder to navigate the code when everything is public. But maybe I am missing something here.",
+      "parentUuid": "9f560f44_2d0000ab",
+      "revId": "90624bf312645ab80ce6d6ff2b0f66aeb5246a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
