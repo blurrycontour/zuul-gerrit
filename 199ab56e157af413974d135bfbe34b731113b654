@@ -70,6 +70,24 @@
       "revId": "199ab56e157af413974d135bfbe34b731113b654",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_f7bd2ab1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-08-27T12:04:07Z",
+      "side": 1,
+      "message": "In fact this option has nothing to do with the \"logs\" (aka zuul artifacts).\n\nThis is about displaying/rendering stdout/stdeerr output of ansible tasks, like shell/command.\n\nHow we display archived logs and if is good or not to drop ANSI from them, is another subject, outside this change (and likely something configurable).",
+      "parentUuid": "9f560f44_9125de5e",
+      "revId": "199ab56e157af413974d135bfbe34b731113b654",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
