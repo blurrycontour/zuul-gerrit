@@ -52,6 +52,24 @@
       "revId": "199ab56e157af413974d135bfbe34b731113b654",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b18462b2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-27T10:26:43Z",
+      "side": 1,
+      "message": "I do understand this doesn\u0027t change the logs.  but it does encourage everyone to add \"--color\" or whatever to everything.\n\nfwiw i don\u0027t think github/travis ci gets this all that right either ... when I look at\n\nhttps://github.com/pyca/cryptography/pull/5404/checks?check_run_id\u003d1029159745\n\ngoing through the pull down boxes it sends my cpu fans spinning and takes well into double digit seconds to render ... to view a log extract.  The raw contents are basically useless because of interactive spinners i guess; e.g.\n\nhttps://pipelines.actions.githubusercontent.com/hvVe09l57RGA3Cm7JL4sgPbWx7zV70eaczPXXeApNFapxvX30z/_apis/pipelines/1/runs/989/signedlogcontent/4?urlExpires\u003d2020-08-27T10%3A07%3A06.0264012Z\u0026urlSigningMethod\u003dHMACV1\u0026urlSignature\u003d78LvvSsc6uUWnRm%2F87Sw1oJfofNA6pqsNPQ1N7QmZkw%3D\n\ni\u0027m not -1 but it\u0027s not a compelling experience all round",
+      "parentUuid": "9f560f44_8083ceca",
+      "revId": "199ab56e157af413974d135bfbe34b731113b654",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
