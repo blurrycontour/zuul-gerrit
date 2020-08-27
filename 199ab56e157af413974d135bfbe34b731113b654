@@ -34,6 +34,24 @@
       "revId": "199ab56e157af413974d135bfbe34b731113b654",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_9125de5e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6816
+      },
+      "writtenOn": "2020-08-27T09:52:20Z",
+      "side": 1,
+      "message": "I like the idea and it would be nice to have it, but the raw logs having ANSI codes does suck a bit.\n\nIs there a way to filter the ANSI from the raw logs before they get written to disk?\n\nAlternatively perhaps this should be an opt-in feature.",
+      "parentUuid": "9f560f44_8083ceca",
+      "revId": "199ab56e157af413974d135bfbe34b731113b654",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
