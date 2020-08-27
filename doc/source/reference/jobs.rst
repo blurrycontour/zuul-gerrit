@@ -906,9 +906,6 @@ may be disabled by setting the
 **zuul.disable_file_comment_line_mapping** variable to ``true`` in
 *zuul_return*.
 
-If *zuul_return* is invoked multiple times (e.g., via multiple playbooks), then
-the elements of `zuul.file_comments` from each invocation will be appended.
-
 Pausing the job
 ~~~~~~~~~~~~~~~
 
