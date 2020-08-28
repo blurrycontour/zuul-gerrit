@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_1d6273ae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-08-28T00:12:29Z",
+      "side": 1,
+      "message": "I don\u0027t really see a response to Jim\u0027s point that any module could return this field in an arbitrary format.  For example, taskOutput.renderData() has the facilities to print arbitrary data which this doesn\u0027t.\n\nI agree that clicking on the \"FAILED\", that dumps all the task fields, is not particularly discoverable.  I\u0027d love to see some ideas on that ... even if it changed when you moved over it, it would give some indication to click.  or some sort of header message when you pull down the status box.",
+      "parentUuid": "9f560f44_623983f0",
+      "revId": "99391be7116f90476e34a20cff68698805ee9047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_a11ccbc1",
         "filename": "web/src/containers/build/BuildOutput.jsx",
         "patchSetId": 1
