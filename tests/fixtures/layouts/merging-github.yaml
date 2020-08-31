@@ -1,7 +1,7 @@
 - pipeline:
     name: merge
     description: Pipeline for merging the pull request
-    manager: independent
+    manager: dependent
     merge-failure-message: Merge failed
     trigger:
       github:
