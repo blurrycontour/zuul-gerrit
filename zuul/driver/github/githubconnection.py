@@ -866,6 +866,9 @@ class GithubClientManager:
         self.installation_map = {}
         self.installation_token_cache = {}
 
+        # The version of github enterprise stays None for github.com
+        self._github_version = None
+
     def initialize(self):
         self.log.info('Authing to GitHub')
         self._authenticateGithubAPI()
@@ -918,8 +921,16 @@ class GithubClientManager:
                                  "GitHub Enterprise")
             github = github3.GitHubEnterprise(url, session=session,
                                               verify=self.verify_ssl)
+            if not self._github_version:
+                version = github.meta().get('installed_version')
+                self._github_version = tuple(
+                    [int(v) for v in version.split('.', 2)])
         else:
             github = github3.GitHub(session=session)
+
+        # Attach a version number to the github client so we can support per
+        # version features.
+        github.version = self._github_version
 
         # anything going through requests to http/s goes through cache
         github.session.mount('http://', self.cache_adapter)
@@ -1631,15 +1642,12 @@ class GithubConnection(BaseConnection):
         if not self._hasRequiredStatusChecks(allow_needs, canmerge_data):
             return False
 
-        if canmerge_data.get('requiresApprovingReviews'):
-            if canmerge_data.get('requiresCodeOwnerReviews'):
-                # we need to process the reviews using code owners
-                # TODO(tobiash): not implemented yet
-                pass
-            else:
-                # we need to process the review using access rights
-                # TODO(tobiash): not implemented yet
-                pass
+        review_decision = canmerge_data['reviewDecision']
+        if review_decision and review_decision != 'APPROVED':
+            # If we got a review decision it must be approved
+            log.debug('Change %s can not merge because it is not approved',
+                      change)
+            return False
 
         return True
 

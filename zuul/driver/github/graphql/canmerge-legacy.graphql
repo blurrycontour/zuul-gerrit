@@ -15,7 +15,6 @@ query canMergeData(
     }
     pullRequest(number: $pull) {
       isDraft
-      reviewDecision
     }
     object(expression: $head_sha) {
       ... on Commit {
