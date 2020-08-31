@@ -133,9 +133,30 @@ class FakeCommit(ObjectType):
 
 class FakePullRequest(ObjectType):
     isDraft = Boolean()
+    reviewDecision = String()
 
     def resolve_isDraft(parent, info):
         return parent.draft
+
+    def resolve_reviewDecision(parent, info):
+        if hasattr(info.context, 'version') and info.context.version:
+            if info.context.version < (2, 21, 0):
+                raise Exception('Field unsupported')
+
+        # Check branch protection rules if reviews are required
+        org, project = parent.project.split('/')
+        repo = info.context._data.repos[(org, project)]
+        rule = repo._branch_protection_rules.get(parent.branch)
+        if not rule or not rule.require_reviews:
+            # Github returns None if there is no review required
+            return None
+
+        approvals = [r for r in parent.reviews
+                     if r.data['state'] == 'APPROVED']
+        if approvals:
+            return 'APPROVED'
+
+        return 'REVIEW_REQUIRED'
 
 
 class FakeRepository(ObjectType):
@@ -163,4 +184,4 @@ class FakeGithubQuery(ObjectType):
                        name=String(required=True))
 
     def resolve_repository(root, info, owner, name):
-        return info.context.repos.get((owner, name))
+        return info.context._data.repos.get((owner, name))

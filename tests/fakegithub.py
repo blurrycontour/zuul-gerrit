@@ -240,7 +240,7 @@ class FakeRepository(object):
         return self._branches
 
     def _set_branch_protection(self, branch_name, protected=True,
-                               contexts=None):
+                               contexts=None, require_review=False):
         if not protected:
             if branch_name in self._branch_protection_rules:
                 del self._branch_protection_rules[branch_name]
@@ -249,6 +249,7 @@ class FakeRepository(object):
         rule = self._branch_protection_rules[branch_name]
         rule.pattern = branch_name
         rule.required_contexts = contexts or []
+        rule.require_reviews = require_review
 
     def _set_permission(self, key, value):
         # NOTE (felix): Currently, this is only used to mock a repo with
@@ -624,7 +625,11 @@ class FakeGithubSession(object):
             query = json.get('query')
             variables = json.get('variables')
             result = self.schema.execute(
-                query, variables=variables, context=self.client._data)
+                query, variables=variables, context=self.client)
+            if result.errors:
+                # Note that github really returns 200 and an errors field in
+                # case of an error.
+                return FakeResponse({'errors': result.errors}, 200)
             return FakeResponse({'data': result.data}, 200)
 
         # Handle creating comments
@@ -760,5 +765,13 @@ class FakeGithubClient(object):
 
 class FakeGithubEnterpriseClient(FakeGithubClient):
 
+    version = '2.21.0'
+
     def __init__(self, url, session=None, verify=True):
         super().__init__(session=session)
+
+    def meta(self):
+        data = {
+            'installed_version': self.version,
+        }
+        return data

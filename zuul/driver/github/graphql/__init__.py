@@ -36,6 +36,7 @@ class GraphQLClient:
         self.log.debug('Loading prepared graphql queries')
         query_names = [
             'canmerge',
+            'canmerge-legacy',
         ]
         for query_name in query_names:
             self.queries[query_name] = resource_string(
@@ -57,7 +58,15 @@ class GraphQLClient:
             'pull': pull,
             'head_sha': sha,
         }
-        query = self._prepare_query(self.queries['canmerge'], variables)
+        if github.version and github.version[:2] < (2, 21):
+            # Github Enterprise prior to 2.21 doesn't offer the review decision
+            # so don't request it as this will result in an error.
+            query = self.queries['canmerge-legacy']
+        else:
+            # Since GitHub Enterprise 2.21 and on github.com we can request the
+            # review decision state of the pull request.
+            query = self.queries['canmerge']
+        query = self._prepare_query(query, variables)
         response = github.session.post(self.url, json=query)
         return response.json()
 
@@ -95,6 +104,11 @@ class GraphQLClient:
         # Check for draft
         pull_request = nested_get(repository, 'pullRequest')
         result['isDraft'] = nested_get(pull_request, 'isDraft', default=False)
+
+        # Get review decision. This is supported since GHE 2.21. Default to
+        # None to signal if the field is not present.
+        result['reviewDecision'] = nested_get(
+            pull_request, 'reviewDecision', default=None)
 
         # Add status checks
         result['status'] = {}
