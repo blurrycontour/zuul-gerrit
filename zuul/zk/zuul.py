@@ -9,8 +9,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
-from typing import TYPE_CHECKING, Optional
+from typing import Dict
+from typing import TYPE_CHECKING, Callable, List, Optional
 
 from kazoo.exceptions import LockTimeout
 from kazoo.recipe.lock import Lock
@@ -21,9 +21,15 @@ class ZooKeeperZuulMixin:
     # Node content max size: keep ~100kB as a reserve form the 1MB limit
     ZUUL_CONFIG_MAX_SIZE = 1024 * 1024 - 100 * 1024
 
-    def _getZuulNodePath(self, *args: str) -> str:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.node_watchers =\
+            {}  # type: Dict[str, List[Callable[[List[str]], None]]]
+
+    def _getZuulNodePath(self, *args: str, **kwargs) -> str:
+        root = kwargs['root'] if 'root' in kwargs else self.ZUUL_CONFIG_ROOT
         return "/".join(filter(lambda s: s is not None and s != '',
-                               [self.ZUUL_CONFIG_ROOT] + list(args)))
+                               [root] + list(args)))
 
     def _getConfigPartContent(self, parent, child) -> str:
         if TYPE_CHECKING:  # IDE type checking support
@@ -80,3 +86,48 @@ class ZooKeeperZuulMixin:
         finally:
             if not keep_locked and self.lockingLock.locked():
                 self.lockingLock.release()
+
+    def watch_node_children(self, path: str,
+                            callback: Callable[[List[str]], None]) -> None:
+        """
+        Watches a node for children changes.
+
+        :param path: Node path
+        :param callback: Callback
+        """
+        if TYPE_CHECKING:  # IDE type checking support
+            from zuul.zk import ZooKeeper
+            assert isinstance(self, ZooKeeper)
+
+        if path not in self.node_watchers:
+            self.node_watchers[path] = [callback]
+
+            if not self.client:
+                raise Exception("No zookeeper client!")
+
+            self.client.ensure_path(path)
+
+            def watch_children(children):
+                if TYPE_CHECKING:  # IDE type checking support
+                    from zuul.zk import ZooKeeper
+                    assert isinstance(self, ZooKeeper)
+
+                if len(children) > 0 and self.node_watchers[path]:
+                    for watcher in self.node_watchers[path]:
+                        watcher(children)
+
+            self.client.ChildrenWatch(path, watch_children)
+        else:
+            self.node_watchers[path].append(callback)
+
+    def unwatch_node_children_completely(self, path: str) -> None:
+        """
+        Removes all children watches for the given path.
+        :param path: Node path
+        """
+        if TYPE_CHECKING:  # IDE type checking support
+            from zuul.zk import ZooKeeper
+            assert isinstance(self, ZooKeeper)
+
+        if path in self.node_watchers:
+            self.node_watchers[path].clear()

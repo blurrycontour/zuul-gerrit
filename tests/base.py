@@ -31,7 +31,9 @@ import random
 import re
 from logging import Logger
 from queue import Queue
+from threading import Lock
 from typing import Callable, Optional, Any, Iterable, Generator, List
+from typing import Dict
 
 import requests
 import select
@@ -63,6 +65,8 @@ import testtools.content_type
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
+
+from zuul.executor.server import JobDir
 from zuul.rpcclient import RPCClient
 
 from zuul.driver.zuul import ZuulDriver
@@ -107,6 +111,7 @@ import zuul.zk
 import zuul.configloader
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.zk.cache import ZooKeeperBuildItem
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -2664,35 +2669,36 @@ class FakeStatsd(threading.Thread):
 class FakeBuild(object):
     log = logging.getLogger("zuul.test")
 
-    def __init__(self, executor_server, job):
-        self.daemon = True
-        self.executor_server = executor_server
-        self.job = job
-        self.jobdir = None
-        self.uuid = job.unique
-        self.parameters = json.loads(job.arguments)
+    def __init__(self, executor_server: 'RecordingExecutorServer',
+                 build_item: ZooKeeperBuildItem):
+        self.daemon = True  # type: bool
+        self.executor_server = executor_server  # type: RecordingExecutorServer
+        # self.job = job
+        self.jobdir = None  # type: Optional[JobDir]
+        self.uuid = build_item.content['uuid']  # type: str
+        self.parameters = build_item.params  # type: Dict[str, Any]
         # TODOv3(jeblair): self.node is really "the label of the node
         # assigned".  We should rename it (self.node_label?) if we
         # keep using it like this, or we may end up exposing more of
         # the complexity around multi-node jobs here
         # (self.nodes[0].label?)
-        self.node = None
+        self.node = None  # type: Optional[str]
         if len(self.parameters.get('nodes')) == 1:
             self.node = self.parameters['nodes'][0]['label']
-        self.unique = self.parameters['zuul']['build']
-        self.pipeline = self.parameters['zuul']['pipeline']
-        self.project = self.parameters['zuul']['project']['name']
-        self.name = self.parameters['job']
+        self.unique = self.parameters['zuul']['build']  # type: str
+        self.pipeline = self.parameters['zuul']['pipeline']  # type: str
+        self.project = self.parameters['zuul']['project']['name']  # type: str
+        self.name = self.parameters['job']  # type: str
         self.wait_condition = threading.Condition()
-        self.waiting = False
-        self.paused = False
-        self.aborted = False
-        self.requeue = False
-        self.created = time.time()
+        self.waiting = False  # type: bool
+        self.paused = False  # type: bool
+        self.aborted = False  # type: bool
+        self.requeue = False  # type: bool
+        self.created = time.time()  # type: float
         self.changes = None
         items = self.parameters['zuul']['items']
         self.changes = ' '.join(['%s,%s' % (x['change'], x['patchset'])
-                                 for x in items if 'change' in x])
+                                 for x in items if 'change' in x])  # type: str
         if 'change' in items[-1]:
             self.change = ' '.join((items[-1]['change'],
                                     items[-1]['patchset']))
@@ -2824,6 +2830,11 @@ class FakeBuild(object):
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     result = None
 
+    def __init__(self, executor_server: 'RecordingExecutorServer',
+                 build_item: ZooKeeperBuildItem):
+        super().__init__(executor_server, build_item)
+        self.executor_server = executor_server  # type: RecordingExecutorServer
+
     def doMergeChanges(self, merger, items, repo_state):
         # Get a merger in order to update the repos involved in this job.
         commit = super(RecordingAnsibleJob, self).doMergeChanges(
@@ -2840,25 +2851,28 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
 
     def recordResult(self, result):
         self.executor_server.lock.acquire()
-        build = self.executor_server.job_builds.get(self.job.unique)
+        build = self.executor_server\
+            .job_builds[self.build_item.content['uuid']]
         if not build:
             self.executor_server.lock.release()
             # Already recorded
             return
-        self.executor_server.build_history.append(
-            BuildHistory(name=build.name, result=result, changes=build.changes,
-                         node=build.node, uuid=build.unique,
-                         ref=build.parameters['zuul']['ref'],
-                         newrev=build.parameters['zuul'].get('newrev'),
-                         parameters=build.parameters, jobdir=build.jobdir,
-                         pipeline=build.parameters['zuul']['pipeline'])
-        )
+        history = BuildHistory(
+            name=build.name, result=result, changes=build.changes,
+            node=build.node, uuid=build.unique,
+            ref=build.parameters['zuul']['ref'],
+            newrev=build.parameters['zuul'].get('newrev'),
+            parameters=build.parameters, jobdir=build.jobdir,
+            pipeline=build.parameters['zuul']['pipeline'])
+        self.log.debug("Appending to build history: %s" % history)
+        self.executor_server.build_history.append(history)
         self.executor_server.running_builds.remove(build)
-        del self.executor_server.job_builds[self.job.unique]
+        del self.executor_server.job_builds[self.build_item.content['uuid']]
         self.executor_server.lock.release()
 
     def runPlaybooks(self, args):
-        build = self.executor_server.job_builds[self.job.unique]
+        build = self.executor_server\
+            .job_builds[self.build_item.content['uuid']]
         build.jobdir = self.jobdir
 
         self.result = super(RecordingAnsibleJob, self).runPlaybooks(args)
@@ -2874,7 +2888,8 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
                    wrapped=True, cleanup=False):
-        build = self.executor_server.job_builds[self.job.unique]
+        build = self.executor_server\
+            .job_builds[self.build_item.content['uuid']]
 
         if self.executor_server._run_ansible:
             # Call run on the fake build omitting the result so we also can
@@ -2900,12 +2915,14 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         return hosts
 
     def pause(self):
-        build = self.executor_server.job_builds[self.job.unique]
+        build = self.executor_server\
+            .job_builds[self.build_item.content['uuid']]
         build.paused = True
         super().pause()
 
     def resume(self):
-        build = self.executor_server.job_builds.get(self.job.unique)
+        build = self.executor_server\
+            .job_builds.get(self.build_item.content['uuid'])
         if build:
             build.paused = False
         super().resume()
@@ -2944,21 +2961,21 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     _job_class = RecordingAnsibleJob
 
     def __init__(self, *args, **kw):
-        self._run_ansible = kw.pop('_run_ansible', False)
-        self._test_root = kw.pop('_test_root', False)
+        self._run_ansible = kw.pop('_run_ansible', False)  # type: bool
+        self._test_root = kw.pop('_test_root', False)  # type: bool
         if self._run_ansible:
             self._ansible_manager_class = zuul.lib.ansible.AnsibleManager
         else:
             self._ansible_manager_class = FakeAnsibleManager
         super(RecordingExecutorServer, self).__init__(*args, **kw)
-        self.hold_jobs_in_build = False
-        self.hold_jobs_in_start = False
-        self.lock = threading.Lock()
-        self.running_builds = []
-        self.build_history = []
-        self.fail_tests = {}
-        self.return_data = {}
-        self.job_builds = {}
+        self.hold_jobs_in_build = False  # type: bool
+        self.hold_jobs_in_start = False  # type: bool
+        self.lock = threading.Lock()  # type: Lock
+        self.running_builds = []  # type: List[FakeBuild]
+        self.build_history = []  # type: List[BuildHistory]
+        self.fail_tests = {}  # type: Dict[str, List[Any]]
+        self.return_data = {}  # type: Dict[str, Any]
+        self.job_builds = {}  # type: Dict[str, FakeBuild]
 
     def failJob(self, name, change):
         """Instruct the executor to report matching builds as failures.
@@ -3021,25 +3038,22 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.log.debug("Done releasing builds %s (%s)" %
                        (regex, len(builds)))
 
-    def executeJob(self, job):
-        build = FakeBuild(self, job)
-        job.build = build
+    def _executeJob(self, build_item: ZooKeeperBuildItem):
+        build = FakeBuild(self, build_item)
+        # job.build = build
         self.running_builds.append(build)
-        self.job_builds[job.unique] = build
-        args = json.loads(job.arguments)
-        args['zuul']['_test'] = dict(test_root=self._test_root)
-        job.arguments = json.dumps(args)
-        super(RecordingExecutorServer, self).executeJob(job)
+        self.job_builds[build_item.content['uuid']] = build
+        build_item.params['zuul']['_test'] = dict(test_root=self._test_root)
+        super()._executeJob(build_item)
 
-    def stopJob(self, job):
+    def _stopJob(self, build_item: ZooKeeperBuildItem):
         self.log.debug("handle stop")
-        parameters = json.loads(job.arguments)
-        uuid = parameters['uuid']
+        uuid = build_item.content['uuid']
         for build in self.running_builds:
             if build.unique == uuid:
                 build.aborted = True
                 build.release()
-        super(RecordingExecutorServer, self).stopJob(job)
+        super()._stopJob(build_item)
 
     def stop(self):
         self.connections.stop()
@@ -3810,8 +3824,11 @@ class SchedulerTestApp:
 
         self.sched.registerConnections(self.connections)
 
+        zk = zuul.zk.ZooKeeper(enable_cache=True)
+        zk.connect(self.zk_config, timeout=30.0)
+
         executor_client = zuul.executor.client.ExecutorClient(
-            self.config, self.sched)
+            self.config, self.sched, zk)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
 
@@ -3820,7 +3837,7 @@ class SchedulerTestApp:
         self.sched.setNodepool(nodepool)
 
         self.sched.start()
-        executor_client.gearman.waitForServer()
+        # executor_client.gearman.waitForServer()
         if self.sched.is_resumed:
             self.sched.reconfigure(self.config)
         self.sched.wakeUp()
@@ -3983,17 +4000,23 @@ class ZuulTestCase(BaseTestCase):
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(
-            self.config, self.scheds.first.connections)
+            self.config, self.zk, self.scheds.first.connections)
         self.merge_server.start()
 
     def setUp(self):
         super(ZuulTestCase, self).setUp()
 
-        self.setupZK()
+        zk_chroot_fixture = self.useFixture(ChrootedKazooFixture(self.id()))
+        self.zk_config = '%s:%s%s' % (
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot)
         self.fake_nodepool = FakeNodepool(
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot)
+        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
+        self.zk.connect(self.zk_config, timeout=30.0)
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4100,7 +4123,7 @@ class ZuulTestCase(BaseTestCase):
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
-            self.config, executor_connections,
+            self.config, self.zk, executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
@@ -4311,14 +4334,6 @@ class ZuulTestCase(BaseTestCase):
         with open(os.path.join(FIXTURE_DIR, 'ssh.pem')) as i:
             with open(private_key_file, 'w') as o:
                 o.write(i.read())
-
-    def setupZK(self):
-        self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id()))
-        self.zk_config = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
@@ -4559,9 +4574,9 @@ class ZuulTestCase(BaseTestCase):
     def __haveAllBuildsReported(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
             executor_client = app.sched.executor
-            # See if Zuul is waiting on a meta job to complete
-            if executor_client.meta_jobs:
-                return False
+            # # See if Zuul is waiting on a meta job to complete
+            # if executor_client.meta_jobs:
+            #     return False
             # Find out if every build that the worker has completed has been
             # reported back to Zuul.  If it hasn't then that means a Gearman
             # event is still in transit and the system is not stable.
@@ -4573,58 +4588,62 @@ class ZuulTestCase(BaseTestCase):
                 # It hasn't been reported yet.
                 return False
             # Make sure that none of the worker connections are in GRAB_WAIT
-            worker = self.executor_server.executor_gearworker.gearman
-            for connection in worker.active_connections:
-                if connection.state == 'GRAB_WAIT':
-                    return False
+            # worker = self.executor_server.executor_gearworker.gearman
+            # for connection in worker.active_connections:
+            #     if connection.state == 'GRAB_WAIT':
+            #         return False
         return True
 
     def __areAllBuildsWaiting(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
             executor_client = app.sched.executor
+            if not executor_client:
+                raise Exception("Scheduler is missing executor client!")
             builds = executor_client.builds.values()
             seen_builds = set()
+            self.log.debug("Builds: %s on %s" % (builds, executor_client))
             for build in builds:
                 seen_builds.add(build.uuid)
-                client_job = None
-                for conn in executor_client.gearman.active_connections:
-                    for j in conn.related_jobs.values():
-                        if j.unique == build.uuid:
-                            client_job = j
-                            break
-                if not client_job:
-                    self.log.debug("%s is not known to the gearman client" %
-                                   build)
-                    return False
-                if not client_job.handle:
-                    self.log.debug("%s has no handle" % client_job)
-                    return False
-                server_job = self.gearman_server.jobs.get(client_job.handle)
-                if not server_job:
-                    self.log.debug("%s is not known to the gearman server" %
-                                   client_job)
-                    return False
-                if not hasattr(server_job, 'waiting'):
-                    self.log.debug("%s is being enqueued" % server_job)
-                    return False
-                if server_job.waiting:
-                    continue
+                # TODO: Check zk queue
+                # client_job = None
+                # for conn in executor_client.gearman.active_connections:
+                #     for j in conn.related_jobs.values():
+                #         if j.unique == build.uuid:
+                #             client_job = j
+                #             break
+                # if not client_job:
+                #     self.log.debug("%s is not known to the gearman client" %
+                #                    build)
+                #     return False
+                # if not client_job.handle:
+                #     self.log.debug("%s has no handle" % client_job)
+                #     return False
+                # server_job = self.gearman_server.jobs.get(client_job.handle)
+                # if not server_job:
+                #     self.log.debug("%s is not known to the gearman server" %
+                #                    client_job)
+                #     return False
+                # if not hasattr(server_job, 'waiting'):
+                #     self.log.debug("%s is being enqueued" % server_job)
+                #     return False
+                # if server_job.waiting:
+                #     continue
                 if build.url is None:
                     self.log.debug("%s has not reported start" % build)
                     return False
                 # using internal ServerJob which offers no Text interface
-                worker_build = self.executor_server.job_builds.get(
-                    server_job.unique.decode('utf8'))
-                if worker_build:
-                    if build.paused:
-                        continue
-                    if worker_build.isWaiting():
-                        continue
-                    self.log.debug("%s is running" % worker_build)
-                    return False
-                else:
-                    self.log.debug("%s is unassigned" % server_job)
-                    return False
+                # worker_build = self.executor_server.job_builds.get(
+                #     server_job.unique.decode('utf8'))
+                # if worker_build:
+                #     if build.paused:
+                #         continue
+                #     if worker_build.isWaiting():
+                #         continue
+                #     self.log.debug("%s is running" % worker_build)
+                #     return False
+                # else:
+                #     self.log.debug("%s is unassigned" % server_job)
+                #     return False
             for (build_uuid, job_worker) in \
                 self.executor_server.job_workers.items():
                 if build_uuid not in seen_builds:
@@ -4779,6 +4798,7 @@ class ZuulTestCase(BaseTestCase):
             self.__releaseZookeeperWorkerLocks(matcher)
             self.executor_server.lock.release()
             self.scheds.execute(lambda app: app.sched.wake_event.wait(0.1))
+            time.sleep(1.0)  # TODO JK: Busy loop - maybe starving?
 
     def __logQueueStatus(self, logger, matcher, areZookeeperEventQueuesEmpty,
                          areAllMergeJobsWaiting, haveAllBuildsReported,

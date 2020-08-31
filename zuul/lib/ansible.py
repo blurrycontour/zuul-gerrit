@@ -20,6 +20,9 @@ import os
 import shutil
 import subprocess
 import sys
+from configparser import ConfigParser
+from typing import Dict, Optional, List
+
 import zuul.ansible
 
 from pkg_resources import resource_string
@@ -29,7 +32,8 @@ from zuul.lib.config import get_default
 class ManagedAnsible:
     log = logging.getLogger('zuul.managed_ansible')
 
-    def __init__(self, config, version, runtime_install_root=None):
+    def __init__(self, config: ConfigParser, version: str,
+                 runtime_install_root: Optional[str]=None):
         self.version = version
 
         requirements = get_default(config, version, 'requirements')
@@ -42,7 +46,7 @@ class ManagedAnsible:
         self.deprecated = get_default(config, version, 'deprecated', False)
 
         self._ansible_roots = [os.path.join(
-            sys.exec_prefix, 'lib', 'zuul', 'ansible')]
+            sys.exec_prefix, 'lib', 'zuul', 'ansible')]  # type: List[str]
         if runtime_install_root:
             self._ansible_roots.append(runtime_install_root)
 
@@ -148,8 +152,8 @@ class AnsibleManager:
 
     def __init__(self, zuul_ansible_dir=None, default_version=None,
                  runtime_install_root=None):
-        self._supported_versions = {}
-        self.default_version = None
+        self._supported_versions = {}  # type: Dict[str, ManagedAnsible]
+        self.default_version = None  # type: Optional[str]
         self.zuul_ansible_dir = zuul_ansible_dir
         self.runtime_install_root = runtime_install_root
 
@@ -257,7 +261,7 @@ class AnsibleManager:
                 result = False
         return result
 
-    def _getAnsible(self, version):
+    def _getAnsible(self, version: str) -> ManagedAnsible:
         if not version:
             version = self.default_version
 

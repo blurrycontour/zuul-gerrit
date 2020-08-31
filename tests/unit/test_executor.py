@@ -660,15 +660,14 @@ class TestGovernor(ZuulTestCase):
                     build = b
                     break
             time.sleep(0.1)
-        self.log.debug("Found build %s", jobname)
+        self.log.debug("Found build %s: %s", jobname, build)
         build_id = build.uuid
         while (time.time() < timeout and
                build_id not in self.executor_server.job_workers):
             time.sleep(0.1)
         worker = self.executor_server.job_workers[build_id]
         self.log.debug("Found worker %s", jobname)
-        while (time.time() < timeout and
-               not worker.started):
+        while time.time() < timeout and not worker.started:
             time.sleep(0.1)
         self.log.debug("Worker for %s started: %s", jobname, worker.started)
         return build

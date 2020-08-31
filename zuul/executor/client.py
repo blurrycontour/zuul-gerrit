@@ -11,21 +11,23 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from typing import Dict, Any, List, Optional
 
-import gear
 import json
 import logging
 import os
 import time
 import threading
+from typing import Set
 from uuid import uuid4
 
-import zuul.model
-from zuul.lib.config import get_default
-from zuul.lib.gear_utils import getGearmanFunctions
-from zuul.lib.jsonutil import json_dumps
+from kazoo.recipe.cache import TreeEvent
+
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Build
+from zuul.model import Build, Job, Pipeline, Project, QueueItem
+from zuul.source import BaseSource
+from zuul.zk.cache import ZooKeeperBuildItem
+from zuul.zk.client import ZooKeeperBuildTreeCacheClient
 
 
 class GearmanCleanup(threading.Thread):
@@ -55,90 +57,119 @@ class GearmanCleanup(threading.Thread):
                 self.log.exception("Exception checking builds:")
 
 
-def getJobData(job):
-    if not len(job.data):
-        return {}
-    d = job.data[-1]
-    if not d:
-        return {}
-    return json.loads(d)
+# def getJobData(job):
+#     if not len(job.data):
+#         return {}
+#     d = job.data[-1]
+#     if not d:
+#         return {}
+#     return json.loads(d)
 
 
-class ZuulGearmanClient(gear.Client):
-    def __init__(self, zuul_gearman):
-        super(ZuulGearmanClient, self).__init__('Zuul Executor Client')
-        self.__zuul_gearman = zuul_gearman
+# class ZuulGearmanClient(gear.Client):
+#     def __init__(self, zuul_gearman):
+#         super(ZuulGearmanClient, self).__init__('Zuul Executor Client')
+#         self.__zuul_gearman = zuul_gearman
+#
+#     def handleWorkComplete(self, packet):
+#         job = super(ZuulGearmanClient, self).handleWorkComplete(packet)
+#         self.__zuul_gearman.onBuildCompleted(job)
+#         return job
+#
+#     def handleWorkFail(self, packet):
+#         job = super(ZuulGearmanClient, self).handleWorkFail(packet)
+#         self.__zuul_gearman.onBuildCompleted(job)
+#         return job
+#
+#     def handleWorkException(self, packet):
+#         job = super(ZuulGearmanClient, self).handleWorkException(packet)
+#         self.__zuul_gearman.onBuildCompleted(job)
+#         return job
+#
+#     def handleWorkStatus(self, packet):
+#         job = super(ZuulGearmanClient, self).handleWorkStatus(packet)
+#         self.__zuul_gearman.onWorkStatus(job)
+#         return job
+#
+#     def handleWorkData(self, packet):
+#         job = super(ZuulGearmanClient, self).handleWorkData(packet)
+#         self.__zuul_gearman.onWorkStatus(job)
+#         return job
+#
+#     def handleDisconnect(self, job):
+#         job = super(ZuulGearmanClient, self).handleDisconnect(job)
+#         self.__zuul_gearman.onDisconnect(job)
+#
+#     def handleStatusRes(self, packet):
+#         try:
+#             job = super(ZuulGearmanClient, self).handleStatusRes(packet)
+#         except gear.UnknownJobError:
+#             handle = packet.getArgument(0)
+#             for build in self.__zuul_gearman.builds.values():
+#                 if build.__gearman_job.handle == handle:
+#                     # NOTE JK: Whether unreachable code, fails or job always
+#                     # None
+#                     self.__zuul_gearman.onUnknownJob(job)
 
-    def handleWorkComplete(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkComplete(packet)
-        self.__zuul_gearman.onBuildCompleted(job)
-        return job
 
-    def handleWorkFail(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkFail(packet)
-        self.__zuul_gearman.onBuildCompleted(job)
-        return job
+class ZuulZookeeperJobHandler(object):
+    def __init__(self, log):
+        self.log = log
 
-    def handleWorkException(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkException(packet)
-        self.__zuul_gearman.onBuildCompleted(job)
-        return job
-
-    def handleWorkStatus(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkStatus(packet)
-        self.__zuul_gearman.onWorkStatus(job)
-        return job
-
-    def handleWorkData(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkData(packet)
-        self.__zuul_gearman.onWorkStatus(job)
-        return job
-
-    def handleDisconnect(self, job):
-        job = super(ZuulGearmanClient, self).handleDisconnect(job)
-        self.__zuul_gearman.onDisconnect(job)
-
-    def handleStatusRes(self, packet):
-        try:
-            job = super(ZuulGearmanClient, self).handleStatusRes(packet)
-        except gear.UnknownJobError:
-            handle = packet.getArgument(0)
-            for build in self.__zuul_gearman.builds.values():
-                if build.__gearman_job.handle == handle:
-                    self.__zuul_gearman.onUnknownJob(job)
+    def __call__(self, uuid: str, data: Dict[str, Any]):
+        self.log.debug("Job %s: %s" % (uuid, json.dumps(data)))
 
 
-class ExecutorClient(object):
+class ExecutorClient(ZooKeeperBuildTreeCacheClient):
     log = logging.getLogger("zuul.ExecutorClient")
 
-    def __init__(self, config, sched):
+    def __init__(self, config, sched, zk):
+        super().__init__(zk=zk, root=zk.ZUUL_BUILDS_ROOT)
         self.config = config
         self.sched = sched
-        self.builds = {}
+        self.zk = zk
+        self.builds = {}  # type: Dict[str, Build]
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
 
-        server = config.get('gearman', 'server')
-        port = get_default(self.config, 'gearman', 'port', 4730)
-        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-        self.gearman = ZuulGearmanClient(self)
-        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
-                               keepalive=True, tcp_keepidle=60,
-                               tcp_keepintvl=30, tcp_keepcnt=5)
+        # server = config.get('gearman', 'server')
+        # port = get_default(self.config, 'gearman', 'port', 4730)
+        # ssl_key = get_default(self.config, 'gearman', 'ssl_key')
+        # ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
+        # ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
+        # self.gearman = ZuulGearmanClient(self)
+        # self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
+        #                        keepalive=True, tcp_keepidle=60,
+        #                        tcp_keepintvl=30, tcp_keepcnt=5)
 
         self.cleanup_thread = GearmanCleanup(self)
         self.cleanup_thread.start()
+        self.start()
 
     def stop(self):
         self.log.debug("Stopping")
+        super().stop()
         self.cleanup_thread.stop()
         self.cleanup_thread.join()
-        self.gearman.shutdown()
+        # self.gearman.shutdown()
         self.log.debug("Stopped")
 
-    def execute(self, job, item, pipeline, dependent_changes=[],
-                merger_items=[]):
+    def _tree_cache_listener(self, segments: List[str], event: TreeEvent,
+                             old: Optional[ZooKeeperBuildItem],
+                             new: Optional[ZooKeeperBuildItem]) -> None:
+
+        if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED)\
+                and new:
+            if len(segments) == 2 and segments[1] == 'data':
+                self.onWorkStatus(new)
+            elif len(segments) == 2 and segments[1] == 'status':
+                self.onWorkStatus(new)
+            elif len(segments) == 2 and segments[1] == 'result':
+                self.onBuildCompleted(new)
+            elif len(segments) == 2 and segments[1] == 'exception':
+                self.onBuildCompleted(new)
+
+    def execute(self, job: Job, item: QueueItem, pipeline: Pipeline,
+                dependent_changes=None, merger_items=None):
         log = get_annotated_logger(self.log, item.event)
         tenant = pipeline.tenant
         uuid = str(uuid4().hex)
@@ -184,14 +215,16 @@ class ExecutorClient(object):
             zuul_params['patchset'] = str(item.change.patchset)
         if hasattr(item.change, 'message'):
             zuul_params['message'] = item.change.message
-        if (hasattr(item.change, 'oldrev') and item.change.oldrev
-            and item.change.oldrev != '0' * 40):
+        if (hasattr(item.change, 'oldrev')
+                and item.change.oldrev
+                and item.change.oldrev != '0' * 40):
             zuul_params['oldrev'] = item.change.oldrev
-        if (hasattr(item.change, 'newrev') and item.change.newrev
-            and item.change.newrev != '0' * 40):
+        if (hasattr(item.change, 'newrev')
+                and item.change.newrev
+                and item.change.newrev != '0' * 40):
             zuul_params['newrev'] = item.change.newrev
         zuul_params['projects'] = {}  # Set below
-        zuul_params['items'] = dependent_changes
+        zuul_params['items'] = dependent_changes or []
         zuul_params['child_jobs'] = list(item.job_graph.getDirectDependentJobs(
             job.name))
 
@@ -199,7 +232,7 @@ class ExecutorClient(object):
         params['job'] = job.name
         params['timeout'] = job.timeout
         params['post_timeout'] = job.post_timeout
-        params['items'] = merger_items
+        params['items'] = merger_items or []
         params['projects'] = []
         if hasattr(item.change, 'branch'):
             params['branch'] = item.change.branch
@@ -253,47 +286,50 @@ class ExecutorClient(object):
         params['host_vars'] = job.host_variables
         params['group_vars'] = job.group_variables
         params['zuul'] = zuul_params
-        projects = set()
-        required_projects = set()
+        projects = set()  # type: Set[Project]
+        required_projects = set()  # type: Set[Project]
 
-        def make_project_dict(project, override_branch=None,
+        def make_project_dict(proj: Project, override_branch=None,
                               override_checkout=None):
             project_metadata = item.layout.getProjectMetadata(
-                project.canonical_name)
+                proj.canonical_name)
             if project_metadata:
                 project_default_branch = project_metadata.default_branch
             else:
                 project_default_branch = 'master'
-            connection = project.source.connection
+            connection = proj.source.connection
             return dict(connection=connection.connection_name,
-                        name=project.name,
-                        canonical_name=project.canonical_name,
+                        name=proj.name,
+                        canonical_name=proj.canonical_name,
                         override_branch=override_branch,
                         override_checkout=override_checkout,
                         default_branch=project_default_branch)
 
         if job.required_projects:
             for job_project in job.required_projects.values():
-                (trusted, project) = tenant.getProject(
+                (trusted, tenant_project) = tenant.getProject(
                     job_project.project_name)
-                if project is None:
+                if tenant_project is None:
                     raise Exception("Unknown project %s" %
                                     (job_project.project_name,))
                 params['projects'].append(
-                    make_project_dict(project,
+                    make_project_dict(tenant_project,
                                       job_project.override_branch,
                                       job_project.override_checkout))
-                projects.add(project)
-                required_projects.add(project)
-        for change in dependent_changes:
+                projects.add(tenant_project)
+                required_projects.add(tenant_project)
+        for change in (dependent_changes or []):
             # We have to find the project this way because it may not
             # be registered in the tenant (ie, a foreign project).
             source = self.sched.connections.getSourceByCanonicalHostname(
-                change['project']['canonical_hostname'])
-            project = source.getProject(change['project']['name'])
-            if project not in projects:
-                params['projects'].append(make_project_dict(project))
-                projects.add(project)
+                change['project']['canonical_hostname']
+            )  # type: Optional[BaseSource]
+            if not source:
+                raise Exception("Missing source!")
+            source_project = source.getProject(change['project']['name'])
+            if source_project not in projects:
+                params['projects'].append(make_project_dict(source_project))
+                projects.add(source_project)  # noqa
         for p in projects:
             zuul_params['projects'][p.canonical_name] = (dict(
                 name=p.name,
@@ -310,7 +346,7 @@ class ExecutorClient(object):
         build.parameters = params
         build.nodeset = nodeset
 
-        log.debug("Adding build %s of job %s to item %s",
+        log.debug("[X] Adding build %s of job %s to item %s",
                   build, job, item)
         item.addBuild(build)
 
@@ -321,60 +357,67 @@ class ExecutorClient(object):
 
         # Update zuul attempts after addBuild above to ensure build_set
         # is up to date.
+        if not build.build_set:
+            raise Exception("Build set undefined for %s" % build)
         attempts = build.build_set.getTries(job.name)
         zuul_params['attempts'] = attempts
 
-        functions = getGearmanFunctions(self.gearman)
-        function_name = 'executor:execute'
-        # Because all nodes belong to the same provider, region and
-        # availability zone we can get executor_zone from only the first
-        # node.
-        executor_zone = None
-        if nodes and nodes[0].get('attributes'):
-            executor_zone = nodes[0]['attributes'].get('executor-zone')
+        # functions = getGearmanFunctions(self.gearman)
+        # function_name = 'executor:execute'
+        # # Because all nodes belong to the same provider, region and
+        # # availability zone we can get executor_zone from only the first
+        # # node.
+        # executor_zone = None
+        # if nodes and nodes[0].get('attributes'):
+        #     executor_zone = nodes[0]['attributes'].get('executor-zone')
+        #
+        # if executor_zone:
+        #     _fname = '%s:%s' % (
+        #         function_name,
+        #         executor_zone)
+        #     if _fname in functions:
+        #         function_name = _fname
+        #     else:
+        #         self.log.warning(
+        #             "Job requested '%s' zuul-executor zone, but no "
+        #             "zuul-executors found for this zone; ignoring zone "
+        #             "request" % executor_zone)
 
-        if executor_zone:
-            _fname = '%s:%s' % (
-                function_name,
-                executor_zone)
-            if _fname in functions:
-                function_name = _fname
-            else:
-                self.log.warning(
-                    "Job requested '%s' zuul-executor zone, but no "
-                    "zuul-executors found for this zone; ignoring zone "
-                    "request" % executor_zone)
+        # gearman_job = gear.TextJob(
+        #     function_name, json_dumps(params), unique=uuid)
 
-        gearman_job = gear.TextJob(
-            function_name, json_dumps(params), unique=uuid)
-
-        build.__gearman_job = gearman_job
-        build.__gearman_worker = None
+        # build.__gearman_job = gearman_job
+        # build.__gearman_worker = None
         self.builds[uuid] = build
 
-        if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:
-            precedence = gear.PRECEDENCE_NORMAL
-        elif pipeline.precedence == zuul.model.PRECEDENCE_HIGH:
-            precedence = gear.PRECEDENCE_HIGH
-        elif pipeline.precedence == zuul.model.PRECEDENCE_LOW:
-            precedence = gear.PRECEDENCE_LOW
+        # if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:
+        #     precedence = gear.PRECEDENCE_NORMAL
+        # elif pipeline.precedence == zuul.model.PRECEDENCE_HIGH:
+        #     precedence = gear.PRECEDENCE_HIGH
+        # elif pipeline.precedence == zuul.model.PRECEDENCE_LOW:
+        #     precedence = gear.PRECEDENCE_LOW
 
         try:
-            self.gearman.submitJob(gearman_job, precedence=precedence,
-                                   timeout=300)
+            # self.gearman.submitJob(gearman_job, precedence=precedence,
+            #                        timeout=300)
+            build.zookeeper_node = self._zk.submitBuild(
+                uuid, params, precedence=pipeline.precedence,
+                watcher=ZuulZookeeperJobHandler(self.log))
         except Exception:
-            log.exception("Unable to submit job to Gearman")
-            self.onBuildCompleted(gearman_job, 'EXCEPTION')
-            return build
+            # TODO: Handle correctly
+            log.exception("Unable to submit job")
+            # self.onBuildCompleted(gearman_job, 'EXCEPTION')
+            # return build
 
-        if not gearman_job.handle:
-            log.error("No job handle was received for %s after"
-                      " 300 seconds; marking as lost.",
-                      gearman_job)
-            self.onBuildCompleted(gearman_job, 'NO_HANDLE')
-
-        log.debug("Received handle %s for %s", gearman_job.handle, build)
-
+        # TODO: Check if still needed
+        # if not gearman_job.handle:
+        #     log.error("No job handle was received for %s after"
+        #               " 300 seconds; marking as lost.",
+        #               gearman_job)
+        #     self.onBuildCompleted(gearman_job, 'NO_HANDLE')
+        #
+        # log.debug("Received handle %s for %s", gearman_job.handle, build)
+        #
         return build
 
     def cancel(self, build):
@@ -412,26 +455,29 @@ class ExecutorClient(object):
             log.debug("Canceled running build")
             return True
         log.error("Unable to cancel build")
+        return False
 
-    def onBuildCompleted(self, job, result=None):
-        if job.unique in self.meta_jobs:
-            del self.meta_jobs[job.unique]
-            return
+    def onBuildCompleted(self, build_item: ZooKeeperBuildItem, result=None):
+        # if job.unique in self.meta_jobs:
+        #     del self.meta_jobs[job.unique]
+        #     return
 
-        build = self.builds.get(job.unique)
+        build = self.builds.get(build_item.content['uuid'])
         if build:
             log = get_annotated_logger(self.log, build.zuul_event_id,
-                                       build=job.unique)
+                                       build=build_item.content['uuid'])
 
-            data = getJobData(job)
-            build.node_labels = data.get('node_labels', [])
-            build.node_name = data.get('node_name')
+            if not build.build_set:
+                raise Exception("Build set undefined for %s" % build)
+
+            build.node_labels = build_item.data.get('node_labels', [])
+            build.node_name = build_item.data.get('node_name')
             if result is None:
-                result = data.get('result')
-                build.error_detail = data.get('error_detail')
+                result = build_item.data.get('result')
+                build.error_detail = build_item.data.get('error_detail')
             if result is None:
                 if (build.build_set.getTries(build.job.name) >=
-                    build.job.attempts):
+                        build.job.attempts):
                     result = 'RETRY_LIMIT'
                 else:
                     build.retry = True
@@ -450,12 +496,12 @@ class ExecutorClient(object):
                 # playbook failures we keep the build result after the max
                 # attempts.
                 if (build.build_set.getTries(build.job.name) <
-                    build.job.attempts):
+                        build.job.attempts):
                     build.retry = True
 
-            result_data = data.get('data', {})
-            warnings = data.get('warnings', [])
-            log.info("Build complete, result %s, warnings %s",
+            result_data = build_item.data.get('data', {})
+            warnings = build_item.data.get('warnings', [])
+            log.info("[X] Build complete, result %s, warnings %s",
                      result, warnings)
 
             if build.retry:
@@ -470,104 +516,131 @@ class ExecutorClient(object):
             self.sched.onBuildCompleted(build, result, result_data, warnings)
             # The test suite expects the build to be removed from the
             # internal dict after it's added to the report queue.
-            del self.builds[job.unique]
+            del self.builds[build_item.content['uuid']]
         else:
-            if not job.name.startswith("executor:stop:"):
-                self.log.error("Unable to find build %s" % job.unique)
+            # FIXME JK: need to distinguish between complete and explicit stop
+            # if not job.name.startswith("executor:stop:"):
+            self.log.error("Unable to find build %s" %
+                           build_item.content['uuid'])
 
-    def onWorkStatus(self, job):
-        data = getJobData(job)
-        self.log.debug("Build %s update %s" % (job, data))
-        build = self.builds.get(job.unique)
+    def onWorkStatus(self, build_item: ZooKeeperBuildItem):
+        self.log.debug("[X] Build %s update %s on %s" %
+                       (build_item.content, build_item.data, self))
+        build = self.builds.get(build_item.content['uuid'])
         if build:
             started = (build.url is not None)
             # Allow URL to be updated
-            build.url = data.get('url', build.url)
+            self.log.debug("[X] Build %s url update: %s -> %s on %s" %
+                           (build, build.url, build_item.data.get('url'),
+                            self))
+            build.url = build_item.data.get('url', build.url)
             # Update information about worker
-            build.worker.updateFromData(data)
-            build.__gearman_worker = build.worker.name
+            build.worker.updateFromData(build_item.data)
+            # build.__gearman_worker = build.worker.name
 
-            if 'paused' in data and build.paused != data['paused']:
-                build.paused = data['paused']
+            if 'paused' in build_item.data and\
+                    build.paused != build_item.data['paused']:
+                build.paused = build_item.data['paused']
                 if build.paused:
-                    result_data = data.get('data', {})
+                    result_data = build_item.data.get('data', {})
                     self.sched.onBuildPaused(build, result_data)
 
             if not started:
-                self.log.info("Build %s started" % job)
+                self.log.info("Build %s started" % build_item.content)
                 self.sched.onBuildStarted(build)
         else:
-            self.log.error("Unable to find build %s" % job.unique)
+            self.log.error("Unable to find build %s" %
+                           build_item.content['uuid'])
 
-    def onDisconnect(self, job):
-        self.log.info("Gearman job %s lost due to disconnect" % job)
-        self.onBuildCompleted(job, 'DISCONNECT')
+    # def onDisconnect(self, job):
+    #     self.log.info("Gearman job %s lost due to disconnect" % job)
+    #     self.onBuildCompleted(job, 'DISCONNECT')
 
-    def onUnknownJob(self, job):
-        self.log.info("Gearman job %s lost due to unknown handle" % job)
-        self.onBuildCompleted(job, 'LOST')
+    # def onUnknownJob(self, job):
+    #     self.log.info("Gearman job %s lost due to unknown handle" % job)
+    #     self.onBuildCompleted(job, 'LOST')
 
-    def cancelJobInQueue(self, build):
-        log = get_annotated_logger(self.log, build.zuul_event_id,
-                                   build=build.uuid)
-        job = build.__gearman_job
-
-        req = gear.CancelJobAdminRequest(job.handle)
-        job.connection.sendAdminRequest(req, timeout=300)
-        log.debug("Response to cancel build request: %s", req.response.strip())
-        if req.response.startswith(b"OK"):
-            try:
-                del self.builds[job.unique]
-            except Exception:
-                pass
-            # Since this isn't otherwise going to get a build complete
-            # event, send one to the scheduler so that it can unlock
-            # the nodes.
+    # TODO JK
+    def cancelJobInQueue(self, build: Build) -> bool:
+        # log = get_annotated_logger(self.log, build.zuul_event_id,
+        #                            build=build.uuid)
+        if build.zookeeper_node:
+            self._zk.cancelBuildInQueue(build.zookeeper_node)
             self.sched.onBuildCompleted(build, 'CANCELED', {}, [])
             return True
         return False
 
-    def cancelRunningBuild(self, build):
-        log = get_annotated_logger(self.log, build.zuul_event_id)
-        if not build.__gearman_worker:
-            log.error("Build %s has no manager while canceling", build)
-        stop_uuid = str(uuid4().hex)
-        data = dict(uuid=build.__gearman_job.unique,
-                    zuul_event_id=build.zuul_event_id)
-        stop_job = gear.TextJob("executor:stop:%s" % build.__gearman_worker,
-                                json_dumps(data), unique=stop_uuid)
-        self.meta_jobs[stop_uuid] = stop_job
-        log.debug("Submitting stop job: %s", stop_job)
-        self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
-                               timeout=300)
-        return True
+        # job = build.__gearman_job
+        #
+        # req = gear.CancelJobAdminRequest(job.handle)
+        # job.connection.sendAdminRequest(req, timeout=300)
+        # log.debug("Response to cancel build request: %s",
+        #           req.response.strip())
+        # if req.response.startswith(b"OK"):
+        #     try:
+        #         del self.builds[job.unique]
+        #     except Exception:
+        #         pass
+        #     # Since this isn't otherwise going to get a build complete
+        #     # event, send one to the scheduler so that it can unlock
+        #     # the nodes.
+        #     self.sched.onBuildCompleted(build, 'CANCELED', {}, [])
+        #     return True
+        # return False
+        raise Exception("Not implemented")
 
-    def resumeBuild(self, build):
+    def cancelRunningBuild(self, build: Build) -> bool:
         log = get_annotated_logger(self.log, build.zuul_event_id)
-        if not build.__gearman_worker:
-            log.error("Build %s has no manager while resuming", build)
-        resume_uuid = str(uuid4().hex)
-        data = dict(uuid=build.__gearman_job.unique,
-                    zuul_event_id=build.zuul_event_id)
-        stop_job = gear.TextJob("executor:resume:%s" % build.__gearman_worker,
-                                json_dumps(data), unique=resume_uuid)
-        self.meta_jobs[resume_uuid] = stop_job
-        log.debug("Submitting resume job: %s", stop_job)
-        self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
-                               timeout=300)
+        # if not build.__gearman_worker:
+        #     log.error("Build %s has no manager while canceling", build)
+        # stop_uuid = str(uuid4().hex)
+        # data = dict(uuid=build.__gearman_job.unique,
+        #             zuul_event_id=build.zuul_event_id)
+        # stop_job = gear.TextJob("executor:stop:%s" % build.__gearman_worker,
+        #                         json_dumps(data), unique=stop_uuid)
+        # self.meta_jobs[stop_uuid] = stop_job
+        # log.debug("Submitting stop job: %s", stop_job)
+        log.debug("Canceling build: %s", build.zookeeper_node)
+        # self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
+        #                        timeout=300)
+        if build.zookeeper_node:
+            self._zk.cancelBuildRequest(build.zookeeper_node)
+            return True
+        return False
 
-    def lookForLostBuilds(self):
+    def resumeBuild(self, build: Build) -> bool:
+        log = get_annotated_logger(self.log, build.zuul_event_id)
+        # if not build.__gearman_worker:
+        #     log.error("Build %s has no manager while resuming", build)
+        # resume_uuid = str(uuid4().hex)
+        # data = dict(uuid=build.__gearman_job.unique,
+        #             zuul_event_id=build.zuul_event_id)
+        # stop_job = gear.TextJob("executor:resume:%s" %
+        #                         build.__gearman_worker,
+        #                         json_dumps(data), unique=resume_uuid)
+        # self.meta_jobs[resume_uuid] = stop_job
+        # log.debug("Submitting resume job: %s", stop_job)
+        log.debug("Resuming build: %s", build.zookeeper_node)
+        # self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
+        #                        timeout=300)
+        if build.zookeeper_node:
+            self._zk.resumeBuildRequest(build.zookeeper_node)
+            return True
+        return False
+
+    # TODO JK
+    def lookForLostBuilds(self) -> None:
         self.log.debug("Looking for lost builds")
         # Construct a list from the values iterator to protect from it changing
         # out from underneath us.
-        for build in list(self.builds.values()):
-            if build.result:
-                # The build has finished, it will be removed
-                continue
-            job = build.__gearman_job
-            if not job.handle:
-                # The build hasn't been enqueued yet
-                continue
-            p = gear.Packet(gear.constants.REQ, gear.constants.GET_STATUS,
-                            job.handle)
-            job.connection.sendPacket(p)
+        # for build in list(self.builds.values()):
+        #     if build.result:
+        #         # The build has finished, it will be removed
+        #         continue
+        #     job = build.__gearman_job
+        #     if not job.handle:
+        #         # The build hasn't been enqueued yet
+        #         continue
+        #     p = gear.Packet(gear.constants.REQ, gear.constants.GET_STATUS,
+        #                     job.handle)
+        #     job.connection.sendPacket(p)
