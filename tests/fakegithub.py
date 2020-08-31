@@ -760,5 +760,13 @@ class FakeGithubClient(object):
 
 class FakeGithubEnterpriseClient(FakeGithubClient):
 
+    version = '2.21.0'
+
     def __init__(self, url, session=None, verify=True):
         super().__init__(session=session)
+
+    def meta(self):
+        data = {
+            'installed_version': self.version,
+        }
+        return data
