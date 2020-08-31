@@ -89,12 +89,7 @@ const routes = () => [
   {
     to: '/build/:buildId',
     component: BuildPage,
-    props: {'activeTab': 'results'},
-  },
-  {
-    to: '/build/:buildId/artifacts',
-    component: BuildPage,
-    props: {'activeTab': 'artifacts'},
+    props: {'activeTab': 'summary'},
   },
   {
     to: '/build/:buildId/logs',
