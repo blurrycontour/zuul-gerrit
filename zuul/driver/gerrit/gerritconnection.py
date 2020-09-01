@@ -81,9 +81,11 @@ class GerritChangeData(object):
     def parseSSH(self, data):
         self.needed_by = []
         self.depends_on = None
+        self.rev = str(data['currentPatchSet']['revision'])
         self.message = data['commitMessage']
         self.current_patchset = str(data['currentPatchSet']['number'])
         self.number = str(data['number'])
+        self.project = str(data['project'])
 
         if 'dependsOn' in data:
             parts = data['dependsOn'][0]['ref'].split('/')
@@ -94,9 +96,9 @@ class GerritChangeData(object):
             self.needed_by.append((parts[3], parts[4]))
 
     def parseHTTP(self, data):
-        rev = data['revisions'][data['current_revision']]
-        self.message = rev['commit']['message']
-        self.current_patchset = str(rev['_number'])
+        self.rev = data['revisions'][data['current_revision']]
+        self.message = self.rev['commit']['message']
+        self.current_patchset = str(self.rev['_number'])
         self.number = str(data['_number'])
 
     def parseRelatedHTTP(self, data, related):
@@ -407,14 +409,13 @@ class GerritPoller(threading.Thread):
 
         Mostly for the benefit of scheduler reconfiguration.
         """
-        rev = change['revisions'][change['current_revision']]
         return {'type': 'change-merged',
                 'change': {
-                    'project': change['project'],
-                    'number': change['_number'],
+                    'project': change.project,
+                    'number': change.number,
                 },
                 'patchSet': {
-                    'number': rev['_number'],
+                    'number': change.current_patchset,
                 }}
 
     def _poll_checkers(self):
@@ -439,7 +440,7 @@ class GerritPoller(threading.Thread):
             if age:
                 # Allow an extra 4 seconds for request time
                 age = int(math.ceil((now - age).total_seconds())) + 4
-            changes = self.connection.simpleQueryHTTP(
+            changes = self.connection.simpleQuery(
                 "status:merged -age:%ss" % (age,))
             self.last_merged_poll = now
             for change in changes:
