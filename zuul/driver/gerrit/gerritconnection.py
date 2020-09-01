@@ -439,7 +439,7 @@ class GerritPoller(threading.Thread):
             if age:
                 # Allow an extra 4 seconds for request time
                 age = int(math.ceil((now - age).total_seconds())) + 4
-            changes = self.connection.simpleQueryHTTP(
+            changes = self.connection.simpleQuery(
                 "status:merged -age:%ss" % (age,))
             self.last_merged_poll = now
             for change in changes:
