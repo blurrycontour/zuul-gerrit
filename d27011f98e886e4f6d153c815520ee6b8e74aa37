@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_86fee268",
+        "filename": "releasenotes/notes/builds_held_attribute-711abd33402ce036.yaml",
+        "patchSetId": 18
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-02T21:51:20Z",
+      "side": 1,
+      "message": "One think that isn\u0027t super clear to me reading the code in this change is if the zuul-web and zuul-scheduler services need to be restarted together in order to have the build.held attribute in all expected locations. It seems that we don\u0027t handle the build.held isn\u0027t there case in zuul-web which can possibly happen if zuul-scheduler isn\u0027t updated when zuul-web is updated?\n\nIf that is the case we should update these upgrade notes to clarify you need to update both together or perhaps update zuul-web to handle either scenario?",
+      "revId": "d27011f98e886e4f6d153c815520ee6b8e74aa37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
