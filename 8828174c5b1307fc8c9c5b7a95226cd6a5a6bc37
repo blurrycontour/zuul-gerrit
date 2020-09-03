@@ -22,6 +22,30 @@
       "revId": "8828174c5b1307fc8c9c5b7a95226cd6a5a6bc37",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_5072aeae",
+        "filename": "web/src/reducers/build.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-09-03T14:45:51Z",
+      "side": 1,
+      "message": "Look at https://review.opendev.org/#/c/747377/7/web/.eslintrc\n\nThis was requested to me during a review on one of my patches and I have to agree that case statements inside look much better indented.\n\nIn fact it is logical: {} is still a block, even if is a case clock, so it needs to follow same rules as any block, 2 chars indent.",
+      "parentUuid": "9f560f44_efb7a539",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 4
+      },
+      "revId": "8828174c5b1307fc8c9c5b7a95226cd6a5a6bc37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
