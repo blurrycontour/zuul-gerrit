@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_ce58ec58",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-03T07:17:30Z",
+      "side": 1,
+      "message": "Where is self.rev needed? I don\u0027t see any user of this new member variable.",
+      "revId": "de99d3090d0b59f8e07f9b13cce6e04ad1d8c952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_2e588854",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-03T07:17:30Z",
+      "side": 1,
+      "message": "See above",
+      "revId": "de99d3090d0b59f8e07f9b13cce6e04ad1d8c952",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
