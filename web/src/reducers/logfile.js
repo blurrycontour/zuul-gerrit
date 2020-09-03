@@ -29,15 +29,15 @@ export default (state = {
   switch (action.type) {
     case LOGFILE_FETCH_REQUEST:
       return update(state, {$merge: {isFetching: true,
-                                     url: action.url,
-                                     data: null}})
+        url: action.url,
+        data: null}})
     case LOGFILE_FETCH_SUCCESS:
       return update(state, {$merge: {isFetching: false,
-                                     data: action.data}})
+        data: action.data}})
     case LOGFILE_FETCH_FAIL:
       return update(state, {$merge: {isFetching: false,
-                                     url: null,
-                                     data: null}})
+        url: null,
+        data: null}})
     default:
       return state
   }

@@ -91,8 +91,8 @@ const shouldFetchProject = (tenant, projectName, state) => {
 
 export const fetchProjectIfNeeded = (tenant, project, force) => (
   dispatch, getState) => {
-    if (force || shouldFetchProject(tenant, project, getState())) {
-      return dispatch(fetchProject(tenant, project))
-    }
-    return Promise.resolve()
+  if (force || shouldFetchProject(tenant, project, getState())) {
+    return dispatch(fetchProject(tenant, project))
+  }
+  return Promise.resolve()
 }
