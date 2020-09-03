@@ -39,8 +39,8 @@ function ExternalLink(props) {
 }
 
 ExternalLink.propTypes = {
-    target: PropTypes.string,
-    children: PropTypes.node,
+  target: PropTypes.string,
+  children: PropTypes.node,
 }
 
 export { ExternalLink }

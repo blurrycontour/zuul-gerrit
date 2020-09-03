@@ -63,7 +63,7 @@ export function renderTree(tenant, build, path, obj, textRenderer, defaultRender
   if ('children' in obj && obj.children) {
     node.nodes = obj.children.map(
       n => renderTree(tenant, build, path+obj.name+'/', n,
-                     textRenderer, defaultRenderer))
+        textRenderer, defaultRenderer))
   }
   if (obj.mimetype === 'application/directory') {
     name = obj.name + '/'
@@ -236,7 +236,7 @@ const receiveBuildManifest = (buildId, manifest) => {
     type: BUILD_MANIFEST_SUCCESS,
     buildId: buildId,
     manifest: {tree: manifest.tree, index: index,
-               index_links: manifest.index_links},
+      index_links: manifest.index_links},
     receivedAt: Date.now()
   }
 }
@@ -355,7 +355,7 @@ const shouldFetchBuildset = (buildsetId, state) => {
 
 export const fetchBuildsetIfNeeded = (tenant, buildsetId, force) => (
   dispatch, getState) => {
-    if (force || shouldFetchBuildset(buildsetId, getState())) {
-      return dispatch(fetchBuildset(tenant, buildsetId))
-    }
+  if (force || shouldFetchBuildset(buildsetId, getState())) {
+    return dispatch(fetchBuildset(tenant, buildsetId))
+  }
 }
