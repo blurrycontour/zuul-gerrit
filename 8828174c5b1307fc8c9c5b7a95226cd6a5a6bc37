@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_efb7a539",
+        "filename": "web/src/reducers/build.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-03T12:59:44Z",
+      "side": 1,
+      "message": "while it is added there?",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 4
+      },
+      "revId": "8828174c5b1307fc8c9c5b7a95226cd6a5a6bc37",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

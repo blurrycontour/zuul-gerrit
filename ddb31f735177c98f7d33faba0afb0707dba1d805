@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_afadadeb",
+        "filename": "web/src/actions/projects.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-03T12:59:44Z",
+      "side": 0,
+      "message": "why is the indentation removed here?",
+      "range": {
+        "startLine": 57,
+        "startChar": 2,
+        "endLine": 57,
+        "endChar": 4
+      },
+      "revId": "ddb31f735177c98f7d33faba0afb0707dba1d805",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
