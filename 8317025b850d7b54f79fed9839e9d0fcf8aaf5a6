@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_536c7307",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-09-03T21:00:27Z",
+      "side": 1,
+      "message": "Nit: if we do this, it probably should be \"skip-playbook\" or something similar so we don\u0027t back ourselves into a corner if there\u0027s something else we want to skip later.",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
