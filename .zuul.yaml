@@ -232,7 +232,7 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - tox-py35:
+        - tox-py36:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -282,7 +282,7 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - tox-py35:
+        - tox-py36:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
