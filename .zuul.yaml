@@ -232,11 +232,11 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - tox-py35:
+        - tox-py36:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
+            nodeset: ubuntu-bionic
             timeout: 4800  # 80 minutes
             vars: &zuul_tox_vars
                 test_setup_environment:
@@ -282,11 +282,11 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - tox-py35:
+        - tox-py36:
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-xenial
+            nodeset: ubuntu-bionic
             timeout: 4800  # 80 minutes
             vars: *zuul_tox_vars
         - tox-py38:
