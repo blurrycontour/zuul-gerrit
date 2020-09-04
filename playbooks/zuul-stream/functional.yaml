@@ -1,6 +1,5 @@
 - hosts: controller
   tasks:
-
     - name: Set python path fact
       set_fact:
         python_path: "/usr/local/lib/python3.5/dist-packages"
