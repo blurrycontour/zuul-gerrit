@@ -557,7 +557,12 @@ class GitlabConnection(BaseConnection):
         mr_approval_status = self.gl_client.get_mr_approvals_status(
             project_name, number, zuul_event_id=event)
         log.info('Got MR approval status %s#%s', project_name, number)
-        mr['approved'] = mr_approval_status['approvals_left'] == 0
+        if 'approvals_left' in mr_approval_status:
+            # 'approvals_left' is not present when 'Required Merge Request
+            # Approvals' feature isn't available
+            mr['approved'] = mr_approval_status['approvals_left'] == 0
+        else:
+            mr['approved'] = mr_approval_status['approved']
         return mr
 
     def commentMR(self, project_name, number, message, event=None):
