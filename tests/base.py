@@ -1676,9 +1676,14 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             r'.+/projects/(.+)/merge_requests/(\d+)/approvals$', url)
         if match:
             mr = self._get_mr(match)
-            return {
-                'approvals_left': 0 if mr.approved else 1,
-            }, 200, "", "GET"
+            if 'community-edition' not in mr.labels:
+                return {
+                    'approvals_left': 0 if mr.approved else 1,
+                }, 200, "", "GET"
+            else:
+                return {
+                    'approved': mr.approved,
+                }, 200, "", "GET"
 
     def post(self, url, params=None, zuul_event_id=None):
 
