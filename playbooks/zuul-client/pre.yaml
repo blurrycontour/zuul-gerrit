@@ -1,0 +1,20 @@
+- hosts: all
+  tasks:
+    - name: install python3-venv
+      apt:
+        name: python3-venv
+        state: present
+
+    - name: pre-create .tox directory
+      file:
+        path: "{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox"
+        state: directory
+
+    - name: pre-create tox venv
+      shell:
+        cmd: "python3 -m venv {{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox/py36"
+
+    - name: pre-install zuul-client in tox venv
+      shell:
+        cmd: "{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox/py36/bin/python setup.py develop"
+        chdir: "{{ zuul.projects['opendev.org/zuul/zuul-client'].src_dir }}"
