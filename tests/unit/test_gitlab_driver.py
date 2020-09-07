@@ -19,6 +19,7 @@ import yaml
 import socket
 
 import zuul.rpcclient
+from zuul.driver.gitlab.gitlabconnection import GitlabEventConnector
 
 from tests.base import ZuulTestCase, simple_layout
 from tests.base import ZuulWebFixture
@@ -160,6 +161,16 @@ class TestGitlabDriver(ZuulTestCase):
         job = self.getJobFromHistory('project-test-approval')
         zuulvars = job.parameters['zuul']
         self.assertEqual('check-approval', zuulvars['pipeline'])
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_event(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+        connector = GitlabEventConnector(self.fake_gitlab)
+        name, payload = A.getMergeRequestUpdatedEvent()
+        self.assertEqual('update', payload['object_attributes']['action'])
+        event = connector._event_merge_request(payload)
+        self.assertEqual('changed', event.action)
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_labeled(self):
