@@ -1842,13 +1842,13 @@ class FakeGitlabMergeRequest(object):
                 'action': action
             },
         }
+        data['labels'] = [{'title': label} for label in self.labels]
+        data['changes'] = {}
+
         if include_labels:
-            data['labels'] = [{'title': label} for label in self.labels]
-            data['changes'] = {
-                'labels': {
-                    'previous': [],
-                    'current': data['labels']
-                }
+            data['changes']['labels'] = {
+                'previous': [],
+                'current': data['labels']
             }
         return (name, data)
 
