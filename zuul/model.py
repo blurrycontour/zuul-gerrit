@@ -13,6 +13,7 @@
 # under the License.
 
 import abc
+import weakref
 from collections import OrderedDict
 import copy
 import json
@@ -1995,7 +1996,8 @@ class BuildSet(object):
     }
 
     def __init__(self, item):
-        self.item = item
+        # Use weakref to prevent reference cycle
+        self.item = weakref.proxy(item)
         self.builds = {}
         self.retry_builds = {}
         self.result = None
