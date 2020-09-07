@@ -559,6 +559,28 @@ class TestGitlabDriver(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
 
+    @simple_layout('layouts/requirements-gitlab.yaml', driver='gitlab_ce')
+    def test_approval_require_community_edition(self):
+
+        A = self.fake_gitlab_ce.openFakeMergeRequest(
+            'org/project2', 'master', 'A')
+
+        self.fake_gitlab_ce.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        A.approved = True
+
+        self.fake_gitlab_ce.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        A.approved = False
+
+        self.fake_gitlab_ce.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
     @simple_layout('layouts/requirements-gitlab.yaml', driver='gitlab')
     def test_label_require(self):
 
