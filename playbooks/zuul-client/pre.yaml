@@ -1,0 +1,36 @@
+- hosts: all
+  tasks:
+    - name: install python3-venv
+      apt:
+        name: python3-venv
+        state: present
+
+    - name: pre-create .tox directory
+      file:
+        path: "{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox"
+        state: directory
+
+    - name: pre-create tox venv
+      shell:
+        cmd: "python3 -m venv /home/zuul/{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox/py36"
+
+    - name: install build dependencies
+      shell: "/home/zuul/{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox/py36/bin/pip3 install --upgrade pip setuptools wheel"
+      chdir: "{{ zuul.projects['opendev.org/zuul/zuul-client'].src_dir }}"
+
+    - name: pre-install zuul-client requirements in tox venv
+      shell: "/home/zuul/{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox/py36/bin/pip3 install -r requirements.txt"
+      chdir: "{{ zuul.projects['opendev.org/zuul/zuul-client'].src_dir }}"
+
+    - name: build zuul-client wheel
+      shell: "/home/zuul/{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox/py36/bin/python3 setup.py bdist_wheel"
+      chdir: "{{ zuul.projects['opendev.org/zuul/zuul-client'].src_dir }}"
+
+    - name: pre-install wheel
+      shell:
+        cmd: "/home/zuul/{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox/py36/bin/pip3 install dist/*.whl"
+        chdir: "{{ zuul.projects['opendev.org/zuul/zuul-client'].src_dir }}"
+
+    - name: check zuul-client
+      shell:
+        cmd: "/home/zuul/{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}/.tox/py36/bin/python3 -c 'from zuulclient.version import version_info; print(version_info)'"
