@@ -14,6 +14,7 @@
 # under the License.
 
 import configparser
+import weakref
 from configparser import ConfigParser
 from contextlib import contextmanager
 import copy
@@ -4291,6 +4292,13 @@ class ZuulTestCase(BaseTestCase):
         try:
             gc.collect()
             for obj in gc.get_objects():
+                if isinstance(obj, weakref.ProxyTypes):
+                    # weakref proxies dereference the proxied object when doing
+                    # isinstance against a different type. This raises a
+                    # ReferenceError because the referenced object is already
+                    # collected at this point so just skip weakref proxies
+                    # here.
+                    continue
                 if isinstance(obj, git.Repo):
                     self.log.debug("Leaked git repo object: 0x%x %s" %
                                    (id(obj), repr(obj)))
