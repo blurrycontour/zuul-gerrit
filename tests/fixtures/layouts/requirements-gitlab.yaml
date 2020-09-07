@@ -2,11 +2,12 @@
     name: state-check
     manager: independent
     require:
-      gitlab:
+      gitlab: &state-require
         open: true
         merged: false
+      gitlab_ce: *state-require
     trigger:
-      gitlab:
+      gitlab: &state-trigger
         - event: gl_merge_request
           action: comment
           comment: (?i)^\s*recheck\s*$
@@ -14,6 +15,7 @@
           action:
             - opened
             - changed
+      gitlab_ce: *state-trigger
     success:
       gitlab:
         comment: true
@@ -22,10 +24,11 @@
     name: approval-check
     manager: independent
     require:
-      gitlab:
+      gitlab: &approval-require
         approved: true
+      gitlab_ce: *approval-require
     trigger:
-      gitlab:
+      gitlab: &approval-trigger
         - event: gl_merge_request
           action: comment
           comment: (?i)^\s*recheck\s*$
@@ -33,18 +36,21 @@
           action:
             - opened
             - changed
+      gitlab_ce: *approval-trigger
     success:
-      gitlab:
+      gitlab: &approval-success
         comment: true
+      gitlab_ce: *approval-success
 
 - pipeline:
     name: label-check
     manager: independent
     require:
-      gitlab:
+      gitlab: &label-require
         labels: gateit
+      gitlab_ce: *label-require
     trigger:
-      gitlab:
+      gitlab: &label-trigger
         - event: gl_merge_request
           action: comment
           comment: (?i)^\s*recheck\s*$
@@ -52,9 +58,11 @@
           action:
             - opened
             - changed
+      gitlab_ce: *label-trigger
     success:
-      gitlab:
+      gitlab: &label-success
         comment: true
+      gitlab_ce: *label-success
 
 - job:
     name: base

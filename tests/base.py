@@ -1555,12 +1555,12 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
     log = logging.getLogger("zuul.test.FakeGitlabConnection")
 
     def __init__(self, driver, connection_name, connection_config, rpcclient,
-                 changes_db=None, upstream_root=None):
+                 changes_db=None, upstream_root=None, community_edition=False):
         super(FakeGitlabConnection, self).__init__(driver, connection_name,
                                                    connection_config)
         self.merge_requests = changes_db
-        self.gl_client = FakeGitlabAPIClient(
-            self.baseurl, self.api_token, merge_requests_db=changes_db)
+        self.gl_client = FakeGitlabAPIClient(self.baseurl, self.api_token,
+            community_edition, merge_requests_db=changes_db)
         self.rpcclient = rpcclient
         self.upstream_root = upstream_root
         self.mr_number = 0
@@ -1632,9 +1632,11 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
 class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
     log = logging.getLogger("zuul.test.FakeGitlabAPIClient")
 
-    def __init__(self, baseurl, api_token, merge_requests_db={}):
+    def __init__(self, baseurl, api_token, community_edition,
+            merge_requests_db={}):
         super(FakeGitlabAPIClient, self).__init__(baseurl, api_token)
         self.merge_requests = merge_requests_db
+        self.community_edition = community_edition
 
     def gen_error(self, verb):
         return {
@@ -1676,9 +1678,14 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             r'.+/projects/(.+)/merge_requests/(\d+)/approvals$', url)
         if match:
             mr = self._get_mr(match)
-            return {
-                'approvals_left': 0 if mr.approved else 1,
-            }, 200, "", "GET"
+            if not self.community_edition:
+                return {
+                    'approvals_left': 0 if mr.approved else 1,
+                }, 200, "", "GET"
+            else:
+                return {
+                    'approved': mr.approved,
+                }, 200, "", "GET"
 
     def post(self, url, params=None, zuul_event_id=None):
 
@@ -4011,11 +4018,13 @@ class ZuulTestCase(BaseTestCase):
         def getGitlabConnection(driver, name, config):
             server = config.get('server', 'gitlab.com')
             db = self.gitlab_changes_dbs.setdefault(server, {})
+            community_edition = server != 'gitlab.com'
             con = FakeGitlabConnection(
                 driver, name, config,
                 self.rpcclient,
                 changes_db=db,
-                upstream_root=self.upstream_root)
+                upstream_root=self.upstream_root,
+                community_edition = community_edition)
             self.additional_event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
             return con

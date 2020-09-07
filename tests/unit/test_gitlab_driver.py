@@ -101,7 +101,7 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual(str(A.number), zuulvars['change'])
         self.assertEqual(str(A.sha), zuulvars['patchset'])
         self.assertEqual('master', zuulvars['branch'])
-        self.assertEquals('https://gitlab/org/project/merge_requests/1',
+        self.assertEquals('https://gitlab.com/org/project/merge_requests/1',
                           zuulvars['items'][0]['change_url'])
         self.assertEqual(zuulvars["message"], description)
         self.assertEqual(2, len(self.history))
@@ -254,7 +254,7 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual('project-post-job', zuulvars['job'])
         self.assertEqual('master', zuulvars['branch'])
         self.assertEqual(
-            'https://gitlab/org/project/tree/%s' % zuulvars['newrev'],
+            'https://gitlab.com/org/project/tree/%s' % zuulvars['newrev'],
             zuulvars['change_url'])
         self.assertEqual(expected_newrev, zuulvars['newrev'])
         self.assertEqual(expected_oldrev, zuulvars['oldrev'])
@@ -556,6 +556,28 @@ class TestGitlabDriver(ZuulTestCase):
         A.approved = False
 
         self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+    @simple_layout('layouts/requirements-gitlab.yaml', driver='gitlab_ce')
+    def test_approval_require_community_edition(self):
+
+        A = self.fake_gitlab_ce.openFakeMergeRequest(
+            'org/project2', 'master', 'A')
+
+        self.fake_gitlab_ce.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(0, len(self.history))
+
+        A.approved = True
+
+        self.fake_gitlab_ce.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        A.approved = False
+
+        self.fake_gitlab_ce.emitEvent(A.getMergeRequestUpdatedEvent())
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
 
