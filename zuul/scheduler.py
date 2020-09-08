@@ -25,7 +25,9 @@ import sys
 import threading
 import time
 import urllib
+from typing import Optional
 
+from zuul.executor.client import ExecutorClient
 from zuul.lib.named_queue import NamedQueue
 
 from zuul import configloader
@@ -42,6 +44,7 @@ from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
+from zuul.zk import ZooKeeper
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure',
             'pause', 'resume', 'stop',
@@ -314,7 +317,7 @@ class Scheduler(threading.Thread):
         self._hibernate = False
         self._stopped = False
         self._zuul_app = None
-        self.executor = None
+        self.executor = None  # type: Optional[ExecutorClient]
         self.merger = None
         self.connections = None
         self.statsd = get_statsd(config)
@@ -442,8 +445,8 @@ class Scheduler(threading.Thread):
     def setZuulApp(self, app):
         self._zuul_app = app
 
-    def setExecutor(self, executor):
-        self.executor = executor
+    def setExecutor(self, executor_client: ExecutorClient):
+        self.executor = executor_client
 
     def setMerger(self, merger):
         self.merger = merger
@@ -451,8 +454,10 @@ class Scheduler(threading.Thread):
     def setNodepool(self, nodepool):
         self.nodepool = nodepool
 
-    def setZooKeeper(self, zk):
-        self.zk = zk
+    def setZooKeeper(self, zk: ZooKeeper):
+        self.zk = zk  # type: ZooKeeper
+
+        self.zk.registerAllBuildZones()
 
     def runStats(self):
         while not self.stats_stop.wait(self._stats_interval):
@@ -466,20 +471,10 @@ class Scheduler(threading.Thread):
             return
         functions = getGearmanFunctions(self.rpc.gearworker.gearman)
         functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
-        executors_accepting = 0
-        executors_online = 0
-        execute_queue = 0
-        execute_running = 0
         mergers_online = 0
         merge_queue = 0
         merge_running = 0
         for (name, (queued, running, registered)) in functions.items():
-            if name.startswith('executor:execute'):
-                executors_accepting = registered
-                execute_queue = queued - running
-                execute_running = running
-            if name.startswith('executor:stop'):
-                executors_online += registered
             if name == 'merger:merge':
                 mergers_online = registered
             if name.startswith('merger:'):
@@ -488,6 +483,16 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.mergers.online', mergers_online)
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
+
+        executors_accepting = 0
+        executors_online = 0
+        for (_, item) in self.zk.getExecutors():
+            executors_online += 1
+            if item['accepting_work']:
+                executors_accepting += 1
+        execute_queue = len(list(self.zk.getBuildsInState('REQUESTED')))
+        execute_running = len(list(self.zk.getBuildsInState(
+            ['RUNNING', 'PAUSED'])))
         self.statsd.gauge('zuul.executors.online', executors_online)
         self.statsd.gauge('zuul.executors.accepting', executors_accepting)
         self.statsd.gauge('zuul.executors.jobs_running', execute_running)
