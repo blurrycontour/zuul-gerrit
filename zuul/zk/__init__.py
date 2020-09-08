@@ -15,23 +15,25 @@ import json
 import logging
 import threading
 import time
-from typing import Dict, Callable, List
-from typing import Optional
+from typing import Dict, Callable, List, Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.handlers.threading import KazooTimeoutError
-from kazoo.recipe.cache import TreeCache
 
-import zuul.model
 from zuul.zk.connection_event import ZooKeeperConnectionEventMixin
 from zuul.lib.config import get_default
+from zuul.zk.builds import ZooKeeperBuildsMixin
+from zuul.zk.executors import ZooKeeperExecutorsMixin
 from zuul.zk.nodepool import ZooKeeperNodepoolMixin
 from zuul.zk.zuul import ZooKeeperZuulMixin
 
 
 class ZooKeeper(ZooKeeperNodepoolMixin,
                 ZooKeeperZuulMixin,
-                ZooKeeperConnectionEventMixin, object):
+                ZooKeeperConnectionEventMixin,
+                ZooKeeperBuildsMixin,
+                ZooKeeperExecutorsMixin,
+                object):
     '''
     Class implementing the ZooKeeper interface.
 
@@ -63,15 +65,11 @@ class ZooKeeper(ZooKeeperNodepoolMixin,
         self.lockingLock = threading.Lock()
         self.event_watchers =\
             {}  # type: Dict[str, List[Callable[[List[str]], None]]]
-        # The caching model we use is designed around handing out model
-        # data as objects. To do this, we use two caches: one is a TreeCache
-        # which contains raw znode data (among other details), and one for
-        # storing that data serialized as objects. This allows us to return
-        # objects from the APIs, and avoids calling the methods to serialize
-        # the data into objects more than once.
-        self._hold_request_tree = None  # type: Optional[TreeCache]
-        self._cached_hold_requests =\
-            {}  # type: Optional[Dict[str, zuul.model.HoldRequest]]
+
+        super().__init__()
+
+    def __str__(self):
+        return "<ZooKeeper hash=%s>" % hex(hash(self))
 
     def _dictToStr(self, data):
         return json.dumps(data).encode('utf8')
@@ -154,14 +152,10 @@ class ZooKeeper(ZooKeeperNodepoolMixin,
                 except KazooTimeoutError:
                     self.logConnectionRetryEvent()
 
-        if self.enable_cache:
-            self._hold_request_tree = TreeCache(self.client,
-                                                self.HOLD_REQUEST_ROOT)
-            self._hold_request_tree.listen_fault(self.__cacheFaultListener)
-            self._hold_request_tree.listen(self._holdRequestCacheListener)
-            self._hold_request_tree.start()
+        ZooKeeperNodepoolMixin._startCaching(self)
+        ZooKeeperBuildsMixin._startCaching(self)
 
-    def __cacheFaultListener(self, e):
+    def _cacheFaultListener(self, e):
         self.log.exception(e)
 
     def disconnect(self):
@@ -171,9 +165,9 @@ class ZooKeeper(ZooKeeperNodepoolMixin,
         You should call this method if you used connect() to establish a
         cluster connection.
         '''
-        if self._hold_request_tree is not None:
-            self._hold_request_tree.close()
-            self._hold_request_tree = None
+
+        ZooKeeperNodepoolMixin._stopCaching(self)
+        ZooKeeperBuildsMixin._stopCaching(self)
 
         if self.client is not None and self.client.connected:
             self.client.stop()
@@ -200,7 +194,7 @@ def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
     zookeeper_tls_cert = get_default(config, 'zookeeper', 'tls_cert')
     zookeeper_tls_ca = get_default(config, 'zookeeper', 'tls_ca')
     zookeeper_timeout = float(get_default(config, 'zookeeper',
-                                          'session_timeout', 10.0))
+                                          'session_timeout', 120.0))
     zookeeper.connect(
         hosts=zookeeper_hosts,
         timeout=zookeeper_timeout,
