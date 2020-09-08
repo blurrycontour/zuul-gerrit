@@ -378,9 +378,3 @@ details.foldable[open] summary::before {
         );
     }
 }
-
-/* This restores correct scroll bar and scrolling behaviour */
-.pf-c-page__main {
-    overflow-x: visible;
-    overflow-y: visible;
-}
