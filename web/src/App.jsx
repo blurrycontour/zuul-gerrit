@@ -29,22 +29,16 @@ import {
   Brand,
   Button,
   ButtonVariant,
-  Drawer,
-  DrawerActions,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerContentBody,
-  DrawerPanelContent,
   Dropdown,
   DropdownItem,
   KebabToggle,
+  Modal,
   Nav,
   NavItem,
   NavList,
   NotificationBadge,
   NotificationDrawer,
   NotificationDrawerBody,
-  NotificationDrawerHeader,
   NotificationDrawerList,
   NotificationDrawerListItem,
   NotificationDrawerListItemBody,
@@ -218,7 +212,7 @@ class App extends React.Component {
     history.push(tenant.defaultRoute)
   }
 
-  handleDrawerClose = () => {
+  handleModalClose = () => {
     this.setState({
       showErrors: false
     })
@@ -245,6 +239,7 @@ class App extends React.Component {
 
   renderConfigErrors = (configErrors) => {
     const { history } = this.props
+    const { showErrors } = this.state
     const errors = []
     configErrors.forEach((item, idx) => {
       let error = item.error
@@ -274,29 +269,34 @@ class App extends React.Component {
     })
 
     return (
-      <DrawerPanelContent>
+      <Modal
+        isOpen={showErrors}
+        onClose={this.handleModalClose}
+        aria-label="Config Errors"
+        header={
+          <>
+            <span className="zuul-config-errors-title">
+              Config Errors
+            </span>
+            <span className="zuul-config-errors-count">
+              {errors.length} error(s)
+            </span>
+          </>
+        }
+      >
         <NotificationDrawer>
-          <NotificationDrawerHeader
-            count={errors.length}
-            title="Config Errors"
-            unreadText="error(s)"
-          >
-            <DrawerActions>
-              <DrawerCloseButton onClick={this.handleDrawerClose} />
-            </DrawerActions>
-          </NotificationDrawerHeader>
           <NotificationDrawerBody>
             <NotificationDrawerList>
               {errors.map(item => (item))}
             </NotificationDrawerList>
           </NotificationDrawerBody>
         </NotificationDrawer>
-      </DrawerPanelContent>
+      </Modal>
     )
   }
 
   render() {
-    const { isKebabDropdownOpen, showErrors } = this.state
+    const { isKebabDropdownOpen } = this.state
     const { errors, configErrors, tenant } = this.props
 
     const nav = this.renderMenu()
@@ -402,21 +402,14 @@ class App extends React.Component {
       />
     )
 
-    const drawerPanelContent = this.renderConfigErrors(configErrors)
-
     return (
       <React.Fragment>
         {errors.length > 0 && this.renderErrors(errors)}
+        {this.renderConfigErrors(configErrors)}
         <Page header={pageHeader}>
-          <Drawer isExpanded={showErrors}>
-            <DrawerContent panelContent={drawerPanelContent}>
-              <DrawerContentBody>
-                <ErrorBoundary>
-                  {this.renderContent()}
-                </ErrorBoundary>
-              </DrawerContentBody>
-            </DrawerContent>
-          </Drawer>
+          <ErrorBoundary>
+            {this.renderContent()}
+          </ErrorBoundary>
         </Page>
       </React.Fragment>
     )
