@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_785af9f1",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 32
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-08T19:15:09Z",
+      "side": 1,
+      "message": "Perhaps the documentation should explain what is the purpose of this option, what is the use-case?",
+      "revId": "6659c84418ff24ccc869b6ebb10c1b65f72d0bfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_98a6edbf",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 1270,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-08T19:15:09Z",
+      "side": 1,
+      "message": "Shouldn\u0027t the handler be pause no matter what is the status of the queue when `not self.is_resumed` is true?",
+      "range": {
+        "startLine": 1268,
+        "startChar": 0,
+        "endLine": 1270,
+        "endChar": 53
+      },
+      "revId": "6659c84418ff24ccc869b6ebb10c1b65f72d0bfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
