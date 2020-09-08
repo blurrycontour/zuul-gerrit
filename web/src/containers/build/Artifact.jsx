@@ -43,13 +43,13 @@ class Artifact extends React.Component {
 
 class ArtifactList extends React.Component {
   static propTypes = {
-    build: PropTypes.object.isRequired
+    artifacts: PropTypes.array.isRequired
   }
 
   render() {
-    const { build } = this.props
+    const { artifacts } = this.props
 
-    const nodes = build.artifacts.map((artifact, index) => {
+    const nodes = artifacts.map((artifact, index) => {
       const node = {text: <a href={artifact.url}>{artifact.name}</a>,
                     icon: null}
       if (artifact.metadata) {
@@ -60,11 +60,14 @@ class ArtifactList extends React.Component {
     })
 
     return (
-      <div className="tree-view-container">
-        <TreeView
-          nodes={nodes}
-        />
-      </div>
+      <>
+        <br/>
+        <div className="tree-view-container">
+          <TreeView
+            nodes={nodes}
+          />
+        </div>
+      </>
     )
   }
 }
