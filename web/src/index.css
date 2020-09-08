@@ -1,8 +1,3 @@
-#root {
-    /* This is needed to make the navigation bar fixed on top */
-    height: 100%;
-}
-
 body {
   margin: 0;
   padding: 0;
@@ -32,6 +27,15 @@ a.refresh {
 .zuul-select-tz {
     /* That's the color PF4 uses for the dropdown items in the navbar */
     color: var(--pf-global--Color--dark-100);
+}
+
+/* Config error modal */
+.zuul-config-errors-title {
+    font-size: var(--pf-global--FontSize--xl);
+}
+
+.zuul-config-errors-count {
+    margin-left: var(--pf-global--spacer--md);
 }
 
 /* Build Lists */
@@ -377,10 +381,4 @@ details.foldable[open] summary::before {
             --pf-c-page__header-nav--lg--PaddingLeft
         );
     }
-}
-
-/* This restores correct scroll bar and scrolling behaviour */
-.pf-c-page__main {
-    overflow-x: visible;
-    overflow-y: visible;
 }
