@@ -79,9 +79,15 @@ function Buildset(props) {
                 WrapElement={ListItem}
                 icon={<CodeBranchIcon />}
                 value={
-                  <>
-                    <strong>Branch </strong> {buildset.branch}
-                  </>
+                  buildset.branch ? (
+                    <>
+                      <strong>Branch </strong> {buildset.branch}
+                    </>
+                  ) : (
+                    <>
+                      <strong>Ref </strong> {buildset.ref}
+                    </>
+                  )
                 }
               />
               <IconProperty

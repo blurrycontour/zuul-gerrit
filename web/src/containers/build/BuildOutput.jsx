@@ -108,6 +108,7 @@ class BuildOutput extends React.Component {
     const { output } = this.props
     return (
       <React.Fragment>
+        <br />
         <div key="tasks">
           {Object.entries(output)
            .filter(([, values]) => values.failed.length > 0)
