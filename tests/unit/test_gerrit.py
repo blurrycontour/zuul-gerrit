@@ -14,7 +14,7 @@
 
 import os
 import textwrap
-from unittest import mock
+from unittest import mock, skip
 
 import tests.base
 from tests.base import (
@@ -539,6 +539,7 @@ class TestPolling(ZuulTestCase):
     config_file = 'zuul-gerrit-no-stream.conf'
 
     @simple_layout('layouts/gerrit-checks.yaml')
+    @skip("TODO JK")
     def test_config_update(self):
         # Test that the config is updated via polling when a change
         # merges without stream-events enabled.
