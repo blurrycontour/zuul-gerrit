@@ -33,6 +33,7 @@ from logging import Logger
 from queue import Queue
 from typing import Callable, Optional, Any, Iterable, Generator, List
 
+import objgraph
 import requests
 import select
 import shutil
@@ -93,6 +94,8 @@ import zuul.zk
 import zuul.configloader
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import BuildSet, QueueItem, Layout
+from zuul.scheduler import Scheduler
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -3789,6 +3792,8 @@ class ZuulTestCase(BaseTestCase):
     def setUp(self):
         super(ZuulTestCase, self).setUp()
 
+        self.assertCleanState()
+
         self.setupZK()
         self.fake_nodepool = FakeNodepool(
             self.zk_chroot_fixture.zookeeper_host,
@@ -4281,6 +4286,26 @@ class ZuulTestCase(BaseTestCase):
                     continue
                 with open(os.path.join(root, fn)) as f:
                     self.assertTrue(f.read() in test_keys)
+
+    def assertCleanState(self):
+        gc.disable()
+        try:
+            gc.collect()
+            for obj in gc.get_objects():
+                if isinstance(obj, BuildSet):
+                    objgraph.show_backrefs(obj, max_depth=10)
+                    raise Exception('Leaked BuildSet object: %s' % obj)
+                if isinstance(obj, QueueItem):
+                    objgraph.show_backrefs(obj, max_depth=10)
+                    raise Exception('Leaked QueueItem object: %s' % obj)
+                if isinstance(obj, Scheduler):
+                    objgraph.show_backrefs(obj, max_depth=10)
+                    raise Exception('Leaked Scheduler object: %s' % obj)
+                if isinstance(obj, Layout):
+                    objgraph.show_backrefs(obj, max_depth=10)
+                    raise Exception('Leaked Layout object: %s' % obj)
+        finally:
+            gc.enable()
 
     def assertFinalState(self):
         self.log.debug("Assert final state")
