@@ -684,15 +684,15 @@ class Scheduler(threading.Thread):
         request.node_expiration = node_hold_expiration
 
         # No need to lock it since we are creating a new one.
-        self.zk.storeHoldRequest(request)
+        self.zk.nodepool.storeHoldRequest(request)
 
     def autohold_list(self):
         '''
         Return current hold requests as a list of dicts.
         '''
         data = []
-        for request_id in self.zk.getHoldRequests():
-            request = self.zk.getHoldRequest(request_id)
+        for request_id in self.zk.nodepool.getHoldRequests():
+            request = self.zk.nodepool.getHoldRequest(request_id)
             if not request:
                 continue
             data.append(request.toDict())
@@ -705,7 +705,7 @@ class Scheduler(threading.Thread):
         :param str hold_request_id: The unique ID of the request to delete.
         '''
         try:
-            hold_request = self.zk.getHoldRequest(hold_request_id)
+            hold_request = self.zk.nodepool.getHoldRequest(hold_request_id)
         except Exception:
             self.log.exception(
                 "Error retrieving autohold ID %s:", hold_request_id)
@@ -722,7 +722,7 @@ class Scheduler(threading.Thread):
         :param str hold_request_id: The unique ID of the request to delete.
         '''
         try:
-            hold_request = self.zk.getHoldRequest(hold_request_id)
+            hold_request = self.zk.nodepool.getHoldRequest(hold_request_id)
         except Exception:
             self.log.exception(
                 "Error retrieving autohold ID %s:", hold_request_id)
@@ -734,7 +734,7 @@ class Scheduler(threading.Thread):
 
         self.log.debug("Removing autohold %s", hold_request)
         try:
-            self.zk.deleteHoldRequest(hold_request)
+            self.zk.nodepool.deleteHoldRequest(hold_request)
         except Exception:
             self.log.exception(
                 "Error removing autohold request %s:", hold_request)
@@ -1536,15 +1536,15 @@ class Scheduler(threading.Thread):
             return True
 
         try:
-            self.zk.lockHoldRequest(request)
+            self.zk.nodepool.lockHoldRequest(request)
             self.log.info("Removing expired hold request %s", request)
-            self.zk.deleteHoldRequest(request)
+            self.zk.nodepool.deleteHoldRequest(request)
         except Exception:
             self.log.exception(
                 "Failed to delete expired hold request %s", request)
         finally:
             try:
-                self.zk.unlockHoldRequest(request)
+                self.zk.nodepool.unlockHoldRequest(request)
             except Exception:
                 pass
 
@@ -1582,8 +1582,8 @@ class Scheduler(threading.Thread):
         autohold = None
         scope = Scope.NONE
         self.log.debug("Checking build autohold key %s", autohold_key_base)
-        for request_id in self.zk.getHoldRequests():
-            request = self.zk.getHoldRequest(request_id)
+        for request_id in self.zk.nodepool.getHoldRequests():
+            request = self.zk.nodepool.getHoldRequest(request_id)
             if not request:
                 continue
 
