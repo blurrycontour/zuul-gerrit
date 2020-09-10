@@ -105,8 +105,8 @@ class TestNodepool(BaseTestCase):
         job.nodeset = nodeset
         self.fake_nodepool.pause()
         request = self.nodepool.requestNodes(None, job, 0)
-        self.zk.client.stop()
-        self.zk.client.start()
+        self.zk.kazoo_client.stop()
+        self.zk.kazoo_client.start()
         self.fake_nodepool.unpause()
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
@@ -161,7 +161,7 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
-        self.zk.deleteNodeRequest(request)
+        self.zk.nodepool.deleteNodeRequest(request)
 
         # Accept the nodes
         self.nodepool.acceptNodes(request, request.id)
