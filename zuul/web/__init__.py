@@ -804,7 +804,7 @@ class ZuulWebAPI(object):
             allowed_labels = data['allowed_labels']
             disallowed_labels = data['disallowed_labels']
         labels = set()
-        for launcher in self.zk.getRegisteredLaunchers():
+        for launcher in self.zk.nodepool.getRegisteredLaunchers():
             labels.update(filter_allowed_disallowed(
                 launcher.supported_labels,
                 allowed_labels, disallowed_labels))
@@ -818,7 +818,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def nodes(self, tenant):
         ret = []
-        for node in self.zk.nodeIterator():
+        for node in self.zk.nodepool.nodeIterator():
             node_data = {}
             for key in ("id", "type", "connection_type", "external_id",
                         "provider", "state", "state_time", "comment"):
