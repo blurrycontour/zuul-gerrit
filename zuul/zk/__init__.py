@@ -13,10 +13,13 @@ import configparser
 
 from zuul.zk.connection_event import ZooKeeperConnectionEventMixin
 from zuul.lib.config import get_default
+from zuul.zk.builds import ZooKeeperBuildsMixin
+from zuul.zk.executors import ZooKeeperExecutorsMixin
 from zuul.zk.nodepool import ZooKeeperNodepoolMixin
 
 
-class ZooKeeper(ZooKeeperConnectionEventMixin, ZooKeeperNodepoolMixin):
+class ZooKeeper(ZooKeeperConnectionEventMixin, ZooKeeperBuildsMixin,
+                ZooKeeperExecutorsMixin, ZooKeeperNodepoolMixin):
     '''
     Class implementing the ZooKeeper interface.
 
@@ -39,7 +42,7 @@ def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
     zookeeper_tls_cert = get_default(config, 'zookeeper', 'tls_cert')
     zookeeper_tls_ca = get_default(config, 'zookeeper', 'tls_ca')
     zookeeper_timeout = float(get_default(config, 'zookeeper',
-                                          'session_timeout', 10.0))
+                                          'session_timeout', 120.0))
     zookeeper.connect(
         hosts=zookeeper_hosts,
         timeout=zookeeper_timeout,

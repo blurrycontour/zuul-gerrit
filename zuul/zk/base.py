@@ -14,7 +14,7 @@ import json
 import logging
 import threading
 import time
-from typing import Optional
+from typing import Dict, Optional, Callable, List
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import LockTimeout
@@ -40,6 +40,11 @@ class ZooKeeperBase(object):
         self._last_retry_log = 0  # type: int
         self.enable_cache = enable_cache  # type: bool
         self.lockingLock = threading.Lock()
+        self.node_watchers = \
+            {}  # type: Dict[str, List[Callable[[List[str]], None]]]
+
+    def __str__(self):
+        return "<ZooKeeper hash=%s>" % hex(hash(self))
 
     def _dictToStr(self, data):
         return json.dumps(data).encode('utf8')
@@ -180,3 +185,36 @@ class ZooKeeperBase(object):
         finally:
             if not keep_locked and self.lockingLock.locked():
                 self.lockingLock.release()
+
+    def watch_node_children(self, path: str,
+                            callback: Callable[[List[str]], None]) -> None:
+        """
+        Watches a node for children changes.
+
+        :param path: Node path
+        :param callback: Callback
+        """
+        if path not in self.node_watchers:
+            self.node_watchers[path] = [callback]
+
+            if not self.client:
+                raise Exception("No zookeeper client!")
+
+            self.client.ensure_path(path)
+
+            def watch_children(children):
+                if len(children) > 0 and self.node_watchers[path]:
+                    for watcher in self.node_watchers[path]:
+                        watcher(children)
+
+            self.client.ChildrenWatch(path, watch_children)
+        else:
+            self.node_watchers[path].append(callback)
+
+    def unwatch_node_children_completely(self, path: str) -> None:
+        """
+        Removes all children watches for the given path.
+        :param path: Node path
+        """
+        if path in self.node_watchers:
+            self.node_watchers[path].clear()
