@@ -16,6 +16,24 @@
       "revId": "1af48464ac1cbde986efce3d092b975a48232ab0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_fbbb82c0",
+        "filename": "zuul/zk/zuul.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-09-10T08:07:50Z",
+      "side": 1,
+      "message": "Yes, thats because of the mixin approach. I was trying the function approach too. But did not like the result either. I am open to suggestions. The goal here was to break up the ZooKeeper God-Class. This will become even a larger one due to the focus on Zookeeper as a central component",
+      "parentUuid": "9f560f44_1803fd11",
+      "revId": "1af48464ac1cbde986efce3d092b975a48232ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
