@@ -325,6 +325,10 @@ pre.zuul-log-output
   color: #555;
 }
 
+.zuul-log-output .log-message {
+    white-space: pre-wrap;
+}
+
 .highlight {
   background: rgb(255, 255, 204);
 }

@@ -76,7 +76,11 @@ class LogFile extends React.Component {
                      {line.index}
                    </td>
                    <td>
-                     <span className={'zuul-log-sev-'+(line.severity||0)}>
+                      <span
+                        className={`log-message zuul-log-sev-${
+                          line.severity || 0
+                        }`}
+                      >
                        {line.text+'\n'}
                      </span>
                    </td>
