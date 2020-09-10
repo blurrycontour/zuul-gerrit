@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_fdd6d226",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-10T12:34:58Z",
+      "side": 1,
+      "message": "It seems like this code is defined twice.",
+      "revId": "b27684784b4c84089719c264b97eb00b3e42b894",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
