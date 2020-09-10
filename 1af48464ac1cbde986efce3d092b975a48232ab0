@@ -34,6 +34,24 @@
       "revId": "1af48464ac1cbde986efce3d092b975a48232ab0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_fda412bb",
+        "filename": "zuul/zk/zuul.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-10T12:46:17Z",
+      "side": 1,
+      "message": "IIUC PS28, the current design is:\n\n\n               BaseClient\n                 /    \\\n                /      \\\n             Nodepool  Zuul\n                \\       /\n                 \\     /\n                   Zk\n\n\nI find it difficult to follow the state where all the methods and internal state are shared amongs these object. As an improvement, I suggest this design:\n\n    Zk:\n      client \u003d BaseClient()\n      nodepool \u003d Nodepool(client)\n      zuul \u003d Zuul(client)\n\nWhere the client provides a higher level interface of the kazooclient with its internal state hidden from Nodepool and Zuul. The downside is that call site needs to be changed from `zk.getHoldRequest` to `zk.nodepool.getHoldRequest`.",
+      "parentUuid": "9f560f44_fbbb82c0",
+      "revId": "1af48464ac1cbde986efce3d092b975a48232ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
