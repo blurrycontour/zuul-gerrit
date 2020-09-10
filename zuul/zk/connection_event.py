@@ -21,6 +21,9 @@ from kazoo.recipe.lock import ReadLock, WriteLock
 
 class ZooKeeperConnectionEventMixin:
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def _getConnectionEventReadLock(self, connection_name: str) -> ReadLock:
         if TYPE_CHECKING:  # IDE type checking support
             from zuul.zk import ZooKeeper
