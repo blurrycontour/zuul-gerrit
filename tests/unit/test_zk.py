@@ -16,6 +16,7 @@
 import testtools
 
 import zuul.zk
+import zuul.zk.exceptions
 from zuul import model
 
 from tests.base import BaseTestCase, ChrootedKazooFixture
@@ -46,37 +47,37 @@ class TestZK(BaseTestCase):
 
     def test_hold_requests_api(self):
         # Test no requests returns empty list
-        self.assertEqual([], self.zk.getHoldRequests())
+        self.assertEqual([], self.zk.nodepool.getHoldRequests())
 
         # Test get on non-existent request is None
-        self.assertIsNone(self.zk.getHoldRequest('anything'))
+        self.assertIsNone(self.zk.nodepool.getHoldRequest('anything'))
 
         # Test creating a new request
         req1 = self._createRequest()
-        self.zk.storeHoldRequest(req1)
+        self.zk.nodepool.nodepool.storeHoldRequest(req1)
         self.assertIsNotNone(req1.id)
-        self.assertEqual(1, len(self.zk.getHoldRequests()))
+        self.assertEqual(1, len(self.zk.nodepool.getHoldRequests()))
 
         # Test getting the request
-        req2 = self.zk.getHoldRequest(req1.id)
+        req2 = self.zk.nodepool.getHoldRequest(req1.id)
         self.assertEqual(req1.toDict(), req2.toDict())
 
         # Test updating the request
         req2.reason = 'a new reason'
-        self.zk.storeHoldRequest(req2)
-        req2 = self.zk.getHoldRequest(req2.id)
+        self.zk.nodepool.storeHoldRequest(req2)
+        req2 = self.zk.nodepool.getHoldRequest(req2.id)
         self.assertNotEqual(req1.reason, req2.reason)
 
         # Test lock operations
-        self.zk.lockHoldRequest(req2, blocking=False)
+        self.zk.nodepool.lockHoldRequest(req2, blocking=False)
         with testtools.ExpectedException(
-            zuul.zk.LockException,
+            zuul.zk.exceptions.LockException,
             "Timeout trying to acquire lock .*"
         ):
-            self.zk.lockHoldRequest(req2, blocking=True, timeout=2)
-        self.zk.unlockHoldRequest(req2)
+            self.zk.nodepool.lockHoldRequest(req2, blocking=True, timeout=2)
+        self.zk.nodepool.unlockHoldRequest(req2)
         self.assertIsNone(req2.lock)
 
         # Test deleting the request
-        self.zk.deleteHoldRequest(req1)
-        self.assertEqual([], self.zk.getHoldRequests())
+        self.zk.nodepool.deleteHoldRequest(req1)
+        self.assertEqual([], self.zk.nodepool.getHoldRequests())
