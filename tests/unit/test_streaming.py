@@ -20,6 +20,8 @@ import os.path
 import re
 import socket
 import tempfile
+from unittest import skip
+
 import testtools
 import threading
 import time
@@ -479,6 +481,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
         self.waitUntilSettled()
 
+    @skip("TODO JK")
     def test_finger_gateway(self):
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(

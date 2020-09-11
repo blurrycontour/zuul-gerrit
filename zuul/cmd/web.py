@@ -90,7 +90,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                                             'zookeeper', 'tls_cert')
         params["zk_tls_ca"] = get_default(self.config, 'zookeeper', 'tls_ca')
         params["zk_timeout"] = float(get_default(self.config, 'zookeeper',
-                                                 'session_timeout', 10.0))
+                                                 'session_timeout', 120.0))
 
         try:
             self.web = zuul.web.ZuulWeb(**params)

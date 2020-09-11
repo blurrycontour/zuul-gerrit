@@ -17,7 +17,9 @@ import configparser
 from zuul.lib.config import get_default
 
 from zuul.zk.base import ZooKeeperClient
+from zuul.zk.builds import ZooKeeperBuilds
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
+from zuul.zk.executors import ZooKeeperExecutors
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 
@@ -41,7 +43,9 @@ class ZooKeeper(object):
             objects (e.g., HoldRequests).
         """
         self.client = ZooKeeperClient()
+        self.builds = ZooKeeperBuilds(self.client, enable_cache=enable_cache)
         self.connection_event = ZooKeeperConnectionEvent(self.client)
+        self.executors = ZooKeeperExecutors(self.client)
         self.nodepool = ZooKeeperNodepool(self.client,
                                           enable_cache=enable_cache)
 
@@ -69,7 +73,7 @@ def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
     zookeeper_tls_cert = get_default(config, 'zookeeper', 'tls_cert')
     zookeeper_tls_ca = get_default(config, 'zookeeper', 'tls_ca')
     zookeeper_timeout = float(get_default(config, 'zookeeper',
-                                          'session_timeout', 10.0))
+                                          'session_timeout', 120.0))
     zookeeper.connect(
         hosts=zookeeper_hosts,
         timeout=zookeeper_timeout,
