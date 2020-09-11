@@ -461,7 +461,6 @@ class GitlabConnection(BaseConnection):
             change = self._getChange(
                 project, event.change_number, event.patch_number,
                 refresh=refresh, event=event)
-            change.source_event = event
             change.is_current_patchset = (change.patchset ==
                                           event.patch_number)
         else:
@@ -483,8 +482,6 @@ class GitlabConnection(BaseConnection):
             change.url = self.getGitwebUrl(project, sha=event.newrev)
 
             change.files = None
-
-            change.source_event = event
         return change
 
     def _getChange(self, project, number, patch_number=None,
