@@ -110,10 +110,10 @@
 - job:
     name: zuul-quick-start
     parent: opendev-buildset-registry-consumer
-    description: Run the commands in the Zuul quick-start documentation.
-    pre-run: playbooks/quick-start/pre.yaml
-    run: playbooks/quick-start/run.yaml
-    post-run: playbooks/quick-start/post.yaml
+    description: Run the commands in the Zuul tutorial quick-start documentation.
+    pre-run: playbooks/tutorial/pre.yaml
+    run: playbooks/tutorial/run.yaml
+    post-run: playbooks/tutorial/post.yaml
     required-projects:
       - zuul/zuul
 
