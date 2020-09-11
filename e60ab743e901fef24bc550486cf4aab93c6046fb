@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_61b26a4b",
+        "filename": "web/src/pages/Builds.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-11T08:42:58Z",
+      "side": 1,
+      "message": "Branch",
+      "range": {
+        "startLine": 59,
+        "startChar": 32,
+        "endLine": 59,
+        "endChar": 37
+      },
+      "revId": "e60ab743e901fef24bc550486cf4aab93c6046fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_6a8fe7cc",
+        "filename": "web/src/pages/Buildsets.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-11T08:42:58Z",
+      "side": 1,
+      "message": "Branch",
+      "range": {
+        "startLine": 51,
+        "startChar": 32,
+        "endLine": 51,
+        "endChar": 37
+      },
+      "revId": "e60ab743e901fef24bc550486cf4aab93c6046fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_2ab20f95",
+        "filename": "web/src/pages/Buildsets.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-11T08:42:58Z",
+      "side": 1,
+      "message": "big +1",
+      "range": {
+        "startLine": 66,
+        "startChar": 9,
+        "endLine": 66,
+        "endChar": 79
+      },
+      "revId": "e60ab743e901fef24bc550486cf4aab93c6046fb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
