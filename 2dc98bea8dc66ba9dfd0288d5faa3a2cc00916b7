@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_511eb8ba",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-11T08:30:58Z",
+      "side": 1,
+      "message": "Is that always the case? Couldn\u0027t it help debugging knowing which tenant is impacted for example?",
+      "range": {
+        "startLine": 14,
+        "startChar": 19,
+        "endLine": 15,
+        "endChar": 30
+      },
+      "revId": "2dc98bea8dc66ba9dfd0288d5faa3a2cc00916b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
