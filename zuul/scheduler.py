@@ -25,6 +25,7 @@ import socket
 import sys
 import threading
 import time
+import traceback
 import urllib
 
 from zuul import configloader
@@ -1385,7 +1386,11 @@ class Scheduler(threading.Thread):
             event.done()
         except Exception:
             self.log.exception("Exception in management event:")
-            event.exception(sys.exc_info())
+            type, val, tb = sys.exc_info()
+            # Remove local variables from the traceback to prevent leaking
+            # large objects.
+            traceback.clear_frames(tb)
+            event.exception((type, val, tb))
         self.management_event_queue.task_done()
 
     def process_result_queue(self):
