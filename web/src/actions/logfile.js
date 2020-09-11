@@ -14,8 +14,6 @@
 
 import Axios from 'axios'
 
-import {fetchBuild, fetchBuildManifest} from './build'
-
 export const LOGFILE_FETCH_REQUEST = 'LOGFILE_FETCH_REQUEST'
 export const LOGFILE_FETCH_SUCCESS = 'LOGFILE_FETCH_SUCCESS'
 export const LOGFILE_FETCH_FAIL = 'LOGFILE_FETCH_FAIL'
@@ -42,7 +40,7 @@ const severityMap = {
 const OSLO_LOGMATCH = new RegExp(`^(${DATEFMT})(( \\d+)? (${STATUSFMT}).*)`)
 const SYSTEMD_LOGMATCH = new RegExp(`^(${SYSLOGDATE})( (\\S+) \\S+\\[\\d+\\]\\: (${STATUSFMT})?.*)`)
 
-const receiveLogfile = (data) => {
+const receiveLogfile = (buildId, file, data) => {
 
   const out = data.split(/\r?\n/).map((line, idx) => {
     let m = null
@@ -66,7 +64,9 @@ const receiveLogfile = (data) => {
   })
   return {
     type: LOGFILE_FETCH_SUCCESS,
-    data: out,
+    buildId,
+    fileName: file,
+    fileContent: out,
     receivedAt: Date.now()
   }
 }
@@ -79,32 +79,34 @@ const failedLogfile = (error, url) => {
   }
 }
 
-const fetchLogfile = (buildId, file, state, force) => dispatch => {
-  const build = state.build.builds[buildId]
-  const item = build.manifest.index['/' + file]
+export function fetchLogfile(buildId, file, state) {
+  return async function(dispatch) {
+    const build = state.build.builds[buildId]
+    // Don't do anything if the logfile is already part of our local state
+    if (buildId in state.logfile.files && file in state.logfile.files[buildId]) {
+      return Promise.resolve()
+    }
+    const item = build.manifest.index['/' + file]
 
-  if (!item)
-    dispatch(failedLogfile(null))
-  const url = build.log_url + file
+    if (!item) {
+      return dispatch(
+        failedLogfile(Error(`No manifest entry found for logfile "${file}"`))
+      )
+    }
 
-  if (!force && state.logfile.url === url) {
-    return Promise.resolve()
+    if (item.mimetype !== 'text/plain') {
+      return dispatch(
+        failedLogfile(Error(`Logfile "${file}" has invalid mimetype`))
+      )
+    }
+
+    const url = build.log_url + file
+    dispatch(requestLogfile())
+    try {
+      const response = await Axios.get(url, { transformResponse: [] })
+      dispatch(receiveLogfile(buildId, file, response.data))
+    } catch(error) {
+      dispatch(failedLogfile(error, url))
+    }
   }
-  dispatch(requestLogfile())
-  if (item.mimetype === 'text/plain') {
-    return Axios.get(url, {transformResponse: []})
-      .then(response => dispatch(receiveLogfile(response.data)))
-      .catch(error => dispatch(failedLogfile(error, url)))
-  }
-  dispatch(failedLogfile(null))
-}
-
-export const fetchLogfileIfNeeded = (tenant, buildId, file, force) => (dispatch, getState) => {
-  dispatch(fetchBuild(tenant, buildId, getState(), force))
-    .then(() => {
-      dispatch(fetchBuildManifest(buildId, getState(), force))
-        .then(() => {
-          dispatch(fetchLogfile(buildId, file, getState(), force))
-        })
-    })
 }

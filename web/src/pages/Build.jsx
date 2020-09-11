@@ -16,6 +16,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { parse } from 'query-string'
 import {
   EmptyState,
   EmptyStateVariant,
@@ -37,6 +38,7 @@ import {
 } from '@patternfly/react-icons'
 
 import { fetchBuildAllInfo } from '../actions/build'
+import { fetchLogfile } from '../actions/logfile'
 import { EmptyPage } from '../containers/Errors'
 import { Fetchable, Fetching } from '../containers/Fetching'
 import ArtifactList from '../containers/build/Artifact'
@@ -44,6 +46,7 @@ import Build from '../containers/build/Build'
 import BuildOutput from '../containers/build/BuildOutput'
 import Console from '../containers/build/Console'
 import Manifest from '../containers/build/Manifest'
+import LogFile from '../containers/logfile/LogFile'
 
 class BuildPage extends React.Component {
   static propTypes = {
@@ -60,12 +63,13 @@ class BuildPage extends React.Component {
   }
 
   updateData = () => {
-    if (!this.props.build) {
-      this.props.fetchBuildAllInfo(
-        this.props.tenant,
-        this.props.match.params.buildId
-      )
-    }
+    // The related fetchBuild...() methods won't do anything if the data is
+    // already available in the local state, so just call them.
+    this.props.fetchBuildAllInfo(
+      this.props.tenant,
+      this.props.match.params.buildId,
+      this.props.match.params.file
+    )
   }
 
   componentDidMount() {
@@ -103,22 +107,34 @@ class BuildPage extends React.Component {
         history.push(`${tenant.linkPrefix}/build/${build.uuid}/console`)
         break
       default:
-        // results
+        // task summary
         history.push(`${tenant.linkPrefix}/build/${build.uuid}`)
     }
+  }
+
+  handleBreadcrumbItemClick = () => {
+    // Simply link back to the logs tab without an active logfile
+    this.handleTabClick('logs', this.props.build)
   }
 
   render() {
     const {
       build,
+      logfile,
       isFetching,
       isFetchingManifest,
       isFetchingOutput,
+      isFetchingLogfile,
       activeTab,
+      history,
       location,
       tenant,
     } = this.props
     const hash = location.hash.substring(1).split('/')
+    const severity = parseInt(parse(location.search).severity)
+
+    // Get the logfile from react-routers URL parameters
+    const logfileName = this.props.match.params.file
 
     if (!build && isFetching) {
       return <Fetching />
@@ -164,12 +180,27 @@ class BuildPage extends React.Component {
       </EmptyState>
     )
 
-    const logsTabContent =
-      !build.manifest && isFetchingManifest ? (
-        <Fetching />
-      ) : build.manifest ? (
-        <Manifest tenant={this.props.tenant} build={build} />
-      ) : (
+    let logsTabContent = null
+    if (!build.manifest && isFetchingManifest) {
+      logsTabContent = <Fetching />
+    } else if (logfileName) {
+      logsTabContent = (
+        <LogFile
+          logfileContent={logfile}
+          logfileName={logfileName}
+          isFetching={isFetchingLogfile}
+          // We let the LogFile component itself handle the severity default
+          // value in case it's not set via the URL.
+          severity={severity ? severity : undefined}
+          handleBreadcrumbItemClick={this.handleBreadcrumbItemClick}
+          location={location}
+          history={history}
+        />
+      )
+    } else if (build.manifest) {
+      logsTabContent = <Manifest tenant={this.props.tenant} build={build} />
+    } else {
+      logsTabContent = (
         <EmptyState variant={EmptyStateVariant.small}>
           <EmptyStateIcon icon={FileCodeIcon} />
           <Title headingLevel="h4" size="lg">
@@ -177,6 +208,7 @@ class BuildPage extends React.Component {
           </Title>
         </EmptyState>
       )
+    }
 
     const consoleTabContent =
       !build.output && isFetchingOutput ? (
@@ -277,16 +309,23 @@ function mapStateToProps(state, ownProps) {
     buildId && Object.keys(state.build.builds).length > 0
       ? state.build.builds[buildId]
       : null
+  const logfileName = ownProps.match.params.file
+  const logfile =
+    logfileName && Object.keys(state.logfile.files).length > 0
+      ? state.logfile.files[buildId][logfileName]
+      : null
   return {
     build,
+    logfile,
     tenant: state.tenant,
     isFetching: state.build.isFetching,
     isFetchingManifest: state.build.isFetchingManifest,
     isFetchingOutput: state.build.isFetchingOutput,
+    isFetchingLogfile: state.logfile.isFetching,
   }
 }
 
-const mapDispatchToProps = { fetchBuildAllInfo }
+const mapDispatchToProps = { fetchBuildAllInfo, fetchLogfile }
 
 export default connect(
   mapStateToProps,
