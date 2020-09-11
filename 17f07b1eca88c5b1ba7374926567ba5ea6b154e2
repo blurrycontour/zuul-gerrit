@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_2d18001c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-09-11T15:32:37Z",
+      "side": 1,
+      "message": "Ok, I\u0027ve did all my testing with gitlab.com via a free account. So I cannot say for enterprise version.\n\nI cannot remember why I decided to use \u0027approvals_lefts\u0027 instead of \u0027approved\u0027 field, but my test today showed me that a PR that does not require any approval then \u0027approved\u0027 is to true, and this seems good to me. If at least one approval is needed then \u0027approved\u0027 is set to false and then to true if all approval rules are satisfied.\n\nSo what about just using \u0027approved\u0027 instead of \u0027approval_left\u0027 ?",
+      "revId": "17f07b1eca88c5b1ba7374926567ba5ea6b154e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
