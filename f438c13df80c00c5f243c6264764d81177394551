@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_8b63011a",
+        "filename": "web/package.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-11T05:42:40Z",
+      "side": 1,
+      "message": "Not sure about this update here. I\u0027ve already a change that updates the PF4 version while including the tables package (which was necessary as I got some version conflicts otherwise) https://review.opendev.org/#/c/746112/9/web/package.json . But that update didn\u0027t include another (new) patternfly package.\n\nI will check out the rest of this change later today. This was just the first thing that caught my eye ;-)",
+      "revId": "f438c13df80c00c5f243c6264764d81177394551",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
