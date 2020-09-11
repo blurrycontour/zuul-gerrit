@@ -21,7 +21,6 @@ import JobsPage from './pages/Jobs'
 import LabelsPage from './pages/Labels'
 import NodesPage from './pages/Nodes'
 import BuildPage from './pages/Build'
-import LogFilePage from './pages/LogFile'
 import BuildsPage from './pages/Builds'
 import BuildsetPage from './pages/Buildset'
 import BuildsetsPage from './pages/Buildsets'
@@ -108,7 +107,8 @@ const routes = () => [
   },
   {
     to: '/build/:buildId/log/:file*',
-    component: LogFilePage
+    component: BuildPage,
+    props: {'activeTab': 'logs', 'logfile': true},
   },
   {
     to: '/buildset/:buildsetId',
