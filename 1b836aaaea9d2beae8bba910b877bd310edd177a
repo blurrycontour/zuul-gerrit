@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_68878662",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1850,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-09-11T16:00:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_6a849e5e",
+      "range": {
+        "startLine": 1847,
+        "startChar": 0,
+        "endLine": 1850,
+        "endChar": 13
+      },
+      "revId": "1b836aaaea9d2beae8bba910b877bd310edd177a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_ca6e8a94",
         "filename": "tests/unit/test_gitlab_driver.py",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2020-09-11T14:52:53Z",
       "side": 1,
       "message": "I don\u0027t think we need this new test. test_merge_request_labeled and test_merge_request_updated already validate that feature.",
+      "range": {
+        "startLine": 165,
+        "startChar": 0,
+        "endLine": 173,
+        "endChar": 49
+      },
+      "revId": "1b836aaaea9d2beae8bba910b877bd310edd177a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_e86436e7",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-09-11T16:00:13Z",
+      "side": 1,
+      "message": "Indeed, test_merge_request_updated already validate that feature. test_merge_request_labeled doesn\u0027t (this test succeed when the changes to tests/base.py are kept and the changes to\nzuul/driver/gitlab/gitlabconnection.py are discarded).",
+      "parentUuid": "9f560f44_ca6e8a94",
       "range": {
         "startLine": 165,
         "startChar": 0,
