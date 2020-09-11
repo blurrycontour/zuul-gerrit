@@ -107,7 +107,9 @@ class StatusPage extends React.Component {
       this.updateData(true)
     }
     // If the user just enabled auto-reload
-    if (this.props.preferences.autoReload && !this.timer) {
+    if (this.props.preferences.autoReload &&
+        !prevProps.preferences.autoReload &&
+        !this.timer) {
       this.updateData(true)
     }
   }
