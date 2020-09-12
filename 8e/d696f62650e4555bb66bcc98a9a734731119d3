@@ -1,0 +1,9 @@
+Code-Review+2: Clark Boylan <cboylan@sapwetik.org>
+Code-Review+2: Tristan Cacqueray <tdecacqu@redhat.com>
+Workflow+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Sat, 12 Sep 2020 14:48:58 +0000
+Reviewed-on: https://review.opendev.org/751425
+Project: zuul/zuul
+Branch: refs/heads/master
