@@ -34,6 +34,24 @@
       "revId": "f438c13df80c00c5f243c6264764d81177394551",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_cccccb64",
+        "filename": "web/package.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-14T12:26:13Z",
+      "side": 1,
+      "message": "I think, we should not add any updates to this change if they are not required. As I said there is already another change that updates the patternfly version as required. IMHO you can simply remove the changes made to this file from the change.",
+      "parentUuid": "9f560f44_8b8f622c",
+      "revId": "f438c13df80c00c5f243c6264764d81177394551",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
