@@ -348,6 +348,9 @@ class Nodepool(object):
             log.debug("Resubmitting lost node request %s", request)
             request.id = None
             self.sched.zk.submitNodeRequest(request, self._updateNodeRequest)
+
+            # Stop watching this request node
+            return False
         elif request.state in (model.STATE_FULFILLED, model.STATE_FAILED):
             log.info("Node request %s %s", request, request.state)
 
