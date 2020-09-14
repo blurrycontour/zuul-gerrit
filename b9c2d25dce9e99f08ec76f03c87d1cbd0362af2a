@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_af56a4cd",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-14T15:51:01Z",
+      "side": 1,
+      "message": "What does this mean for the zuul user and/or operator? Should a single branch protection rule be used always? Maybe we should provide a hint to that here?",
+      "revId": "b9c2d25dce9e99f08ec76f03c87d1cbd0362af2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_af3d0490",
+        "filename": "zuul/driver/github/graphql/canmerge-legacy.graphql",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-14T15:51:01Z",
+      "side": 1,
+      "message": "If a repo is operating on more than 100 matching refs could we potentially miss branch protections for ref 101 and beyond?",
+      "range": {
+        "startLine": 14,
+        "startChar": 21,
+        "endLine": 14,
+        "endChar": 31
+      },
+      "revId": "b9c2d25dce9e99f08ec76f03c87d1cbd0362af2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_cf431811",
+        "filename": "zuul/driver/github/graphql/canmerge.graphql",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-14T15:51:01Z",
+      "side": 1,
+      "message": "See comment in the legacy file.",
+      "range": {
+        "startLine": 14,
+        "startChar": 21,
+        "endLine": 14,
+        "endChar": 31
+      },
+      "revId": "b9c2d25dce9e99f08ec76f03c87d1cbd0362af2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
