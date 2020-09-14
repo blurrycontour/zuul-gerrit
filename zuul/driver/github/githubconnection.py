@@ -809,6 +809,8 @@ class GithubUser(collections.Mapping):
 
 class GithubClientManager:
     log = logging.getLogger('zuul.GithubConnection.GithubClientManager')
+    github_class = github3.GitHub
+    github_enterprise_class = github3.GitHubEnterprise
 
     def __init__(self, connection_config):
         self.connection_config = connection_config
@@ -916,10 +918,10 @@ class GithubClientManager:
                 # disabling ssl verification is evil so emit a warning
                 self.log.warning("SSL verification disabled for "
                                  "GitHub Enterprise")
-            github = github3.GitHubEnterprise(url, session=session,
-                                              verify=self.verify_ssl)
+            github = self.github_enterprise_class(
+                url, session=session, verify=self.verify_ssl)
         else:
-            github = github3.GitHub(session=session)
+            github = self.github_class(session=session)
 
         # anything going through requests to http/s goes through cache
         github.session.mount('http://', self.cache_adapter)
@@ -986,7 +988,8 @@ class GithubClientManager:
             url = "%s/app/installations/%s/access_tokens" % (
                 self.base_url, installation_id)
 
-            response = requests.post(url, headers=headers, json=None)
+            github = self._createGithubClient()
+            response = github.session.post(url, headers=headers, json=None)
             response.raise_for_status()
 
             data = response.json()

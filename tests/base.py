@@ -2288,6 +2288,8 @@ class FakeGithubPullRequest(object):
 
 
 class FakeGithubClientManager(GithubClientManager):
+    github_class = tests.fakegithub.FakeGithubClient
+    github_enterprise_class = tests.fakegithub.FakeGithubEnterpriseClient
 
     def __init__(self, connection_config):
         super().__init__(connection_config)
@@ -2297,15 +2299,19 @@ class FakeGithubClientManager(GithubClientManager):
 
     def getGithubClient(self,
                         project_name=None,
-                        user_id=None,
                         zuul_event_id=None):
+        client = super().getGithubClient(
+            project_name=project_name,
+            zuul_event_id=zuul_event_id)
 
+        # Some tests expect the installation id as part of the
         if self.app_id:
             inst_id = self.installation_map.get(project_name)
-            client = tests.fakegithub.FakeGithubClient(
-                self.github_data, inst_id=inst_id)
-        else:
-            client = tests.fakegithub.FakeGithubClient(self.github_data)
+            client.setInstId(inst_id)
+
+        # The super method creates a fake github client with empty data so
+        # add it here.
+        client.setData(self.github_data)
 
         if self.record_clients:
             self.recorded_clients.append(client)
@@ -2417,7 +2423,7 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         # use the original method here and additionally register it in the
         # fake github
         super(FakeGithubConnection, self).addProject(project)
-        self.getGithubClient(project).addProject(project)
+        self.getGithubClient(project.name).addProject(project)
 
     def getGitUrl(self, project):
         if self.git_url_with_auth:

@@ -16,6 +16,7 @@
 import urllib
 from collections import defaultdict
 
+import datetime
 import github3.exceptions
 import re
 import time
@@ -25,6 +26,7 @@ from requests import HTTPError
 from requests.structures import CaseInsensitiveDict
 
 from tests.fake_graphql import FakeGithubQuery
+from zuul.driver.github.githubconnection import utc
 
 FAKE_BASE_URL = 'https://example.com/api/v3/'
 
@@ -262,7 +264,7 @@ class FakeRepository(object):
         return FAKE_BASE_URL + fakepath
 
     def _get(self, url, headers=None):
-        client = FakeGithubClient(self.data)
+        client = FakeGithubClient(data=self.data)
         return client.session.get(url, headers)
 
     def _create_branch(self, branch):
@@ -493,7 +495,8 @@ class FakePull(object):
 
     @property
     def head(self):
-        client = FakeGithubClient(self._fake_pull_request.github.github_data)
+        client = FakeGithubClient(
+            data=self._fake_pull_request.github.github_data)
         repo = client.repo_from_project(self._fake_pull_request.project)
         return repo.commit(self._fake_pull_request.head_sha)
 
@@ -592,6 +595,11 @@ class FakeGithubSession(object):
         self._base_url = None
         self.schema = graphene.Schema(query=FakeGithubQuery)
 
+        # Imitate hooks dict. This will be unused and ignored in the tests.
+        self.hooks = {
+            'response': []
+        }
+
     def build_url(self, *args):
         fakepath = '/'.join(args)
         return FAKE_BASE_URL + fakepath
@@ -629,6 +637,16 @@ class FakeGithubSession(object):
             pull_request.addComment(json['body'])
             return FakeResponse(None, 200)
 
+        # Handle access token creation
+        if re.match(r'.*/app/installations/.*/access_tokens', url):
+            expiry = (datetime.datetime.now(utc) + datetime.timedelta(
+                minutes=60)).replace(microsecond=0).isoformat()
+            data = {
+                'token': 'fake',
+                'expires_at': expiry,
+            }
+            return FakeResponse(data, 201)
+
         return FakeResponse(None, 404)
 
     def get_repo(self, request, params=None):
@@ -638,6 +656,10 @@ class FakeGithubSession(object):
         repo = self.client.repo_from_project(project_name)
 
         return repo.get_url(request, params=params)
+
+    def mount(self, prefix, adapter):
+        # Don't care in tests
+        pass
 
 
 class FakeBranchProtectionRule:
@@ -657,10 +679,17 @@ class FakeGithubData(object):
 
 
 class FakeGithubClient(object):
-    def __init__(self, data, inst_id=None):
+
+    def __init__(self, session=None, data=None):
         self._data = data
-        self._inst_id = inst_id
+        self._inst_id = None
         self.session = FakeGithubSession(self)
+
+    def setData(self, data):
+        self._data = data
+
+    def setInstId(self, inst_id):
+        self._inst_id = inst_id
 
     def user(self, login):
         return FakeUser(login)
@@ -727,3 +756,9 @@ class FakeGithubClient(object):
                     break
 
         return iter(results)
+
+
+class FakeGithubEnterpriseClient(FakeGithubClient):
+
+    def __init__(self, url, session=None, verify=True):
+        super().__init__(session=session)
