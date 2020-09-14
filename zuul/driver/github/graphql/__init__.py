@@ -13,8 +13,9 @@
 # under the License.
 import logging
 
-import pathspec
 from pkg_resources import resource_string
+
+from zuul.lib.logutil import get_annotated_logger
 
 
 def nested_get(d, *keys, default=None):
@@ -70,7 +71,8 @@ class GraphQLClient:
         response = github.session.post(self.url, json=query)
         return response.json()
 
-    def fetch_canmerge(self, github, change):
+    def fetch_canmerge(self, github, change, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         owner, repo = change.project.name.split('/')
 
         data = self._fetch_canmerge(github, owner, repo, change.number,
@@ -81,14 +83,21 @@ class GraphQLClient:
         # Find corresponding rule to our branch
         rules = nested_get(repository, 'branchProtectionRules', 'nodes',
                            default=[])
-        matching_rule = None
-        for rule in rules:
-            pattern = pathspec.patterns.GitWildMatchPattern(
-                rule.get('pattern'))
-            match = pathspec.match_files([pattern], [change.branch])
-            if match:
-                matching_rule = rule
-                break
+
+        # Filter branch protection rules for the one matching the change.
+        matching_rules = [
+            rule for rule in rules
+            for ref in nested_get(rule, 'matchingRefs', 'nodes', default=[])
+            if ref.get('name') == change.branch
+        ]
+        if len(matching_rules) > 1:
+            log.warn('More than one branch protection rules match change %s',
+                     change)
+            return result
+        elif len(matching_rules) == 1:
+            matching_rule = matching_rules[0]
+        else:
+            matching_rule = None
 
         # If there is a matching rule, get required status checks
         if matching_rule:

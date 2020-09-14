@@ -1635,7 +1635,8 @@ class GithubConnection(BaseConnection):
 
         # For performance reasons fetch all needed data for canMerge upfront
         # using a single graphql call.
-        canmerge_data = self.graphql_client.fetch_canmerge(github, change)
+        canmerge_data = self.graphql_client.fetch_canmerge(
+            github, change, zuul_event_id=event)
 
         # If the PR is a draft it cannot be merged.
         if canmerge_data.get('isDraft', False):
