@@ -2342,7 +2342,6 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.upstream_root = upstream_root
         self.merge_failure = False
         self.merge_not_allowed_count = 0
-        self.reports = []
 
         self.github_data = tests.fakegithub.FakeGithubData(changes_db)
         self._github_client_manager.github_data = self.github_data
@@ -2434,27 +2433,28 @@ class FakeGithubConnection(githubconnection.GithubConnection):
 
     def commentPull(self, project, pr_number, message, zuul_event_id=None):
         # record that this got reported
-        self.reports.append((project, pr_number, 'comment'))
+        self.github_data.reports.append((project, pr_number, 'comment'))
         pull_request = self.pull_requests[int(pr_number)]
         pull_request.addComment(message)
 
     def setCommitStatus(self, project, sha, state, url='', description='',
                         context='default', user='zuul', zuul_event_id=None):
         # record that this got reported and call original method
-        self.reports.append((project, sha, 'status', (user, context, state)))
+        self.github_data.reports.append(
+            (project, sha, 'status', (user, context, state)))
         super(FakeGithubConnection, self).setCommitStatus(
             project, sha, state,
             url=url, description=description, context=context)
 
     def labelPull(self, project, pr_number, label, zuul_event_id=None):
         # record that this got reported
-        self.reports.append((project, pr_number, 'label', label))
+        self.github_data.reports.append((project, pr_number, 'label', label))
         pull_request = self.pull_requests[int(pr_number)]
         pull_request.addLabel(label)
 
     def unlabelPull(self, project, pr_number, label, zuul_event_id=None):
         # record that this got reported
-        self.reports.append((project, pr_number, 'unlabel', label))
+        self.github_data.reports.append((project, pr_number, 'unlabel', label))
         pull_request = self.pull_requests[pr_number]
         pull_request.removeLabel(label)
 
