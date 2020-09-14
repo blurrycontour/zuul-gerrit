@@ -658,7 +658,6 @@ class PagureConnection(BaseConnection):
             change = self._getChange(
                 project, event.change_number, event.patch_number,
                 refresh=refresh, event=event)
-            change.source_event = event
             change.is_current_patchset = (change.pr.get('commit_stop') ==
                                           event.patch_number)
         else:
@@ -683,8 +682,6 @@ class PagureConnection(BaseConnection):
             # Explicitly set files to None and let the pipelines processor
             # call the merger asynchronuously
             change.files = None
-
-            change.source_event = event
 
         return change
 

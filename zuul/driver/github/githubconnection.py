@@ -1258,7 +1258,6 @@ class GithubConnection(BaseConnection):
             change = self._getChange(project, event.change_number,
                                      event.patch_number, refresh=refresh,
                                      event=event)
-            change.source_event = event
             change.is_current_patchset = (change.pr.get('head').get('sha') ==
                                           event.patch_number)
         else:
@@ -1278,7 +1277,6 @@ class GithubConnection(BaseConnection):
             # In case we have a tag, we build the url pointing to this
             # tag/release on GitHub.
             change.url = self.getGitwebUrl(project, sha=event.newrev, tag=tag)
-            change.source_event = event
             if hasattr(event, 'commits'):
                 change.files = self.getPushedFileNames(event)
         return change

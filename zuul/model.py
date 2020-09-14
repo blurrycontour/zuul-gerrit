@@ -3212,8 +3212,6 @@ class Change(Branch):
         # look for depends-on headers.
         self.message = None
 
-        self.source_event = None
-
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)
 
