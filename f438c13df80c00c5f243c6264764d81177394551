@@ -16,6 +16,24 @@
       "revId": "f438c13df80c00c5f243c6264764d81177394551",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_8b8f622c",
+        "filename": "web/package.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-14T04:44:17Z",
+      "side": 1,
+      "message": "I didn\u0027t do this manually, I just did \"npm install\" and I guess it pulled this in?  Maybe it\u0027s required as part of the react-core update?",
+      "parentUuid": "9f560f44_8b63011a",
+      "revId": "f438c13df80c00c5f243c6264764d81177394551",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
