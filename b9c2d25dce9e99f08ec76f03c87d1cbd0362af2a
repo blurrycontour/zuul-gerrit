@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_8f01206e",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-14T16:00:08Z",
+      "side": 1,
+      "message": "If the github ui warns too then I think this is sufficient to point people in the right direction.",
+      "parentUuid": "9f560f44_6f864c19",
+      "revId": "b9c2d25dce9e99f08ec76f03c87d1cbd0362af2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_af3d0490",
         "filename": "zuul/driver/github/graphql/canmerge-legacy.graphql",
         "patchSetId": 2
