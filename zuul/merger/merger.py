@@ -903,7 +903,8 @@ class Merger(object):
             # we need to reset here in order to call getBranchHead
             log.debug("No base commit found for %s" % (key,))
             try:
-                repo.reset(zuul_event_id=zuul_event_id)
+                repo.reset(zuul_event_id=zuul_event_id,
+                           process_worker=process_worker)
             except Exception:
                 log.exception("Unable to reset repo %s" % repo)
                 return None, None
