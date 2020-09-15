@@ -221,6 +221,19 @@
     parent: opendev-release-python
     pre-run: playbooks/release/pre.yaml
 
+- job:
+    name: zuul-client-zuul-functional
+    parent: tox
+    description: |
+      Test that Zuul and zuul-client work together.
+    required-projects:
+      - zuul/zuul
+      - zuul/zuul-client
+    vars:
+      zuul_work_dir: "{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}"
+      tox_envlist: zuul_client
+    nodeset: ubuntu-bionic
+
 - project:
     vars:
       node_version: 14
@@ -233,6 +246,8 @@
             vars:
               tox_install_bindep: false
         - tox-py36:
+            required-projects:
+              - zuul/zuul-client
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -246,6 +261,8 @@
                     ZUUL_TEST_ROOT: /tmp/zuul-test
                     YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
         - tox-py38:
+            required-projects:
+              - zuul/zuul-client
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -274,6 +291,8 @@
             dependencies: zuul-build-image
         - nodepool-zuul-functional:
             voting: false
+        - zuul-client-zuul-functional:
+            voting: false
         - zuul-build-python-release
     gate:
       jobs:
@@ -283,6 +302,8 @@
             vars:
               tox_install_bindep: false
         - tox-py36:
+            required-projects:
+              - zuul/zuul-client
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -290,6 +311,8 @@
             timeout: 4800  # 80 minutes
             vars: *zuul_tox_vars
         - tox-py38:
+            required-projects:
+              - zuul/zuul-client
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
