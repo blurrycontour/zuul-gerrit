@@ -176,6 +176,24 @@ class MergeClient(object):
                              precedence, event=event)
         return job
 
+    def getFilesChangesRevision(
+            self, connection_name, project_name, branch,
+            tosha=None, precedence=zuul.model.PRECEDENCE_HIGH,
+            build_set=None, event=None):
+        if event is not None:
+            zuul_event_id = event.zuul_event_id
+        else:
+            zuul_event_id = None
+
+        data = dict(connection=connection_name,
+                    project=project_name,
+                    oldrev=event.oldrev,
+                    newrev=event.newrev,
+                    zuul_event_id=zuul_event_id)
+        job = self.submitJob('merger:fileschangesrev', data, build_set,
+                             precedence, event=event)
+        return job
+
     def onBuildCompleted(self, job):
         data = getJobData(job)
         zuul_event_id = data.get('zuul_event_id')
@@ -196,6 +214,8 @@ class MergeClient(object):
         job.setComplete()
         if job.build_set:
             if job.name == 'merger:fileschanges':
+                self.sched.onFilesChangesCompleted(job.build_set, files)
+            elif job.name == 'merger:fileschangesrev':
                 self.sched.onFilesChangesCompleted(job.build_set, files)
             else:
                 self.sched.onMergeCompleted(job.build_set,
