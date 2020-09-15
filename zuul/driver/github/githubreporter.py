@@ -245,7 +245,8 @@ class GithubReporter(BaseReporter):
             }
         )
 
-        return self.connection.updateCheck(
+        state = item.dynamic_state[self.connection.connection_name]
+        check_run_id, errors = self.connection.updateCheck(
             project,
             pr_number,
             sha,
@@ -257,7 +258,13 @@ class GithubReporter(BaseReporter):
             file_comments,
             external_id,
             zuul_event_id=item.event,
+            check_run_id=state.get('check_run_id')
         )
+
+        if check_run_id:
+            state['check_run_id'] = check_run_id
+
+        return errors
 
     def setLabels(self, item):
         log = get_annotated_logger(self.log, item.event)
