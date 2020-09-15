@@ -17,6 +17,7 @@ import urllib
 from collections import defaultdict
 
 import datetime
+
 import github3.exceptions
 import re
 import time
@@ -86,11 +87,12 @@ class FakeStatus(object):
 
 
 class FakeCheckRun(object):
-    def __init__(self, name, details_url, output, status, conclusion,
+    def __init__(self, id, name, details_url, output, status, conclusion,
                  completed_at, external_id, actions, app):
         if actions is None:
             actions = []
 
+        self.id = id
         self.name = name
         self.details_url = details_url
         self.output = output
@@ -109,6 +111,7 @@ class FakeCheckRun(object):
 
     def as_dict(self):
         return {
+            'id': self.id,
             "name": self.name,
             "status": self.status,
             "output": self.output,
@@ -164,9 +167,10 @@ class FakeCommit(object):
         # the last status provided for a commit.
         self._statuses.insert(0, status)
 
-    def set_check_run(self, name, details_url, output, status, conclusion,
+    def set_check_run(self, id, name, details_url, output, status, conclusion,
                       completed_at, external_id, actions, app):
         check_run = FakeCheckRun(
+            id,
             name,
             details_url,
             output,
@@ -180,6 +184,7 @@ class FakeCommit(object):
         # Always insert a check_run to the front of the list to represent the
         # last check_run provided for a commit.
         self._check_runs.insert(0, check_run)
+        return check_run
 
     def get_url(self, path, params=None):
         if path == 'statuses':
@@ -217,6 +222,7 @@ class FakeRepository(object):
         self._commits = {}
         self.data = data
         self.name = name
+        self.check_run_counter = 0
 
         # Simple dictionary to store permission values per feature (e.g.
         # checks, Repository contents, Pull requests, Commit statuses, ...).
@@ -301,7 +307,9 @@ class FakeRepository(object):
         if commit is None:
             commit = FakeCommit(head_sha)
             self._commits[head_sha] = commit
+        self.check_run_counter += 1
         commit.set_check_run(
+            str(self.check_run_counter),
             name,
             details_url,
             output,
@@ -584,8 +592,11 @@ class FakeResponse(object):
 
     def raise_for_status(self):
         if 400 <= self.status_code < 600:
-            raise HTTPError('{} Something went wrong'.format(self.status_code),
-                            response=self)
+            if isinstance(self.data, str):
+                text = '{} {}'.format(self.status_code, self.data)
+            else:
+                text = '{} Something went wrong'.format(self.status_code)
+            raise HTTPError(text, response=self)
 
 
 class FakeGithubSession(object):
@@ -651,6 +662,39 @@ class FakeGithubSession(object):
                 'expires_at': expiry,
             }
             return FakeResponse(data, 201)
+
+        # Handle check run creation
+        match = re.match(r'.*/repos/(.*)/check-runs$', url)
+        if match:
+            org, reponame = match.groups()[0].split('/', 1)
+            repo = self.client._data.repos.get((org, reponame))
+
+            if repo._permissions.get("checks") is False:
+                # To create a proper github3 exception, we need to mock a
+                # response object
+                return FakeResponse(
+                    "Resource not accessible by integration", 403)
+
+            head_sha = json.get('head_sha')
+            commit = repo._commits.get(head_sha, None)
+            if commit is None:
+                commit = FakeCommit(head_sha)
+                repo._commits[head_sha] = commit
+                repo.check_run_counter += 1
+            check_run = commit.set_check_run(
+                str(repo.check_run_counter),
+                json['name'],
+                json['details_url'],
+                json['output'],
+                json.get('status'),
+                json.get('conclusion'),
+                json.get('completed_at'),
+                json['external_id'],
+                json['actions'],
+                json.get('app', 'zuul'),
+            )
+
+            return FakeResponse(check_run.as_dict(), 201)
 
         return FakeResponse(None, 404)
 
