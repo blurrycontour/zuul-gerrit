@@ -6,4 +6,3 @@ PyMySQL
 psycopg2-binary
 beautifulsoup4
 graphene
-zuul-client
