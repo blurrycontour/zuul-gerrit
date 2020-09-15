@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_3c9f5452",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-09-15T21:44:36Z",
+      "side": 1,
+      "message": "This is not universally true.  Horizontal scrolling of log lines is critical for my use of the system, which is why I made sure that this log view was horizontally scrollable when I wrote it.  I understand others have different preferences, which is why Sorin is working on the ability to toggle, which I expect us to add after this PF4 refactor is done.  But let\u0027s keep the current behavior, and then add optional wrapping behavior later with the toggle.",
+      "revId": "555934fdb818c8f0de4a94a65442b7709c96de34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
