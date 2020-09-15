@@ -68,10 +68,11 @@ class GitlabReporter(BaseReporter):
         log = get_annotated_logger(self.log, item.event)
         project = item.change.project.name
         mr_number = item.change.number
+        patchset = item.change.patchset
         log.debug('Reporting change %s, params %s, approval: %s',
                   item.change, self.config, self._approval)
-        self.connection.approveMR(project, mr_number, self._approval,
-                                  event=item.event)
+        self.connection.approveMR(project, mr_number, patchset,
+                                  self._approval, event=item.event)
 
     def mergeMR(self, item):
         project = item.change.project.name
