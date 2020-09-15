@@ -25,6 +25,7 @@ from unittest import mock, skip
 import git
 import github3.exceptions
 
+from tests.fakegithub import FakeGithubEnterpriseClient
 from zuul.driver.github.githubconnection import GithubShaCache
 import zuul.rpcclient
 
@@ -2145,3 +2146,81 @@ class TestCheckRunAnnotations(ZuulGithubAppTestCase, AnsibleZuulTestCase):
             "start_line": 3,
             "end_line": 3,
         })
+
+
+class TestGithubDriverEnterise(ZuulGithubAppTestCase):
+    config_file = 'zuul-github-driver-enterprise.conf'
+
+    @simple_layout('layouts/merging-github.yaml', driver='github')
+    def test_report_pull_merge(self):
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project')
+        repo._set_branch_protection(
+            'master', require_review=True)
+
+        # pipeline merges the pull request on success
+        A = self.fake_github.openFakePullRequest('org/project', 'master',
+                                                 'PR title',
+                                                 body='I shouldnt be seen',
+                                                 body_text='PR body')
+
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+
+        # Since the PR was not approved it should not be merged
+        self.assertFalse(A.is_merged)
+
+        A.addReview('derp', 'APPROVED')
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+
+        # After approval it should be merged
+        self.assertTrue(A.is_merged)
+        self.assertThat(A.merge_message,
+                        MatchesRegex(r'.*PR title\n\nPR body.*', re.DOTALL))
+        self.assertThat(A.merge_message,
+                        Not(MatchesRegex(
+                            r'.*I shouldnt be seen.*',
+                            re.DOTALL)))
+        self.assertEqual(len(A.comments), 0)
+
+
+class TestGithubDriverEnteriseLegacy(ZuulGithubAppTestCase):
+    config_file = 'zuul-github-driver-enterprise.conf'
+
+    def setUp(self):
+        self.old_version = FakeGithubEnterpriseClient.version
+        FakeGithubEnterpriseClient.version = '2.19.0'
+
+        super().setUp()
+
+    def tearDown(self):
+        super().tearDown()
+        FakeGithubEnterpriseClient.version = self.old_version
+
+    @simple_layout('layouts/merging-github.yaml', driver='github')
+    def test_report_pull_merge(self):
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project')
+        repo._set_branch_protection(
+            'master', require_review=True)
+
+        # pipeline merges the pull request on success
+        A = self.fake_github.openFakePullRequest('org/project', 'master',
+                                                 'PR title',
+                                                 body='I shouldnt be seen',
+                                                 body_text='PR body')
+
+        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+        self.waitUntilSettled()
+
+        # Note: PR was not approved but old github does not support
+        # reviewDecision so this gets ignored and zuul merges nevertheless
+        self.assertTrue(A.is_merged)
+        self.assertThat(A.merge_message,
+                        MatchesRegex(r'.*PR title\n\nPR body.*', re.DOTALL))
+        self.assertThat(A.merge_message,
+                        Not(MatchesRegex(
+                            r'.*I shouldnt be seen.*',
+                            re.DOTALL)))
+        self.assertEqual(len(A.comments), 0)
