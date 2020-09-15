@@ -26,11 +26,28 @@ class FakePageInfo(ObjectType):
         return False
 
 
+class FakeMatchingRef(ObjectType):
+    name = String()
+
+    def resolve_name(parent, info):
+        return parent
+
+
+class FakeMatchingRefs(ObjectType):
+    nodes = List(FakeMatchingRef)
+
+    def resolve_nodes(parent, info):
+        # To simplify tests just return the pattern and a bogus ref that should
+        # not disturb zuul.
+        return [parent.pattern, 'bogus-ref']
+
+
 class FakeBranchProtectionRule(ObjectType):
     pattern = String()
     requiredStatusCheckContexts = List(String)
     requiresApprovingReviews = Boolean()
     requiresCodeOwnerReviews = Boolean()
+    matchingRefs = Field(FakeMatchingRefs, first=Int())
 
     def resolve_pattern(parent, info):
         return parent.pattern
@@ -43,6 +60,9 @@ class FakeBranchProtectionRule(ObjectType):
 
     def resolve_requiresCodeOwnerReviews(parent, info):
         return parent.require_codeowners_review
+
+    def resolve_matchingRefs(parent, info, first=None):
+        return parent
 
 
 class FakeBranchProtectionRules(ObjectType):

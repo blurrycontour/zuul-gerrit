@@ -11,6 +11,11 @@ query canMergeData(
         requiredStatusCheckContexts
         requiresApprovingReviews
         requiresCodeOwnerReviews
+        matchingRefs(first: 100) {
+          nodes {
+            name
+          }
+        }
       }
     }
     pullRequest(number: $pull) {
