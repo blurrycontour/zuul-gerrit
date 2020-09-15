@@ -233,6 +233,8 @@
             vars:
               tox_install_bindep: false
         - tox-py36:
+            required-projects:
+              - zuul/zuul-client
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -246,6 +248,8 @@
                     ZUUL_TEST_ROOT: /tmp/zuul-test
                     YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
         - tox-py38:
+            required-projects:
+              - zuul/zuul-client
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -283,6 +287,8 @@
             vars:
               tox_install_bindep: false
         - tox-py36:
+            required-projects:
+              - zuul/zuul-client
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
@@ -290,6 +296,8 @@
             timeout: 4800  # 80 minutes
             vars: *zuul_tox_vars
         - tox-py38:
+            required-projects:
+              - zuul/zuul-client
             irrelevant-files:
               - zuul/cmd/migrate.py
               - playbooks/zuul-migrate/.*
