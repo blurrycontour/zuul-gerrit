@@ -68,6 +68,28 @@ class BuildsPage extends TableFilters {
   }
 
   prepareTableHeaders() {
+    // compresses duration
+    moment.updateLocale('en', {
+      relativeTime: {
+        future: 'in %s',
+        past:   '%s ago',
+        s  : 'a few seconds',
+        ss : '%ds',
+        m:  'm',
+        mm: '%dm',
+        h:  '1h',
+        hh: '%dh',
+        d:  '1d',
+        dd: '%dd',
+        w:  '1w',
+        ww: '%dw',
+        M:  '1mo',
+        MM: '%dmo',
+        y:  '1y',
+        yy: '%dy'
+      }
+    }
+    )
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
@@ -82,13 +104,14 @@ class BuildsPage extends TableFilters {
       </Table.Cell>
     )
     const durationFormat = (value) => (
-      <Table.Cell>
-        {moment.duration(value, 'seconds').format('h [hr] m [min] s [sec]')}
+      // SI symbols for time are: h, min and s
+      <Table.Cell title={moment.duration(value, 'seconds').format('h [h] m [min] s [s]')}>
+        {moment.duration(value, 'seconds').format('h[h] m[m]')}
       </Table.Cell>
     )
     const timeFormat = (value) => (
-      <Table.Cell>
-        {moment.utc(value).tz(this.props.timezone).format('YYYY-MM-DD HH:mm:ss')}
+      <Table.Cell title={moment.utc(value).tz(this.props.timezone).format('YYYY-MM-DD HH:mm:ss')}>
+        {moment.utc(value).tz(this.props.timezone).fromNow(true)}
       </Table.Cell>
     )
     this.columns = []
