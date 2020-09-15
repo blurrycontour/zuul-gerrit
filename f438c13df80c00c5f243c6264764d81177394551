@@ -52,6 +52,24 @@
       "revId": "f438c13df80c00c5f243c6264764d81177394551",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_7e9d536b",
+        "filename": "web/package.json",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-15T05:57:31Z",
+      "side": 1,
+      "message": "I fully admit to not understanding exactly how all this works.  I figured if \"npm install\" was bringing this in, then it would be because react-core requires it?\n\nThe release notes for the version required for this feature [1] quote v4.35.2 as the released version, which doesn\u0027t even seem to match up with any version here?\n\nhttps://www.patternfly.org/v4/documentation/core/overview/release-notes#202011-release-notes-2020-08-26",
+      "parentUuid": "9f560f44_cccccb64",
+      "revId": "f438c13df80c00c5f243c6264764d81177394551",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
