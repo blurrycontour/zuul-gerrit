@@ -17,6 +17,8 @@ import urllib
 from collections import defaultdict
 
 import datetime
+import random
+
 import github3.exceptions
 import re
 import time
@@ -649,6 +651,42 @@ class FakeGithubSession(object):
             data = {
                 'token': 'fake',
                 'expires_at': expiry,
+            }
+            return FakeResponse(data, 201)
+
+        # Handle check run creation
+        match = re.match(r'.*/repos/(.*)/check-runs$', url)
+        if match:
+            org, reponame = match.groups()[0].split('/', 1)
+            repo = self.client._data.repos.get((org, reponame))
+
+            if repo._permissions.get("checks") is False:
+                # To create a proper github3 exception, we need to mock a
+                # response object
+                return FakeResponse(
+                    "Resource not accessible by integration", 403)
+
+            head_sha = json.get('head_sha')
+            commit = repo._commits.get(head_sha, None)
+            if commit is None:
+                commit = FakeCommit(head_sha)
+                repo._commits[head_sha] = commit
+            check_run_id = random.randint(0, 32000)
+            commit.set_check_run(
+                json['name'],
+                json['details_url'],
+                json['output'],
+                json['status'],
+                json.get('conclusion'),
+                json.get('completed_at'),
+                json['external_id'],
+                json['actions'],
+                json.get('app', 'zuul'),
+            )
+
+            # There is much more data but return just the id for now.s
+            data = {
+                'id': check_run_id,
             }
             return FakeResponse(data, 201)
 
