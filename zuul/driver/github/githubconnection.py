@@ -1993,8 +1993,8 @@ class GithubConnection(BaseConnection):
                     zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         github = self.getGithubClient(project, zuul_event_id=zuul_event_id)
+        self._append_accept_header(github, PREVIEW_CHECKS_ACCEPT)
         owner, proj = project.split("/")
-        repository = github.repository(owner, proj)
 
         # Always provide an empty list of actions by default
         actions = []
@@ -2045,6 +2045,8 @@ class GithubConnection(BaseConnection):
             # change (e.g. the check_run creation failed), there should already
             # be a check_run available. If not we will create one.
             check_runs = []
+
+            repository = github.repository(owner, proj)
             try:
                 check_runs = [
                     c for c in repository.commit(sha).check_runs()
@@ -2132,7 +2134,7 @@ class GithubConnection(BaseConnection):
 
             # Report the start of a check run
             try:
-                check_run = repository.create_check_run(
+                data = dict(
                     name=context,
                     head_sha=sha,
                     status=status,
@@ -2141,8 +2143,13 @@ class GithubConnection(BaseConnection):
                     external_id=external_id,
                     actions=actions,
                 )
-            except github3.exceptions.GitHubException as exc:
-                # TODO (felix): Should we retry the check run creation?
+
+                url = github.session.build_url('repos', project,
+                                               'check-runs')
+                resp = github.session.post(url, json=data)
+                resp.raise_for_status()
+
+            except requests.exceptions.HTTPError as exc:
                 log.error(
                     "Failed to create check run %s for %s#%s on sha %s: %s",
                     context, project, pr_number, sha, str(exc),
