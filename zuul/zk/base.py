@@ -12,9 +12,7 @@
 import logging
 import threading
 import time
-from typing import Callable
-from typing import List
-from typing import Optional
+from typing import Callable, Dict, List, Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import LockTimeout
@@ -38,6 +36,11 @@ class ZooKeeperClient(object):
         self._last_retry_log = 0  # type: int
         self.on_connect_listeners = []  # type: List[Callable[[], None]]
         self.on_disconnect_listeners = []
+        self.node_watchers = \
+            {}  # type: Dict[str, List[Callable[[List[str]], None]]]
+
+    def __str__(self):
+        return "<ZooKeeper hash=%s>" % hex(hash(self))
 
     def _connection_listener(self, state):
         '''
@@ -178,6 +181,39 @@ class ZooKeeperClient(object):
         finally:
             if not keep_locked and self.locking_lock.locked():
                 self.locking_lock.release()
+
+    def watch_node_children(self, path: str,
+                            callback: Callable[[List[str]], None]) -> None:
+        """
+        Watches a node for children changes.
+
+        :param path: Node path
+        :param callback: Callback
+        """
+        if path not in self.node_watchers:
+            self.node_watchers[path] = [callback]
+
+            if not self.client:
+                raise Exception("No zookeeper client!")
+
+            self.client.ensure_path(path)
+
+            def watch_children(children):
+                if len(children) > 0 and self.node_watchers[path]:
+                    for watcher in self.node_watchers[path]:
+                        watcher(children)
+
+            self.client.ChildrenWatch(path, watch_children)
+        else:
+            self.node_watchers[path].append(callback)
+
+    def unwatch_node_children_completely(self, path: str) -> None:
+        """
+        Removes all children watches for the given path.
+        :param path: Node path
+        """
+        if path in self.node_watchers:
+            self.node_watchers[path].clear()
 
 
 class ZooKeeperBase(object):
