@@ -13,7 +13,7 @@
 # under the License.
 
 import abc
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 import copy
 import json
 import logging
@@ -2174,6 +2174,10 @@ class QueueItem(object):
         self._old_job_graph = None  # Cached job graph of previous layout
         self._cached_sql_results = {}
         self.event = event  # The trigger event that lead to this queue item
+
+        # Additional container for connection specifig information to be used
+        # by reporters throughout the lifecycle
+        self.dynamic_state = defaultdict(dict)
 
     def annotateLogger(self, logger):
         """Return an annotated logger with the trigger event"""
