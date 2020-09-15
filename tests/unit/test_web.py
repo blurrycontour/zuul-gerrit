@@ -2151,6 +2151,8 @@ class TestWebMulti(BaseTestWeb):
         self.assertEqual([gerrit_connection, github_connection], data)
 
 
+# TODO Remove this class once REST support is removed from Zuul CLI, or
+# switch to the gearman client
 class TestCLIViaWebApi(BaseTestWeb):
     config_file = 'zuul-admin-web.conf'
 
