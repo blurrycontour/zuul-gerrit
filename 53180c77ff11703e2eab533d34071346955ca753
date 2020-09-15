@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_fcd201d1",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2010,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-09-15T17:36:02Z",
+      "side": 1,
+      "message": "nit: could use a keyword arg for the check_run_id here as it\u0027s not clear what that None is for from the method call.",
+      "revId": "53180c77ff11703e2eab533d34071346955ca753",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
