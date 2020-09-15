@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_16f076fd",
+        "filename": "web/src/containers/logfile/LogFile.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-15T15:29:49Z",
+      "side": 1,
+      "message": "Please combine all imports from the same source in a single statement (in alphabetical order) like so:\n\nimport {\n    Card,\n    CardBody,\n    CardHeader,\n    ...\n} from \u0027@patternfly/react-core\u0027",
+      "revId": "362b7dc6ef9a046d54a621d4edd55a64f3b4f3a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_96bc8607",
+        "filename": "web/src/containers/logfile/LogFile.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-15T15:29:49Z",
+      "side": 1,
+      "message": "Is this redirect used somewhere? If so, I cannot find it.",
+      "revId": "362b7dc6ef9a046d54a621d4edd55a64f3b4f3a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
