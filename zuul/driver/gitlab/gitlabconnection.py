@@ -321,12 +321,12 @@ class GitlabAPIClient():
         return resp[0]
 
     # https://docs.gitlab.com/ee/api/merge_request_approvals.html#approve-merge-request
-    def approve_mr(self, project_name, number, approve=True,
+    def approve_mr(self, project_name, number, patchset, approve=True,
                    zuul_event_id=None):
         approve = 'approve' if approve else 'unapprove'
         path = "/projects/%s/merge_requests/%s/%s" % (
             quote_plus(project_name), number, approve)
-        params = {}
+        params = {'sha': patchset} if approve else {}
         resp = self.post(
             self.baseurl + path, params=params,
             zuul_event_id=zuul_event_id)
@@ -336,8 +336,13 @@ class GitlabAPIClient():
             # approve and unapprove endpoint could return code 401 whether the
             # actual state of the Merge Request approval. Two call on approve
             # endpoint the second call return 401.
-            if resp[1] != 401:
+            # 409 is returned when current HEAD of the merge request doesn't
+            # match the 'sha' parameter.
+            if resp[1] not in (401, 409):
                 raise
+            elif approve == 'approve' and resp[1] == 409:
+                log = get_annotated_logger(self.log, zuul_event_id)
+                log.error('Fail to approve the merge request: %s' % resp[0])
         return resp[0]
 
     # https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
@@ -563,12 +568,13 @@ class GitlabConnection(BaseConnection):
             project_name, number, message, zuul_event_id=event)
         log.info("Commented on MR %s#%s", project_name, number)
 
-    def approveMR(self, project_name, number, approve, event=None):
+    def approveMR(self, project_name, number, patchset, approve, event=None):
         log = get_annotated_logger(self.log, event)
         self.gl_client.approve_mr(
-            project_name, number, approve, zuul_event_id=event)
+            project_name, number, patchset, approve, zuul_event_id=event)
         log.info(
-            "Set approval: %s on MR %s#%s", approve, project_name, number)
+            "Set approval: %s on MR %s#%s (%s)", approve,
+            project_name, number, patchset)
 
     def getChangesDependingOn(self, change, projects, tenant):
         """ Reverse lookup of MR depending on this one

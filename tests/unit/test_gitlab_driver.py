@@ -17,10 +17,12 @@ import os
 import git
 import yaml
 import socket
+from unittest.mock import patch
 
 import zuul.rpcclient
+from zuul.driver.gitlab.gitlabconnection import GitlabAPIClient
 
-from tests.base import ZuulTestCase, simple_layout
+from tests.base import BaseTestCase, ZuulTestCase, simple_layout
 from tests.base import ZuulWebFixture
 
 from testtools.matchers import MatchesRegex
@@ -651,3 +653,21 @@ class TestGitlabDriver(ZuulTestCase):
 
         self.assertTrue(A.is_merged)
         self.assertTrue(B.is_merged)
+
+
+class TestGitLabAPIClient(BaseTestCase):
+
+    def test_approve_updated_merge_request(self):
+        values = (
+            {'message': 'SHA does not match HEAD of source branch: <new_sha>'},
+            409,
+            'https://gitlab.local/api/v4/'
+            'projects/test/merge_requests/1/approve',
+            'POST'
+        )
+
+        with patch.object(GitlabAPIClient, 'post',
+                          return_value=values) as post:
+            client = GitlabAPIClient('https://gitlab.local', 'XXXX')
+            client.approve_mr('test', 1, '<tested_sha>', True)
+            self.assertTrue(post.call_count, 1)
