@@ -1908,19 +1908,22 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
         project = "org/project3"
         github = self.fake_github.getGithubClient(None)
 
+        # Make check run creation fail
+        github._data.fail_check_run_creation = True
+
         # pipeline reports pull request status both on start and success
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_github.openFakePullRequest(project, "master", "A")
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
-        # We should have a pending check for the head sha
+        # We should have no pending check for the head sha
         commit = github.repo_from_project(project)._commits.get(A.head_sha)
         check_runs = commit.check_runs()
-        self.assertEqual(1, len(check_runs))
+        self.assertEqual(0, len(check_runs))
 
-        # Delete this check_run to simulate a failed check_run creation
-        commit._check_runs = []
+        # Make check run creation work again
+        github._data.fail_check_run_creation = False
 
         # Now run the build and check if the update of the check_run could
         # still be accomplished.

@@ -1928,13 +1928,27 @@ class GithubConnection(BaseConnection):
         pull_request.remove_label(label)
         log.debug("Removed label %s from %s#%s", label, proj, pr_number)
 
+    def _create_or_update_check(self, github, project_name, check_run_id,
+                                **kwargs):
+        if check_run_id:
+            # Update an existing check run
+            url = github.session.build_url(
+                'repos', project_name, 'check-runs', str(check_run_id))
+            resp = github.session.patch(url, json=kwargs)
+        else:
+            # Create a new check run
+            url = github.session.build_url(
+                'repos', project_name, 'check-runs')
+            resp = github.session.post(url, json=kwargs)
+        resp.raise_for_status()
+        return resp.json().get('id')
+
     def updateCheck(self, project, pr_number, sha, status, completed, context,
                     details_url, message, file_comments, external_id,
-                    zuul_event_id=None):
+                    zuul_event_id=None, check_run_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         github = self.getGithubClient(project, zuul_event_id=zuul_event_id)
         self._append_accept_header(github, PREVIEW_CHECKS_ACCEPT)
-        owner, proj = project.split("/")
 
         # Always provide an empty list of actions by default
         actions = []
@@ -1958,7 +1972,7 @@ class GithubConnection(BaseConnection):
                     context
                 )
             )
-            return errors
+            return None, errors
 
         output = {"title": "Summary", "summary": message}
 
@@ -1981,25 +1995,7 @@ class GithubConnection(BaseConnection):
             # conclusion, as the status will always be "completed".
             conclusion = status
 
-            # Unless something went wrong during the start reporting of this
-            # change (e.g. the check_run creation failed), there should already
-            # be a check_run available. If not we will create one.
-            check_runs = []
-
-            repository = github.repository(owner, proj)
-            try:
-                check_runs = [
-                    c for c in repository.commit(sha).check_runs()
-                    if c.name == context
-                ]
-            except github3.exceptions.GitHubException as exc:
-                log.error(
-                    "Could not retrieve existing check runs for %s#%s on "
-                    "sha %s: %s",
-                    project, pr_number, sha, str(exc),
-                )
-
-            if not check_runs:
+            if not check_run_id:
                 log.debug(
                     "Could not find check run %s for %s#%s on sha %s. "
                     "Creating a new one",
@@ -2007,7 +2003,10 @@ class GithubConnection(BaseConnection):
                 )
 
                 try:
-                    check_run = repository.create_check_run(
+                    check_run_id = self._create_or_update_check(
+                        github,
+                        project,
+                        None,
                         name=context,
                         head_sha=sha,
                         conclusion=conclusion,
@@ -2017,7 +2016,7 @@ class GithubConnection(BaseConnection):
                         external_id=external_id,
                         actions=actions,
                     )
-                except github3.exceptions.GitHubException as exc:
+                except requests.exceptions.HTTPError as exc:
                     # TODO (felix): Should we retry the check_run creation?
                     log.error(
                         "Failed to create check run %s for %s#%s on sha %s: "
@@ -2030,7 +2029,6 @@ class GithubConnection(BaseConnection):
                         )
                     )
             else:
-                check_run = check_runs[0]
                 log.debug(
                     "Updating existing check run %s for %s#%s on sha %s "
                     "with status %s",
@@ -2038,7 +2036,10 @@ class GithubConnection(BaseConnection):
                 )
 
                 try:
-                    check_run.update(
+                    check_run_id = self._create_or_update_check(
+                        github,
+                        project,
+                        check_run_id,
                         conclusion=conclusion,
                         completed_at=completed_at,
                         output=output,
@@ -2046,7 +2047,7 @@ class GithubConnection(BaseConnection):
                         external_id=external_id,
                         actions=actions,
                     )
-                except github3.exceptions.GitHubException as exc:
+                except requests.exceptions.HTTPError as exc:
                     log.error(
                         "Failed to update check run %s for %s#%s on sha %s: "
                         "%s",
@@ -2074,7 +2075,10 @@ class GithubConnection(BaseConnection):
 
             # Report the start of a check run
             try:
-                data = dict(
+                check_run_id = self._create_or_update_check(
+                    github,
+                    project,
+                    None,
                     name=context,
                     head_sha=sha,
                     status=status,
@@ -2083,11 +2087,6 @@ class GithubConnection(BaseConnection):
                     external_id=external_id,
                     actions=actions,
                 )
-
-                url = github.session.build_url('repos', project,
-                                               'check-runs')
-                resp = github.session.post(url, json=data)
-                resp.raise_for_status()
 
             except requests.exceptions.HTTPError as exc:
                 log.error(
@@ -2100,7 +2099,7 @@ class GithubConnection(BaseConnection):
                     )
                 )
 
-        return errors
+        return check_run_id, errors
 
     def _buildAnnotationsFromComments(self, file_comments):
         annotations = []
