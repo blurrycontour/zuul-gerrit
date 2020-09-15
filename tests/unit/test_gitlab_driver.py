@@ -162,6 +162,27 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual('check-approval', zuulvars['pipeline'])
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_updated_during_build(self):
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        old = A.sha
+        A.addCommit()
+        new = A.sha
+        self.assertNotEqual(old, new)
+        self.waitUntilSettled()
+
+        self.assertEqual(2, len(self.history))
+        # MR must not be approved: tested commit isn't current commit
+        self.assertFalse(A.approved)
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestUpdatedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual(4, len(self.history))
+        self.assertTrue(A.approved)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_labeled(self):
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
