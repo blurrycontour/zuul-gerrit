@@ -290,36 +290,6 @@ class FakeRepository(object):
             self._commits[sha] = commit
         commit.set_status(state, url, description, context, user)
 
-    def create_check_run(self, head_sha, name, details_url=None, output=None,
-                         status=None, conclusion=None, completed_at=None,
-                         external_id=None, actions=None, app="zuul"):
-
-        # Raise the appropriate github3 exception in case we don't have
-        # permission to access the checks API
-        if self._permissions.get("checks") is False:
-            # To create a proper github3 exception, we need to mock a response
-            # object
-            raise github3.exceptions.ForbiddenError(
-                FakeResponse("Resource not accessible by integration", 403)
-            )
-
-        commit = self._commits.get(head_sha, None)
-        if commit is None:
-            commit = FakeCommit(head_sha)
-            self._commits[head_sha] = commit
-        commit.set_check_run(
-            random.randint(0, 32000),
-            name,
-            details_url,
-            output,
-            status,
-            conclusion,
-            completed_at,
-            external_id,
-            actions,
-            app,
-        )
-
     def commit(self, sha):
 
         if self.fail_not_found > 0:
@@ -665,6 +635,9 @@ class FakeGithubSession(object):
         # Handle check run creation
         match = re.match(r'.*/repos/(.*)/check-runs$', url)
         if match:
+            if self.client._data.fail_check_run_creation:
+                return FakeResponse('Internal server error', 500)
+
             org, reponame = match.groups()[0].split('/', 1)
             repo = self.client._data.repos.get((org, reponame))
 
@@ -680,7 +653,7 @@ class FakeGithubSession(object):
                 commit = FakeCommit(head_sha)
                 repo._commits[head_sha] = commit
             check_run = commit.set_check_run(
-                random.randint(0, 32000),
+                str(random.randint(0, 32000)),
                 json['name'],
                 json['details_url'],
                 json['output'],
@@ -695,6 +668,32 @@ class FakeGithubSession(object):
             return FakeResponse(check_run.as_dict(), 201)
 
         return FakeResponse(None, 404)
+
+    def patch(self, url, data=None, headers=None, params=None, json=None):
+
+        # Handle check run update
+        match = re.match(r'.*/repos/(.*)/check-runs/(.*)$', url)
+        if match:
+            org, reponame = match.groups()[0].split('/', 1)
+            check_run_id = match.groups()[1]
+            repo = self.client._data.repos.get((org, reponame))
+
+            # Find the specified check run
+            check_runs = [
+                check_run
+                for commit in repo._commits.values()
+                for check_run in commit._check_runs
+                if check_run.id == check_run_id
+            ]
+            check_run = check_runs[0]
+
+            check_run.update(json['conclusion'],
+                             json['completed_at'],
+                             json['output'],
+                             json['details_url'],
+                             json['external_id'],
+                             json['actions'])
+            return FakeResponse(check_run.as_dict(), 200)
 
     def get_repo(self, request, params=None):
         org, project, request = request.split('/', 2)
@@ -723,6 +722,7 @@ class FakeGithubData(object):
         self.pull_requests = pull_requests
         self.repos = {}
         self.reports = []
+        self.fail_check_run_creation = False
 
 
 class FakeGithubClient(object):
