@@ -12,9 +12,9 @@
 import logging
 import threading
 import time
-from typing import Callable
-from typing import List
-from typing import Optional
+import traceback
+import uuid
+from typing import Callable, Dict, List, Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import LockTimeout
@@ -24,6 +24,7 @@ from kazoo.recipe.lock import Lock
 
 class ZooKeeperClient(object):
     log = logging.getLogger("zuul.zk.base.ZooKeeperClient")
+    connections = {}  # type: Dict[str, str]
 
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
@@ -38,6 +39,12 @@ class ZooKeeperClient(object):
         self._last_retry_log = 0  # type: int
         self.on_connect_listeners = []  # type: List[Callable[[], None]]
         self.on_disconnect_listeners = []
+        self.connection_id = ''  # type: str
+        self.node_watchers = \
+            {}  # type: Dict[str, List[Callable[[List[str]], None]]]
+
+    def __str__(self):
+        return "<ZooKeeper hash=%s>" % hex(hash(self))
 
     def _connection_listener(self, state):
         '''
@@ -55,15 +62,15 @@ class ZooKeeperClient(object):
 
     @property
     def connected(self):
-        return self.client.state == KazooState.CONNECTED
+        return self.client and self.client.state == KazooState.CONNECTED
 
     @property
     def suspended(self):
-        return self.client.state == KazooState.SUSPENDED
+        return self.client and self.client.state == KazooState.SUSPENDED
 
     @property
     def lost(self):
-        return self.client.state == KazooState.LOST
+        return not self.client or self.client.state == KazooState.LOST
 
     @property
     def didLoseConnection(self):
@@ -97,6 +104,11 @@ class ZooKeeperClient(object):
         :param str tls_ca: Path to TLS CA cert
         '''
         if self.client is None:
+            stack = "\n".join(traceback.format_stack())
+            self.connection_id = uuid.uuid4().hex
+            ZooKeeperClient.connections[self.connection_id] = stack
+            self.log.debug("ZK Connecting (%s)", self.connection_id)
+
             args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
             if tls_key:
                 args['use_ssl'] = True
@@ -127,6 +139,12 @@ class ZooKeeperClient(object):
             listener()
 
         if self.client is not None and self.client.connected:
+            if self.connection_id in ZooKeeperClient.connections:
+                # stack = "\n".join(traceback.format_stack())
+                del ZooKeeperClient.connections[self.connection_id]
+                self.log.debug("ZK Disconnecting (%s)", self.connection_id)
+                self.connection_id = ''
+
             self.client.stop()
             self.client.close()
             self.client = None
@@ -178,6 +196,39 @@ class ZooKeeperClient(object):
         finally:
             if not keep_locked and self.locking_lock.locked():
                 self.locking_lock.release()
+
+    def watch_node_children(self, path: str,
+                            callback: Callable[[List[str]], None]) -> None:
+        """
+        Watches a node for children changes.
+
+        :param path: Node path
+        :param callback: Callback
+        """
+        if path not in self.node_watchers:
+            self.node_watchers[path] = [callback]
+
+            if not self.client:
+                raise Exception("No zookeeper client!")
+
+            self.client.ensure_path(path)
+
+            def watch_children(children):
+                if len(children) > 0 and self.node_watchers[path]:
+                    for watcher in self.node_watchers[path]:
+                        watcher(children)
+
+            self.client.ChildrenWatch(path, watch_children)
+        else:
+            self.node_watchers[path].append(callback)
+
+    def unwatch_node_children_completely(self, path: str) -> None:
+        """
+        Removes all children watches for the given path.
+        :param path: Node path
+        """
+        if path in self.node_watchers:
+            self.node_watchers[path].clear()
 
 
 class ZooKeeperBase(object):
