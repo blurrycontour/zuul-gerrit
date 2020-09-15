@@ -666,6 +666,9 @@ class FakeGithubSession(object):
         # Handle check run creation
         match = re.match(r'.*/repos/(.*)/check-runs$', url)
         if match:
+            if self.client._data.fail_check_run_creation:
+                return FakeResponse('Internal server error', 500)
+
             org, reponame = match.groups()[0].split('/', 1)
             repo = self.client._data.repos.get((org, reponame))
 
@@ -698,6 +701,32 @@ class FakeGithubSession(object):
 
         return FakeResponse(None, 404)
 
+    def patch(self, url, data=None, headers=None, params=None, json=None):
+
+        # Handle check run update
+        match = re.match(r'.*/repos/(.*)/check-runs/(.*)$', url)
+        if match:
+            org, reponame = match.groups()[0].split('/', 1)
+            check_run_id = match.groups()[1]
+            repo = self.client._data.repos.get((org, reponame))
+
+            # Find the specified check run
+            check_runs = [
+                check_run
+                for commit in repo._commits.values()
+                for check_run in commit._check_runs
+                if check_run.id == check_run_id
+            ]
+            check_run = check_runs[0]
+
+            check_run.update(json['conclusion'],
+                             json['completed_at'],
+                             json['output'],
+                             json['details_url'],
+                             json['external_id'],
+                             json['actions'])
+            return FakeResponse(check_run.as_dict(), 200)
+
     def get_repo(self, request, params=None):
         org, project, request = request.split('/', 2)
         project_name = '{}/{}'.format(org, project)
@@ -725,6 +754,7 @@ class FakeGithubData(object):
         self.pull_requests = pull_requests
         self.repos = {}
         self.reports = []
+        self.fail_check_run_creation = False
 
 
 class FakeGithubClient(object):
