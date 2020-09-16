@@ -21,10 +21,11 @@ import os
 import time
 from unittest import mock
 
+from kazoo.protocol.states import ZnodeStat
+
 import zuul.executor.server
 import zuul.model
 import gear
-
 from tests.base import (
     ZuulTestCase,
     AnsibleZuulTestCase,
@@ -36,6 +37,7 @@ from tests.base import (
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib.ansible import AnsibleManager
+from zuul.zk.cache import ZooKeeperBuildItem
 
 
 class TestExecutorRepos(ZuulTestCase):
@@ -435,11 +437,17 @@ class TestAnsibleJob(ZuulTestCase):
 
     def setUp(self):
         super(TestAnsibleJob, self).setUp()
-        ansible_version = AnsibleManager().default_version
-        args = '{"ansible_version": "%s"}' % ansible_version
-        job = gear.TextJob('executor:execute', args, unique='test')
+        build_item = ZooKeeperBuildItem(
+            "/test/path",
+            {
+                'uuid': '123e4567-e89b-12d3-a456-426614174000',
+                'params': {
+                    'zuul_event_id': 0,
+                },
+            },
+            ZnodeStat(0, 0, 0, 0, 0, 0, 0, '', 0, 0, 0))
         self.test_job = zuul.executor.server.AnsibleJob(self.executor_server,
-                                                        job)
+                                                        build_item)
 
     def test_getHostList_host_keys(self):
         # Test without connection_port set
@@ -660,7 +668,7 @@ class TestGovernor(ZuulTestCase):
                     build = b
                     break
             time.sleep(0.1)
-        self.log.debug("Found build %s", jobname)
+        self.log.debug("Found build %s: %s", jobname, build)
         build_id = build.uuid
         while (time.time() < timeout and
                build_id not in self.executor_server.job_workers):
