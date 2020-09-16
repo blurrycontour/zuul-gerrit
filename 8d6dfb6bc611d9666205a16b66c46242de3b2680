@@ -16,6 +16,24 @@
       "revId": "8d6dfb6bc611d9666205a16b66c46242de3b2680",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_4257b1cb",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1920,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-16T19:10:10Z",
+      "side": 0,
+      "message": "Kind of. The test lets zuul successfully create a check run and deletes it afterwards to imitate the state if that has failed. With the optimized code this breaks and we need to change the test to be more like the reality, aka directly fail the initial test run creation. Thus we need to make sure that this really has failed hence the changed assert.",
+      "parentUuid": "9f560f44_22727dae",
+      "revId": "8d6dfb6bc611d9666205a16b66c46242de3b2680",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
