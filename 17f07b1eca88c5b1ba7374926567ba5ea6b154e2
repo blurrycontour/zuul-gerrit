@@ -34,6 +34,29 @@
       "revId": "17f07b1eca88c5b1ba7374926567ba5ea6b154e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_e1f411f4",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1679,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-09-16T07:58:41Z",
+      "side": 1,
+      "message": "I would have preferred to use a different switch mechanism. Indeed in a real use case this label is not set.\nThen I think it should be done in an other way. You could add a community_edition: Bool in FakeGitlabConnection and pass it to FakeGitlabAPIClient. Then react on it to send or not \u0027approved\u0027 instead of \u0027approvals_left\u0027. The test will set the self.fake_gitlab.community_edition \u003d True instead of the label.",
+      "range": {
+        "startLine": 1679,
+        "startChar": 16,
+        "endLine": 1679,
+        "endChar": 34
+      },
+      "revId": "17f07b1eca88c5b1ba7374926567ba5ea6b154e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
