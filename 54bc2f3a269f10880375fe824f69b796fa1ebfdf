@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_5dcaf045",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1690,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-16T20:29:22Z",
+      "side": 1,
+      "message": "Nit maybe consider returning False or None. Avoids creating a new list.\n\nIf we want to keep types aligned maybe return set().",
+      "range": {
+        "startLine": 1690,
+        "startChar": 19,
+        "endLine": 1690,
+        "endChar": 21
+      },
+      "revId": "54bc2f3a269f10880375fe824f69b796fa1ebfdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
