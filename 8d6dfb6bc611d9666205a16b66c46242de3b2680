@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_22727dae",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1920,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-16T19:04:05Z",
+      "side": 0,
+      "message": "Was this test buggy previously?",
+      "revId": "8d6dfb6bc611d9666205a16b66c46242de3b2680",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

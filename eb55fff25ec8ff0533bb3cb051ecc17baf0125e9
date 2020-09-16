@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_623595db",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1998,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-16T19:04:05Z",
+      "side": 1,
+      "message": "Can we collapse this whole if else block a bit? Something like:\n\n  if not check_run_id:\n      action \u003d \u0027create\u0027\n      log.debug(\"Could not find a check run ...\")\n  else:\n      action \u003d \u0027update\u0027\n      log.debug(\"Updating existing check run...\")\n  try:\n      check_run_id \u003d self._create_or_update_check()\n  except:\n      log.error(\"Failed to %s check run...\" % action)\n      errors.append(\"Failed to %s check run\" % action)\n\nI mention it because this function is quite long and _create_or_update_check() seems to give us the opportunity to dedup a bit.",
+      "revId": "eb55fff25ec8ff0533bb3cb051ecc17baf0125e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
