@@ -27,6 +27,7 @@ import threading
 import time
 import traceback
 import urllib
+from concurrent.futures.thread import ThreadPoolExecutor
 
 from zuul import configloader
 from zuul import model
@@ -360,6 +361,10 @@ class Scheduler(threading.Thread):
         self.ansible_manager = AnsibleManager(
             default_version=default_ansible_version)
 
+        # Used for asynchronous revising of node requests if relative priority
+        # is used.
+        self.node_request_updater = ThreadPoolExecutor(max_workers=1)
+
     def start(self):
         super(Scheduler, self).start()
         self._command_running = True
@@ -388,6 +393,7 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
+        self.node_request_updater.shutdown()
 
     def runCommand(self):
         while self._command_running:
