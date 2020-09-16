@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_dfe39d33",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-09-16T14:13:08Z",
+      "side": 1,
+      "message": "The current implementation updates the URL and allows the user to share a deep-link to a page filtered by severity (and also optionally to a line number -- both links work in tandem).  This change removes the severity from the URL.",
+      "revId": "63511d7dcaa9ca091412b6d659e589adcb0c27a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_bfe06928",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-09-16T14:13:08Z",
+      "side": 1,
+      "message": "They\u0027re not intended to be an OpenStacky thing; they currently work with python style logs and some others, and we would be happy to accept regex updates for other languages.  I\u0027m not sure hiding them actually saves any space.  How about we always show them?",
+      "revId": "63511d7dcaa9ca091412b6d659e589adcb0c27a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
