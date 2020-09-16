@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_c74c73ca",
+        "filename": "tests/fakegithub.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 683,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-16T18:39:52Z",
+      "side": 1,
+      "message": "Do we need to avoid collisions with these ids? If so we may need a counter instead?",
+      "range": {
+        "startLine": 683,
+        "startChar": 16,
+        "endLine": 683,
+        "endChar": 40
+      },
+      "revId": "8d6dfb6bc611d9666205a16b66c46242de3b2680",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
