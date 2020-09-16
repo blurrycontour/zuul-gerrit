@@ -52,6 +52,24 @@
       "revId": "53180c77ff11703e2eab533d34071346955ca753",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b032650e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2010,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-09-16T05:00:08Z",
+      "side": 1,
+      "message": "It won\u0027t show up in kwargs as you have the check_run_id in the method signature.",
+      "parentUuid": "9f560f44_e7ceeeb5",
+      "revId": "53180c77ff11703e2eab533d34071346955ca753",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
