@@ -23,6 +23,7 @@ import threading
 import time
 import json
 from collections import OrderedDict
+from json.decoder import JSONDecodeError
 
 import cherrypy
 import cachecontrol
@@ -227,6 +228,23 @@ class GithubRetryHandler:
             return
         if not 500 <= response.status_code < 600:
             return
+
+        try:
+            data = response.json()
+            errors = data.get('errors', [])
+            for error in errors:
+                resource = error.get('resource')
+                field = error.get('field')
+                code = error.get('code')
+                if (resource == 'PullRequest' and
+                        field == 'diff' and
+                        code == 'not_available'):
+                    # Github responds with 500 if the diff is too large so we
+                    # need to ignore it because retries won't help.
+                    return
+        except JSONDecodeError:
+            # If there is no json just continue with retry handling.
+            pass
 
         if hasattr(response.request, 'zuul_retry_count'):
             retry_count = response.request.zuul_retry_count
@@ -1420,7 +1438,9 @@ class GithubConnection(BaseConnection):
             # Github's pull requests files API only returns at max
             # the first 300 changed files of a PR in alphabetical order.
             # https://developer.github.com/v3/pulls/#list-pull-requests-files
-            if len(change.files) < change.pr.get('changed_files', 0):
+            if change.files is None:
+                log.warning("Got no files of PR.")
+            elif len(change.files) < change.pr.get('changed_files', 0):
                 log.warning("Got only %s files but PR has %s files.",
                             len(change.files),
                             change.pr.get('changed_files', 0))
@@ -1610,7 +1630,7 @@ class GithubConnection(BaseConnection):
             self.log.warning("Failed to get list of files from Github. "
                              "Using empty file list to trigger update "
                              "via the merger: %s", exc)
-            pr['files'] = []
+            pr['files'] = None
 
         labels = [l['name'] for l in pr['labels']]
         pr['labels'] = labels
