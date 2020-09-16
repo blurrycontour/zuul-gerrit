@@ -1403,8 +1403,11 @@ class PipelineManager(metaclass=ABCMeta):
                     # need to update the relative priority.
                     continue
                 if node_request.relative_priority != priority:
-                    self.sched.nodepool.reviseRequest(
-                        node_request, priority)
+                    # Asynchronous fire and forget update to the node request
+                    # priority.
+                    self.sched.node_request_updater.submit(
+                        self.sched.nodepool.reviseRequest, node_request,
+                        priority)
         return (changed, nnfi)
 
     def reportProcessedBundleItems(self, item):

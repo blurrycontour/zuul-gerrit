@@ -25,6 +25,7 @@ import traceback
 import uuid
 from contextlib import suppress
 from collections import defaultdict
+from concurrent.futures.thread import ThreadPoolExecutor
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -246,6 +247,10 @@ class Scheduler(threading.Thread):
                 self.zk_client, self.system.system_id, self.statsd,
                 scheduler=True)
 
+        # Used for asynchronous revising of node requests if relative priority
+        # is used.
+        self.node_request_updater = ThreadPoolExecutor(max_workers=1)
+
     def start(self):
         super(Scheduler, self).start()
         self.keystore = KeyStorage(
@@ -293,6 +298,7 @@ class Scheduler(threading.Thread):
         self.times.join()
         self.join()
         self.zk_client.disconnect()
+        self.node_request_updater.shutdown()
 
     def runCommand(self):
         while self._command_running:
