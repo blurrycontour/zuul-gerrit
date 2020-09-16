@@ -361,6 +361,30 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       executor to run on.  This should ideally be at zero; persistent
       higher values indicate more executor resources would be useful.
 
+
+.. stat:: zuul.scheduler
+
+   Holds metrics related to the Zuul scheduler.
+
+   .. stat:: eventqueues
+
+      Holds metrics about the event queue lengths in the Zuul scheduler.
+
+      .. stat:: trigger
+         :type: gauge
+
+         The size of the current trigger event queue.
+
+      .. stat:: result
+         :type: gauge
+
+         The size of the current result event queue.
+
+      .. stat:: management
+         :type: gauge
+
+         The size of the current management event queue.
+
 .. stat:: zuul.geard
 
    Gearman job distribution statistics.  Gearman jobs encompass the
