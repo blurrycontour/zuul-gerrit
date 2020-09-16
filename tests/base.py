@@ -1628,6 +1628,12 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         }
         return (name, data)
 
+    @contextmanager
+    def enable_community_edition(self):
+        self.gl_client.community_edition = True
+        yield
+        self.gl_client.community_edition = False
+
 
 class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
     log = logging.getLogger("zuul.test.FakeGitlabAPIClient")
@@ -1635,6 +1641,7 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
     def __init__(self, baseurl, api_token, merge_requests_db={}):
         super(FakeGitlabAPIClient, self).__init__(baseurl, api_token)
         self.merge_requests = merge_requests_db
+        self.community_edition = False
 
     def gen_error(self, verb):
         return {
@@ -1676,9 +1683,14 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             r'.+/projects/(.+)/merge_requests/(\d+)/approvals$', url)
         if match:
             mr = self._get_mr(match)
-            return {
-                'approvals_left': 0 if mr.approved else 1,
-            }, 200, "", "GET"
+            if not self.community_edition:
+                return {
+                    'approvals_left': 0 if mr.approved else 1,
+                }, 200, "", "GET"
+            else:
+                return {
+                    'approved': mr.approved,
+                }, 200, "", "GET"
 
     def post(self, url, params=None, zuul_event_id=None):
 
