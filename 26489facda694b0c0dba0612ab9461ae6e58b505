@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_b9dec9d7",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-09-16T13:10:10Z",
+      "side": 1,
+      "message": "Isn \u0027t it possible to just do here self.fake_gitlab.community_edition \u003d True instead of defining a new connection \"fake_gitlab_ce\" ?",
+      "revId": "26489facda694b0c0dba0612ab9461ae6e58b505",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
