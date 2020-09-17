@@ -18,9 +18,27 @@ import PropTypes from 'prop-types'
 import { Panel } from 'react-bootstrap'
 import {
   Icon,
-  ListView,
 } from 'patternfly-react'
+import {
+    Card,
+    CardBody,
+    CardHeader,
+    DataList,
+    DataListItem,
+    DataListItemRow,
+    DataListItemCells,
+    DataListCell,
+    Label,
+    Flex,
+    FlexItem,
+    Grid,
+    GridItem,
+    Title,
+} from '@patternfly/react-core'
 
+import CheckCircleIcon from '@patternfly/react-icons/dist/js/icons/check-circle-icon'
+import InfoCircleIcon from '@patternfly/react-icons/dist/js/icons/info-circle-icon'
+import TimesCircleIcon from '@patternfly/react-icons/dist/js/icons/times-circle-icon'
 
 class BuildOutput extends React.Component {
   static propTypes = {
@@ -28,30 +46,47 @@ class BuildOutput extends React.Component {
   }
 
   renderHosts (hosts) {
-    return (
-      <ListView>
-        {Object.entries(hosts).map(([host, values]) => (
-          <ListView.Item
-            key={host}
-            heading={host}
-            additionalInfo={[
-              <ListView.InfoItem key="ok" title="Task OK">
-                <Icon type='pf' name='info' />
-                <strong>{values.ok}</strong>
-              </ListView.InfoItem>,
-              <ListView.InfoItem key="changed" title="Task changed">
-                <Icon type='pf' name='ok' />
-                <strong>{values.changed}</strong>
-              </ListView.InfoItem>,
-              <ListView.InfoItem key="fail" title="Task failure">
-                <Icon type='pf' name='error-circle-o' />
-                <strong>{values.failures}</strong>
-              </ListView.InfoItem>
-            ]}
-          />
-        ))}
-      </ListView>
-    )
+      return (
+          <Grid>
+              <GridItem span={7}>
+                  <Card>
+                      <CardHeader>
+                          <strong>Task run summary</strong>
+                      </CardHeader>
+                      <CardBody>
+                          <DataList aria-label="Build Results">
+                              {Object.entries(hosts).map(([host, values]) => (
+                                  <DataListItem aria-label="Host">
+                                      <DataListItemRow>
+                                          <DataListItemCells
+                                              dataListCells={[
+                                                  <DataListCell
+                                                      key={host}>{host}
+                                                  </DataListCell>,
+                                                  <DataListCell>
+                                                      <Flex>
+                                                          <FlexItem>
+                                                              <Label color="green" icon={<CheckCircleIcon />}>{values.ok} OK</Label>
+                                                          </FlexItem>
+                                                          <FlexItem>
+                                                              <Label color="orange" icon={<InfoCircleIcon />}>{values.changed} changed</Label>
+                                                          </FlexItem>
+                                                          <FlexItem>
+                                                              <Label color="red" icon={<TimesCircleIcon />}>{values.failures} failed</Label>
+                                                          </FlexItem>
+                                                      </Flex>
+                                                  </DataListCell>
+                                              ]}
+                                          />
+                                      </DataListItemRow>
+                                  </DataListItem>
+                              ))}
+                          </DataList>
+                      </CardBody>
+                  </Card>
+              </GridItem>
+          </Grid>
+      )
   }
 
   renderFailedTask (host, task) {
