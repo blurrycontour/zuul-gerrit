@@ -632,8 +632,24 @@ class Repo(object):
             for dn in dirs:
                 if dn not in tree:
                     continue
+
+                # Some people like to keep playbooks, etc. grouped
+                # under their zuul config dirs; record the leading
+                # directories of any .zuul.ignore files and prune them
+                # from the config read.
+                to_ignore = []
                 for blob in tree[dn].traverse():
-                    if blob.path.endswith(".yaml"):
+                    if blob.path.endswith(".zuul.ignore"):
+                        to_ignore.append(os.path.split(blob.path)[0])
+
+                def _ignored(blob):
+                    for prefix in to_ignore:
+                        if blob.path.startswith(prefix):
+                            return True
+                    return False
+
+                for blob in tree[dn].traverse():
+                    if not _ignored(blob) and blob.path.endswith(".yaml"):
                         ret[blob.path] = blob.data_stream.read().decode(
                             'utf-8')
         return ret

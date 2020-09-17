@@ -77,6 +77,10 @@ example using number prefixes in file's names::
 * zuul.d/01_jobs.yaml
 * zuul.d/02_jobs-variants.yaml
 
+Note subdirectories are traversed.  Any subdirectories with a
+``.zuul.ignore`` file will be pruned and ignored (this is facilitates
+keeping playbooks or roles in the config directory, if required).
+
 Below are references to the different configuration items you may use within
 the YAML files:
 
