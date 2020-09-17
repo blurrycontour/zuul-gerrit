@@ -567,6 +567,20 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
          The number of log streamers currently in operation.
 
+.. stat:: zuul.reporter.<reporter>
+
+   Holds metrics regarding reporters.  The ``<reporter>``
+   component of the key will be replaced with the reporter name.
+
+   .. stat:: duration
+      :type: timer
+
+      How long each reporter spent reporting.
+
+   .. stat:: count
+      :type: counter
+
+      A counter for each reporter holding the count of reports done.
 
 As an example, given a job named `myjob` in `mytenant` triggered by a
 change to `myproject` on the `master` branch in the `gate` pipeline
