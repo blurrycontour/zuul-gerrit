@@ -12,6 +12,7 @@
 
 import logging
 import textwrap
+import time
 import urllib
 from abc import ABCMeta
 
@@ -19,6 +20,7 @@ from zuul import exceptions
 from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
+from zuul.scheduler import Scheduler
 
 
 class DynamicChangeQueueContextManager(object):
@@ -47,11 +49,11 @@ class StaticChangeQueueContextManager(object):
 class PipelineManager(metaclass=ABCMeta):
     """Abstract Base Class for enqueing and processing Changes in a Pipeline"""
 
-    def __init__(self, sched, pipeline):
+    def __init__(self, sched: Scheduler, pipeline):
         self.log = logging.getLogger("zuul.Pipeline.%s.%s" %
                                      (pipeline.tenant.name,
                                       pipeline.name,))
-        self.sched = sched
+        self.sched: Scheduler = sched
         self.pipeline = pipeline
         self.event_filters = []
         self.ref_filters = []
@@ -193,9 +195,20 @@ class PipelineManager(metaclass=ABCMeta):
         if len(action_reporters) > 0:
             for reporter in action_reporters:
                 try:
+                    self.log.debug("Reporting to %s started", reporter.name)
+                    start = time.monotonic()
                     ret = reporter.report(item)
+                    duration = (time.monotonic() - start) * 1000
+                    self.log.debug("Reporting to %s finished in %sms",
+                                   reporter.name, duration)
                     if ret:
                         report_errors.append(ret)
+                    self.sched.statsd.timing(
+                        "zuul.reporter.{reporter}.report_sum"
+                        .format(reporter=reporter.name), duration)
+                    self.sched.statsd.incr(
+                        "zuul.reporter.{reporter}.report_total"
+                        .format(reporter=reporter.name))
                 except Exception as e:
                     item.setReportedResult('ERROR')
                     log.exception("Exception while reporting")
