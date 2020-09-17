@@ -12,6 +12,7 @@
 
 import logging
 import textwrap
+import time
 import urllib
 from abc import ABCMeta
 
@@ -193,9 +194,17 @@ class PipelineManager(metaclass=ABCMeta):
         if len(action_reporters) > 0:
             for reporter in action_reporters:
                 try:
+                    self.log.debug("Reporting to %s started", reporter.name)
+                    start = time.monotonic()
                     ret = reporter.report(item)
+                    duration = (time.monotonic() - start) * 1000
+                    self.log.debug("Reporting to %s finished in %sms",
+                                   reporter.name, duration)
                     if ret:
                         report_errors.append(ret)
+                    self.sched.statsd.timing(
+                        "zuul.reporter.{reporter}.duration"
+                        .format(reporter=reporter.name), duration)
                 except Exception as e:
                     item.setReportedResult('ERROR')
                     log.exception("Exception while reporting")
