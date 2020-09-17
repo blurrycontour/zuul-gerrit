@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_8bb38b0a",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2106,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-09-17T19:08:39Z",
+      "side": 0,
+      "message": "This change doesn\u0027t remove the Zuul CLI, so we shouldn\u0027t remove the tests yet.",
+      "revId": "d676b6d6d9ac3c903b0f8a8ed013b96cf8a65df7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
