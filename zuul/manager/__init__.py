@@ -12,6 +12,7 @@
 
 import logging
 import textwrap
+import time
 import urllib
 from abc import ABCMeta
 
@@ -192,6 +193,9 @@ class PipelineManager(metaclass=ABCMeta):
         report_errors = []
         if len(action_reporters) > 0:
             for reporter in action_reporters:
+                log.debug("Reporting to %s started", reporter.name)
+                start = time.monotonic()
+
                 try:
                     ret = reporter.report(item)
                     if ret:
@@ -200,6 +204,20 @@ class PipelineManager(metaclass=ABCMeta):
                     item.setReportedResult('ERROR')
                     log.exception("Exception while reporting")
                     report_errors.append(str(e))
+
+                duration_ms = int((time.monotonic() - start) * 1000)
+                log.debug("Reporting to %s finished in %sms",
+                          reporter.name, duration_ms)
+                if self.sched.statsd:  # only if statsd is enabled
+                    try:
+                        self.sched.statsd.timing(
+                            "zuul.reporter.{reporter}.duration"
+                            .format(reporter=reporter.name), duration_ms)
+                        self.sched.statsd.incr(
+                            "zuul.reporter.{reporter}.count"
+                            .format(reporter=reporter.name))
+                    except Exception:
+                        log.exception("Exception reporting report stats")
         return report_errors
 
     def isChangeReadyToBeEnqueued(self, change, event):
