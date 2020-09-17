@@ -15,12 +15,26 @@
 import * as React from 'react'
 import { Fragment } from 'react'
 import PropTypes from 'prop-types'
-import { Panel } from 'react-bootstrap'
 import {
-  Icon,
-  ListView,
-} from 'patternfly-react'
+    Card,
+    CardBody,
+    CardHeader,
+    DataList,
+    DataListItem,
+    DataListItemRow,
+    DataListItemCells,
+    DataListCell,
+    Label,
+    Flex,
+    FlexItem,
+} from '@patternfly/react-core'
 
+import {
+    CheckCircleIcon,
+    InfoCircleIcon,
+    TimesIcon,
+    TimesCircleIcon,
+} from '@patternfly/react-icons'
 
 class BuildOutput extends React.Component {
   static propTypes = {
@@ -28,38 +42,53 @@ class BuildOutput extends React.Component {
   }
 
   renderHosts (hosts) {
-    return (
-      <ListView>
-        {Object.entries(hosts).map(([host, values]) => (
-          <ListView.Item
-            key={host}
-            heading={host}
-            additionalInfo={[
-              <ListView.InfoItem key="ok" title="Task OK">
-                <Icon type='pf' name='info' />
-                <strong>{values.ok}</strong>
-              </ListView.InfoItem>,
-              <ListView.InfoItem key="changed" title="Task changed">
-                <Icon type='pf' name='ok' />
-                <strong>{values.changed}</strong>
-              </ListView.InfoItem>,
-              <ListView.InfoItem key="fail" title="Task failure">
-                <Icon type='pf' name='error-circle-o' />
-                <strong>{values.failures}</strong>
-              </ListView.InfoItem>
-            ]}
-          />
-        ))}
-      </ListView>
-    )
+      return (
+        <Card>
+          <CardHeader>
+            <strong>Task run summary</strong>
+          </CardHeader>
+          <CardBody>
+            <DataList aria-label="Build Results">
+              {Object.entries(hosts).map(([host, values]) => (
+                <DataListItem key={host} aria-label="Host">
+                  <DataListItemRow>
+                    <DataListItemCells
+                      dataListCells={[
+                        <DataListCell key={host + ".name"}>{host} </DataListCell>,
+                        <DataListCell key={host + ".data"}>
+                          <Flex>
+                            <FlexItem>
+                              <Label color="green" icon={<CheckCircleIcon />}>{values.ok} OK</Label>
+                            </FlexItem>
+                            <FlexItem>
+                              <Label color="orange" icon={<InfoCircleIcon />}>{values.changed} changed</Label>
+                            </FlexItem>
+                            <FlexItem>
+                              <Label color="red" icon={<TimesCircleIcon />}>{values.failures} failed</Label>
+                            </FlexItem>
+                          </Flex>
+                        </DataListCell>
+                      ]}
+                    />
+                  </DataListItemRow>
+                </DataListItem>
+              ))}
+            </DataList>
+          </CardBody>
+        </Card>
+      )
   }
 
   renderFailedTask (host, task) {
     const max_lines = 42
     return (
-      <Panel key={host + task.zuul_log_id}>
-        <Panel.Heading>{host}: {task.name}</Panel.Heading>
-        <Panel.Body>
+      <Card key={host + task.zuul_log_id}>
+          <CardHeader>
+            <TimesIcon style={{ color: 'var(--pf-global--danger-color--100)' }}/>
+            &nbsp;Task&nbsp;<strong>{task.name}</strong>&nbsp;
+            failed running on host&nbsp;<strong>{host}</strong>
+          </CardHeader>
+        <CardBody>
           {task.invocation && task.invocation.module_args &&
            task.invocation.module_args._raw_params && (
              <pre key="cmd" title="cmd" className={`${'cmd'}`}>
@@ -99,8 +128,8 @@ class BuildOutput extends React.Component {
             </pre>
             </Fragment>
           )}
-        </Panel.Body>
-      </Panel>
+        </CardBody>
+      </Card>
     )
   }
 
@@ -108,16 +137,11 @@ class BuildOutput extends React.Component {
     const { output } = this.props
     return (
       <React.Fragment>
-        <br />
-        <div key="tasks">
+          {this.renderHosts(output)}
           {Object.entries(output)
            .filter(([, values]) => values.failed.length > 0)
            .map(([host, values]) => (values.failed.map(failed => (
              this.renderFailedTask(host, failed)))))}
-        </div>
-        <div key="hosts">
-          {this.renderHosts(output)}
-        </div>
       </React.Fragment>
     )
   }
