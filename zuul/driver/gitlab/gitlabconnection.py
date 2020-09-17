@@ -464,6 +464,26 @@ class GitlabConnection(CachedBranchConnection):
                                                    zuul_event_id)
         return branch.get('protected')
 
+    def testReconfigureTenant(self, event, project, tenant,
+                              abide, reconfigure_tenant):
+        # If the driver knows the branch but we don't have a config, we
+        # also need to reconfigure. This happens if a Gitlab branch
+        # was just configured as protected without a push in between.
+        if (event.branch in self.getProjectBranches(
+                project, tenant)
+                and not abide.hasUnparsedBranchCache(
+                    project.canonical_name, event.branch)):
+            reconfigure_tenant = True
+
+        # If the branch is unprotected and unprotected branches
+        # are excluded from the tenant for that project skip reconfig.
+        if (reconfigure_tenant and not
+                event.branch_protected and
+                tenant.getExcludeUnprotectedBranches(project)):
+            reconfigure_tenant = False
+
+        return reconfigure_tenant
+
     def getGitwebUrl(self, project, sha=None):
         url = '%s/%s' % (self.baseurl, project)
         if sha is not None:

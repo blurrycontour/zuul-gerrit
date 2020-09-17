@@ -108,6 +108,11 @@ class GithubSource(BaseSource):
             self.connection.addProject(p)
         return p
 
+    def testReconfigureTenant(self, event, project, tenant,
+                              abide, reconfigure_tenant):
+        return self.connection.testReconfigureTenant(event, project, tenant,
+                                                     abide, reconfigure_tenant)
+
     def getProjectBranches(self, project, tenant):
         return self.connection.getProjectBranches(project, tenant)
 
