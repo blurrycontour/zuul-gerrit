@@ -74,6 +74,7 @@ class GithubTriggerEvent(TriggerEvent):
         self.action = None
         self.delivery = None
         self.check_runs = None
+        self.branch_protected = True
 
     def isPatchsetCreated(self):
         if self.type == 'pull_request':
