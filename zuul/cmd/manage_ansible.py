@@ -44,7 +44,7 @@ class ManageAnsible(zuul.cmd.ZuulApp):
     log = logging.getLogger('zuul.ManageAnsible')
 
     def createParser(self):
-        parser = super().createParser()
+        parser = super(ManageAnsible, self).createParser()
         parser.add_argument('-v', dest='verbose', action='store_true',
                             help='verbose output')
         parser.add_argument('-u', dest='upgrade', action='store_true',
@@ -58,7 +58,7 @@ class ManageAnsible(zuul.cmd.ZuulApp):
                             help='root path for ansible venv installations')
         return parser
 
-    def _setup_logging(self):
+    def setup_logging(self):
         """Manage ansible logging does not rely on conf file"""
         if self.args.verbose:
             logging.basicConfig(level=logging.DEBUG)
@@ -73,7 +73,7 @@ class ManageAnsible(zuul.cmd.ZuulApp):
             # This script must be able to run without config so this can be
             # safely ignored here.
             pass
-        self._setup_logging()
+        self.setup_logging()
 
         manager = AnsibleManager(runtime_install_root=self.args.install_root)
 

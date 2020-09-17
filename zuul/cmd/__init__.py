@@ -14,8 +14,6 @@
 # under the License.
 
 import abc
-import argparse
-import configparser
 import daemon
 import extras
 import io
@@ -38,6 +36,13 @@ pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
 from zuul.ansible import logconfig
 import zuul.lib.connections
 from zuul.lib.config import get_default
+
+try:
+    from zuulclient.common.client import App
+except ImportError:
+    # Remove before merging! this is to circumvent errors in zuul-client 0.0.1
+    from unittest.mock import MagicMock
+    App = MagicMock()
 
 
 def stack_dump_handler(signum, frame):
@@ -92,34 +97,17 @@ def stack_dump_handler(signum, frame):
     signal.signal(signal.SIGUSR2, stack_dump_handler)
 
 
-class ZuulApp(object):
-    app_name = None  # type: str
-    app_description = None  # type: str
-
+class ZuulApp(App):
     def __init__(self):
-        self.args = None
-        self.config = None
+        super(ZuulApp, self).__init__()
         self.connections = {}
 
     def _get_version(self):
         from zuul.version import version_info as zuul_version_info
         return "Zuul version: %s" % zuul_version_info.release_string()
 
-    def createParser(self):
-        parser = argparse.ArgumentParser(
-            description=self.app_description,
-            formatter_class=argparse.RawDescriptionHelpFormatter)
-        parser.add_argument('-c', dest='config',
-                            help='specify the config file')
-        parser.add_argument('--version', dest='version', action='version',
-                            version=self._get_version(),
-                            help='show zuul version')
-        return parser
-
     def parseArguments(self, args=None):
-        parser = self.createParser()
-        self.args = parser.parse_args(args)
-
+        parser = super(ZuulApp, self).parseArguments(args)
         # The arguments debug and foreground both lead to nodaemon mode so
         # set nodaemon if one of them is set.
         if ((hasattr(self.args, 'debug') and self.args.debug) or
@@ -128,23 +116,6 @@ class ZuulApp(object):
         else:
             self.args.nodaemon = False
         return parser
-
-    def readConfig(self):
-        safe_env = {
-            k: v for k, v in os.environ.items()
-            if k.startswith('ZUUL_')
-        }
-        self.config = configparser.ConfigParser(safe_env)
-        if self.args.config:
-            locations = [self.args.config]
-        else:
-            locations = ['/etc/zuul/zuul.conf',
-                         '~/zuul.conf']
-        for fp in locations:
-            if os.path.exists(os.path.expanduser(fp)):
-                self.config.read(os.path.expanduser(fp))
-                return
-        raise Exception("Unable to locate config file in %s" % locations)
 
     def setup_logging(self, section, parameter):
         if self.config.has_option(section, parameter):
