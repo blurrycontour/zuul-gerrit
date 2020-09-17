@@ -39,6 +39,13 @@ from zuul.ansible import logconfig
 import zuul.lib.connections
 from zuul.lib.config import get_default
 
+try:
+    from zuulclient.common import client
+except ImportError:
+    # Remove before merging! this is to circumvent errors in zuul-client 0.0.1
+    from unittest.mock import MagicMock
+    client = MagicMock()
+
 
 def stack_dump_handler(signum, frame):
     signal.signal(signal.SIGUSR2, signal.SIG_IGN)
@@ -145,6 +152,49 @@ class ZuulApp(object):
                 self.config.read(os.path.expanduser(fp))
                 return
         raise Exception("Unable to locate config file in %s" % locations)
+
+    def setup_logging(self, section, parameter):
+        if self.config.has_option(section, parameter):
+            fp = os.path.expanduser(self.config.get(section, parameter))
+            logging_config = logconfig.load_config(fp)
+        else:
+            # If someone runs in the foreground and doesn't give a logging
+            # config, leave the config set to emit to stdout.
+            if hasattr(self.args, 'nodaemon') and self.args.nodaemon:
+                logging_config = logconfig.ServerLoggingConfig()
+            else:
+                # Setting a server value updates the defaults to use
+                # WatchedFileHandler on /var/log/zuul/{server}-debug.log
+                # and /var/log/zuul/{server}.log
+                logging_config = logconfig.ServerLoggingConfig(server=section)
+            if hasattr(self.args, 'debug') and self.args.debug:
+                logging_config.setDebug()
+        logging_config.apply()
+
+    def configure_connections(self, source_only=False, include_drivers=None):
+        self.connections = zuul.lib.connections.ConnectionRegistry()
+        self.connections.configure(self.config, source_only, include_drivers)
+
+
+class ZuulApp(client.App):
+    def __init__(self):
+        super(ZuulApp, self).__init__()
+        self.connections = {}
+
+    def _get_version(self):
+        from zuul.version import version_info as zuul_version_info
+        return "Zuul version: %s" % zuul_version_info.release_string()
+
+    def parseArguments(self, args=None):
+        parser = super(ZuulApp, self).parseArguments(args)
+        # The arguments debug and foreground both lead to nodaemon mode so
+        # set nodaemon if one of them is set.
+        if ((hasattr(self.args, 'debug') and self.args.debug) or
+                (hasattr(self.args, 'foreground') and self.args.foreground)):
+            self.args.nodaemon = True
+        else:
+            self.args.nodaemon = False
+        return parser
 
     def setup_logging(self, section, parameter):
         if self.config.has_option(section, parameter):
