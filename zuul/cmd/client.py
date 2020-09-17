@@ -23,280 +23,58 @@ import re
 import sys
 import time
 import textwrap
-import requests
-import urllib.parse
+
+try:
+    from zuulclient.api import ZuulRESTClient
+    from zuulclient.common.client import CLI
+except ImportError:
+    # Remove before merging! this is to circumvent errors in zuul-client 0.0.1
+    from unittest.mock import MagicMock
+
+    ZuulRESTClient = MagicMock()
+    CLI = MagicMock()
+
+
+import zuul.lib.connections
 
 import zuul.rpcclient
 import zuul.cmd
 from zuul.lib.config import get_default
 
 
-# todo This should probably live somewhere else
-class ZuulRESTClient(object):
-    """Basic client for Zuul's REST API"""
-    def __init__(self, url, verify=False, auth_token=None):
-        self.url = url
-        if not self.url.endswith('/'):
-            self.url += '/'
-        self.auth_token = auth_token
-        self.verify = verify
-        self.base_url = urllib.parse.urljoin(self.url, 'api/')
-        self.session = requests.Session()
-        self.session.verify = self.verify
-        self.session.headers = dict(
-            Authorization='Bearer %s' % self.auth_token)
-
-    def _check_status(self, req):
-        try:
-            req.raise_for_status()
-        except Exception as e:
-            if req.status_code == 401:
-                print('Unauthorized - your token might be invalid or expired.')
-            elif req.status_code == 403:
-                print('Insufficient privileges to perform the action.')
-            else:
-                print('Unknown error: "%e"' % e)
-
-    def autohold(self, tenant, project, job, change, ref,
-                 reason, count, node_hold_expiration):
-        if not self.auth_token:
-            raise Exception('Auth Token required')
-        args = {"reason": reason,
-                "count": count,
-                "job": job,
-                "change": change,
-                "ref": ref,
-                "node_hold_expiration": node_hold_expiration}
-        url = urllib.parse.urljoin(
-            self.base_url,
-            'tenant/%s/project/%s/autohold' % (tenant, project))
-        req = self.session.post(url, json=args)
-        self._check_status(req)
-        return req.json()
-
-    def autohold_list(self, tenant):
-        if not tenant:
-            raise Exception('"--tenant" argument required')
-        url = urllib.parse.urljoin(
-            self.base_url,
-            'tenant/%s/autohold' % tenant)
-        req = requests.get(url, verify=self.verify)
-        self._check_status(req)
-        resp = req.json()
-        # reformat the answer to match RPC format
-        ret = {}
-        for d in resp:
-            key = ','.join([d['tenant'],
-                            d['project'],
-                            d['job'],
-                            d['ref_filter']])
-            ret[key] = (d['count'], d['reason'], d['node_hold_expiration'])
-
-        return ret
-
-    def enqueue(self, tenant, pipeline, project, trigger, change):
-        if not self.auth_token:
-            raise Exception('Auth Token required')
-        args = {"trigger": trigger,
-                "change": change,
-                "pipeline": pipeline}
-        url = urllib.parse.urljoin(
-            self.base_url,
-            'tenant/%s/project/%s/enqueue' % (tenant, project))
-        req = self.session.post(url, json=args)
-        self._check_status(req)
-        return req.json()
-
-    def enqueue_ref(self, tenant, pipeline, project,
-                    trigger, ref, oldrev, newrev):
-        if not self.auth_token:
-            raise Exception('Auth Token required')
-        args = {"trigger": trigger,
-                "ref": ref,
-                "oldrev": oldrev,
-                "newrev": newrev,
-                "pipeline": pipeline}
-        url = urllib.parse.urljoin(
-            self.base_url,
-            'tenant/%s/project/%s/enqueue' % (tenant, project))
-        req = self.session.post(url, json=args)
-        self._check_status(req)
-        return req.json()
-
-    def dequeue(self, tenant, pipeline, project, change=None, ref=None):
-        if not self.auth_token:
-            raise Exception('Auth Token required')
-        args = {"pipeline": pipeline}
-        if change and not ref:
-            args['change'] = change
-        elif ref and not change:
-            args['ref'] = ref
-        else:
-            raise Exception('need change OR ref')
-        url = urllib.parse.urljoin(
-            self.base_url,
-            'tenant/%s/project/%s/dequeue' % (tenant, project))
-        req = self.session.post(url, json=args)
-        self._check_status(req)
-        return req.json()
-
-    def promote(self, tenant, pipeline, change_ids):
-        if not self.auth_token:
-            raise Exception('Auth Token required')
-        args = {
-            "pipeline": pipeline,
-            "changes": change_ids,
-        }
-        url = urllib.parse.urljoin(
-            self.base_url,
-            'tenant/%s/promote' % tenant)
-        req = self.session.post(url, json=args)
-        self._check_status(req)
-        return req.json()
-
-    def get_running_jobs(self, *args, **kwargs):
-        raise NotImplementedError(
-            'This action is unsupported by the REST API')
-
-
-class Client(zuul.cmd.ZuulApp):
+class Client(CLI):
     app_name = 'zuul'
     app_description = 'Zuul CLI client.'
     log = logging.getLogger("zuul.Client")
 
     def createParser(self):
         parser = super(Client, self).createParser()
-        parser.add_argument('-v', dest='verbose', action='store_true',
-                            help='verbose output')
         parser.add_argument('--auth-token', dest='auth_token',
                             required=False,
                             default=None,
-                            help='Authentication Token, needed if using the'
-                                 'REST API')
+                            help='[DEPRECATED] Authentication Token, needed '
+                                 'if using the REST API')
         parser.add_argument('--zuul-url', dest='zuul_url',
                             required=False,
                             default=None,
-                            help='Zuul API URL, needed if using the '
-                                 'REST API without a configuration file')
+                            help='[DEPRECATED] Zuul API URL, needed if using '
+                                 'the REST API without a configuration file')
         parser.add_argument('--insecure', dest='insecure_ssl',
                             required=False,
                             action='store_false',
-                            help='Do not verify SSL connection to Zuul, '
-                                 'when using the REST API (Defaults to False)')
+                            help='[DEPRECATED] Do not verify SSL connection '
+                                 'to Zuul, when using the REST API '
+                                 '(Defaults to False)')
+        return parser
 
-        subparsers = parser.add_subparsers(title='commands',
-                                           description='valid commands',
-                                           help='additional help')
+    def createCommandParsers(self, parser):
+        subparsers = super(Client, self).createCommandParsers(parser)
+        self.add_show_subparser(subparsers)
+        self.add_conf_check_subparser(subparsers)
+        self.add_create_auth_token_subparser(subparsers)
+        return subparsers
 
-        cmd_autohold = subparsers.add_parser(
-            'autohold', help='hold nodes for failed job')
-        cmd_autohold.add_argument('--tenant', help='tenant name',
-                                  required=True)
-        cmd_autohold.add_argument('--project', help='project name',
-                                  required=True)
-        cmd_autohold.add_argument('--job', help='job name',
-                                  required=True)
-        cmd_autohold.add_argument('--change',
-                                  help='specific change to hold nodes for',
-                                  required=False, default='')
-        cmd_autohold.add_argument('--ref', help='git ref to hold nodes for',
-                                  required=False, default='')
-        cmd_autohold.add_argument('--reason', help='reason for the hold',
-                                  required=True)
-        cmd_autohold.add_argument('--count',
-                                  help='number of job runs (default: 1)',
-                                  required=False, type=int, default=1)
-        cmd_autohold.add_argument(
-            '--node-hold-expiration',
-            help=('how long in seconds should the node set be in HOLD status '
-                  '(default: scheduler\'s default_hold_expiration value)'),
-            required=False, type=int)
-        cmd_autohold.set_defaults(func=self.autohold)
-
-        cmd_autohold_delete = subparsers.add_parser(
-            'autohold-delete', help='delete autohold request')
-        cmd_autohold_delete.set_defaults(func=self.autohold_delete)
-        cmd_autohold_delete.add_argument('id', metavar='REQUEST_ID',
-                                         help='the hold request ID')
-
-        cmd_autohold_info = subparsers.add_parser(
-            'autohold-info', help='retrieve autohold request detailed info')
-        cmd_autohold_info.set_defaults(func=self.autohold_info)
-        cmd_autohold_info.add_argument('id', metavar='REQUEST_ID',
-                                       help='the hold request ID')
-
-        cmd_autohold_list = subparsers.add_parser(
-            'autohold-list', help='list autohold requests')
-        cmd_autohold_list.add_argument('--tenant', help='tenant name',
-                                       required=False)
-        cmd_autohold_list.set_defaults(func=self.autohold_list)
-
-        cmd_enqueue = subparsers.add_parser('enqueue', help='enqueue a change')
-        cmd_enqueue.add_argument('--tenant', help='tenant name',
-                                 required=True)
-        # TODO(mhu) remove in a few releases
-        cmd_enqueue.add_argument('--trigger',
-                                 help='trigger name (deprecated and ignored. '
-                                      'Kept only for backward compatibility)',
-                                 required=False, default=None)
-        cmd_enqueue.add_argument('--pipeline', help='pipeline name',
-                                 required=True)
-        cmd_enqueue.add_argument('--project', help='project name',
-                                 required=True)
-        cmd_enqueue.add_argument('--change', help='change id',
-                                 required=True)
-        cmd_enqueue.set_defaults(func=self.enqueue)
-
-        cmd_enqueue = subparsers.add_parser(
-            'enqueue-ref', help='enqueue a ref',
-            formatter_class=argparse.RawDescriptionHelpFormatter,
-            description=textwrap.dedent('''\
-            Submit a trigger event
-
-            Directly enqueue a trigger event.  This is usually used
-            to manually "replay" a trigger received from an external
-            source such as gerrit.'''))
-        cmd_enqueue.add_argument('--tenant', help='tenant name',
-                                 required=True)
-        cmd_enqueue.add_argument('--trigger', help='trigger name',
-                                 required=False, default=None)
-        cmd_enqueue.add_argument('--pipeline', help='pipeline name',
-                                 required=True)
-        cmd_enqueue.add_argument('--project', help='project name',
-                                 required=True)
-        cmd_enqueue.add_argument('--ref', help='ref name',
-                                 required=True)
-        cmd_enqueue.add_argument(
-            '--oldrev', help='old revision', default=None)
-        cmd_enqueue.add_argument(
-            '--newrev', help='new revision', default=None)
-        cmd_enqueue.set_defaults(func=self.enqueue_ref)
-
-        cmd_dequeue = subparsers.add_parser('dequeue',
-                                            help='dequeue a buildset by its '
-                                                 'change or ref')
-        cmd_dequeue.add_argument('--tenant', help='tenant name',
-                                 required=True)
-        cmd_dequeue.add_argument('--pipeline', help='pipeline name',
-                                 required=True)
-        cmd_dequeue.add_argument('--project', help='project name',
-                                 required=True)
-        cmd_dequeue.add_argument('--change', help='change id',
-                                 default=None)
-        cmd_dequeue.add_argument('--ref', help='ref name',
-                                 default=None)
-        cmd_dequeue.set_defaults(func=self.dequeue)
-
-        cmd_promote = subparsers.add_parser('promote',
-                                            help='promote one or more changes')
-        cmd_promote.add_argument('--tenant', help='tenant name',
-                                 required=True)
-        cmd_promote.add_argument('--pipeline', help='pipeline name',
-                                 required=True)
-        cmd_promote.add_argument('--changes', help='change ids',
-                                 required=True, nargs='+')
-        cmd_promote.set_defaults(func=self.promote)
-
+    def add_show_subparser(self, subparsers):
         cmd_show = subparsers.add_parser('show',
                                          help='show current statuses')
         cmd_show.set_defaults(func=self.show_running_jobs)
@@ -316,11 +94,13 @@ class Client(zuul.cmd.ZuulApp):
         # TODO: add filters such as queue, project, changeid etc
         show_running_jobs.set_defaults(func=self.show_running_jobs)
 
+    def add_conf_check_subparser(self, subparsers):
         cmd_conf_check = subparsers.add_parser(
             'tenant-conf-check',
             help='validate the tenant configuration')
         cmd_conf_check.set_defaults(func=self.validate)
 
+    def add_create_auth_token_subparser(self, subparsers):
         cmd_create_auth_token = subparsers.add_parser(
             'create-auth-token',
             help='create an Authentication Token for the web API',
@@ -359,51 +139,13 @@ class Client(zuul.cmd.ZuulApp):
             required=False)
         cmd_create_auth_token.set_defaults(func=self.create_auth_token)
 
-        return parser
-
-    def parseArguments(self, args=None):
-        parser = super(Client, self).parseArguments()
-        if not getattr(self.args, 'func', None):
-            parser.print_help()
-            sys.exit(1)
-        if self.args.func == self.enqueue_ref:
-            # if oldrev or newrev is set, ensure they're not the same
-            if (self.args.oldrev is not None) or \
-               (self.args.newrev is not None):
-                if self.args.oldrev == self.args.newrev:
-                    parser.error(
-                        "The old and new revisions must not be the same.")
-            # if they're not set, we pad them out to zero
-            if self.args.oldrev is None:
-                self.args.oldrev = '0000000000000000000000000000000000000000'
-            if self.args.newrev is None:
-                self.args.newrev = '0000000000000000000000000000000000000000'
-        if self.args.func == self.dequeue:
-            if self.args.change is None and self.args.ref is None:
-                parser.error("Change or ref needed.")
-            if self.args.change is not None and self.args.ref is not None:
-                parser.error(
-                    "The 'change' and 'ref' arguments are mutually exclusive.")
-
-    def setup_logging(self):
-        """Client logging does not rely on conf file"""
-        if self.args.verbose:
-            logging.basicConfig(level=logging.DEBUG)
-
-    def main(self):
-        self.parseArguments()
-        if not self.args.zuul_url:
-            self.readConfig()
-        self.setup_logging()
-
-        if self.args.func():
-            sys.exit(0)
-        else:
-            sys.exit(1)
-
     def get_client(self):
         if self.args.zuul_url:
             self.log.debug('Zuul URL provided as argument, using REST client')
+            self.log.warning('Using the REST client is deprecated, '
+                             'use zuul-client instead')
+            print('[DEPRECATED] The REST client is deprecated for this CLI. '
+                  'Use `zuul-client` instead.')
             client = ZuulRESTClient(self.args.zuul_url,
                                     self.args.insecure_ssl,
                                     self.args.auth_token)
@@ -422,6 +164,10 @@ class Client(zuul.cmd.ZuulApp):
                 client_id=self.app_description)
         elif 'webclient' in conf_sections:
             self.log.debug('web section found in config, using REST client')
+            self.log.warning('Using the REST client is deprecated, '
+                             'use zuul-client instead')
+            print('[DEPRECATED] The REST client is deprecated for this CLI. '
+                  'Use `zuul-client` instead.')
             server = get_default(self.config, 'webclient', 'url', None)
             verify = get_default(self.config, 'webclient', 'verify_ssl',
                                  self.args.insecure_ssl)
@@ -429,119 +175,12 @@ class Client(zuul.cmd.ZuulApp):
                                     self.args.auth_token)
         else:
             print('Unable to find a way to connect to Zuul, add a "gearman" '
-                  'or "web" section to your configuration file')
+                  'section to your configuration file')
             sys.exit(1)
         if server is None:
             print('Missing "server" configuration value')
             sys.exit(1)
         return client
-
-    def autohold(self):
-        if self.args.change and self.args.ref:
-            print("Change and ref can't be both used for the same request")
-            return False
-        if "," in self.args.change:
-            print("Error: change argument can not contain any ','")
-            return False
-
-        node_hold_expiration = self.args.node_hold_expiration
-        client = self.get_client()
-        r = client.autohold(
-            tenant=self.args.tenant,
-            project=self.args.project,
-            job=self.args.job,
-            change=self.args.change,
-            ref=self.args.ref,
-            reason=self.args.reason,
-            count=self.args.count,
-            node_hold_expiration=node_hold_expiration)
-        return r
-
-    def autohold_delete(self):
-        client = self.get_client()
-        return client.autohold_delete(self.args.id)
-
-    def autohold_info(self):
-        client = self.get_client()
-        request = client.autohold_info(self.args.id)
-
-        if not request:
-            print("Autohold request not found")
-            return True
-
-        print("ID: %s" % request['id'])
-        print("Tenant: %s" % request['tenant'])
-        print("Project: %s" % request['project'])
-        print("Job: %s" % request['job'])
-        print("Ref Filter: %s" % request['ref_filter'])
-        print("Max Count: %s" % request['max_count'])
-        print("Current Count: %s" % request['current_count'])
-        print("Node Expiration: %s" % request['node_expiration'])
-        print("Request Expiration: %s" % time.ctime(request['expired']))
-        print("Reason: %s" % request['reason'])
-        print("Held Nodes: %s" % request['nodes'])
-
-        return True
-
-    def autohold_list(self):
-        client = self.get_client()
-        autohold_requests = client.autohold_list(tenant=self.args.tenant)
-
-        if not autohold_requests:
-            print("No autohold requests found")
-            return True
-
-        table = prettytable.PrettyTable(
-            field_names=[
-                'ID', 'Tenant', 'Project', 'Job', 'Ref Filter',
-                'Max Count', 'Reason'
-            ])
-
-        for request in autohold_requests:
-            table.add_row([
-                request['id'],
-                request['tenant'],
-                request['project'],
-                request['job'],
-                request['ref_filter'],
-                request['max_count'],
-                request['reason'],
-            ])
-
-        print(table)
-        return True
-
-    def enqueue(self):
-        client = self.get_client()
-        r = client.enqueue(
-            tenant=self.args.tenant,
-            pipeline=self.args.pipeline,
-            project=self.args.project,
-            trigger=self.args.trigger,
-            change=self.args.change)
-        return r
-
-    def enqueue_ref(self):
-        client = self.get_client()
-        r = client.enqueue_ref(
-            tenant=self.args.tenant,
-            pipeline=self.args.pipeline,
-            project=self.args.project,
-            trigger=self.args.trigger,
-            ref=self.args.ref,
-            oldrev=self.args.oldrev,
-            newrev=self.args.newrev)
-        return r
-
-    def dequeue(self):
-        client = self.get_client()
-        r = client.dequeue(
-            tenant=self.args.tenant,
-            pipeline=self.args.pipeline,
-            project=self.args.project,
-            change=self.args.change,
-            ref=self.args.ref)
-        return r
 
     def create_auth_token(self):
         auth_section = ''
@@ -553,7 +192,7 @@ class Client(zuul.cmd.ZuulApp):
         if auth_section == '':
             print('"%s" authenticator configuration not found.'
                   % self.args.auth_config)
-            sys.exit(1)
+            return False
         now = time.time()
         token = {'iat': now,
                  'exp': now + self.args.expires_in,
@@ -574,30 +213,22 @@ class Client(zuul.cmd.ZuulApp):
             except Exception as e:
                 print('Could not read private key at "%s": %s' % (private_key,
                                                                   e))
-                sys.exit(1)
+                return False
         else:
             print('Unknown or unsupported authenticator driver "%s"' % driver)
-            sys.exit(1)
+            return False
         try:
             auth_token = jwt.encode(token,
                                     key=key,
                                     algorithm=driver).decode('utf-8')
             print("Bearer %s" % auth_token)
-            err_code = 0
+            success = True
         except Exception as e:
             print("Error when generating Auth Token")
             print(e)
-            err_code = 1
+            success = False
         finally:
-            sys.exit(err_code)
-
-    def promote(self):
-        client = self.get_client()
-        r = client.promote(
-            tenant=self.args.tenant,
-            pipeline=self.args.pipeline,
-            change_ids=self.args.changes)
-        return r
+            return success
 
     def show_running_jobs(self):
         client = self.get_client()
@@ -737,13 +368,17 @@ class Client(zuul.cmd.ZuulApp):
             for conf_tenant in unparsed_abide.tenants:
                 loader.tenant_parser.getSchema()(conf_tenant)
             print("Tenants config validated with success")
-            err_code = 0
+            success = True
         except Exception as e:
             print("Error when validating tenants config")
             print(e)
-            err_code = 1
+            success = False
         finally:
-            sys.exit(err_code)
+            return success
+
+    def configure_connections(self, source_only=False, include_drivers=None):
+        self.connections = zuul.lib.connections.ConnectionRegistry()
+        self.connections.configure(self.config, source_only, include_drivers)
 
 
 def main():
