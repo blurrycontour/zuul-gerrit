@@ -1162,7 +1162,7 @@ class TestGithubDriver(ZuulTestCase):
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         check_pipeline = tenant.layout.pipelines['check']
-        self.assertEqual(check_pipeline.getAllItems(), [])
+        self.assertEqual(list(check_pipeline.getAllItems()), [])
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 2)
 
         self.executor_server.hold_jobs_in_build = False
@@ -2014,7 +2014,7 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
 
         tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
         check_pipeline = tenant.layout.pipelines["check"]
-        self.assertEqual(0, len(check_pipeline.getAllItems()))
+        self.assertEqual(0, len(list(check_pipeline.getAllItems())))
         self.assertEqual(1, self.countJobResults(self.history, "ABORTED"))
 
         # The buildset was already dequeued, so there shouldn't be anything to

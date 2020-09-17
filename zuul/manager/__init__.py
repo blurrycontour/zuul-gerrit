@@ -132,10 +132,13 @@ class PipelineManager(metaclass=ABCMeta):
     def getNodePriority(self, item):
         queue = self.pipeline.getRelativePriorityQueue(item.change.project)
         items = self.pipeline.getAllItems()
-        items = [i for i in items
+        items = (i for i in items
                  if i.change.project in queue and
-                 i.live]
-        return items.index(item)
+                 i.live)
+        for n, i in enumerate(items):
+            if i == item:
+                return n
+        raise ValueError('Item %s not found' % item)
 
     def isChangeAlreadyInPipeline(self, change):
         # Checks live items in the pipeline
@@ -1215,7 +1218,7 @@ class PipelineManager(metaclass=ABCMeta):
                 dt = int((item.dequeue_time - item.enqueue_time) * 1000)
             else:
                 dt = None
-            items = len(self.pipeline.getAllItems())
+            items = self.pipeline.countAllItems()
 
             tenant = self.pipeline.tenant
             basekey = 'zuul.tenant.%s' % tenant.name

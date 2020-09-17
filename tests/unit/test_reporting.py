@@ -54,7 +54,7 @@ class TestReporting(ZuulTestCase):
         self.assertIn("Build started (check)", A.messages[0])
         self.assertIn("Build canceled (check)", A.messages[1])
         # There shouldn't be any successful items
-        self.assertEqual(len(check_pipeline.getAllItems()), 0)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 0)
         # But one canceled
         self.assertEqual(self.countJobResults(self.history, "ABORTED"), 1)
 

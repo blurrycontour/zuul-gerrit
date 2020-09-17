@@ -1266,7 +1266,7 @@ class TestInRepoConfig(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        items = check_pipeline.getAllItems()
+        items = list(check_pipeline.getAllItems())
         self.assertEqual(items[0].change.number, '1')
         self.assertEqual(items[0].change.patchset, '1')
         self.assertTrue(items[0].live)
@@ -1296,7 +1296,7 @@ class TestInRepoConfig(ZuulTestCase):
 
         self.waitUntilSettled()
 
-        items = check_pipeline.getAllItems()
+        items = list(check_pipeline.getAllItems())
         self.assertEqual(items[0].change.number, '1')
         self.assertEqual(items[0].change.patchset, '2')
         self.assertTrue(items[0].live)
@@ -2573,7 +2573,7 @@ class TestInRepoJoin(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        items = gate_pipeline.getAllItems()
+        items = list(gate_pipeline.getAllItems())
         self.assertEqual(items[0].change.number, '1')
         self.assertEqual(items[0].change.patchset, '1')
         self.assertTrue(items[0].live)

@@ -471,17 +471,17 @@ class TestGerritCRD(ZuulTestCase):
         B.setDependsOn(A, 1)
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 2)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 2)
 
         # ...make sure the live one is not duplicated...
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 2)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 2)
 
         # ...but the non-live one is able to be.
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 3)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 3)
 
         # Release jobs in order to avoid races with change A jobs
         # finishing before change B jobs.
@@ -576,7 +576,7 @@ class TestGerritCRD(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         check_pipeline = tenant.layout.pipelines['check']
         self.assertEqual(len(check_pipeline.queues), 3)
-        self.assertEqual(len(check_pipeline.getAllItems()), 3)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 3)
         for item in check_pipeline.getAllItems():
             self.assertTrue(item.live)
 

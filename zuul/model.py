@@ -351,10 +351,15 @@ class Pipeline(object):
         return changes
 
     def getAllItems(self):
-        items = []
         for shared_queue in self.queues:
-            items.extend(shared_queue.queue)
-        return items
+            for item in shared_queue.queue:
+                yield item
+
+    def countAllItems(self):
+        result = 0
+        for shared_queue in self.queues:
+            result += len(shared_queue.queue)
+        return result
 
     def formatStatusJSON(self, websocket_url=None):
         j_pipeline = dict(name=self.name,

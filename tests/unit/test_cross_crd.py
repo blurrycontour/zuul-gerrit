@@ -294,17 +294,17 @@ class TestGerritToGithubCRD(ZuulTestCase):
         # Add two dependent changes...
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 2)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 2)
 
         # ...make sure the live one is not duplicated...
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 2)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 2)
 
         # ...but the non-live one is able to be.
         self.fake_github.emitEvent(B.getPullRequestEditedEvent())
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 3)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 3)
 
         # Release jobs in order to avoid races with change A jobs
         # finishing before change B jobs.
@@ -748,17 +748,17 @@ class TestGithubToGerritCRD(ZuulTestCase):
         # Add two dependent changes...
         self.fake_github.emitEvent(A.getPullRequestEditedEvent())
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 2)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 2)
 
         # ...make sure the live one is not duplicated...
         self.fake_github.emitEvent(A.getPullRequestEditedEvent())
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 2)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 2)
 
         # ...but the non-live one is able to be.
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertEqual(len(check_pipeline.getAllItems()), 3)
+        self.assertEqual(len(list(check_pipeline.getAllItems())), 3)
 
         # Release jobs in order to avoid races with change A jobs
         # finishing before change B jobs.

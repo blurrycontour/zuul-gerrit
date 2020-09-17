@@ -420,7 +420,7 @@ class TestGitlabDriver(ZuulTestCase):
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         check_pipeline = tenant.layout.pipelines['check']
-        self.assertEqual(check_pipeline.getAllItems(), [])
+        self.assertEqual(list(check_pipeline.getAllItems()), [])
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 2)
 
         self.executor_server.hold_jobs_in_build = False
