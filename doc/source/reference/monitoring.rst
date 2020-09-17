@@ -416,6 +416,21 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
       The sum of the `running` and `waiting` jobs.
 
+.. stat:: zuul.reporter.<reporter>
+
+   Holds metrics regarding reporters.  The ``<reporter>``
+   component of the key will be replaced with the reporter name.
+
+   .. stat:: duration
+      :type: timer
+
+      How long each reporter spent reporting.
+
+   .. stat:: count
+      :type: counter
+
+      A counter for each reporter holding the count of reports done.
+
 As an example, given a job named `myjob` in `mytenant` triggered by a
 change to `myproject` on the `master` branch in the `gate` pipeline
 which took 40 seconds to build, the Zuul scheduler will emit the
@@ -424,3 +439,9 @@ following statsd events:
   * ``zuul.tenant.mytenant.pipeline.gate.project.example_com.myproject.master.job.myjob.SUCCESS`` +1
   * ``zuul.tenant.mytenant.pipeline.gate.project.example_com.myproject.master.job.myjob.SUCCESS``  40 seconds
   * ``zuul.tenant.mytenant.pipeline.gate.all_jobs`` +1
+
+Such job reporting results using a SQL reporter will emit following
+statsd events, given the SQL report took 2 seconds:
+
+  * ``zuul.reporter.sql.duration`` 2 seconds
+  * ``zuul.reporter.sql.count`` +1
