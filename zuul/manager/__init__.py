@@ -1215,7 +1215,7 @@ class PipelineManager(metaclass=ABCMeta):
                 dt = int((item.dequeue_time - item.enqueue_time) * 1000)
             else:
                 dt = None
-            items = len(self.pipeline.getAllItems())
+            items = self.pipeline.countAllItems()
 
             tenant = self.pipeline.tenant
             basekey = 'zuul.tenant.%s' % tenant.name
