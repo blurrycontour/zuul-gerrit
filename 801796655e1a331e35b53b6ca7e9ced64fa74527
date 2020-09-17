@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_72aa7171",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-17T12:34:13Z",
+      "side": 1,
+      "message": "We need to use log instead of self.log to have annotated logging.",
+      "revId": "801796655e1a331e35b53b6ca7e9ced64fa74527",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
