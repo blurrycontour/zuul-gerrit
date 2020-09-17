@@ -213,7 +213,7 @@ class BuildPage extends React.Component {
                   <TabTitleIcon>
                     <PollIcon />
                   </TabTitleIcon>
-                  <TabTitleText>Results</TabTitleText>
+                  <TabTitleText>Task Summary</TabTitleText>
                 </>
               }
             >

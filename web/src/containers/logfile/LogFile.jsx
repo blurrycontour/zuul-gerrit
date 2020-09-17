@@ -75,12 +75,10 @@ class LogFile extends React.Component {
       const fileName = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1)
 
       // Update the URL to have the severity link selected
-      var sev_query
+      let sev_query=''
       if (severity !== '') {
           sev_query='?severity=' + severity
-      } else {
-          sev_query=''
-      }
+      } 
       let newurl = window.location.protocol + '//' + window.location.host + window.location.pathname + sev_query
       window.history.pushState({path:newurl},'',newurl)
 
