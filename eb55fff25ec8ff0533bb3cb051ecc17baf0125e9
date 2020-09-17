@@ -34,6 +34,23 @@
       "revId": "eb55fff25ec8ff0533bb3cb051ecc17baf0125e9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_53f13c95",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2009,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-17T07:06:45Z",
+      "side": 1,
+      "message": "Could we use a kw argument here, check_run_id\u003dNone? Makes the function call easier to read and you directly know which argument has the None value.",
+      "revId": "eb55fff25ec8ff0533bb3cb051ecc17baf0125e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
