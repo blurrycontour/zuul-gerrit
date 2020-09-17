@@ -202,7 +202,6 @@ class BuildPage extends React.Component {
         </PageSection>
         <PageSection variant={PageSectionVariants.light}>
           <Tabs
-            isFilled
             activeKey={activeTab}
             onSelect={(event, tabIndex) => this.handleTabClick(tabIndex, build)}
           >
