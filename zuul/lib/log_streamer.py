@@ -162,7 +162,7 @@ class LogStreamer(object):
 
     def __init__(self, host, port, jobdir_root):
         self.log = logging.getLogger('zuul.log_streamer')
-        self.log.debug("LogStreamer starting on port %s", port)
+        self.log.debug("LogStreamer starting on %s:%s", host, port)
         self.server = LogStreamerServer((host, port),
                                         RequestHandler,
                                         jobdir_root=jobdir_root)

@@ -41,6 +41,7 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
 
     def __init__(self, *args, **kwargs):
         self.rpc = kwargs.pop('rpc')
+        self.zookeeper = kwargs.pop('zookeeper')
         super(RequestHandler, self).__init__(*args, **kwargs)
 
     def _fingerClient(self, server, port, build_uuid):
@@ -53,6 +54,7 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
 
         Both IPv4 and IPv6 are supported.
         '''
+        self.log.debug("Finger client: %s:%s", server, port)
         with socket.create_connection((server, port), timeout=10) as s:
             # timeout only on the connection, let recv() wait forever
             s.settimeout(None)
@@ -175,7 +177,9 @@ class FingerGateway(object):
 
         self.server = streamer_utils.CustomThreadingTCPServer(
             self.address,
-            functools.partial(RequestHandler, rpc=self.rpc),
+            functools.partial(RequestHandler,
+                              rpc=self.rpc,
+                              zookeeper=self.zookeeper),
             user=self.user,
             pid_file=self.pid_file)
 
