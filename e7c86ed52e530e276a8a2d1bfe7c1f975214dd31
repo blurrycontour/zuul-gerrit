@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_e9f5eacd",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-09-18T06:49:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_ce4d8cc6",
+      "revId": "e7c86ed52e530e276a8a2d1bfe7c1f975214dd31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_4e621c3f",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2020-09-18T06:01:00Z",
       "side": 1,
       "message": "With disabled statsd reporting self.sched.statsd is None so we need to guard for that. Further stats reporting should not lead to failed reports so we need to catch exceptions there separately, see also https://opendev.org/zuul/zuul/src/branch/master/zuul/connection/__init__.py#L51",
+      "revId": "e7c86ed52e530e276a8a2d1bfe7c1f975214dd31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_890f0edf",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-09-18T06:49:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_4e621c3f",
       "revId": "e7c86ed52e530e276a8a2d1bfe7c1f975214dd31",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
