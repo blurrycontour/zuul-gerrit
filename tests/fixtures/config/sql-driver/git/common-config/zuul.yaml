@@ -69,6 +69,10 @@
     run: playbooks/project-test3.yaml
 
 - job:
+    name: project-test4
+    run: playbooks/project-test4.yaml
+
+- job:
     name: project-publish
     run: playbooks/project-publish.yaml
 
@@ -115,3 +119,15 @@
             dependencies: project-merge
         - project-test2:
             dependencies: project-merge
+
+- project:
+    name: org/project2
+    check:
+      jobs:
+        - project-test4
+
+- project:
+    name: org/project3
+    check:
+      jobs:
+        - project-test2
