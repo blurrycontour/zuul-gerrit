@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_89838ecb",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-18T07:13:26Z",
+      "side": 1,
+      "message": "We still need to catch and log exceptions here since this stats reporting errors must not mark the report as failed.",
+      "range": {
+        "startLine": 205,
+        "startChar": 0,
+        "endLine": 211,
+        "endChar": 60
+      },
+      "revId": "19528d5297171227b11c8f91dedd3e0ead353b20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
