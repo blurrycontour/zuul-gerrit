@@ -16,6 +16,23 @@
       "revId": "4857941d05c51d6c5c4714f2563a4122735cedc9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_a1e4a60f",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2020-09-18T11:49:14Z",
+      "side": 1,
+      "message": "NIT: you could return here",
+      "revId": "4857941d05c51d6c5c4714f2563a4122735cedc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
