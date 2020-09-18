@@ -120,6 +120,7 @@ class SQLReporter(BaseReporter):
                     if 'metadata' in artifact:
                         artifact['metadata'] = json.dumps(artifact['metadata'])
                     db_build.createArtifact(**artifact)
+            db.session().add(db_buildset)
 
 
 def getSchema():

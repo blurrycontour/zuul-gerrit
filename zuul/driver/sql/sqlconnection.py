@@ -117,8 +117,6 @@ class DatabaseSession(object):
 
     def createBuildSet(self, *args, **kw):
         bs = self.connection.buildSetModel(*args, **kw)
-        self.session().add(bs)
-        self.session().flush()
         return bs
 
     def getBuildsets(self, tenant=None, project=None, pipeline=None,
@@ -281,12 +279,9 @@ class SQLConnection(BaseConnection):
             event_id = sa.Column(sa.String(255), nullable=True)
 
             def createBuild(self, *args, **kw):
-                session = orm.session.Session.object_session(self)
                 b = BuildModel(*args, **kw)
                 b.buildset_id = self.id
                 self.builds.append(b)
-                session.add(b)
-                session.flush()
                 return b
 
         class BuildModel(Base):
@@ -308,7 +303,6 @@ class SQLConnection(BaseConnection):
             buildset = orm.relationship(BuildSetModel, backref="builds")
 
             def createArtifact(self, *args, **kw):
-                session = orm.session.Session.object_session(self)
                 # SQLAlchemy reserves the 'metadata' attribute on
                 # object models, so our model and table names use
                 # 'meta', but here we accept data directly from
@@ -320,17 +314,12 @@ class SQLConnection(BaseConnection):
                 a = ArtifactModel(*args, **kw)
                 a.build_id = self.id
                 self.artifacts.append(a)
-                session.add(a)
-                session.flush()
                 return a
 
             def createProvides(self, *args, **kw):
-                session = orm.session.Session.object_session(self)
                 p = ProvidesModel(*args, **kw)
                 p.build_id = self.id
                 self.provides.append(p)
-                session.add(p)
-                session.flush()
                 return p
 
         class ArtifactModel(Base):
