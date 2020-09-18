@@ -376,6 +376,54 @@ class TestSQLConnectionMysql(ZuulDBTestCase):
 
         check_results('database', 'resultsdb_failures')
 
+    def test_too_long_url_recover(self):
+        """
+        Tests that zuul recovers from errors during db commit
+
+        There can be situations in which the db commit fails e.g. too long
+        log url (which is job defined). In case we run into an error this
+        must not affect subsequent builds.
+        """
+
+        # Run a job that sets a too long log url
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Run a job that should be correctly reported
+        A = self.fake_gerrit.addFakeChange('org/project3', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Grab the sa tables for resultsdb
+        tenant = self.scheds.first.sched.abide.tenants.get(
+            'tenant-one')
+        reporter = _get_reporter_from_connection_name(
+            tenant.layout.pipelines['check'].success_actions,
+            'database'
+        )
+
+        conn = self.scheds.first.connections.connections[
+            'database']. \
+            engine.connect()
+        buildsets_resultsdb = conn.execute(sa.sql.select(
+            [reporter.connection.zuul_buildset_table])).fetchall()
+
+        # Should have been 1 buildset reported to the resultsdb. The first
+        # one should have failed due to the too long url field, the second
+        # one should be successful.
+        self.assertEqual(1, len(buildsets_resultsdb))
+
+        # The second one should have passed
+        self.assertEqual('check', buildsets_resultsdb[0]['pipeline'])
+        self.assertEqual(
+            'org/project3', buildsets_resultsdb[0]['project'])
+        self.assertEqual(2, buildsets_resultsdb[0]['change'])
+        self.assertEqual('1', buildsets_resultsdb[0]['patchset'])
+        self.assertEqual('SUCCESS', buildsets_resultsdb[0]['result'])
+        self.assertEqual(
+            'Build succeeded.', buildsets_resultsdb[0]['message'])
+
 
 class TestSQLConnectionPostgres(TestSQLConnectionMysql):
     config_file = 'zuul-sql-driver-postgres.conf'
