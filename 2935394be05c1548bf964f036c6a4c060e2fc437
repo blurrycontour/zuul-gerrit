@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_bc7677a2",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-09-20T15:47:21Z",
+      "side": 1,
+      "message": "This seems unwise. Gerrit account display names are not guaranteed unique like account IDs and usernames are. Unlike the REST API, the SSH event stream doesn\u0027t seem to include _account_id (which is guaranteed unique due to being an incrementing integer), so you should at least include the username attribute as it is at least practically unique (Gerrit tries to avoid username collisions).",
+      "revId": "2935394be05c1548bf964f036c6a4c060e2fc437",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_1c6e83c8",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-09-20T15:47:21Z",
+      "side": 1,
+      "message": "Same concern here.",
+      "revId": "2935394be05c1548bf964f036c6a4c060e2fc437",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
