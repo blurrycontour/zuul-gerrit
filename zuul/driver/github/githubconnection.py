@@ -1458,8 +1458,6 @@ class GithubConnection(BaseConnection):
         if not change.is_merged:
             change.is_merged = change.pr.get('merged')
 
-        change.status = self._get_statuses(
-            change.project, change.patchset, event)
         change.reviews = self.getPullReviews(
             pr_obj, change.project, change.number, event)
         change.labels = change.pr.get('labels')
@@ -1492,10 +1490,38 @@ class GithubConnection(BaseConnection):
                 self.server, change.project.name, change.number),
         ]
 
+        self._updateCanMergeInfo(change, event)
+
         if self.sched:
             self.sched.onChangeUpdated(change, event)
 
         return change
+
+    def _updateCanMergeInfo(self, change, event):
+        # NOTE: The 'mergeable' field may get a false (null) while GitHub is
+        # calculating if it can merge. The Github API will just return
+        # that as false. This could lead to false negatives. So don't get this
+        # field here and only evaluate branch protection settings. Any merge
+        # conflicts which would block merging finally will be detected by
+        # the zuul-mergers anyway.
+        github = self.getGithubClient(change.project.name, zuul_event_id=event)
+
+        # Append accept headers so we get the draft status and checks api
+        self._append_accept_header(github, PREVIEW_DRAFT_ACCEPT)
+        self._append_accept_header(github, PREVIEW_CHECKS_ACCEPT)
+
+        # For performance reasons fetch all needed data upfront using a
+        # single graphql call.
+        canmerge_data = self.graphql_client.fetch_canmerge(
+            github, change, zuul_event_id=event)
+
+        change.contexts = self._get_contexts(canmerge_data)
+        change.status = ["{}:{}:{}".format(*c) for c in change.contexts]
+        change.draft = canmerge_data.get('isDraft', False)
+        change.review_decision = canmerge_data['reviewDecision']
+        change.required_contexts = set(
+            canmerge_data['requiredStatusCheckContexts']
+        )
 
     def getGitUrl(self, project: Project):
         if self.git_ssh_key:
@@ -1638,40 +1664,21 @@ class GithubConnection(BaseConnection):
         return (pr, probj)
 
     def canMerge(self, change, allow_needs, event=None):
-        # NOTE: The mergeable call may get a false (null) while GitHub is
-        # calculating if it can merge. The github3.py library will just return
-        # that as false. This could lead to false negatives. So don't do this
-        # call here and only evaluate branch protection settings. Any merge
-        # conflicts which would block merging finally will be detected by
-        # the zuul-mergers anyway.
-
         log = get_annotated_logger(self.log, event)
 
-        github = self.getGithubClient(change.project.name, zuul_event_id=event)
-
-        # Append accept headers so we get the draft status and checks api
-        self._append_accept_header(github, PREVIEW_DRAFT_ACCEPT)
-        self._append_accept_header(github, PREVIEW_CHECKS_ACCEPT)
-
-        # For performance reasons fetch all needed data for canMerge upfront
-        # using a single graphql call.
-        canmerge_data = self.graphql_client.fetch_canmerge(
-            github, change, zuul_event_id=event)
-
         # If the PR is a draft it cannot be merged.
-        if canmerge_data.get('isDraft', False):
+        if change.draft:
             log.debug('Change %s can not merge because it is a draft', change)
             return False
 
         missing_status_checks = self._getMissingStatusChecks(
-            allow_needs, canmerge_data)
+            change, allow_needs)
         if missing_status_checks:
             log.debug('Change %s can not merge because required status checks '
                       'are missing: %s', change, missing_status_checks)
             return False
 
-        review_decision = canmerge_data['reviewDecision']
-        if review_decision and review_decision != 'APPROVED':
+        if change.review_decision and change.review_decision != 'APPROVED':
             # If we got a review decision it must be approved
             log.debug('Change %s can not merge because it is not approved',
                       change)
@@ -1788,23 +1795,19 @@ class GithubConnection(BaseConnection):
         return resp.json()
 
     @staticmethod
-    def _getMissingStatusChecks(allow_needs, canmerge_data):
-        required_contexts = canmerge_data['requiredStatusCheckContexts']
-        if not required_contexts:
+    def _getMissingStatusChecks(change, allow_needs):
+        if not change.required_contexts:
             # There are no required contexts -> ok by definition
             return set()
 
         # Strip allow_needs as we will set this in the gate ourselves
         required_contexts = set(
-            [x for x in required_contexts if x not in allow_needs])
-
-        # Get successful statuses
-        successful = set([s[0] for s in canmerge_data['status'].items()
-                          if s[1] == 'SUCCESS'])
+            x for x in change.required_contexts if x not in allow_needs
+        )
 
         # Remove successful checks from the required contexts to get the
         # remaining missing required status.
-        return required_contexts.difference(successful)
+        return required_contexts.difference(change.successful_contexts)
 
     @cachetools.cached(cache=cachetools.TTLCache(maxsize=2048, ttl=3600),
                        key=lambda self, login, project:
@@ -2201,34 +2204,14 @@ class GithubConnection(BaseConnection):
     def _ghTimestampToDate(self, timestamp):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
-    def _get_statuses(self, project, sha, event):
-        # A ref can have more than one status from each context,
-        # however the API returns them in order, newest first.
-        # So we can keep track of which contexts we've already seen
-        # and throw out the rest. Our unique key is based on
-        # the user and the context, since context is free form and anybody
-        # can put whatever they want there. We want to ensure we track it
-        # by user, so that we can require/trigger by user too.
-        seen = []
-        statuses = []
-        for status in self.getCommitStatuses(project.name, sha, event):
-            stuple = _status_as_tuple(status)
-            if "%s:%s" % (stuple[0], stuple[1]) not in seen:
-                statuses.append("%s:%s:%s" % stuple)
-                seen.append("%s:%s" % (stuple[0], stuple[1]))
-
-        # Although Github differentiates commit statuses and commit checks via
-        # their respective APIs, the branch protection the status section
-        # (below the comments of a PR) do not differentiate between both. Thus,
-        # to mimic this behaviour also in Zuul, a required_status in the
-        # pipeline config could map to either a status or a check.
-        for check in self.getCommitChecks(project.name, sha, event):
-            ctuple = _check_as_tuple(check)
-            if "{}:{}".format(ctuple[0], ctuple[1]) not in seen:
-                statuses.append("{}:{}:{}".format(*ctuple))
-                seen.append("{}:{}".format(ctuple[0], ctuple[1]))
-
-        return statuses
+    def _get_contexts(self, canmerge_data):
+        contexts = set(
+            _status_as_tuple(s) for s in canmerge_data["status"].values()
+        )
+        contexts.update(set(
+            _check_as_tuple(c) for c in canmerge_data["checks"].values()
+        ))
+        return contexts
 
     def getWebController(self, zuul_web):
         return GithubWebController(zuul_web, self)
@@ -2350,6 +2333,9 @@ def _status_as_tuple(status):
         user = creator.get('login')
     context = status.get('context')
     state = status.get('state')
+    # Normalize state to lowercase as the Graphql and REST API are not
+    # consistent in this regard.
+    state = state.lower() if state else state
     return (user, context, state)
 
 
@@ -2365,4 +2351,7 @@ def _check_as_tuple(check):
         slug = "Unknown"
     name = check.get("name")
     conclusion = check.get("conclusion")
+    # Normalize conclusion to lowercase as the Graphql and REST API are not
+    # consistent in this regard.
+    conclusion = conclusion.lower() if conclusion else conclusion
     return (slug, name, conclusion)

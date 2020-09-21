@@ -72,9 +72,14 @@ class FakeBranchProtectionRules(ObjectType):
         return parent.values()
 
 
+class FakeActor(ObjectType):
+    login = String()
+
+
 class FakeStatusContext(ObjectType):
     state = String()
     context = String()
+    creator = Field(FakeActor)
 
     def resolve_state(parent, info):
         state = parent.state.upper()
@@ -82,6 +87,9 @@ class FakeStatusContext(ObjectType):
 
     def resolve_context(parent, info):
         return parent.context
+
+    def resolve_creator(parent, info):
+        return parent.creator
 
 
 class FakeStatus(ObjectType):
@@ -99,7 +107,9 @@ class FakeCheckRun(ObjectType):
         return parent.name
 
     def resolve_conclusion(parent, info):
-        return parent.conclusion.upper()
+        if parent.conclusion:
+            return parent.conclusion.upper()
+        return None
 
 
 class FakeCheckRuns(ObjectType):
@@ -109,11 +119,28 @@ class FakeCheckRuns(ObjectType):
         return parent
 
 
+class FakeApp(ObjectType):
+    slug = String()
+    name = String()
+
+
 class FakeCheckSuite(ObjectType):
+    app = Field(FakeApp)
     checkRuns = Field(FakeCheckRuns, first=Int())
 
+    def resolve_app(parent, info):
+        if not parent:
+            return None
+        return parent[0].app
+
     def resolve_checkRuns(parent, info, first=None):
-        return parent
+        # We only want to return the latest result for a check run per app.
+        # Since the check runs are ordered from latest to oldest result we
+        # need to traverse the list in reverse order.
+        check_runs_by_name = {
+            "{}:{}".format(cr.app, cr.name): cr for cr in reversed(parent)
+        }
+        return check_runs_by_name.values()
 
 
 class FakeCheckSuites(ObjectType):
