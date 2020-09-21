@@ -273,6 +273,7 @@
             dependencies: zuul-build-image
         - nodepool-zuul-functional:
             voting: false
+        - zuul-client-zuul-functional
         - zuul-build-python-release
     gate:
       jobs:
@@ -312,6 +313,7 @@
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
+        - zuul-client-zuul-functional
         - zuul-build-python-release
     promote:
       jobs:
