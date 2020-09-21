@@ -264,7 +264,6 @@
             success-url: 'npm/reports/bundle.html'
             files:
               - web/.*
-        - zuul-stream-functional-2.7
         - zuul-stream-functional-2.8
         - zuul-stream-functional-2.9
         - zuul-tox-remote:
@@ -306,7 +305,6 @@
             success-url: 'npm/reports/bundle.html'
             files:
               - web/.*
-        - zuul-stream-functional-2.7
         - zuul-stream-functional-2.8
         - zuul-stream-functional-2.9
         - zuul-tox-remote:
