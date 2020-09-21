@@ -278,6 +278,8 @@
             dependencies: zuul-build-image
         - nodepool-zuul-functional:
             voting: false
+        - zuul-client-zuul-functional:
+            voting: false
         - zuul-build-python-release
     gate:
       jobs:
