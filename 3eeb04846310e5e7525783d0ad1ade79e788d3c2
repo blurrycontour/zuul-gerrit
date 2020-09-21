@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_c03419af",
+        "filename": "requirements.txt",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-21T13:17:10Z",
+      "side": 1,
+      "message": "I worry this can be a source of circular dependency. IIUC the dependency is only added for the ZuulApp command line object, and in that case I think it would be better if the zuul-client does not use this object.",
+      "revId": "3eeb04846310e5e7525783d0ad1ade79e788d3c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
