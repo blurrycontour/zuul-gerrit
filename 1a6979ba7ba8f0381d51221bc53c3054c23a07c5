@@ -63,6 +63,30 @@
       "revId": "1a6979ba7ba8f0381d51221bc53c3054c23a07c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_ed7e7119",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-21T16:26:26Z",
+      "side": 1,
+      "message": "alright.",
+      "parentUuid": "9f560f44_27024a3f",
+      "range": {
+        "startLine": 44,
+        "startChar": 13,
+        "endLine": 44,
+        "endChar": 18
+      },
+      "revId": "1a6979ba7ba8f0381d51221bc53c3054c23a07c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
