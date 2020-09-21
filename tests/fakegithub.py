@@ -506,24 +506,6 @@ class FakePull(object):
         # with the head_sha as the only commit
         return [self.head]
 
-    def merge(self, commit_message=None, sha=None, merge_method=None):
-        conn = self._fake_pull_request.github
-        pr = self._fake_pull_request
-
-        # record that this got reported
-        conn.github_data.reports.append(
-            (pr.project, pr.number, 'merge', merge_method))
-        if conn.merge_failure:
-            raise Exception('Unknown merge failure')
-        if conn.merge_not_allowed_count > 0:
-            conn.merge_not_allowed_count -= 1
-            resp = ErrorResponse()
-            resp.status_code = 403
-            resp.message = 'Merge not allowed'
-            raise github3.exceptions.MethodNotAllowed(resp)
-        pr.setMerged(commit_message)
-        return True
-
     def as_dict(self):
         pr = self._fake_pull_request
         connection = pr.github
@@ -651,6 +633,31 @@ class FakeGithubSession(object):
                 'expires_at': expiry,
             }
             return FakeResponse(data, 201)
+
+        return FakeResponse(None, 404)
+
+    def put(self, url, data=None, headers=None, params=None, json=None):
+        # Handle pull request merge
+        match = re.match(r'.+/repos/(.+)/pulls/(\d+)/merge$', url)
+        if match:
+            project, pr_number = match.groups()
+            project = urllib.parse.unquote(project)
+            pr = self.client._data.pull_requests[int(pr_number)]
+            conn = pr.github
+
+            # record that this got reported
+            self.client._data.reports.append(
+                (pr.project, pr.number, 'merge', json["merge_method"]))
+            if conn.merge_failure:
+                raise Exception('Unknown merge failure')
+            if conn.merge_not_allowed_count > 0:
+                conn.merge_not_allowed_count -= 1
+                resp = ErrorResponse()
+                resp.status_code = 403
+                resp.message = 'Merge not allowed'
+                raise github3.exceptions.MethodNotAllowed(resp)
+            pr.setMerged(json["commit_message"])
+            return FakeResponse({"merged": True}, 200)
 
         return FakeResponse(None, 404)
 
