@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_8dbb75c2",
+        "filename": "doc/source/reference/drivers/mqtt.rst",
+        "patchSetId": 34
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-21T16:32:12Z",
+      "side": 1,
+      "message": "Is it a Change-Id or a git commit id? I think it should be the git commit id, but the examples below show Change-Id.",
+      "range": {
+        "startLine": 55,
+        "startChar": 10,
+        "endLine": 55,
+        "endChar": 18
+      },
+      "revId": "4ef1c77a49b3e89c94baacaae55b00da37323931",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
