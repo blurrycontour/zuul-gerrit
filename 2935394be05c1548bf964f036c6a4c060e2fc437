@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_36f1e3df",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2020-09-21T07:21:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_bc7677a2",
+      "revId": "2935394be05c1548bf964f036c6a4c060e2fc437",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_1c6e83c8",
         "filename": "zuul/driver/gerrit/gerritmodel.py",
         "patchSetId": 30
@@ -30,6 +48,24 @@
       "writtenOn": "2020-09-20T15:47:21Z",
       "side": 1,
       "message": "Same concern here.",
+      "revId": "2935394be05c1548bf964f036c6a4c060e2fc437",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_9600afad",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2020-09-21T07:21:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_1c6e83c8",
       "revId": "2935394be05c1548bf964f036c6a4c060e2fc437",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
