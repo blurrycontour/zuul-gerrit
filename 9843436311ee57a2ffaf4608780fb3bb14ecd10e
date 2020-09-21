@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_47bdbeaf",
+        "filename": "releasenotes/notes/ansible-2.7-4b6504e46c18cc57.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-21T15:07:14Z",
+      "side": 1,
+      "message": "We should update this release note file if we make the change in ansible-config.conf",
+      "revId": "9843436311ee57a2ffaf4608780fb3bb14ecd10e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

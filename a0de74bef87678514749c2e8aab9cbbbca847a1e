@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_27ca4a4e",
+        "filename": "zuul/lib/ansible-config.conf",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-21T15:07:14Z",
+      "side": 0,
+      "message": "Do we need to deprecate 2.8?",
+      "revId": "a0de74bef87678514749c2e8aab9cbbbca847a1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
