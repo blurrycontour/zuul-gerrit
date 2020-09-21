@@ -22,6 +22,23 @@
       "revId": "1a6979ba7ba8f0381d51221bc53c3054c23a07c5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_c7270e63",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-09-21T14:58:43Z",
+      "side": 1,
+      "message": "I think it still needs to be disambiguated as the owner username, since Gerrit can supply other related objects with usernames in its events too (author, uploader, submitter). This string is a reasonably unique representation of the \"owner\" in Gerrit, and the other information such as display name or E-mail address can be looked up anonymously through the Gerrit API if it\u0027s needed. If we wanted to get more granular than just usernames for these we would need to extend the data structure, but the other connection drivers are similarly just using various username strings as well at the moment.",
+      "revId": "1a6979ba7ba8f0381d51221bc53c3054c23a07c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
