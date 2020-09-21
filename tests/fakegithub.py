@@ -654,6 +654,31 @@ class FakeGithubSession(object):
 
         return FakeResponse(None, 404)
 
+    def put(self, url, data=None, headers=None, params=None, json=None):
+        # Handle pull request merge
+        match = re.match(r'.+/repos/(.+)/pulls/(\d+)/merge$', url)
+        if match:
+            project, pr_number = match.groups()
+            project = urllib.parse.unquote(project)
+            pr = self.client._data.pull_requests[int(pr_number)]
+            conn = pr.github
+
+            # record that this got reported
+            self.client._data.reports.append(
+                (pr.project, pr.number, 'merge', json["merge_method"]))
+            if conn.merge_failure:
+                raise Exception('Unknown merge failure')
+            if conn.merge_not_allowed_count > 0:
+                conn.merge_not_allowed_count -= 1
+                resp = ErrorResponse()
+                resp.status_code = 403
+                resp.message = 'Merge not allowed'
+                raise github3.exceptions.MethodNotAllowed(resp)
+            pr.setMerged(json["commit_message"])
+            return FakeResponse({"merged": True}, 200)
+
+        return FakeResponse(None, 404)
+
     def get_repo(self, request, params=None):
         org, project, request = request.split('/', 2)
         project_name = '{}/{}'.format(org, project)
