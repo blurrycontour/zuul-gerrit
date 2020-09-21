@@ -1492,10 +1492,39 @@ class GithubConnection(BaseConnection):
                 self.server, change.project.name, change.number),
         ]
 
+        self._updateCanMergeInfo(change, event)
+
         if self.sched:
             self.sched.onChangeUpdated(change, event)
 
         return change
+
+    def _updateCanMergeInfo(self, change, event):
+        # NOTE: The mergeable call may get a false (null) while GitHub is
+        # calculating if it can merge. The github3.py library will just return
+        # that as false. This could lead to false negatives. So don't do this
+        # call here and only evaluate branch protection settings. Any merge
+        # conflicts which would block merging finally will be detected by
+        # the zuul-mergers anyway.
+        github = self.getGithubClient(change.project.name, zuul_event_id=event)
+
+        # Append accept headers so we get the draft status and checks api
+        self._append_accept_header(github, PREVIEW_DRAFT_ACCEPT)
+        self._append_accept_header(github, PREVIEW_CHECKS_ACCEPT)
+
+        # For performance reasons fetch all needed data for upfront
+        # using a single graphql call.
+        canmerge_data = self.graphql_client.fetch_canmerge(
+            github, change, zuul_event_id=event)
+
+        change.draft = canmerge_data.get('isDraft', False)
+        change.review_decision = canmerge_data['reviewDecision']
+        change.required_contexts = set(
+            canmerge_data['requiredStatusCheckContexts']
+        )
+        change.successful_contexts = set(
+            s[0] for s in canmerge_data['status'].items() if s[1] == 'SUCCESS'
+        )
 
     def getGitUrl(self, project: Project):
         if self.git_ssh_key:
@@ -1638,40 +1667,21 @@ class GithubConnection(BaseConnection):
         return (pr, probj)
 
     def canMerge(self, change, allow_needs, event=None):
-        # NOTE: The mergeable call may get a false (null) while GitHub is
-        # calculating if it can merge. The github3.py library will just return
-        # that as false. This could lead to false negatives. So don't do this
-        # call here and only evaluate branch protection settings. Any merge
-        # conflicts which would block merging finally will be detected by
-        # the zuul-mergers anyway.
-
         log = get_annotated_logger(self.log, event)
 
-        github = self.getGithubClient(change.project.name, zuul_event_id=event)
-
-        # Append accept headers so we get the draft status and checks api
-        self._append_accept_header(github, PREVIEW_DRAFT_ACCEPT)
-        self._append_accept_header(github, PREVIEW_CHECKS_ACCEPT)
-
-        # For performance reasons fetch all needed data for canMerge upfront
-        # using a single graphql call.
-        canmerge_data = self.graphql_client.fetch_canmerge(
-            github, change, zuul_event_id=event)
-
         # If the PR is a draft it cannot be merged.
-        if canmerge_data.get('isDraft', False):
+        if change.draft:
             log.debug('Change %s can not merge because it is a draft', change)
             return False
 
         missing_status_checks = self._getMissingStatusChecks(
-            allow_needs, canmerge_data)
+            change, allow_needs)
         if missing_status_checks:
             log.debug('Change %s can not merge because required status checks '
                       'are missing: %s', change, missing_status_checks)
             return False
 
-        review_decision = canmerge_data['reviewDecision']
-        if review_decision and review_decision != 'APPROVED':
+        if change.review_decision and change.review_decision != 'APPROVED':
             # If we got a review decision it must be approved
             log.debug('Change %s can not merge because it is not approved',
                       change)
@@ -1788,23 +1798,19 @@ class GithubConnection(BaseConnection):
         return resp.json()
 
     @staticmethod
-    def _getMissingStatusChecks(allow_needs, canmerge_data):
-        required_contexts = canmerge_data['requiredStatusCheckContexts']
-        if not required_contexts:
+    def _getMissingStatusChecks(change, allow_needs):
+        if not change.required_contexts:
             # There are no required contexts -> ok by definition
             return set()
 
         # Strip allow_needs as we will set this in the gate ourselves
         required_contexts = set(
-            [x for x in required_contexts if x not in allow_needs])
-
-        # Get successful statuses
-        successful = set([s[0] for s in canmerge_data['status'].items()
-                          if s[1] == 'SUCCESS'])
+            x for x in change.required_contexts if x not in allow_needs
+        )
 
         # Remove successful checks from the required contexts to get the
         # remaining missing required status.
-        return required_contexts.difference(successful)
+        return required_contexts.difference(change.successful_contexts)
 
     @cachetools.cached(cache=cachetools.TTLCache(maxsize=2048, ttl=3600),
                        key=lambda self, login, project:
