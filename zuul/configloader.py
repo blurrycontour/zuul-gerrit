@@ -390,12 +390,13 @@ def safe_load_yaml(stream, context):
         return loader.get_single_data()
     except yaml.YAMLError as e:
         m = """
-Zuul encountered a syntax error while parsing its configuration in the
-repo {repo} on branch {branch}.  The error was:
+Zuul encountered a syntax error while parsing tenant {tenant}'s configuration
+in the repo {repo} on branch {branch}.  The error was:
 
   {error}
 """
-        m = m.format(repo=context.project.name,
+        m = m.format(tenant=context.tenant.name,
+                     repo=context.project.name,
                      branch=context.branch,
                      error=str(e))
         raise ConfigurationSyntaxError(m)
