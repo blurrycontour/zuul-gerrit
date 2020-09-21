@@ -65,13 +65,18 @@ class FakeBranch(object):
         }
 
 
+class FakeCreator:
+    def __init__(self, login):
+        self.login = login
+
+
 class FakeStatus(object):
     def __init__(self, state, url, description, context, user):
         self.state = state
         self.context = context
+        self.creator = FakeCreator(user)
         self._url = url
         self._description = description
-        self._user = user
 
     def as_dict(self):
         return {
@@ -80,9 +85,15 @@ class FakeStatus(object):
             'description': self._description,
             'context': self.context,
             'creator': {
-                'login': self._user
+                'login': self.creator.login
             }
         }
+
+
+class FakeApp:
+    def __init__(self, name, slug):
+        self.name = name
+        self.slug = slug
 
 
 class FakeCheckRun(object):
@@ -98,7 +109,7 @@ class FakeCheckRun(object):
         self.completed_at = completed_at
         self.external_id = external_id
         self.actions = actions
-        self.app = app
+        self.app = FakeApp(name=app, slug=app)
 
         # Github automatically sets the status to "completed" if a conclusion
         # is provided.
@@ -118,7 +129,8 @@ class FakeCheckRun(object):
             "external_id": self.external_id,
             "actions": self.actions,
             "app": {
-                "slug": self.app,
+                "slug": self.app.slug,
+                "name": self.app.name,
             },
         }
 
@@ -719,6 +731,13 @@ class FakeGithubClient(object):
 
     def pull_request(self, owner, project, number):
         fake_pr = self._data.pull_requests[int(number)]
+        repo = self.repository(owner, project)
+        # Ensure a commit for the head_sha exists so this can be resolved in
+        # graphql queries.
+        repo._commits.setdefault(
+            fake_pr.head_sha,
+            FakeCommit(fake_pr.head_sha)
+        )
         return FakePull(fake_pr)
 
     def search_issues(self, query):
