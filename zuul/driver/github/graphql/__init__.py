@@ -126,11 +126,15 @@ class GraphQLClient:
         # afterwards
         status = commit.get('status') or {}
         for context in status.get('contexts', []):
-            result['status'][context['context']] = context['state']
+            result['status'][context['context']] = context
 
         # Add check runs
+        result['checks'] = {}
         for suite in nested_get(commit, 'checkSuites', 'nodes', default=[]):
             for run in nested_get(suite, 'checkRuns', 'nodes', default=[]):
-                result['status'][run['name']] = run['conclusion']
+                result['checks'][run['name']] = {
+                    **run,
+                    "app": suite.get("app")
+                }
 
         return result
