@@ -170,8 +170,10 @@ class ProjectNotPermittedError(Exception):
 class YAMLDuplicateKeyError(ConfigurationSyntaxError):
     def __init__(self, key, node, context, start_mark):
         intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a syntax error while parsing its configuration in the
-        repo {repo} on branch {branch}.  The error was:""".format(
+        Zuul encountered a syntax error while parsing tenant {tenant}'s
+        configuration in the repo {repo} on branch {branch}.
+        The error was:""".format(
+            tenant=context.tenant.name,
             repo=context.project.name,
             branch=context.branch,
         )))
@@ -236,8 +238,10 @@ def early_configuration_exceptions(context):
         raise
     except Exception as e:
         intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a syntax error while parsing its configuration in the
-        repo {repo} on branch {branch}.  The error was:""".format(
+        Zuul encountered a syntax error while parsing tenant {tenant}'s
+        configuration in the repo {repo} on branch {branch}.
+        The error was:""".format(
+            tenant=context.tenant.name,
             repo=context.project.name,
             branch=context.branch,
         )))
@@ -263,8 +267,10 @@ def configuration_exceptions(stanza, conf, accumulator):
         context = conf.pop('_source_context')
         start_mark = conf.pop('_start_mark')
         intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a syntax error while parsing its configuration in the
-        repo {repo} on branch {branch}.  The error was:""".format(
+        Zuul encountered a syntax error while parsing tenant {tenant}'s
+        configuration in the repo {repo} on branch {branch}.
+        The error was:""".format(
+            tenant=context.tenant.name,
             repo=context.project.name,
             branch=context.branch,
         )))
@@ -299,8 +305,10 @@ def reference_exceptions(stanza, obj, accumulator):
         context = obj.source_context
         start_mark = obj.start_mark
         intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a syntax error while parsing its configuration in the
-        repo {repo} on branch {branch}.  The error was:""".format(
+        Zuul encountered a syntax error while parsing tenant {tenant}'s
+        configuration in the repo {repo} on branch {branch}.
+        The error was:""".format(
+            tenant=context.tenant.name,
             repo=context.project.name,
             branch=context.branch,
         )))
@@ -390,12 +398,13 @@ def safe_load_yaml(stream, context):
         return loader.get_single_data()
     except yaml.YAMLError as e:
         m = """
-Zuul encountered a syntax error while parsing its configuration in the
-repo {repo} on branch {branch}.  The error was:
+Zuul encountered a syntax error while parsing tenant {tenant}'s configuration
+in the repo {repo} on branch {branch}.  The error was:
 
   {error}
 """
-        m = m.format(repo=context.project.name,
+        m = m.format(tenant=context.tenant.name,
+                     repo=context.project.name,
                      branch=context.branch,
                      error=str(e))
         raise ConfigurationSyntaxError(m)
