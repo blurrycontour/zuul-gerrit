@@ -19,7 +19,7 @@ from zuul.lib import capabilities as cpb
 
 
 class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
-    name = 'sql'
+    name: str = 'sql'
 
     def __init__(self):
         self.tenant_connections = {}

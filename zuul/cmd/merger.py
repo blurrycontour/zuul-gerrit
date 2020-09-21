@@ -16,14 +16,21 @@
 
 import signal
 import sys
+from typing import Optional
+
 import zuul.cmd
 import zuul.merger.server
 import zuul.zk
+from zuul.merger.server import MergeServer
 
 
 class Merger(zuul.cmd.ZuulDaemonApp):
     app_name = 'merger'
     app_description = 'A standalone Zuul merger.'
+
+    def __init__(self):
+        super().__init__()
+        self.merger: Optional[MergeServer] = None
 
     def createParser(self):
         parser = super(Merger, self).createParser()
@@ -38,8 +45,9 @@ class Merger(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        self.merger.stop()
-        self.merger.join()
+        if self.merger:
+            self.merger.stop()
+            self.merger.join()
         sys.exit(0)
 
     def run(self):
@@ -52,9 +60,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('merger', 'log_config')
 
         zookeeper = zuul.zk.connect_zookeeper(self.config)
-        self.merger = zuul.merger.server.MergeServer(self.config,
-                                                     self.connections)
-        self.merger.setZookeeper(zookeeper)
+        self.merger = MergeServer(self.config, zookeeper, self.connections)
         self.merger.start()
 
         if self.args.nodaemon:
@@ -66,7 +72,6 @@ class Merger(zuul.cmd.ZuulDaemonApp):
                     print("Ctrl + C: asking merger to exit nicely...\n")
                     self.exit_handler(signal.SIGINT, None)
         else:
-            zookeeper.disconnect()
             self.merger.join()
 
 

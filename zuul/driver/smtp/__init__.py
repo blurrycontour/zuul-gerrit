@@ -18,7 +18,7 @@ from zuul.driver.smtp import smtpreporter
 
 
 class SMTPDriver(Driver, ConnectionInterface, ReporterInterface):
-    name = 'smtp'
+    name: str = 'smtp'
 
     def getConnection(self, name, config):
         return smtpconnection.SMTPConnection(self, name, config)

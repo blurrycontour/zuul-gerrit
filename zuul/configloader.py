@@ -21,6 +21,7 @@ import textwrap
 import io
 import re
 import subprocess
+from typing import Dict, Any
 
 import voluptuous as vs
 
@@ -38,6 +39,9 @@ from zuul.lib.re2util import filter_allowed_disallowed
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
+from zuul.model import Tenant
+
+
 def to_list(x):
     return vs.Any([x], x)
 
@@ -674,8 +678,8 @@ class JobParser(object):
         self.log = logging.getLogger("zuul.JobParser")
         self.pcontext = pcontext
 
-    def fromYaml(self, conf, project_pipeline=False, name=None,
-                 validate=True):
+    def fromYaml(self, conf: Dict[str, Any], project_pipeline: bool=False,
+                 name: bool=None, validate: bool=True) -> model.Job:
         if validate:
             self.schema(conf)
 
@@ -876,9 +880,9 @@ class JobParser(object):
             semaphore = conf.get('semaphore')
             if isinstance(semaphore, str):
                 job.semaphore = model.JobSemaphore(semaphore)
-            else:
+            elif isinstance(semaphore, dict):
                 job.semaphore = model.JobSemaphore(
-                    semaphore.get('name'),
+                    semaphore.get('name', ''),
                     semaphore.get('resources-first', False))
 
         for k in ('tags', 'requires', 'provides'):
@@ -1397,10 +1401,11 @@ class AuthorizationRuleParser(object):
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
-    def __init__(self, connections, scheduler, tenant, ansible_manager):
+    def __init__(self, connections, scheduler, tenant: Tenant,
+                 ansible_manager):
         self.connections = connections
         self.scheduler = scheduler
-        self.tenant = tenant
+        self.tenant: Tenant = tenant
         self.ansible_manager = ansible_manager
         self.pragma_parser = PragmaParser(self)
         self.pipeline_parser = PipelineParser(self)
@@ -1504,7 +1509,7 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager):
+    def fromYaml(self, abide, conf, ansible_manager) -> Tenant:
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -2131,7 +2136,7 @@ class TenantParser(object):
                     for ppc in project_config.pipelines.values():
                         inner_validate_ppcs(ppc)
 
-    def _parseLayout(self, tenant, data, loading_errors):
+    def _parseLayout(self, tenant, data, loading_errors) -> model.Layout:
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
         layout = model.Layout(tenant)
@@ -2141,7 +2146,8 @@ class TenantParser(object):
         self._addLayoutItems(layout, tenant, data)
 
         for pipeline in layout.pipelines.values():
-            pipeline.manager._postConfig(layout)
+            if pipeline.manager:
+                pipeline.manager._postConfig(layout)
 
         return layout
 
