@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_3b86e4bb",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-21T14:55:52Z",
+      "side": 1,
+      "message": "nit: Duplicated field. Since it\u0027s in the assert I guess it doesn\u0027t matter however.",
+      "revId": "428c59e241bc16bbf553034b99061d823f5faeae",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
