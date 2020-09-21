@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_60438d40",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-21T13:10:20Z",
+      "side": 1,
+      "message": "usually `owner` includes email and fullname, so perhaps this field could be named `username`?",
+      "range": {
+        "startLine": 44,
+        "startChar": 13,
+        "endLine": 44,
+        "endChar": 18
+      },
+      "revId": "1a6979ba7ba8f0381d51221bc53c3054c23a07c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
