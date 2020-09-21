@@ -731,3 +731,40 @@ class TestMerger(ZuulTestCase):
             ref_map[foo_zuul_ref].commit.hexsha,
             merge_state[("gerrit", "org/project", "foo")]
         )
+
+    def test_stale_index_lock_cleanup(self):
+        # Stop the running executor's merger. We needed it running to merge
+        # things during test boostrapping but now it is just in the way.
+        self.executor_server.merger_gearworker.stop()
+        self.executor_server.merger_gearworker.join()
+        # Start the merger and do a merge to populate the repo on disk
+        self._startMerger()
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(A.data['status'], 'MERGED')
+
+        # Stop the merger so we can modify the git repo
+        self.merge_server.stop()
+        self.merge_server.join()
+
+        # Add an index.lock file
+        fpath = os.path.join(self.merger_src_root, 'review.example.com',
+                             'org', 'project1', '.git', 'index.lock')
+        with open(fpath, 'w'):
+            pass
+        self.assertTrue(os.path.exists(fpath))
+
+        # Start a new merger and check that we can still merge things
+        self._startMerger()
+
+        # This will fail if git can't modify the repo due to a stale lock file.
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(B.data['status'], 'MERGED')
+
+        self.assertFalse(os.path.exists(fpath))
