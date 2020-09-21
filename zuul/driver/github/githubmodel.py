@@ -38,6 +38,10 @@ class PullRequest(Change):
         self.reviews = []
         self.files = []
         self.labels = []
+        self.draft = None
+        self.review_decision = None
+        self.required_contexts = set()
+        self.succesful_contexts = set()
 
     def isUpdateOf(self, other):
         if (self.project == other.project and

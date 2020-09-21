@@ -99,7 +99,9 @@ class FakeCheckRun(ObjectType):
         return parent.name
 
     def resolve_conclusion(parent, info):
-        return parent.conclusion.upper()
+        if parent.conclusion:
+            return parent.conclusion.upper()
+        return None
 
 
 class FakeCheckRuns(ObjectType):
