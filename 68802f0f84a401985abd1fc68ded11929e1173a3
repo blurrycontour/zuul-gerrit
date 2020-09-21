@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_ec0e7c8a",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 673,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-09-21T09:51:35Z",
+      "side": 1,
+      "message": "I think you can remove that test and instead read the sha params in FakeGitlabAPIClient, for /approve, this will ensure, we always pass the sha to the api.\nFurthermore you could also simulate the 409 error by checking the FakeGitlabMergeRequest\u0027s sha when approved is made with the wrong sha.",
+      "range": {
+        "startLine": 658,
+        "startChar": 0,
+        "endLine": 673,
+        "endChar": 47
+      },
+      "revId": "68802f0f84a401985abd1fc68ded11929e1173a3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
