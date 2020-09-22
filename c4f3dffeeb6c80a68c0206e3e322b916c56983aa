@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_75f5fb50",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1527,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-22T08:24:32Z",
+      "side": 1,
+      "message": "If we store all contexts (and add a property to filter the successful contexts) we can ditch _get_statuses as well which does api calls to fetch data we already have here.",
+      "range": {
+        "startLine": 1525,
+        "startChar": 0,
+        "endLine": 1527,
+        "endChar": 9
+      },
+      "revId": "c4f3dffeeb6c80a68c0206e3e322b916c56983aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
