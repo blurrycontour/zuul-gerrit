@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: fileglob in a good location
+      debug:
+        msg: '{{ lookup("fileglob", zuul.executor.work_root + "/*") }}'

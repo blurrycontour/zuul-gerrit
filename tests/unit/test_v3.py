@@ -2839,6 +2839,8 @@ class FunctionalAnsibleMixIn(object):
             ('block_local_override', 'FAILURE'),
             ('file_local_good', 'SUCCESS'),
             ('file_local_bad', 'FAILURE'),
+            ('fileglob_local_good', 'SUCCESS'),
+            ('fileglob_local_bad', 'FAILURE'),
             ('zuul_return', 'SUCCESS'),
             ('password_create_good', 'SUCCESS'),
             ('password_null_good', 'SUCCESS'),
