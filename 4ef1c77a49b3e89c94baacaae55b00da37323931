@@ -22,6 +22,30 @@
       "revId": "4ef1c77a49b3e89c94baacaae55b00da37323931",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b95e6d10",
+        "filename": "doc/source/reference/drivers/mqtt.rst",
+        "patchSetId": 34
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2020-09-22T08:39:26Z",
+      "side": 1,
+      "message": "it should be commit id and you are right about this one. I just changed the changeId to right commit id",
+      "parentUuid": "9f560f44_8dbb75c2",
+      "range": {
+        "startLine": 55,
+        "startChar": 10,
+        "endLine": 55,
+        "endChar": 18
+      },
+      "revId": "4ef1c77a49b3e89c94baacaae55b00da37323931",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
