@@ -13,13 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-from ansible.module_utils.six.moves.urllib.parse import urlparse
 from ansible.errors import AnsibleError
 
 from zuul.ansible import paths
 normal = paths._import_ansible_action_plugin('normal')
-
-ALLOWED_URL_SCHEMES = ('https', 'http', 'ftp')
 
 
 class ActionModule(normal.ActionModule):
@@ -93,29 +90,6 @@ class ActionModule(normal.ActionModule):
             path = self._task.args.get('path')
             if path:
                 paths._fail_if_unsafe(path)
-
-    def handle_uri(self):
-        '''Allow uri module on localhost if it doesn't touch unsafe files.
-
-        The :ansible:module:`uri` can be used from the executor to do
-        things like pinging readthedocs.org that otherwise don't need a node.
-        However, it can also download content to a local file, or be used to
-        read from file:/// urls.
-
-        Block any use of url schemes other than https, http and ftp. Further,
-        block any local file interaction that falls outside of the zuul
-        work dir.
-        '''
-        # uri takes all the file arguments, so just let handle_file validate
-        # them for us.
-        self.handle_file()
-        scheme = urlparse(self._task.args['url']).scheme
-        if scheme not in ALLOWED_URL_SCHEMES:
-            raise AnsibleError(
-                "{scheme} urls are not allowed from localhost."
-                " Only {allowed_schemes} are allowed".format(
-                    scheme=scheme,
-                    allowed_schemes=ALLOWED_URL_SCHEMES))
 
     def handle_k8s(self):
         '''Allow k8s module on localhost if it doesn't touch unsafe files.
