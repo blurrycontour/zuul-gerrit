@@ -1668,10 +1668,19 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                 'title': mr.title,
                 'state': mr.state,
                 'description': mr.description,
+                'author': {
+                    'name': 'Administrator',
+                    'username': 'admin'
+                },
                 'updated_at': mr.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                 'sha': mr.sha,
                 'labels': mr.labels,
                 'merged_at': mr.merged_at,
+                'diff_refs': {
+                    'base_sha': 'c380d3acebd181f13629a25d2e2acca46ffe1e00',
+                    'head_sha': '2be7ddb704c7b6b83732fdd5b9f09d5a397b5f8f',
+                    'start_sha': 'c380d3acebd181f13629a25d2e2acca46ffe1e00'
+                },
                 'merge_status': mr.merge_status,
             }, 200, "", "GET"
 
