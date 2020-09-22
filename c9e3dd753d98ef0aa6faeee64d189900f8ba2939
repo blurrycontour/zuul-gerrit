@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_c86389b0",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 41
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2020-09-22T13:22:57Z",
+      "side": 1,
+      "message": "I suggest to check elasticsearch connection using info method before returning the object, e.g.:\n\n        try:\n            self.log.debug(\"Elasticsearch info: %s\" % self.es.info())\n        except Exception as e:\n            self.log.warn(\"An error occured on estabilishing \"\n                          \"connection to Elasticsearch: %s\" % e)",
+      "revId": "c9e3dd753d98ef0aa6faeee64d189900f8ba2939",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
