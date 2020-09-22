@@ -2841,6 +2841,8 @@ class FunctionalAnsibleMixIn(object):
             ('file_local_bad', 'FAILURE'),
             ('fileglob_local_good', 'SUCCESS'),
             ('fileglob_local_bad', 'FAILURE'),
+            ('find_local_good', 'SUCCESS'),
+            ('find_local_bad', 'FAILURE'),
             ('zuul_return', 'SUCCESS'),
             ('password_create_good', 'SUCCESS'),
             ('password_null_good', 'SUCCESS'),
