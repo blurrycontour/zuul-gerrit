@@ -11,18 +11,19 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.github import githubconnection
 from zuul.driver.github import githubtrigger
 from zuul.driver.github import githubsource
 from zuul.driver.github import githubreporter
+from zuul.source import BaseSource
 
 
 class GithubDriver(Driver, ConnectionInterface, TriggerInterface,
                    SourceInterface, ReporterInterface):
-    name = 'github'
+    name: str = 'github'
 
     def getConnection(self, name, config):
         return githubconnection.GithubConnection(self, name, config)
@@ -30,7 +31,7 @@ class GithubDriver(Driver, ConnectionInterface, TriggerInterface,
     def getTrigger(self, connection, config=None):
         return githubtrigger.GithubTrigger(self, connection, config)
 
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> BaseSource:
         return githubsource.GithubSource(self, connection)
 
     def getReporter(self, connection, pipeline, config=None):

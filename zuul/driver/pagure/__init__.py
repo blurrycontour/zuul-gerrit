@@ -11,18 +11,19 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.pagure import pagureconnection
 from zuul.driver.pagure import paguresource
 from zuul.driver.pagure import pagurereporter
 from zuul.driver.pagure import paguretrigger
+from zuul.source import BaseSource
 
 
 class PagureDriver(Driver, ConnectionInterface, TriggerInterface,
                    SourceInterface, ReporterInterface):
-    name = 'pagure'
+    name: str = 'pagure'
 
     def getConnection(self, name, config):
         return pagureconnection.PagureConnection(self, name, config)
@@ -30,7 +31,7 @@ class PagureDriver(Driver, ConnectionInterface, TriggerInterface,
     def getTrigger(self, connection, config=None):
         return paguretrigger.PagureTrigger(self, connection, config)
 
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> BaseSource:
         return paguresource.PagureSource(self, connection)
 
     def getReporter(self, connection, pipeline, config=None):

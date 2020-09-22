@@ -12,14 +12,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, SourceInterface
 from zuul.driver.git import gitconnection
 from zuul.driver.git import gitsource
 from zuul.driver.git import gittrigger
+from zuul.source import BaseSource
 
 
 class GitDriver(Driver, ConnectionInterface, SourceInterface):
-    name = 'git'
+    name: str = 'git'
 
     def getConnection(self, name, config):
         return gitconnection.GitConnection(self, name, config)
@@ -27,7 +29,7 @@ class GitDriver(Driver, ConnectionInterface, SourceInterface):
     def getTrigger(self, connection, config=None):
         return gittrigger.GitTrigger(self, connection, config)
 
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> BaseSource:
         return gitsource.GitSource(self, connection)
 
     def getTriggerSchema(self):

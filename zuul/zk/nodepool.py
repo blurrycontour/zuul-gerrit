@@ -23,7 +23,7 @@ from kazoo.recipe.lock import Lock
 import zuul.model
 from zuul.zk import ZooKeeperClient
 from zuul.zk.base import ZooKeeperBase
-from zuul.zk.exceptions import LockException
+from zuul.zk.exceptions import LockException, NoClientException
 
 
 class ZooKeeperNodepool(ZooKeeperBase):
@@ -182,7 +182,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         :param HoldRequest request: Object representing the hold request.
         """
         if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
+            raise NoClientException()
 
         if request.id is None:
             path = self.kazoo_client.create(
@@ -259,7 +259,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         :param HoldRequest request: Object representing the hold request.
         """
         if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
+            raise NoClientException()
 
         if not self.__markHeldNodesAsUsed(request):
             self.log.info("Unable to delete hold request %s because "
