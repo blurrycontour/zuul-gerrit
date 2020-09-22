@@ -22,6 +22,7 @@ ERROR_LOCAL_CODE = "Executing local code is prohibited"
 ERROR_SYNC_TO_OUTSIDE = "Syncing files to outside the working dir"
 ERROR_SYNC_FROM_OUTSIDE = "Syncing files from outside the working dir"
 ERROR_SYNC_RSH = "Using custom synchronize rsh is prohibited"
+ERROR_SCHEME_INVALID = "file urls are not allowed from localhost."
 
 
 class FunctionalActionModulesMixIn:
@@ -220,6 +221,12 @@ class FunctionalActionModulesMixIn:
         self._run_job('known-hosts-localhost', 'SUCCESS')
 
         self._run_job('known-hosts-bad', 'FAILURE', ERROR_ACCESS_OUTSIDE)
+
+    def test_uri_module(self):
+        self._run_job('uri-good', 'SUCCESS')
+        self._run_job('uri-bad-src', 'FAILURE', ERROR_ACCESS_OUTSIDE)
+        self._run_job('uri-bad-dest', 'FAILURE', ERROR_ACCESS_OUTSIDE)
+        self._run_job('uri-bad-url', 'FAILURE', ERROR_SCHEME_INVALID)
 
 
 class TestActionModules28(AnsibleZuulTestCase, FunctionalActionModulesMixIn):

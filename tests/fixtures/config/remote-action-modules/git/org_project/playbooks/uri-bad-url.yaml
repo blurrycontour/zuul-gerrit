@@ -1,0 +1,14 @@
+- hosts: localhost
+  tasks:
+    - name: Request with bad url scheme
+      uri:
+        url: "file:///etc/resolv.conf"
+        dest: "{{ zuul.executor.log_root }}/resolv.conf"
+    - name: stat file that shouldnt exist
+      stat:
+        path: "{{ zuul.executor.log_root }}/resolv.conf"
+      register: test_stat
+    - name: Debug the stat
+      debug:
+        msg: "resolv.conf exists when it shouldn't"
+      when: test_stat.stat.exists
