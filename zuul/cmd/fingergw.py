@@ -33,7 +33,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
 
     def __init__(self):
         super(FingerGatewayApp, self).__init__()
-        self.gateway = None  # type: Optional[FingerGateway]
+        self.gateway: Optional[FingerGateway] = None
 
     def createParser(self):
         parser = super(FingerGatewayApp, self).createParser()
@@ -73,35 +73,34 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
         ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
 
-        zookeeper = zuul.zk.connect_zookeeper(self.config)
+        with zuul.zk.ZooKeeperConnection(self.config) as zookeeper:
+            self.gateway = zuul.lib.fingergw.FingerGateway(
+                (gear_server, gear_port, ssl_key, ssl_cert, ssl_ca),
+                zookeeper,
+                (host, port),
+                user,
+                cmdsock,
+                self.getPidFile(),
+            )
 
-        self.gateway = zuul.lib.fingergw.FingerGateway(
-            (gear_server, gear_port, ssl_key, ssl_cert, ssl_ca),
-            zookeeper,
-            (host, port),
-            user,
-            cmdsock,
-            self.getPidFile(),
-        )
+            self.log.info('Starting Zuul finger gateway app')
+            self.gateway.start()
 
-        self.log.info('Starting Zuul finger gateway app')
-        self.gateway.start()
+            if self.args.nodaemon:
+                # NOTE(Shrews): When running in non-daemon mode, although
+                # sending the 'stop' command via the command socket will
+                # shutdown the gateway, it's still necessary to Ctrl+C to stop
+                # the app.
+                while True:
+                    try:
+                        signal.pause()
+                    except KeyboardInterrupt:
+                        print("Ctrl + C: asking gateway to exit nicely...\n")
+                        self.stop()
+                        break
+            else:
+                self.gateway.wait()
 
-        if self.args.nodaemon:
-            # NOTE(Shrews): When running in non-daemon mode, although sending
-            # the 'stop' command via the command socket will shutdown the
-            # gateway, it's still necessary to Ctrl+C to stop the app.
-            while True:
-                try:
-                    signal.pause()
-                except KeyboardInterrupt:
-                    print("Ctrl + C: asking gateway to exit nicely...\n")
-                    self.stop()
-                    break
-        else:
-            self.gateway.wait()
-
-        zookeeper.disconnect()
         self.log.info('Stopped Zuul finger gateway app')
 
     def stop(self):

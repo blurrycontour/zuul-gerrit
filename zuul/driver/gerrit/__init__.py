@@ -11,7 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.gerrit import gerritconnection
@@ -19,11 +19,12 @@ from zuul.driver.gerrit import gerrittrigger
 from zuul.driver.gerrit import gerritsource
 from zuul.driver.gerrit import gerritreporter
 from zuul.driver.util import to_list
+from zuul.source import BaseSource
 
 
 class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
                    SourceInterface, ReporterInterface):
-    name = 'gerrit'
+    name: str = 'gerrit'
 
     def reconfigure(self, tenant):
         connection_checker_map = {}
@@ -49,7 +50,7 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
     def getTrigger(self, connection, config=None):
         return gerrittrigger.GerritTrigger(self, connection, config)
 
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> BaseSource:
         return gerritsource.GerritSource(self, connection)
 
     def getReporter(self, connection, pipeline, config=None):

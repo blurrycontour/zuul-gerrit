@@ -18,7 +18,7 @@ from zuul.driver.mqtt import mqttreporter
 
 
 class MQTTDriver(Driver, ConnectionInterface, ReporterInterface):
-    name = 'mqtt'
+    name: str = 'mqtt'
 
     def getConnection(self, name, config):
         return mqttconnection.MQTTConnection(self, name, config)

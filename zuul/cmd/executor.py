@@ -17,10 +17,12 @@ import logging
 import os
 import sys
 import signal
+from typing import Optional
 
 import zuul.cmd
 import zuul.executor.server
 import zuul.zk
+from zuul.executor.server import ExecutorServer
 
 from zuul.lib.config import get_default
 
@@ -28,6 +30,11 @@ from zuul.lib.config import get_default
 class Executor(zuul.cmd.ZuulDaemonApp):
     app_name = 'executor'
     app_description = 'A standalone Zuul executor.'
+
+    def __init__(self):
+        super().__init__()
+        self.executor_server: Optional[ExecutorServer] = None
+        self.log_streamer_pid: Optional[int] = None
 
     def createParser(self):
         parser = super(Executor, self).createParser()
@@ -45,7 +52,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        self.executor.stop()
+        if self.executor_server:
+            self.executor_server.stop()
 
     def start_log_streamer(self):
         pipe_read, pipe_write = os.pipe()
@@ -54,7 +62,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             os.close(pipe_write)
             import zuul.lib.log_streamer
 
-            self.log.info("Starting log streamer")
+            self.log.info("Starting log streamer on port %s" %
+                          self.finger_port)
             streamer = zuul.lib.log_streamer.LogStreamer(
                 '::', self.finger_port, self.job_dir)
 
@@ -66,7 +75,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             os._exit(0)
         else:
             os.close(pipe_read)
-            self.log_streamer_pid = child_pid
+            self.log_streamer_pid = child_pid  # TODO JK: unused?
 
     def run(self):
         if self.args.command in zuul.executor.server.COMMANDS:
@@ -97,21 +106,19 @@ class Executor(zuul.cmd.ZuulDaemonApp):
 
         self.start_log_streamer()
 
-        zookeeper = zuul.zk.connect_zookeeper(self.config)
+        with zuul.zk.ZooKeeperConnection(self.config) as zookeeper:
 
-        ExecutorServer = zuul.executor.server.ExecutorServer
-        self.executor = ExecutorServer(self.config, self.connections,
-                                       jobdir_root=self.job_dir,
-                                       keep_jobdir=self.args.keep_jobdir,
-                                       log_streaming_port=self.finger_port)
-        self.executor.setZookeeper(zookeeper)
-        self.executor.start()
+            self.executor_server = ExecutorServer(
+                self.config, zookeeper, self.connections,
+                jobdir_root=self.job_dir,
+                keep_jobdir=self.args.keep_jobdir,
+                log_streaming_port=self.finger_port)
+            self.executor_server.start()
 
-        if self.args.nodaemon:
-            signal.signal(signal.SIGTERM, self.exit_handler)
+            if self.args.nodaemon:
+                signal.signal(signal.SIGTERM, self.exit_handler)
 
-        zookeeper.disconnect()
-        self.executor.join()
+        self.executor_server.join()
 
 
 def main():
