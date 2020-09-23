@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_5e2eeef9",
+        "filename": "tests/fixtures/config/remote-action-modules/git/org_project/playbooks/uri-bad-dest.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-23T19:10:12Z",
+      "side": 1,
+      "message": "nit: that looks like a bad dest",
+      "revId": "1fb7bd33e7cb788797a243689cf27573e2e8bed4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
