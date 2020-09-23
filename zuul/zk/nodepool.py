@@ -21,6 +21,7 @@ from kazoo.recipe.cache import TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
+from zuul.model import HoldRequest
 from zuul.zk import ZooKeeperClient
 from zuul.zk.base import ZooKeeperBase
 from zuul.zk.exceptions import LockException
@@ -40,16 +41,15 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
     def __init__(self, client: ZooKeeperClient, enable_cache: bool = True):
         super().__init__(client)
-        self.enable_cache = enable_cache  # type: bool
+        self.enable_cache: bool = enable_cache
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
         # which contains raw znode data (among other details), and one for
         # storing that data serialized as objects. This allows us to return
         # objects from the APIs, and avoids calling the methods to serialize
         # the data into objects more than once.
-        self._hold_request_tree = None  # type: Optional[TreeCache]
-        self._cached_hold_requests = \
-            {}  # type: Optional[Dict[str, zuul.model.HoldRequest]]
+        self._hold_request_tree: Optional[TreeCache] = None
+        self._cached_hold_requests: Optional[Dict[str, HoldRequest]] = {}
 
     def _onConnect(self):
         if self.enable_cache:
