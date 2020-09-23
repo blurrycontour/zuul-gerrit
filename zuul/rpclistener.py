@@ -17,23 +17,26 @@ import json
 import logging
 import time
 from abc import ABCMeta
-from typing import List
+from typing import List, Optional, TYPE_CHECKING
 
 from zuul import model
 from zuul.connection import BaseConnection
 from zuul.lib import encryption
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
+from zuul.model import Build
+if TYPE_CHECKING:
+    from zuul.scheduler import Scheduler
 
 
 class RPCListenerBase(metaclass=ABCMeta):
     log = logging.getLogger("zuul.RPCListenerBase")
     thread_name = 'zuul-rpc-gearman-worker'
-    functions = []  # type: List[str]
+    functions: List[str] = []
 
     def __init__(self, config, sched):
         self.config = config
-        self.sched = sched
+        self.sched: Scheduler = sched
 
         self.jobs = {}
 
@@ -299,7 +302,7 @@ class RPCListener(RPCListenerBase):
         #       log files, so this is forwards compatible with a future
         #       where there are more logs to potentially request than
         #       "console.log"
-        def find_build(uuid):
+        def find_build(uuid: str) -> Optional[Build]:
             for tenant in self.sched.abide.tenants.values():
                 for pipeline_name, pipeline in tenant.layout.pipelines.items():
                     for queue in pipeline.queues:

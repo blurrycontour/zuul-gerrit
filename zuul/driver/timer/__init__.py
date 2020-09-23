@@ -28,7 +28,7 @@ from zuul.lib.logutil import get_annotated_logger
 
 
 class TimerDriver(Driver, TriggerInterface):
-    name = 'timer'
+    name: str = 'timer'
     log = logging.getLogger("zuul.TimerDriver")
 
     def __init__(self):
