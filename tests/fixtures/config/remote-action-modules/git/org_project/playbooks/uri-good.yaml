@@ -1,0 +1,16 @@
+- hosts: localhost
+  tasks:
+    - name: Safe uri request from localhost
+      uri:
+        # We don't seem to have working ssl cert chains in
+        # the test bwrap context. Use http to workaround that
+        # and don't follow the redirect to https.
+        url: http://zuul.opendev.org
+        follow_redirects: none
+        return_content: yes
+        status_code:
+          - 301
+          - 302
+          - 303
+          - 307
+          - 308

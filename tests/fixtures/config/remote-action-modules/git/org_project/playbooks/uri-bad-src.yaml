@@ -1,0 +1,7 @@
+- hosts: localhost
+  tasks:
+    - name: Request with bad src
+      uri:
+        url: https://zuul.opendev.org
+        method: POST
+        src: /etc/resolv.conf

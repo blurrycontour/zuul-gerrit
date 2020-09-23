@@ -13,9 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+from ansible.errors import AnsibleError
+from ansible.module_utils.six.moves.urllib.parse import urlparse
 
 from zuul.ansible import paths
 uri = paths._import_ansible_action_plugin("uri")
+
+ALLOWED_URL_SCHEMES = ('https', 'http', 'ftp')
 
 
 class ActionModule(uri.ActionModule):
@@ -34,5 +38,12 @@ class ActionModule(uri.ActionModule):
                 dest = self._task.args.get(arg)
                 if dest:
                     paths._fail_if_unsafe(dest)
+            scheme = urlparse(self._task.args['url']).scheme
+            if scheme not in ALLOWED_URL_SCHEMES:
+                raise AnsibleError(
+                    "{scheme} urls are not allowed from localhost."
+                    " Only {allowed_schemes} are allowed".format(
+                        scheme=scheme,
+                        allowed_schemes=ALLOWED_URL_SCHEMES))
 
         return super(ActionModule, self).run(tmp, task_vars)
