@@ -28,6 +28,7 @@ class PullRequest(Change):
         self.score = 0
         self.files = []
         self.tags = []
+        self.status = None
 
     def __repr__(self):
         r = ['<Change 0x%x' % id(self)]
