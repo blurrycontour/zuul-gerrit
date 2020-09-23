@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+from typing import Dict, Set, Optional
 
 import gear
 import json
@@ -25,7 +26,8 @@ from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Build
+from zuul.model import Build, Job, QueueItem, Pipeline, Project
+from zuul.source import BaseSource
 
 
 class GearmanCleanup(threading.Thread):
@@ -114,7 +116,7 @@ class ExecutorClient(object):
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
-        self.builds = {}
+        self.builds: Dict[str, Build] = {}
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
 
         server = config.get('gearman', 'server')
@@ -137,8 +139,8 @@ class ExecutorClient(object):
         self.gearman.shutdown()
         self.log.debug("Stopped")
 
-    def execute(self, job, item, pipeline, dependent_changes=[],
-                merger_items=[]):
+    def execute(self, job: Job, item: QueueItem, pipeline: Pipeline,
+                dependent_changes=None, merger_items=None):
         log = get_annotated_logger(self.log, item.event)
         tenant = pipeline.tenant
         uuid = str(uuid4().hex)
@@ -156,18 +158,19 @@ class ExecutorClient(object):
             src_dir=os.path.join('src', item.change.project.canonical_name),
         )
 
-        zuul_params = dict(build=uuid,
-                           buildset=item.current_build_set.uuid,
-                           ref=item.change.ref,
-                           pipeline=pipeline.name,
-                           job=job.name,
-                           voting=job.voting,
-                           project=project,
-                           tenant=tenant.name,
-                           timeout=job.timeout,
-                           event_id=item.event.zuul_event_id,
-                           jobtags=sorted(job.tags),
-                           _inheritance_path=list(job.inheritance_path))
+        zuul_params = dict(
+            build=uuid,
+            buildset=item.current_build_set.uuid,
+            ref=item.change.ref,
+            pipeline=pipeline.name,
+            job=job.name,
+            voting=job.voting,
+            project=project,
+            tenant=tenant.name,
+            timeout=job.timeout,
+            event_id=item.event.zuul_event_id if item.event else None,
+            jobtags=sorted(job.tags),
+            _inheritance_path=list(job.inheritance_path))
         if job.artifact_data:
             zuul_params['artifacts'] = job.artifact_data
         if job.override_checkout:
@@ -175,7 +178,7 @@ class ExecutorClient(object):
         if hasattr(item.change, 'branch'):
             zuul_params['branch'] = item.change.branch
         if hasattr(item.change, 'tag'):
-            zuul_params['tag'] = item.change.tag
+            zuul_params['tag'] = getattr(item.change, 'tag')
         if hasattr(item.change, 'number'):
             zuul_params['change'] = str(item.change.number)
         if hasattr(item.change, 'url'):
@@ -191,15 +194,15 @@ class ExecutorClient(object):
             and item.change.newrev != '0' * 40):
             zuul_params['newrev'] = item.change.newrev
         zuul_params['projects'] = {}  # Set below
-        zuul_params['items'] = dependent_changes
+        zuul_params['items'] = dependent_changes or []
         zuul_params['child_jobs'] = list(item.job_graph.getDirectDependentJobs(
-            job.name))
+            job.name)) if item.job_graph else []
 
         params = dict()
         params['job'] = job.name
         params['timeout'] = job.timeout
         params['post_timeout'] = job.post_timeout
-        params['items'] = merger_items
+        params['items'] = merger_items or []
         params['projects'] = []
         if hasattr(item.change, 'branch'):
             params['branch'] = item.change.branch
@@ -253,47 +256,50 @@ class ExecutorClient(object):
         params['host_vars'] = job.host_variables
         params['group_vars'] = job.group_variables
         params['zuul'] = zuul_params
-        projects = set()
-        required_projects = set()
+        projects: Set[Project] = set()
+        required_projects: Set[Project] = set()
 
-        def make_project_dict(project, override_branch=None,
+        def make_project_dict(proj: Project, override_branch=None,
                               override_checkout=None):
             project_metadata = item.layout.getProjectMetadata(
-                project.canonical_name)
+                proj.canonical_name) if item.layout else None
             if project_metadata:
                 project_default_branch = project_metadata.default_branch
             else:
                 project_default_branch = 'master'
-            connection = project.source.connection
+            connection = proj.source.connection
             return dict(connection=connection.connection_name,
-                        name=project.name,
-                        canonical_name=project.canonical_name,
+                        name=proj.name,
+                        canonical_name=proj.canonical_name,
                         override_branch=override_branch,
                         override_checkout=override_checkout,
                         default_branch=project_default_branch)
 
         if job.required_projects:
             for job_project in job.required_projects.values():
-                (trusted, project) = tenant.getProject(
+                (trusted, tenant_project) = tenant.getProject(
                     job_project.project_name)
-                if project is None:
+                if tenant_project is None:
                     raise Exception("Unknown project %s" %
                                     (job_project.project_name,))
                 params['projects'].append(
-                    make_project_dict(project,
+                    make_project_dict(tenant_project,
                                       job_project.override_branch,
                                       job_project.override_checkout))
-                projects.add(project)
-                required_projects.add(project)
-        for change in dependent_changes:
+                projects.add(tenant_project)
+                required_projects.add(tenant_project)
+        for change in (dependent_changes or []):
             # We have to find the project this way because it may not
             # be registered in the tenant (ie, a foreign project).
-            source = self.sched.connections.getSourceByCanonicalHostname(
+            source: Optional[BaseSource] = self.sched.connections\
+                .getSourceByCanonicalHostname(
                 change['project']['canonical_hostname'])
-            project = source.getProject(change['project']['name'])
-            if project not in projects:
-                params['projects'].append(make_project_dict(project))
-                projects.add(project)
+            if not source:
+                raise Exception("Missing source!")
+            source_project = source.getProject(change['project']['name'])
+            if source_project not in projects:
+                params['projects'].append(make_project_dict(source_project))
+                projects.add(source_project)  # noqa
         for p in projects:
             zuul_params['projects'][p.canonical_name] = (dict(
                 name=p.name,
@@ -305,8 +311,10 @@ class ExecutorClient(object):
                 src_dir=os.path.join('src', p.canonical_name),
                 required=(p in required_projects),
             ))
-        params['zuul_event_id'] = item.event.zuul_event_id
-        build = Build(job, uuid, zuul_event_id=item.event.zuul_event_id)
+        params['zuul_event_id'] = item.event.zuul_event_id\
+            if item.event else None
+        build = Build(job, uuid, zuul_event_id=item.event
+                      .zuul_event_id if item.event else None)
         build.parameters = params
         build.nodeset = nodeset
 
@@ -321,6 +329,8 @@ class ExecutorClient(object):
 
         # Update zuul attempts after addBuild above to ensure build_set
         # is up to date.
+        if not build.build_set:
+            raise Exception("Build set undefined for %s" % build)
         attempts = build.build_set.getTries(job.name)
         zuul_params['attempts'] = attempts
 
@@ -348,8 +358,8 @@ class ExecutorClient(object):
         gearman_job = gear.TextJob(
             function_name, json_dumps(params), unique=uuid)
 
-        build.__gearman_job = gearman_job
-        build.__gearman_worker = None
+        setattr(build, '__gearman_job', gearman_job)
+        setattr(build, '__gearman_worker', None)
         self.builds[uuid] = build
 
         if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:

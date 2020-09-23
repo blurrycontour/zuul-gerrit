@@ -727,26 +727,26 @@ class Merger(object):
                  speed_limit: str, speed_time: str,
                  cache_root: Optional[str]=None, logger: Optional[Logger]=None,
                  execution_context: bool=False, git_timeout: int=300):
-        self.explicit_logger = logger  # type: Optional[Logger]
+        self.explicit_logger: Optional[Logger] = logger
         if logger is None:  # one optional and one with default?
             self.log = logging.getLogger("zuul.Merger")
         else:
             self.log = logger
-        self.repos = {}  # type: Dict[str, Repo]
-        self.working_root = working_root  # type: str
+        self.repos: Dict[str, Repo] = {}
+        self.working_root: str = working_root
         os.makedirs(working_root, exist_ok=True)
-        self.connections = connections  # type: ConnectionRegistry
-        self.zookeeper = zookeeper  # type: ZooKeeper
-        self.email = email  # type: str
-        self.username = username  # type: str
-        self.speed_limit = speed_limit  # type: str
-        self.speed_time = speed_time  # type: str
-        self.git_timeout = git_timeout  # type: int
-        self.cache_root = cache_root  # type: Optional[str]
+        self.connections: ConnectionRegistry = connections
+        self.zookeeper: ZooKeeper = zookeeper
+        self.email: str = email
+        self.username: str = username
+        self.speed_limit: str = speed_limit
+        self.speed_time: str = speed_time
+        self.git_timeout: int = git_timeout
+        self.cache_root: Optional[str] = cache_root
         # Flag to determine if the merger is used for preparing repositories
         # for job execution. This flag can be used to enable executor specific
         # behavior e.g. to keep the 'origin' remote intact.
-        self.execution_context = execution_context  # type: bool
+        self.execution_context: bool = execution_context
 
     def _addProject(self, hostname, project_name, url, sshkey, zuul_event_id):
         repo = None
