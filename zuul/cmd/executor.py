@@ -17,10 +17,12 @@ import logging
 import os
 import sys
 import signal
+from typing import Optional
 
 import zuul.cmd
 import zuul.executor.server
 import zuul.zk
+from zuul.executor.server import ExecutorServer
 
 from zuul.lib.config import get_default
 
@@ -28,6 +30,11 @@ from zuul.lib.config import get_default
 class Executor(zuul.cmd.ZuulDaemonApp):
     app_name = 'executor'
     app_description = 'A standalone Zuul executor.'
+
+    def __init__(self):
+        super().__init__()
+        self.executor_server: Optional[ExecutorServer] = None
+        self.log_streamer_pid: Optional[int] = None
 
     def createParser(self):
         parser = super(Executor, self).createParser()
@@ -45,7 +52,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        self.executor.stop()
+        if self.executor_server:
+            self.executor_server.stop()
 
     def start_log_streamer(self):
         pipe_read, pipe_write = os.pipe()
