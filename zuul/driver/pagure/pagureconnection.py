@@ -31,7 +31,7 @@ from zuul.connection import BaseConnection
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.lib.config import get_default
-from zuul.model import Ref, Branch, Tag
+from zuul.model import Ref, Branch, Tag, Project
 from zuul.lib import dependson
 
 from zuul.driver.pagure.paguremodel import PagureTriggerEvent, PullRequest
@@ -619,7 +619,7 @@ class PagureConnection(BaseConnection):
     def validateWebConfig(self, config, connections):
         return True
 
-    def getProject(self, name):
+    def getProject(self, name: str) -> Project:
         return self.projects.get(name)
 
     def addProject(self, project):
