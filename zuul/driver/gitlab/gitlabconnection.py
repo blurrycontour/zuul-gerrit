@@ -30,7 +30,7 @@ from zuul.connection import BaseConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Ref, Branch, Tag
+from zuul.model import Ref, Branch, Tag, Project
 
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 
@@ -428,7 +428,7 @@ class GitlabConnection(BaseConnection):
     def getWebController(self, zuul_web):
         return GitlabWebController(zuul_web, self)
 
-    def getProject(self, name):
+    def getProject(self, name: str) -> Project:
         return self.projects.get(name)
 
     def addProject(self, project):
