@@ -93,8 +93,8 @@ def stack_dump_handler(signum, frame):
 
 
 class ZuulApp(object):
-    app_name = None  # type: str
-    app_description = None  # type: str
+    app_name: str = ''
+    app_description: str = ''
 
     def __init__(self):
         self.args = None
