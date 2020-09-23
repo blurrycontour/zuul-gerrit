@@ -34,10 +34,10 @@ class ZooKeeperClient(object):
         '''
         Initialize the ZooKeeper base client object.
         '''
-        self.client = None  # type: Optional[KazooClient]
+        self.client: Optional[KazooClient] = None
         self.locking_lock = threading.Lock()
-        self._last_retry_log = 0  # type: int
-        self.on_connect_listeners = []  # type: List[Callable[[], None]]
+        self._last_retry_log: int = 0
+        self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners = []
 
     def _connectionListener(self, state):
