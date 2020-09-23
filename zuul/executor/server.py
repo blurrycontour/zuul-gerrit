@@ -19,6 +19,9 @@ import json
 import logging
 import multiprocessing
 import os
+from threading import Thread
+from typing import Any, Dict, List, Union, Optional
+
 import psutil
 import shutil
 import signal
@@ -35,6 +38,7 @@ import re
 import git
 from urllib.parse import urlsplit
 
+from zuul.executor.sensors import SensorInterface
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.yamlutil import yaml
@@ -553,7 +557,7 @@ class JobDir(object):
         self.logging_json = os.path.join(self.ansible_root, 'logging.json')
         self.playbooks = []  # The list of candidate playbooks
         self.pre_playbooks = []
-        self.post_playbooks = []
+        self.post_playbooks: List[JobDirPlaybook] = []
         self.cleanup_playbooks = []
         self.job_output_file = os.path.join(self.log_root, 'job-output.txt')
         # We need to create the job-output.txt upfront in order to close the
@@ -808,29 +812,30 @@ class AnsibleJob(object):
         RESULT_DISK_FULL: 'RESULT_DISK_FULL',
     }
 
-    def __init__(self, executor_server, job):
+    def __init__(self, executor_server: 'ExecutorServer', job):
         logger = logging.getLogger("zuul.AnsibleJob")
-        self.arguments = json.loads(job.arguments)
-        self.zuul_event_id = self.arguments.get('zuul_event_id')
+        self.arguments: Dict[str, Any] = json.loads(job.arguments)
+        self.zuul_event_id: Optional[str] = self.arguments.get('zuul_event_id')
         # Record ansible version being used for the cleanup phase
-        self.ansible_version = self.arguments.get('ansible_version')
+        self.ansible_version: Optional[str] = self.arguments\
+            .get('ansible_version')
         self.log = get_annotated_logger(
             logger, self.zuul_event_id, build=job.unique)
-        self.executor_server = executor_server
+        self.executor_server: ExecutorServer = executor_server
         self.job = job
-        self.jobdir = None
+        self.jobdir: Optional[str] = None
         self.proc = None
-        self.proc_lock = threading.Lock()
-        self.running = False
-        self.started = False  # Whether playbooks have started running
-        self.time_starting_build = None
-        self.paused = False
-        self.aborted = False
-        self.aborted_reason = None
-        self.cleanup_started = False
-        self._resume_event = threading.Event()
-        self.thread = None
-        self.project_info = {}
+        self.proc_lock: threading.Lock = threading.Lock()
+        self.running: bool = False
+        self.started: bool = False  # Whether playbooks have started running
+        self.time_starting_build: Optional[int] = None
+        self.paused: bool = False
+        self.aborted: bool = False
+        self.aborted_reason: Optional[int] = None
+        self.cleanup_started: bool = False
+        self._resume_event: threading.Event = threading.Event()
+        self.thread: Optional[threading.Thread] = None
+        self.project_info: Dict[Any, Any] = {}
         self.private_key_file = get_default(self.executor_server.config,
                                             'executor', 'private_key_file',
                                             '~/.ssh/id_rsa')
@@ -850,7 +855,7 @@ class AnsibleJob(object):
             'winrm_read_timeout_sec')
         self.ssh_agent = SshAgent(zuul_event_id=self.zuul_event_id,
                                   build=self.job.unique)
-        self.port_forwards = []
+        self.port_forwards: List[KubeFwd] = []
         self.executor_variables_file = None
 
         self.cpu_times = {'user': 0, 'system': 0,
@@ -2586,7 +2591,7 @@ class ExecutorServer(BaseMergeServer):
                                              'ansible_setup_timeout', 60))
         self.zone = get_default(self.config, 'executor', 'zone')
 
-        self.ansible_callbacks = {}
+        self.ansible_callbacks: Dict[str, Dict[str, Any]] = {}
         for section_name in self.config.sections():
             cb_match = re.match(r'^ansible_callback ([\'\"]?)(.*)(\1)$',
                                 section_name, re.I)
@@ -2599,11 +2604,11 @@ class ExecutorServer(BaseMergeServer):
 
         # TODO(tobiash): Take cgroups into account
         self.update_workers = multiprocessing.cpu_count()
-        self.update_threads = []
+        self.update_threads: List[Thread] = []
         # If the execution driver ever becomes configurable again,
         # this is where it would happen.
         execution_wrapper_name = 'bubblewrap'
-        self.accepting_work = False
+        self.accepting_work: bool = False
         self.execution_wrapper = connections.drivers[execution_wrapper_name]
 
         self.update_queue = DeduplicateQueue()
@@ -2638,7 +2643,7 @@ class ExecutorServer(BaseMergeServer):
                 if subprocess.Popen(["rm", "-Rf", jobdir]).wait():
                     raise RuntimeError("Couldn't delete: " + jobdir)
 
-        self.job_workers = {}
+        self.job_workers: Dict[str, Union[Any, AnsibleJob]] = {}
         self.disk_accountant = DiskAccountant(self.jobdir_root,
                                               self.disk_limit_per_job,
                                               self.stopJobDiskFull,
@@ -2649,7 +2654,7 @@ class ExecutorServer(BaseMergeServer):
         self.log.info("Starting executor (hostname: %s) in %spaused mode" % (
             self.hostname, "" if self.pause_sensor.pause else "un"))
         cpu_sensor = CPUSensor(config)
-        self.sensors = [
+        self.sensors: List[SensorInterface] = [
             cpu_sensor,
             HDDSensor(config),
             self.pause_sensor,
@@ -3003,13 +3008,13 @@ class ExecutorServer(BaseMergeServer):
             except Exception:
                 self.log.exception("Exception in governor thread:")
 
-    def manageLoad(self):
+    def manageLoad(self) -> None:
         ''' Apply some heuristics to decide whether or not we should
             be asking for more jobs '''
         with self.governor_lock:
             return self._manageLoad()
 
-    def _manageLoad(self):
+    def _manageLoad(self) -> None:
 
         if self.accepting_work:
             # Don't unregister if we don't have any active jobs.
@@ -3038,10 +3043,10 @@ class ExecutorServer(BaseMergeServer):
             for sensor in self.sensors:
                 sensor.reportStats(self.statsd, base_key)
 
-    def finishJob(self, unique):
+    def finishJob(self, unique: str) -> None:
         del(self.job_workers[unique])
 
-    def stopJobDiskFull(self, jobdir):
+    def stopJobDiskFull(self, jobdir: str) -> None:
         unique = os.path.basename(jobdir)
         self.stopJobByUnique(unique, reason=AnsibleJob.RESULT_DISK_FULL)
 

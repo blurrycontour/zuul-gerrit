@@ -13,6 +13,12 @@
 # under the License.
 
 import abc
+from typing import Any, Dict, Optional
+import voluptuous
+from zuul.reporter import BaseReporter
+from zuul import model
+from zuul.connection import BaseConnection
+from zuul.source import BaseSource
 
 
 class Driver(object, metaclass=abc.ABCMeta):
@@ -33,7 +39,7 @@ class Driver(object, metaclass=abc.ABCMeta):
     The class or instance attribute **name** must be provided as a string.
 
     """
-    name = None  # type: str
+    name: str = 'unknown'
 
     def reconfigure(self, tenant):
         """Called when a tenant is reconfigured.
@@ -86,7 +92,8 @@ class ConnectionInterface(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def getConnection(self, name, config):
+    def getConnection(self, name: str,
+                      config: Dict[str, Any]) -> BaseConnection:
         """Create and return a new Connection object.
 
         This method is required by the interface.
@@ -171,7 +178,7 @@ class SourceInterface(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> BaseSource:
         """Create and return a new Source object.
 
         This method is required by the interface.
@@ -219,7 +226,8 @@ class ReporterInterface(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(self, connection: BaseConnection, pipeline: model.Pipeline,
+                    config: Optional[Dict[str, Any]] = None) -> BaseReporter:
         """Create and return a new Reporter object.
 
         This method is required by the interface.
@@ -239,7 +247,7 @@ class ReporterInterface(object, metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> voluptuous.Schema:
         """Get the schema for this driver's reporter.
 
         This method is required by the interface.
