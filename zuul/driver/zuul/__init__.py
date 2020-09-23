@@ -26,7 +26,7 @@ PROJECT_CHANGE_MERGED = 'project-change-merged'
 
 
 class ZuulDriver(Driver, TriggerInterface):
-    name = 'zuul'
+    name: str = 'zuul'
     log = logging.getLogger("zuul.ZuulTrigger")
 
     def __init__(self):

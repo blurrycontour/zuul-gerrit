@@ -123,28 +123,28 @@ class FingerGateway(object):
         :param str command_socket: Path to the daemon command socket.
         :param str pid_file: Path to the daemon PID file.
         '''
-        self.gear_server = gearman[0]  # type: str
-        self.gear_port = gearman[1]  # type: int
-        self.gear_ssl_key = gearman[2]  # type: Optional[str]
-        self.gear_ssl_cert = gearman[3]  # type: Optional[str]
-        self.gear_ssl_ca = gearman[4]  # type: Optional[str]
-        self.zookeeper = zookeeper  # type: ZooKeeper
-        self.address = address  # type: Tuple[str, int]
-        self.user = user  # type: Optional[str]
-        self.pid_file = pid_file  # type: Optional[str]
+        self.gear_server: str = gearman[0]
+        self.gear_port: int = gearman[1]
+        self.gear_ssl_key: Optional[str] = gearman[2]
+        self.gear_ssl_cert: Optional[str] = gearman[3]
+        self.gear_ssl_ca: Optional[str] = gearman[4]
+        self.zookeeper: ZooKeeper = zookeeper
+        self.address: Tuple[str, int] = address
+        self.user: Optional[str] = user
+        self.pid_file: Optional[str] = pid_file
 
-        self.rpc = None  # type: Optional[RPCClient]
-        self.server = None  # type: Optional[CustomThreadingTCPServer]
-        self.server_thread = None  # type: Optional[Thread]
+        self.rpc: Optional[RPCClient] = None
+        self.server: Optional[CustomThreadingTCPServer] = None
+        self.server_thread: Optional[Thread] = None
 
-        self.command_thread = None  # type: Optional[Thread]
-        self.command_running = False  # type: bool
-        self.command_socket_path = command_socket  # type: Optional[str]
-        self.command_socket = None  # type: Optional[CommandSocket]
+        self.command_thread: Optional[Thread] = None
+        self.command_running: bool = False
+        self.command_socket_path: Optional[str] = command_socket
+        self.command_socket: Optional[CommandSocket] = None
 
-        self.command_map = dict(
+        self.command_map: Dict[str, Callable[[], Any]] = dict(
             stop=self.stop,
-        )  # type: Dict[str, Callable[[], Any]]
+        )
 
     def _runCommand(self):
         while self.command_running:
