@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_72cb3aa3",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-23T06:13:35Z",
+      "side": 1,
+      "message": "These icons can directly be imported from \u0027@patternfly/react-icons\u0027 like this:\n\nimport {\n    CheckCircleIcon,\n    InfoCircleIcon,\n    TimesCircleIcon,\n} from \u0027@patternfly/react-icons\u0027",
+      "revId": "9f66e6f97583a1dfc5a39970368ce5b2886e096b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_f24bca24",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-23T06:13:35Z",
+      "side": 1,
+      "message": "This format string doesn\u0027t work in JavaScript. Usually there are two options:\n\n1. Use a \u0027+\u0027 to concat string and variable like so:\n\nkey\u003d{host + \".name\"}\n\n2. Use a JS format string with backticks (Honestly I have no idea why they decided for this character, but that\u0027s the JS world :D ). Note that you also have to wrap the variable in ${} like so:\n\nkey\u003d{`${host}.name`}",
+      "revId": "9f66e6f97583a1dfc5a39970368ce5b2886e096b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b245d217",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-23T06:13:35Z",
+      "side": 1,
+      "message": "I think we could spare the card here and just don\u0027t use any additional container as we are already \"wrapped\" in the tab content itself.",
+      "revId": "9f66e6f97583a1dfc5a39970368ce5b2886e096b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_12ebdedc",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-23T06:13:35Z",
+      "side": 1,
+      "message": "I don\u0027t think we should show a label on the left hand side (start) of a line. Usually those are used on the right hand side to provide additional information to the thing that is shown on the left (like tags, or a task result summary :D). I wouldn\u0027t use a tag here at all but something like the \u003cBuildResultWithIcon /\u003e which is also used to show the buildname with it\u0027s respective result icon on top of the builds page.\n\nI also think, that we should highlight the taskname more than the hostname. IMHO this is the more relevant part when it comes to analysis and debugging. It\u0027s also more helpful if you want to look up the failed message/task from the log to see it in it\u0027s context (play).",
+      "revId": "9f66e6f97583a1dfc5a39970368ce5b2886e096b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
