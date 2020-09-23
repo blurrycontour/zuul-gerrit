@@ -957,7 +957,7 @@ class GerritConnection(BaseConnection):
         return False
 
     def getRefSha(self, project: Project, ref: str) -> str:
-        refs = {}  # type: Dict[str, str]
+        refs: Dict[str, str] = {}
         try:
             refs = self.getInfoRefs(project)
         except Exception:
@@ -986,7 +986,7 @@ class GerritConnection(BaseConnection):
         self.log.debug("Running query %s to get project open changes" %
                        (query,))
         data = self.simpleQuery(query)
-        changes = []  # type: List[GerritChange]
+        changes: List[GerritChange] = []
         for record in data:
             try:
                 changes.append(
