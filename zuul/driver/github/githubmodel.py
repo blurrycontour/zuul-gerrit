@@ -42,6 +42,7 @@ class PullRequest(Change):
         self.review_decision = None
         self.required_contexts = set()
         self.contexts = set()
+        self.branch_protected = False
 
     @property
     def status(self):

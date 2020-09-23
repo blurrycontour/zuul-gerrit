@@ -435,12 +435,14 @@ class GithubEventProcessor(object):
                 event.zuul_event_id = self.delivery
                 event.timestamp = self.ts
                 project = self.connection.source.getProject(event.project_name)
+                change = None
                 if event.change_number:
-                    self.connection._getChange(project,
-                                               event.change_number,
-                                               event.patch_number,
-                                               refresh=True,
-                                               event=event)
+                    change = self.connection._getChange(
+                        project,
+                        event.change_number,
+                        event.patch_number,
+                        refresh=True,
+                        event=event)
                     self.log.debug("Refreshed change %s,%s",
                                    event.change_number, event.patch_number)
 
@@ -448,7 +450,14 @@ class GithubEventProcessor(object):
                 # unprotected branches, we might need to check whether the
                 # branch is now protected.
                 if hasattr(event, "branch") and event.branch:
-                    self.connection.checkBranchCache(project.name, event)
+                    protected = None
+                    if change:
+                        # PR based events already have the information if the
+                        # target branch is protected so take the information
+                        # from there.
+                        protected = change.branch_protected
+                    self.connection.checkBranchCache(project.name, event,
+                                                     protected=protected)
 
             event.project_hostname = self.connection.canonical_hostname
             self.event = event
@@ -1484,6 +1493,7 @@ class GithubConnection(CachedBranchConnection):
         change.required_contexts = set(
             canmerge_data['requiredStatusCheckContexts']
         )
+        change.branch_protected = canmerge_data['protected']
 
     def getGitUrl(self, project: Project):
         if self.git_ssh_key:
