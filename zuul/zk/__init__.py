@@ -9,7 +9,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from typing import Optional
+import logging
+from logging import Logger
+from typing import Optional, Any
 
 from kazoo.client import KazooClient
 import configparser
@@ -17,7 +19,9 @@ import configparser
 from zuul.lib.config import get_default
 
 from zuul.zk.base import ZooKeeperClient
+from zuul.zk.builds import ZooKeeperBuilds
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
+from zuul.zk.executors import ZooKeeperExecutors
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 
@@ -41,7 +45,9 @@ class ZooKeeper(object):
             objects (e.g., HoldRequests).
         """
         self.client = ZooKeeperClient()
+        self.builds = ZooKeeperBuilds(self.client, enable_cache=enable_cache)
         self.connection_event = ZooKeeperConnectionEvent(self.client)
+        self.executors = ZooKeeperExecutors(self.client)
         self.nodepool = ZooKeeperNodepool(self.client,
                                           enable_cache=enable_cache)
 
@@ -60,7 +66,8 @@ class ZooKeeper(object):
         self.client.disconnect()
 
 
-def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
+def connect_zookeeper(config: configparser.ConfigParser,
+                      log: Optional[Logger] = None) -> ZooKeeper:
     zookeeper = ZooKeeper(enable_cache=True)
     zookeeper_hosts = get_default(config, 'zookeeper', 'hosts', None)
     if not zookeeper_hosts:
@@ -69,7 +76,10 @@ def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
     zookeeper_tls_cert = get_default(config, 'zookeeper', 'tls_cert')
     zookeeper_tls_ca = get_default(config, 'zookeeper', 'tls_ca')
     zookeeper_timeout = float(get_default(config, 'zookeeper',
-                                          'session_timeout', 10.0))
+                                          'session_timeout', 120.0))
+
+    log = log or logging.getLogger("zuul.zk.connect_zookeeper")
+    log.debug("Connecting to '%s' ...", zookeeper_hosts)
     zookeeper.connect(
         hosts=zookeeper_hosts,
         timeout=zookeeper_timeout,
@@ -77,3 +87,21 @@ def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
         tls_key=zookeeper_tls_key,
         tls_ca=zookeeper_tls_ca)
     return zookeeper
+
+
+class ZooKeeperConnection(object):
+
+    def __init__(self, config: configparser.ConfigParser):
+        self.log = logging.getLogger("zuul.zk.ZooKeeperConnection")
+        self.config = config
+        self.zookeeper: Optional[ZooKeeper] = None
+
+    def __enter__(self) -> ZooKeeper:
+        self.log.debug("Establishing connection...")
+        self.zookeeper = connect_zookeeper(self.config)
+        return self.zookeeper
+
+    def __exit__(self, kind: Any, value: Any, traceback: Optional[Any]):
+        self.log.debug("Destroying connection...")
+        if self.zookeeper:
+            self.zookeeper.disconnect()

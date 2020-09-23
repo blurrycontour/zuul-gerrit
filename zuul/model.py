@@ -1896,9 +1896,12 @@ class Build(object):
         self.nodeset: Optional[NodeSet] = None
         self.zuul_event_id: Optional[str] = zuul_event_id
 
+        self.zookeeper_node: Optional[str] = None
+
     def __repr__(self):
-        return ('<Build %s of %s voting:%s on %s>' %
-                (self.uuid, self.job.name, self.job.voting, self.worker))
+        return ('<Build %s of %s voting:%s, url: %s on %s>' %
+                (self.uuid, self.job.name, self.job.voting, self.url,
+                 self.worker))
 
     @property
     def failed(self):
