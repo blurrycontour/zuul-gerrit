@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_8022f352",
+        "filename": "tests/unit/test_url_driver.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-23T12:43:41Z",
+      "side": 1,
+      "message": "We typically use iterate_timeout for such kind of waits.",
+      "revId": "b25ceccf2f0e2b454d0ca2f7af688f5fe974b068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
