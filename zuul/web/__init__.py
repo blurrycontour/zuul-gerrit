@@ -1171,16 +1171,15 @@ class ZuulWeb(object):
                  info: Optional[zuul.model.WebInfo]=None,
                  static_path: Optional[str]=None,
                  command_socket: Optional[str]=None):
-        self.start_time = time.time()  # type: float
-        self.listen_address = listen_address  # type: str
-        self.listen_port = listen_port  # type: int
+        self.start_time: float = time.time()
+        self.listen_address: str = listen_address
+        self.listen_port: int = listen_port
         self.event_loop = None  # TODO JK: Is this variable used?
         self.term = None  # TODO JK: Is this variable used?
-        self.server = None  # type: Optional[str]
-        self.static_cache_expiry = static_cache_expiry  # type: int
-        self.info = info  # type: Optional[zuul.model.WebInfo]
-        self.static_path = os.path\
-            .abspath(static_path or STATIC_DIR)  # type: str
+        self.server: Optional[str] = None
+        self.static_cache_expiry: int = static_cache_expiry
+        self.info: Optional[zuul.model.WebInfo] = info
+        self.static_path: str = os.path.abspath(static_path or STATIC_DIR)
         # instanciate handlers
         self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
                                             ssl_key, ssl_cert, ssl_ca,
