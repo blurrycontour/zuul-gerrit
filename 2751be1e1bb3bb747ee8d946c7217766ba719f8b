@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_9829c3f3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1385,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-23T15:23:38Z",
+      "side": 1,
+      "message": "nit: report state",
+      "range": {
+        "startLine": 1385,
+        "startChar": 30,
+        "endLine": 1385,
+        "endChar": 34
+      },
+      "revId": "2751be1e1bb3bb747ee8d946c7217766ba719f8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_787cafea",
+        "filename": "zuul/model.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 2242,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-23T15:23:38Z",
+      "side": 1,
+      "message": "nit: Report state",
+      "range": {
+        "startLine": 2242,
+        "startChar": 10,
+        "endLine": 2242,
+        "endChar": 14
+      },
+      "revId": "2751be1e1bb3bb747ee8d946c7217766ba719f8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_f850bf60",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-23T15:23:38Z",
+      "side": 1,
+      "message": "We should annotate the logs in this method:\n\n  log \u003d get_annotated_logger(self.log, item.event)",
+      "revId": "2751be1e1bb3bb747ee8d946c7217766ba719f8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
