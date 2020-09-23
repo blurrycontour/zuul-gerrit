@@ -27,8 +27,6 @@ import threading
 import re
 import struct
 
-from typing import Dict, List  # noqa
-
 from zuul.driver import (Driver, WrapperInterface)
 from zuul.execution_context import BaseExecutionContext
 
@@ -157,7 +155,7 @@ class BubblewrapExecutionContext(BaseExecutionContext):
 
 class BubblewrapDriver(Driver, WrapperInterface):
     log = logging.getLogger("zuul.BubblewrapDriver")
-    name = 'bubblewrap'
+    name: str = 'bubblewrap'
 
     release_file_re = re.compile(r'^\W+-release$')
 
