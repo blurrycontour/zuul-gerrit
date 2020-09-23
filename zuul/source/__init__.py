@@ -14,6 +14,8 @@
 
 import abc
 
+from zuul.model import Project
+
 
 class BaseSource(object, metaclass=abc.ABCMeta):
     """Base class for sources.
@@ -93,7 +95,7 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """Get the git url for a project."""
 
     @abc.abstractmethod
-    def getProject(self, name):
+    def getProject(self, name: str) -> Project:
         """Get a project."""
 
     @abc.abstractmethod
