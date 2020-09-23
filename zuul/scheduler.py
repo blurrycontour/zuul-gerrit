@@ -27,21 +27,28 @@ import threading
 import time
 import traceback
 import urllib
+from typing import Optional
+
 
 from zuul import configloader
 from zuul import model
 from zuul import exceptions
 from zuul import version as zuul_version
 from zuul import rpclistener
+from zuul.executor.client import ExecutorClient
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.queue import MergedQueue
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
-from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
+from zuul.merger.client import MergeClient
+from zuul.model import Build, HoldRequest, Tenant, TriggerEvent, Abide, \
+    UnparsedAbideConfig
+from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -306,8 +313,8 @@ class Scheduler(threading.Thread):
         self._hibernate = False
         self._stopped = False
         self._zuul_app = None
-        self.executor = None
-        self.merger = None
+        self.executor: Optional[ExecutorClient] = None
+        self.merger: Optional[MergeClient] = None
         self.connections = None
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
@@ -324,12 +331,14 @@ class Scheduler(threading.Thread):
         # self.triggers['connection_name'] = triggerObject
         self.triggers = dict()
         self.config = config
+        self.zk_client: Optional[ZooKeeperClient] = None
+        self.zk_nodepool: Optional[ZooKeeperNodepool] = None
 
         self.trigger_event_queue = queue.Queue()
         self.result_event_queue = queue.Queue()
-        self.management_event_queue = zuul.lib.queue.MergedQueue()
-        self.abide = model.Abide()
-        self.unparsed_abide = model.UnparsedAbideConfig()
+        self.management_event_queue: MergedQueue = MergedQueue()
+        self.abide: Abide = Abide()
+        self.unparsed_abide: UnparsedAbideConfig = UnparsedAbideConfig()
 
         if not testonly:
             time_dir = self._get_time_database_dir()
@@ -411,10 +420,10 @@ class Scheduler(threading.Thread):
     def setZuulApp(self, app):
         self._zuul_app = app
 
-    def setExecutor(self, executor):
-        self.executor = executor
+    def setExecutor(self, executor_client: ExecutorClient):
+        self.executor = executor_client
 
-    def setMerger(self, merger):
+    def setMerger(self, merger: MergeClient):
         self.merger = merger
 
     def setNodepool(self, nodepool):
