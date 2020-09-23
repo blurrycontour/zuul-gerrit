@@ -33,7 +33,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
 
     def __init__(self):
         super(FingerGatewayApp, self).__init__()
-        self.gateway = None  # type: Optional[FingerGateway]
+        self.gateway: Optional[FingerGateway] = None
 
     def createParser(self):
         parser = super(FingerGatewayApp, self).createParser()

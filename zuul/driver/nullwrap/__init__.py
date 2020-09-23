@@ -29,7 +29,7 @@ class NullExecutionContext(BaseExecutionContext):
 
 
 class NullwrapDriver(Driver, WrapperInterface):
-    name = 'nullwrap'
+    name: str = 'nullwrap'
     log = logging.getLogger("zuul.NullwrapDriver")
 
     def getExecutionContext(self, ro_paths=None, rw_paths=None, secrets=None):
