@@ -12,35 +12,42 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from typing import Dict, Any, Optional
+import voluptuous
+from zuul import model
+from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.gitlab import gitlabconnection
 from zuul.driver.gitlab import gitlabsource
 from zuul.driver.gitlab import gitlabreporter
 from zuul.driver.gitlab import gitlabtrigger
+from zuul.source import BaseSource
+from zuul.driver.gitlab.gitlabreporter import GitlabReporter
 
 
 class GitlabDriver(Driver, ConnectionInterface, TriggerInterface,
                    SourceInterface, ReporterInterface):
     name = 'gitlab'
 
-    def getConnection(self, name, config):
+    def getConnection(self, name: str,
+                      config: Dict[str, Any]) -> BaseConnection:
         return gitlabconnection.GitlabConnection(self, name, config)
 
     def getTrigger(self, connection, config=None):
         return gitlabtrigger.GitlabTrigger(self, connection, config)
 
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> BaseSource:
         return gitlabsource.GitlabSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
-        return gitlabreporter.GitlabReporter(
-            self, connection, pipeline, config)
+    def getReporter(self, connection: BaseConnection, pipeline: model.Pipeline,
+                    config: Optional[Dict[str, Any]] = None) -> GitlabReporter:
+        return GitlabReporter(self, connection, pipeline, config)
 
     def getTriggerSchema(self):
         return gitlabtrigger.getSchema()
 
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> voluptuous.Schema:
         return gitlabreporter.getSchema()
 
     def getRequireSchema(self):

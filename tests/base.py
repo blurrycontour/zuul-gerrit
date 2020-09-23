@@ -31,7 +31,7 @@ import random
 import re
 from logging import Logger
 from queue import Queue
-from typing import Callable, Optional, Any, Iterable, Generator, List
+from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
 
 import requests
 import select
@@ -2714,23 +2714,23 @@ class FakeBuild(object):
         # keep using it like this, or we may end up exposing more of
         # the complexity around multi-node jobs here
         # (self.nodes[0].label?)
-        self.node = None
+        self.node: Optional[str] = None
         if len(self.parameters.get('nodes')) == 1:
             self.node = self.parameters['nodes'][0]['label']
-        self.unique = self.parameters['zuul']['build']
-        self.pipeline = self.parameters['zuul']['pipeline']
-        self.project = self.parameters['zuul']['project']['name']
-        self.name = self.parameters['job']
+        self.unique: str = self.parameters['zuul']['build']
+        self.pipeline: str = self.parameters['zuul']['pipeline']
+        self.project: str = self.parameters['zuul']['project']['name']
+        self.name: str = self.parameters['job']
         self.wait_condition = threading.Condition()
-        self.waiting = False
-        self.paused = False
-        self.aborted = False
-        self.requeue = False
-        self.created = time.time()
+        self.waiting: bool = False
+        self.paused: bool = False
+        self.aborted: bool = False
+        self.requeue: bool = False
+        self.created: float = time.time()
         self.changes = None
         items = self.parameters['zuul']['items']
-        self.changes = ' '.join(['%s,%s' % (x['change'], x['patchset'])
-                                 for x in items if 'change' in x])
+        self.changes: str = ' '.join(['%s,%s' % (x['change'], x['patchset'])
+                                      for x in items if 'change' in x])
         if 'change' in items[-1]:
             self.change = ' '.join((items[-1]['change'],
                                     items[-1]['patchset']))
@@ -2982,21 +2982,21 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     _job_class = RecordingAnsibleJob
 
     def __init__(self, *args, **kw):
-        self._run_ansible = kw.pop('_run_ansible', False)
-        self._test_root = kw.pop('_test_root', False)
+        self._run_ansible: bool = kw.pop('_run_ansible', False)
+        self._test_root: bool = kw.pop('_test_root', False)
         if self._run_ansible:
             self._ansible_manager_class = zuul.lib.ansible.AnsibleManager
         else:
             self._ansible_manager_class = FakeAnsibleManager
         super(RecordingExecutorServer, self).__init__(*args, **kw)
-        self.hold_jobs_in_build = False
-        self.hold_jobs_in_start = False
-        self.lock = threading.Lock()
-        self.running_builds = []
-        self.build_history = []
-        self.fail_tests = {}
-        self.return_data = {}
-        self.job_builds = {}
+        self.hold_jobs_in_build: bool = False
+        self.hold_jobs_in_start: bool = False
+        self.lock: threading.Lock = threading.Lock()
+        self.running_builds: List[FakeBuild] = []
+        self.build_history: List[BuildHistory] = []
+        self.fail_tests: Dict[str, List[Any]] = {}
+        self.return_data: Dict[str, Any] = {}
+        self.job_builds: Dict[str, FakeBuild] = {}
 
     def failJob(self, name, change):
         """Instruct the executor to report matching builds as failures.
@@ -3922,7 +3922,7 @@ class SchedulerTestManager:
         return self.instances[0]
 
     def filter(self, matcher=None) -> Iterable[SchedulerTestApp]:
-        fcn = None  # type: Optional[Callable[[int, SchedulerTestApp], bool]]
+        fcn: Optional[Callable[[int, SchedulerTestApp], bool]] = None
         if type(matcher) == list:
             def fcn(_: int, app: SchedulerTestApp) -> bool:
                 return app in matcher
