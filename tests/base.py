@@ -31,7 +31,7 @@ import random
 import re
 from logging import Logger
 from queue import Queue
-from typing import Callable, Optional, Any, Iterable, Generator, List
+from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
 
 import requests
 import select
@@ -63,6 +63,8 @@ import testtools.content_type
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
+
+from zuul.executor.server import JobDir
 from zuul.rpcclient import RPCClient
 
 from zuul.driver.zuul import ZuulDriver
@@ -2711,34 +2713,34 @@ class FakeBuild(object):
     log = logging.getLogger("zuul.test")
 
     def __init__(self, executor_server, job):
-        self.daemon = True
-        self.executor_server = executor_server
+        self.daemon: bool = True
+        self.executor_server: RecordingExecutorServer = executor_server
         self.job = job
-        self.jobdir = None
-        self.uuid = job.unique
-        self.parameters = json.loads(job.arguments)
+        self.jobdir: Optional[JobDir] = None
+        self.uuid: str = job.unique
+        self.parameters: Dict[str, Any] = json.loads(job.arguments)
         # TODOv3(jeblair): self.node is really "the label of the node
         # assigned".  We should rename it (self.node_label?) if we
         # keep using it like this, or we may end up exposing more of
         # the complexity around multi-node jobs here
         # (self.nodes[0].label?)
-        self.node = None
+        self.node: Optional[str] = None
         if len(self.parameters.get('nodes')) == 1:
             self.node = self.parameters['nodes'][0]['label']
-        self.unique = self.parameters['zuul']['build']
-        self.pipeline = self.parameters['zuul']['pipeline']
-        self.project = self.parameters['zuul']['project']['name']
-        self.name = self.parameters['job']
+        self.unique: str = self.parameters['zuul']['build']
+        self.pipeline: str = self.parameters['zuul']['pipeline']
+        self.project: str = self.parameters['zuul']['project']['name']
+        self.name: str = self.parameters['job']
         self.wait_condition = threading.Condition()
-        self.waiting = False
-        self.paused = False
-        self.aborted = False
-        self.requeue = False
-        self.created = time.time()
+        self.waiting: bool = False
+        self.paused: bool = False
+        self.aborted: bool = False
+        self.requeue: bool = False
+        self.created: float = time.time()
         self.changes = None
         items = self.parameters['zuul']['items']
-        self.changes = ' '.join(['%s,%s' % (x['change'], x['patchset'])
-                                 for x in items if 'change' in x])
+        self.changes: str = ' '.join(['%s,%s' % (x['change'], x['patchset'])
+                                      for x in items if 'change' in x])
         if 'change' in items[-1]:
             self.change = ' '.join((items[-1]['change'],
                                     items[-1]['patchset']))
@@ -2990,21 +2992,21 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     _job_class = RecordingAnsibleJob
 
     def __init__(self, *args, **kw):
-        self._run_ansible = kw.pop('_run_ansible', False)
-        self._test_root = kw.pop('_test_root', False)
+        self._run_ansible: bool = kw.pop('_run_ansible', False)
+        self._test_root: bool = kw.pop('_test_root', False)
         if self._run_ansible:
             self._ansible_manager_class = zuul.lib.ansible.AnsibleManager
         else:
             self._ansible_manager_class = FakeAnsibleManager
         super(RecordingExecutorServer, self).__init__(*args, **kw)
-        self.hold_jobs_in_build = False
-        self.hold_jobs_in_start = False
-        self.lock = threading.Lock()
-        self.running_builds = []
-        self.build_history = []
-        self.fail_tests = {}
-        self.return_data = {}
-        self.job_builds = {}
+        self.hold_jobs_in_build: bool = False
+        self.hold_jobs_in_start: bool = False
+        self.lock: threading.Lock = threading.Lock()
+        self.running_builds: List[FakeBuild] = []
+        self.build_history: List[BuildHistory] = []
+        self.fail_tests: Dict[str, List[Any]] = {}
+        self.return_data: Dict[str, Any] = {}
+        self.job_builds: Dict[str, FakeBuild] = {}
 
     def failJob(self, name, change):
         """Instruct the executor to report matching builds as failures.
@@ -3930,7 +3932,7 @@ class SchedulerTestManager:
         return self.instances[0]
 
     def filter(self, matcher=None) -> Iterable[SchedulerTestApp]:
-        fcn = None  # type: Optional[Callable[[int, SchedulerTestApp], bool]]
+        fcn: Optional[Callable[[int, SchedulerTestApp], bool]] = None
         if type(matcher) == list:
             def fcn(_: int, app: SchedulerTestApp) -> bool:
                 return app in matcher
@@ -4005,13 +4007,13 @@ class ZuulTestCase(BaseTestCase):
 
     """
 
-    config_file = 'zuul.conf'  # type: str
-    run_ansible = False  # type: bool
-    create_project_keys = False  # type: bool
-    use_ssl = False  # type: bool
-    git_url_with_auth = False  # type: bool
-    log_console_port = 19885  # type: int
-    source_only = False  # type: bool
+    config_file: str = 'zuul.conf'
+    run_ansible: bool = False
+    create_project_keys: bool = False
+    use_ssl: bool = False
+    git_url_with_auth: bool = False
+    log_console_port: int = 19885
+    source_only: bool = False
 
     def __getattr__(self, name):
         """Allows to access fake connections the old way, e.g., using
