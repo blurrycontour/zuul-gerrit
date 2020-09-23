@@ -18,6 +18,9 @@ import copy
 import json
 import logging
 import os
+from logging import LoggerAdapter
+from typing import Any, Tuple, Dict, List, Optional
+
 import re2
 import struct
 import time
@@ -34,6 +37,7 @@ from zuul.lib.config import get_default
 from zuul.lib.artifacts import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
+from zuul.trigger import BaseTrigger
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -247,13 +251,13 @@ class Pipeline(object):
     STATE_NORMAL = 'normal'
     STATE_ERROR = 'error'
 
-    def __init__(self, name, tenant):
-        self.name = name
+    def __init__(self, name: str, tenant: 'Tenant'):
+        self.name: str = name
         # Note that pipelines are not portable across tenants (new
         # pipeline objects must be made when a tenant is
         # reconfigured).  A pipeline requires a tenant in order to
         # reach the currently active layout for that tenant.
-        self.tenant = tenant
+        self.tenant: Tenant = tenant
         self.source_context = None
         self.start_mark = None
         self.description = None
@@ -264,32 +268,32 @@ class Pipeline(object):
         self.enqueue_message = None
         self.start_message = None
         self.dequeue_message = None
-        self.post_review = False
-        self.dequeue_on_new_patchset = True
-        self.ignore_dependencies = False
+        self.post_review: bool = False
+        self.dequeue_on_new_patchset: bool = True
+        self.ignore_dependencies: bool = False
         self.manager = None
-        self.queues = []
-        self.relative_priority_queues = {}
+        self.queues: List[ChangeQueue] = []
+        self.relative_priority_queues: Dict[str, List[Project]] = {}
         self.precedence = PRECEDENCE_NORMAL
-        self.triggers = []
-        self.enqueue_actions = []
-        self.start_actions = []
-        self.success_actions = []
-        self.failure_actions = []
-        self.merge_failure_actions = []
-        self.no_jobs_actions = []
-        self.disabled_actions = []
-        self.dequeue_actions = []
+        self.triggers: List[BaseTrigger] = []
+        self.enqueue_actions: List[str] = []
+        self.start_actions: List[str] = []
+        self.success_actions: List[str] = []
+        self.failure_actions: List[str] = []
+        self.merge_failure_actions: List[str] = []
+        self.no_jobs_actions: List[str] = []
+        self.disabled_actions: List[str] = []
+        self.dequeue_actions: List[str] = []
         self.disable_at = None
-        self._consecutive_failures = 0
-        self._disabled = False
+        self._consecutive_failures: int = 0
+        self._disabled: bool = False
         self.window = None
         self.window_floor = None
         self.window_increase_type = None
         self.window_increase_factor = None
         self.window_decrease_type = None
         self.window_decrease_factor = None
-        self.state = self.STATE_NORMAL
+        self.state: str = self.STATE_NORMAL
 
     @property
     def actions(self):
@@ -411,13 +415,12 @@ class ChangeQueue(object):
                  window_decrease_type='exponential', window_decrease_factor=2,
                  name=None, dynamic=False):
         self.pipeline = pipeline
+        self.name: str = ''
         if name:
             self.name = name
-        else:
-            self.name = ''
         self.projects = []
         self._jobs = set()
-        self.queue = []
+        self.queue: List[QueueItem] = []
         self.window = window
         self.window_floor = window_floor
         self.window_increase_type = window_increase_type
@@ -445,7 +448,7 @@ class ChangeQueue(object):
         item.enqueue_time = time.time()
         return item
 
-    def enqueueItem(self, item):
+    def enqueueItem(self, item: 'QueueItem'):
         item.pipeline = self.pipeline
         item.queue = self
         if self.queue:
@@ -453,7 +456,7 @@ class ChangeQueue(object):
             item.item_ahead.items_behind.append(item)
         self.queue.append(item)
 
-    def dequeueItem(self, item):
+    def dequeueItem(self, item: 'QueueItem'):
         if item in self.queue:
             self.queue.remove(item)
         if item.item_ahead:
@@ -1701,11 +1704,11 @@ class JobProject(ConfigObject):
     """ A reference to a project from a job. """
 
     def __init__(self, project_name, override_branch=None,
-                 override_checkout=None):
+                 override_checkout: Optional[str]=None):
         super(JobProject, self).__init__()
         self.project_name = project_name
         self.override_branch = override_branch
-        self.override_checkout = override_checkout
+        self.override_checkout: Optional[str] = override_checkout
 
     def toDict(self):
         d = dict()
@@ -1718,10 +1721,10 @@ class JobProject(ConfigObject):
 class JobSemaphore(ConfigObject):
     """ A reference to a semaphore from a job. """
 
-    def __init__(self, semaphore_name, resources_first=False):
+    def __init__(self, semaphore_name: str, resources_first: bool=False):
         super().__init__()
-        self.name = semaphore_name
-        self.resources_first = resources_first
+        self.name: str = semaphore_name
+        self.resources_first: bool = resources_first
 
     def toDict(self):
         d = dict()
@@ -1735,9 +1738,10 @@ class JobList(ConfigObject):
 
     def __init__(self):
         super(JobList, self).__init__()
-        self.jobs = OrderedDict()  # job.name -> [job, ...]
+        # job.name -> [job, ...]
+        self.jobs: OrderedDict[str, List[Job]] = OrderedDict()
 
-    def addJob(self, job):
+    def addJob(self, job: Job) -> None:
         if job.name in self.jobs:
             self.jobs[job.name].append(job)
         else:
@@ -1767,14 +1771,15 @@ class JobGraph(object):
     """ A JobGraph represents the dependency graph between Job."""
 
     def __init__(self):
-        self.jobs = OrderedDict()  # job_name -> Job
+        # job_name -> Job
+        self.jobs: OrderedDict[str, Job] = OrderedDict()
         # dependent_job_name -> dict(parent_job_name -> soft)
         self._dependencies = {}
 
     def __repr__(self):
         return '<JobGraph %s>' % (self.jobs)
 
-    def addJob(self, job):
+    def addJob(self, job: Job):
         # A graph must be created after the job list is frozen,
         # therefore we should only get one job with the same name.
         if job.name in self.jobs:
@@ -1798,7 +1803,7 @@ class JobGraph(object):
             del self._dependencies[job.name]
             raise
 
-    def getJobs(self):
+    def getJobs(self) -> List[Job]:
         return list(self.jobs.values())  # Report in the order of layout cfg
 
     def getDirectDependentJobs(self, parent_job, skip_soft=False):
@@ -1867,28 +1872,29 @@ class Build(object):
     Job (related builds are grouped together in a BuildSet).
     """
 
-    def __init__(self, job, uuid, zuul_event_id=None):
-        self.job = job
-        self.uuid = uuid
-        self.url = None
-        self.result = None
-        self.result_data = {}
-        self.error_detail = None
-        self.build_set = None
-        self.execute_time = time.time()
-        self.start_time = None
-        self.end_time = None
-        self.estimated_time = None
-        self.canceled = False
-        self.paused = False
-        self.retry = False
-        self.held = False
-        self.parameters = {}
-        self.worker = Worker()
-        self.node_labels = []
-        self.node_name = None
-        self.nodeset = None
-        self.zuul_event_id = zuul_event_id
+    def __init__(self, job: Job, uuid: Optional[str],
+                 zuul_event_id: Optional[str]=None):
+        self.job: Job = job
+        self.uuid: Optional[str] = uuid
+        self.url: Optional[str] = None
+        self.result: Optional[str] = None
+        self.result_data: Dict[str, Any] = {}
+        self.error_detail: Optional[str] = None
+        self.build_set: Optional[BuildSet] = None
+        self.execute_time: float = time.time()
+        self.start_time: Optional[float] = None
+        self.end_time: Optional[float] = None
+        self.estimated_time: Optional[float] = None
+        self.canceled: bool = False
+        self.paused: bool = False
+        self.retry: bool = False
+        self.held: bool = False
+        self.parameters: Dict[str, Any] = {}
+        self.worker: Worker = Worker()
+        self.node_labels: List[str] = []
+        self.node_name: Optional[str] = None
+        self.nodeset: Optional[NodeSet] = None
+        self.zuul_event_id: Optional[str] = zuul_event_id
 
     def __repr__(self):
         return ('<Build %s of %s voting:%s on %s>' %
@@ -1997,7 +2003,7 @@ class BuildSet(object):
 
     def __init__(self, item):
         self.item = item
-        self.builds = {}
+        self.builds: Dict[str, Build] = {}
         self.retry_builds = {}
         self.result = None
         self.uuid = None
@@ -2053,7 +2059,7 @@ class BuildSet(object):
         return self.states_map.get(
             state_num, 'UNKNOWN (%s)' % state_num)
 
-    def addBuild(self, build):
+    def addBuild(self, build: Build) -> None:
         self.builds[build.job.name] = build
         if build.job.name not in self.tries:
             self.tries[build.job.name] = 1
@@ -2068,13 +2074,13 @@ class BuildSet(object):
         self.tries[build.job.name] += 1
         del self.builds[build.job.name]
 
-    def getBuild(self, job_name):
+    def getBuild(self, job_name: str) -> Optional[Build]:
         return self.builds.get(job_name)
 
-    def getBuilds(self):
+    def getBuilds(self) -> List[Build]:
         keys = list(self.builds.keys())
         keys.sort()
-        return [self.builds.get(x) for x in keys]
+        return [self.builds.get(x) for x in keys]  # type: ignore
 
     def getRetryBuildsForJob(self, job_name):
         return self.retry_builds.get(job_name, [])
@@ -2149,31 +2155,36 @@ class QueueItem(object):
     produced for this `QueueItem`.
     """
 
-    def __init__(self, queue, change, event):
+    def __init__(self, queue: ChangeQueue, change: 'Change',
+                 event: Optional['TriggerEvent']):
         log = logging.getLogger("zuul.QueueItem")
-        self.log = get_annotated_logger(log, event)
-        self.pipeline = queue.pipeline
-        self.queue = queue
-        self.change = change  # a ref
-        self.dequeued_needing_change = False
-        self.current_build_set = BuildSet(self)
-        self.item_ahead = None
-        self.items_behind = []
-        self.enqueue_time = None
-        self.report_time = None
-        self.dequeue_time = None
-        self.reported = False
-        self.reported_enqueue = False
-        self.reported_start = False
-        self.quiet = False
-        self.active = False  # Whether an item is within an active window
-        self.live = True  # Whether an item is intended to be processed at all
-        self.layout = None
-        self.project_pipeline_config = None
-        self.job_graph = None
-        self._old_job_graph = None  # Cached job graph of previous layout
-        self._cached_sql_results = {}
-        self.event = event  # The trigger event that lead to this queue item
+        self.log: LoggerAdapter = get_annotated_logger(log, event)
+        self.pipeline: Pipeline = queue.pipeline
+        self.queue: ChangeQueue = queue
+        self.change: Change = change  # a ref
+        self.dequeued_needing_change: bool = False
+        self.current_build_set: BuildSet = BuildSet(self)
+        self.item_ahead: Optional[QueueItem] = None
+        self.items_behind: List[QueueItem] = []
+        self.enqueue_time: Optional[float] = None
+        self.report_time: Optional[float] = None
+        self.dequeue_time: Optional[float] = None
+        self.reported: bool = False
+        self.reported_enqueue: bool = False
+        self.reported_start: bool = False
+        self.quiet: bool = False
+        # Whether an item is within an active window
+        self.active: bool = False
+        # Whether an item is intended to be processed at all
+        self.live: bool = True
+        self.layout: Optional[Layout] = None
+        self.project_pipeline_config: Optional[ProjectPipelineConfig] = None
+        self.job_graph: Optional[JobGraph] = None
+        # Cached job graph of previous layout
+        self._old_job_graph: Optional[JobGraph] = None
+        self._cached_sql_results: Dict[Any, Any] = {}
+        # The trigger event that lead to this queue item
+        self.event: Optional[TriggerEvent] = event
 
     def annotateLogger(self, logger):
         """Return an annotated logger with the trigger event"""
@@ -2194,7 +2205,7 @@ class QueueItem(object):
         self.job_graph = None
         self._old_job_graph = None
 
-    def addBuild(self, build):
+    def addBuild(self, build: Build):
         self.current_build_set.addBuild(build)
 
     def addRetryBuild(self, build):
@@ -2225,7 +2236,8 @@ class QueueItem(object):
         """Find or create actual matching jobs for this item's change and
         store the resulting job tree."""
 
-        ppc = self.layout.getProjectPipelineConfig(self)
+        ppc: Optional[ProjectPipelineConfig] = self.layout\
+            .getProjectPipelineConfig(self)
         try:
             # Conditionally set self.ppc so that the debug method can
             # consult it as we resolve the jobs.
@@ -2233,7 +2245,7 @@ class QueueItem(object):
             if ppc:
                 for msg in ppc.debug_messages:
                     self.debug(msg)
-            job_graph = self.layout.createJobGraph(
+            job_graph: JobGraph = self.layout.createJobGraph(
                 self, ppc, skip_file_matcher)
             for job in job_graph.getJobs():
                 # Ensure that each jobs's dependencies are fully
@@ -2515,8 +2527,9 @@ class QueueItem(object):
             ret = True
         return ret
 
-    def findJobsToRun(self, semaphore_handler):
-        torun = []
+    def findJobsToRun(self, semaphore_handler: 'SemaphoreHandler')\
+            -> List[Job]:
+        torun: List[Job] = []
         if not self.live:
             return []
         if not self.job_graph:
@@ -2560,7 +2573,7 @@ class QueueItem(object):
                     all_parent_jobs_successful = False
                     break
                 parent_build = self.current_build_set.getBuild(parent_job.name)
-                if parent_build.result_data:
+                if parent_build and parent_build.result_data:
                     parent_builds_with_data[parent_job.name] = parent_build
 
             for parent_job in self.job_graph.getParentJobsRecursively(
@@ -3765,7 +3778,7 @@ class Layout(object):
         self.project_configs = {}
         self.project_templates = {}
         self.project_metadata = {}
-        self.pipelines = OrderedDict()
+        self.pipelines: Dict[str, Pipeline] = OrderedDict()
         # This is a dictionary of name -> [jobs].  The first element
         # of the list is the first job added with that name.  It is
         # the reference definition for a given job.  Subsequent
@@ -3888,7 +3901,7 @@ class Layout(object):
             return
         self.semaphores[semaphore.name] = semaphore
 
-    def addPipeline(self, pipeline):
+    def addPipeline(self, pipeline: Pipeline):
         if pipeline.tenant is not self.tenant:
             raise Exception("Pipeline created for tenant %s "
                             "may not be added to %s" % (
@@ -3956,7 +3969,8 @@ class Layout(object):
             return self.project_metadata[name]
         return None
 
-    def getProjectPipelineConfig(self, item):
+    def getProjectPipelineConfig(self, item)\
+            -> Optional[ProjectPipelineConfig]:
         log = item.annotateLogger(self.log)
         # Create a project-pipeline config for the given item, taking
         # its branch (if any) into consideration.  If the project does
@@ -4010,7 +4024,10 @@ class Layout(object):
             return ppc
         return None
 
-    def _updateOverrideCheckouts(self, override_checkouts, job):
+    def _updateOverrideCheckouts(self,
+                                 override_checkouts: Dict[Optional[str],
+                                                          Optional[str]],
+                                 job: Job) -> None:
         # Update the values in an override_checkouts dict with those
         # in a job.  Used in collectJobVariants.
         if job.override_checkout:
@@ -4019,8 +4036,12 @@ class Layout(object):
             if req.override_checkout:
                 override_checkouts[req.project_name] = req.override_checkout
 
-    def _collectJobVariants(self, item, jobname, change, path, jobs, stack,
-                            override_checkouts, indent):
+    def _collectJobVariants(self, item: QueueItem, jobname: str,
+                            change: Change, path: List[str], jobs: List[Job],
+                            stack,
+                            override_checkouts: Dict[Optional[str],
+                                                     Optional[str]],
+                            indent: int) -> bool:
         log = item.annotateLogger(self.log)
         matched = False
         local_override_checkouts = override_checkouts.copy()
@@ -4064,8 +4085,13 @@ class Layout(object):
                 jobs.append(variant)
         return matched
 
-    def collectJobs(self, item, jobname, change, path=None, jobs=None,
-                    stack=None, override_checkouts=None):
+    def collectJobs(self, item: QueueItem, jobname: str, change: Change,
+                    path: Optional[List[str]] = None,
+                    jobs: Optional[List[Job]] = None,
+                    stack: Optional[List[str]] = None,
+                    override_checkouts: Optional[
+                        Dict[Optional[str], Optional[str]]] = None)\
+            -> List[Job]:
         log = item.annotateLogger(self.log)
         # Stack is the recursion stack of job parent names.  Each time
         # we go up a level, we add to stack, and it's popped as we
@@ -4105,7 +4131,8 @@ class Layout(object):
             raise NoMatchingParentError()
         return jobs
 
-    def _createJobGraph(self, item, ppc, job_graph, skip_file_matcher):
+    def _createJobGraph(self, item: QueueItem, ppc: ProjectPipelineConfig,
+                        job_graph: JobGraph, skip_file_matcher: bool) -> None:
         log = item.annotateLogger(self.log)
         job_list = ppc.job_list
         change = item.change
@@ -4113,23 +4140,24 @@ class Layout(object):
         item.debug("Freezing job graph")
         for jobname in job_list.jobs:
             # This is the final job we are constructing
-            frozen_job = None
+            frozen_job: Optional[Job] = None
             log.debug("Collecting jobs %s for %s", jobname, change)
             item.debug("Freezing job {jobname}".format(
                 jobname=jobname), indent=1)
             # Create the initial list of override_checkouts, which are
             # used as we walk up the hierarchy to expand the set of
             # jobs which match.
-            override_checkouts = {}
+            override_checkouts: Dict[Optional[str], Optional[str]] = {}
             for variant in job_list.jobs[jobname]:
                 if variant.changeMatchesBranch(change):
                     self._updateOverrideCheckouts(override_checkouts, variant)
+            variants: Optional[List[Job]] = None
             try:
                 variants = self.collectJobs(
                     item, jobname, change,
                     override_checkouts=override_checkouts)
             except NoMatchingParentError:
-                variants = None
+                pass
             log.debug("Collected jobs %s for %s", jobname, change)
             if not variants:
                 # A change must match at least one defined job variant
@@ -4145,6 +4173,8 @@ class Layout(object):
                 else:
                     frozen_job.applyVariant(variant, item.layout)
                     frozen_job.name = variant.name
+            if not frozen_job:
+                raise Exception("No frozen job constructed")
             frozen_job.name = jobname
 
             # Now merge variables set from this parent ppc
@@ -4153,7 +4183,7 @@ class Layout(object):
 
             # If the job does not specify an ansible version default to the
             # tenant default.
-            if not frozen_job.ansible_version:
+            if not frozen_job.ansible_version and item.layout:
                 frozen_job.ansible_version = \
                     item.layout.tenant.default_ansible_version
 
@@ -4222,7 +4252,9 @@ class Layout(object):
 
             job_graph.addJob(frozen_job)
 
-    def createJobGraph(self, item, ppc, skip_file_matcher=False):
+    def createJobGraph(self, item: QueueItem,
+                       ppc: Optional[ProjectPipelineConfig],
+                       skip_file_matcher: bool=False) -> JobGraph:
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
         ret = JobGraph()
@@ -4362,21 +4394,21 @@ class Tenant(object):
         self.exclude_unprotected_branches = False
         self.default_base_job = None
         self.report_build_page = False
-        self.layout = None
+        self.layout: Optional[Layout] = None
         # The unparsed configuration from the main zuul config for
         # this tenant.
         self.unparsed_config = None
         # The list of projects from which we will read full
         # configuration.
-        self.config_projects = []
+        self.config_projects: List[Project] = []
         # The parsed config from those projects.
         self.config_projects_config = None
         # The list of projects from which we will read untrusted
         # in-repo configuration.
-        self.untrusted_projects = []
+        self.untrusted_projects: List[Project] = []
         # The parsed config from those projects.
         self.untrusted_projects_config = None
-        self.semaphore_handler = SemaphoreHandler()
+        self.semaphore_handler: SemaphoreHandler = SemaphoreHandler()
         # Metadata about projects for this tenant
         # canonical project name -> TenantProjectConfig
         self.project_configs = {}
@@ -4384,13 +4416,18 @@ class Tenant(object):
         # A mapping of project names to projects.  project_name ->
         # VALUE where VALUE is a further dictionary of
         # canonical_hostname -> Project.
-        self.projects = {}
+        self.projects: Dict[str, Dict[str, Project]] = {}
         self.canonical_hostnames = set()
 
         # The per tenant default ansible version
         self.default_ansible_version = None
 
         self.authorization_rules = []
+        self.web_root: Optional[str] = None
+        self.allowed_triggers: Optional[List[str]] = None
+        self.allowed_reporters: Optional[List[str]] = None
+        self.allowed_labels: Optional[List[str]] = None
+        self.disallowed_labels: Optional[List[str]] = None
 
     @property
     def all_projects(self):
@@ -4417,7 +4454,8 @@ class Tenant(object):
         hostname_dict[project.canonical_hostname] = project
         self.project_configs[project.canonical_name] = tpc
 
-    def getProject(self, name):
+    def getProject(self, name: str)\
+            -> Tuple[Optional[bool], Optional[Project]]:
         """Return a project given its name.
 
         :arg str name: The name of the project.  It may be fully
@@ -4433,12 +4471,11 @@ class Tenant(object):
 
         """
         path = name.split('/', 1)
+        hostname = None
+        project_name = name
         if path[0] in self.canonical_hostnames:
             hostname = path[0]
             project_name = path[1]
-        else:
-            hostname = None
-            project_name = name
         hostname_dict = self.projects.get(project_name)
         project = None
         if hostname_dict:
@@ -4594,7 +4631,7 @@ class UnparsedBranchCache(object):
 class Abide(object):
     def __init__(self):
         self.admin_rules = OrderedDict()
-        self.tenants = OrderedDict()
+        self.tenants: Dict[str, Tenant] = OrderedDict()
         # project -> branch -> UnparsedBranchCache
         self.unparsed_project_branch_cache = {}
 
