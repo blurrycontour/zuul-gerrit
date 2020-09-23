@@ -21,10 +21,11 @@ import textwrap
 import io
 import re
 import subprocess
-
+from typing import Dict, Any, Optional, TYPE_CHECKING
 import voluptuous as vs
-
 from zuul import model
+from zuul.lib import ansible
+from zuul.merger.client import MergeClient
 from zuul.lib import yamlutil as yaml
 import zuul.manager.dependent
 import zuul.manager.independent
@@ -38,6 +39,12 @@ from zuul.lib.re2util import filter_allowed_disallowed
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
+from zuul.model import Tenant
+if TYPE_CHECKING:
+    from zuul.lib.connections import ConnectionRegistry
+    from zuul.scheduler import Scheduler
+
+
 def to_list(x):
     return vs.Any([x], x)
 
@@ -676,8 +683,8 @@ class JobParser(object):
         self.log = logging.getLogger("zuul.JobParser")
         self.pcontext = pcontext
 
-    def fromYaml(self, conf, project_pipeline=False, name=None,
-                 validate=True):
+    def fromYaml(self, conf: Dict[str, Any], project_pipeline: bool=False,
+                 name: bool=None, validate: bool=True) -> model.Job:
         if validate:
             self.schema(conf)
 
@@ -881,9 +888,9 @@ class JobParser(object):
             semaphore = conf.get('semaphore')
             if isinstance(semaphore, str):
                 job.semaphore = model.JobSemaphore(semaphore)
-            else:
+            elif isinstance(semaphore, dict):
                 job.semaphore = model.JobSemaphore(
-                    semaphore.get('name'),
+                    semaphore.get('name', ''),
                     semaphore.get('resources-first', False))
 
         for k in ('tags', 'requires', 'provides'):
@@ -1163,9 +1170,9 @@ class PipelineParser(object):
         'dequeue': 'dequeue_actions',
     }
 
-    def __init__(self, pcontext):
+    def __init__(self, pcontext: 'ParseContext'):
         self.log = logging.getLogger("zuul.PipelineParser")
-        self.pcontext = pcontext
+        self.pcontext: ParseContext = pcontext
         self.schema = self.getSchema()
 
     def getDriverSchema(self, dtype):
@@ -1402,19 +1409,22 @@ class AuthorizationRuleParser(object):
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
-    def __init__(self, connections, scheduler, tenant, ansible_manager):
-        self.connections = connections
-        self.scheduler = scheduler
-        self.tenant = tenant
-        self.ansible_manager = ansible_manager
-        self.pragma_parser = PragmaParser(self)
-        self.pipeline_parser = PipelineParser(self)
-        self.nodeset_parser = NodeSetParser(self)
-        self.secret_parser = SecretParser(self)
-        self.job_parser = JobParser(self)
-        self.semaphore_parser = SemaphoreParser(self)
-        self.project_template_parser = ProjectTemplateParser(self)
-        self.project_parser = ProjectParser(self)
+    def __init__(self, connections: 'ConnectionRegistry',
+                 scheduler: 'Scheduler', tenant: Tenant,
+                 ansible_manager: ansible.AnsibleManager):
+        self.connections: ConnectionRegistry = connections
+        self.scheduler: Scheduler = scheduler
+        self.tenant: Tenant = tenant
+        self.ansible_manager: ansible.AnsibleManager = ansible_manager
+        self.pragma_parser: PragmaParser = PragmaParser(self)
+        self.pipeline_parser: PipelineParser = PipelineParser(self)
+        self.nodeset_parser: NodeSetParser = NodeSetParser(self)
+        self.secret_parser: SecretParser = SecretParser(self)
+        self.job_parser: JobParser = JobParser(self)
+        self.semaphore_parser: SemaphoreParser = SemaphoreParser(self)
+        self.project_template_parser: ProjectTemplateParser =\
+            ProjectTemplateParser(self)
+        self.project_parser: ProjectParser = ProjectParser(self)
 
     def getImpliedBranches(self, source_context):
         # If the user has set a pragma directive for this, use the
@@ -1509,7 +1519,7 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager):
+    def fromYaml(self, abide, conf, ansible_manager) -> Tenant:
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1888,11 +1898,12 @@ class TenantParser(object):
             loading_errors.addError(source_context, None, e)
         return config
 
-    def filterConfigProjectYAML(self, data):
+    def filterConfigProjectYAML(self, data: model.UnparsedConfig):
         # Any config object may appear in a config project.
         return data.copy(trusted=True)
 
-    def filterUntrustedProjectYAML(self, data, loading_errors):
+    def filterUntrustedProjectYAML(self, data: model.UnparsedConfig,
+                                   loading_errors):
         if data and data.pipelines:
             with configuration_exceptions(
                     'pipeline', data.pipelines[0], loading_errors):
@@ -1904,7 +1915,9 @@ class TenantParser(object):
         tpc = tenant.project_configs[project.canonical_name]
         return tpc.load_classes
 
-    def parseConfig(self, tenant, unparsed_config, loading_errors, pcontext):
+    def parseConfig(self, tenant: model.Tenant,
+                    unparsed_config: model.UnparsedConfig, loading_errors,
+                    pcontext: ParseContext):
         parsed_config = model.ParsedConfig()
 
         # Handle pragma items first since they modify the source context
@@ -2136,7 +2149,7 @@ class TenantParser(object):
                     for ppc in project_config.pipelines.values():
                         inner_validate_ppcs(ppc)
 
-    def _parseLayout(self, tenant, data, loading_errors):
+    def _parseLayout(self, tenant, data, loading_errors) -> model.Layout:
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
         layout = model.Layout(tenant)
@@ -2146,7 +2159,8 @@ class TenantParser(object):
         self._addLayoutItems(layout, tenant, data)
 
         for pipeline in layout.pipelines.values():
-            pipeline.manager._postConfig(layout)
+            if pipeline.manager:
+                pipeline.manager._postConfig(layout)
 
         return layout
 
@@ -2154,14 +2168,15 @@ class TenantParser(object):
 class ConfigLoader(object):
     log = logging.getLogger("zuul.ConfigLoader")
 
-    def __init__(self, connections, scheduler, merger, key_dir):
-        self.connections = connections
-        self.scheduler = scheduler
+    def __init__(self, connections: 'ConnectionRegistry',
+                 scheduler: 'Scheduler', merger: Optional[MergeClient],
+                 key_dir: Optional[str]):
+        self.connections: ConnectionRegistry = connections
+        self.scheduler: Scheduler = scheduler
         self.merger = merger
+        self.keystorage: Optional[KeyStorage] = None
         if key_dir:
             self.keystorage = KeyStorage(key_dir)
-        else:
-            self.keystorage = None
         self.tenant_parser = TenantParser(connections, scheduler,
                                           merger, self.keystorage)
         self.admin_rule_parser = AuthorizationRuleParser()
@@ -2224,8 +2239,10 @@ class ConfigLoader(object):
                     self.log.warning(err.error)
         return abide
 
-    def reloadTenant(self, abide, tenant, ansible_manager,
-                     unparsed_abide=None):
+    def reloadTenant(self, abide: model.Abide, tenant: model.Tenant,
+                     ansible_manager: ansible.AnsibleManager,
+                     unparsed_abide: Optional[model.UnparsedAbideConfig] = None
+                     ) -> model.Abide:
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
         new_abide.admin_rules = abide.admin_rules.copy()
@@ -2249,7 +2266,7 @@ class ConfigLoader(object):
         new_tenant = self.tenant_parser.fromYaml(
             new_abide, unparsed_config, ansible_manager)
         new_abide.tenants[tenant.name] = new_tenant
-        if len(new_tenant.layout.loading_errors):
+        if new_tenant.layout and len(new_tenant.layout.loading_errors):
             self.log.warning(
                 "%s errors detected during %s tenant "
                 "configuration re-loading" % (
@@ -2301,7 +2318,6 @@ class ConfigLoader(object):
                         fns4.append(fn)
             fns = (["zuul.yaml"] + sorted(fns1) + [".zuul.yaml"] +
                    sorted(fns2) + fns3 + sorted(fns4))
-            incdata = None
             loaded = None
             for fn in fns:
                 data = files.getFile(project.source.connection.connection_name,
