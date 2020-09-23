@@ -21,6 +21,7 @@ from kazoo.recipe.lock import ReadLock, WriteLock
 
 from zuul.zk import ZooKeeperClient
 from zuul.zk.base import ZooKeeperBase
+from zuul.zk.exceptions import NoClientException
 
 
 class ZooKeeperConnectionEvent(ZooKeeperBase):
@@ -38,13 +39,13 @@ class ZooKeeperConnectionEvent(ZooKeeperBase):
 
     def __read_lock(self, connection_name: str) -> ReadLock:
         if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
+            raise NoClientException()
         lock_node = "%s/%s" % (self.ROOT, connection_name)
         return self.kazoo_client.ReadLock(lock_node)
 
     def write_lock(self, connection_name: str) -> WriteLock:
         if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
+            raise NoClientException()
         lock_node = "%s/%s" % (self.ROOT, connection_name)
         return self.kazoo_client.WriteLock(lock_node)
 
@@ -53,7 +54,7 @@ class ZooKeeperConnectionEvent(ZooKeeperBase):
             self.event_watchers[connection_name] = [watch]
 
             if not self.kazoo_client:
-                raise Exception("No zookeeper client!")
+                raise NoClientException()
 
             path = "%s/%s/nodes" % (self.ROOT, connection_name)
             self.kazoo_client.ensure_path(path)
@@ -74,7 +75,7 @@ class ZooKeeperConnectionEvent(ZooKeeperBase):
     def has_events(self, connection_name: str, keep_locked: bool = False)\
             -> bool:
         if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
+            raise NoClientException()
         lock = self.__read_lock(connection_name)
         self.client.acquire_lock(lock, keep_locked)
         self.log.debug('hasConnectionEvents[%s]: locked' % connection_name)
@@ -95,7 +96,7 @@ class ZooKeeperConnectionEvent(ZooKeeperBase):
 
     def pop(self, connection_name: str):
         if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
+            raise NoClientException()
 
         class EventWrapper:
             def __init__(self, connection_event: 'ZooKeeperConnectionEvent',
@@ -128,7 +129,7 @@ class ZooKeeperConnectionEvent(ZooKeeperBase):
 
     def push(self, connection_name: str, event: Any):
         if not self.kazoo_client:
-            raise Exception("No zookeeper client!")
+            raise NoClientException()
         lock = self.write_lock(connection_name)
         self.client.acquire_lock(lock)
         self.log.debug('push: locked')
