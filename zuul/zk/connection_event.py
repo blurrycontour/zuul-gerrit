@@ -33,8 +33,7 @@ class ZooKeeperConnectionEvent(ZooKeeperBase):
 
     def __init__(self, client: ZooKeeperClient):
         super().__init__(client)
-        self.event_watchers = \
-            {}  # type: Dict[str, List[Callable[[List[str]], None]]]
+        self.event_watchers: Dict[str, List[Callable[[List[str]], None]]] = {}
 
     def __read_lock(self, connection_name: str) -> ReadLock:
         if not self.kazoo_client:
