@@ -16,6 +16,24 @@
       "revId": "0a0394dfdf5ddf478570c5d7605dd2353bc57292",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_5ba44a07",
+        "filename": "zuul/driver/sql/alembic/versions/52d49e1bfe22_change_missing_build_url_to_null.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-23T13:03:54Z",
+      "side": 1,
+      "message": "Done (current is now 32e28a297c3e)",
+      "parentUuid": "bf51134e_7880d647",
+      "revId": "0a0394dfdf5ddf478570c5d7605dd2353bc57292",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
