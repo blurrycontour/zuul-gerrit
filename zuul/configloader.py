@@ -603,6 +603,7 @@ class JobParser(object):
                       'final': bool,
                       'abstract': bool,
                       'protected': bool,
+                      'intermediate': bool,
                       'requires': to_list(str),
                       'provides': to_list(str),
                       'failure-message': str,
@@ -655,6 +656,7 @@ class JobParser(object):
         'final',
         'abstract',
         'protected',
+        'intermediate',
         'timeout',
         'post-timeout',
         'workspace',
@@ -809,6 +811,9 @@ class JobParser(object):
                 run = model.PlaybookContext(job.source_context, run_name,
                                             job.roles, secrets)
                 job.run = job.run + (run,)
+
+        if conf.get('intermediate', False) and not conf.get('abstract', False):
+            raise Exception("An intermediate job must also be abstract")
 
         for k in self.simple_attributes:
             a = k.replace('-', '_')

@@ -153,6 +153,21 @@ Here is an example of two job definitions:
          limitation does not apply to jobs in a
          :term:`config-project`.
 
+   .. attr:: intermediate
+      :default: false
+
+      An intermediate job must be inherited by an abstract job; it can
+      not be inherited by a final job.  All ``intermediate`` jobs
+      *must* also be ``abstract``; a configuration error will be
+      raised if not.
+
+      For example, you may define a base abstract job `foo` and create
+      two abstract jobs that inherit from `foo` called
+      `foo-production` and `foo-development`.  If it would be an error
+      to accidentally inherit from the base job `foo` instead of
+      choosing one of the two variants, `foo` could be marked as
+      ``intermediate``.
+
    .. attr:: success-message
       :default: SUCCESS
 
