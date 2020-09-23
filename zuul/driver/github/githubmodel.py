@@ -49,11 +49,6 @@ class PullRequest(Change):
             return None
         return ["{}:{}:{}".format(*c) for c in self.contexts]
 
-    @status.setter
-    def status(self, value):
-        # Dummy setter to ignore init to None in base class.
-        pass
-
     @property
     def successful_contexts(self) -> set:
         if not self.contexts:

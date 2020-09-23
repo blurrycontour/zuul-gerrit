@@ -3204,7 +3204,6 @@ class Change(Branch):
         self.is_merged = False
         self.failed_to_merge = False
         self.open = None
-        self.status = None
         self.owner = None
 
         # This may be the commit message, or it may be a cover message
