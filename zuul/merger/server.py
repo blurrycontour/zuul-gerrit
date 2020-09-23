@@ -70,7 +70,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.merge_root = get_default(config, component, 'git_dir',
                                       '/var/lib/zuul/{}-git'.format(component))
-        self.zookeeper = None  # type: Optional[ZooKeeper]
+        self.zookeeper: Optional[ZooKeeper] = None
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
