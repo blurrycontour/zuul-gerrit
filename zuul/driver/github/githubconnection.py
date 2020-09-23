@@ -434,12 +434,14 @@ class GithubEventProcessor(object):
                 event.zuul_event_id = self.delivery
                 event.timestamp = self.ts
                 project = self.connection.source.getProject(event.project_name)
+                change = None
                 if event.change_number:
-                    self.connection._getChange(project,
-                                               event.change_number,
-                                               event.patch_number,
-                                               refresh=True,
-                                               event=event)
+                    change = self.connection._getChange(
+                        project,
+                        event.change_number,
+                        event.patch_number,
+                        refresh=True,
+                        event=event)
                     self.log.debug("Refreshed change %s,%s",
                                    event.change_number, event.patch_number)
 
@@ -447,20 +449,31 @@ class GithubEventProcessor(object):
                 # unprotected branches, we might need to check whether the
                 # branch is now protected.
                 if hasattr(event, "branch") and event.branch:
-                    b = self.connection.getBranch(
-                        project.name, event.branch, zuul_event_id=event)
-                    if b is not None:
-                        branch_protected = b.get('protected')
+                    if change:
+                        # PR based events already have the information if the
+                        # target branch is protected so take the information
+                        # from there.
                         self.connection.checkBranchCache(
-                            project, event.branch, branch_protected, self.log)
-                        event.branch_protected = branch_protected
+                            project, event.branch, change.branch_protected,
+                            self.log)
+                        event.branch_protected = change.branch_protected
                     else:
-                        # This can happen if the branch was deleted in GitHub.
-                        # In this case we assume that the branch COULD have
-                        # been protected before. The cache update is handled by
-                        # the push event, so we don't touch the cache here
-                        # again.
-                        event.branch_protected = True
+                        # Ref updated events
+                        b = self.connection.getBranch(
+                            project.name, event.branch, zuul_event_id=event)
+                        if b is not None:
+                            branch_protected = b.get('protected')
+                            self.connection.checkBranchCache(
+                                project, event.branch, branch_protected,
+                                self.log)
+                            event.branch_protected = branch_protected
+                        else:
+                            # This can happen if the branch was deleted in
+                            # GitHub. In this case we assume that the branch
+                            # COULD have been protected before. The cache
+                            # update is handled by the push event, so we don't
+                            # touch the cache here again.
+                            event.branch_protected = True
 
             event.project_hostname = self.connection.canonical_hostname
             self.event = event
@@ -1521,6 +1534,7 @@ class GithubConnection(BaseConnection):
         change.required_contexts = set(
             canmerge_data['requiredStatusCheckContexts']
         )
+        change.branch_protected = canmerge_data['protected']
 
     def getGitUrl(self, project: Project):
         if self.git_ssh_key:

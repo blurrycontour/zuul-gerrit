@@ -107,8 +107,10 @@ class GraphQLClient:
                 'requiresApprovingReviews')
             result['requiresCodeOwnerReviews'] = matching_rule.get(
                 'requiresCodeOwnerReviews')
+            result['protected'] = True
         else:
             result['requiredStatusCheckContexts'] = []
+            result['protected'] = False
 
         # Check for draft
         pull_request = nested_get(repository, 'pullRequest')
