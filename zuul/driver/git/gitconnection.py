@@ -22,7 +22,7 @@ import urllib
 from zuul.connection import BaseConnection
 from zuul.driver.git.gitmodel import GitTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
-from zuul.model import Ref, Branch
+from zuul.model import Ref, Branch, Project
 
 
 class GitConnection(BaseConnection):
@@ -58,7 +58,7 @@ class GitConnection(BaseConnection):
         })
         return d
 
-    def getProject(self, name):
+    def getProject(self, name: str) -> Project:
         return self.projects.get(name)
 
     def addProject(self, project):
