@@ -227,6 +227,7 @@
       release_python: python3
     check:
       jobs:
+        - zuul-client-zuul-functional
         - zuul-build-image
         - zuul-tox-docs
         - tox-linters:
