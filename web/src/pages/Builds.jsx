@@ -15,9 +15,6 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
-import * as moment from 'moment-timezone'
 import 'moment-duration-format'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
@@ -28,6 +25,7 @@ import {
   getFiltersFromUrl,
   writeFiltersToUrl,
 } from '../containers/FilterToolbar'
+import BuildTable from '../containers/build/BuildTable'
 
 class BuildsPage extends React.Component {
   static propTypes = {
@@ -39,7 +37,6 @@ class BuildsPage extends React.Component {
 
   constructor(props) {
     super()
-    this.prepareTableHeaders()
     this.filterCategories = [
       {
         key: 'job_name',
@@ -87,7 +84,8 @@ class BuildsPage extends React.Component {
     ]
 
     this.state = {
-      builds: null,
+      builds: [],
+      fetching: false,
       filters: getFiltersFromUrl(props.location, this.filterCategories),
     }
   }
@@ -100,9 +98,15 @@ class BuildsPage extends React.Component {
     // passed as prop and doesn't change since the page itself wasn't
     // re-rendered.
     const queryString = buildQueryString(filters)
-    this.setState({builds: null})
-    fetchBuilds(this.props.tenant.apiPrefix, queryString).then(response => {
-      this.setState({builds: response.data})
+    this.setState({ fetching: true })
+    // TODO (felix): What happens in case of a broken network connection? Is the
+    // fetching shows infinitely or can we catch this and show an erro state in
+    // the table instead?
+    fetchBuilds(this.props.tenant.apiPrefix, queryString).then((response) => {
+      this.setState({
+        builds: response.data,
+        fetching: false,
+      })
     })
   }
 
@@ -137,107 +141,17 @@ class BuildsPage extends React.Component {
     })
   }
 
-  prepareTableHeaders() {
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = (value) => (
-      <Table.Cell>{value}</Table.Cell>)
-    const linkBuildFormat = (value, rowdata) => (
-      <Table.Cell>
-        <Link to={this.props.tenant.linkPrefix + '/build/' + rowdata.rowData.uuid}>{value}</Link>
-      </Table.Cell>
-    )
-    const linkChangeFormat = (value, rowdata) => (
-      <Table.Cell>
-        <a href={rowdata.rowData.ref_url}>{value ? rowdata.rowData.change+','+rowdata.rowData.patchset : rowdata.rowData.newrev ? rowdata.rowData.newrev.substr(0, 7) : rowdata.rowData.branch}</a>
-      </Table.Cell>
-    )
-    const durationFormat = (value) => (
-      <Table.Cell>
-        {moment.duration(value, 'seconds').format('h [hr] m [min] s [sec]')}
-      </Table.Cell>
-    )
-    const timeFormat = (value) => (
-      <Table.Cell>
-        {moment.utc(value).tz(this.props.timezone).format('YYYY-MM-DD HH:mm:ss')}
-      </Table.Cell>
-    )
-    this.columns = []
-    this.filterTypes = []
-    const myColumns = [
-      'job',
-      'project',
-      'branch',
-      'pipeline',
-      'change',
-      'duration',
-      'start time',
-      'result']
-    myColumns.forEach(column => {
-      let prop = column
-      let formatter = cellFormat
-      // Adapt column name and property name
-      if (column === 'job') {
-        prop = 'job_name'
-      } else if (column === 'start time') {
-        prop = 'start_time'
-        formatter = timeFormat
-      } else if (column === 'change') {
-        prop = 'change'
-        formatter = linkChangeFormat
-      } else if (column === 'result') {
-        formatter = linkBuildFormat
-      } else if (column === 'duration') {
-        formatter = durationFormat
-      }
-      const label = column.charAt(0).toUpperCase() + column.slice(1)
-      this.columns.push({
-        header: {label: label, formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
-      if (prop !== 'start_time' && prop !== 'ref_url' && prop !== 'duration'
-          && prop !== 'log_url' && prop !== 'uuid') {
-        this.filterTypes.push({
-          id: prop,
-          title: label,
-          placeholder: 'Filter by ' + label,
-          filterType: 'text',
-        })
-      }
-    })
-    // Add build filter at the end
-    this.filterTypes.push({
-      id: 'uuid',
-      title: 'Build',
-      placeholder: 'Filter by Build UUID',
-      filterType: 'text',
-    })
-  }
-
-  renderTable (builds) {
-    return (
-      <Table.PfProvider
-        striped
-        bordered
-        columns={this.columns}
-      >
-        <Table.Header/>
-        <Table.Body
-          rows={builds}
-          rowKey='uuid'
-          onRow={(row) => {
-            switch (row.result) {
-              case 'SUCCESS':
-                return { className: 'success' }
-              default:
-                return { className: 'warning' }
-            }
-          }} />
-      </Table.PfProvider>)
+  handleClearFilters = () => {
+    // Delete the values for each filter category
+    const filters = this.filterCategories.reduce((filterDict, category) => {
+      filterDict[category.key] = []
+      return filterDict
+    }, {})
+    this.handleFilterChange(filters)
   }
 
   render() {
-    const { builds, filters } = this.state
+    const { builds, fetching, filters } = this.state
     return (
       <PageSection variant={PageSectionVariants.light}>
         <FilterToolbar
@@ -245,7 +159,11 @@ class BuildsPage extends React.Component {
           onFilterChange={this.handleFilterChange}
           filters={filters}
         />
-        {builds ? this.renderTable(builds) : <p>Loading...</p>}
+        <BuildTable
+          builds={builds}
+          fetching={fetching}
+          onClearFilters={this.handleClearFilters}
+        />
       </PageSection>
     )
   }
