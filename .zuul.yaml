@@ -227,58 +227,59 @@
       release_python: python3
     check:
       jobs:
-        - zuul-build-image
-        - zuul-tox-docs
-        - tox-linters:
-            vars:
-              tox_install_bindep: false
-        - tox-py36:
-            required-projects:
-              - zuul/zuul-client
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-bionic
-            timeout: 4800  # 80 minutes
-            vars: &zuul_tox_vars
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                    YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                    YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
-        - tox-py38:
-            required-projects:
-              - zuul/zuul-client
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            timeout: 4800  # 80 minutes
-            nodeset: ubuntu-bionic
-            vars: *zuul_tox_vars
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.7
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-tox-remote:
-            timeout: 2700  # 45 minutes
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
-        - zuul-build-python-release
+        - zuul-client-zuul-functional
+        # - zuul-build-image
+        # - zuul-tox-docs
+        # - tox-linters:
+        #     vars:
+        #       tox_install_bindep: false
+        # - tox-py36:
+        #     required-projects:
+        #       - zuul/zuul-client
+        #     irrelevant-files:
+        #       - zuul/cmd/migrate.py
+        #       - playbooks/zuul-migrate/.*
+        #     nodeset: ubuntu-bionic
+        #     timeout: 4800  # 80 minutes
+        #     vars: &zuul_tox_vars
+        #         test_setup_environment:
+        #             ZUUL_TEST_ROOT: /tmp/zuul-test
+        #             YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+        #         tox_environment:
+        #             ZUUL_TEST_ROOT: /tmp/zuul-test
+        #             YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+        # - tox-py38:
+        #     required-projects:
+        #       - zuul/zuul-client
+        #     irrelevant-files:
+        #       - zuul/cmd/migrate.py
+        #       - playbooks/zuul-migrate/.*
+        #     timeout: 4800  # 80 minutes
+        #     nodeset: ubuntu-bionic
+        #     vars: *zuul_tox_vars
+        # - zuul-build-dashboard-openstack-whitelabel
+        # - zuul-build-dashboard-software-factory
+        # - zuul-build-dashboard-opendev
+        # - nodejs-run-lint:
+        #     vars:
+        #       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        # - nodejs-run-test:
+        #     vars:
+        #       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #     success-url: 'npm/reports/bundle.html'
+        #     files:
+        #       - web/.*
+        # - zuul-stream-functional-2.7
+        # - zuul-stream-functional-2.8
+        # - zuul-stream-functional-2.9
+        # - zuul-tox-remote:
+        #     timeout: 2700  # 45 minutes
+        # - zuul-quick-start:
+        #     requires: nodepool-container-image
+        #     dependencies: zuul-build-image
+        # - nodepool-zuul-functional:
+        #     voting: false
+        # - zuul-build-python-release
     gate:
       jobs:
         - zuul-upload-image

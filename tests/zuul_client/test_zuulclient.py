@@ -14,7 +14,10 @@
 
 import time
 import jwt
+import os
 import subprocess
+import tempfile
+import textwrap
 
 import zuul.web
 import zuul.rpcclient
@@ -23,15 +26,109 @@ from tests.base import iterate_timeout
 from tests.unit.test_web import BaseTestWeb
 
 
-class TestZuulClient(BaseTestWeb):
-    config_file = 'zuul-admin-web.conf'
-
+class TestSmokeZuulClient(BaseTestWeb):
     def test_is_installed(self):
         """Test that the CLI is installed"""
         test_version = subprocess.check_output(
             ['zuul-client', '--version'],
             stderr=subprocess.STDOUT)
         self.assertTrue(b'Zuul-client version:' in test_version)
+
+
+class TestZuulClientEncrypt(BaseTestWeb):
+    """Test using zuul-client to encrypt secrets"""
+    tenant_config_file = 'config/secrets/main.yaml'
+    secret = {'password': 'zuul-client'}
+
+    def _getSecrets(self, job, pbtype):
+        secrets = []
+        build = self.getJobFromHistory(job)
+        for pb in build.parameters[pbtype]:
+            secrets.append(pb['secrets'])
+        return secrets
+
+    def test_encrypt(self):
+        """Test that we can use zuul-client to generate a project secret"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'encrypt', '--tenant', 'tenant-one', '--project', 'org/project1',
+             '--secret-name', 'my_secret', '--field-name', 'password'],
+            stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+        p.stdin.write(
+            str.encode(self.secret['password'])
+        )
+        output, error = p.communicate()
+        p.stdin.close()
+        self._test_encrypt(output, error)
+
+    def test_encrypt_infile(self):
+        """Test that we can use zuul-client to generate a project secret from
+        a file"""
+        infile = tempfile.NamedTemporaryFile(delete=False)
+        infile.write(
+            str.encode(self.secret['password'])
+        )
+        infile.close()
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'encrypt', '--tenant', 'tenant-one', '--project', 'org/project1',
+             '--secret-name', 'my_secret', '--field-name', 'password',
+             '--infile', infile.name],
+            stdout=subprocess.PIPE)
+        output, error = p.communicate()
+        os.unlink(infile.name)
+        self._test_encrypt(output, error)
+
+    def _test_encrypt(self, output, error):
+        self.assertEqual(None, error, error)
+        self.assertTrue(b'- secret:' in output, output.decode())
+        new_repo_conf = output.decode()
+        new_repo_conf += textwrap.dedent(
+            """
+            - job:
+                parent: base
+                name: project1-secret
+                run: playbooks/secret.yaml
+                secrets:
+                  - secret: my_secret
+                    name: my_secret_in_job
+
+            - project:
+                check:
+                  jobs:
+                    - project1-secret
+            """
+        )
+        file_dict = {'zuul.yaml': new_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/org_project1', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        # check that the secret is used from there on
+        B = self.fake_gerrit.addFakeChange('org/org_project1', 'master', 'B',
+                                           files={'newfile': ''})
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(B.reported, 1, "B should report success")
+        self.assertHistory([
+            dict(name='project1-secret', result='SUCCESS', changes='2,1'),
+        ])
+        secrets = self._getSecrets('project1-secret', 'playbooks')
+        self.assertEqual(
+            secrets,
+            [{'my_secret_in_job': self.secret}],
+            secrets)
+
+
+class TestZuulClientAdmin(BaseTestWeb):
+    """Test the admin commands of zuul-client"""
+    config_file = 'zuul-admin-web.conf'
 
     def test_autohold(self):
         """Test that autohold can be set with the Web client"""
