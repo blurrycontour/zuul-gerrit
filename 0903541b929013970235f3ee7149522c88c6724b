@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_e364824b",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-24T08:48:33Z",
+      "side": 1,
+      "message": "This needs to be self.connection.report_queue",
+      "revId": "0903541b929013970235f3ee7149522c88c6724b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
