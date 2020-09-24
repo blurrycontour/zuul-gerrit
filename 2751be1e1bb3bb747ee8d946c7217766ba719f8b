@@ -62,6 +62,23 @@
       "revId": "2751be1e1bb3bb747ee8d946c7217766ba719f8b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_0379b6fa",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-24T08:47:37Z",
+      "side": 1,
+      "message": "This needs to be self.connection.report_queue",
+      "revId": "2751be1e1bb3bb747ee8d946c7217766ba719f8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
