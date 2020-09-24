@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_fe753599",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-24T09:02:51Z",
+      "side": 1,
+      "message": "Oh I think this method is dead code since the connection already handles this and it doesn\u0027t seem to get called anywhere.",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 76,
+        "endChar": 46
+      },
+      "revId": "7b20e1f3dab5d933b23a2bd1f8e3fd0439311f3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
