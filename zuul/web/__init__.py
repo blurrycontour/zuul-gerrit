@@ -37,6 +37,7 @@ from zuul import exceptions
 import zuul.rpcclient
 import zuul.zk
 from zuul.lib import commandsocket
+from zuul.zk import connect_zookeeper
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -1184,12 +1185,11 @@ class ZuulWeb(object):
         self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
                                             ssl_key, ssl_cert, ssl_ca,
                                             client_id='Zuul Web Server')
-        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
         if not zk_hosts:
             raise Exception("Zookeeper is required!")
-        self.zk.connect(hosts=zk_hosts, read_only=True,
-                        timeout=zk_timeout, tls_cert=zk_tls_cert,
-                        tls_key=zk_tls_key, tls_ca=zk_tls_ca)
+        self.zk = connect_zookeeper(hosts=zk_hosts, read_only=True,
+                                    timeout=zk_timeout, tls_cert=zk_tls_cert,
+                                    tls_key=zk_tls_key, tls_ca=zk_tls_ca)
 
         self.connections = connections
         self.authenticators = authenticators

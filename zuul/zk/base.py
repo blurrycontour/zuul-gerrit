@@ -21,6 +21,8 @@ from kazoo.exceptions import LockTimeout
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.recipe.lock import Lock
 
+from zuul.zk.exceptions import NoClientException
+
 
 class ZooKeeperClient(object):
     log = logging.getLogger("zuul.zk.base.ZooKeeperClient")
@@ -203,7 +205,7 @@ class ZooKeeperBase(object):
     @property
     def kazoo_client(self) -> KazooClient:
         if not self.client.client:
-            raise Exception("No zookeeper client!")
+            raise NoClientException()
         return self.client.client
 
     def _onConnect(self):
