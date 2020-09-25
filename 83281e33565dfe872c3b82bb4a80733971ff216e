@@ -22,6 +22,30 @@
       "revId": "83281e33565dfe872c3b82bb4a80733971ff216e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_0de9ce7d",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-09-25T05:29:57Z",
+      "side": 0,
+      "message": "Yes the Github driver is still using the status.",
+      "parentUuid": "9f560f44_adec22f4",
+      "range": {
+        "startLine": 46,
+        "startChar": 1,
+        "endLine": 48,
+        "endChar": 61
+      },
+      "revId": "83281e33565dfe872c3b82bb4a80733971ff216e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
