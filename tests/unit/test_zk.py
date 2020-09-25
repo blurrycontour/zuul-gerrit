@@ -20,6 +20,7 @@ import zuul.zk.exceptions
 from zuul import model
 
 from tests.base import BaseTestCase, ChrootedKazooFixture
+from zuul.zk import connect_zookeeper
 
 
 class TestZK(BaseTestCase):
@@ -34,9 +35,8 @@ class TestZK(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
+        self.zk = connect_zookeeper(self.zk_config)
         self.addCleanup(self.zk.disconnect)
-        self.zk.connect(self.zk_config)
 
     def _createRequest(self):
         req = model.HoldRequest()
