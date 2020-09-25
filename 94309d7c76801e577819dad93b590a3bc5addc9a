@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_1980ecf6",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-25T08:32:06Z",
+      "side": 1,
+      "message": "Note to reviewers: This is a drive by fix since DefaultConnection has no logger otherwise.",
+      "revId": "94309d7c76801e577819dad93b590a3bc5addc9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_d9b794d7",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-25T08:32:06Z",
+      "side": 1,
+      "message": "This is a drive by log annotation fix.",
+      "revId": "94309d7c76801e577819dad93b590a3bc5addc9a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
