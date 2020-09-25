@@ -12,12 +12,14 @@
 import logging
 import time
 from abc import ABCMeta
-from typing import Optional, List, Callable
+from configparser import ConfigParser
+from typing import Optional, Any, List, Callable
 
 from kazoo.client import KazooClient
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
 
+from zuul.lib.config import get_default
 from zuul.zk.exceptions import NoClientException
 
 
@@ -149,3 +151,56 @@ class ZooKeeperBase(metaclass=ABCMeta):
 
     def _onDisconnect(self):
         pass
+
+
+class ZooKeeperConnection(object):
+    _zk_client_class = ZooKeeperClient
+
+    @classmethod
+    def fromConfig(cls, config: ConfigParser) -> 'ZooKeeperConnection':
+        hosts = get_default(config, "zookeeper", "hosts", None)
+        if not hosts:
+            raise Exception("The zookeeper hosts config value is required")
+        timeout = float(get_default(config, "zookeeper", "session_timeout",
+                                    120.0))
+        tls_key = get_default(config, "zookeeper", "tls_key")
+        tls_cert = get_default(config, "zookeeper", "tls_cert")
+        tls_ca = get_default(config, "zookeeper", "tls_ca")
+
+        return cls(hosts=hosts, timeout=timeout, tls_key=tls_key,
+                   tls_cert=tls_cert, tls_ca=tls_ca)
+
+    def __init__(self, hosts: str, timeout: float = 120.0,
+                 tls_key: Optional[str] = None, tls_cert: Optional[str] = None,
+                 tls_ca: Optional[str] = None, read_only: bool = False):
+        self.log = logging.getLogger("zuul.zk.ZooKeeperConnection")
+        self._zk_client: Optional[ZooKeeperClient] = None
+        self._hosts = hosts
+        self._timeout = timeout
+        self._tls_key = tls_key
+        self._tls_cert = tls_cert
+        self._tls_ca = tls_ca
+        self._read_only = read_only
+
+    def __enter__(self) -> ZooKeeperClient:
+        self.log.debug("Establishing connection...")
+        self._zk_client = self.connect()
+        return self._zk_client
+
+    def __exit__(self, kind: Any, value: Any, traceback: Optional[Any]):
+        self.log.debug("Destroying connection...")
+        if self._zk_client:
+            self._zk_client.disconnect()
+            self._zk_client = None
+
+    def connect(self) -> ZooKeeperClient:
+        zk_client = self._zk_client_class()
+        zk_client.connect(
+            hosts=self._hosts,
+            timeout=self._timeout,
+            tls_key=self._tls_key,
+            tls_cert=self._tls_cert,
+            tls_ca=self._tls_ca,
+            read_only=self._read_only,
+        )
+        return zk_client
