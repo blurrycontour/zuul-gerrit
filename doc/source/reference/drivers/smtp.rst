@@ -56,6 +56,17 @@ Connection Configuration
       Issue a STARTTLS request to establish an encrypted channel after having
       connected to the SMTP server.
 
+   .. attr:: certfile
+
+      Optional path to a single file in PEM format containing the certificate.
+      Ignored when ``use_starttls`` is not enabled.
+
+   .. attr:: keyfile
+
+      Optional path to a single file containing the private key. If not set,
+      the private key will be taken from ``certfile`` as well.
+      Ignored when ``use_starttls`` is not enabled.
+
 Reporter Configuration
 ----------------------
 

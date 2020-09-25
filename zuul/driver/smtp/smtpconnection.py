@@ -14,6 +14,7 @@
 
 import logging
 import smtplib
+import ssl
 
 from email.mime.text import MIMEText
 
@@ -38,6 +39,8 @@ class SMTPConnection(BaseConnection):
             'default_to', 'zuul')
         self.smtp_user = self.connection_config.get('user')
         self.smtp_pass = self.connection_config.get('password')
+        self.certfile = self.connection_config.get('certfile')
+        self.keyfile = self.connection_config.get('keyfile')
         starttls = self.connection_config.get('use_starttls', 'false')
         if starttls.lower() == 'false':
             self.smtp_starttls = False
@@ -59,7 +62,10 @@ class SMTPConnection(BaseConnection):
         try:
             s = smtplib.SMTP(self.smtp_server, self.smtp_port)
             if self.smtp_starttls:
-                s.starttls()
+                context = ssl.create_default_context()
+                if self.certfile:
+                    context.load_cert_chain(self.certfile, self.keyfile)
+                s.starttls(context=context)
                 s.ehlo()
             if self.smtp_user is not None and self.smtp_pass is not None:
                 s.login(self.smtp_user, self.smtp_pass)
