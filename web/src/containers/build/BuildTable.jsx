@@ -144,7 +144,11 @@ function BuildTable(props) {
               {build.change && (
                 <span style={{ zIndex: 1, position: 'relative' }}>
                   <ExternalLink target={build.ref_url}>
-                    {build.change},{build.patchset}
+                    build.change ? (
+                      {build.change},{build.patchset}
+                    ) : (
+                      {build.newrev}
+                    )
                   </ExternalLink>
                 </span>
               )}

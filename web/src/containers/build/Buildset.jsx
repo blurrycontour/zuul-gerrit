@@ -59,8 +59,13 @@ function Buildset(props) {
                   icon={<CodeIcon />}
                   value={
                     <ExternalLink target={buildset.ref_url}>
-                      <strong>Change </strong>
-                      {buildset.change},{buildset.patchset}
+                      build.change ? (
+                        <strong>Change </strong>
+                        {build.change},{build.patchset}
+                      ) : (
+                        <strong>Revision </strong>
+                        {build.newrev}
+                      )
                     </ExternalLink>
                   }
                 />

@@ -117,7 +117,11 @@ function BuildsetTable(props) {
               {buildset.change && (
                 <span style={{ zIndex: 1, position: 'relative' }}>
                   <ExternalLink target={buildset.ref_url}>
-                    {buildset.change},{buildset.patchset}
+                    build.change ? (
+                      {build.change},{build.patchset}
+                    ) : (
+                      {build.newrev}
+                    )
                   </ExternalLink>
                 </span>
               )}
