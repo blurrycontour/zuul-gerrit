@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_236491b2",
+        "filename": "web/src/containers/build/BuildTable.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-25T20:51:43Z",
+      "side": 1,
+      "message": "Chrome complains about this with:\n\n  Cannot read property \u0027slice\u0027 of null\n\nWhich I don\u0027t really understand because build.newrev is the ternary condition. Does anyone understand why this is trying to evaluate the null value past the condition?",
+      "revId": "aaff24fb647d6b89aa08550e770f9bbf3964bc16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
