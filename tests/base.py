@@ -64,6 +64,7 @@ from git.exc import NoSuchPathError
 import yaml
 import paramiko
 
+from tests.zk import TestZooKeeper
 from zuul.executor.server import JobDir
 from zuul.rpcclient import RPCClient
 
@@ -109,6 +110,7 @@ import zuul.zk
 import zuul.configloader
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.zk import ZooKeeperConnection
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -3848,8 +3850,7 @@ class SchedulerTestApp:
             git_url_with_auth, add_cleanup)
         self.connections.configure(self.config, source_only=source_only)
 
-        zk = zuul.zk.ZooKeeper(enable_cache=True)
-        zk.connect(self.zk_config, timeout=30.0)
+        zk = ZooKeeperConnection(hosts=self.zk_config).connect()
         self.sched.setZooKeeper(zk)
 
         self.sched.registerConnections(self.connections)
@@ -4030,6 +4031,7 @@ class ZuulTestCase(BaseTestCase):
 
     def setUp(self):
         super(ZuulTestCase, self).setUp()
+        zuul.zk.zookeeper_class = TestZooKeeper
 
         self.setupZK()
         self.fake_nodepool = FakeNodepool(
