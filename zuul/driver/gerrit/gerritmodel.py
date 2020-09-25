@@ -31,6 +31,7 @@ EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 class GerritChange(Change):
     def __init__(self, project):
         super(GerritChange, self).__init__(project)
+        self.status = None
         self.approvals = []
 
     def update(self, data, connection):
