@@ -63,7 +63,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             os.close(pipe_write)
             import zuul.lib.log_streamer
 
-            self.log.info("Starting log streamer")
+            self.log.info("Starting log streamer on port %s",
+                          self.finger_port)
             streamer = zuul.lib.log_streamer.LogStreamer(
                 '::', self.finger_port, self.job_dir)
 
@@ -75,7 +76,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             os._exit(0)
         else:
             os.close(pipe_read)
-            self.log_streamer_pid = child_pid
+            self.log_streamer_pid = child_pid  # TODO JK: unused?
 
     def run(self):
         if self.args.command in zuul.executor.server.COMMANDS:

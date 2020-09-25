@@ -21,10 +21,10 @@ import os
 import time
 from unittest import mock
 
+from kazoo.protocol.states import ZnodeStat
+
 import zuul.executor.server
 import zuul.model
-import gear
-
 from tests.base import (
     ZuulTestCase,
     AnsibleZuulTestCase,
@@ -35,7 +35,7 @@ from tests.base import (
 
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
-from zuul.lib.ansible import AnsibleManager
+from zuul.zk.cache import ZooKeeperBuildItem
 
 
 class TestExecutorRepos(ZuulTestCase):
@@ -435,11 +435,17 @@ class TestAnsibleJob(ZuulTestCase):
 
     def setUp(self):
         super(TestAnsibleJob, self).setUp()
-        ansible_version = AnsibleManager().default_version
-        args = '{"ansible_version": "%s"}' % ansible_version
-        job = gear.TextJob('executor:execute', args, unique='test')
+        build_item = ZooKeeperBuildItem(
+            "/test/path",
+            {
+                'uuid': '123e4567-e89b-12d3-a456-426614174000',
+                'params': {
+                    'zuul_event_id': 0,
+                },
+            },
+            ZnodeStat(0, 0, 0, 0, 0, 0, 0, '', 0, 0, 0))
         self.test_job = zuul.executor.server.AnsibleJob(self.executor_server,
-                                                        job)
+                                                        build_item)
 
     def test_getHostList_host_keys(self):
         # Test without connection_port set
@@ -555,13 +561,13 @@ class TestGovernor(ZuulTestCase):
         vm_mock.return_value = ram
         loadavg_mock.return_value = (0.0, 0.0, 0.0)
         self.executor_server.manageLoad()
-        self.assertTrue(self.executor_server.accepting_work)
+        self.assertTrue(self.executor_server.zk_component['accepting_work'])
 
         # fake the load to be higher than permitted
         fake_load = multiprocessing.cpu_count() * 2.6
         loadavg_mock.return_value = (fake_load, fake_load, fake_load)
         self.executor_server.manageLoad()
-        self.assertFalse(self.executor_server.accepting_work)
+        self.assertFalse(self.executor_server.zk_component['accepting_work'])
 
     @mock.patch('os.getloadavg')
     @mock.patch('psutil.virtual_memory')
@@ -574,10 +580,10 @@ class TestGovernor(ZuulTestCase):
         vm_mock.return_value = ram
         loadavg_mock.return_value = (0.0, 0.0, 0.0)
         self.executor_server.manageLoad()
-        self.assertTrue(self.executor_server.accepting_work)
+        self.assertTrue(self.executor_server.zk_component['accepting_work'])
         ram.percent = 99.0  # 99% used
         self.executor_server.manageLoad()
-        self.assertFalse(self.executor_server.accepting_work)
+        self.assertFalse(self.executor_server.zk_component['accepting_work'])
 
     @mock.patch('os.getloadavg')
     @mock.patch('psutil.virtual_memory')
@@ -596,19 +602,19 @@ class TestGovernor(ZuulTestCase):
         ram_sensor.cgroup_stats_file = os.path.join(
             FIXTURE_DIR, 'cgroup', 'memory.stat.nolimit')
         self.executor_server.manageLoad()
-        self.assertTrue(self.executor_server.accepting_work)
+        self.assertTrue(self.executor_server.zk_component['accepting_work'])
 
         # Set cgroup limit 5GiB and ram usage 20%
         ram_sensor.cgroup_stats_file = os.path.join(
             FIXTURE_DIR, 'cgroup', 'memory.stat.ok')
         self.executor_server.manageLoad()
-        self.assertTrue(self.executor_server.accepting_work)
+        self.assertTrue(self.executor_server.zk_component['accepting_work'])
 
         # Set cgroup limit 5GiB and ram usage 96%
         ram_sensor.cgroup_stats_file = os.path.join(
             FIXTURE_DIR, 'cgroup', 'memory.stat.bad')
         self.executor_server.manageLoad()
-        self.assertFalse(self.executor_server.accepting_work)
+        self.assertFalse(self.executor_server.zk_component['accepting_work'])
 
     @mock.patch('os.getloadavg')
     @mock.patch('os.statvfs')
@@ -623,7 +629,7 @@ class TestGovernor(ZuulTestCase):
         loadavg_mock.return_value = (0.0, 0.0, 0.0)
 
         self.executor_server.manageLoad()
-        self.assertTrue(self.executor_server.accepting_work)
+        self.assertTrue(self.executor_server.zk_component['accepting_work'])
 
         self.assertReportedStat(
             'zuul.executor.test-executor-hostname_example_com.pct_used_hdd',
@@ -633,7 +639,7 @@ class TestGovernor(ZuulTestCase):
         statvfs_mock.return_value = hdd  # 95.27% used
 
         self.executor_server.manageLoad()
-        self.assertFalse(self.executor_server.accepting_work)
+        self.assertFalse(self.executor_server.zk_component['accepting_work'])
 
         self.assertReportedStat(
             'zuul.executor.test-executor-hostname_example_com.pct_used_hdd',
@@ -644,11 +650,11 @@ class TestGovernor(ZuulTestCase):
         loadavg_mock.return_value = (0.0, 0.0, 0.0)
 
         self.executor_server.manageLoad()
-        self.assertTrue(self.executor_server.accepting_work)
+        self.assertTrue(self.executor_server.zk_component['accepting_work'])
 
         self.executor_server.pause_sensor.pause = True
         self.executor_server.manageLoad()
-        self.assertFalse(self.executor_server.accepting_work)
+        self.assertFalse(self.executor_server.zk_component['accepting_work'])
 
     def waitForExecutorBuild(self, jobname):
         self.log.debug("Waiting for %s to start", jobname)
@@ -660,7 +666,7 @@ class TestGovernor(ZuulTestCase):
                     build = b
                     break
             time.sleep(0.1)
-        self.log.debug("Found build %s", jobname)
+        self.log.debug("Found build %s: %s", jobname, build)
         build_id = build.uuid
         while (time.time() < timeout and
                build_id not in self.executor_server.job_workers):
@@ -699,14 +705,14 @@ class TestGovernor(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = True
         _set_starting_builds(1, 1)
         self.executor_server.manageLoad()
-        self.assertTrue(self.executor_server.accepting_work)
+        self.assertTrue(self.executor_server.zk_component['accepting_work'])
         A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
 
         build1 = self.waitForExecutorBuild('test1')
         # With one job (test1) being started, we should no longer
         # be accepting new work
-        self.assertFalse(self.executor_server.accepting_work)
+        self.assertFalse(self.executor_server.zk_component['accepting_work'])
         self.assertEqual(len(self.executor_server.job_workers), 1)
         # Allow enough starting builds for the test to complete.
         _set_starting_builds(1, 3)
@@ -739,13 +745,13 @@ class TestGovernor(ZuulTestCase):
         # build starts.  It should always count the second build as
         # starting.  As long as at least one build is still in the
         # starting phase, this will exceed the limit and unregister.
-        self.assertFalse(self.executor_server.accepting_work)
+        self.assertFalse(self.executor_server.zk_component['accepting_work'])
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
         self.executor_server.manageLoad()
-        self.assertTrue(self.executor_server.accepting_work)
+        self.assertTrue(self.executor_server.zk_component['accepting_work'])
 
 
 class TestLineMapping(AnsibleZuulTestCase):
