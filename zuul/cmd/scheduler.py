@@ -28,6 +28,7 @@ import zuul.zk
 
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd_config
+from zuul.zk import ZooKeeperConnection
 
 
 class Scheduler(zuul.cmd.ZuulDaemonApp):
@@ -146,7 +147,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
 
-        zookeeper = zuul.zk.connect_zookeeper(self.config)
+        zookeeper = ZooKeeperConnection.fromConfig(self.config).connect()
 
         self.configure_connections()
         self.sched.setExecutor(gearman)
