@@ -12,9 +12,9 @@
 import logging
 import threading
 import time
-from typing import Callable
-from typing import List
-from typing import Optional
+import traceback
+import uuid
+from typing import Callable, Dict, List, Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import LockTimeout
@@ -26,6 +26,7 @@ from zuul.zk.exceptions import NoClientException
 
 class ZooKeeperClient(object):
     log = logging.getLogger("zuul.zk.base.ZooKeeperClient")
+    connections: Dict[str, str] = {}
 
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
@@ -39,6 +40,11 @@ class ZooKeeperClient(object):
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners = []
+        self.connection_id: str = ''
+        self.node_watchers: Dict[str, List[Callable[[List[str]], None]]] = {}
+
+    def __str__(self):
+        return "<ZooKeeper hash=%s>" % hex(hash(self))
 
     def _connectionListener(self, state):
         '''
@@ -90,6 +96,11 @@ class ZooKeeperClient(object):
         :param str tls_ca: Path to TLS CA cert
         '''
         if self.client is None:
+            stack = "\n".join(traceback.format_stack())
+            self.connection_id = uuid.uuid4().hex
+            ZooKeeperClient.connections[self.connection_id] = stack
+            self.log.debug("ZK Connecting (%s)", self.connection_id)
+
             args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
             if tls_key:
                 args['use_ssl'] = True
@@ -120,6 +131,11 @@ class ZooKeeperClient(object):
             listener()
 
         if self.client is not None and self.client.connected:
+            if self.connection_id in ZooKeeperClient.connections:
+                del ZooKeeperClient.connections[self.connection_id]
+                self.log.debug("ZK Disconnecting (%s)", self.connection_id)
+                self.connection_id = ''
+
             self.client.stop()
             self.client.close()
             self.client = None
@@ -134,7 +150,8 @@ class ZooKeeperClient(object):
         if self.client is not None:
             self.client.set_hosts(hosts=hosts)
 
-    def acquireLock(self, lock: Lock, keep_locked: bool=False):
+    def acquireLock(self, lock: Lock, keep_locked: bool = False,
+                    timeout: float = 10.0):
         """
         Acquires a ZK lock.
 
@@ -155,6 +172,7 @@ class ZooKeeperClient(object):
 
         :param lock: ZK lock to acquire
         :param keep_locked: Whether to keep the locking (threading) lock locked
+        :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
         """
 
         if not keep_locked or not self.locking_lock.locked():
@@ -163,22 +181,23 @@ class ZooKeeperClient(object):
         try:
             while not locked:
                 try:  # Make sure request does not hang
-                    lock.acquire(timeout=10.0)
+                    lock.acquire(timeout=timeout)
                     locked = True
                 except LockTimeout:
-                    self.log.debug("Could not acquire lock %s" % lock.path)
+                    self.log.debug("Could not acquire lock %s", lock.path)
                     raise
         finally:
             if not keep_locked and self.locking_lock.locked():
                 self.locking_lock.release()
 
-    def withLock(self, lock: Lock):
+    def withLock(self, lock: Lock, timeout=10.0):
         """
         Context manager to use for acquiring ZK locks.
 
         See "#acquireLock(...)" for details.
 
         :param lock: ZK lock to acquire
+        :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
         """
         class LockWrapper:
             def __init__(self, client: ZooKeeperClient, l: Lock):
@@ -187,7 +206,7 @@ class ZooKeeperClient(object):
                 pass
 
             def __enter__(self):
-                self.client.acquireLock(self.lock)
+                self.client.acquireLock(self.lock, timeout=timeout)
                 self.client.log.debug("ZK Lock %s locked", self.lock.path)
 
             def __exit__(self, exc_type, exc_val, exc_tb):
@@ -208,8 +227,8 @@ class ZooKeeperBase(object):
             raise NoClientException()
         return self.client.client
 
-    def _onConnect(self):
+    def _onConnect(self) -> None:
         pass
 
-    def _onDisconnect(self):
+    def _onDisconnect(self) -> None:
         pass

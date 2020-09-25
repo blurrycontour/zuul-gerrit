@@ -25,3 +25,7 @@ class NoClientException(ZuulZooKeeperException):
 
     def __init__(self):
         super().__init__("No zookeeper client!")
+
+
+class BadItemException(ZuulZooKeeperException):
+    pass
