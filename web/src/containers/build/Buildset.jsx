@@ -31,6 +31,25 @@ import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 function Buildset(props) {
   const { buildset, fetchable } = props
 
+  let buildsetExternalLink
+  if (buildset.ref_url && buildset.change) {
+    buildsetExternalLink = (
+      <ExternalLink target={buildset.ref_url}>
+        <strong>Change </strong>
+        {buildset.change},{buildset.patchset}
+      </ExternalLink>
+    )
+  } else if (buildset.ref_url && buildset.newrev) {
+    buildsetExternalLink = (
+      <ExternalLink target={buildset.ref_url}>
+        <strong>Revision </strong>
+        {buildset.newrev.slice(0,7)}
+      </ExternalLink>
+    )
+  } else {
+    buildsetExternalLink = null
+  }
+
   return (
     <>
       <Title headingLevel="h2">
@@ -53,16 +72,11 @@ function Buildset(props) {
                   show the respective icon here (GithubIcon, GitlabIcon,
                   GitIcon - AFAIK the Gerrit icon is not very popular among
                   icon frameworks like fontawesome */}
-              {buildset.change && (
+              {buildsetExternalLink && (
                 <IconProperty
                   WrapElement={ListItem}
                   icon={<CodeIcon />}
-                  value={
-                    <ExternalLink target={buildset.ref_url}>
-                      <strong>Change </strong>
-                      {buildset.change},{buildset.patchset}
-                    </ExternalLink>
-                  }
+                  value={buildsetExternalLink}
                 />
               )}
               {/* TODO (felix): Link to project page in Zuul */}

@@ -44,6 +44,26 @@ import { ExternalLink } from '../../Misc'
 
 function Build(props) {
   const { build, tenant, timezone, fetchable } = props
+
+  let buildExternalLink
+  if (build.ref_url && build.change) {
+    buildExternalLink = (
+      <ExternalLink target={build.ref_url}>
+        <strong>Change </strong>
+        {build.change},{build.patchset}
+      </ExternalLink>
+    )
+  } else if (build.ref_url && build.newrev) {
+    buildExternalLink = (
+      <ExternalLink target={build.ref_url}>
+        <strong>Revision </strong>
+        {build.newrev.slice(0,7)}
+      </ExternalLink>
+    )
+  } else {
+    buildExternalLink = null
+  }
+
   return (
     <>
       <Title
@@ -75,16 +95,11 @@ function Build(props) {
               {/* TODO (felix): What should we show for periodic builds
                   here? They don't provide a change, but the ref_url is
                   also not usable */}
-              {build.change && (
+              {buildExternalLink && (
                 <IconProperty
                   WrapElement={ListItem}
                   icon={<CodeIcon />}
-                  value={
-                    <ExternalLink target={build.ref_url}>
-                      <strong>Change </strong>
-                      {build.change},{build.patchset}
-                    </ExternalLink>
-                  }
+                  value={buildExternalLink}
                 />
               )}
               {/* TODO (felix): Link to project page in Zuul */}

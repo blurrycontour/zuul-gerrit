@@ -98,6 +98,24 @@ function BuildTable(props) {
         className="zuul-stretched-link"
       />
     )
+
+    let buildExternalLink
+    if (build.ref_url && build.change) {
+      buildExternalLink = (
+        <ExternalLink target={build.ref_url}>
+          {build.change},{build.patchset}
+        </ExternalLink>
+      )
+    } else if (build.ref_url && build.newrev) {
+      buildExternalLink = (
+        <ExternalLink target={build.ref_url}>
+          {build.newrev.slice(0,7)}
+        </ExternalLink>
+      )
+    } else {
+      buildExternalLink = null
+    }
+
     return {
       cells: [
         {
@@ -141,11 +159,9 @@ function BuildTable(props) {
           title: (
             <>
               {buildResultLink}
-              {build.change && (
+              {buildExternalLink && (
                 <span style={{ zIndex: 1, position: 'relative' }}>
-                  <ExternalLink target={build.ref_url}>
-                    {build.change},{build.patchset}
-                  </ExternalLink>
+                  {buildExternalLink}
                 </span>
               )}
             </>
