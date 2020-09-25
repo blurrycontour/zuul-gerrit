@@ -1197,10 +1197,11 @@ class ZuulWeb(object):
             hosts=zk_hosts, read_only=True, timeout=zk_timeout,
             tls_cert=zk_tls_cert, tls_key=zk_tls_key, tls_ca=zk_tls_ca
         ).connect()
-        self.zk_connection_event = ZooKeeperConnectionEvent(self.zk_client)
         self.zk_component: ZooKeeperComponent = \
             ZooKeeperComponentRegistry(self.zk_client)\
             .register('webs', self.hostname)
+        self.zk_connection_event: ZooKeeperConnectionEvent =\
+            ZooKeeperConnectionEvent(self.zk_client)
 
         self.connections: ConnectionRegistry = connections
         self.authenticators: AuthenticatorRegistry = authenticators
