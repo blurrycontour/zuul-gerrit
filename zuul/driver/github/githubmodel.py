@@ -38,6 +38,27 @@ class PullRequest(Change):
         self.reviews = []
         self.files = []
         self.labels = []
+        self.draft = None
+        self.review_decision = None
+        self.required_contexts = set()
+        self.contexts = set()
+
+    @property
+    def status(self):
+        return ["{}:{}:{}".format(*c) for c in self.contexts]
+
+    @status.setter
+    def status(self, value):
+        # Dummy setter to ignore init to None in base class.
+        pass
+
+    @property
+    def successful_contexts(self) -> set:
+        if not self.contexts:
+            return set()
+        return set(
+            s[1] for s in self.contexts if s[2] == 'success'
+        )
 
     def isUpdateOf(self, other):
         if (self.project == other.project and
