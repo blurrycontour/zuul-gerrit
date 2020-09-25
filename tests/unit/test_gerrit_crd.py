@@ -395,7 +395,8 @@ class TestGerritCRD(ZuulTestCase):
         "Test cross-repo dependencies in independent pipelines"
 
         self.executor_server.hold_jobs_in_build = True
-        self.gearman_server.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
 
@@ -406,8 +407,8 @@ class TestGerritCRD(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.executor_server.release('.*-merge')
@@ -430,7 +431,8 @@ class TestGerritCRD(ZuulTestCase):
 
     def test_crd_check_git_depends(self):
         "Test single-repo dependencies in independent pipelines"
-        self.gearman_server.hold_jobs_in_build = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
 
@@ -443,7 +445,8 @@ class TestGerritCRD(ZuulTestCase):
         self.waitUntilSettled()
 
         self.orderedRelease()
-        self.gearman_server.hold_jobs_in_build = False
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'NEW')
@@ -505,7 +508,8 @@ class TestGerritCRD(ZuulTestCase):
     def _test_crd_check_reconfiguration(self, project1, project2):
         "Test cross-repo dependencies re-enqueued in independent pipelines"
 
-        self.gearman_server.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_gerrit.addFakeChange(project1, 'master', 'A')
         B = self.fake_gerrit.addFakeChange(project2, 'master', 'B')
 
@@ -529,8 +533,8 @@ class TestGerritCRD(ZuulTestCase):
         self.assertFalse(first_item.live)
         self.assertTrue(queue.queue[1].live)
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'NEW')
@@ -556,7 +560,8 @@ class TestGerritCRD(ZuulTestCase):
     def test_crd_check_ignore_dependencies(self):
         "Test cross-repo dependencies can be ignored"
 
-        self.gearman_server.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project2', 'master', 'C')
@@ -580,8 +585,8 @@ class TestGerritCRD(ZuulTestCase):
         for item in check_pipeline.getAllItems():
             self.assertTrue(item.live)
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'NEW')
@@ -736,7 +741,8 @@ class TestGerritCRDAltBaseUrl(ZuulTestCase):
         "Test basic cross-repo dependencies with an alternate gerrit baseurl"
 
         self.executor_server.hold_jobs_in_build = True
-        self.gearman_server.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
 
@@ -748,8 +754,8 @@ class TestGerritCRDAltBaseUrl(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.executor_server.release('.*-merge')
