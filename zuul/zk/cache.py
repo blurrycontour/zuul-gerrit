@@ -162,3 +162,12 @@ class ZooKeeperWorkItem(ZooKeeperCacheItem):
                 exception_stat=self.exception_stat,
                 cancel=self.cancel,
                 resume=self.resume)
+
+
+class ZooKeeperBuildItem(ZooKeeperWorkItem):
+    """
+    Build cached Zookeeper item.
+    """
+    def __init__(self, path: str, content: Dict[str, Any],
+                 stat: ZnodeStat):
+        super().__init__(path, 'execute', content, stat)
