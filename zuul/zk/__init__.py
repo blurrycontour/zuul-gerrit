@@ -79,7 +79,7 @@ class ZooKeeperClient(object):
     def connect(self, hosts: str, read_only: bool = False,
                 timeout: float = 10.0, tls_cert: Optional[str] = None,
                 tls_key: Optional[str] = None,
-                tls_ca: Optional[str] = None):
+                tls_ca: Optional[str] = None) -> None:
         """
         Establish a connection with ZooKeeper cluster.
 
@@ -95,6 +95,7 @@ class ZooKeeperClient(object):
         :param str tls_cert: Path to TLS cert
         :param str tls_ca: Path to TLS CA cert
         """
+        self.log.info("ZooKeeper client: %s", self.client)
         if self.client is None:
             args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
             if tls_key:
@@ -102,12 +103,13 @@ class ZooKeeperClient(object):
                 args['keyfile'] = tls_key
                 args['certfile'] = tls_cert
                 args['ca'] = tls_ca
+            self.log.info("Connecting to: %s", args)
             self.client = KazooClient(**args)
             self.client.add_listener(self._connectionListener)
             # Manually retry initial connection attempt
             while True:
                 try:
-                    self.client.start(1)
+                    self.client.start(15)
                     break
                 except KazooTimeoutError:
                     self.logConnectionRetryEvent()
@@ -190,15 +192,12 @@ class ZooKeeperClient(object):
         :param blocking: Block until lock is obtained or return immediately.
         :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
         """
-        locked = False
         try:
             self.acquireLock(lock, blocking=blocking, timeout=timeout)
-            locked = True
             self.log.debug("ZK Lock %s locked", lock.path)
             yield lock
         finally:
-            if locked:
-                self.releaseLock(lock)
+            self.releaseLock(lock)
             self.log.debug("ZK Lock %s released", lock.path)
 
     def releaseLock(self, lock: Lock) -> None:
@@ -268,10 +267,10 @@ class ZooKeeperBase(metaclass=ABCMeta):
             raise NoClientException()
         return self.client.client
 
-    def _onConnect(self):
+    def _onConnect(self) -> None:
         pass
 
-    def _onDisconnect(self):
+    def _onDisconnect(self) -> None:
         pass
 
 
