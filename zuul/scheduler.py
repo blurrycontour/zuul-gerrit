@@ -58,8 +58,11 @@ from zuul.trigger import BaseTrigger
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponent, ZooKeeperComponentRegistry,\
     ZooKeeperComponentState
+from zuul.zk.builds import ZooKeeperBuilds
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.work import WorkState
+
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
 
@@ -305,6 +308,7 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
     _merger_client_class = MergeClient
+    _zk_builds_class = ZooKeeperBuilds
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
@@ -346,9 +350,11 @@ class Scheduler(threading.Thread):
         self.triggers: Dict[str, BaseTrigger] = dict()
         self.config: ConfigParser = config
         self.zk_client: ZooKeeperClient = zk_client
+        self.zk_builds: ZooKeeperBuilds = self._zk_builds_class(zk_client)
+        self.zk_component_registry: ZooKeeperComponentRegistry =\
+            ZooKeeperComponentRegistry(zk_client)
         self.zk_component: ZooKeeperComponent =\
-            ZooKeeperComponentRegistry(zk_client)\
-            .register('schedulers', self.hostname)
+            self.zk_component_registry.register('schedulers', self.hostname)
         self.zk_connection_event: ZooKeeperConnectionEvent =\
             ZooKeeperConnectionEvent(zk_client)
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
@@ -392,6 +398,7 @@ class Scheduler(threading.Thread):
         self.merger: MergeClient = self._merger_client_class(self.config, self)
         self.nodepool: Nodepool = Nodepool(self)
         self.connections.registerScheduler(self)
+        self.zk_builds.registerAllZones()
 
     def start(self):
         super(Scheduler, self).start()
@@ -422,6 +429,7 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
+        self.zk_client.disconnect()
 
     def runCommand(self):
         while self._command_running:
@@ -447,20 +455,10 @@ class Scheduler(threading.Thread):
             return
         functions = getGearmanFunctions(self.rpc.gearworker.gearman)
         functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
-        executors_accepting = 0
-        executors_online = 0
-        execute_queue = 0
-        execute_running = 0
         mergers_online = 0
         merge_queue = 0
         merge_running = 0
         for (name, (queued, running, registered)) in functions.items():
-            if name.startswith('executor:execute'):
-                executors_accepting = registered
-                execute_queue = queued - running
-                execute_running = running
-            if name.startswith('executor:stop'):
-                executors_online += registered
             if name == 'merger:merge':
                 mergers_online = registered
             if name.startswith('merger:'):
@@ -469,6 +467,16 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.mergers.online', mergers_online)
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
+
+        executors_accepting = 0
+        executors_online = 0
+        for executor in self.zk_component_registry.all('executors'):
+            executors_online += 1
+            if executor.get('accepting_work', False):
+                executors_accepting += 1
+        execute_queue = len(list(self.zk_builds.inState(WorkState.REQUESTED)))
+        execute_running = len(list(self.zk_builds.inState(
+            [WorkState.RUNNING, WorkState.PAUSED])))
         self.statsd.gauge('zuul.executors.online', executors_online)
         self.statsd.gauge('zuul.executors.accepting', executors_accepting)
         self.statsd.gauge('zuul.executors.jobs_running', execute_running)

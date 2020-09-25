@@ -624,6 +624,8 @@ class ZooKeeperWorkBase(ZooKeeperBase, Generic[TreeCacheClient, WorkItem],
         Cleans up work with lost executors, work which failed to delete
         in callback or in one of previous cleanup runs.
         """
+        self.log.debug("Cleaning up builds...")
+
         # Cleanup work with lost executors
         for path, cached in self.inState([WorkState.RUNNING,
                                           WorkState.PAUSED]):
