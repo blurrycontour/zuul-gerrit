@@ -42,6 +42,7 @@ from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
 
+from zuul.zk import ZooKeeperConnection
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -1209,6 +1210,7 @@ class StreamManager(object):
 
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web.ZuulWeb")
+    _zk_connection_class = ZooKeeperConnection
 
     def __init__(self, listen_address: str, listen_port: int,
                  gear_server: str, gear_port: int,
@@ -1234,10 +1236,10 @@ class ZuulWeb(object):
         self.rpc: RPCClient = RPCClient(gear_server, gear_port,
                                         ssl_key, ssl_cert, ssl_ca,
                                         client_id='Zuul Web Server')
-        self.zk_client: ZooKeeperClient = ZooKeeperClient()
-        self.zk_client.connect(hosts=zk_hosts, read_only=True,
-                               timeout=zk_timeout, tls_cert=zk_tls_cert,
-                               tls_key=zk_tls_key, tls_ca=zk_tls_ca)
+        self.zk_client: ZooKeeperClient = self._zk_connection_class(
+            hosts=zk_hosts, read_only=True, timeout=zk_timeout,
+            tls_cert=zk_tls_cert, tls_key=zk_tls_key, tls_ca=zk_tls_ca
+        ).connect()
 
         self.connections: ConnectionRegistry = connections
         self.authenticators: AuthenticatorRegistry = authenticators
