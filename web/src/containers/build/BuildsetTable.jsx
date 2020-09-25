@@ -114,10 +114,15 @@ function BuildsetTable(props) {
           title: (
             <>
               {buildsetResultLink}
-              {buildset.change && (
+              {buildset.ref_url && (
                 <span style={{ zIndex: 1, position: 'relative' }}>
                   <ExternalLink target={buildset.ref_url}>
-                    {buildset.change},{buildset.patchset}
+                    buildset.change ? (
+                      {buildset.change},{buildset.patchset}
+                    ) : ( buildset.newrev ? (
+                        {buildset.newrev.slice(0,7)}
+                      ) : ()
+                    )
                   </ExternalLink>
                 </span>
               )}
