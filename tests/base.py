@@ -108,7 +108,7 @@ import zuul.rpcclient
 import zuul.configloader
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
-from zuul.zk import ZooKeeperClient
+from zuul.zk import ZooKeeperConnection
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -3852,8 +3852,7 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk_client = ZooKeeperClient()
-        zk_client.connect(self.zk_config, timeout=30.0)
+        zk_client = ZooKeeperConnection(hosts=self.zk_config).connect()
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
