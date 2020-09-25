@@ -19,7 +19,6 @@ import socket
 import threading
 from abc import ABCMeta
 from configparser import ConfigParser
-from typing import Optional
 
 from zuul.zk import ZooKeeperClient
 
@@ -59,8 +58,7 @@ class BaseMergeServer(metaclass=ABCMeta):
     _repo_locks_class = BaseRepoLocks
 
     def __init__(self, config: ConfigParser, component: str,
-                 zk_client: ZooKeeperClient,
-                 connections: Optional[ConnectionRegistry] = None):
+                 zk_client: ZooKeeperClient, connections: ConnectionRegistry):
         self.connections = connections or ConnectionRegistry()
         self.merge_email = get_default(config, 'merger', 'git_user_email',
                                        'zuul.merger.default@example.com')
@@ -144,6 +142,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.merger_gearworker.stop()
 
     def join(self):
+        # self.zookeeper.disconnect()
         self.merger_gearworker.join()
 
     def pause(self):
@@ -244,7 +243,7 @@ class MergeServer(BaseMergeServer):
     log = logging.getLogger("zuul.MergeServer")
 
     def __init__(self, config: ConfigParser, zk_client: ZooKeeperClient,
-                 connections: Optional[ConnectionRegistry] = None):
+                 connections: ConnectionRegistry):
         super().__init__(config, 'merger', zk_client, connections)
         self.hostname = socket.getfqdn()
         self.zk_component = self.zk_component_registry.register(
