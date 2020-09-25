@@ -33,6 +33,24 @@
       "revId": "fd165a9f01567419f893e8b30f8f37130e04f8d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_ab6b65ed",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3625,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-25T11:26:46Z",
+      "side": 1,
+      "message": "Do you mean I should explicitly check for None here? (-1 evaluates to True like positive values).",
+      "parentUuid": "bfdaf3ff_b50edb2f",
+      "revId": "fd165a9f01567419f893e8b30f8f37130e04f8d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
