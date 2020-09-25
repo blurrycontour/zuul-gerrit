@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_adec22f4",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-25T04:46:49Z",
+      "side": 0,
+      "message": "is this necessary then?",
+      "range": {
+        "startLine": 46,
+        "startChar": 1,
+        "endLine": 48,
+        "endChar": 61
+      },
+      "revId": "83281e33565dfe872c3b82bb4a80733971ff216e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
