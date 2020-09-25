@@ -53,14 +53,20 @@ function Buildset(props) {
                   show the respective icon here (GithubIcon, GitlabIcon,
                   GitIcon - AFAIK the Gerrit icon is not very popular among
                   icon frameworks like fontawesome */}
-              {buildset.change && (
+              {buildset.ref_url && (
                 <IconProperty
                   WrapElement={ListItem}
                   icon={<CodeIcon />}
                   value={
                     <ExternalLink target={buildset.ref_url}>
-                      <strong>Change </strong>
-                      {buildset.change},{buildset.patchset}
+                      {buildset.change ? (
+                        <strong>Change </strong>
+                        {buildset.change},{buildset.patchset}
+                      ) : ( {buildset.newrev ? (
+                          <strong>Revision </strong>
+                          {buildset.newrev.slice(0,7)}
+                        ) : ()}
+                      )}
                     </ExternalLink>
                   }
                 />

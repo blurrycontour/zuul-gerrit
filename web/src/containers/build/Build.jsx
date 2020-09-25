@@ -75,14 +75,20 @@ function Build(props) {
               {/* TODO (felix): What should we show for periodic builds
                   here? They don't provide a change, but the ref_url is
                   also not usable */}
-              {build.change && (
+              {build.ref_url && (
                 <IconProperty
                   WrapElement={ListItem}
                   icon={<CodeIcon />}
                   value={
                     <ExternalLink target={build.ref_url}>
-                      <strong>Change </strong>
-                      {build.change},{build.patchset}
+                      {build.change ? (
+                        <strong>Change </strong>
+                        {build.change},{build.patchset}
+                      ) : ( {build.newrev ? (
+                          <strong>Revision </strong>
+                          {build.newrev.slice(0,7)}
+                        ) : ()}
+                      )}
                     </ExternalLink>
                   }
                 />
