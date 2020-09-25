@@ -12,8 +12,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from tests.zk.builds import TestZooKeeperBuilds
 from zuul.zk import ZooKeeper
 
 
 class TestZooKeeper(ZooKeeper):
-    pass
+    builds_class = TestZooKeeperBuilds
