@@ -18,8 +18,10 @@ import configparser
 from zuul.lib.config import get_default
 
 from zuul.zk.base import ZooKeeperClient
+from zuul.zk.builds import ZooKeeperBuilds
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.exceptions import NoClientException
+from zuul.zk.executors import ZooKeeperExecutors
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 
@@ -35,6 +37,8 @@ class ZooKeeper(object):
     testing only ZooKeeper interactions.
     """
 
+    builds_class = ZooKeeperBuilds
+
     def __init__(self, enable_cache: bool = True):
         """
         Initialize the ZooKeeper object.
@@ -43,7 +47,9 @@ class ZooKeeper(object):
             objects (e.g., HoldRequests).
         """
         self.client = ZooKeeperClient()
+        self.builds = self.builds_class(self.client, enable_cache=enable_cache)
         self.connection_event = ZooKeeperConnectionEvent(self.client)
+        self.executors = ZooKeeperExecutors(self.client)
         self.nodepool = ZooKeeperNodepool(self.client,
                                           enable_cache=enable_cache)
 

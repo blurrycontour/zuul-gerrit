@@ -32,49 +32,36 @@ class TestInventoryBase(ZuulTestCase):
         if python_path:
             self.fake_nodepool.python_path = python_path
         self.executor_server.hold_jobs_in_build = True
-        self.gearman_server.hold_jobs_in_queue = True
 
         if self.use_gerrit:
-            A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            self.A = self.fake_gerrit.addFakeChange('org/project', 'master',
+                                                    'A')
+            self.fake_gerrit.addEvent(self.A.getPatchsetCreatedEvent(1))
         else:
-            A = self.fake_github.openFakePullRequest(
+            self.A = self.fake_github.openFakePullRequest(
                 'org/project3', 'master', 'A')
-            self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+            self.fake_github.emitEvent(self.A.getPullRequestOpenedEvent())
 
         self.waitUntilSettled()
 
     def tearDown(self):
-        self.cancelExecutorJobs()
+        if self.use_gerrit:
+            self.fake_gerrit.addEvent(self.A.getChangeAbandonedEvent())
+        else:
+            self.fake_github.emitEvent(self.A.getPullRequestClosedEvent())
         self.waitUntilSettled()
         super(TestInventoryBase, self).tearDown()
 
     def _get_build_inventory(self, name):
-        self.runJob(name)
-
         build = self.getBuildByName(name)
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
         return yaml.safe_load(open(inv_path, 'r'))
 
     def _get_setup_inventory(self, name):
-        self.runJob(name)
-
         build = self.getBuildByName(name)
         setup_inv_path = os.path.join(build.jobdir.root, 'ansible',
                                       'setup-inventory.yaml')
         return yaml.safe_load(open(setup_inv_path, 'r'))
-
-    def runJob(self, name):
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release('^%s$' % name)
-        self.waitUntilSettled()
-
-    def cancelExecutorJobs(self):
-        for app in self.scheds:
-            executor_client = app.sched.executor
-            builds = [b for b in executor_client.builds.values()]
-            for build in builds:
-                executor_client.cancelJobInQueue(build)
 
 
 class TestInventoryGithub(TestInventoryBase):
