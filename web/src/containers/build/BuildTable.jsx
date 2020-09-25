@@ -45,7 +45,7 @@ import 'moment-duration-format'
 import * as moment from 'moment'
 
 import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
-import { ExternalLink } from '../../Misc'
+import { buildExternalTableLink, ExternalLink } from '../../Misc'
 
 function BuildTable(props) {
   const { builds, fetching, onClearFilters, tenant, timezone } = props
@@ -98,6 +98,8 @@ function BuildTable(props) {
         className="zuul-stretched-link"
       />
     )
+    const build_link = buildExternalTableLink(build)
+
     return {
       cells: [
         {
@@ -141,11 +143,9 @@ function BuildTable(props) {
           title: (
             <>
               {buildResultLink}
-              {build.change && (
+              {build_link && (
                 <span style={{ zIndex: 1, position: 'relative' }}>
-                  <ExternalLink target={build.ref_url}>
-                    {build.change},{build.patchset}
-                  </ExternalLink>
+                  {build_link}
                 </span>
               )}
             </>

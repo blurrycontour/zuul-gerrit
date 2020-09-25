@@ -25,11 +25,12 @@ import {
   StreamIcon,
 } from '@patternfly/react-icons'
 
-import { ExternalLink } from '../../Misc'
+import { buildExternalLink, ExternalLink } from '../../Misc'
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 
 function Buildset(props) {
   const { buildset, fetchable } = props
+  const buildset_link = buildExternalLink(buildset)
 
   return (
     <>
@@ -53,16 +54,11 @@ function Buildset(props) {
                   show the respective icon here (GithubIcon, GitlabIcon,
                   GitIcon - AFAIK the Gerrit icon is not very popular among
                   icon frameworks like fontawesome */}
-              {buildset.change && (
+              {buildset_link && (
                 <IconProperty
                   WrapElement={ListItem}
                   icon={<CodeIcon />}
-                  value={
-                    <ExternalLink target={buildset.ref_url}>
-                      <strong>Change </strong>
-                      {buildset.change},{buildset.patchset}
-                    </ExternalLink>
-                  }
+                  value={buildset_link}
                 />
               )}
               {/* TODO (felix): Link to project page in Zuul */}
