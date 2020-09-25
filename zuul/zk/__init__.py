@@ -9,7 +9,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from typing import Optional
+import logging
+from typing import Optional, Any
 
 from kazoo.client import KazooClient
 import configparser
@@ -52,31 +53,63 @@ class ZooKeeper(object):
             raise NoClientException()
         return self.client.client
 
-    def connect(self, hosts: str, read_only: bool = False,
-                timeout: float = 10.0,
-                tls_cert: Optional[str] = None, tls_key: Optional[str] = None,
-                tls_ca: Optional[str] = None):
-        self.client.connect(hosts, read_only, timeout,
-                            tls_cert, tls_key, tls_ca)
-
     def disconnect(self):
         self.client.disconnect()
 
 
-def connect_zookeeper(config: configparser.ConfigParser) -> ZooKeeper:
-    zookeeper = ZooKeeper(enable_cache=True)
-    zookeeper_hosts = get_default(config, 'zookeeper', 'hosts', None)
-    if not zookeeper_hosts:
-        raise Exception("The zookeeper hosts config value is required")
-    zookeeper_tls_key = get_default(config, 'zookeeper', 'tls_key')
-    zookeeper_tls_cert = get_default(config, 'zookeeper', 'tls_cert')
-    zookeeper_tls_ca = get_default(config, 'zookeeper', 'tls_ca')
-    zookeeper_timeout = float(get_default(config, 'zookeeper',
-                                          'session_timeout', 10.0))
-    zookeeper.connect(
-        hosts=zookeeper_hosts,
-        timeout=zookeeper_timeout,
-        tls_cert=zookeeper_tls_cert,
-        tls_key=zookeeper_tls_key,
-        tls_ca=zookeeper_tls_ca)
-    return zookeeper
+zookeeper_class = ZooKeeper
+
+
+class ZooKeeperConnection(object):
+
+    @classmethod
+    def fromConfig(cls, config: configparser.ConfigParser)\
+            -> 'ZooKeeperConnection':
+        hosts = get_default(config, "zookeeper", "hosts", None)
+        if not hosts:
+            raise Exception("The zookeeper hosts config value is required")
+        timeout = float(get_default(config, "zookeeper", "session_timeout",
+                                    120.0))
+        tls_key = get_default(config, "zookeeper", "tls_key")
+        tls_cert = get_default(config, "zookeeper", "tls_cert")
+        tls_ca = get_default(config, "zookeeper", "tls_ca")
+
+        return cls(hosts=hosts, timeout=timeout, tls_key=tls_key,
+                   tls_cert=tls_cert, tls_ca=tls_ca)
+
+    def __init__(self, hosts: str, timeout: float = 120.0,
+                 tls_key: Optional[str] = None, tls_cert: Optional[str] = None,
+                 tls_ca: Optional[str] = None, read_only: bool = False,
+                 enable_cache: bool = True):
+        self.log = logging.getLogger("zuul.zk.ZooKeeperConnection")
+        self._zookeeper: Optional[ZooKeeper] = None
+        self._hosts = hosts
+        self._timeout = timeout
+        self._tls_key = tls_key
+        self._tls_cert = tls_cert
+        self._tls_ca = tls_ca
+        self._read_only = read_only
+        self._enable_cache = enable_cache
+
+    def __enter__(self) -> ZooKeeper:
+        self.log.debug("Establishing connection...")
+        self._zookeeper = self.connect()
+        return self._zookeeper
+
+    def __exit__(self, kind: Any, value: Any, traceback: Optional[Any]):
+        self.log.debug("Destroying connection...")
+        if self._zookeeper:
+            self._zookeeper.disconnect()
+            self._zookeeper = None
+
+    def connect(self) -> ZooKeeper:
+        zookeeper = zookeeper_class(enable_cache=self._enable_cache)
+        zookeeper.client.connect(
+            hosts=self._hosts,
+            timeout=self._timeout,
+            tls_key=self._tls_key,
+            tls_cert=self._tls_cert,
+            tls_ca=self._tls_ca,
+            read_only=self._read_only,
+        )
+        return zookeeper
