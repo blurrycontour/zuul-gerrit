@@ -21,6 +21,7 @@ import zuul.nodepool
 from zuul import model
 
 from tests.base import BaseTestCase
+from zuul.zk import ZooKeeperConnection
 
 
 class TestNodepoolIntegration(BaseTestCase):
@@ -31,9 +32,8 @@ class TestNodepoolIntegration(BaseTestCase):
         super(TestNodepoolIntegration, self).setUp()
 
         self.statsd = None
-        self.zk_client = zuul.zk.ZooKeeperClient()
+        self.zk_client = ZooKeeperConnection(hosts='localhost:2181').connect()
         self.addCleanup(self.zk_client.disconnect)
-        self.zk_client.connect('localhost:2181')
         self.hostname = socket.gethostname()
 
         self.provisioned_requests = []
