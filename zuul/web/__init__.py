@@ -37,6 +37,7 @@ from zuul.lib.repl import REPLServer
 import zuul.model
 from zuul.rpcclient import RPCClient
 from zuul.zk import ZooKeeperConnection, ZooKeeperClient
+from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
@@ -1192,8 +1193,8 @@ class ZuulWeb(object):
             hosts=zk_hosts, read_only=True, timeout=zk_timeout,
             tls_cert=zk_tls_cert, tls_key=zk_tls_key, tls_ca=zk_tls_ca
         ).connect()
-        self.zk_connection_event = zuul.zk.connection_event \
-            .ZooKeeperConnectionEvent(self.zk_client)
+        self.zk_connection_event: ZooKeeperConnectionEvent =\
+            ZooKeeperConnectionEvent(self.zk_client)
 
         self.connections: ConnectionRegistry = connections
         self.authenticators: AuthenticatorRegistry = authenticators

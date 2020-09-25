@@ -12,6 +12,8 @@
 import logging
 import threading
 import time
+import traceback
+import uuid
 from abc import ABCMeta
 from configparser import ConfigParser
 from contextlib import contextmanager
@@ -30,6 +32,7 @@ from zuul.zk.exceptions import NoClientException
 
 class ZooKeeperClient(object):
     log = logging.getLogger("zuul.zk.base.ZooKeeperClient")
+    connections: Dict[str, str] = {}
 
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
@@ -44,6 +47,11 @@ class ZooKeeperClient(object):
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners: List[Callable[[], None]] = []
+        self.connection_id: str = ''
+        self.node_watchers: Dict[str, List[Callable[[List[str]], None]]] = {}
+
+    def __str__(self):
+        return "<ZooKeeper hash=%s>" % hex(hash(self))
 
     def _connectionListener(self, state):
         """
@@ -79,7 +87,7 @@ class ZooKeeperClient(object):
     def connect(self, hosts: str, read_only: bool = False,
                 timeout: float = 10.0, tls_cert: Optional[str] = None,
                 tls_key: Optional[str] = None,
-                tls_ca: Optional[str] = None):
+                tls_ca: Optional[str] = None) -> None:
         """
         Establish a connection with ZooKeeper cluster.
 
@@ -96,6 +104,11 @@ class ZooKeeperClient(object):
         :param str tls_ca: Path to TLS CA cert
         """
         if self.client is None:
+            stack = "\n".join(traceback.format_stack())
+            self.connection_id = uuid.uuid4().hex
+            ZooKeeperClient.connections[self.connection_id] = stack
+            self.log.debug("ZK Connecting (%s)", self.connection_id)
+
             args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
             if tls_key:
                 args['use_ssl'] = True
@@ -126,6 +139,11 @@ class ZooKeeperClient(object):
             listener()
 
         if self.client is not None and self.client.connected:
+            if self.connection_id in ZooKeeperClient.connections:
+                del ZooKeeperClient.connections[self.connection_id]
+                self.log.debug("ZK Disconnecting (%s)", self.connection_id)
+                self.connection_id = ''
+
             self.client.stop()
             self.client.close()
             self.client = None
@@ -190,15 +208,12 @@ class ZooKeeperClient(object):
         :param blocking: Block until lock is obtained or return immediately.
         :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
         """
-        locked = False
         try:
             self.acquireLock(lock, blocking=blocking, timeout=timeout)
-            locked = True
             self.log.debug("ZK Lock %s locked", lock.path)
             yield lock
         finally:
-            if locked:
-                self.releaseLock(lock)
+            self.releaseLock(lock)
             self.log.debug("ZK Lock %s released", lock.path)
 
     def releaseLock(self, lock: Lock) -> None:
@@ -268,10 +283,10 @@ class ZooKeeperBase(metaclass=ABCMeta):
             raise NoClientException()
         return self.client.client
 
-    def _onConnect(self):
+    def _onConnect(self) -> None:
         pass
 
-    def _onDisconnect(self):
+    def _onDisconnect(self) -> None:
         pass
 
 

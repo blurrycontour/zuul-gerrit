@@ -18,7 +18,6 @@ import os
 import threading
 from abc import ABCMeta
 from configparser import ConfigParser
-from typing import Optional
 
 from zuul.zk import ZooKeeperClient
 
@@ -56,7 +55,7 @@ class BaseMergeServer(metaclass=ABCMeta):
     _repo_locks_class = BaseRepoLocks
 
     def __init__(self, config: ConfigParser, component: str,
-                 connections: Optional[ConnectionRegistry] = None):
+                 zk_client: ZooKeeperClient, connections: ConnectionRegistry):
         self.connections = connections or ConnectionRegistry()
         self.merge_email = get_default(config, 'merger', 'git_user_email',
                                        'zuul.merger.default@example.com')
@@ -70,7 +69,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.merge_root = get_default(config, component, 'git_dir',
                                       '/var/lib/zuul/{}-git'.format(component))
-        self.zk_client: Optional[ZooKeeperClient] = None
+        self.zk_client: ZooKeeperClient = zk_client
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -95,9 +94,6 @@ class BaseMergeServer(metaclass=ABCMeta):
             'merger-gearman-worker',
             self.config,
             self.merger_jobs)
-
-    def setZookeeper(self, zk_client: ZooKeeperClient):
-        self.zk_client = zk_client
 
     def _getMerger(self, root, cache_root, logger=None):
         return merger.Merger(
@@ -141,6 +137,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.merger_gearworker.stop()
 
     def join(self):
+        # self.zookeeper.disconnect()
         self.merger_gearworker.join()
 
     def pause(self):
@@ -240,9 +237,9 @@ class BaseMergeServer(metaclass=ABCMeta):
 class MergeServer(BaseMergeServer):
     log = logging.getLogger("zuul.MergeServer")
 
-    def __init__(self, config: ConfigParser,
-                 connections: Optional[ConnectionRegistry] = None):
-        super().__init__(config, 'merger', connections)
+    def __init__(self, config: ConfigParser, zk_client: ZooKeeperClient,
+                 connections: ConnectionRegistry):
+        super().__init__(config, 'merger', zk_client, connections)
 
         self.command_map = dict(
             stop=self.stop,

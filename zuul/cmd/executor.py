@@ -63,7 +63,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             os.close(pipe_write)
             import zuul.lib.log_streamer
 
-            self.log.info("Starting log streamer")
+            self.log.info("Starting log streamer on port %s",
+                          self.finger_port)
             streamer = zuul.lib.log_streamer.LogStreamer(
                 '::', self.finger_port, self.job_dir)
 
@@ -75,7 +76,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             os._exit(0)
         else:
             os.close(pipe_read)
-            self.log_streamer_pid = child_pid
+            self.log_streamer_pid = child_pid  # TODO JK: unused?
 
     def run(self):
         if self.args.command in zuul.executor.server.COMMANDS:
@@ -107,12 +108,11 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         self.start_log_streamer()
 
         with ZooKeeperConnection.fromConfig(self.config) as zk_client:
-            ExecutorServer = zuul.executor.server.ExecutorServer
-            self.executor = ExecutorServer(self.config, self.connections,
+            self.executor = ExecutorServer(self.config, zk_client,
+                                           self.connections,
                                            jobdir_root=self.job_dir,
                                            keep_jobdir=self.args.keep_jobdir,
                                            log_streaming_port=self.finger_port)
-            self.executor.setZookeeper(zk_client)
             self.executor.start()
 
             if self.args.nodaemon:
