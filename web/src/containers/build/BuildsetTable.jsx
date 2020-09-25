@@ -41,7 +41,7 @@ import {
 } from '@patternfly/react-table'
 
 import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
-import { ExternalLink } from '../../Misc'
+import { buildExternalTableLink } from '../../Misc'
 
 function BuildsetTable(props) {
   const { buildsets, fetching, onClearFilters, tenant } = props
@@ -80,6 +80,8 @@ function BuildsetTable(props) {
         className="zuul-stretched-link"
       />
     )
+    const buildset_link = buildExternalTableLink(buildset)
+
     return {
       cells: [
         {
@@ -114,11 +116,9 @@ function BuildsetTable(props) {
           title: (
             <>
               {buildsetResultLink}
-              {buildset.change && (
+              {buildset_link && (
                 <span style={{ zIndex: 1, position: 'relative' }}>
-                  <ExternalLink target={buildset.ref_url}>
-                    {buildset.change},{buildset.patchset}
-                  </ExternalLink>
+                  {buildset_link}
                 </span>
               )}
             </>

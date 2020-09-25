@@ -40,10 +40,12 @@ import * as moment from 'moment'
 import 'moment-duration-format'
 
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
-import { ExternalLink } from '../../Misc'
+import { buildExternalLink, ExternalLink } from '../../Misc'
 
 function Build(props) {
   const { build, tenant, timezone, fetchable } = props
+  const build_link = buildExternalLink(build)
+
   return (
     <>
       <Title
@@ -72,19 +74,11 @@ function Build(props) {
         <Flex flex={{ lg: 'flex_1' }}>
           <FlexItem>
             <List style={{ listStyle: 'none' }}>
-              {/* TODO (felix): What should we show for periodic builds
-                  here? They don't provide a change, but the ref_url is
-                  also not usable */}
-              {build.change && (
+              {build_link && (
                 <IconProperty
                   WrapElement={ListItem}
                   icon={<CodeIcon />}
-                  value={
-                    <ExternalLink target={build.ref_url}>
-                      <strong>Change </strong>
-                      {build.change},{build.patchset}
-                    </ExternalLink>
-                  }
+                  value={build_link}
                 />
               )}
               {/* TODO (felix): Link to project page in Zuul */}
