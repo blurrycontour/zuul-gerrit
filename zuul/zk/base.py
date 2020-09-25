@@ -12,9 +12,9 @@
 import logging
 import threading
 import time
-from typing import Callable
-from typing import List
-from typing import Optional
+import traceback
+import uuid
+from typing import Callable, Dict, List, Optional
 
 from kazoo.client import KazooClient, KazooState
 from kazoo.exceptions import LockTimeout
@@ -24,6 +24,7 @@ from kazoo.recipe.lock import Lock
 
 class ZooKeeperClient(object):
     log = logging.getLogger("zuul.zk.base.ZooKeeperClient")
+    connections: Dict[str, str] = {}
 
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
@@ -38,6 +39,11 @@ class ZooKeeperClient(object):
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners = []
+        self.connection_id: str = ''
+        self.node_watchers: Dict[str, List[Callable[[List[str]], None]]] = {}
+
+    def __str__(self):
+        return "<ZooKeeper hash=%s>" % hex(hash(self))
 
     def _connection_listener(self, state):
         '''
@@ -55,15 +61,15 @@ class ZooKeeperClient(object):
 
     @property
     def connected(self):
-        return self.client.state == KazooState.CONNECTED
+        return self.client and self.client.state == KazooState.CONNECTED
 
     @property
     def suspended(self):
-        return self.client.state == KazooState.SUSPENDED
+        return self.client and self.client.state == KazooState.SUSPENDED
 
     @property
     def lost(self):
-        return self.client.state == KazooState.LOST
+        return not self.client or self.client.state == KazooState.LOST
 
     @property
     def didLoseConnection(self):
@@ -97,6 +103,11 @@ class ZooKeeperClient(object):
         :param str tls_ca: Path to TLS CA cert
         '''
         if self.client is None:
+            stack = "\n".join(traceback.format_stack())
+            self.connection_id = uuid.uuid4().hex
+            ZooKeeperClient.connections[self.connection_id] = stack
+            self.log.debug("ZK Connecting (%s)", self.connection_id)
+
             args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
             if tls_key:
                 args['use_ssl'] = True
@@ -127,6 +138,12 @@ class ZooKeeperClient(object):
             listener()
 
         if self.client is not None and self.client.connected:
+            if self.connection_id in ZooKeeperClient.connections:
+                # stack = "\n".join(traceback.format_stack())
+                del ZooKeeperClient.connections[self.connection_id]
+                self.log.debug("ZK Disconnecting (%s)", self.connection_id)
+                self.connection_id = ''
+
             self.client.stop()
             self.client.close()
             self.client = None
@@ -173,7 +190,7 @@ class ZooKeeperClient(object):
                     lock.acquire(timeout=10.0)
                     locked = True
                 except LockTimeout:
-                    self.log.debug("Could not acquire lock %s" % lock.path)
+                    self.log.debug("Could not acquire lock %s", lock.path)
                     raise
         finally:
             if not keep_locked and self.locking_lock.locked():
@@ -190,8 +207,8 @@ class ZooKeeperBase(object):
     def kazoo_client(self) -> Optional[KazooClient]:
         return self.client.client
 
-    def _on_connect(self):
+    def _on_connect(self) -> None:
         pass
 
-    def _on_disconnect(self):
+    def _on_disconnect(self) -> None:
         pass
