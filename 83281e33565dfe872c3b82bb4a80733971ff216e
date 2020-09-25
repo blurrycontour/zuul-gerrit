@@ -46,6 +46,23 @@
       "revId": "83281e33565dfe872c3b82bb4a80733971ff216e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_400d4d33",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3207,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-25T05:50:03Z",
+      "side": 0,
+      "message": "ok, this causes problems if you want this just as a property, and no non-driver bits reference this.",
+      "revId": "83281e33565dfe872c3b82bb4a80733971ff216e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
