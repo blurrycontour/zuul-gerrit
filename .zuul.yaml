@@ -245,6 +245,7 @@
                 tox_environment:
                     ZUUL_TEST_ROOT: /tmp/zuul-test
                     YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+            post-run: playbooks/common/post-system-logs.yaml
         - tox-py38:
             irrelevant-files:
               - zuul/cmd/migrate.py
@@ -252,6 +253,7 @@
             timeout: 7200  # 120 minutes / 2 hours
             nodeset: ubuntu-bionic
             vars: *zuul_tox_vars
+            post-run: playbooks/common/post-system-logs.yaml
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
