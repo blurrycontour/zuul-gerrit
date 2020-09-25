@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_b1f667d7",
+        "filename": "doc/source/reference/drivers/elasticsearch.rst",
+        "patchSetId": 43
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-25T14:09:35Z",
+      "side": 1,
+      "message": "nit: this block needs to be indented to be a valid rst block",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 37
+      },
+      "revId": "1fcf20b5fcc02fba2a4f2cb804fcf827d7496891",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
