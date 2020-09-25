@@ -43,4 +43,48 @@ ExternalLink.propTypes = {
     children: PropTypes.node,
 }
 
-export { ExternalLink }
+function buildExternalLink(buildish) {
+  /* TODO (felix): What should we show for periodic builds
+      here? They don't provide a change, but the ref_url is
+      also not usable */
+  if (buildish.ref_url && buildish.change) {
+    return (
+      <ExternalLink target={buildish.ref_url}>
+        <strong>Change </strong>
+        {buildish.change},{buildish.patchset}
+      </ExternalLink>
+    )
+  } else if (buildish.ref_url && buildish.newrev) {
+    return (
+      <ExternalLink target={buildish.ref_url}>
+        <strong>Revision </strong>
+        {buildish.newrev.slice(0,7)}
+      </ExternalLink>
+    )
+  }
+
+  return null
+}
+
+function buildExternalTableLink(buildish) {
+  /* TODO (felix): What should we show for periodic builds
+      here? They don't provide a change, but the ref_url is
+      also not usable */
+  if (buildish.ref_url && buildish.change) {
+    return (
+      <ExternalLink target={buildish.ref_url}>
+        {buildish.change},{buildish.patchset}
+      </ExternalLink>
+    )
+  } else if (buildish.ref_url && buildish.newrev) {
+    return (
+      <ExternalLink target={buildish.ref_url}>
+        {buildish.newrev.slice(0,7)}
+      </ExternalLink>
+    )
+  }
+
+  return null
+}
+
+export { ExternalLink, buildExternalLink, buildExternalTableLink }
