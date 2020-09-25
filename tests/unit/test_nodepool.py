@@ -20,6 +20,7 @@ import zuul.nodepool
 from zuul import model
 
 from tests.base import BaseTestCase, ChrootedKazooFixture, FakeNodepool
+from zuul.zk import connect_zookeeper
 
 
 class TestNodepool(BaseTestCase):
@@ -37,9 +38,8 @@ class TestNodepool(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
+        self.zk = connect_zookeeper(self.zk_config)
         self.addCleanup(self.zk.disconnect)
-        self.zk.connect(self.zk_config)
         self.hostname = 'nodepool-test-hostname'
 
         self.provisioned_requests = []
