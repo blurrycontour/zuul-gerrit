@@ -68,6 +68,7 @@ from git.util import IterableList
 import yaml
 import paramiko
 
+from tests.zk import TestZooKeeperClient, TestZooKeeperConnection
 from zuul.model import Change
 from zuul.rpcclient import RPCClient
 
@@ -113,7 +114,7 @@ import zuul.rpcclient
 import zuul.configloader
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
-from zuul.zk import ZooKeeperClient
+from zuul.web import ZuulWeb
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -3653,6 +3654,10 @@ class WebProxyFixture(fixtures.Fixture):
         self.thread.join()
 
 
+class TestZuulWeb(ZuulWeb):
+    _zk_connection_class = TestZooKeeperConnection
+
+
 class ZuulWebFixture(fixtures.Fixture):
     def __init__(self, gearman_server_port,
                  changes: Dict[str, Dict[str, Change]], config: ConfigParser,
@@ -3683,7 +3688,7 @@ class ZuulWebFixture(fixtures.Fixture):
 
     def _setUp(self):
         # Start the web server
-        self.web = zuul.web.ZuulWeb(
+        self.web = TestZuulWeb(
             listen_address='::', listen_port=0,
             gear_server='127.0.0.1', gear_port=self.gearman_server_port,
             info=self.info,
@@ -3950,8 +3955,7 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk_client = ZooKeeperClient()
-        zk_client.connect(self.zk_config, timeout=30.0)
+        zk_client = TestZooKeeperConnection(hosts=self.zk_config).connect()
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
@@ -4262,6 +4266,7 @@ class ZuulTestCase(BaseTestCase):
         self.merge_server = None
 
         # Cleanups are run in reverse order
+        self.addCleanup(self.assertNoZkConnections)
         self.addCleanup(self.assertCleanShutdown)
         self.addCleanup(self.shutdown)
         self.addCleanup(self.assertFinalState)
@@ -4538,6 +4543,14 @@ class ZuulTestCase(BaseTestCase):
                     continue
                 with open(os.path.join(root, fn)) as f:
                     self.assertTrue(f.read() in test_keys)
+
+    def assertNoZkConnections(self):
+        open_count = len(TestZooKeeperClient.connections.values())
+        if open_count > 0:
+            for uid, stack in TestZooKeeperClient.connections.items():
+                self.log.error("ZK Not disconnected (%s): %s", uid, stack)
+            raise RuntimeError("Not all ZK connections closed (%s opened)!" %
+                               open_count)
 
     def assertFinalState(self):
         self.log.debug("Assert final state")
