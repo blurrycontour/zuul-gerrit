@@ -61,9 +61,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('merger', 'log_config')
 
         zookeeper = ZooKeeperConnection.fromConfig(self.config).connect()
-        self.merger = zuul.merger.server.MergeServer(self.config,
-                                                     self.connections)
-        self.merger.setZookeeper(zookeeper)
+        self.merger = MergeServer(self.config, zookeeper, self.connections)
         self.merger.start()
 
         if self.args.nodaemon:
@@ -75,7 +73,6 @@ class Merger(zuul.cmd.ZuulDaemonApp):
                     print("Ctrl + C: asking merger to exit nicely...\n")
                     self.exit_handler(signal.SIGINT, None)
         else:
-            zookeeper.disconnect()
             self.merger.join()
 
 
