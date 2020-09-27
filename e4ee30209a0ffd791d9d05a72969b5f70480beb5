@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_92095c85",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-27T23:28:02Z",
+      "side": 0,
+      "message": "I guess this was added with I6b51565a81cb7d47bb971505570431ba784ec26b but it\u0027s not exactly clear why.  \n\nWhat exactly about the \"test\" profile requires python 3.8?  \n\nwhile i agree we run tox-py38 and with the recent change I346c2fe22f8409c600a3ee2a229369778e3cabd6 we install that into the images, that seems to be more that we are running those environments under 3.8, rather than the test profile *requires* 3.8\n\nIn other words, I don\u0027t see anything in the zuul code-base that requires python3.8 to run tests.\n\nergo, can we just remove this?",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 10
+      },
+      "revId": "e4ee30209a0ffd791d9d05a72969b5f70480beb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
