@@ -12,11 +12,38 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { applyMiddleware, createStore } from 'redux'
-import thunk from 'redux-thunk'
+// Use CommonJS require so we can dynamically import during build-time.
+if (
+  process.env.NODE_ENV === 'production' ||
+  // FIXME (felix): This deactivates redux-immutable-state-invariant for tests.
+  // Usually, this is not a good idea, but there are some weird state mutations
+  // deep within the zuul-web JS code I couldn't track down so far. Both of them
+  // make the "render single tenant" test in App.test.js. To still continue
+  // development while using redux-immutable-state-invariant, remove it from the
+  // test env for now by using the same store configuration as for the
+  // production environment.
 
-import appReducers from './reducers'
+  // Some details to the state mutation errors:
+  // 1. The status page does some weird status mutations between dispatches
+  // (so, most probably somewhere within its render method or the render method
+  // of its child components).
+  // The concrete path where state mutation is detected, is:
+  // status.status.pipelines.0.change_queues.0.heads.0.0._tree_branches
 
-const store = createStore(appReducers, applyMiddleware(thunk))
+  // While we could also ignore the first error by providing an ignore parameter
+  // to the reduxImmutableStateInvariant() when applying the middleware in
+  // store.dev.js this doesn't "silence" the second error.
+  // Just for reference, this would look like:
+  // applyMiddleware(thunk, reduxImmutableStateInvariant({ ignore: ['status.status.pipelines']}))
 
-export default store
+  // 2.RangeError: Maximum call stack size exceeded
+  //   at trackProperties (node_modules/redux-immutable-state-invariant/dist/trackForMutations.js:16:25)
+  //   at trackProperties (node_modules/redux-immutable-state-invariant/dist/trackForMutations.js:32:31)
+  //   at trackProperties (node_modules/redux-immutable-state-invariant/dist/trackForMutations.js:32:31)
+  //   ...
+  process.env.NODE_ENV === 'test'
+) {
+  module.exports = require('./store.prod')
+} else {
+  module.exports = require('./store.dev')
+}
