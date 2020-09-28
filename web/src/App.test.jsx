@@ -19,7 +19,7 @@ import { Link, BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
 import { fetchInfoIfNeeded } from './actions/info'
-import store from './store'
+import configureStore from './store'
 import App from './App'
 import TenantsPage from './pages/Tenants'
 import StatusPage from './pages/Status'
@@ -31,6 +31,7 @@ api.fetchStatus = jest.fn()
 api.fetchConfigErrors = jest.fn()
 api.fetchConfigErrors.mockImplementation(() => Promise.resolve({data: []}))
 
+const store = configureStore()
 
 it('renders without crashing', () => {
   const div = document.createElement('div')
