@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_52c6a417",
+        "filename": "doc/source/reference/monitoring.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-28T00:17:22Z",
+      "side": 1,
+      "message": "might be nice to add details here?  I find these sorts of practical examples more useful as a first example that the raw docs.",
+      "range": {
+        "startLine": 434,
+        "startChar": 0,
+        "endLine": 441,
+        "endChar": 54
+      },
+      "revId": "eb73728823ebef8a4f7209dade0ca245ea563d29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_92ccbc34",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-28T00:17:22Z",
+      "side": 1,
+      "message": "Is this really necessary?  Doesn\u0027t seem to have much useful context and will be in the logs a lot?",
+      "range": {
+        "startLine": 196,
+        "startChar": 16,
+        "endLine": 196,
+        "endChar": 67
+      },
+      "revId": "eb73728823ebef8a4f7209dade0ca245ea563d29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_128eeccf",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-28T00:17:22Z",
+      "side": 1,
+      "message": "This also -- we\u0027re logging it in the stat",
+      "range": {
+        "startLine": 209,
+        "startChar": 5,
+        "endLine": 210,
+        "endChar": 53
+      },
+      "revId": "eb73728823ebef8a4f7209dade0ca245ea563d29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
