@@ -10,6 +10,8 @@
 
           # This project contains broken config
           - org/project3
+
+          - org/project5
 - tenant:
     name: tenant-good
     source:
