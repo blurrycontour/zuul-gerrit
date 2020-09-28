@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_6315cd4c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1220,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-28T22:29:16Z",
+      "side": 1,
+      "message": "To alleviate ianw\u0027s concern with logging maybe we can drop this log.info then in sendReport() record what is logged here. Then add in a second logger at debug log level that records the time taken? That way this line and \"log.debug(\"Reporting to %s started\", reporter.name)\" aren\u0027t redundant?\n\nSomething like:\n\n  log.info(\"Reporting item %s, actions: %s, to %s\", item, actions, reporter.name)\n  # Run reporter actions\n  log.debug(\"Reporting %s to %s finished in %sms\", item, reporter.name, duration_ms)\n\nIn sendReport()?",
+      "revId": "69b3b02870d50b7c20e472f68b5effb5e82b59e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
