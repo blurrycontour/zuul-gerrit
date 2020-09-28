@@ -1714,7 +1714,11 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
         match = re.match(
             r'.+/projects/(.+)/merge_requests/(\d+)/approve$', url)
         if match:
+            assert 'sha' in params
             mr = self._get_mr(match)
+            if params['sha'] != mr.sha:
+                return {'message': 'SHA does not match HEAD of source '
+                        'branch: <new_sha>'}, 409, "", "POST"
             mr.approved = True
 
         match = re.match(
