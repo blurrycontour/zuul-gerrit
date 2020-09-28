@@ -757,9 +757,24 @@ class FakeGithubClient(object):
             return re.match(r'[a-z0-9]{40}', s)
 
         if query_is_sha(query):
-            return (FakeIssueSearchResult(FakeIssue(pr))
-                    for pr in self._data.pull_requests.values()
-                    if pr.head_sha == query)
+            # Github returns all PR's that contain the sha in their history
+            result = []
+            for pr in self._data.pull_requests.values():
+                # Quick check if head sha matches
+                if pr.head_sha == query:
+                    result.append(FakeIssueSearchResult(FakeIssue(pr)))
+                    continue
+
+                # If head sha doesn't match it still could be in the pr history
+                repo = pr._getRepo()
+                commits = repo.iter_commits(
+                    '%s...%s' % (pr.branch, pr.head_sha))
+                for commit in commits:
+                    if commit.hexsha == query:
+                        result.append(FakeIssueSearchResult(FakeIssue(pr)))
+                        continue
+
+            return result
 
         # Non-SHA queries are of the form:
         #

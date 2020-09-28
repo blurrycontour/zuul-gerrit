@@ -92,6 +92,11 @@ class TestGithubRequirements(ZuulTestCase):
         project = 'org/project2'
         A = self.fake_github.openFakePullRequest(project, 'master', 'A')
 
+        # Create second PR which contains the head of A in its history. Zuul
+        # should not get disturbed by the existence of this one.
+        self.fake_github.openFakePullRequest(
+            project, 'master', 'A', base_sha=A.head_sha)
+
         # An error status should not cause it to be enqueued
         self.fake_github.setCommitStatus(project, A.head_sha, 'error',
                                          context='tenant-one/check')
