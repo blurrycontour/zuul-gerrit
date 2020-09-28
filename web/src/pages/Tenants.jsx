@@ -47,7 +47,6 @@ class TenantsPage extends React.Component {
       return <Fetching />
     }
 
-    const tenants = remoteData.tenants
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = (value) => (
       <Table.Cell>{value}</Table.Cell>)
@@ -69,17 +68,20 @@ class TenantsPage extends React.Component {
         cell: {formatters: [cellFormat]}
       })
     })
-    tenants.forEach(tenant => {
-      tenant.status = (
-        <Link to={'/t/' + tenant.name + '/status'}>Status</Link>)
-      tenant.projects_link = (
-        <Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)
-      tenant.jobs = (
-        <Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)
-      tenant.builds = (
-        <Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)
-      tenant.buildsets = (
-        <Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)
+    const tenantRows = []
+    remoteData.tenants.forEach(tenant => {
+      tenantRows.push({
+        ...tenant,
+        status: <Link to={'/t/' + tenant.name + '/status'}>Status</Link>,
+        projects_link: (
+          <Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>
+        ),
+        jobs: <Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>,
+        builds: <Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>,
+        buildsets: (
+          <Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>
+        ),
+      })
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
@@ -91,7 +93,7 @@ class TenantsPage extends React.Component {
           >
           <Table.Header/>
           <Table.Body
-            rows={tenants}
+            rows={tenantRows}
             rowKey="name"
             />
         </Table.PfProvider>

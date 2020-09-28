@@ -18,7 +18,7 @@ import { Link, BrowserRouter as Router } from 'react-router-dom'
 import { Provider } from 'react-redux'
 
 import { setTenantAction } from '../../actions/tenant'
-import store from '../../store'
+import configureStore from '../../store'
 import ChangePanel from './ChangePanel'
 
 
@@ -30,6 +30,8 @@ const fakeChange = {
     result: null
   }]
 }
+
+const store = configureStore()
 
 it('change panel render multi tenant links', () => {
   store.dispatch(setTenantAction('tenant-one', false))
