@@ -2816,6 +2816,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     def __init__(self, *args, **kw):
         self._run_ansible = kw.pop('_run_ansible', False)
         self._test_root = kw.pop('_test_root', False)
+        self.fail_cat_job = kw.pop('_fail_cat_job', {})
         if self._run_ansible:
             self._ansible_manager_class = zuul.lib.ansible.AnsibleManager
         else:
@@ -2900,6 +2901,18 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         args['zuul']['_test'] = dict(test_root=self._test_root)
         job.arguments = json.dumps(args)
         super(RecordingExecutorServer, self).executeJob(job)
+
+    def cat(self, job):
+        args = json.loads(job.arguments)
+        project = args['project']
+        branch = args['branch']
+        if project in self.fail_cat_job\
+                and (self.fail_cat_job[project] is True
+                     or branch in self.fail_cat_job[project]):
+            result = dict(updated=False)
+            job.sendWorkComplete(json.dumps(result))
+        else:
+            super().cat(job)
 
     def stopJob(self, job):
         self.log.debug("handle stop")
@@ -3805,6 +3818,7 @@ class ZuulTestCase(BaseTestCase):
     use_ssl = False
     git_url_with_auth = False
     log_console_port = 19885
+    fail_cat_job = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -3924,6 +3938,7 @@ class ZuulTestCase(BaseTestCase):
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
+            _fail_cat_job=self.fail_cat_job,
             keep_jobdir=KEEP_TEMPDIRS,
             log_console_port=self.log_console_port)
         self.executor_server.start()
