@@ -421,15 +421,15 @@ def zuul_run_command(self, args, zuul_log_id, check_rc=False, close_fds=True, ex
         #
         # # ZUUL: stderr follows stdout
         # rpipes = [cmd.stdout]
-        #
-        # if data:
-        #     if not binary_data:
-        #         data += '\n'
-        #     if isinstance(data, text_type):
-        #         data = to_bytes(data)
-        #     cmd.stdin.write(data)
-        #     cmd.stdin.close()
-        #
+
+        if data:
+            if not binary_data:
+                data += '\n'
+            if isinstance(data, text_type):
+                data = to_bytes(data)
+            cmd.stdin.write(data)
+            cmd.stdin.close()
+
         # while True:
         #     rfds, wfds, efds = select.select(rpipes, [], rpipes, 1)
         #     stdout += self._read_from_pipes(rpipes, rfds, cmd.stdout)
