@@ -16,6 +16,24 @@
       "revId": "69b3b02870d50b7c20e472f68b5effb5e82b59e9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_03005102",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1220,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-28T22:33:18Z",
+      "side": 1,
+      "message": "I guess the issue is if it never came back, you didn\u0027t see that it even started (i.e. the database just ate requests or something?)  I guess it depends what inspired this.\n\nBut I support less debug messages, if appropriate.",
+      "parentUuid": "9f560f44_6315cd4c",
+      "revId": "69b3b02870d50b7c20e472f68b5effb5e82b59e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
