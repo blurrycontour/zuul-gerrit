@@ -27,12 +27,10 @@ export default (state = {
     case TENANT_SET:
       return {
         isFetching: false,
-        status: null,
       }
     case STATUS_FETCH_REQUEST:
       return {
         isFetching: true,
-        status: state.status
       }
     case STATUS_FETCH_SUCCESS:
       return {
@@ -42,7 +40,6 @@ export default (state = {
     case STATUS_FETCH_FAIL:
       return {
         isFetching: false,
-        status: state.status,
       }
     default:
       return state
