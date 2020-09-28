@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_2908e68e",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-28T06:48:22Z",
+      "side": 1,
+      "message": "JobError is misleading. We should name it more something like ConfigFetchError or similar to indicate that fetching config from a repo and specific branch failed. We also need to add the repo and branch to the error message (this information should be in the job).",
+      "range": {
+        "startLine": 204,
+        "startChar": 0,
+        "endLine": 204,
+        "endChar": 26
+      },
+      "revId": "e902cde91cd29fef47176782f15ef7bc8b6b7d3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
