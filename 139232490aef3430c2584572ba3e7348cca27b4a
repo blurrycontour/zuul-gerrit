@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_c975eacd",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-28T07:32:27Z",
+      "side": 1,
+      "message": "This message will be displayed in the tenant errors to the users. The users don\u0027t know about zuul internals like cat jobs. We need to tell the user that loading config from a repo failed.",
+      "revId": "139232490aef3430c2584572ba3e7348cca27b4a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
