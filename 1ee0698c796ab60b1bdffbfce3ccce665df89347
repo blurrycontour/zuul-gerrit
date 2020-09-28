@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_524b4485",
+        "filename": "tests/fakegithub.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-28T00:46:18Z",
+      "side": 1,
+      "message": "This is now dead code, as it is now handed by the PUT operator below?  Could probably just remove the function, or put it in NotImplementedError raise to explicitly call out it is done via direct PUT statements now.",
+      "range": {
+        "startLine": 509,
+        "startChar": 1,
+        "endLine": 525,
+        "endChar": 19
+      },
+      "revId": "1ee0698c796ab60b1bdffbfce3ccce665df89347",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
