@@ -1,4 +1,4 @@
-// Copyright 2018 Red Hat, Inc
+// Copyright 2020 BMW Group
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,9 +12,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// Use CommonJS require so we can dynamically import during build-time.
-if (process.env.NODE_ENV === 'production') {
-  module.exports = require('./store.prod')
-} else {
-  module.exports = require('./store.dev')
+import { applyMiddleware, createStore } from 'redux'
+import appReducer from './reducers'
+import thunk from 'redux-thunk'
+
+export default function configureStore(initialState) {
+  return createStore(appReducer, initialState, applyMiddleware(thunk))
 }
