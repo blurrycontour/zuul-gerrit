@@ -22,6 +22,30 @@
       "revId": "e4ee30209a0ffd791d9d05a72969b5f70480beb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_a3308557",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-28T21:57:03Z",
+      "side": 0,
+      "message": "The platform:ubuntu-bionic specifier is the hint to what this was created for. I believe it is an artifact of running unittests on bionic which doesn\u0027t have python3.7 installed by default (it has 3.6). It also doesn\u0027t have 3.8 either, but our jobs now specify the python versions themselves and handle that for us (https://zuul.opendev.org/t/zuul/build/f168c9fb53544a839f0253272c60a6be/console#2/0/1/ubuntu-bionic shows this).\n\nFinally, our docker images are debian based so won\u0027t match these lines anyway.\n\nAll that to say: yes I think we can remove these two lines.",
+      "parentUuid": "9f560f44_92095c85",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 10
+      },
+      "revId": "e4ee30209a0ffd791d9d05a72969b5f70480beb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
