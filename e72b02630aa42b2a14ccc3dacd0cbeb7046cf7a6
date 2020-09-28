@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_52622417",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2325,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-28T00:31:48Z",
+      "side": 1,
+      "message": "I know you just copied it, but since it\u0027s making it to the user I think we should explicitly say what\u0027s going on.  I would suggest\n\n\"Configuration in %s ignored because project-branch is already configured\" % (fn)\n\nor something like that",
+      "revId": "e72b02630aa42b2a14ccc3dacd0cbeb7046cf7a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
