@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_4c743b05",
+        "filename": ".zuul.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-28T19:56:15Z",
+      "side": 1,
+      "message": "The tox -py3* jobs only run tests in tests/unit/ they do not run any of the new tests/zuul_client tests. This is controlled by the .stestr.conf.\n\nInstead of adding zuul-client to required projects here maybe we should have a new job like https://review.opendev.org/#/c/751264/16 and only run the zuul client tests there?",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_4cb39bed",
+        "filename": "tests/zuul_client/__init__.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-28T19:56:15Z",
+      "side": 1,
+      "message": "Nit an empty file doesn\u0027t need a license header.",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_0c724313",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-28T19:56:15Z",
+      "side": 1,
+      "message": "Nit might want to check exit codes here too.",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_acd237ce",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-28T19:56:15Z",
+      "side": 1,
+      "message": "Might want to check the build history here to ensure org/project\u0027s jobs were run and/or that it merged.",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_2cf0e766",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-28T19:56:15Z",
+      "side": 1,
+      "message": "See above about checking the build history.",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
