@@ -1665,7 +1665,7 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             mr = self._get_mr(match)
             return {
                 'target_branch': mr.branch,
-                'title': mr.title,
+                'title': mr.subject,
                 'state': mr.state,
                 'description': mr.description,
                 'author': {
@@ -1751,13 +1751,13 @@ class FakeGitlabMergeRequest(object):
     log = logging.getLogger("zuul.test.FakeGitlabMergeRequest")
 
     def __init__(self, gitlab, number, project, branch,
-                 title, upstream_root, files=[], description=''):
+                 subject, upstream_root, files=[], description=''):
         self.gitlab = gitlab
         self.source = gitlab
         self.number = number
         self.project = project
         self.branch = branch
-        self.title = title
+        self.subject = subject
         self.description = description
         self.upstream_root = upstream_root
         self.number_of_commits = 0
@@ -1830,7 +1830,7 @@ class FakeGitlabMergeRequest(object):
         else:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
             self.files = {fn: "test %s %s\n" % (self.branch, self.number)}
-        msg = self.title + '-' + str(self.number_of_commits)
+        msg = self.subject + '-' + str(self.number_of_commits)
         for fn, content in self.files.items():
             fn = os.path.join(repo.working_dir, fn)
             with open(fn, 'w') as f:
@@ -1856,7 +1856,7 @@ class FakeGitlabMergeRequest(object):
                 'path_with_namespace': self.project
             },
             'object_attributes': {
-                'title': self.title,
+                'title': self.subject,
                 'created_at': self.created_at.strftime(
                     '%Y-%m-%d %H:%M:%S UTC'),
                 'updated_at': self.updated_at.strftime(
@@ -1911,7 +1911,7 @@ class FakeGitlabMergeRequest(object):
                 'path_with_namespace': self.project
             },
             'merge_request': {
-                'title': self.title,
+                'title': self.subject,
                 'iid': self.number,
                 'target_branch': self.branch,
                 'last_commit': {'id': self.sha}
