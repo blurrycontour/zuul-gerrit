@@ -58,7 +58,7 @@ export default (
       return { ...state, isFetching: false }
     case BUILD_OUTPUT_REQUEST:
       return { ...state, isFetchingOutput: true }
-    case BUILD_OUTPUT_SUCCESS:
+    case BUILD_OUTPUT_SUCCESS: {
       const buildsWithOutput = {
         ...state.builds,
         [action.buildId]: {
@@ -69,11 +69,12 @@ export default (
         },
       }
       return { ...state, builds: buildsWithOutput, isFetchingOutput: false }
+    }
     case BUILD_OUTPUT_FAIL:
       return { ...state, isFetchingOutput: false }
     case BUILD_MANIFEST_REQUEST:
       return { ...state, isFetchingManifest: false }
-    case BUILD_MANIFEST_SUCCESS:
+    case BUILD_MANIFEST_SUCCESS: {
       const buildsWithManifest = {
         ...state.builds,
         [action.buildId]: {
@@ -82,6 +83,7 @@ export default (
         },
       }
       return { ...state, builds: buildsWithManifest, isFetchingManifest: false }
+    }
     case BUILD_MANIFEST_FAIL:
       return { ...state, isFetchingManifest: false }
     default:

@@ -36,7 +36,7 @@ import {
   PollIcon,
 } from '@patternfly/react-icons'
 
-import { fetchBuildIfNeeded } from '../actions/build'
+import { fetchBuildAllInfo } from '../actions/build'
 import { EmptyPage } from '../containers/Errors'
 import { Fetchable, Fetching } from '../containers/Fetching'
 import ArtifactList from '../containers/build/Artifact'
@@ -48,22 +48,24 @@ import Manifest from '../containers/build/Manifest'
 class BuildPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
-    remoteData: PropTypes.object,
-    tenant: PropTypes.object,
-    dispatch: PropTypes.func,
+    build: PropTypes.object,
+    isFetching: PropTypes.bool.isRequired,
+    isFetchingManifest: PropTypes.bool.isRequired,
+    isFetchingOutput: PropTypes.bool.isRequired,
+    tenant: PropTypes.object.isRequired,
+    fetchBuildAllInfo: PropTypes.func.isRequired,
     activeTab: PropTypes.string.isRequired,
-    location: PropTypes.object,
-    history: PropTypes.object,
+    location: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   }
 
-  updateData = (force) => {
-    this.props.dispatch(
-      fetchBuildIfNeeded(
+  updateData = async () => {
+    if (!this.props.build) {
+      this.props.fetchBuildAllInfo(
         this.props.tenant,
-        this.props.match.params.buildId,
-        force
+        this.props.match.params.buildId
       )
-    )
+    }
   }
 
   componentDidMount() {
@@ -107,11 +109,18 @@ class BuildPage extends React.Component {
   }
 
   render() {
-    const { remoteData, activeTab, location, tenant } = this.props
-    const build = remoteData.builds[this.props.match.params.buildId]
+    const {
+      build,
+      isFetching,
+      isFetchingManifest,
+      isFetchingOutput,
+      activeTab,
+      location,
+      tenant,
+    } = this.props
     const hash = location.hash.substring(1).split('/')
 
-    if (!build && remoteData.isFetching) {
+    if (!build && isFetching) {
       return <Fetching />
     }
 
@@ -127,14 +136,11 @@ class BuildPage extends React.Component {
     }
 
     const fetchable = (
-      <Fetchable
-        isFetching={remoteData.isFetching}
-        fetchCallback={this.updateData}
-      />
+      <Fetchable isFetching={isFetching} fetchCallback={this.updateData} />
     )
 
     const resultsTabContent =
-      !build.hosts && remoteData.isFetchingOutput ? (
+      !build.hosts && isFetchingOutput ? (
         <Fetching />
       ) : build.hosts ? (
         <BuildOutput output={build.hosts} />
@@ -159,7 +165,7 @@ class BuildPage extends React.Component {
     )
 
     const logsTabContent =
-      !build.manifest && remoteData.isFetchingManifest ? (
+      !build.manifest && isFetchingManifest ? (
         <Fetching />
       ) : build.manifest ? (
         <Manifest tenant={this.props.tenant} build={build} />
@@ -173,7 +179,7 @@ class BuildPage extends React.Component {
       )
 
     const consoleTabContent =
-      !build.output && remoteData.isFetchingOutput ? (
+      !build.output && isFetchingOutput ? (
         <Fetching />
       ) : build.output ? (
         <Console
@@ -265,7 +271,24 @@ class BuildPage extends React.Component {
   }
 }
 
-export default connect((state) => ({
-  tenant: state.tenant,
-  remoteData: state.build,
-}))(withRouter(BuildPage))
+function mapStateToProps(state, ownProps) {
+  const buildId = ownProps.match.params.buildId
+  const build =
+    buildId && Object.keys(state.build.builds).length > 0
+      ? state.build.builds[buildId]
+      : null
+  return {
+    build,
+    tenant: state.tenant,
+    isFetching: state.build.isFetching,
+    isFetchingManifest: state.build.isFetchingManifest,
+    isFetchingOutput: state.build.isFetchingOutput,
+  }
+}
+
+const mapDispatchToProps = { fetchBuildAllInfo }
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(BuildPage))
