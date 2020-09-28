@@ -22,6 +22,30 @@
       "revId": "e902cde91cd29fef47176782f15ef7bc8b6b7d3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_89093285",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-09-28T06:57:25Z",
+      "side": 1,
+      "message": "Renamed. Isn\u0027t the repo, project, branch in the source_context added below using \"addError\"? Should it be explicitly part of the error message here?",
+      "parentUuid": "9f560f44_2908e68e",
+      "range": {
+        "startLine": 204,
+        "startChar": 0,
+        "endLine": 204,
+        "endChar": 26
+      },
+      "revId": "e902cde91cd29fef47176782f15ef7bc8b6b7d3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
