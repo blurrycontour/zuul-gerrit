@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_976144d8",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 47
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-09-28T14:01:45Z",
+      "side": 1,
+      "message": "this method is removed in your current change.",
+      "range": {
+        "startLine": 52,
+        "startChar": 29,
+        "endLine": 52,
+        "endChar": 46
+      },
+      "revId": "14ec838acd8e4f85cd4206e379a88754de79e266",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
