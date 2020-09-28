@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_a644251a",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-28T02:05:30Z",
+      "side": 1,
+      "message": "Ok, some archaeology.  \n\nThis original idea seems to have been added by Iae4769f923ecf74462e1fe43168ea93ff1c61d6e which copied in the ansible code at or around [1].  It seems this re-wrote the output tracking, but didn\u0027t really ever take notice of the \"data\" argument.  There was no discussion in the change about this but it seems no particular reason why it was left out.\n\nThen this commented out code was added by I63f72b45ecb9533eac5ba9eb0eef426beec905e3 with the Ansible 2.4 update.  again no particular reference to why writing the data to stdin was not done.\n\nErgo my conclusion is probably that this was overlooked in the original change, and then subsequent changes have just maintained the status quo without any particular reason.  \n\n[1] https://github.com/ansible/ansible/blob/v2.2.1.0-1/lib/ansible/module_utils/basic.py#L2223",
+      "revId": "844a7c87bbee0c10c9a3dc7547ef555c95d3b35b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
