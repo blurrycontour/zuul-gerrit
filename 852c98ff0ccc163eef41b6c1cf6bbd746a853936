@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_262ad57c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-09-28T01:22:37Z",
+      "side": 1,
+      "message": "I guess you mean FakeBuild.hasChanges() (with a \u0027s\u0027), but yes\n\n commit_message \u003d \u0027%s-1\u0027 % change.subject",
+      "range": {
+        "startLine": 9,
+        "startChar": 4,
+        "endLine": 9,
+        "endChar": 23
+      },
+      "revId": "852c98ff0ccc163eef41b6c1cf6bbd746a853936",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
