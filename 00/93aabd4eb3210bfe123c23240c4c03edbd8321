@@ -1,0 +1,9 @@
+Code-Review+2: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+2: Ian Wienand <iwienand@redhat.com>
+Workflow+1: Ian Wienand <iwienand@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 28 Sep 2020 00:56:38 +0000
+Reviewed-on: https://review.opendev.org/741402
+Project: zuul/zuul
+Branch: refs/heads/master
