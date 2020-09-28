@@ -12,11 +12,9 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { applyMiddleware, createStore } from 'redux'
-import thunk from 'redux-thunk'
-
-import appReducers from './reducers'
-
-const store = createStore(appReducers, applyMiddleware(thunk))
-
-export default store
+// Use CommonJS require so we can dynamically import during build-time.
+if (process.env.NODE_ENV === 'production') {
+  module.exports = require('./store.prod')
+} else {
+  module.exports = require('./store.dev')
+}

@@ -37,13 +37,15 @@ import './pf4-migration.css'
 import { getHomepageUrl } from './api'
 import registerServiceWorker from './registerServiceWorker'
 import { fetchInfoIfNeeded } from './actions/info'
-import store from './store'
+import configureStore from './store'
 import App from './App'
 
 // Importing our custom css file after the App allows us to also overwrite the
 // style attributes of PF4 component (as their CSS is loaded when the component
 // is imported within the App).
 import './index.css'
+
+const store = configureStore()
 
 // Load info endpoint
 store.dispatch(fetchInfoIfNeeded())
