@@ -201,6 +201,15 @@ class YAMLDuplicateKeyError(ConfigurationSyntaxError):
         super(YAMLDuplicateKeyError, self).__init__(m)
 
 
+class JobError(Exception):
+    def __init__(self, job):
+        message = textwrap.dedent("""\
+                Zuul encountered a failure of "{name}" job.
+                """)
+        message = textwrap.fill(message.format(name=job.name))
+        super().__init__(message)
+
+
 def indent(s):
     return '\n'.join(['  ' + x for x in s.split('\n')])
 
@@ -1807,7 +1816,11 @@ class TenantParser(object):
             self.log.debug("Waiting for cat job %s" % (job,))
             job.wait(self.merger.git_timeout)
             if not job.updated:
-                raise Exception("Cat job %s failed" % (job,))
+                source_context = job.source_context.copy()
+                e = JobError(job)
+                loading_errors.addError(source_context, None, e)
+                self.log.error("Cat job %s failed", job)
+                continue
             self.log.debug("Cat job %s got files %s" %
                            (job, job.files.keys()))
             loaded = False
