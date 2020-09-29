@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_1441a5a7",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-29T05:39:54Z",
+      "side": 1,
+      "message": "nit: Was the title attribute removed by accident?",
+      "revId": "367e8e0907d10a9142fe5e71ab9b971f8313423f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
