@@ -25,7 +25,7 @@ import {
 } from '@patternfly/react-core'
 import { BuildIcon } from '@patternfly/react-icons'
 
-import { fetchBuildsetIfNeeded } from '../actions/build'
+import { fetchBuildset } from '../actions/build'
 import { EmptyPage } from '../containers/Errors'
 import { Fetchable, Fetching } from '../containers/Fetching'
 import BuildList from '../containers/build/BuildList'
@@ -39,13 +39,9 @@ class BuildsetPage extends React.Component {
     dispatch: PropTypes.func,
   }
 
-  updateData = (force) => {
+  updateData = () => {
     this.props.dispatch(
-      fetchBuildsetIfNeeded(
-        this.props.tenant,
-        this.props.match.params.buildsetId,
-        force
-      )
+      fetchBuildset(this.props.tenant, this.props.match.params.buildsetId)
     )
   }
 
