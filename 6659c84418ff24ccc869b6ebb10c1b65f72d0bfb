@@ -39,6 +39,30 @@
       "revId": "6659c84418ff24ccc869b6ebb10c1b65f72d0bfb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_66fe69b0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 1270,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-29T22:25:48Z",
+      "side": 1,
+      "message": "I think the idea is to allow the scheduler to steady state with empty queues before pausing. However, I do wonder if that means a busy zuul would never properly pause? Might be something to evaluate as we start using the new feature?",
+      "parentUuid": "9f560f44_98a6edbf",
+      "range": {
+        "startLine": 1268,
+        "startChar": 0,
+        "endLine": 1270,
+        "endChar": 53
+      },
+      "revId": "6659c84418ff24ccc869b6ebb10c1b65f72d0bfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
