@@ -107,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_94001569",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-09-29T05:27:15Z",
+      "side": 1,
+      "message": "I\u0027ve never seen a build with multiple failed tasks listed on the result page. But if this could be the case a card might indeed be helpful to wrap single tasks. I think we can keep it for now an have a look later on when we also update the other tab contents so we get a consistent design ;-)",
+      "parentUuid": "9f560f44_cd3996a3",
+      "revId": "9f66e6f97583a1dfc5a39970368ce5b2886e096b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_12ebdedc",
         "filename": "web/src/containers/build/BuildOutput.jsx",
         "patchSetId": 7
