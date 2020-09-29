@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_66730950",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 3673,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-29T22:25:48Z",
+      "side": 1,
+      "message": "Re: discussion in patchset 28 I think we should consider removing this condition so that we can simplify the check in the scheduler that has us reconfigure if resuming.",
+      "revId": "13e81b6fbbff67a033ac0a09a2e3362c7b80591a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_c699356e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-29T22:25:48Z",
+      "side": 1,
+      "message": "This is the code that I think we can simplify (remove?) if we update the code in tests/base.py as suggested in my other comment.",
+      "revId": "13e81b6fbbff67a033ac0a09a2e3362c7b80591a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
