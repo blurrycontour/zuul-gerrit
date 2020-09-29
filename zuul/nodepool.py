@@ -79,16 +79,18 @@ class Nodepool(object):
             return
         statsd = self.sched.statsd
 
+        pipe = statsd.pipeline()
         for tenant, resources in self.current_resources_by_tenant.items():
             for resource, value in resources.items():
                 key = 'zuul.nodepool.resources.tenant.' \
                       '{tenant}.{resource}'
-                statsd.gauge(key, value, tenant=tenant, resource=resource)
+                pipe.gauge(key, value, tenant=tenant, resource=resource)
         for project, resources in self.current_resources_by_project.items():
             for resource, value in resources.items():
                 key = 'zuul.nodepool.resources.project.' \
                       '{project}.{resource}'
-                statsd.gauge(key, value, project=project, resource=resource)
+                pipe.gauge(key, value, project=project, resource=resource)
+        pipe.send()
 
     def emitStatsResourceCounters(self, tenant, project, resources, duration):
         if not self.sched.statsd:
