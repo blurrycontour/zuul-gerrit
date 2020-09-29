@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_25fe35af",
+        "filename": ".zuul.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-29T09:44:15Z",
+      "side": 1,
+      "message": "right, this is a leftover from previous patchsets, I\u0027ll remove it.",
+      "parentUuid": "9f560f44_4c743b05",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_4cb39bed",
         "filename": "tests/zuul_client/__init__.py",
         "patchSetId": 15
@@ -30,6 +48,24 @@
       "writtenOn": "2020-09-28T19:56:15Z",
       "side": 1,
       "message": "Nit an empty file doesn\u0027t need a license header.",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_0514d1e8",
+        "filename": "tests/zuul_client/__init__.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-29T09:44:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_4cb39bed",
       "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_c5de593b",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-29T09:44:15Z",
+      "side": 1,
+      "message": "If we get the client version, then the exit code should be 0. According to python\u0027s doc on check_output: \"If the return code was non-zero it raises a CalledProcessError\", so the test will fail anyway.",
+      "parentUuid": "9f560f44_0c724313",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_acd237ce",
         "filename": "tests/zuul_client/test_zuulclient.py",
         "patchSetId": 15
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_a5a6c5bf",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-29T09:44:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_acd237ce",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_2cf0e766",
         "filename": "tests/zuul_client/test_zuulclient.py",
         "patchSetId": 15
@@ -81,6 +153,24 @@
       "writtenOn": "2020-09-28T19:56:15Z",
       "side": 1,
       "message": "See above about checking the build history.",
+      "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_85abc186",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 15
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-29T09:44:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_2cf0e766",
       "revId": "a1de50e0044eabd18f138a483c4041f6b35aa4f5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
