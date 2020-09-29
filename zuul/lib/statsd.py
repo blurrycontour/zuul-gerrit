@@ -35,6 +35,20 @@ def get_statsd(config, extra_keys=None):
         return None
     import statsd
 
+    class CustomPipeline(statsd.client.udp.Pipeline):
+
+        def gauge(self, stat, value, rate=1, delta=False, **format_keys):
+            stat = self._client._format_stat(stat, **format_keys)
+            super().gauge(stat, value, rate, delta)
+
+        def incr(self, stat, count=1, rate=1, **format_keys):
+            stat = self._client._format_stat(stat, **format_keys)
+            super().incr(stat, count, rate)
+
+        def timing(self, stat, delta, rate=1, **format_keys):
+            stat = self._client._format_stat(stat, **format_keys)
+            super().timing(stat, delta, rate)
+
     class CustomStatsClient(statsd.StatsClient):
 
         def __init__(self, host, port, prefix, extra=None):
@@ -68,6 +82,9 @@ def get_statsd(config, extra_keys=None):
         def timing(self, stat, delta, rate=1, **format_keys):
             stat = self._format_stat(stat, **format_keys)
             super().timing(stat, delta, rate)
+
+        def pipeline(self):
+            return CustomPipeline(self)
 
     return CustomStatsClient(
         statsd_host, statsd_port, statsd_prefix, extra_keys)

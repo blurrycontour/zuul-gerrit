@@ -85,31 +85,34 @@ class Nodepool(object):
         if not self.statsd:
             return
 
+        pipe = self.statsd.pipeline()
         for tenant, resources in self.current_resources_by_tenant.items():
             for resource, value in resources.items():
                 key = 'zuul.nodepool.resources.tenant.' \
                       '{tenant}.{resource}'
-                self.statsd.gauge(key, value, tenant=tenant, resource=resource)
+                pipe.gauge(key, value, tenant=tenant, resource=resource)
         for project, resources in self.current_resources_by_project.items():
             for resource, value in resources.items():
                 key = 'zuul.nodepool.resources.project.' \
                       '{project}.{resource}'
-                self.statsd.gauge(
-                    key, value, project=project, resource=resource)
+                pipe.gauge(key, value, project=project, resource=resource)
+        pipe.send()
 
     def emitStatsResourceCounters(self, tenant, project, resources, duration):
         if not self.statsd:
             return
 
+        pipe = self.statsd.pipeline()
         for resource, value in resources.items():
             key = 'zuul.nodepool.resources.tenant.{tenant}.{resource}'
-            self.statsd.incr(
+            pipe.incr(
                 key, value * duration, tenant=tenant, resource=resource)
         for resource, value in resources.items():
             key = 'zuul.nodepool.resources.project.' \
                   '{project}.{resource}'
-            self.statsd.incr(
+            pipe.incr(
                 key, value * duration, project=project, resource=resource)
+        pipe.send()
 
     def requestNodes(self, build_set, job, relative_priority, event=None):
         log = get_annotated_logger(self.log, event)
