@@ -34,6 +34,24 @@
       "revId": "69b3b02870d50b7c20e472f68b5effb5e82b59e9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_3215d43e",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1220,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-09-29T13:18:14Z",
+      "side": 1,
+      "message": "Yes, we needed to also see the start. This log could be IMHO removed or downgraded to debug.",
+      "parentUuid": "9f560f44_03005102",
+      "revId": "69b3b02870d50b7c20e472f68b5effb5e82b59e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
