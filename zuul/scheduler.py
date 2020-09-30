@@ -43,7 +43,9 @@ import zuul.lib.queue
 import zuul.lib.repl
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
 
-COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
+COMMANDS = ['full-reconfigure', 'smart-reconfigure',
+            'pause', 'resume', 'stop',
+            'repl', 'norepl']
 
 
 class ManagementEvent(object):
@@ -296,12 +298,19 @@ class Scheduler(threading.Thread):
         self.layout_lock = threading.Lock()
         self.run_handler_lock = threading.Lock()
         self.command_map = {
+            'pause': self.pause,
+            'resume': self.resume,
             'stop': self.stop,
             'full-reconfigure': self.fullReconfigureCommandHandler,
             'smart-reconfigure': self.smartReconfigureCommandHandler,
             'repl': self.start_repl,
             'norepl': self.stop_repl,
         }
+
+        self._resumed = threading.Event()
+        if not get_default(config, 'scheduler', 'paused_on_start', False):
+            self._resumed.set()
+        self.is_paused = False  # Paused state was entered
         self._hibernate = False
         self._stopped = False
         self._zuul_app = None
@@ -373,6 +382,29 @@ class Scheduler(threading.Thread):
         self.rpc.start()
         self.rpc_slow.start()
         self.stats_thread.start()
+
+    def resume(self) -> None:
+        """
+        Resumes scheduler from paused mode.
+        """
+        self.log.debug("Requesting pause mode = False")
+        self._resumed.set()
+        # # Never reconfigured = started in paused mode:
+        if self.last_reconfigured is None:
+            self.reconfigure(self.config)
+        self.wake_event.set()
+
+    @property
+    def is_resumed(self) -> bool:
+        return self._resumed.is_set()
+
+    def pause(self) -> None:
+        """
+        Puts scheduler in paused mode.
+        """
+        self.log.debug("Requesting pause mode = True")
+        self._resumed.clear()
+        self.wake_event.set()
 
     def stop(self):
         self._stopped = True
@@ -1240,6 +1272,15 @@ class Scheduler(threading.Thread):
         else:
             self.log.debug("Statsd not configured")
         while True:
+            if (not self.is_resumed and
+                    self.management_event_queue.empty() and
+                    self.result_event_queue.empty() and
+                    self.trigger_event_queue.empty()):
+                self.log.debug("Run handler paused")
+                self.is_paused = True
+                self._resumed.wait()
+                self.is_paused = False
+                self.log.debug("Run handler resumed")
             self.log.debug("Run handler sleeping")
             self.wake_event.wait()
             self.wake_event.clear()
@@ -1250,18 +1291,21 @@ class Scheduler(threading.Thread):
             self.run_handler_lock.acquire()
             try:
                 while (not self.management_event_queue.empty() and
-                       not self._stopped):
+                       not self._stopped and
+                       self.is_resumed):
                     self.process_management_queue()
 
                 # Give result events priority -- they let us stop builds,
                 # whereas trigger events cause us to execute builds.
                 while (not self.result_event_queue.empty() and
-                       not self._stopped):
+                       not self._stopped and
+                       self.is_resumed):
                     self.process_result_queue()
 
                 if not self._hibernate:
                     while (not self.trigger_event_queue.empty() and
-                           not self._stopped):
+                           not self._stopped and
+                           self.is_resumed):
                         self.process_event_queue()
 
                 if self._hibernate and self._areAllBuildsComplete():
@@ -1271,7 +1315,8 @@ class Scheduler(threading.Thread):
                     for pipeline in tenant.layout.pipelines.values():
                         try:
                             while (pipeline.manager.processQueue() and
-                                   not self._stopped):
+                                   not self._stopped and
+                                   self.is_resumed):
                                 pass
                         except Exception:
                             self.log.exception(

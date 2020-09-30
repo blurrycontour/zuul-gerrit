@@ -323,6 +323,13 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
       Path to log config file.
 
+   .. attr:: paused_on_start
+
+      Starts the scheduler in paused mode. This may be useful in a
+      multi-scheduler deployment to start instances in paused mode for
+      maintenance purposes.
+      See :ref:`scheduler_operation`.
+
    .. attr:: pidfile
       :default: /var/run/zuul/scheduler.pid
 
@@ -375,11 +382,16 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       If a value higher than ``max_hold_expiration`` is supplied during
       hold request creation, it will be lowered to this value.
 
+.. _scheduler_operation:
+
 Operation
 ~~~~~~~~~
 
 To start the scheduler, run ``zuul-scheduler``.  To stop it, kill the
 PID which was saved in the pidfile specified in the configuration.
+
+To pause the scheduler, run ``zuul-scheduler pause``, to resume it, run
+``zuul-scheduler resume``.
 
 Reconfiguration
 ~~~~~~~~~~~~~~~
