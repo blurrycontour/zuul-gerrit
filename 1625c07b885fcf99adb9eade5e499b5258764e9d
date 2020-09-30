@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_8b2a948e",
+        "filename": "zuul/ansible/base/action/normal.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T19:32:34Z",
+      "side": 1,
+      "message": "Reading up on the find module I believe this is generally safe. However, the find module does allow you to follow symlinks. I think we need to error here if the symlink follow flag is set to yes/true because you could set a symlink in the zuul workspace to point to / then find everything on the system.",
+      "revId": "1625c07b885fcf99adb9eade5e499b5258764e9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
