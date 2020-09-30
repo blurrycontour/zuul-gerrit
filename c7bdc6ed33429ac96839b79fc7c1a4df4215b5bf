@@ -22,6 +22,30 @@
       "revId": "c7bdc6ed33429ac96839b79fc7c1a4df4215b5bf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b200adb3",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-09-30T15:30:02Z",
+      "side": 1,
+      "message": "It would be nice to move the Zuul unit test framework to the zuul package like you suggested (or a similar solution). This way functional testing could occur as changes to zuul-client are added.\nIn the meantime, we have to rely on contributors to add testing in the zuul repo alongside their changes to zuul-client.",
+      "parentUuid": "9f560f44_5ff67a5f",
+      "range": {
+        "startLine": 282,
+        "startChar": 12,
+        "endLine": 282,
+        "endChar": 25
+      },
+      "revId": "c7bdc6ed33429ac96839b79fc7c1a4df4215b5bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
