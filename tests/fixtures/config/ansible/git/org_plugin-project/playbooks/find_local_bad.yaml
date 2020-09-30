@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: Find in a bad location
+      find:
+        paths: '/tmp/'

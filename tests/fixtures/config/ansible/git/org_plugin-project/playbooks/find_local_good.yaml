@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: Find in a good location
+      find:
+        paths: '{{ zuul.executor.work_root }}'

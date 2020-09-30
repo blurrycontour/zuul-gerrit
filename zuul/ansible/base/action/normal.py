@@ -103,3 +103,15 @@ class ActionModule(normal.ActionModule):
             path = self._task.args.get(arg)
             if path:
                 paths._fail_if_unsafe(path)
+
+    def handle_find(self):
+        '''Allow find module on localhost if it doesn't traverse unsafe files.
+
+        The :ansible:module:`find` can be used from the executor to
+        gather a list of files.
+        '''
+        find_paths = self._task.args.get('paths')
+        if not isinstance(find_paths, list):
+            find_paths = (find_paths,)
+        for path in find_paths:
+            paths._fail_if_unsafe(path)
