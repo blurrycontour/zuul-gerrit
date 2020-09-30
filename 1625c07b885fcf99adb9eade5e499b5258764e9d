@@ -34,6 +34,24 @@
       "revId": "1625c07b885fcf99adb9eade5e499b5258764e9d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_257294b1",
+        "filename": "zuul/ansible/base/action/normal.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T22:47:29Z",
+      "side": 1,
+      "message": "Wow, that checking code seems to basically implement the bulk of what find must be doing too. Anyway that should make this safe.",
+      "parentUuid": "9f560f44_c1474d7a",
+      "revId": "1625c07b885fcf99adb9eade5e499b5258764e9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
