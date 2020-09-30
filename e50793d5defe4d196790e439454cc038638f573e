@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_e699c76d",
+        "filename": "zuul/zk/base.py",
+        "patchSetId": 41
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T20:38:49Z",
+      "side": 1,
+      "message": "Do these properties need to check if self.client is not None? Before we connect for the first time they would be None.\n\nPerhaps:\n\n  return self.client is not None and self.client.state \u003d\u003d CONNECTED",
+      "revId": "e50793d5defe4d196790e439454cc038638f573e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
