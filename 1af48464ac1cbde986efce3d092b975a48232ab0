@@ -52,6 +52,24 @@
       "revId": "1af48464ac1cbde986efce3d092b975a48232ab0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_072322a9",
+        "filename": "zuul/zk/zuul.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-09-30T10:18:04Z",
+      "side": 1,
+      "message": "I like your suggesstion also more: I changed that.",
+      "parentUuid": "9f560f44_fda412bb",
+      "revId": "1af48464ac1cbde986efce3d092b975a48232ab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
