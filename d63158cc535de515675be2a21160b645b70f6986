@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_c60003b5",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 4159,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T20:14:28Z",
+      "side": 1,
+      "message": "In order to simplify the SchedulerTestManager and SchedulerTestApp does it make sense to pass in a premade TestConnectionRegistry to scheds.create() and drop self.changes from the init method entirely?\n\nIt reduces the number of arguments and SchedulerTestApp can set its self.foo values using the values from TestConnectionRegistry.",
+      "revId": "d63158cc535de515675be2a21160b645b70f6986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_26be1f00",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 4178,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T20:14:28Z",
+      "side": 1,
+      "message": "We should avoid the double underscores as mentioned in other changes. Particularly for testing being able to access or override methods is useful.",
+      "range": {
+        "startLine": 4178,
+        "startChar": 8,
+        "endLine": 4178,
+        "endChar": 10
+      },
+      "revId": "d63158cc535de515675be2a21160b645b70f6986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_86bbab0d",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 4191,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T20:14:28Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 4191,
+        "startChar": 8,
+        "endLine": 4191,
+        "endChar": 10
+      },
+      "revId": "d63158cc535de515675be2a21160b645b70f6986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_e641c70c",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 4731,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T20:14:28Z",
+      "side": 1,
+      "message": "It would probably be a good idea to clean these up too in a separate change.",
+      "range": {
+        "startLine": 4731,
+        "startChar": 37,
+        "endLine": 4731,
+        "endChar": 39
+      },
+      "revId": "d63158cc535de515675be2a21160b645b70f6986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
