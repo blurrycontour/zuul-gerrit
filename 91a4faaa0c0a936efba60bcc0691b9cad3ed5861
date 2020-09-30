@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_47d35ad4",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-30T11:29:09Z",
+      "side": 1,
+      "message": "That function can be static, and perhaps moved to the base class.",
+      "revId": "91a4faaa0c0a936efba60bcc0691b9cad3ed5861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_87dd72df",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-09-30T11:29:09Z",
+      "side": 1,
+      "message": "dito, it seems like useful to have for the other module.",
+      "range": {
+        "startLine": 79,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 46
+      },
+      "revId": "91a4faaa0c0a936efba60bcc0691b9cad3ed5861",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
