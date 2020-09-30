@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_bc6089a6",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 32
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-09-30T14:32:50Z",
+      "side": 1,
+      "message": "Done: It is primarily useful for testing purposes. This would make this option a candidate to be hidden. I also believe that in a multi-scheduler deployment eventually it will make sense to be able to start some instances in paused mode for maintenance/debugging purpose.",
+      "parentUuid": "9f560f44_785af9f1",
+      "revId": "6659c84418ff24ccc869b6ebb10c1b65f72d0bfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_98a6edbf",
         "filename": "zuul/scheduler.py",
         "patchSetId": 32
@@ -54,6 +72,30 @@
       "side": 1,
       "message": "I think the idea is to allow the scheduler to steady state with empty queues before pausing. However, I do wonder if that means a busy zuul would never properly pause? Might be something to evaluate as we start using the new feature?",
       "parentUuid": "9f560f44_98a6edbf",
+      "range": {
+        "startLine": 1268,
+        "startChar": 0,
+        "endLine": 1270,
+        "endChar": 53
+      },
+      "revId": "6659c84418ff24ccc869b6ebb10c1b65f72d0bfb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_7cc27155",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 32
+      },
+      "lineNbr": 1270,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-09-30T14:32:50Z",
+      "side": 1,
+      "message": "Yes I can imagine such problem to actually happen. The pause/resume functionality is at this time meant for tests. We need to be able to control which scheduler is doing what. But I also see a practical use in production for maintenance or debug purposes.\n\nNow, however, that case you describe may actually happen. Even worse. When I look at it: the event queues are still getting events in but are not processing them \u003d\u003e queues are never empty \u003d\u003e pausing is not happening.\n\nWe should make sure that a paused scheduler does not accept new events. But I am not sure how to solve it here. The event processing needs to introduce some locking/caching mechanism over zookeeper not to loose events. This is done later on. Maybe moving this change after all components are connected to zk.\n\nWe could also simply just pause no matter what as Tristan suggests for now.",
+      "parentUuid": "9f560f44_66fe69b0",
       "range": {
         "startLine": 1268,
         "startChar": 0,
