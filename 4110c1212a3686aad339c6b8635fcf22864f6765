@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_6115a13d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1262,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T20:57:56Z",
+      "side": 1,
+      "message": "One possible advantage to the implementation from bolg is that we don\u0027t end up waking and reprocessing this block unless we\u0027re unpaused. Currently wake_event is set by a number of events some of which we\u0027re going to completely skip with this continue.\n\nProbably not a major concern, we\u0027ll just end up continuing here often if there are many events coming into the system. But we\u0027ll still skip doing real work.",
+      "revId": "4110c1212a3686aad339c6b8635fcf22864f6765",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
