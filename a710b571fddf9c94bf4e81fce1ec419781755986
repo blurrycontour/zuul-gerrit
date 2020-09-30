@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_53f5e083",
+        "filename": "tests/base.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-09-30T06:44:34Z",
+      "side": 1,
+      "message": "I think there is a misunderstanding. Clark meant if this line is necessary at all. Yes it is necessary since the what is already initialized is the set of changes dbs (per gerrit server). This line creates the changes db for the specific server if necessary.\n\nIf we want to make this nicer we could use a defaultdict for self.gerrit_changes_dbs and just do this here:\n\n  db \u003d self.gerrit_changes_dbs[config[\u0027server\u0027]",
+      "parentUuid": "9f560f44_23eb1a78",
+      "range": {
+        "startLine": 207,
+        "startChar": 45,
+        "endLine": 207,
+        "endChar": 55
+      },
+      "revId": "a710b571fddf9c94bf4e81fce1ec419781755986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_efde290f",
         "filename": "tests/base.py",
         "patchSetId": 25
