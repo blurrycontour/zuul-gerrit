@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_5ff67a5f",
+        "filename": ".zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-09-30T15:05:09Z",
+      "side": 1,
+      "message": "I think we can make this job voting then rely on depends-on to ensure zuul gets updated along with zuul-client? I guess the risk there is that if zuul-client merges before zuul there will be a period of time where other zuul changes could have failing jobs?",
+      "range": {
+        "startLine": 282,
+        "startChar": 12,
+        "endLine": 282,
+        "endChar": 25
+      },
+      "revId": "c7bdc6ed33429ac96839b79fc7c1a4df4215b5bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
