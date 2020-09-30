@@ -140,7 +140,7 @@ export function taskPathMatches (ref, test) {
 }
 
 
-const receiveBuildOutput = (buildId, output) => {
+export const receiveBuildOutput = (buildId, output) => {
   const hosts = {}
   // Compute stats
   output.forEach(phase => {
@@ -220,7 +220,7 @@ export const requestBuildManifest = () => ({
   type: BUILD_MANIFEST_REQUEST
 })
 
-const receiveBuildManifest = (buildId, manifest) => {
+export const receiveBuildManifest = (buildId, manifest) => {
   const index = {}
 
   const renderNode = (root, object) => {
