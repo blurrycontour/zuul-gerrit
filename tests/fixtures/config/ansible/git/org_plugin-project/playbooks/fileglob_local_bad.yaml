@@ -1,0 +1,5 @@
+- hosts: localhost
+  tasks:
+    - name: fileglob in a bad location
+      debug:
+        msg: '{{ lookup("fileglob", "/tmp/*") }}'
