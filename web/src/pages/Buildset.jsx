@@ -34,15 +34,19 @@ import Buildset from '../containers/build/Buildset'
 class BuildsetPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
-    remoteData: PropTypes.object,
-    tenant: PropTypes.object,
-    dispatch: PropTypes.func,
+    tenant: PropTypes.object.isRequired,
+    buildset: PropTypes.object,
+    isFetching: PropTypes.bool.isRequired,
+    fetchBuildset: PropTypes.func.isRequired,
   }
 
   updateData = () => {
-    this.props.dispatch(
-      fetchBuildset(this.props.tenant, this.props.match.params.buildsetId)
-    )
+    if (!this.props.buildset) {
+      this.props.fetchBuildset(
+        this.props.tenant,
+        this.props.match.params.buildsetId
+      )
+    }
   }
 
   componentDidMount() {
@@ -59,11 +63,10 @@ class BuildsetPage extends React.Component {
   }
 
   render() {
-    const { remoteData, tenant } = this.props
-    const buildset = remoteData.buildsets[this.props.match.params.buildsetId]
+    const { buildset, isFetching, tenant } = this.props
 
     // Initial page load
-    if (!buildset && remoteData.isFetching) {
+    if (!buildset && isFetching) {
       return <Fetching />
     }
 
@@ -101,10 +104,7 @@ class BuildsetPage extends React.Component {
     )
 
     const fetchable = (
-      <Fetchable
-        isFetching={remoteData.isFetching}
-        fetchCallback={this.updateData}
-      />
+      <Fetchable isFetching={isFetching} fetchCallback={this.updateData} />
     )
 
     return (
@@ -129,7 +129,19 @@ class BuildsetPage extends React.Component {
   }
 }
 
-export default connect((state) => ({
-  tenant: state.tenant,
-  remoteData: state.build,
-}))(BuildsetPage)
+function mapStateToProps(state, ownProps) {
+  const buildsetId = ownProps.match.params.buildsetId
+  const buildset =
+    buildsetId && Object.keys(state.build.buildsets).length > 0
+      ? state.build.buildsets[buildsetId]
+      : null
+  return {
+    buildset,
+    tenant: state.tenant,
+    isFetching: state.build.isFetching,
+  }
+}
+
+const mapDispatchToProps = { fetchBuildset }
+
+export default connect(mapStateToProps, mapDispatchToProps)(BuildsetPage)
