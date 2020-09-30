@@ -27,16 +27,9 @@ import {
   BUILD_MANIFEST_SUCCESS,
 } from '../actions/build'
 
-export default (
-  state = {
-    isFetching: false,
-    isFetchingOutput: false,
-    isFetchingManifest: false,
-    builds: {},
-    buildsets: {},
-  },
-  action
-) => {
+import initialState from './initialState'
+
+export default (state = initialState.build, action) => {
   switch (action.type) {
     case BUILD_FETCH_REQUEST:
     case BUILDSET_FETCH_REQUEST:
