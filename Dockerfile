@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM docker.io/opendevorg/python-builder:3.7 as builder
+FROM docker.io/opendevorg/python-builder:3.8 as builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Optional location of Zuul API endpoint.
@@ -47,7 +47,7 @@ RUN mkdir /tmp/openshift-install \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
   && tar xvfz openshift-client.tgz --strip-components=1 -C /tmp/openshift-install
 
-FROM docker.io/opendevorg/python-base:3.7 as zuul
+FROM docker.io/opendevorg/python-base:3.8 as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
