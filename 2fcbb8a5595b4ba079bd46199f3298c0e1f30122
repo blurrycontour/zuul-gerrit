@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_14b85ce6",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 44
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T11:22:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_b94889b3",
+      "revId": "2fcbb8a5595b4ba079bd46199f3298c0e1f30122",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_99c78547",
         "filename": "zuul/lib/named_queue.py",
         "patchSetId": 44
@@ -30,6 +48,24 @@
       "writtenOn": "2020-10-01T09:36:25Z",
       "side": 1,
       "message": "nit: Would it make sense to allow passing `maxsize` to the parent `__init__()`? But I guess we can also add that later on if there is ever a need for that.",
+      "revId": "2fcbb8a5595b4ba079bd46199f3298c0e1f30122",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_149dfc6b",
+        "filename": "zuul/lib/named_queue.py",
+        "patchSetId": 44
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T11:22:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_99c78547",
       "revId": "2fcbb8a5595b4ba079bd46199f3298c0e1f30122",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_b497f045",
+        "filename": "zuul/zk/connection_event.py",
+        "patchSetId": 44
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T11:22:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_d9ec5df6",
+      "revId": "2fcbb8a5595b4ba079bd46199f3298c0e1f30122",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_79f1d1de",
         "filename": "zuul/zk/connection_event.py",
         "patchSetId": 44
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_f4b848c8",
+        "filename": "zuul/zk/connection_event.py",
+        "patchSetId": 44
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T11:22:24Z",
+      "side": 1,
+      "message": "The reason is to hide it since it only reason is to provide context manager to use it in \"with\" blocks. Would @contextmanager decoration work for you?",
+      "parentUuid": "9f560f44_79f1d1de",
+      "revId": "2fcbb8a5595b4ba079bd46199f3298c0e1f30122",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_198b7517",
         "filename": "zuul/zk/connection_event.py",
         "patchSetId": 44
@@ -81,6 +153,24 @@
       "writtenOn": "2020-10-01T09:36:25Z",
       "side": 1,
       "message": "nit: Maybe a a context manager would make sense for locking/unlocking:\n\n  with self.client.acquire_lock(lock):\n      ...",
+      "revId": "2fcbb8a5595b4ba079bd46199f3298c0e1f30122",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_142dfcad",
+        "filename": "zuul/zk/connection_event.py",
+        "patchSetId": 44
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T11:22:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_198b7517",
       "revId": "2fcbb8a5595b4ba079bd46199f3298c0e1f30122",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
