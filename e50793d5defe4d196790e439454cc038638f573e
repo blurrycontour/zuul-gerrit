@@ -16,6 +16,24 @@
       "revId": "e50793d5defe4d196790e439454cc038638f573e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_cbec87bd",
+        "filename": "zuul/zk/base.py",
+        "patchSetId": 41
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T06:26:19Z",
+      "side": 1,
+      "message": "Yes, good catch.",
+      "parentUuid": "9f560f44_e699c76d",
+      "revId": "e50793d5defe4d196790e439454cc038638f573e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
