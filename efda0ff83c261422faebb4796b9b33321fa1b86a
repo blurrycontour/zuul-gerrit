@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_dff9dd4e",
+        "filename": ".zuul.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-01T11:36:40Z",
+      "side": 1,
+      "message": "If we run this job in check we also need to run it in gate to ensure merges don\u0027t break it and thus block the project.",
+      "revId": "efda0ff83c261422faebb4796b9b33321fa1b86a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
