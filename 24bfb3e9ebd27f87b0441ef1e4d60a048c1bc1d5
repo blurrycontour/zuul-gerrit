@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_ce8bf5bd",
+        "filename": "zuul/zk/base.py",
+        "patchSetId": 43
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-01T08:42:35Z",
+      "side": 1,
+      "message": "You could remove the `didLoseConnection` property, `resetLostFlag()` method and maybe event the `_became_lost` flag as this is not used anywhere.",
+      "revId": "24bfb3e9ebd27f87b0441ef1e4d60a048c1bc1d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_591e8d5f",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 43
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-01T08:42:35Z",
+      "side": 1,
+      "message": "Is there any reason  to use name mangling for this and the above methods (e.g. name clashes in subclasses)? Otherwise the convention is to just use one underscore for internal methods/attributes.",
+      "revId": "24bfb3e9ebd27f87b0441ef1e4d60a048c1bc1d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
