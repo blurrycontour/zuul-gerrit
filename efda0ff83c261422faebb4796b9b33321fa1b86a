@@ -34,6 +34,24 @@
       "revId": "efda0ff83c261422faebb4796b9b33321fa1b86a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_1a2a432e",
+        "filename": ".zuul.yaml",
+        "patchSetId": 12
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-01T12:04:32Z",
+      "side": 1,
+      "message": "Then this should be done probably via depends-on as this would add a second entry for this in check.",
+      "parentUuid": "9f560f44_7a0b7f21",
+      "revId": "efda0ff83c261422faebb4796b9b33321fa1b86a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
