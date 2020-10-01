@@ -20,6 +20,7 @@ from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import codecs
 import copy
+from typing import Optional, Callable, Dict, TYPE_CHECKING
 from datetime import datetime
 import json
 import logging
@@ -29,13 +30,18 @@ import select
 import threading
 
 from zuul import exceptions
-import zuul.lib.repl
-from zuul.lib import commandsocket
+from zuul.lib.auth import AuthenticatorRegistry
+from zuul.lib.commandsocket import CommandSocket
+from zuul.rpcclient import RPCClient
 from zuul.lib.re2util import filter_allowed_disallowed
+from zuul.lib.repl import REPLServer
 import zuul.model
 import zuul.rpcclient
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
+if TYPE_CHECKING:
+    from zuul.lib.connections import ConnectionRegistry
+
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -1204,41 +1210,44 @@ class StreamManager(object):
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web.ZuulWeb")
 
-    def __init__(self, listen_address, listen_port, gear_server,
-                 gear_port, ssl_key=None, ssl_cert=None, ssl_ca=None,
-                 static_cache_expiry=3600, connections=None,
-                 info=None, static_path=None, zk_hosts=None,
-                 zk_timeout=None, zk_tls_cert=None, zk_tls_key=None,
-                 zk_tls_ca=None, authenticators=None,
-                 command_socket=None):
-        self.start_time = time.time()
-        self.listen_address = listen_address
-        self.listen_port = listen_port
-        self.event_loop = None
-        self.term = None
-        self.server = None
-        self.static_cache_expiry = static_cache_expiry
-        self.info = info
-        self.static_path = os.path.abspath(static_path or STATIC_DIR)
+    def __init__(self, listen_address: str, listen_port: int,
+                 gear_server: str, gear_port: int,
+                 connections,  # ConnectionRegistry
+                 authenticators: AuthenticatorRegistry,
+                 zk_hosts: str, zk_timeout: float = 10.0,
+                 zk_tls_cert: Optional[str] = None,
+                 zk_tls_key: Optional[str] = None,
+                 zk_tls_ca: Optional[str] = None, ssl_key: str = None,
+                 ssl_cert: str = None, ssl_ca: str = None,
+                 static_cache_expiry: int = 3600,
+                 info: Optional[zuul.model.WebInfo] = None,
+                 static_path: Optional[str] = None,
+                 command_socket: Optional[str] = None):
+        self.start_time: float = time.time()
+        self.listen_address: str = listen_address
+        self.listen_port: int = listen_port
+        self.server: Optional[str] = None
+        self.static_cache_expiry: int = static_cache_expiry
+        self.info: Optional[zuul.model.WebInfo] = info
+        self.static_path: str = os.path.abspath(static_path or STATIC_DIR)
         # instanciate handlers
-        self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
-                                            ssl_key, ssl_cert, ssl_ca,
-                                            client_id='Zuul Web Server')
-        self.zk_client = ZooKeeperClient()
-        if zk_hosts:
-            self.zk_client.connect(hosts=zk_hosts, read_only=True,
-                                   timeout=zk_timeout, tls_cert=zk_tls_cert,
-                                   tls_key=zk_tls_key, tls_ca=zk_tls_ca)
+        self.rpc: RPCClient = RPCClient(gear_server, gear_port,
+                                        ssl_key, ssl_cert, ssl_ca,
+                                        client_id='Zuul Web Server')
+        self.zk_client: ZooKeeperClient = ZooKeeperClient()
+        self.zk_client.connect(hosts=zk_hosts, read_only=True,
+                               timeout=zk_timeout, tls_cert=zk_tls_cert,
+                               tls_key=zk_tls_key, tls_ca=zk_tls_ca)
 
-        self.connections = connections
-        self.authenticators = authenticators
-        self.stream_manager = StreamManager()
+        self.connections: ConnectionRegistry = connections
+        self.authenticators: AuthenticatorRegistry = authenticators
+        self.stream_manager: StreamManager = StreamManager()
 
-        self.command_socket = commandsocket.CommandSocket(command_socket)
+        self.command_socket: CommandSocket = CommandSocket(command_socket)
 
-        self.repl = None
+        self.repl: Optional[REPLServer] = None
 
-        self.command_map = {
+        self.command_map: Dict[str, Callable[[], None]] = {
             'stop': self.stop,
             'repl': self.start_repl,
             'norepl': self.stop_repl,
@@ -1406,7 +1415,7 @@ class ZuulWeb(object):
     def start_repl(self):
         if self.repl:
             return
-        self.repl = zuul.lib.repl.REPLServer(self)
+        self.repl = REPLServer(self)
         self.repl.start()
 
     def stop_repl(self):
