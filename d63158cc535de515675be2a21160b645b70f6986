@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_2b86e317",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 4159,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T06:19:52Z",
+      "side": 1,
+      "message": "I am more for leaving it more flat than encapsulating it inside TestConnectionRegistry. We would need to make public attributes, e.g., \"config\", \"changes\" in TestConnectionRegistry only for that purpose in order to be able to use them in SchedulerTestManager and SchedulerTestApp. While it will make the number of parameters less it will imho decrease the navigability and readability of the code. Here its more clear what a SchedulerTestManager and SchedulerTestApp need. In case of adding/removing one or more parameters to one of these calls less changes will be needed.\n\nOne point may be to reuse TestConnectionRegistry in SchedulerTestApp. I am not sure if it is a good idea to share the same connection objects between \"ExecutorServer\" and \"SchedulerTestApp\"? It seams to me that currently we simulate the real setup better by having 2 separate instances. Or am I missing something?\n\nMoving the \"changes\" parameter from SchedulerTestManager to the \"create\" method makes sense.",
+      "parentUuid": "9f560f44_c60003b5",
+      "revId": "d63158cc535de515675be2a21160b645b70f6986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_26be1f00",
         "filename": "tests/base.py",
         "patchSetId": 40
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_0b067fce",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 4178,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T06:19:52Z",
+      "side": 1,
+      "message": "Done: You can always increase visibility if there is need to. Minimal necessary visibility was the approach here.",
+      "parentUuid": "9f560f44_26be1f00",
+      "range": {
+        "startLine": 4178,
+        "startChar": 8,
+        "endLine": 4178,
+        "endChar": 10
+      },
+      "revId": "d63158cc535de515675be2a21160b645b70f6986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_86bbab0d",
         "filename": "tests/base.py",
         "patchSetId": 40
@@ -53,6 +95,30 @@
       "writtenOn": "2020-09-30T20:14:28Z",
       "side": 1,
       "message": "See above.",
+      "range": {
+        "startLine": 4191,
+        "startChar": 8,
+        "endLine": 4191,
+        "endChar": 10
+      },
+      "revId": "d63158cc535de515675be2a21160b645b70f6986",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_eb9a2b6d",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 4191,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T06:19:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_86bbab0d",
       "range": {
         "startLine": 4191,
         "startChar": 8,
