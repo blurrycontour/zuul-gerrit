@@ -104,8 +104,8 @@ class TestNodepoolIntegration(BaseTestCase):
         job.nodeset = nodeset
         self.fake_nodepool.paused = True
         request = self.nodepool.requestNodes(None, job, 0)
-        self.zk.client.stop()
-        self.zk.client.start()
+        self.zk.kazoo_client.stop()
+        self.zk.kazoo_client.start()
         self.fake_nodepool.paused = False
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
