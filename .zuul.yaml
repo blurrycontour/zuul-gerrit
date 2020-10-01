@@ -311,7 +311,7 @@
         - opendev-promote-python:
             vars:
               download_artifact_job: zuul-build-python-release
-        - opendev-promote-javascript-deployment:
+        - opendev-promote-javascript-deployment-tarball:
             vars:
               download_artifact_job: zuul-build-dashboard
     release:
