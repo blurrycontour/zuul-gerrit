@@ -16,6 +16,24 @@
       "revId": "4110c1212a3686aad339c6b8635fcf22864f6765",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b98a4961",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1262,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-01T08:50:10Z",
+      "side": 1,
+      "message": "I think that\u0027s ok since that won\u0027t create much load and keeps the implementation simpler.",
+      "parentUuid": "9f560f44_6115a13d",
+      "revId": "4110c1212a3686aad339c6b8635fcf22864f6765",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
