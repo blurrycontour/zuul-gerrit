@@ -20,13 +20,13 @@ import signal
 
 import zuul.cmd
 import zuul.executor.client
+from zuul.lib.config import get_default
+from zuul.lib.statsd import get_statsd_config
 import zuul.merger.client
 import zuul.nodepool
 import zuul.scheduler
 import zuul.zk
-
-from zuul.lib.config import get_default
-from zuul.lib.statsd import get_statsd_config
+import zuul.zk.nodepool
 
 
 class Scheduler(zuul.cmd.ZuulDaemonApp):
@@ -144,7 +144,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
 
-        zookeeper = zuul.zk.ZooKeeper(enable_cache=True)
+        zk_client = zuul.zk.ZooKeeperClient()
+        zk_nodepool = zuul.zk.nodepool.ZooKeeperNodepool(zk_client)
         zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts', None)
         if not zookeeper_hosts:
             raise Exception("The zookeeper hosts config value is required")
@@ -153,7 +154,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
         zookeeper_timeout = float(get_default(self.config, 'zookeeper',
                                               'session_timeout', 10.0))
-        zookeeper.connect(
+        zk_client.connect(
             zookeeper_hosts,
             timeout=zookeeper_timeout,
             tls_cert=zookeeper_tls_cert,
@@ -164,7 +165,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.sched.setExecutor(gearman)
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zookeeper)
+        self.sched.setZooKeeper(zk_client, zk_nodepool)
 
         self.log.info('Starting scheduler')
         try:

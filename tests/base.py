@@ -106,6 +106,7 @@ import zuul.model
 import zuul.nodepool
 import zuul.rpcclient
 import zuul.zk
+import zuul.zk.nodepool
 import zuul.configloader
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
@@ -3851,13 +3852,14 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk = zuul.zk.ZooKeeper(enable_cache=True)
-        zk.connect(self.zk_config, timeout=30.0)
+        zk_client = zuul.zk.ZooKeeperClient()
+        zk_nodepool = zuul.zk.nodepool.ZooKeeperNodepool(zk_client)
+        zk_client.connect(self.zk_config, timeout=30.0)
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
         self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zk)
+        self.sched.setZooKeeper(zk_client, zk_nodepool)
 
         self.sched.start()
         executor_client.gearman.waitForServer()
@@ -4470,7 +4472,7 @@ class ZuulTestCase(BaseTestCase):
         self.rpcclient.shutdown()
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
-        self.scheds.execute(lambda app: app.sched.zk.disconnect())
+        self.scheds.execute(lambda app: app.sched.zk_client.disconnect())
         self.printHistory()
         # We whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.
