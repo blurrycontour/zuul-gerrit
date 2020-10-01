@@ -59,10 +59,9 @@ class BaseTestWeb(ZuulTestCase):
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
-                           self.test_root,
+                           self.test_root, self.zk_config,
                            info=zuul.model.WebInfo.fromConfig(
-                               self.zuul_ini_config),
-                           zk_hosts=self.zk_config))
+                               self.zuul_ini_config)))
 
         self.executor_server.hold_jobs_in_build = True
 
