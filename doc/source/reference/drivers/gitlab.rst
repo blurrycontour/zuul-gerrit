@@ -9,9 +9,6 @@ The GitLab driver supports sources, triggers, and reporters. It can
 interact with the public GitLab.com service as well as site-local
 installations of GitLab.
 
-.. note:: The driver is not features complete compared to the other
-          drivers provided with Zuul.
-
 Configure GitLab
 ----------------
 
