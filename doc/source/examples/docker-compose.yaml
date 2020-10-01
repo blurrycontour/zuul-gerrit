@@ -8,13 +8,8 @@ services:
     ports:
       - "8080:8080"
       - "29418:29418"
-    command: |
-      /bin/sh -c '\
-        git config -f /var/gerrit/etc/gerrit.config gerrit.canonicalWebUrl http://localhost:8080/ && \
-        git config -f /var/gerrit/etc/gerrit.config gerrit.ui POLYGERRIT && \
-        git config -f /var/gerrit/etc/gerrit.config sendemail.enable false && \
-        git config -f /var/gerrit/etc/gerrit.config noteDb.changes.autoMigrate true && \
-        /var/gerrit/bin/gerrit.sh run'
+    environment:
+      - CANONICAL_WEB_URL=http://localhost:8080/
   gerritconfig:
     image: zuul/zuul-executor
     environment:
