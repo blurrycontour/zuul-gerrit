@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_d97c5db8",
+        "filename": "zuul/zk/base.py",
+        "patchSetId": 43
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T09:42:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_ce8bf5bd",
+      "revId": "24bfb3e9ebd27f87b0441ef1e4d60a048c1bc1d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_591e8d5f",
         "filename": "zuul/zk/nodepool.py",
         "patchSetId": 43
@@ -30,6 +48,24 @@
       "writtenOn": "2020-10-01T08:42:35Z",
       "side": 1,
       "message": "Is there any reason  to use name mangling for this and the above methods (e.g. name clashes in subclasses)? Otherwise the convention is to just use one underscore for internal methods/attributes.",
+      "revId": "24bfb3e9ebd27f87b0441ef1e4d60a048c1bc1d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_19489588",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 43
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-01T09:42:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_591e8d5f",
       "revId": "24bfb3e9ebd27f87b0441ef1e4d60a048c1bc1d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
