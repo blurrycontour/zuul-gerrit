@@ -2770,6 +2770,7 @@ class ExecutorServer(BaseMergeServer):
 
     def stop(self):
         self.log.debug("Stopping")
+        self.connections.stop()
         self.disk_accountant.stop()
         # The governor can change function registration, so make sure
         # it has stopped.
