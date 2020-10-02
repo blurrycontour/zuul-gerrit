@@ -1872,17 +1872,31 @@ class GithubConnection(BaseConnection):
                   method='merge', zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         github = self.getGithubClient(project, zuul_event_id=zuul_event_id)
-        owner, proj = project.split('/')
-        pull_request = github.pull_request(owner, proj, pr_number)
+        url = github.session.build_url("repos", project, "pulls",
+                                       str(pr_number), "merge")
+
+        payload = {
+            "merge_method": method,
+        }
+        if sha:
+            payload["sha"] = sha
+        if commit_message:
+            payload["commit_message"] = commit_message
+
         try:
-            result = pull_request.merge(commit_message=commit_message, sha=sha,
-                                        merge_method=method)
+            resp = github.session.put(url, json=payload)
+            resp.raise_for_status()
+            data = resp.json()
+            if not data:
+                result = False
+            else:
+                result = data["merged"]
         except Exception as e:
             raise MergeFailure('Pull request merge failed: %s' % e)
 
         if not result:
             raise MergeFailure('Pull request was not merged')
-        log.debug("Merged PR %s/%s#%s", owner, proj, pr_number)
+        log.debug("Merged PR %s#%s", project, pr_number)
 
     def _getCommit(self, repository, sha, retries=5):
         try:
