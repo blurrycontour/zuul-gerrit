@@ -2837,12 +2837,14 @@ class ExecutorServer(BaseMergeServer):
     def pause(self):
         self.log.debug('Pausing')
         self.pause_sensor.pause = True
+        self.manageLoad()
         if self.process_merge_jobs:
             super().pause()
 
     def unpause(self):
         self.log.debug('Resuming')
         self.pause_sensor.pause = False
+        self.manageLoad()
         if self.process_merge_jobs:
             super().unpause()
 
