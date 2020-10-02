@@ -3367,6 +3367,7 @@ class ExecutorServer(BaseMergeServer):
         self.log.debug('Pausing')
         self.component_info.state = self.component_info.PAUSED
         self.pause_sensor.pause = True
+        self.manageLoad()
         if self.process_merge_jobs:
             super().pause()
 
@@ -3374,6 +3375,7 @@ class ExecutorServer(BaseMergeServer):
         self.log.debug('Resuming')
         self.component_info.state = self.component_info.RUNNING
         self.pause_sensor.pause = False
+        self.manageLoad()
         if self.process_merge_jobs:
             super().unpause()
 
