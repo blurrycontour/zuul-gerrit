@@ -8,3 +8,6 @@ features:
 
     For more details on how to provide file comments from Zuul, see the
     documentation of the :ref:`return_values`.
+
+upgrade:
+  - With GitHub Zuul App now requires permissions to read/write check runs.
