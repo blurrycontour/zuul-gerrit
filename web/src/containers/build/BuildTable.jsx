@@ -53,8 +53,8 @@ function BuildTable({
   builds,
   fetching,
   onClearFilters,
+  preferences,
   tenant,
-  timezone,
   history,
 }) {
   const columns = [
@@ -143,7 +143,7 @@ function BuildTable({
         {
           title: moment
             .utc(build.start_time)
-            .tz(timezone)
+            .tz(preferences.timezone)
             .format('YYYY-MM-DD HH:mm:ss'),
         },
         {
@@ -245,12 +245,12 @@ BuildTable.propTypes = {
   builds: PropTypes.array.isRequired,
   fetching: PropTypes.bool.isRequired,
   onClearFilters: PropTypes.func.isRequired,
+  preferences: PropTypes.string.isRequired,
   tenant: PropTypes.object.isRequired,
-  timezone: PropTypes.string.isRequired,
   history: PropTypes.object.isRequired,
 }
 
 export default connect((state) => ({
+  preferences: state.preferences,
   tenant: state.tenant,
-  timezone: state.timezone,
 }))(BuildTable)
