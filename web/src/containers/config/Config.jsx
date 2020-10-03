@@ -16,12 +16,16 @@ import { connect } from 'react-redux'
 import {
   Button,
   ButtonVariant,
+  Form,
+  FormGroup,
   Modal,
   ModalVariant,
   Switch
 } from '@patternfly/react-core'
+import Timezone from './Timezone'
 import { CogIcon } from '@patternfly/react-icons'
 import { setPreference } from '../../actions/preferences'
+
 
 class ConfigModal extends React.Component {
 
@@ -29,7 +33,6 @@ class ConfigModal extends React.Component {
     location: PropTypes.object,
     tenant: PropTypes.object,
     preferences: PropTypes.object,
-    timezone: PropTypes.string,
     remoteData: PropTypes.object,
     dispatch: PropTypes.func
   }
@@ -39,6 +42,7 @@ class ConfigModal extends React.Component {
     this.state = {
       isModalOpen: false,
       autoReload: false,
+      timezone: null
      }
     this.handleModalToggle = () => {
       this.setState(({ isModalOpen }) => ({
@@ -50,6 +54,7 @@ class ConfigModal extends React.Component {
     this.handleSave = () => {
       this.handleModalToggle()
       this.props.dispatch(setPreference('autoReload', this.state.autoReload))
+      this.props.dispatch(setPreference('timezone', this.state.timezone))
     }
 
     this.handleAutoReload = () => {
@@ -57,16 +62,21 @@ class ConfigModal extends React.Component {
         autoReload: !autoReload
       }))
     }
+
+    this.handleTimezone = (timezone) => {
+      this.setState({timezone})
+    }
   }
 
   resetState() {
     this.setState({
       autoReload: this.props.preferences.autoReload,
+      timezone: this.props.preferences.timezone
     })
   }
 
   render() {
-    const { isModalOpen, autoReload } = this.state
+    const { isModalOpen, autoReload, timezone } = this.state
     return (
       <React.Fragment>
         <Button
@@ -91,13 +101,22 @@ class ConfigModal extends React.Component {
           >
             <div>
               <p key="info">User configurable settings are saved in browser local storage only.</p>
-              <Switch
-                key="autoreload"
-                id="autoreload"
-                label="Auto reload status page"
-                isChecked={autoReload}
-                onChange={this.handleAutoReload}
-              />
+              <Form>
+                <FormGroup>
+                  <Switch
+                    key="autoreload"
+                    id="autoreload"
+                    label="Auto reload status page"
+                    isChecked={autoReload}
+                    onChange={this.handleAutoReload}
+                  />
+                </FormGroup>
+                <FormGroup label="Select result display timezone">
+                  <Timezone
+                    selected={timezone}
+                    onSelect={this.handleTimezone}/>
+                </FormGroup>
+              </Form>
             </div>
         </Modal>
         </React.Fragment>
@@ -106,5 +125,5 @@ class ConfigModal extends React.Component {
 }
 
 export default connect(state => ({
-    preferences: state.preferences,
+    preferences: state.preferences
   }))(ConfigModal)
