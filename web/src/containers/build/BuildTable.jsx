@@ -48,7 +48,7 @@ import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalTableLink } from '../../Misc'
 
 function BuildTable(props) {
-  const { builds, fetching, onClearFilters, tenant, timezone } = props
+  const { builds, fetching, onClearFilters, tenant, preferences } = props
   const columns = [
     {
       title: <IconProperty icon={<BuildIcon />} value="Job" />,
@@ -170,7 +170,7 @@ function BuildTable(props) {
               <span>
                 {moment
                   .utc(build.start_time)
-                  .tz(timezone)
+                  .tz(preferences.timezone)
                   .format('YYYY-MM-DD HH:mm:ss')}
               </span>
             </>
@@ -259,10 +259,10 @@ BuildTable.propTypes = {
   fetching: PropTypes.bool.isRequired,
   onClearFilters: PropTypes.func.isRequired,
   tenant: PropTypes.object.isRequired,
-  timezone: PropTypes.string.isRequired,
+  preferences: PropTypes.string.isRequired,
 }
 
 export default connect((state) => ({
   tenant: state.tenant,
-  timezone: state.timezone,
+  preferences: state.preferences,
 }))(BuildTable)
