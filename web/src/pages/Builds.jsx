@@ -30,7 +30,7 @@ import BuildTable from '../containers/build/BuildTable'
 class BuildsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
-    timezone: PropTypes.string,
+    preferences: PropTypes.object,
     location: PropTypes.object,
     history: PropTypes.object,
   }
@@ -171,5 +171,5 @@ class BuildsPage extends React.Component {
 
 export default connect((state) => ({
   tenant: state.tenant,
-  timezone: state.timezone,
+  preferences: state.preferences,
 }))(BuildsPage)
