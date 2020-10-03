@@ -60,7 +60,6 @@ import {
 
 import ErrorBoundary from './containers/ErrorBoundary'
 import { Fetching } from './containers/Fetching'
-import SelectTz from './containers/timezone/SelectTz'
 import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
 import { clearError } from './actions/errors'
@@ -73,8 +72,8 @@ class App extends React.Component {
     errors: PropTypes.array,
     configErrors: PropTypes.array,
     info: PropTypes.object,
+    preferences: PropTypes.object,
     tenant: PropTypes.object,
-    timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
     dispatch: PropTypes.func,
@@ -228,16 +227,16 @@ class App extends React.Component {
     return (
       <ToastNotificationList>
         {errors.map(error => (
-          <TimedToastNotification
+         <TimedToastNotification
             key={error.id}
             type='error'
             onDismiss={() => {this.props.dispatch(clearError(error.id))}}
           >
-            <span title={moment.utc(error.date).tz(this.props.timezone).format()}>
+            <span title={moment.utc(error.date).tz(this.props.preferences.timezone).format()}>
               <strong>{error.text}</strong> ({error.status})&nbsp;
-              {error.url}
+                {error.url}
             </span>
-          </TimedToastNotification>
+         </TimedToastNotification>
         ))}
       </ToastNotificationList>
     )
@@ -408,7 +407,6 @@ class App extends React.Component {
             <BellIcon />
           </NotificationBadge>
         }
-        <SelectTz/>
         <ConfigModal/>
       </PageHeaderTools>
     )
@@ -445,7 +443,7 @@ export default withRouter(connect(
     errors: state.errors,
     configErrors: state.configErrors,
     info: state.info,
-    tenant: state.tenant,
-    timezone: state.timezone
+    preferences: state.preferences,
+    tenant: state.tenant
   })
 )(App))

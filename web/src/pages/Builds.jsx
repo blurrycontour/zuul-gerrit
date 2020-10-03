@@ -29,10 +29,10 @@ import BuildTable from '../containers/build/BuildTable'
 
 class BuildsPage extends React.Component {
   static propTypes = {
-    tenant: PropTypes.object,
-    timezone: PropTypes.string,
-    location: PropTypes.object,
     history: PropTypes.object,
+    location: PropTypes.object,
+    preferences: PropTypes.object,
+    tenant: PropTypes.object,
   }
 
   constructor(props) {
@@ -163,7 +163,7 @@ class BuildsPage extends React.Component {
     const { filters } = this.state
     if (
       this.props.tenant.name !== prevProps.tenant.name ||
-      this.props.timezone !== prevProps.timezone
+      this.props.preferences.timezone !== prevProps.preferences.timezone
     ) {
       this.updateData(filters)
     }
@@ -215,5 +215,5 @@ class BuildsPage extends React.Component {
 
 export default connect((state) => ({
   tenant: state.tenant,
-  timezone: state.timezone,
+  preferences: state.preferences,
 }))(BuildsPage)

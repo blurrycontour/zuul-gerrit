@@ -16,15 +16,13 @@ import {
   PREFERENCE_SET,
 } from '../actions/preferences'
 
-
 const stored_prefs = localStorage.getItem('preferences')
-let default_prefs
-if (stored_prefs === null) {
-  default_prefs = {
-    autoReload: true
-  }
-} else {
-  default_prefs = JSON.parse(stored_prefs)
+let default_prefs = {
+  autoReload: true,
+  timezone: 'UTC'
+}
+if (stored_prefs !== null) {
+  Object.assign(default_prefs, JSON.parse(stored_prefs))
 }
 
 export default (state = {

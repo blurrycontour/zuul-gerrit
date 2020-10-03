@@ -32,7 +32,6 @@ import preferences from './preferences'
 import status from './status'
 import tenant from './tenant'
 import tenants from './tenants'
-import timezone from './timezone'
 
 const reducers = {
   build,
@@ -52,7 +51,6 @@ const reducers = {
   status,
   tenant,
   tenants,
-  timezone,
   preferences,
 }
 

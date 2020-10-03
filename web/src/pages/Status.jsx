@@ -36,7 +36,6 @@ class StatusPage extends React.Component {
     location: PropTypes.object,
     tenant: PropTypes.object,
     preferences: PropTypes.object,
-    timezone: PropTypes.string,
     remoteData: PropTypes.object,
     dispatch: PropTypes.func
   }
@@ -182,7 +181,7 @@ class StatusPage extends React.Component {
         <p>Zuul version: <span>{status.zuul_version}</span></p>
         {status.last_reconfigured ? (
           <p>Last reconfigured: <span>
-            {moment.utc(status.last_reconfigured).tz(this.props.timezone).format('llll')}
+            {moment.utc(status.last_reconfigured).tz(this.props.preferences.timezone).format('llll')}
           </span></p>) : ''}
       </React.Fragment>
     )
@@ -250,6 +249,5 @@ class StatusPage extends React.Component {
 export default connect(state => ({
   preferences: state.preferences,
   tenant: state.tenant,
-  timezone: state.timezone,
   remoteData: state.status,
 }))(StatusPage)
