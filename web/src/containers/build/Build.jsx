@@ -41,7 +41,7 @@ import { buildExternalLink, ExternalLink, IconProperty } from '../../Misc'
 
 import AutoholdModal from '../autohold/autoholdModal'
 
-function Build({ build, tenant, timezone, user }) {
+function Build({ build, preferences, tenant, user }) {
   const [showAutoholdModal, setShowAutoholdModal] = useState(false)
   const change = build.change ? build.change : ''
   const ref = build.change ? '' : build.ref
@@ -173,13 +173,13 @@ function Build({ build, tenant, timezone, user }) {
                     <strong>Started at </strong>
                     {moment
                       .utc(build.start_time)
-                      .tz(timezone)
+                      .tz(preferences.timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
                     <br />
                     <strong>Completed at </strong>
                     {moment
                       .utc(build.end_time)
-                      .tz(timezone)
+                      .tz(preferences.timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
                   </span>
                 }
@@ -284,14 +284,13 @@ function Build({ build, tenant, timezone, user }) {
 
 Build.propTypes = {
   build: PropTypes.object,
+  preferences: PropTypes.object,
   tenant: PropTypes.object,
-  hash: PropTypes.array,
-  timezone: PropTypes.string,
   user: PropTypes.object,
 }
 
 export default connect((state) => ({
+  preferences: state.preferences,
   tenant: state.tenant,
-  timezone: state.timezone,
   user: state.user,
 }))(Build)
