@@ -43,7 +43,7 @@ import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalLink, ExternalLink } from '../../Misc'
 
 function Build(props) {
-  const { build, tenant, timezone, fetchable } = props
+  const { build, tenant, preferences, fetchable } = props
   const build_link = buildExternalLink(build)
 
   return (
@@ -139,13 +139,13 @@ function Build(props) {
                     <strong>Started at </strong>
                     {moment
                       .utc(build.start_time)
-                      .tz(timezone)
+                      .tz(preferences.timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
                     <br />
                     <strong>Completed at </strong>
                     {moment
                       .utc(build.end_time)
-                      .tz(timezone)
+                      .tz(preferences.timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
                   </span>
                 }
@@ -243,11 +243,11 @@ Build.propTypes = {
   build: PropTypes.object,
   tenant: PropTypes.object,
   hash: PropTypes.array,
-  timezone: PropTypes.string,
+ preferences: PropTypes.object,
   fetchable: PropTypes.node,
 }
 
 export default connect((state) => ({
   tenant: state.tenant,
-  timezone: state.timezone,
+  preferences: state.preferences,
 }))(Build)
