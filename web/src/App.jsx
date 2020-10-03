@@ -61,7 +61,6 @@ import {
 import AuthContainer from './containers/auth/Auth'
 import ErrorBoundary from './containers/ErrorBoundary'
 import { Fetching } from './containers/Fetching'
-import SelectTz from './containers/timezone/SelectTz'
 import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
 import { clearNotification } from './actions/notifications'
@@ -75,8 +74,8 @@ class App extends React.Component {
     notifications: PropTypes.array,
     configErrors: PropTypes.array,
     info: PropTypes.object,
+    preferences: PropTypes.object,
     tenant: PropTypes.object,
-    timezone: PropTypes.string,
     location: PropTypes.object,
     history: PropTypes.object,
     dispatch: PropTypes.func,
@@ -256,7 +255,7 @@ class App extends React.Component {
               type={notification.type}
               onDismiss={() => { this.props.dispatch(clearNotification(notification.id)) }}
             >
-              <span title={moment.utc(notification.date).tz(this.props.timezone).format()}>
+              <span title={moment.utc(notification.date).tz(this.props.preferences.timezone).format()}>
                 {notificationBody}
               </span>
             </TimedToastNotification>
@@ -432,7 +431,6 @@ class App extends React.Component {
             <BellIcon />
           </NotificationBadge>
         }
-        <SelectTz />
         <ConfigModal />
 
         {tenant.name && (<AuthContainer />)}
@@ -471,8 +469,8 @@ export default withRouter(connect(
     notifications: state.notifications,
     configErrors: state.configErrors,
     info: state.info,
+    preferences: state.preferences,
     tenant: state.tenant,
-    timezone: state.timezone,
     user: state.user
   })
 )(App))
