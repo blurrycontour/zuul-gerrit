@@ -36,7 +36,7 @@ import 'moment-duration-format'
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalLink, ExternalLink } from '../../Misc'
 
-function Build({ build, tenant, timezone }) {
+function Build({ build, preferences, tenant }) {
   const build_link = buildExternalLink(build)
 
   return (
@@ -131,13 +131,13 @@ function Build({ build, tenant, timezone }) {
                     <strong>Started at </strong>
                     {moment
                       .utc(build.start_time)
-                      .tz(timezone)
+                      .tz(preferences.timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
                     <br />
                     <strong>Completed at </strong>
                     {moment
                       .utc(build.end_time)
-                      .tz(timezone)
+                      .tz(preferences.timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
                   </span>
                 }
@@ -233,12 +233,12 @@ function Build({ build, tenant, timezone }) {
 
 Build.propTypes = {
   build: PropTypes.object,
-  tenant: PropTypes.object,
   hash: PropTypes.array,
-  timezone: PropTypes.string,
+  preferences: PropTypes.object,
+  tenant: PropTypes.object,
 }
 
 export default connect((state) => ({
+  preferences: state.preferences,
   tenant: state.tenant,
-  timezone: state.timezone,
 }))(Build)
