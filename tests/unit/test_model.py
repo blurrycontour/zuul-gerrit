@@ -118,6 +118,8 @@ class TestJob(BaseTestCase):
                                           secrets)
 
         py27 = model.Job('py27')
+        py27.source_context = self.context
+        py27.start_mark = self.start_mark
         py27.timeout = 30
         py27.pre_run = [py27_pre]
         py27.run = [py27_run]
@@ -128,6 +130,8 @@ class TestJob(BaseTestCase):
 
         # Apply the diablo variant
         diablo = model.Job('py27')
+        diablo.source_context = self.context
+        diablo.start_mark = self.start_mark
         diablo.timeout = 40
         job.applyVariant(diablo, self.layout)
 
@@ -147,6 +151,8 @@ class TestJob(BaseTestCase):
         self.assertTrue(job.voting)
 
         good_final = model.Job('py27')
+        good_final.source_context = self.context
+        good_final.start_mark = self.start_mark
         good_final.voting = False
         job.applyVariant(good_final, self.layout)
         self.assertFalse(job.voting)
