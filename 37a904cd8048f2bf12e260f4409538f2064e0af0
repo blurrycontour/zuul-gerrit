@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_b3424167",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1683,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-05T08:12:04Z",
+      "side": 1,
+      "message": "I think we need to be careful here since inherited playbook files can origin from a different project which should not match the change. We should probably filter the matchers by the source context of the playbook.",
+      "range": {
+        "startLine": 1681,
+        "startChar": 0,
+        "endLine": 1683,
+        "endChar": 51
+      },
+      "revId": "37a904cd8048f2bf12e260f4409538f2064e0af0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
