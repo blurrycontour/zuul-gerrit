@@ -795,7 +795,12 @@ class JobParser(object):
             roles.insert(0, r)
         job.addRoles(roles)
 
+        # Store the playbook file names, as we should always trigger a
+        # run if these are modified.
+        playbook_files = []
+
         for pre_run_name in as_list(conf.get('pre-run')):
+            playbook_files.append(pre_run_name)
             pre_run = model.PlaybookContext(job.source_context,
                                             pre_run_name, job.roles,
                                             secrets)
@@ -804,11 +809,13 @@ class JobParser(object):
         # post-runs for inherits however, we want to execute post-runs in the
         # order they are listed within the job.
         for post_run_name in reversed(as_list(conf.get('post-run'))):
+            playbook_files.append(post_run_name)
             post_run = model.PlaybookContext(job.source_context,
                                              post_run_name, job.roles,
                                              secrets)
             job.post_run = (post_run,) + job.post_run
         for cleanup_run_name in reversed(as_list(conf.get('cleanup-run'))):
+            playbook_files.append(cleanup_run_name)
             cleanup_run = model.PlaybookContext(job.source_context,
                                                 cleanup_run_name, job.roles,
                                                 secrets)
@@ -816,9 +823,12 @@ class JobParser(object):
 
         if 'run' in conf:
             for run_name in as_list(conf.get('run')):
+                playbook_files.append(run_name)
                 run = model.PlaybookContext(job.source_context, run_name,
                                             job.roles, secrets)
                 job.run = job.run + (run,)
+
+        job.playbook_files = playbook_files
 
         if conf.get('intermediate', False) and not conf.get('abstract', False):
             raise Exception("An intermediate job must also be abstract")

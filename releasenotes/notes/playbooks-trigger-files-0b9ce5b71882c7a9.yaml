@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Jobs now have their dependent playbooks (directly and those
+    inherited from the same project) implicitly added when using a
+    ``file`` filter.  This means that modifying playbooks will cause
+    jobs that use that playbook to automatically run without having to
+    explicitly list the playbooks in the job's file filter.
