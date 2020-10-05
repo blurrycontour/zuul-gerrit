@@ -29,7 +29,8 @@ class Timezone extends React.Component {
     this.state = {
       options: moment.tz.names().map(item => ({value: item, label: item})),
       isOpen: false,
-      hasOnCreateOption: false
+      hasOnCreateOption: false,
+      selected: null,
     }
 
     this.onToggle = isOpen => {
@@ -41,16 +42,18 @@ class Timezone extends React.Component {
     this.onSelect = (event, selection, isPlaceholder) => {
       if (isPlaceholder) this.clearSelection()
       else {
-        this.setState({
-          isOpen: false
+         this.setState({
+         selected: selection,
+         isOpen: false
         })
-        this.props.onSelect(selection)
       }
+      this.props.onSelect(selection)
     }
 
     this.clearSelection = () => {
       this.setState({
-        isOpen: false
+          isOpen: false,
+          selected: null,
       })
       this.props.onSelect('UTC')
     }
@@ -80,8 +83,7 @@ class Timezone extends React.Component {
   }
 
   render() {
-    const { isOpen, options } = this.state
-    const { selected } = this.props
+    const { isOpen, options, selected } = this.state
     const titleId = 'select-timezone-typeahead'
     const label = 'Timezones'
     return (
@@ -96,7 +98,7 @@ class Timezone extends React.Component {
           selections={selected}
           isOpen={isOpen}
           aria-labelledby={titleId}
-          placeholderText={label}
+          placeholderText={this.props.selected}
           menuAppendTo='parent'
         >
           {this.getSelectOptions(options)}
