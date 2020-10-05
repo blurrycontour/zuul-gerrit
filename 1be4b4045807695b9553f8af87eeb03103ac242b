@@ -22,6 +22,30 @@
       "revId": "1be4b4045807695b9553f8af87eeb03103ac242b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_29040218",
+        "filename": "web/src/containers/config/Timezone.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2020-10-05T10:33:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_ddfa6442",
+      "range": {
+        "startLine": 101,
+        "startChar": 10,
+        "endLine": 101,
+        "endChar": 42
+      },
+      "revId": "1be4b4045807695b9553f8af87eeb03103ac242b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
