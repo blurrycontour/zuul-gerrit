@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_6afd436d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-10-05T16:43:49Z",
+      "side": 1,
+      "message": "It seems like the code actually returns 404 in that case.",
+      "revId": "894f53a4b68f634a91b48b92bb26e2e712402d84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
