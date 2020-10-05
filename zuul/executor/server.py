@@ -2683,14 +2683,9 @@ class ExecutorServer(BaseMergeServer):
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
 
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-
         self.executor_jobs = {
             "executor:resume:%s" % self.hostname: self.resumeJob,
             "executor:stop:%s" % self.hostname: self.stopJob,
-            function_name: self.executeJob,
         }
 
         self.executor_gearworker = ZuulGearWorker(
@@ -2748,6 +2743,9 @@ class ExecutorServer(BaseMergeServer):
         self.governor_thread.daemon = True
         self.governor_thread.start()
         self.disk_accountant.start()
+
+        # Register the execute functions
+        self._manageLoad()
 
     def register_work(self):
         if self._running:
