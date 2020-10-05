@@ -2704,8 +2704,6 @@ class ExecutorServer(BaseMergeServer):
             "executor:resume:%s" % self.hostname: self.resumeJob,
             "executor:stop:%s" % self.hostname: self.stopJob,
         }
-        for function_name in self._getExecuteFunctionNames():
-            self.executor_jobs[function_name] = self.executeJob
         for function_name in self._getOnlineFunctionNames():
             self.executor_jobs[function_name] = self.noop
 
@@ -2764,6 +2762,7 @@ class ExecutorServer(BaseMergeServer):
         self.process_worker = ProcessPoolExecutor()
 
         self.executor_gearworker.start()
+        self.manageLoad()
 
         self.log.debug("Starting command processor")
         self.command_socket.start()
@@ -2791,6 +2790,10 @@ class ExecutorServer(BaseMergeServer):
         if self._running:
             self.accepting_work = True
             for function in self._getExecuteFunctionNames():
+                # Add the job to the gearworker if needed so dispatching works
+                if function not in self.executor_gearworker.jobs:
+                    self.executor_gearworker.addJob(function, self.executeJob)
+
                 self.executor_gearworker.gearman.registerFunction(function)
             # TODO(jeblair): Update geard to send a noop after
             # registering for a job which is in the queue, then remove

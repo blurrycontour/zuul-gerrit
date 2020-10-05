@@ -56,6 +56,9 @@ class ZuulGearWorker:
         self.register()
         self.thread.start()
 
+    def addJob(self, function_name, callback):
+        self.jobs[function_name] = callback
+
     def register(self):
         self.log.debug('Registering %s jobs' % len(self.jobs))
         for job in self.jobs:
