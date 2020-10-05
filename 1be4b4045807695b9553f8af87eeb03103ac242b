@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_ddfa6442",
+        "filename": "web/src/containers/config/Timezone.jsx",
+        "patchSetId": 17
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-10-05T02:38:45Z",
+      "side": 1,
+      "message": "I think this should say something like\n\nSelect result display timezone\n\nI don\u0027t quite think \"select your local timezone\" is appropriate, because for various reasons you may not want this in your local timezone (if you\u0027re talking to someone in a different TZ for example and want to quote times useful to them)",
+      "range": {
+        "startLine": 101,
+        "startChar": 10,
+        "endLine": 101,
+        "endChar": 42
+      },
+      "revId": "1be4b4045807695b9553f8af87eeb03103ac242b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
