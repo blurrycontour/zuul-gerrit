@@ -848,6 +848,11 @@ Here is an example of two job definitions:
       value is used to determine if the job should run. This is a
       regular expression or list of regular expressions.
 
+      Playbooks specified in ``pre-run``, ``run`` ``post-run``, etc.,
+      either directly or inherited, will be implicitly added if
+      ``files`` is set; i.e. the job will run if any of the playbooks
+      it uses are modified in the change.
+
    .. attr:: irrelevant-files
 
       This is a negative complement of **files**.  It indicates that

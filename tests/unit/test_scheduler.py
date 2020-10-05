@@ -2990,6 +2990,25 @@ class TestScheduler(ZuulTestCase):
     def test_irrelevant_files_no_match_runs_job(self):
         self._test_irrelevant_files_jobs(should_skip=False)
 
+    @simple_layout('layouts/playbook-changes-run.yaml')
+    def test_playbook_files_match(self):
+        # Simulate updating the playbooks/base.yaml file, which should
+        # cause the child-job project-test-playbook-changes which uses
+        # this playbook to run even though it specifies an explicit
+        # file: list.
+        files = {'playbooks/base.yaml': ''}
+        change = self.fake_gerrit.addFakeChange('org/project',
+                                                'master',
+                                                'test playbook match',
+                                                files=files)
+        self.fake_gerrit.addEvent(change.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        tested_change_ids = [x.changes[0] for x in self.history
+                             if x.name == 'project-test-playbook-changes']
+
+        self.assertIn(change.data['number'], tested_change_ids)
+
     @simple_layout('layouts/inheritance.yaml')
     def test_inherited_jobs_keep_matchers(self):
         files = {'ignoreme': 'ignored\n'}

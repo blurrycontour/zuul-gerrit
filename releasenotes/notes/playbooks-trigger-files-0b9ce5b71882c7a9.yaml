@@ -1,0 +1,7 @@
+---
+upgrade:
+  - |
+    Jobs now have their dependent playbooks (directly and inherited)
+    implicitly added when using a ``file`` filter.  This means that
+    modifying playbooks will cause jobs that use that playbook to
+    always run.

@@ -1230,6 +1230,8 @@ class Job(ConfigObject):
             protected_origin=None,
             secrets=(),  # secrets aren't inheritable
             queued=False,
+            playbook_files=(),
+            playbook_matcher=None,
         )
 
         self.attributes = {}
@@ -1676,6 +1678,18 @@ class Job(ConfigObject):
         elif other._get('allowed_projects') is not None:
             self.allowed_projects = other.allowed_projects
 
+        # This matcher covers all playbook files for the job
+        # (inherited also) and ensures that even if files: limits the
+        # job, it always runs for playbook changes.
+        if other._get('playbook_files'):
+            self.playbook_files = self.playbook_files + \
+                other._get('playbook_files')
+        playbook_matchers = []
+        for playbook_fn in self.playbook_files:
+            playbook_matchers.append(
+                change_matcher.FileMatcher(playbook_fn))
+        self.playbook_matcher = change_matcher.MatchAnyFiles(playbook_matchers)
+
         for k in self.context_attributes:
             if (other._get(k) is not None and
                 k not in set(['tags', 'requires', 'provides'])):
@@ -1703,6 +1717,9 @@ class Job(ConfigObject):
         return True
 
     def changeMatchesFiles(self, change):
+        if self.playbook_matcher and self.playbook_matcher.matches(change):
+            return True
+
         if self.file_matcher and not self.file_matcher.matches(change):
             return False
 
