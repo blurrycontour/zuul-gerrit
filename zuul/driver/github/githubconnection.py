@@ -2096,6 +2096,10 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
         return True
 
+    def isMerged(self, change, event):
+        github = self.getGithubClient(change.project.name, zuul_event_id=event)
+        return self.graphql_client.merged(github, change)
+
     def getPullBySha(self, sha, project_name, event):
         log = get_annotated_logger(self.log, event)
 

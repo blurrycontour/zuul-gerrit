@@ -759,7 +759,7 @@ class TestGithubDriver(ZuulTestCase):
 
         # pipeline does not merge the pull request
         # merge failed on 405 Method Not Allowed error - twice
-        self.fake_github.merge_not_allowed_count = 2
+        self.fake_github.merge_not_allowed_count = 5
         D = self.fake_github.openFakePullRequest('org/project', 'master', 'D')
         self.fake_github.emitEvent(D.getCommentAddedEvent('merge me'))
         self.waitUntilSettled()
