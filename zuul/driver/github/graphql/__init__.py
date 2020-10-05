@@ -41,6 +41,7 @@ class GraphQLClient:
             'canmerge-legacy',
             'branch-protection',
             'branch-protection-inner',
+            'merged',
         ]
         for query_name in query_names:
             f = importlib.resources.files('zuul').joinpath(
@@ -156,6 +157,7 @@ class GraphQLClient:
 
         return result
 
+<<<<<<< HEAD
     def _fetch_branch_protection(self, log, github, project,
                                  zuul_event_id=None):
         owner, repo = project.name.split('/')
@@ -205,3 +207,20 @@ class GraphQLClient:
         log = get_annotated_logger(self.log, zuul_event_id)
         return self._fetch_branch_protection(log, github, project,
                                              zuul_event_id)
+=======
+    def merged(self, github, change):
+        owner, repo = change.project.name.split('/')
+
+        variables = {
+            'zuul_query': 'merged',  # used for logging
+            'owner': owner,
+            'repo': repo,
+            'pull': change.number,
+        }
+        query = self.queries['merged']
+        query = self._prepare_query(query, variables)
+        response = github.session.post(self.url, json=query)
+        response.raise_for_status()
+        return nested_get(response.json(), 'data', 'repository', 'pullRequest',
+                          'merged')
+>>>>>>> 8e1908882 (Increase merge retries and delays in between)
