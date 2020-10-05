@@ -2683,14 +2683,9 @@ class ExecutorServer(BaseMergeServer):
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
 
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-
         self.executor_jobs = {
             "executor:resume:%s" % self.hostname: self.resumeJob,
             "executor:stop:%s" % self.hostname: self.stopJob,
-            function_name: self.executeJob,
         }
 
         self.executor_gearworker = ZuulGearWorker(
@@ -2726,6 +2721,7 @@ class ExecutorServer(BaseMergeServer):
         self.process_worker = ProcessPoolExecutor()
 
         self.executor_gearworker.start()
+        self.manageLoad()
 
         self.log.debug("Starting command processor")
         self.command_socket.start()
@@ -2755,6 +2751,11 @@ class ExecutorServer(BaseMergeServer):
             function_name = 'executor:execute'
             if self.zone:
                 function_name += ':%s' % self.zone
+
+            # Add the job to the gearworker if needed so dispatching works
+            if function_name not in self.executor_gearworker.jobs:
+                self.executor_gearworker.addJob(function_name, self.executeJob)
+
             self.executor_gearworker.gearman.registerFunction(function_name)
             # TODO(jeblair): Update geard to send a noop after
             # registering for a job which is in the queue, then remove
