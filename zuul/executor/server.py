@@ -2690,7 +2690,6 @@ class ExecutorServer(BaseMergeServer):
         self.executor_jobs = {
             "executor:resume:%s" % self.hostname: self.resumeJob,
             "executor:stop:%s" % self.hostname: self.stopJob,
-            function_name: self.executeJob,
         }
 
         self.executor_gearworker = ZuulGearWorker(
