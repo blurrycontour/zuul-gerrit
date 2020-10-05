@@ -675,7 +675,8 @@ class TestGithubDriver(ZuulTestCase):
         # Validate that the merge failure comment contains the message github
         # returned
         self.assertEqual(D.comments[0],
-                         'Pull request merge failed: 403 Merge not allowed')
+                         'Pull request merge failed: Merge not allowed '
+                         'because of fake reason')
 
     @simple_layout('layouts/merging-github.yaml', driver='github')
     def test_report_pull_merge_message_reviewed_by(self):

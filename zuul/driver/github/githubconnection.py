@@ -1892,6 +1892,14 @@ class GithubConnection(BaseConnection):
             else:
                 result = data["merged"]
         except Exception as e:
+            if hasattr(e, 'response'):
+                response = e.response
+                try:
+                    raise MergeFailure('Pull request merge failed: '
+                                       '%s' % response.json().get('message'))
+                except ValueError:
+                    # There was no json body so use the generic message below.
+                    pass
             raise MergeFailure('Pull request merge failed: %s' % e)
 
         if not result:

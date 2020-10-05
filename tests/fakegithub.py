@@ -31,16 +31,6 @@ from zuul.driver.github.githubconnection import utc
 FAKE_BASE_URL = 'https://example.com/api/v3/'
 
 
-class ErrorResponse:
-    status_code = 0
-    message = ''
-
-    def json(self):
-        return {
-            'message': self.message
-        }
-
-
 class FakeUser(object):
     def __init__(self, login):
         self.login = login
@@ -329,11 +319,7 @@ class FakeRepository(object):
 
         if self.fail_not_found > 0:
             self.fail_not_found -= 1
-
-            resp = ErrorResponse()
-            resp.status_code = 404
-            resp.message = 'Not Found'
-
+            resp = FakeResponse(404, 'Not found')
             raise github3.exceptions.NotFoundError(resp)
 
         commit = self._commits.get(sha, None)
@@ -565,8 +551,9 @@ class FakeIssueSearchResult(object):
 
 
 class FakeResponse(object):
-    def __init__(self, data, status_code=200):
+    def __init__(self, data, status_code=200, status_message='OK'):
         self.status_code = status_code
+        self.status_message = status_message
         self.data = data
         self.links = {}
 
@@ -581,8 +568,9 @@ class FakeResponse(object):
 
     def raise_for_status(self):
         if 400 <= self.status_code < 600:
-            raise HTTPError('{} Something went wrong'.format(self.status_code),
-                            response=self)
+            raise HTTPError(
+                '{} {}'.format(self.status_code, self.status_message),
+                response=self)
 
 
 class FakeGithubSession(object):
@@ -667,10 +655,12 @@ class FakeGithubSession(object):
                 raise Exception('Unknown merge failure')
             if conn.merge_not_allowed_count > 0:
                 conn.merge_not_allowed_count -= 1
-                resp = ErrorResponse()
-                resp.status_code = 403
-                resp.message = 'Merge not allowed'
-                raise github3.exceptions.MethodNotAllowed(resp)
+                # GitHub returns 405 Method not allowed with more details in
+                # the body of the response.
+                data = {
+                    'message': 'Merge not allowed because of fake reason',
+                }
+                return FakeResponse(data, 405, 'Method not allowed')
             pr.setMerged(json["commit_message"])
             return FakeResponse({"merged": True}, 200)
 
