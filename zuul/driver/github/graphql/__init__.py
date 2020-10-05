@@ -38,6 +38,7 @@ class GraphQLClient:
         query_names = [
             'canmerge',
             'canmerge-legacy',
+            'merged',
         ]
         for query_name in query_names:
             self.queries[query_name] = resource_string(
@@ -138,3 +139,19 @@ class GraphQLClient:
                 }
 
         return result
+
+    def merged(self, github, change):
+        owner, repo = change.project.name.split('/')
+
+        variables = {
+            'zuul_query': 'merged',  # used for logging
+            'owner': owner,
+            'repo': repo,
+            'pull': change.number,
+        }
+        query = self.queries['merged']
+        query = self._prepare_query(query, variables)
+        response = github.session.post(self.url, json=query)
+        response.raise_for_status()
+        return nested_get(response.json(), 'data', 'repository', 'pullRequest',
+                          'merged')

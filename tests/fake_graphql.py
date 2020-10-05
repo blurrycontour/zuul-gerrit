@@ -181,9 +181,13 @@ class FakeCommit(ObjectType):
 class FakePullRequest(ObjectType):
     isDraft = Boolean()
     reviewDecision = String()
+    merged = Boolean()
 
     def resolve_isDraft(parent, info):
         return parent.draft
+
+    def resolve_merged(parent, info):
+        return False
 
     def resolve_reviewDecision(parent, info):
         if hasattr(info.context, 'version') and info.context.version:
