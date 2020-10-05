@@ -759,7 +759,7 @@ class TestGithubDriver(ZuulTestCase):
 
         # pipeline does not merge the pull request
         # merge failed on 405 Method Not Allowed error - twice
-        self.fake_github.merge_not_allowed_count = 2
+        self.fake_github.merge_not_allowed_count = 5
         D = self.fake_github.openFakePullRequest('org/project', 'master', 'D')
         self.fake_github.emitEvent(D.getCommentAddedEvent('merge me'))
         self.waitUntilSettled()
@@ -770,6 +770,26 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual(D.comments[0],
                          'Pull request merge failed: Merge not allowed '
                          'because of fake reason')
+
+    @simple_layout('layouts/merging-github.yaml', driver='github')
+    @okay_tracebacks('Unknown merge failure',
+                     'Method not allowed')
+    def test_report_pull_merge_error_success(self):
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        # Fail all merge attempts
+        self.fake_github.merge_failure = True
+        self.fake_github.merge_not_allowed_count = 5
+        with mock.patch(
+            "tests.fake_graphql.PullRequest.resolve_merged"
+        ) as merged_mock:
+            # Report change as merged despite the merge failure.
+            merged_mock.return_value = True
+            self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
+            self.waitUntilSettled()
+
+        # Checking A.is_merged doesn't work here as we did not call
+        # A.setMerged(). Instead make sure that no error was reported.
+        self.assertEqual(len(A.comments), 0)
 
     @simple_layout('layouts/merging-github.yaml', driver='github')
     def test_report_pull_merge_message_reviewed_by(self):

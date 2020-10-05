@@ -309,6 +309,7 @@ class PullRequest(ObjectType):
     isDraft = Boolean()
     reviewDecision = String()
     mergeable = String()
+    merged = Boolean()
     reviewThreads = Field(PullRequestReviewThreads,
                           first=Int(), after=String())
 
@@ -320,6 +321,9 @@ class PullRequest(ObjectType):
 
     def resolve_mergeable(parent, info):
         return "MERGEABLE" if parent.mergeable else "CONFLICTING"
+
+    def resolve_merged(parent, info):
+        return parent.is_merged
 
     def resolve_reviewThreads(parent, info, first, after=None):
         if after is None:
