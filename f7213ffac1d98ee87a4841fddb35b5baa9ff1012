@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_96bd54b3",
+        "filename": "doc/source/reference/drivers/elasticsearch.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-10-06T12:56:25Z",
+      "side": 1,
+      "message": "I think it needs to align with the c - so one space less.\n\nBut let\u0027s see how the rendered content looks like.",
+      "range": {
+        "startLine": 85,
+        "startChar": 3,
+        "endLine": 87,
+        "endChar": 4
+      },
+      "revId": "f7213ffac1d98ee87a4841fddb35b5baa9ff1012",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
