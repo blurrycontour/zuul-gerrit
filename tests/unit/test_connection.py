@@ -13,6 +13,7 @@
 # under the License.
 
 import textwrap
+import types
 
 import sqlalchemy as sa
 
@@ -693,3 +694,10 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
             build_doc['job_returned_vars'], {'foo': 'bar'})
 
         self.assertEqual(self.history[0].uuid, build_doc['uuid'])
+        self.assertIn('duration', build_doc)
+        self.assertTrue(type(build_doc['duration']) is int)
+
+        doc_gen = self.connections.connections['elasticsearch'].gen(
+            indexed_docs, index)
+        self.assertIsInstance(doc_gen, types.GeneratorType)
+        self.assertTrue('@timestamp' in list(doc_gen)[0]['_source'])
