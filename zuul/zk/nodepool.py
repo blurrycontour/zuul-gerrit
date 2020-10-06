@@ -221,8 +221,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
             node_obj = zuul.model.Node(name, label)
             node_obj.updateFromDict(node)
 
+            lock = None
             try:
-                self.lockNode(node_obj, blocking=False)
+                lock = self.lockNode(node_obj, blocking=False)
                 self.storeNode(node_obj)
             except Exception:
                 self.log.exception("Cannot change HELD node state to USED "
@@ -231,8 +232,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
                 failure = True
             finally:
                 try:
-                    if node_obj.lock:
-                        self.unlockNode(node_obj)
+                    if lock:
+                        lock.release()
                 except Exception:
                     self.log.exception(
                         "Failed to unlock HELD node %s for request %s",
@@ -384,6 +385,13 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         self.kazoo_client.DataWatch(path, callback)
 
+    def deleteNodeRequestById(self, node_request_id: str) -> None:
+        path = '%s/%s' % (self.REQUEST_ROOT, node_request_id)
+        try:
+            self.kazoo_client.delete(path)
+        except NoNodeError:
+            pass
+
     def deleteNodeRequest(self, node_request):
         """
         Delete a request for nodes.
@@ -391,11 +399,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         :param NodeRequest node_request: A NodeRequest with the
             contents of the request.
         """
-        path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
-        try:
-            self.kazoo_client.delete(path)
-        except NoNodeError:
-            pass
+        self.deleteNodeRequestById(node_request.id)
 
     def nodeRequestExists(self, node_request):
         """
@@ -406,9 +410,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         :returns: True if the request exists, False otherwise.
         """
         path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
-        if self.kazoo_client.exists(path):
-            return True
-        return False
+        return self.kazoo_client.exists(path)
 
     def storeNodeRequest(self, node_request):
         """
@@ -463,18 +465,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
         node_data = json.loads(node_data.decode('utf8'))
         node.updateFromDict(node_data)
 
-    def lockNode(self, node, blocking=True, timeout=None):
-        """
-        Lock a node.
-
-        This should be called as soon as a request is fulfilled and
-        the lock held for as long as the node is in-use.  It can be
-        used by nodepool to detect if Zuul has gone offline and the
-        node should be reclaimed.
-
-        :param Node node: The node which should be locked.
-        """
-        lock_path = '%s/%s/lock' % (self.NODES_ROOT, node.id)
+    def lockNodeById(self, node_id: str, blocking: bool = True,
+                     timeout: Optional[float] = None) -> Lock:
+        lock_path = '%s/%s/lock' % (self.NODES_ROOT, node_id)
         try:
             lock = Lock(self.kazoo_client, lock_path)
             have_lock = lock.acquire(blocking, timeout)
@@ -487,21 +480,22 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if not have_lock:
             raise LockException("Did not get lock on %s" % lock_path)
 
-        node.lock = lock
+        return lock
 
-    def unlockNode(self, node):
+    def lockNode(self, node, blocking=True, timeout=None) -> Optional[Lock]:
         """
-        Unlock a node.
+        Lock a node.
 
-        The node must already have been locked.
+        This should be called as soon as a request is fulfilled and
+        the lock held for as long as the node is in-use.  It can be
+        used by nodepool to detect if Zuul has gone offline and the
+        node should be reclaimed.
 
-        :param Node node: The node which should be unlocked.
+        :param Node node: The node which should be locked.
         """
-
-        if node.lock is None:
-            raise LockException("Node %s does not hold a lock" % (node,))
-        node.lock.release()
-        node.lock = None
+        if node.id:
+            return self.lockNodeById(node.id, blocking, timeout)
+        return None
 
     def lockNodeRequest(self, request, blocking=True, timeout=None):
         """

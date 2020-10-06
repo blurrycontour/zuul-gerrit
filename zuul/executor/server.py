@@ -3032,7 +3032,16 @@ class ExecutorServer(BaseMergeServer):
         # benefit of the unit tests to make the calculation of the
         # number of starting jobs more deterministic.
         self.manageLoad()
-        self.job_workers[build_item.content['uuid']].run()
+        locks = []
+        try:
+            for node in build_item.content['params']['nodes']:
+                lock = self.zookeeper.nodepool.lockNodeById(node['id'],
+                                                            timeout=30)
+                locks.append(lock)
+            self.job_workers[build_item.content['uuid']].run()
+        finally:
+            for lock in locks:
+                lock.release()
 
     def run_governor(self):
         while not self.governor_stop_event.wait(10):

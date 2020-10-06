@@ -181,8 +181,6 @@ class Nodepool(object):
         nodes = nodeset.getNodes()
 
         for node in nodes:
-            if node.lock is None:
-                raise Exception("Node %s is not locked" % (node,))
             node.state = model.STATE_HOLD
             node.hold_job = " ".join([request.tenant,
                                       request.project,
@@ -226,8 +224,6 @@ class Nodepool(object):
         self.log.info("Setting nodeset %s in use" % (nodeset,))
         resources = defaultdict(int)
         for node in nodeset.getNodes():
-            if node.lock is None:
-                raise Exception("Node %s is not locked" % (node,))
             node.state = model.STATE_IN_USE
             self.sched.zk.nodepool.storeNode(node)
             if node.resources:
@@ -268,19 +264,15 @@ class Nodepool(object):
                      "for %s seconds for build %s for project %s",
                      nodeset, len(nodeset.nodes), duration, build, project)
         for node in nodeset.getNodes():
-            if node.lock is None:
-                log.error("Node %s is not locked", node)
-            else:
-                try:
-                    if node.state == model.STATE_IN_USE:
-                        if node.resources:
-                            add_resources(resources, node.resources)
-                        node.state = model.STATE_USED
-                        self.sched.zk.nodepool.storeNode(node)
-                except Exception:
-                    log.exception("Exception storing node %s "
-                                  "while unlocking:", node)
-        self._unlockNodes(nodeset.getNodes())
+            try:
+                if node.state == model.STATE_IN_USE:
+                    if node.resources:
+                        add_resources(resources, node.resources)
+                    node.state = model.STATE_USED
+                    self.sched.zk.nodepool.storeNode(node)
+            except Exception:
+                log.exception("Exception storing node %s "
+                              "while unlocking:", node)
 
         # When returning a nodeset we need to update the gauges if we have a
         # build. Further we calculate resource*duration and increment their
@@ -298,36 +290,12 @@ class Nodepool(object):
                 self.emitStatsResourceCounters(
                     tenant, project_name, resources, duration)
 
-    def unlockNodeSet(self, nodeset):
-        self._unlockNodes(nodeset.getNodes())
-
-    def _unlockNodes(self, nodes):
+    def checkNodeSet(self, nodeset: model.NodeSet, request_id: str):
+        nodes = nodeset.getNodes()
         for node in nodes:
-            try:
-                self.sched.zk.nodepool.unlockNode(node)
-            except Exception:
-                self.log.exception("Error unlocking node:")
-
-    def lockNodeSet(self, nodeset, request_id):
-        self._lockNodes(nodeset.getNodes(), request_id)
-
-    def _lockNodes(self, nodes, request_id):
-        # Try to lock all of the supplied nodes.  If any lock fails,
-        # try to unlock any which have already been locked before
-        # re-raising the error.
-        locked_nodes = []
-        try:
-            for node in nodes:
-                if node.allocated_to != request_id:
-                    raise Exception("Node %s allocated to %s, not %s" %
-                                    (node.id, node.allocated_to, request_id))
-                self.log.debug("Locking node %s" % (node,))
-                self.sched.zk.nodepool.lockNode(node, timeout=30)
-                locked_nodes.append(node)
-        except Exception:
-            self.log.exception("Error locking nodes:")
-            self._unlockNodes(locked_nodes)
-            raise
+            if node.allocated_to != request_id:
+                raise Exception("Node %s allocated to %s, not %s" %
+                                (node.id, node.allocated_to, request_id))
 
     def _updateNodeRequest(self, request, deleted):
         log = get_annotated_logger(self.log, request.event_id)
@@ -417,27 +385,19 @@ class Nodepool(object):
             request.failed = True
             return True
 
-        locked = False
         if request.fulfilled:
-            # If the request suceeded, try to lock the nodes.
+            # If the request succeeded, try to lock the nodes.
             try:
-                self.lockNodeSet(request.nodeset, request.id)
-                locked = True
+                self.checkNodeSet(request.nodeset, request.id)
             except Exception:
                 log.exception("Error locking nodes:")
                 request.failed = True
-
-        # Regardless of whether locking (or even the request)
-        # succeeded, delete the request.
-        log.debug("Deleting node request %s", request)
-        try:
-            self.sched.zk.nodepool.deleteNodeRequest(request)
-        except Exception:
-            log.exception("Error deleting node request:")
-            request.failed = True
-            # If deleting the request failed, and we did lock the
-            # nodes, unlock the nodes since we're not going to use
-            # them.
-            if locked:
-                self.unlockNodeSet(request.nodeset)
+        else:
+            # If the request did not succeed, delete it
+            log.debug("Deleting node request %s", request)
+            try:
+                self.sched.zk.nodepool.deleteNodeRequest(request)
+            except Exception:
+                log.exception("Error deleting node request:")
+                request.failed = True
         return True
