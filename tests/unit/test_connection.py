@@ -691,5 +691,6 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
         self.assertIn('job_returned_vars', build_doc)
         self.assertDictEqual(
             build_doc['job_returned_vars'], {'foo': 'bar'})
+        self.assertTrue(build_doc['@timestamp'])
 
         self.assertEqual(self.history[0].uuid, build_doc['uuid'])
