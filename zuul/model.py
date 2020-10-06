@@ -561,7 +561,6 @@ class Node(ConfigObject):
         self.name = name
         self.label = label
         self.id = None
-        self.lock = None
         self.hold_job = None
         self.comment = None
         # Attributes from Nodepool
