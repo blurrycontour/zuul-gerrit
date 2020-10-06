@@ -22,6 +22,30 @@
       "revId": "1fcf20b5fcc02fba2a4f2cb804fcf827d7496891",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_339c5a0d",
+        "filename": "doc/source/reference/drivers/elasticsearch.rst",
+        "patchSetId": 43
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 6547
+      },
+      "writtenOn": "2020-10-06T12:25:52Z",
+      "side": 1,
+      "message": "Could somebody do a followup with the fix, please?",
+      "parentUuid": "9f560f44_b1f667d7",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 37
+      },
+      "revId": "1fcf20b5fcc02fba2a4f2cb804fcf827d7496891",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
