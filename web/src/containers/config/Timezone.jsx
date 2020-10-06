@@ -26,6 +26,8 @@ class Timezone extends React.Component {
   constructor(props) {
     super(props)
 
+    const defaultSelected = this.props.selected
+
     this.state = {
       options: moment.tz.names().map(item => ({value: item, label: item})),
       isOpen: false,
@@ -46,8 +48,8 @@ class Timezone extends React.Component {
          selected: selection,
          isOpen: false
         })
+        this.props.onSelect(selection)
       }
-      this.props.onSelect(selection)
     }
 
     this.clearSelection = () => {
@@ -55,7 +57,7 @@ class Timezone extends React.Component {
           isOpen: false,
           selected: null,
       })
-      this.props.onSelect('UTC')
+      this.props.onSelect(defaultSelected)
     }
 
     this.getSelectOptions = options => {
@@ -91,16 +93,17 @@ class Timezone extends React.Component {
         <Select
           variant={SelectVariant.typeahead}
           typeAheadAriaLabel={label}
-          onToggle={this.onToggle}
-          onSelect={this.onSelect}
+          aria-labelledby={titleId}
+          isOpen={isOpen}
+          menuAppendTo='parent'
           onClear={this.clearSelection}
           onFilter={this.customFilter}
-          selections={selected}
-          isOpen={isOpen}
-          aria-labelledby={titleId}
+          onSelect={this.onSelect}
+          onToggle={this.onToggle}
           placeholderText={this.props.selected}
-          menuAppendTo='parent'
+          selections={selected}
         >
+          <SelectOption key={-1} value="UTC" description="This is the default timezone." />
           {this.getSelectOptions(options)}
         </Select>
       </div>
