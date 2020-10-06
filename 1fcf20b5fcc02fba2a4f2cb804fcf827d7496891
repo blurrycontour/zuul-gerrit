@@ -46,6 +46,30 @@
       "revId": "1fcf20b5fcc02fba2a4f2cb804fcf827d7496891",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_d6898c25",
+        "filename": "doc/source/reference/drivers/elasticsearch.rst",
+        "patchSetId": 43
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2020-10-06T12:54:07Z",
+      "side": 1,
+      "message": "Done: https://review.opendev.org/756284",
+      "parentUuid": "9f560f44_339c5a0d",
+      "range": {
+        "startLine": 85,
+        "startChar": 0,
+        "endLine": 87,
+        "endChar": 37
+      },
+      "revId": "1fcf20b5fcc02fba2a4f2cb804fcf827d7496891",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
