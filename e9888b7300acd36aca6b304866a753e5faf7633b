@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_5613aa59",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-07T12:43:15Z",
+      "side": 1,
+      "message": "Yes it should B-)",
+      "parentUuid": "9f560f44_ed34b1fc",
+      "revId": "e9888b7300acd36aca6b304866a753e5faf7633b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_5041f235",
         "filename": "zuul/executor/server.py",
         "patchSetId": 16
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_d655fafa",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 2646,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-07T12:43:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_5041f235",
+      "revId": "e9888b7300acd36aca6b304866a753e5faf7633b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_d0a342fe",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 16
@@ -47,6 +83,24 @@
       "writtenOn": "2020-10-07T09:57:33Z",
       "side": 1,
       "message": "Maybe you can annotate the scheduler here as well",
+      "revId": "e9888b7300acd36aca6b304866a753e5faf7633b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_363ef6b8",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-07T12:43:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_d0a342fe",
       "revId": "e9888b7300acd36aca6b304866a753e5faf7633b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
