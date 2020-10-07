@@ -16,6 +16,24 @@
       "revId": "4cb639d4844e733d3fe08a2df36195fcf4c2e298",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_bb494f8f",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 46
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-07T11:55:36Z",
+      "side": 1,
+      "message": "I can rename it explicit_logger -\u003e parent_logger.\n\nMy comment above was more about if this is needed or if the one logger with the default would be enough?\n\nI guess this is for the case if in the upstream some annotations were set. In that case I guess it would be good to use only `logging.getLogger(\"zuul.Merger\")` and pass the annotations. The same in the `Repo`, etc. But that would be imho an unrelated change.",
+      "parentUuid": "9f560f44_6d71c145",
+      "revId": "4cb639d4844e733d3fe08a2df36195fcf4c2e298",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
