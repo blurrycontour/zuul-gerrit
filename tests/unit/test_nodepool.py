@@ -81,7 +81,6 @@ class TestNodepool(BaseTestCase):
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
-            self.assertIsNotNone(node.lock)
             self.assertEqual(node.state, 'ready')
 
         # Mark the nodes in use
@@ -92,7 +91,6 @@ class TestNodepool(BaseTestCase):
         # Return the nodes
         self.nodepool.returnNodeSet(nodeset)
         for node in nodeset.getNodes():
-            self.assertIsNone(node.lock)
             self.assertEqual(node.state, 'used')
 
     def test_node_request_disconnect(self):
@@ -145,7 +143,6 @@ class TestNodepool(BaseTestCase):
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
-            self.assertIsNone(node.lock)
             self.assertEqual(node.state, 'ready')
 
     def test_accept_nodes_lost_request(self):
@@ -161,14 +158,13 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
-        self.zk.nodepool.deleteNodeRequest(request)
+        self.zk.nodepool.deleteNodeRequestById(request.id)
 
         # Accept the nodes
         self.nodepool.acceptNodes(request, request.id)
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
-            self.assertIsNone(node.lock)
             self.assertEqual(node.state, 'ready')
 
     def test_node_request_priority(self):
