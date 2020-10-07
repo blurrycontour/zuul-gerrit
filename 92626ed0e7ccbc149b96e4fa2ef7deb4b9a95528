@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_901c2a78",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-07T10:43:15Z",
+      "side": 1,
+      "message": "It feels like this function is now doing a little too much and it\u0027s also hard to see the different ways you can call it. How about adding a `from_config()` class methods to  ZooKeeperConnection that allow creating a connection from a configparser? E.g. something like\n\nclass ZooKeeperConnection(object):\n    def __init__(\n        self,\n        hosts: Union[str, List[str]],\n        timeout: int \u003d 120,\n        tls_key: Optional[str] \u003d None,\n        tls_cert: Optional[str] \u003d None,\n        tls_ca: Optional[str] \u003d None,\n        read_only: bool \u003d False,\n        enable_cache: bool \u003d True,\n    ):\n        self.log \u003d logging.getLogger(\"zuul.zk.ZooKeeperConnection\")\n        self.zookeeper: Optional[ZooKeeper] \u003d None\n        self.hosts \u003d hosts\n        self.timeout \u003d timeout\n        self.tls_key \u003d tls_key\n        self.tls_cert \u003d tls_cert\n        self.tls_ca \u003d tls_ca\n        self.read_only \u003d read_only\n\n    def __enter__(self) -\u003e ZooKeeper:\n        self.log.debug(\"Establishing connection...\")\n        self.zookeeper \u003d self.connect()\n        return self.zookeeper\n\n    def __exit__(self, kind: Any, value: Any, traceback: Optional[Any]):\n        self.log.debug(\"Destroying connection...\")\n        if self.zookeeper:\n            self.zookeeper.disconnect()\n\n    def connect(self) -\u003e ZooKeeper:\n        zookeeper \u003d zookeeper_class(enable_cache\u003dself.enable_cache)\n        zookeeper.client.connect(\n            hosts\u003dself.hosts,\n            timeout\u003dself.timeout,\n            tls_key\u003dself.tls_key,\n            tls_cert\u003dself.tls_cert,\n            tls_ca\u003dself.tls_ca,\n            read_only\u003dself.read_only,\n        )\n        return zookeeper\n\n    @classmethod\n    def from_config(cls, config: configparser.ConfigParser) -\u003e ZooKeeperConnection:\n        hosts \u003d get_default(config, \"zookeeper\", \"hosts\", None)\n        if not hosts:\n            raise Exception(\"The zookeeper hosts config value is required\")\n        tls_key \u003d get_default(config, \"zookeeper\", \"tls_key\")\n        tls_cert \u003d get_default(config, \"zookeeper\", \"tls_cert\")\n        tls_ca \u003d get_default(config, \"zookeeper\", \"tls_ca\")\n        timeout \u003d float(get_default(config, \"zookeeper\", \"session_timeout\", 120))\n\n        return cls(hosts\u003dhosts, tls_key\u003dtls_key, tls_cert\u003dtls_cert, timeout\u003dtimeout)\n\nThis way you don\u0027t need to use a separate `connect_zookeeper()` method and clients can directly use the ZooKeeperConnection wrapper:\n\n    with ZooKeeperConnection.from_config(config) as zk:\n        # ...\n\nOr if you want to use the Zookeeper instance directly:\n\n    connection \u003d ZooKeeperConnection.from_config(config)\n    self.zk \u003d connection.connect()",
+      "revId": "92626ed0e7ccbc149b96e4fa2ef7deb4b9a95528",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
