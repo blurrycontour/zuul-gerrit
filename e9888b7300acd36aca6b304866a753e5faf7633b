@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_ed34b1fc",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-07T09:57:33Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be:\n\n    name: Optional[str] \u003d None",
+      "revId": "e9888b7300acd36aca6b304866a753e5faf7633b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_5041f235",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 2646,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-07T09:57:33Z",
+      "side": 1,
+      "message": "Is there a specific reason to have a union of Any and AnsibleJob?",
+      "revId": "e9888b7300acd36aca6b304866a753e5faf7633b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_d0a342fe",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-07T09:57:33Z",
+      "side": 1,
+      "message": "Maybe you can annotate the scheduler here as well",
+      "revId": "e9888b7300acd36aca6b304866a753e5faf7633b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
