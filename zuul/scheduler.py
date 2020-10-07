@@ -1778,7 +1778,8 @@ class Scheduler(threading.Thread):
         job_name = job.name
         try:
             # Cancel node request if needed
-            req = buildset.getJobNodeRequest(job_name)
+            req = buildset.getJobNodeRequest(job_name)\
+                or buildset.completed_node_requests.get(job_name)
             if req:
                 self.nodepool.cancelRequest(req)
                 buildset.removeJobNodeRequest(job_name)

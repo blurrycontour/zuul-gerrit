@@ -22,6 +22,7 @@ from tests.zk import TestZooKeeperConnection
 from zuul import model
 
 from tests.base import BaseTestCase
+from zuul.zk.nodepool import ZooKeeperNodepool
 
 
 class TestNodepoolIntegration(BaseTestCase):
@@ -34,6 +35,7 @@ class TestNodepoolIntegration(BaseTestCase):
         self.statsd = None
         self.zk_client = TestZooKeeperConnection(hosts='localhost:2181')\
             .connect()
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
         self.hostname = socket.gethostname()
 
@@ -69,7 +71,6 @@ class TestNodepoolIntegration(BaseTestCase):
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
-            self.assertIsNotNone(node.lock)
             self.assertEqual(node.state, model.STATE_READY)
 
         # Mark the nodes in use
@@ -80,7 +81,6 @@ class TestNodepoolIntegration(BaseTestCase):
         # Return the nodes
         self.nodepool.returnNodeSet(nodeset)
         for node in nodeset.getNodes():
-            self.assertIsNone(node.lock)
             self.assertEqual(node.state, model.STATE_USED)
 
     def test_invalid_node_request(self):
