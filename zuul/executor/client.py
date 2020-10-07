@@ -166,7 +166,10 @@ class ExecutorClient(object):
         nodes = []
         for node in nodeset.getNodes():
             n = node.toDict()
-            n.update(dict(name=node.name, label=node.label))
+            n.update(dict(id=node.id,
+                          name=node.name,
+                          label=node.label,
+                          allocated_to=node.allocated_to))
             nodes.append(n)
         params['nodes'] = nodes
         params['groups'] = [group.toDict() for group in nodeset.getGroups()]
@@ -273,11 +276,20 @@ class ExecutorClient(object):
             precedence=PRIORITY_MAP[pipeline.precedence])
         return build
 
+    def _deleteNodeRequest(self, build: Build) -> None:
+        if build.nodeset:
+            request_ids = list(set(map(lambda n: n.allocated_to,
+                                       build.nodeset.getNodes())))
+            for request_id in request_ids:
+                if request_id:
+                    self.zk.nodepool.deleteNodeRequestById(request_id)
+
     def cancel(self, build: Build) -> bool:
         log = get_annotated_logger(self.log, build.zuul_event_id,
                                    build=build.uuid)
         # Returns whether a running build was canceled
         log.info("Cancel build %s for job %s", build, build.job)
+        self._deleteNodeRequest(build)
 
         build.canceled = True
 
@@ -388,6 +400,7 @@ class ExecutorClient(object):
                        build_item.data, self)
         build = self.builds.get(build_item.content['uuid'])
         if build:
+            self._deleteNodeRequest(build)
             started = (build.url is not None)
             # Allow URL to be updated
             self.log.debug("Build %s url update: %s -> %s on %s", build,

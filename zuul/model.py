@@ -563,8 +563,7 @@ class Node(ConfigObject):
         self.name: Any = name
         self.label: Optional[str] = label
         self.id: Optional[str] = None
-        self.lock = None
-        self.hold_job = None
+        self.hold_job: Optional[str] = None
         self.comment: Optional[str] = None
         # Attributes from Nodepool
         self._state: str = 'unknown'
@@ -2041,6 +2040,7 @@ class BuildSet(object):
         self.merge_state = self.NEW
         self.nodesets = {}  # job -> nodeset
         self.node_requests = {}  # job -> reqs
+        self.completed_node_requests = {}  # job -> reqs
         self.files = RepoFiles()
         self.repo_state = {}
         self.tries = {}
@@ -2129,11 +2129,16 @@ class BuildSet(object):
     def removeJobNodeRequest(self, job_name: str):
         if job_name in self.node_requests:
             del self.node_requests[job_name]
+        if job_name in self.completed_node_requests:
+            del self.completed_node_requests[job_name]
 
     def jobNodeRequestComplete(self, job_name: str, nodeset: NodeSet):
         if job_name in self.nodesets:
             raise Exception("Prior node request for %s" % (job_name))
         self.nodesets[job_name] = nodeset
+        # Add node requests to completed node requests to be able to
+        # clean them up when job gets canceled
+        self.completed_node_requests[job_name] = self.node_requests[job_name]
         del self.node_requests[job_name]
 
     def getTries(self, job_name):
