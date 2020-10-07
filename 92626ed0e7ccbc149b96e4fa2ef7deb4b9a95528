@@ -16,6 +16,24 @@
       "revId": "92626ed0e7ccbc149b96e4fa2ef7deb4b9a95528",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_41c92658",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-07T13:45:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_901c2a78",
+      "revId": "92626ed0e7ccbc149b96e4fa2ef7deb4b9a95528",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
