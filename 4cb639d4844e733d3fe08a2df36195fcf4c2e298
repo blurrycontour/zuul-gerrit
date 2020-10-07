@@ -34,6 +34,24 @@
       "revId": "4cb639d4844e733d3fe08a2df36195fcf4c2e298",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_b60206b9",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 46
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-07T12:26:57Z",
+      "side": 1,
+      "message": "Sorry, thought you were not sure about the name :)\nI think this used for the merger that is started with the executor, but I might be wrong.",
+      "parentUuid": "9f560f44_bb494f8f",
+      "revId": "4cb639d4844e733d3fe08a2df36195fcf4c2e298",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
