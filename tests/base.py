@@ -4417,6 +4417,11 @@ class ZuulTestCase(BaseTestCase):
             except kazoo.exceptions.ConnectionLoss:
                 # NOTE(pabelanger): We lost access to zookeeper, iterate again
                 pass
+        if len(requests) > 0:
+            self.log.error("Leaked node requests:")
+            for request in requests:
+                self.log.error("  - %s", request)
+
         self.assertEqual(len(requests), 0)
 
         nodes = None

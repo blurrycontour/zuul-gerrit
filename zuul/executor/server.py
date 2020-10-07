@@ -67,6 +67,7 @@ from zuul.merger.server import BaseMergeServer, RepoLocks
 from zuul.zk.client import event_type_str
 from zuul.zk.exceptions import NoClientException
 from zuul.zk.executors import ZooKeeperExecutors
+from zuul.zk.nodepool import ZooKeeperNodepool
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -2573,6 +2574,7 @@ class ExecutorServer(BaseMergeServer):
 
         self.zk_builds: ZooKeeperBuilds = self._zk_builds_class(zk_client)
         self.zk_executors: ZooKeeperExecutors = ZooKeeperExecutors(zk_client)
+        self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -3037,7 +3039,15 @@ class ExecutorServer(BaseMergeServer):
         # benefit of the unit tests to make the calculation of the
         # number of starting jobs more deterministic.
         self.manageLoad()
-        self.job_workers[build_item.content['uuid']].run()
+        locks = []
+        try:
+            for node in build_item.content['params']['nodes']:
+                lock = self.zk_nodepool.lockNodeById(node['id'], timeout=30)
+                locks.append(lock)
+            self.job_workers[build_item.content['uuid']].run()
+        finally:
+            for lock in locks:
+                lock.release()
 
     def run_governor(self):
         while not self.governor_stop_event.wait(10):
