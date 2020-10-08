@@ -24,6 +24,7 @@ import time
 import json
 from collections import OrderedDict
 from json.decoder import JSONDecodeError
+from typing import List, Optional
 
 import cherrypy
 import cachecontrol
@@ -38,7 +39,7 @@ import github3.exceptions
 import github3.pulls
 from github3.session import AppInstallationTokenAuth
 
-from zuul.connection import BaseConnection
+from zuul.connection import CachedBranchConnection
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.web.handler import BaseWebController
@@ -447,20 +448,7 @@ class GithubEventProcessor(object):
                 # unprotected branches, we might need to check whether the
                 # branch is now protected.
                 if hasattr(event, "branch") and event.branch:
-                    b = self.connection.getBranch(
-                        project.name, event.branch, zuul_event_id=event)
-                    if b is not None:
-                        branch_protected = b.get('protected')
-                        self.connection.checkBranchCache(
-                            project, event.branch, branch_protected, self.log)
-                        event.branch_protected = branch_protected
-                    else:
-                        # This can happen if the branch was deleted in GitHub.
-                        # In this case we assume that the branch COULD have
-                        # been protected before. The cache update is handled by
-                        # the push event, so we don't touch the cache here
-                        # again.
-                        event.branch_protected = True
+                    self.connection.checkBranchCache(project.name, event)
 
             event.project_hostname = self.connection.canonical_hostname
             self.event = event
@@ -484,31 +472,7 @@ class GithubEventProcessor(object):
             # necessary for the scheduler to match against particular branches
             event.branch = ref_parts[2]
 
-        # This checks whether the event created or deleted a branch so
-        # that Zuul may know to perform a reconfiguration on the
-        # project.
-        if event.oldrev == '0' * 40:
-            event.branch_created = True
-        elif event.newrev == '0' * 40:
-            event.branch_deleted = True
-        else:
-            event.branch_updated = True
-
-        if event.branch:
-            project = self.connection.source.getProject(event.project_name)
-            if event.branch_deleted:
-                # We currently cannot determine if a deleted branch was
-                # protected so we need to assume it was. GitHub doesn't allow
-                # deletion of protected branches but we don't get a
-                # notification about branch protection settings. Thus we don't
-                # know if branch protection has been disabled before deletion
-                # of the branch.
-                # FIXME(tobiash): Find a way to handle that case
-                self.connection._clearBranchCache(project, self.log)
-            elif event.branch_created:
-                # A new branch never can be protected because that needs to be
-                # configured after it has been created.
-                self.connection._clearBranchCache(project, self.log)
+        self.connection.clearConnectionCacheOnBranchEvent(event)
 
         return event
 
@@ -1175,19 +1139,17 @@ class GithubClientManager:
         return github
 
 
-class GithubConnection(BaseConnection):
+class GithubConnection(CachedBranchConnection):
     driver_name = 'github'
     log = logging.getLogger("zuul.GithubConnection")
     payload_path = 'payload'
     client_manager_class = GithubClientManager
 
     def __init__(self, driver, connection_name, connection_config):
-        super(GithubConnection, self).__init__(
-            driver, connection_name, connection_config)
+        super(GithubConnection, self).__init__(driver, connection_name,
+                                               connection_config)
         self._change_cache = {}
         self._change_update_lock = {}
-        self._project_branch_cache_include_unprotected = {}
-        self._project_branch_cache_exclude_unprotected = {}
         self.projects = {}
         self.git_ssh_key = self.connection_config.get('sshkey')
         self.server = self.connection_config.get('server', 'github.com')
@@ -1560,21 +1522,8 @@ class GithubConnection(BaseConnection):
     def addProject(self, project):
         self.projects[project.name] = project
 
-    def clearBranchCache(self):
-        self._project_branch_cache_exclude_unprotected = {}
-        self._project_branch_cache_include_unprotected = {}
-
-    def getProjectBranches(self, project, tenant):
-        exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
-        if exclude_unprotected:
-            cache = self._project_branch_cache_exclude_unprotected
-        else:
-            cache = self._project_branch_cache_include_unprotected
-
-        branches = cache.get(project.name)
-        if branches is not None:
-            return branches
-
+    def _fetchProjectBranches(self, project: Project,
+                              exclude_unprotected: bool) -> List[str]:
         github = self.getGithubClient(project.name)
         url = github.session.build_url('repos', project.name,
                                        'branches')
@@ -1605,25 +1554,25 @@ class GithubConnection(BaseConnection):
 
             branches.extend([x['name'] for x in resp.json()])
 
-        cache[project.name] = branches
         return branches
 
-    def getBranch(self, project_name, branch, zuul_event_id=None):
+    def isBranchProtected(self, project_name: str, branch_name: str,
+                          zuul_event_id=None) -> Optional[bool]:
         github = self.getGithubClient(
             project_name, zuul_event_id=zuul_event_id)
 
         # Note that we directly use a web request here because if we use the
         # github3.py api directly we need a repository object which needs
         # an unneeded web request during creation.
-        url = github.session.build_url('repos', project_name,
-                                       'branches', branch)
+        url = github.session.build_url('repos', project_name, 'branches',
+                                       branch_name)
 
         resp = github.session.get(url)
 
         if resp.status_code == 404:
             return None
 
-        return resp.json()
+        return resp.json().get('protected')
 
     def getPullUrl(self, project, number):
         return '%s/pull/%s' % (self.getGitwebUrl(project), number)
@@ -2245,46 +2194,6 @@ class GithubConnection(BaseConnection):
                 "webhook_token not found in config for connection %s" %
                 self.connection_name)
         return True
-
-    def _clearBranchCache(self, project, log):
-        log.debug("Clearing branch cache for %s", project.name)
-        for cache in [
-                self._project_branch_cache_exclude_unprotected,
-                self._project_branch_cache_include_unprotected,
-        ]:
-            try:
-                del cache[project.name]
-            except KeyError:
-                pass
-
-    def checkBranchCache(self, project, branch, protected, log):
-        # If the branch appears in the exclude_unprotected cache but
-        # is unprotected, clear the exclude cache.
-
-        # If the branch does not appear in the exclude_unprotected
-        # cache but is protected, clear the exclude cache.
-
-        # All branches should always appear in the include_unprotected
-        # cache, so we never clear it.
-
-        cache = self._project_branch_cache_exclude_unprotected
-        branches = cache.get(project.name, [])
-        if (branch in branches) and (not protected):
-            log.debug("Clearing protected branch cache for %s",
-                      project.name)
-            try:
-                del cache[project.name]
-            except KeyError:
-                pass
-            return
-        if (branch not in branches) and (protected):
-            log.debug("Clearing protected branch cache for %s",
-                      project.name)
-            try:
-                del cache[project.name]
-            except KeyError:
-                pass
-            return
 
 
 class GithubWebController(BaseWebController):
