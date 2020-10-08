@@ -3856,7 +3856,9 @@ class SchedulerTestApp:
         self.zk_config = zk_config
         self.changes = changes
 
-        self.sched = zuul.scheduler.Scheduler(self.config)
+        zk = ZooKeeperConnection(hosts=self.zk_config).connect()
+
+        self.sched = zuul.scheduler.Scheduler(self.config, zk)
         self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
@@ -3872,9 +3874,6 @@ class SchedulerTestApp:
             upstream_root, rpcclient, poller_events,
             git_url_with_auth, add_cleanup)
         self.connections.configure(self.config, source_only=source_only)
-
-        zk = ZooKeeperConnection(hosts=self.zk_config).connect()
-        self.sched.setZooKeeper(zk)
 
         self.sched.registerConnections(self.connections)
 

@@ -1151,6 +1151,9 @@ class PipelineManager(metaclass=ABCMeta):
                 log.debug("%s window size increased to %s",
                           change_queue, change_queue.window)
 
+                if not self.sched.connections:
+                    raise Exception("Scheduler has no connection registry!")
+
                 zuul_driver = self.sched.connections.drivers['zuul']
                 tenant = self.pipeline.tenant
                 zuul_driver.onChangeMerged(tenant, item.change, source)
