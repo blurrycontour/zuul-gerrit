@@ -13,8 +13,12 @@
 # under the License.
 
 import abc
+import logging
+
+from typing import Dict, List, Optional
 
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import Project, Tenant
 
 
 class BaseConnection(object, metaclass=abc.ABCMeta):
@@ -32,6 +36,8 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
     methods are validated by the {trigger, source, reporter} they are loaded
     into. For example, a trigger will likely require some kind of query method
     while a reporter may need a review method."""
+
+    log = logging.getLogger('zuul.BaseConnection')
 
     def __init__(self, driver, connection_name, connection_config):
         # connection_name is the name given to this connection in zuul.ini
@@ -70,11 +76,11 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
     def registerScheduler(self, sched):
         self.sched = sched
 
-    def clearBranchCache(self):
-        """Clear the branch cache for this connection.
+    def clearCache(self):
+        """Clear the cache for this connection.
 
         This is called immediately prior to performing a full
-        reconfiguration.  The branch cache should be cleared so that a
+        reconfiguration. The cache should be cleared so that a
         full reconfiguration can be used to correct any errors in
         cached data.
 
@@ -118,3 +124,132 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
             "name": self.connection_name,
             "driver": self.driver.name,
         }
+
+
+class CachedBranchConnection(BaseConnection):
+
+    def __init__(self, *args, **kwargs):
+        super(CachedBranchConnection, self).__init__(*args, **kwargs)
+        self._project_branch_cache_exclude_unprotected = {}
+        self._project_branch_cache_include_unprotected = {}
+
+    @abc.abstractmethod
+    def is_branch_protected(self, project_name: str, branch_name: str,
+                            zuul_event_id) -> Optional[bool]:
+        """Return if the branch is protected or None if the branch is unknown.
+
+        :param project_name:
+            The name of the project.
+        :param branch_name:
+            The name of the branch.
+        :param zuul_event_id:
+            Unique id associated to the handled event.
+        """
+        pass
+
+    @abc.abstractmethod
+    def projectBranches(self, project: Project,
+                        exclude_unprotected: bool) -> List[str]:
+        pass
+
+    def handle_branch_event(self, event):
+        # This checks whether the event created or deleted a branch so
+        # that Zuul may know to perform a reconfiguration on the
+        # project.
+
+        if event.oldrev == '0' * 40:
+            event.branch_created = True
+        elif event.newrev == '0' * 40:
+            event.branch_deleted = True
+        else:
+            event.branch_updated = True
+
+        project = self.source.getProject(event.project_name)
+        if event.branch:
+            if event.branch_deleted:
+                # We currently cannot determine if a deleted branch was
+                # protected so we need to assume it was. GitHub/GitLab don't
+                # allow deletion of protected branches but we don't get a
+                # notification about branch protection settings. Thus we don't
+                # know if branch protection has been disabled before deletion
+                # of the branch.
+                # FIXME(tobiash): Find a way to handle that case
+                self.clearProjectCache(project)
+            elif event.branch_created:
+                # A new branch never can be protected because that needs to be
+                # configured after it has been created.
+                self.clearProjectCache(project)
+        return event
+
+    def getCachedBranches(self, exclude_unprotected) -> Dict[str, List[str]]:
+        if exclude_unprotected:
+            cache = self._project_branch_cache_exclude_unprotected
+        else:
+            cache = self._project_branch_cache_include_unprotected
+
+        return cache
+
+    def getProjectBranches(self, project: Project,
+                           tenant: Tenant) -> List[str]:
+        exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
+        cache = self.getCachedBranches(exclude_unprotected)
+        branches = cache.get(project.name)
+
+        if branches is not None:
+            return branches
+
+        branches = self.projectBranches(project, exclude_unprotected)
+        self.log.info("Got branches for %s" % project.name)
+
+        cache[project.name] = branches
+        return branches
+
+    def clearCache(self) -> None:
+        self.log.debug("Clearing branch cache for all branches: %s",
+                       self.connection_name)
+        self._project_branch_cache_exclude_unprotected = {}
+        self._project_branch_cache_include_unprotected = {}
+
+    def clearProjectCache(self, project: Project) -> None:
+        """Clear the connection cache for this project.
+        """
+
+        self.log.debug("Clearing cache for %s:%s", self.connection_name,
+                       project.name)
+        self._project_branch_cache_exclude_unprotected.pop(project.name, None)
+        self._project_branch_cache_include_unprotected.pop(project.name, None)
+
+    def checkBranchCache(self, project_name: str, event) -> None:
+
+        protected = self.is_branch_protected(project_name, event.branch,
+                                             zuul_event_id=event)
+        if protected is not None:
+
+            # If the branch appears in the exclude_unprotected cache but
+            # is unprotected, clear the exclude cache.
+
+            # If the branch does not appear in the exclude_unprotected
+            # cache but is protected, clear the exclude cache.
+
+            # All branches should always appear in the include_unprotected
+            # cache, so we never clear it.
+
+            cache = self._project_branch_cache_exclude_unprotected
+            branches = cache.get(project_name, [])
+            if (event.branch in branches) and (not protected):
+                self.log.debug("Clearing protected branch cache for %s",
+                               project_name)
+                cache.pop(project_name, None)
+            if (event.branch not in branches) and (protected):
+                self.log.debug("Clearing protected branch cache for %s",
+                               project_name)
+                cache.pop(project_name, None)
+
+            event.branch_protected = protected
+        else:
+            # This can happen if the branch was deleted in GitHub/GitLab.
+            # In this case we assume that the branch COULD have
+            # been protected before. The cache update is handled by
+            # the push event, so we don't touch the cache here
+            # again.
+            event.branch_protected = True
