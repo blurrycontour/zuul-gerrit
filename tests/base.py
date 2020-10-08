@@ -31,6 +31,7 @@ import os
 import queue
 import random
 import re
+from collections import defaultdict, namedtuple
 from logging import Logger
 from queue import Queue
 from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
@@ -63,6 +64,7 @@ import testtools
 import testtools.content
 import testtools.content_type
 from git.exc import NoSuchPathError
+from git.util import IterableList
 import yaml
 import paramiko
 
@@ -184,6 +186,28 @@ def never_capture():
     return decorator
 
 
+def registerProjects(source_name, client, config):
+    path = config.get('scheduler', 'tenant_config')
+    with open(os.path.join(FIXTURE_DIR, path)) as f:
+        tenant_config = yaml.safe_load(f.read())
+    for tenant in tenant_config:
+        sources = tenant['tenant']['source']
+        conf = sources.get(source_name)
+        if not conf:
+            return
+
+        projects = conf.get('config-projects', [])
+        projects.extend(conf.get('untrusted-projects', []))
+
+        for project in projects:
+            if isinstance(project, dict):
+                # This can be a dict with the project as the only key
+                client.addProjectByName(
+                    list(project.keys())[0])
+            else:
+                client.addProjectByName(project)
+
+
 class GerritDriverMock(GerritDriver):
     def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
                  upstream_root: str, additional_event_queues, poller_events,
@@ -229,28 +253,6 @@ class GithubDriverMock(GithubDriver):
         self.rpcclient = rpcclient
         self.git_url_with_auth = git_url_with_auth
 
-    def registerGithubProjects(self, connection):
-        path = self.config.get('scheduler', 'tenant_config')
-        with open(os.path.join(FIXTURE_DIR, path)) as f:
-            tenant_config = yaml.safe_load(f.read())
-        for tenant in tenant_config:
-            sources = tenant['tenant']['source']
-            conf = sources.get(connection.source.name)
-            if not conf:
-                return
-
-            projects = conf.get('config-projects', [])
-            projects.extend(conf.get('untrusted-projects', []))
-
-            client = connection.getGithubClient(None)
-            for project in projects:
-                if isinstance(project, dict):
-                    # This can be a dict with the project as the only key
-                    client.addProjectByName(
-                        list(project.keys())[0])
-                else:
-                    client.addProjectByName(project)
-
     def getConnection(self, name, config):
         server = config.get('server', 'github.com')
         db = self.changes.setdefault(server, {})
@@ -261,7 +263,8 @@ class GithubDriverMock(GithubDriver):
             git_url_with_auth=self.git_url_with_auth)
         self.additional_event_queues.append(connection.event_queue)
         setattr(self.registry, 'fake_' + name, connection)
-        self.registerGithubProjects(connection)
+        client = connection.getGithubClient(None)
+        registerProjects(connection.source.name, client, self.config)
         return connection
 
 
@@ -290,11 +293,12 @@ class PagureDriverMock(PagureDriver):
 
 class GitlabDriverMock(GitlabDriver):
     def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
-                 upstream_root: str, additional_event_queues,
-                 rpcclient: RPCClient):
+                 config: ConfigParser, upstream_root: str,
+                 additional_event_queues, rpcclient: RPCClient):
         super(GitlabDriverMock, self).__init__()
         self.registry = registry
         self.changes = changes
+        self.config = config
         self.upstream_root = upstream_root
         self.additional_event_queues = additional_event_queues
         self.rpcclient = rpcclient
@@ -308,6 +312,8 @@ class GitlabDriverMock(GitlabDriver):
             upstream_root=self.upstream_root)
         self.additional_event_queues.append(connection.event_queue)
         setattr(self.registry, 'fake_' + name, connection)
+        registerProjects(connection.source.name, connection.gl_client,
+                         self.config)
         return connection
 
 
@@ -337,7 +343,8 @@ class TestConnectionRegistry(ConnectionRegistry):
         self.registerDriver(PagureDriverMock(
             self, changes, upstream_root, additional_event_queues, rpcclient))
         self.registerDriver(GitlabDriverMock(
-            self, changes, upstream_root, additional_event_queues, rpcclient))
+            self, changes, config, upstream_root, additional_event_queues,
+            rpcclient))
         self.registerDriver(ElasticsearchDriver())
 
 
@@ -1782,6 +1789,20 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         self.upstream_root = upstream_root
         self.mr_number = 0
 
+    def addProject(self, project):
+        super(FakeGitlabConnection, self).addProject(project)
+        self.gl_client.addProject(project)
+
+    def protectBranch(self, owner, project, branch, protected=True):
+        if branch in self.gl_client.fake_repos[(owner, project)]:
+            del self.gl_client.fake_repos[(owner, project)][branch]
+        fake_branch = FakeBranch(branch, protected=protected)
+        self.gl_client.fake_repos[(owner, project)].append(fake_branch)
+
+    def deleteBranch(self, owner, project, branch):
+        if branch in self.gl_client.fake_repos[(owner, project)]:
+            del self.gl_client.fake_repos[(owner, project)][branch]
+
     def getGitUrl(self, project):
         return 'file://' + os.path.join(self.upstream_root, project.name)
 
@@ -1852,12 +1873,16 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         self.gl_client.community_edition = False
 
 
+FakeBranch = namedtuple('Branch', ('name', 'protected'))
+
+
 class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
     log = logging.getLogger("zuul.test.FakeGitlabAPIClient")
 
     def __init__(self, baseurl, api_token, merge_requests_db={}):
         super(FakeGitlabAPIClient, self).__init__(baseurl, api_token)
         self.merge_requests = merge_requests_db
+        self.fake_repos = defaultdict(lambda: IterableList('name'))
         self.community_edition = False
 
     def gen_error(self, verb):
@@ -1901,9 +1926,15 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                 'merge_status': mr.merge_status,
             }, 200, "", "GET"
 
-        match = re.match('.+/projects/(.+)/repository/branches$', url)
+        match = re.match('.+/projects/(.+)/'
+                         '(repository/branches|protected_branches)$', url)
         if match:
-            return [{'name': 'master'}], 200, "", "GET"
+            protected = url.endswith('protected_branches')
+            project = urllib.parse.unquote(match.group(1)).split('/')
+            branches = [{'name': branch.name, 'protected': branch.protected}
+                        for branch in self.fake_repos[tuple(project)]
+                        if ((not protected) or branch.protected)]
+            return branches, 200, "", "GET"
 
         match = re.match(
             r'.+/projects/(.+)/merge_requests/(\d+)/approvals$', url)
@@ -1917,6 +1948,18 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                 return {
                     'approved': mr.approved,
                 }, 200, "", "GET"
+
+        match = re.match(r'.+/projects/(.+)/repository/branches/(.+)$', url)
+        if match:
+            project, branch = match.groups()
+            project = urllib.parse.unquote(project)
+            branch = urllib.parse.unquote(branch)
+            owner, name = project.split('/')
+            if branch in self.fake_repos[(owner, name)]:
+                protected = self.fake_repos[(owner, name)][branch].protected
+                return {'protected': protected}, 200, "", "GET"
+            else:
+                return {}, 404, "", "GET"
 
     def post(self, url, params=None, zuul_event_id=None):
 
@@ -1957,6 +2000,16 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             mr.mergeMergeRequest()
 
         return {}, 200, "", "PUT"
+
+    def addProject(self, project):
+        self.addProjectByName(project.name)
+
+    def addProjectByName(self, project_name):
+        owner, proj = project_name.split('/')
+        repo = self.fake_repos[(owner, proj)]
+        branch = FakeBranch('master', False)
+        if 'master' not in repo:
+            repo.append(branch)
 
 
 class GitlabChangeReference(git.Reference):

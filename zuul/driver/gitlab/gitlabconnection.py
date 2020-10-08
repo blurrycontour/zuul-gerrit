@@ -25,12 +25,13 @@ import requests
 import dateutil.parser
 
 from urllib.parse import quote_plus
+from typing import List, Optional
 
-from zuul.connection import BaseConnection
+from zuul.connection import CachedBranchConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Ref, Branch, Tag
+from zuul.model import Branch, Project, Ref, Tag
 
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 
@@ -178,13 +179,10 @@ class GitlabEventConnector(threading.Thread):
         event.ref = body['ref']
         event.newrev = body['after']
         event.oldrev = body['before']
-        if event.newrev == '0' * 40:
-            event.branch_deleted = True
-        elif event.oldrev == '0' * 40:
-            event.branch_created = True
-        else:
-            event.branch_updated = True
         event.type = 'gl_push'
+
+        self.connection.clearConnectionCacheOnBranchEvent(event)
+
         return event
 
     # https://gitlab.com/help/user/project/integrations/webhooks#tag-events
@@ -222,6 +220,7 @@ class GitlabEventConnector(threading.Thread):
         if event:
             event.zuul_event_id = str(uuid.uuid4())
             event.timestamp = ts
+            event.project_hostname = self.connection.canonical_hostname
             if event.change_number:
                 project = self.connection.source.getProject(event.project_name)
                 self.connection._getChange(project,
@@ -230,7 +229,13 @@ class GitlabEventConnector(threading.Thread):
                                            refresh=True,
                                            url=event.change_url,
                                            event=event)
-            event.project_hostname = self.connection.canonical_hostname
+
+            # If this event references a branch and we're excluding
+            # unprotected branches, we might need to check whether the
+            # branch is now protected.
+            if hasattr(event, "branch") and event.branch:
+                self.connection.checkBranchCache(event.project_name, event)
+
             self.connection.logEvent(event)
             self.connection.sched.addEvent(event)
 
@@ -304,12 +309,31 @@ class GitlabAPIClient():
         return resp[0]
 
     # https://docs.gitlab.com/ee/api/branches.html#list-repository-branches
-    def get_project_branches(self, project_name, zuul_event_id=None):
-        path = "/projects/%s/repository/branches" % (
-            quote_plus(project_name))
-        resp = self.get(self.baseurl + path, zuul_event_id=zuul_event_id)
+    def get_project_branches(self, project_name, exclude_unprotected,
+                             zuul_event_id=None):
+        if exclude_unprotected:
+            path = "/projects/{}/protected_branches"
+        else:
+            path = "/projects/{}/repository/branches"
+        url = self.baseurl + path.format(quote_plus(project_name))
+        resp = self.get(url, zuul_event_id=zuul_event_id)
         self._manage_error(*resp, zuul_event_id=zuul_event_id)
         return [branch['name'] for branch in resp[0]]
+
+    # https://docs.gitlab.com/ee/api/branches.html#get-single-repository-branch
+    def get_project_branch(self, project_name, branch_name,
+                           zuul_event_id=None):
+        path = "/projects/{}/repository/branches/{}"
+        path = path.format(quote_plus(project_name), quote_plus(branch_name))
+        url = self.baseurl + path
+        resp = self.get(url, zuul_event_id=zuul_event_id)
+        try:
+            self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        except GitlabAPIClientException:
+            if resp[1] != 404:
+                raise
+            return {}
+        return resp[0]
 
     # https://docs.gitlab.com/ee/api/notes.html#create-new-merge-request-note
     def comment_mr(self, project_name, number, msg, zuul_event_id=None):
@@ -367,7 +391,7 @@ class GitlabAPIClient():
         return resp[0]
 
 
-class GitlabConnection(BaseConnection):
+class GitlabConnection(CachedBranchConnection):
     driver_name = 'gitlab'
     log = logging.getLogger("zuul.GitlabConnection")
     payload_path = 'payload'
@@ -376,7 +400,6 @@ class GitlabConnection(BaseConnection):
         super(GitlabConnection, self).__init__(
             driver, connection_name, connection_config)
         self.projects = {}
-        self.project_branch_cache = {}
         self._change_cache = {}
         self.server = self.connection_config.get('server', 'gitlab.com')
         self.baseurl = self.connection_config.get(
@@ -434,20 +457,17 @@ class GitlabConnection(BaseConnection):
     def addProject(self, project):
         self.projects[project.name] = project
 
-    def getProjectBranches(self, project, tenant):
-        branches = self.project_branch_cache.get(project.name)
-
-        if branches is not None:
-            return branches
-
-        branches = self.gl_client.get_project_branches(project.name)
-        self.project_branch_cache[project.name] = branches
-
-        self.log.info("Got branches for %s" % project.name)
+    def _fetchProjectBranches(self, project: Project,
+                              exclude_unprotected: bool) -> List[str]:
+        branches = self.gl_client.get_project_branches(project.name,
+                                                       exclude_unprotected)
         return branches
 
-    def clearCache(self):
-        self.project_branch_cache = {}
+    def isBranchProtected(self, project_name: str, branch_name: str,
+                          zuul_event_id=None) -> Optional[bool]:
+        branch = self.gl_client.get_project_branch(project_name, branch_name,
+                                                   zuul_event_id)
+        return branch.get('protected')
 
     def getGitwebUrl(self, project, sha=None):
         url = '%s/%s' % (self.baseurl, project)

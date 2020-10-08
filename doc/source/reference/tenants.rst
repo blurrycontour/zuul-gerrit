@@ -199,9 +199,10 @@ configuration. Some examples of tenant definitions are:
 
          .. attr:: exclude-unprotected-branches
 
-            Define if unprotected github branches should be
-            processed. Defaults to the tenant wide setting of
-            exclude-unprotected-branches.
+            Define if unprotected branches should be processed.
+            Defaults to the tenant wide setting of
+            exclude-unprotected-branches. This currently only affects
+            GitHub and GitLab projects.
 
          .. attr:: extra-config-paths
 
@@ -264,7 +265,7 @@ configuration. Some examples of tenant definitions are:
    .. attr:: exclude-unprotected-branches
       :default: false
 
-      When using a branch and pull model on a shared GitHub repository
+      When using a branch and pull model on a shared repository
       there are usually one or more protected branches which are gated
       and a dynamic number of personal/feature branches which are the
       source for the pull requests. These branches can potentially
@@ -272,7 +273,7 @@ configuration. Some examples of tenant definitions are:
       wide configuration. In order to deal with this Zuul's operations
       can be limited to the protected branches which are gated. This
       is a tenant wide setting and can be overridden per project.
-      This currently only affects GitHub projects.
+      This currently only affects GitHub and GitLab projects.
 
    .. attr:: default-parent
       :default: base

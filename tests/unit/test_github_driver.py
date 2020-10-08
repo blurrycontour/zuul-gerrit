@@ -1341,7 +1341,7 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
 
         # Enable branch protection on org/project3@stable. We'll use a PR on
         # this branch as a depends-on to validate that the stable branch
-        # which is not protected in org/project3 is not filtered out.
+        # which is not protected in org/project2 is not filtered out.
         repo = github.repo_from_project('org/project3')
         self.create_branch('org/project3', 'stable')
         repo._set_branch_protection('stable', True)
