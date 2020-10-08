@@ -20,8 +20,8 @@ import socket
 
 import zuul.rpcclient
 
-from tests.base import ZuulTestCase, simple_layout
-from tests.base import ZuulWebFixture
+from tests.base import random_sha1, simple_layout
+from tests.base import ZuulTestCase, ZuulWebFixture
 
 from testtools.matchers import MatchesRegex
 
@@ -511,7 +511,7 @@ class TestGitlabDriver(ZuulTestCase):
         self.waitUntilSettled()
 
         # The changes for the job from project2 should include the project1
-        # PR content
+        # MR content
         changes = self.getJobFromHistory(
             'project2-test', 'org/project2').changes
 
@@ -687,7 +687,7 @@ class TestGitlabDriver(ZuulTestCase):
         self.waitUntilSettled()
 
         # The changes for the job from project4 should include the project3
-        # PR content
+        # MR content
         changes = self.getJobFromHistory(
             'project4-test', 'org/project4').changes
 
@@ -698,3 +698,325 @@ class TestGitlabDriver(ZuulTestCase):
 
         self.assertTrue(A.is_merged)
         self.assertTrue(B.is_merged)
+
+
+class TestGitlabUnprotectedBranches(ZuulTestCase):
+    config_file = 'zuul-gitlab-driver.conf'
+    tenant_config_file = 'config/unprotected-branches-gitlab/main.yaml'
+
+    def test_unprotected_branches(self):
+        tenant = self.scheds.first.sched.abide.tenants\
+            .get('tenant-one')
+
+        project1 = tenant.untrusted_projects[0]
+        project2 = tenant.untrusted_projects[1]
+
+        tpc1 = tenant.project_configs[project1.canonical_name]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+
+        # project1 should have parsed master
+        self.assertIn('master', tpc1.parsed_branch_config.keys())
+
+        # project2 should have no parsed branch
+        self.assertEqual(0, len(tpc2.parsed_branch_config.keys()))
+
+        # now enable branch protection and trigger reload
+        self.fake_gitlab.protectBranch('org', 'project2', 'master')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        tpc1 = tenant.project_configs[project1.canonical_name]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+
+        # project1 and project2 should have parsed master now
+        self.assertIn('master', tpc1.parsed_branch_config.keys())
+        self.assertIn('master', tpc2.parsed_branch_config.keys())
+
+    def test_filtered_branches_in_build(self):
+        """
+        Tests unprotected branches are filtered in builds if excluded
+        """
+        self.executor_server.keep_jobdir = True
+
+        # Enable branch protection on org/project2@master
+        self.create_branch('org/project2', 'feat-x')
+        self.fake_gitlab.protectBranch('org', 'project2', 'master',
+                                       protected=True)
+
+        # Enable branch protection on org/project3@stable. We'll use a MR on
+        # this branch as a depends-on to validate that the stable branch
+        # which is not protected in org/project2 is not filtered out.
+        self.create_branch('org/project3', 'stable')
+        self.fake_gitlab.protectBranch('org', 'project3', 'stable',
+                                       protected=True)
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project3', 'stable',
+                                                  'A')
+        msg = "Depends-On: %s" % A.url
+        B = self.fake_gitlab.openFakeMergeRequest('org/project2', 'master',
+                                                  'B', description=msg)
+
+        self.fake_gitlab.emitEvent(B.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        build = self.history[0]
+        path = os.path.join(
+            build.jobdir.src_root, 'gitlab', 'org/project2')
+        build_repo = git.Repo(path)
+        branches = [x.name for x in build_repo.branches]
+        self.assertNotIn('feat-x', branches)
+
+        self.assertHistory([
+            dict(name='used-job', result='SUCCESS',
+                 changes="%s,%s %s,%s" % (A.number, A.sha,
+                                          B.number, B.sha)),
+        ])
+
+    def test_unfiltered_branches_in_build(self):
+        """
+        Tests unprotected branches are not filtered in builds if not excluded
+        """
+        self.executor_server.keep_jobdir = True
+
+        # Enable branch protection on org/project1@master
+        self.create_branch('org/project1', 'feat-x')
+        self.fake_gitlab.protectBranch('org', 'project1', 'master',
+                                       protected=True)
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project1', 'master',
+                                                  'A')
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        build = self.history[0]
+        path = os.path.join(
+            build.jobdir.src_root, 'gitlab', 'org/project1')
+        build_repo = git.Repo(path)
+        branches = [x.name for x in build_repo.branches]
+        self.assertIn('feat-x', branches)
+
+        self.assertHistory([
+            dict(name='project-test', result='SUCCESS',
+                 changes="%s,%s" % (A.number, A.sha)),
+        ])
+
+    def test_unprotected_push(self):
+        """Test that unprotected pushes don't cause tenant reconfigurations"""
+
+        # Prepare repo with an initial commit
+        A = self.fake_gitlab.openFakeMergeRequest('org/project2', 'master',
+                                                  'A')
+
+        zuul_yaml = [
+            {'job': {
+                'name': 'used-job2',
+                'run': 'playbooks/used-job.yaml'
+            }},
+            {'project': {
+                'check': {
+                    'jobs': [
+                        'used-job2'
+                    ]
+                }
+            }}
+        ]
+
+        A.addCommit({'zuul.yaml': yaml.dump(zuul_yaml)})
+        A.mergeMergeRequest()
+
+        # Do a push on top of A
+        pevent = self.fake_gitlab.getPushEvent(project='org/project2',
+                                               before=A.sha,
+                                               branch='refs/heads/master')
+
+        # record previous tenant reconfiguration time, which may not be set
+        old = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        self.waitUntilSettled()
+
+        self.fake_gitlab.emitEvent(pevent)
+        self.waitUntilSettled()
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+
+        # We don't expect a reconfiguration because the push was to an
+        # unprotected branch
+        self.assertEqual(old, new)
+
+        # now enable branch protection and trigger the push event again
+        self.fake_gitlab.protectBranch('org', 'project2', 'master')
+
+        self.fake_gitlab.emitEvent(pevent)
+        self.waitUntilSettled()
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+
+        # We now expect that zuul reconfigured itself
+        self.assertLess(old, new)
+
+    def test_protected_branch_delete(self):
+        """Test that protected branch deletes trigger a tenant reconfig"""
+
+        # Prepare repo with an initial commit and enable branch protection
+        self.fake_gitlab.protectBranch('org', 'project2', 'master')
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project2', 'master',
+                                                  'A')
+        A.mergeMergeRequest()
+
+        # add a spare branch so that the project is not empty after master gets
+        # deleted.
+        self.create_branch('org/project2', 'feat-x')
+        self.fake_gitlab.protectBranch('org', 'project2', 'feat-x',
+                                       protected=False)
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        # record previous tenant reconfiguration time, which may not be set
+        old = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        self.waitUntilSettled()
+
+        # Delete the branch
+        self.fake_gitlab.deleteBranch('org', 'project2', 'master')
+
+        pevent = self.fake_gitlab.getPushEvent(project='org/project2',
+                                               before=A.sha,
+                                               after='0' * 40,
+                                               branch='refs/heads/master')
+
+        self.fake_gitlab.emitEvent(pevent)
+        self.waitUntilSettled()
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+
+        # We now expect that zuul reconfigured itself as we deleted a protected
+        # branch
+        self.assertLess(old, new)
+
+    # This test verifies that a PR is considered in case it was created for
+    # a branch just has been set to protected before a tenant reconfiguration
+    # took place.
+    def test_reconfigure_on_pr_to_new_protected_branch(self):
+        self.create_branch('org/project2', 'release')
+        self.create_branch('org/project2', 'feature')
+
+        self.fake_gitlab.protectBranch('org', 'project2', 'master')
+        self.fake_gitlab.protectBranch('org', 'project2', 'release',
+                                       protected=False)
+        self.fake_gitlab.protectBranch('org', 'project2', 'feature',
+                                       protected=False)
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        self.fake_gitlab.protectBranch('org', 'project2', 'release')
+
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project2', 'release', 'A')
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('used-job').result)
+
+        job = self.getJobFromHistory('used-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual(str(A.number), zuulvars['change'])
+        self.assertEqual(str(A.sha), zuulvars['patchset'])
+        self.assertEqual('release', zuulvars['branch'])
+
+        self.assertEqual(1, len(self.history))
+
+    def _test_push_event_reconfigure(self, project, branch,
+                                     expect_reconfigure=False,
+                                     old_sha=None, new_sha=None,
+                                     modified_files=None,
+                                     removed_files=None,
+                                     expected_cat_jobs=None):
+        pevent = self.fake_gitlab.getPushEvent(
+            project=project,
+            branch='refs/heads/%s' % branch,
+            before=old_sha,
+            after=new_sha)
+
+        # record previous tenant reconfiguration time, which may not be set
+        old = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+        self.waitUntilSettled()
+
+        if expected_cat_jobs is not None:
+            # clear the gearman jobs history so we can count the cat jobs
+            # issued during reconfiguration
+            self.gearman_server.jobs_history.clear()
+
+        self.fake_gitlab.emitEvent(pevent)
+        self.waitUntilSettled()
+        new = self.scheds.first.sched.tenant_last_reconfigured\
+            .get('tenant-one', 0)
+
+        if expect_reconfigure:
+            # New timestamp should be greater than the old timestamp
+            self.assertLess(old, new)
+        else:
+            # Timestamps should be equal as no reconfiguration shall happen
+            self.assertEqual(old, new)
+
+        if expected_cat_jobs is not None:
+            # Check the expected number of cat jobs here as the (empty) config
+            # of org/project should be cached.
+            cat_jobs = set([job for job in self.gearman_server.jobs_history
+                           if job.name == b'merger:cat'])
+            self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
+
+    def test_push_event_reconfigure_complex_branch(self):
+
+        branch = 'feature/somefeature'
+        project = 'org/project2'
+
+        # prepare an existing branch
+        self.create_branch(project, branch)
+
+        self.fake_gitlab.protectBranch(*project.split('/'), branch,
+                                       protected=False)
+
+        self.fake_gitlab.emitEvent(
+            self.fake_gitlab.getPushEvent(
+                project,
+                branch='refs/heads/%s' % branch))
+        self.waitUntilSettled()
+
+        A = self.fake_gitlab.openFakeMergeRequest(project, branch, 'A')
+        old_sha = A.sha
+        A.mergeMergeRequest()
+        new_sha = random_sha1()
+
+        # branch is not protected, no reconfiguration even if config file
+        self._test_push_event_reconfigure(project, branch,
+                                          expect_reconfigure=False,
+                                          old_sha=old_sha,
+                                          new_sha=new_sha,
+                                          modified_files=['zuul.yaml'],
+                                          expected_cat_jobs=0)
+
+        # branch is not protected: no reconfiguration
+        self.fake_gitlab.deleteBranch(*project.split('/'), branch)
+
+        self._test_push_event_reconfigure(project, branch,
+                                          expect_reconfigure=False,
+                                          old_sha=new_sha,
+                                          new_sha='0' * 40,
+                                          removed_files=['zuul.yaml'])
