@@ -71,7 +71,7 @@ docker-compose in order to start Zuul, Nodepool and Gerrit.
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   sudo -E docker-compose up
+   sudo -E docker-compose -p zuul-tutorial up
 
 For reference, the files in that directory are also `browsable on the web
 <https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples>`_.
