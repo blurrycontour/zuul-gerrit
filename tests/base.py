@@ -29,6 +29,7 @@ import os
 import queue
 import random
 import re
+from collections import defaultdict, namedtuple
 from logging import Logger
 from queue import Queue
 from typing import Callable, Optional, Any, Iterable, Generator, List
@@ -61,6 +62,7 @@ import testtools
 import testtools.content
 import testtools.content_type
 from git.exc import NoSuchPathError
+from git.util import IterableList
 import yaml
 import paramiko
 
@@ -1565,6 +1567,20 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         self.upstream_root = upstream_root
         self.mr_number = 0
 
+    def addProject(self, project):
+        super(FakeGitlabConnection, self).addProject(project)
+        self.gl_client.addProject(project)
+
+    def protectBranch(self, owner, project, branch, protected=True):
+        if branch in self.gl_client.fake_repos[(owner, project)]:
+            del self.gl_client.fake_repos[(owner, project)][branch]
+        fake_branch = FakeBranch(branch, protected=protected)
+        self.gl_client.fake_repos[(owner, project)].append(fake_branch)
+
+    def deleteBranch(self, owner, project, branch):
+        if branch in self.gl_client.fake_repos[(owner, project)]:
+            del self.gl_client.fake_repos[(owner, project)][branch]
+
     def getGitUrl(self, project):
         return 'file://' + os.path.join(self.upstream_root, project.name)
 
@@ -1635,12 +1651,16 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         self.gl_client.community_edition = False
 
 
+FakeBranch = namedtuple('Branch', ('name', 'protected'))
+
+
 class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
     log = logging.getLogger("zuul.test.FakeGitlabAPIClient")
 
     def __init__(self, baseurl, api_token, merge_requests_db={}):
         super(FakeGitlabAPIClient, self).__init__(baseurl, api_token)
         self.merge_requests = merge_requests_db
+        self.fake_repos = defaultdict(lambda: IterableList('name'))
         self.community_edition = False
 
     def gen_error(self, verb):
@@ -1685,8 +1705,15 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             }, 200, "", "GET"
 
         match = re.match('.+/projects/(.+)/repository/branches$', url)
+        if not match:
+            match = re.match('.+/projects/(.+)/protected_branches$', url)
         if match:
-            return [{'name': 'master'}], 200, "", "GET"
+            protected = url.endswith('protected_branches')
+            project = urllib.parse.unquote(match.group(1)).split('/')
+            branches = [{'name': branch.name, 'protected': branch.protected}
+                        for branch in self.fake_repos[tuple(project)]
+                        if ((not protected) or branch.protected)]
+            return branches, 200, "", "GET"
 
         match = re.match(
             r'.+/projects/(.+)/merge_requests/(\d+)/approvals$', url)
@@ -1700,6 +1727,18 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                 return {
                     'approved': mr.approved,
                 }, 200, "", "GET"
+
+        match = re.match(r'.+/projects/(.+)/repository/branches/(.+)$', url)
+        if match:
+            project, branch = match.groups()
+            project = urllib.parse.unquote(project)
+            branch = urllib.parse.unquote(branch)
+            owner, name = project.split('/')
+            if branch in self.fake_repos[(owner, name)]:
+                protected = self.fake_repos[(owner, name)][branch].protected
+                return {'protected': protected}, 200, "", "GET"
+            else:
+                return {}, 404, "", "GET"
 
     def post(self, url, params=None, zuul_event_id=None):
 
@@ -1740,6 +1779,16 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
             mr.mergeMergeRequest()
 
         return {}, 200, "", "PUT"
+
+    def addProject(self, project):
+        self.addProjectByName(project.name)
+
+    def addProjectByName(self, project_name):
+        owner, proj = project_name.split('/')
+        repo = self.fake_repos[(owner, proj)]
+        branch = FakeBranch('master', False)
+        if 'master' not in repo:
+            repo.append(branch)
 
 
 class GitlabChangeReference(git.Reference):
@@ -3981,28 +4030,6 @@ class ZuulTestCase(BaseTestCase):
             'zuul.driver.gerrit.GerritDriver.getConnection',
             getGerritConnection))
 
-        def registerGithubProjects(con):
-            path = self.config.get('scheduler', 'tenant_config')
-            with open(os.path.join(FIXTURE_DIR, path)) as f:
-                tenant_config = yaml.safe_load(f.read())
-            for tenant in tenant_config:
-                sources = tenant['tenant']['source']
-                conf = sources.get(con.source.name)
-                if not conf:
-                    return
-
-                projects = conf.get('config-projects', [])
-                projects.extend(conf.get('untrusted-projects', []))
-
-                client = con.getGithubClient(None)
-                for project in projects:
-                    if isinstance(project, dict):
-                        # This can be a dict with the project as the only key
-                        client.addProjectByName(
-                            list(project.keys())[0])
-                    else:
-                        client.addProjectByName(project)
-
         def getGithubConnection(driver, name, config):
             server = config.get('server', 'github.com')
             db = self.github_changes_dbs.setdefault(server, {})
@@ -4014,7 +4041,8 @@ class ZuulTestCase(BaseTestCase):
                 git_url_with_auth=self.git_url_with_auth)
             self.additional_event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
-            registerGithubProjects(con)
+            client = con.getGithubClient(None)
+            self.registerProjects(con.source.name, client)
             return con
 
         self.useFixture(fixtures.MonkeyPatch(
@@ -4047,6 +4075,7 @@ class ZuulTestCase(BaseTestCase):
                 upstream_root=self.upstream_root)
             self.additional_event_queues.append(con.event_queue)
             setattr(self, 'fake_' + name, con)
+            self.registerProjects(con.source.name, con.gl_client)
             return con
 
         self.useFixture(fixtures.MonkeyPatch(
@@ -4079,6 +4108,27 @@ class ZuulTestCase(BaseTestCase):
         # Register connections from the config using fakes
         self.connections = zuul.lib.connections.ConnectionRegistry()
         self.connections.configure(self.config, source_only=source_only)
+
+    def registerProjects(self, source_name, client):
+        path = self.config.get('scheduler', 'tenant_config')
+        with open(os.path.join(FIXTURE_DIR, path)) as f:
+            tenant_config = yaml.safe_load(f.read())
+        for tenant in tenant_config:
+            sources = tenant['tenant']['source']
+            conf = sources.get(source_name)
+            if not conf:
+                return
+
+            projects = conf.get('config-projects', [])
+            projects.extend(conf.get('untrusted-projects', []))
+
+            for project in projects:
+                if isinstance(project, dict):
+                    # This can be a dict with the project as the only key
+                    client.addProjectByName(
+                        list(project.keys())[0])
+                else:
+                    client.addProjectByName(project)
 
     def setup_config(self, config_file: str):
         # This creates the per-test configuration object.  It can be
