@@ -1701,6 +1701,11 @@ class FakeGitlabAPIClient(gitlabconnection.GitlabAPIClient):
                     'approved': mr.approved,
                 }, 200, "", "GET"
 
+        match = re.match(r'.+/projects/(.+)/repository/branches/(.+)$', url)
+        if match:
+            project, branch = match.groups()
+            return {'protected': False}, 200, "", "GET"
+
     def post(self, url, params=None, zuul_event_id=None):
 
         self.log.info(
