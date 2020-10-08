@@ -444,7 +444,7 @@ class GitlabConnection(BaseConnection):
         self.log.info("Got branches for %s" % project.name)
         return branches
 
-    def clearBranchCache(self):
+    def clearCache(self):
         self.project_branch_cache = {}
 
     def getGitwebUrl(self, project, sha=None):

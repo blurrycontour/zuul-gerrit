@@ -857,8 +857,8 @@ class Scheduler(threading.Thread):
                 default_version=default_ansible_version)
 
             for connection in self.connections.connections.values():
-                self.log.debug("Clear branch cache for: %s" % connection)
-                connection.clearBranchCache()
+                self.log.debug("Clear cache for: %s" % connection)
+                connection.clearCache()
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
