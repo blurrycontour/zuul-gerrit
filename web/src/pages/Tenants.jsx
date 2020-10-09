@@ -34,8 +34,17 @@ import {
 } from '@patternfly/react-table'
 import { Fetching } from '../containers/Fetching'
 import { fetchTenantsIfNeeded } from '../actions/tenants'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { Grid,
+         GridItem,
+         PageSection,
+         PageSectionVariants,
+         TextContent,
+         Title,
+         Text,
+} from '@patternfly/react-core'
 import { IconProperty } from '../containers/build/Misc'
+import LogoImage from '../images/logo.compact.svg'
+import SplashBackgroundImage from '../images/bg01.png'
 
 class TenantsPage extends React.Component {
   static propTypes = {
@@ -108,19 +117,52 @@ class TenantsPage extends React.Component {
       }
     ]
 
-    return (
-      <PageSection variant={PageSectionVariants.light}>
-        <Table
-          aria-label="Tenant Table"
-          variant={TableVariant.compact}
-          cells={columns}
-          rows={tenants}
-          className="zuul-tenant-table"
-        >
-        <TableHeader />
-        <TableBody />
-      </Table>
-      </PageSection>
+      return (
+        <React.Fragment>
+          <PageSection
+            variant={PageSectionVariants.light}
+              style={{ backgroundColor: '#37c0fb', backgroundImage: `url(${SplashBackgroundImage})` }}>
+            <Grid>
+              <GridItem offset={4} span={4}>
+                <TextContent>
+                  <Title headingLevel="h1" size="4xl" style={{ color: 'white' }}>
+                    Hello, welcome to Zuul
+                  </Title>
+                  <Text style={{ color: 'white' }}>
+                    Zuul is the complete solution for your software development lifecycle
+                  </Text>
+                </TextContent>
+              </GridItem>
+              <GridItem span={1}>
+                <a href='https://zuul-ci.org'>
+                  <img src={LogoImage} style={{ height: 90 }} alt='Zuul Logo' />
+                </a>
+              </GridItem>
+            </Grid>
+          </PageSection>
+          <PageSection variant={PageSectionVariants.light}>
+            <TextContent>
+              <Title headingLevel="h2">
+                Tenants
+              </Title>
+              <Text>
+                The following tenants are configured for this instance of Zuul
+              </Text>
+            </TextContent>
+          </PageSection>
+          <PageSection variant={PageSectionVariants.light}>
+            <Table
+              aria-label="Tenant Table"
+              variant={TableVariant.compact}
+              cells={columns}
+              rows={tenants}
+              className="zuul-tenant-table"
+            >
+              <TableHeader />
+              <TableBody />
+            </Table>
+          </PageSection>
+        </React.Fragment>
     )
   }
 }
