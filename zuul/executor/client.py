@@ -389,7 +389,7 @@ class ExecutorClient(object):
 
         return build
 
-    def cancel(self, build):
+    def cancel(self, build: Build) -> bool:
         log = get_annotated_logger(self.log, build.zuul_event_id,
                                    build=build.uuid)
         # Returns whether a running build was canceled
@@ -397,12 +397,12 @@ class ExecutorClient(object):
 
         build.canceled = True
         try:
-            job = build.__gearman_job  # noqa
+            _ = build.__gearman_job  # type: ignore
         except AttributeError:
             log.debug("Build has no associated gearman job")
             return False
 
-        if build.__gearman_worker is not None:
+        if build.__gearman_worker is not None:  # type: ignore
             log.debug("Build has already started")
             self.cancelRunningBuild(build)
             log.debug("Canceled running build")
@@ -418,12 +418,13 @@ class ExecutorClient(object):
         time.sleep(1)
 
         log.debug("Still unable to find build to cancel")
-        if build.__gearman_worker is not None:
+        if build.__gearman_worker is not None:  # type: ignore
             log.debug("Build has just started")
             self.cancelRunningBuild(build)
             log.debug("Canceled running build")
             return True
         log.error("Unable to cancel build")
+        return False
 
     def onBuildCompleted(self, job, result=None):
         if job.unique in self.meta_jobs:
