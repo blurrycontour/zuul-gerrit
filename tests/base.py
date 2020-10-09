@@ -3865,9 +3865,9 @@ class SchedulerTestApp:
             git_url_with_auth, add_cleanup)
         self.connections.configure(self.config, source_only=source_only)
 
+        zuul.scheduler.Scheduler.merger_client_class = RecordingMergeClient
         self.sched = zuul.scheduler.Scheduler(self.config, self.connections,
-                                              zk)
-        self.sched.setZuulApp(self)
+                                              zk, app=self)
         self.sched._stats_interval = 1
 
         self.event_queues = [
@@ -3875,15 +3875,6 @@ class SchedulerTestApp:
             self.sched.trigger_event_queue,
             self.sched.management_event_queue
         ]
-
-        executor_client = zuul.executor.client.ExecutorClient(
-            self.config, self.sched, zk)
-        merge_client = RecordingMergeClient(self.config, self.sched)
-        nodepool = zuul.nodepool.Nodepool(self.sched)
-
-        self.sched.setExecutor(executor_client)
-        self.sched.setMerger(merge_client)
-        self.sched.setNodepool(nodepool)
 
         self.sched.start()
         self.sched.reconfigure(self.config)
