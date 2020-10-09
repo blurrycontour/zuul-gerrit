@@ -15,7 +15,7 @@
 import logging
 import re
 from collections import OrderedDict
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from typing import Dict, Any
 from urllib.parse import urlparse
 from zuul.reporter import BaseReporter
@@ -35,6 +35,8 @@ from zuul import model
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 from zuul.source import BaseSource
+if TYPE_CHECKING:
+    from zuul.scheduler import Scheduler
 
 
 class DefaultConnection(BaseConnection):
@@ -68,13 +70,11 @@ class ConnectionRegistry(object):
             raise Exception("Driver %s already registered" % driver.name)
         self.drivers[driver.name] = driver
 
-    def registerScheduler(self, sched, load=True):
-        for driver_name, driver in self.drivers.items():
+    def registerScheduler(self, sched: 'Scheduler') -> None:
+        for _, driver in self.drivers.items():
             driver.registerScheduler(sched)
-        for connection_name, connection in self.connections.items():
+        for _, connection in self.connections.items():
             connection.registerScheduler(sched)
-            if load:
-                connection.onLoad()
 
     def reconfigureDrivers(self, tenant):
         for driver in self.drivers.values():
