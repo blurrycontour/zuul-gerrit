@@ -31,6 +31,8 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from uuid import uuid4
 
 import jsonpath_rw
+from kazoo.protocol.states import ZnodeStat
+from kazoo.recipe.lock import Lock
 
 from zuul import change_matcher
 from zuul.lib.capabilities import capabilities_registry
@@ -566,31 +568,32 @@ class Node(ConfigObject):
     provided by Nodepool.
     """
 
-    def __init__(self, name, label):
+    def __init__(self, name: Any, label: Optional[str]):
         super(Node, self).__init__()
         self.name = name
         self.label = label
-        self.id = None
+        self.id: Optional[str] = None
         self.lock = None
         self.hold_job = None
-        self.comment = None
+        self.comment: Optional[str] = None
         # Attributes from Nodepool
         self._state = 'unknown'
         self.state_time = time.time()
-        self.host_id = None
-        self.interface_ip = None
-        self.public_ipv4 = None
-        self.private_ipv4 = None
-        self.public_ipv6 = None
+        self.host_id: Optional[str] = None
+        self.interface_ip: Optional[str] = None
+        self.public_ipv4: Optional[str] = None
+        self.private_ipv4: Optional[str] = None
+        self.public_ipv6: Optional[str] = None
         self.connection_port = 22
-        self.connection_type = None
-        self._keys = []
-        self.az = None
-        self.provider = None
-        self.region = None
-        self.username = None
-        self.hold_expiration = None
-        self.resources = None
+        self.connection_type: Optional[str] = None
+        self._keys: List[str] = []
+        self.az: Optional[str] = None
+        self.provider: Optional[str] = None
+        self.region: Optional[str] = None
+        self.username: Optional[str] = None
+        self.hold_expiration: Optional[str] = None
+        self.resources: Optional[Dict[str, int]] = None
+        self.allocated_to: Optional[str] = None
 
     @property
     def state(self):
@@ -686,8 +689,8 @@ class NodeSet(ConfigObject):
     def __init__(self, name=None):
         super(NodeSet, self).__init__()
         self.name = name or ''
-        self.nodes = OrderedDict()
-        self.groups = OrderedDict()
+        self.nodes: Dict[Any, Node] = OrderedDict()
+        self.groups: Dict[str, Group] = OrderedDict()
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -709,29 +712,29 @@ class NodeSet(ConfigObject):
             d['groups'].append(group.toDict())
         return d
 
-    def copy(self):
+    def copy(self) -> 'NodeSet':
         n = NodeSet(self.name)
-        for name, node in self.nodes.items():
+        for node in self.nodes.values():
             n.addNode(Node(node.name, node.label))
-        for name, group in self.groups.items():
+        for group in self.groups.values():
             n.addGroup(Group(group.name, group.nodes[:]))
         return n
 
-    def addNode(self, node):
+    def addNode(self, node: Node) -> None:
         for name in node.name:
             if name in self.nodes:
                 raise Exception("Duplicate node in %s" % (self,))
         self.nodes[tuple(node.name)] = node
 
-    def getNodes(self):
+    def getNodes(self) -> List[Node]:
         return list(self.nodes.values())
 
-    def addGroup(self, group):
+    def addGroup(self, group: Group) -> None:
         if group.name in self.groups:
             raise Exception("Duplicate group in %s" % (self,))
         self.groups[group.name] = group
 
-    def getGroups(self):
+    def getGroups(self) -> List[Group]:
         return list(self.groups.values())
 
     def __repr__(self):
@@ -748,26 +751,33 @@ class NodeSet(ConfigObject):
 class NodeRequest(object):
     """A request for a set of nodes."""
 
-    def __init__(self, requestor, build_set, job, nodeset, relative_priority,
-                 event=None):
+    def __init__(
+        self,
+        requestor: str,
+        build_set: "BuildSet",
+        job: "Job",
+        nodeset: NodeSet,
+        relative_priority: int,
+        event: Optional["TriggerEvent"] = None,
+    ):
         self.requestor = requestor
         self.build_set = build_set
         self.job = job
+        self.lock: Optional[Lock] = None
         self.nodeset = nodeset
         self._state = STATE_REQUESTED
         self.requested_time = time.time()
         self.state_time = time.time()
-        self.created_time = None
-        self.stat = None
+        self.created_time: Optional[float] = None
+        self.stat: Optional[ZnodeStat] = None
         self.uid = uuid4().hex
         self.relative_priority = relative_priority
-        self.provider = self._getPausedParentProvider()
-        self.id = None
-        self._zk_data = {}  # Data that we read back from ZK
+        self.provider: Optional[str] = self._getPausedParentProvider()
+        self.id: Optional[str] = None
+        self._zk_data: Dict[str, Any] = {}  # Data that we read back from ZK
+        self.event_id: Optional[str] = None
         if event is not None:
             self.event_id = event.zuul_event_id
-        else:
-            self.event_id = None
         # Zuul internal flags (not stored in ZK so they are not
         # overwritten).
         self.failed = False
