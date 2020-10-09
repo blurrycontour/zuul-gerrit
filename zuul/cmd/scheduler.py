@@ -139,11 +139,11 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.log = logging.getLogger("zuul.Scheduler")
 
         self.configure_connections(require_sql=True)
-        self.sched = zuul.scheduler.Scheduler(self.config, self.connections)
+        self.sched = zuul.scheduler.Scheduler(self.config,
+                                              self.connections, self)
         if self.args.validate_tenants is None:
             self.connections.registerScheduler(self.sched)
 
-        self.sched.setZuulApp(self)
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
         self.sched.setMerger(merger)
 
