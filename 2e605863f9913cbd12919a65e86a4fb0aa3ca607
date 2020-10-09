@@ -22,6 +22,29 @@
       "revId": "2e605863f9913cbd12919a65e86a4fb0aa3ca607",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_851e8571",
+        "filename": "web/src/pages/Tenants.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2020-10-09T10:15:41Z",
+      "side": 1,
+      "message": "In the documentation, only default,light,dark,darker are available for PageSection",
+      "range": {
+        "startLine": 142,
+        "startChar": 32,
+        "endLine": 142,
+        "endChar": 58
+      },
+      "revId": "2e605863f9913cbd12919a65e86a4fb0aa3ca607",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
