@@ -12,32 +12,32 @@
 
 import base64
 import collections
-from contextlib import contextmanager
 import copy
-import itertools
-import os
-import logging
-import textwrap
 import io
+import itertools
+import logging
+import os
 import re
 import subprocess
+import textwrap
+from contextlib import contextmanager
 from typing import Any, Dict, Optional, TYPE_CHECKING
 
 import voluptuous as vs
 
-from zuul.driver.sql.sqlconnection import SQLConnection
-from zuul import model
-from zuul.lib import ansible
-from zuul.lib import yamlutil as yaml
-from zuul.merger.client import MergeClient
 import zuul.manager.dependent
 import zuul.manager.independent
-import zuul.manager.supercedent
 import zuul.manager.serial
+import zuul.manager.supercedent
+from zuul import model
+from zuul.driver.sql.sqlconnection import SQLConnection
 from zuul.lib import encryption
+from zuul.lib import yamlutil as yaml
+from zuul.lib.ansible import AnsibleManager
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
+from zuul.merger.client import MergeClient
 
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
@@ -1445,7 +1445,7 @@ class ParseContext(object):
         connections: "ConnectionRegistry",
         scheduler: "Scheduler",
         tenant: model.Tenant,
-        ansible_manager: ansible.AnsibleManager,
+        ansible_manager: AnsibleManager,
     ):
         self.connections = connections
         self.scheduler = scheduler
@@ -1523,7 +1523,7 @@ class TenantParser(object):
     })
 
     @classmethod
-    def getSchema(cls, connections: 'ConnectionRegistry'):
+    def getSchema(cls, connections: 'ConnectionRegistry') -> vs.Schema:
         def validateTenantSources(value, path=None):
             if isinstance(value, dict):
                 for k, val in value.items():
@@ -1549,7 +1549,12 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager) -> model.Tenant:
+    def fromYaml(
+        self,
+        abide: model.Abide,
+        conf: Dict[str, Any],
+        ansible_manager: AnsibleManager,
+    ) -> model.Tenant:
         self.getSchema(self.connections)(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -2221,7 +2226,9 @@ class ConfigLoader(object):
         self.admin_rule_parser = AuthorizationRuleParser()
 
     @classmethod
-    def readConfig(cls, config_path: str, from_script: bool = False):
+    def readConfig(
+        cls, config_path: str, from_script: bool = False
+    ) -> model.UnparsedAbideConfig:
         if config_path:
             config_path = os.path.expanduser(config_path)
         if not os.path.exists(config_path):
@@ -2279,7 +2286,7 @@ class ConfigLoader(object):
         self,
         abide: model.Abide,
         tenant: model.Tenant,
-        ansible_manager: ansible.AnsibleManager,
+        ansible_manager: AnsibleManager,
         unparsed_abide: Optional[model.UnparsedAbideConfig] = None
     ) -> model.Abide:
         new_abide = model.Abide()
