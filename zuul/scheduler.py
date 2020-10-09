@@ -29,7 +29,7 @@ import urllib
 from configparser import ConfigParser
 from queue import Queue
 from threading import Thread
-from typing import Optional, Dict, TYPE_CHECKING, Callable
+from typing import Optional, Dict, TYPE_CHECKING, Callable, Any
 
 from statsd import StatsClient
 
@@ -50,12 +50,12 @@ import zuul.lib.repl
 from zuul.merger.client import MergeClient
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent, \
     UnparsedAbideConfig, Abide, TimeDataBase, Change
+from zuul.nodepool import Nodepool
 from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
-    from zuul.cmd import ZuulDaemonApp
     from zuul.lib.connections import ConnectionRegistry
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -299,12 +299,13 @@ class Scheduler(threading.Thread):
 
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
+    _merger_client_class = MergeClient
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
 
     def __init__(self, config: ConfigParser, connections,
-                 zk_client: ZooKeeperClient):
+                 zk_client: ZooKeeperClient, app: Any):
         threading.Thread.__init__(self)
         self.daemon: bool = True
         self.hostname: str = socket.getfqdn()
@@ -320,9 +321,7 @@ class Scheduler(threading.Thread):
         }
         self._hibernate: bool = False
         self._stopped: bool = False
-        self._zuul_app: Optional[ZuulDaemonApp] = None
-        self.executor: Optional[ExecutorClient] = None
-        self.merger: Optional[MergeClient] = None
+        self._zuul_app = app
         self.connections: ConnectionRegistry = connections
         self.statsd: StatsClient = get_statsd(config)
         self.rpc: RPCListener = RPCListener(config, self)
@@ -379,6 +378,9 @@ class Scheduler(threading.Thread):
         self.ansible_manager: AnsibleManager = AnsibleManager(
             default_version=default_ansible_version)
 
+        self.executor: ExecutorClient = ExecutorClient(self.config, self)
+        self.merger: MergeClient = self._merger_client_class(self.config, self)
+        self.nodepool: Nodepool = Nodepool(self)
         self.connections.registerScheduler(self)
 
     def start(self):
@@ -420,18 +422,6 @@ class Scheduler(threading.Thread):
 
     def stopConnections(self):
         self.connections.stop()
-
-    def setZuulApp(self, app: 'ZuulDaemonApp'):
-        self._zuul_app = app
-
-    def setExecutor(self, executor_client: ExecutorClient):
-        self.executor = executor_client
-
-    def setMerger(self, merger: MergeClient):
-        self.merger = merger
-
-    def setNodepool(self, nodepool):
-        self.nodepool = nodepool
 
     def runStats(self):
         while not self.stats_stop.wait(self._stats_interval):
