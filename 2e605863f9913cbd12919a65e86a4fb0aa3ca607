@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_3816c1a8",
+        "filename": "web/src/pages/Tenants.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-10-09T05:52:51Z",
+      "side": 1,
+      "message": "note this is the colour from the zuul-ci.org page",
+      "range": {
+        "startLine": 123,
+        "startChar": 75,
+        "endLine": 123,
+        "endChar": 83
+      },
+      "revId": "2e605863f9913cbd12919a65e86a4fb0aa3ca607",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
