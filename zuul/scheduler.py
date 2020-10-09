@@ -28,17 +28,18 @@ import traceback
 import urllib
 from configparser import ConfigParser
 from queue import Queue
-from typing import Optional, Dict, TYPE_CHECKING
+from threading import Thread
+from typing import Optional, Dict, TYPE_CHECKING, Callable
+
+from statsd import StatsClient
 
 
 from zuul import configloader
-from zuul import model
 from zuul import exceptions
 from zuul import version as zuul_version
-from zuul import rpclistener
 from zuul.executor.client import ExecutorClient
-from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
+from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
@@ -47,12 +48,14 @@ from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul.merger.client import MergeClient
-from zuul.model import Build, HoldRequest, Tenant, TriggerEvent, Abide, \
-    UnparsedAbideConfig
+from zuul.model import Build, HoldRequest, Tenant, TriggerEvent, \
+    UnparsedAbideConfig, Abide, TimeDataBase, Change
+from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
+    from zuul.cmd import ZuulDaemonApp
     from zuul.lib.connections import ConnectionRegistry
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -303,29 +306,31 @@ class Scheduler(threading.Thread):
     def __init__(self, config: ConfigParser, connections,
                  zk_client: ZooKeeperClient):
         threading.Thread.__init__(self)
-        self.daemon = True
-        self.hostname = socket.getfqdn()
-        self.wake_event = threading.Event()
-        self.layout_lock = threading.Lock()
-        self.run_handler_lock = threading.Lock()
-        self.command_map = {
+        self.daemon: bool = True
+        self.hostname: str = socket.getfqdn()
+        self.wake_event: threading.Event = threading.Event()
+        self.layout_lock: threading.Lock = threading.Lock()
+        self.run_handler_lock: threading.Lock = threading.Lock()
+        self.command_map: Dict[str, Callable[[], None]] = {
             'stop': self.stop,
             'full-reconfigure': self.fullReconfigureCommandHandler,
             'smart-reconfigure': self.smartReconfigureCommandHandler,
             'repl': self.start_repl,
             'norepl': self.stop_repl,
         }
-        self._hibernate = False
-        self._stopped = False
-        self._zuul_app = None
+        self._hibernate: bool = False
+        self._stopped: bool = False
+        self._zuul_app: Optional[ZuulDaemonApp] = None
         self.executor: Optional[ExecutorClient] = None
         self.merger: Optional[MergeClient] = None
         self.connections: ConnectionRegistry = connections
-        self.statsd = get_statsd(config)
-        self.rpc = rpclistener.RPCListener(config, self)
-        self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
-        self.repl = None
-        self.stats_thread = threading.Thread(target=self.runStats)
+        self.statsd: StatsClient = get_statsd(config)
+        self.rpc: RPCListener = RPCListener(config, self)
+        self.rpc_slow: RPCListenerSlow = RPCListenerSlow(config, self)
+        self.repl: Optional[zuul.lib.repl.REPLServer] = None
+        self.command_thread: Optional[Thread] = None
+        self._command_running: bool = False
+        self.stats_thread: Thread = Thread(target=self.runStats)
         self.stats_thread.daemon = True
         self.stats_stop = threading.Event()
         # TODO(jeblair): fix this
@@ -346,32 +351,32 @@ class Scheduler(threading.Thread):
         self.unparsed_abide: UnparsedAbideConfig = UnparsedAbideConfig()
 
         time_dir = self._get_time_database_dir()
-        self.time_database = model.TimeDataBase(time_dir)
+        self.time_database: TimeDataBase = TimeDataBase(time_dir)
 
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
             '/var/lib/zuul/scheduler.socket')
-        self.command_socket = commandsocket.CommandSocket(command_socket)
+        self.command_socket: CommandSocket = CommandSocket(command_socket)
 
-        if zuul_version.is_release is False:
-            self.zuul_version = "%s %s" % (zuul_version.release_string,
-                                           zuul_version.git_version)
-        else:
-            self.zuul_version = zuul_version.release_string
-        self.last_reconfigured = None
+        self.zuul_version: str = "%s %s" % (zuul_version.release_string,
+                                            zuul_version.git_version)\
+            if zuul_version.is_release is False\
+            else zuul_version.release_string
+
+        self.last_reconfigured: Optional[int] = None
         self.tenant_last_reconfigured: Dict[str, float] = {}
-        self.use_relative_priority = False
+        self.use_relative_priority: bool = False
         if self.config.has_option('scheduler', 'relative_priority'):
             if self.config.getboolean('scheduler', 'relative_priority'):
                 self.use_relative_priority = True
         web_root = get_default(self.config, 'web', 'root', None)
         if web_root:
             web_root = urllib.parse.urljoin(web_root, 't/{tenant.name}/')
-        self.web_root = web_root
+        self.web_root: Optional[str] = web_root
 
         default_ansible_version = get_default(
             self.config, 'scheduler', 'default_ansible_version', None)
-        self.ansible_manager = AnsibleManager(
+        self.ansible_manager: AnsibleManager = AnsibleManager(
             default_version=default_ansible_version)
 
         self.connections.registerScheduler(self)
@@ -381,8 +386,7 @@ class Scheduler(threading.Thread):
         self._command_running = True
         self.log.debug("Starting command processor")
         self.command_socket.start()
-        self.command_thread = threading.Thread(target=self.runCommand,
-                                               name='command')
+        self.command_thread = Thread(target=self.runCommand, name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
 
@@ -417,7 +421,7 @@ class Scheduler(threading.Thread):
     def stopConnections(self):
         self.connections.stop()
 
-    def setZuulApp(self, app):
+    def setZuulApp(self, app: 'ZuulDaemonApp'):
         self._zuul_app = app
 
     def setExecutor(self, executor_client: ExecutorClient):
@@ -1203,7 +1207,7 @@ class Scheduler(threading.Thread):
             for item in shared_queue.queue:
                 if item.change.project != change.project:
                     continue
-                if (isinstance(item.change, model.Change) and
+                if (isinstance(item.change, Change) and
                         item.change.number == change.number and
                         item.change.patchset == change.patchset) or\
                    (item.change.ref == change.ref):
