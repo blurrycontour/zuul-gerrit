@@ -3849,6 +3849,10 @@ def cpu_times(self):
     return FakeCPUTimes()
 
 
+class TestScheduler(zuul.scheduler.Scheduler):
+    _merger_client_class = RecordingMergeClient
+
+
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
     wait_timeout = 90
@@ -3988,10 +3992,9 @@ class SchedulerTestApp:
         )
         self.connections.configure(self.config, source_only=source_only)
 
-        self.sched = zuul.scheduler.Scheduler(
-            self.config, self.connections, zk_client
+        self.sched = TestScheduler(
+            self.config, self.connections, zk_client, app=self
         )
-        self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
         self.event_queues = [
@@ -4000,17 +4003,8 @@ class SchedulerTestApp:
             self.sched.management_event_queue
         ]
 
-        executor_client = zuul.executor.client.ExecutorClient(
-            self.config, self.sched)
-        merge_client = RecordingMergeClient(self.config, self.sched)
-        nodepool = zuul.nodepool.Nodepool(self.sched)
-
-        self.sched.setExecutor(executor_client)
-        self.sched.setMerger(merge_client)
-        self.sched.setNodepool(nodepool)
-
         self.sched.start()
-        executor_client.gearman.waitForServer()
+        self.sched.executor.gearman.waitForServer()
         self.sched.reconfigure(self.config)
         self.sched.wakeUp()
 

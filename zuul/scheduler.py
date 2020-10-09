@@ -54,6 +54,7 @@ from zuul.model import (
     TriggerEvent,
     UnparsedAbideConfig,
 )
+from zuul.nodepool import Nodepool
 from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
 from zuul.zk import ZooKeeperClient
@@ -305,6 +306,7 @@ class Scheduler(threading.Thread):
 
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
+    _merger_client_class = MergeClient
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
@@ -314,6 +316,7 @@ class Scheduler(threading.Thread):
         config: ConfigParser,
         connections: "ConnectionRegistry",
         zk_client: ZooKeeperClient,
+        app: "ZuulDaemonApp",
     ):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -330,9 +333,7 @@ class Scheduler(threading.Thread):
         }
         self._hibernate = False
         self._stopped = False
-        self._zuul_app: Optional[ZuulDaemonApp] = None
-        self.executor: Optional[ExecutorClient] = None
-        self.merger: Optional[MergeClient] = None
+        self._zuul_app = app
         self.connections = connections
         self.statsd: StatsClient = get_statsd(config)
         self.rpc = RPCListener(config, self)
@@ -390,6 +391,9 @@ class Scheduler(threading.Thread):
         self.ansible_manager = AnsibleManager(
             default_version=default_ansible_version)
 
+        self.executor = ExecutorClient(self.config, self)
+        self.merger = self._merger_client_class(self.config, self)
+        self.nodepool = Nodepool(self)
         self.connections.registerScheduler(self)
 
     def start(self):
@@ -432,18 +436,6 @@ class Scheduler(threading.Thread):
 
     def stopConnections(self):
         self.connections.stop()
-
-    def setZuulApp(self, app: 'ZuulDaemonApp'):
-        self._zuul_app = app
-
-    def setExecutor(self, executor: ExecutorClient):
-        self.executor = executor
-
-    def setMerger(self, merger: MergeClient):
-        self.merger = merger
-
-    def setNodepool(self, nodepool):
-        self.nodepool = nodepool
 
     def runStats(self):
         while not self.stats_stop.wait(self._stats_interval):
