@@ -1464,7 +1464,7 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onBuildPaused(event.build)
 
-    def _handleExpiredHoldRequest(self, request):
+    def _handleExpiredHoldRequest(self, request: HoldRequest) -> bool:
         '''
         Check if a hold request is expired and delete it if it is.
 
@@ -1477,6 +1477,7 @@ class Scheduler(threading.Thread):
         expiration (EXPIRED_HOLD_REQUEST_TTL), then we will delete the hold
         request.
 
+        :param: request Hold request
         :returns: True if it is expired, False otherwise.
         '''
         if not request.expired:
