@@ -273,7 +273,7 @@ class ExecutorClient(object):
             precedence=PRIORITY_MAP[pipeline.precedence])
         return build
 
-    def cancel(self, build):
+    def cancel(self, build: Build) -> bool:
         log = get_annotated_logger(self.log, build.zuul_event_id,
                                    build=build.uuid)
         # Returns whether a running build was canceled
@@ -290,7 +290,8 @@ class ExecutorClient(object):
                     self.zk.builds.remove(build_zk_node)
                     build.zookeeper_node = None
                     try:
-                        del self.builds[build.uuid]
+                        if build.uuid in self.builds:
+                            del self.builds[build.uuid]
                     except KeyError:
                         pass
                     self.sched.onBuildCompleted(build, 'CANCELED', {}, [])

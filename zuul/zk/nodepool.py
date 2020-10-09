@@ -13,7 +13,7 @@
 import json
 import logging
 import time
-from typing import Dict, Optional
+from typing import Dict, Optional, Callable, List, Any, Generator, Set
 
 from kazoo.exceptions import NoNodeError, LockTimeout
 from kazoo.recipe.cache import TreeCache
@@ -21,7 +21,7 @@ from kazoo.recipe.cache import TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
-from zuul.model import HoldRequest
+from zuul.model import HoldRequest, NodeRequest, Node
 from zuul.zk import ZooKeeperClient
 from zuul.zk.base import ZooKeeperBase
 from zuul.zk.exceptions import LockException
@@ -49,9 +49,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
         # objects from the APIs, and avoids calling the methods to serialize
         # the data into objects more than once.
         self._hold_request_tree: Optional[TreeCache] = None
-        self._cached_hold_requests: Optional[Dict[str, HoldRequest]] = {}
+        self._cached_hold_requests: Dict[str, HoldRequest] = {}
 
-    def _onConnect(self):
+    def _onConnect(self) -> None:
         if self.enable_cache:
             self._hold_request_tree = TreeCache(self.kazoo_client,
                                                 self.HOLD_REQUEST_ROOT)
@@ -59,21 +59,21 @@ class ZooKeeperNodepool(ZooKeeperBase):
             self._hold_request_tree.listen(self._holdRequestCacheListener)
             self._hold_request_tree.start()
 
-    def _onDisconnect(self):
+    def _onDisconnect(self) -> None:
         if self._hold_request_tree is not None:
             self._hold_request_tree.close()
             self._hold_request_tree = None
 
-    def _launcherPath(self, launcher):
+    def _launcherPath(self, launcher: str) -> str:
         return "%s/%s" % (self.LAUNCHER_ROOT, launcher)
 
-    def _nodePath(self, node):
-        return "%s/%s" % (self.NODES_ROOT, node)
+    def _cacheFaultListener(self, e: Exception):
+        try:
+            raise e
+        except Exception:
+            self.log.exception("Cache fault!")
 
-    def _cacheFaultListener(self, e):
-        self.log.exception(e)
-
-    def getRegisteredLaunchers(self):
+    def getRegisteredLaunchers(self) -> List['Launcher']:
         """
         Get a list of all launchers that have registered with ZooKeeper.
 
@@ -97,7 +97,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
             objs.append(Launcher.fromDict(json.loads(data.decode('utf8'))))
         return objs
 
-    def getNodes(self):
+    def getNodes(self) -> List[str]:
         """
         Get the current list of all nodes.
 
@@ -108,15 +108,14 @@ class ZooKeeperNodepool(ZooKeeperBase):
         except NoNodeError:
             return []
 
-    def _getNode(self, node):
+    def _getNode(self, node: str) -> Optional[Dict[str, Any]]:
         """
         Get the data for a specific node.
 
         :param str node: The node ID.
-
         :returns: The node data, or None if the node was not found.
         """
-        path = self._nodePath(node)
+        path = "%s/%s" % (self.NODES_ROOT, node)
         try:
             data, stat = self.kazoo_client.get(path)
         except NoNodeError:
@@ -128,7 +127,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         d['id'] = node
         return d
 
-    def nodeIterator(self):
+    def nodeIterator(self) -> Generator[Dict[str, Any], None, None]:
         """
         Utility generator method for iterating through all nodes.
         """
@@ -137,7 +136,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
             if node:
                 yield node
 
-    def getHoldRequests(self):
+    def getHoldRequests(self) -> List[str]:
         """
         Get the current list of all hold requests.
         """
@@ -148,7 +147,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         except NoNodeError:
             return []
 
-    def getHoldRequest(self, hold_request_id):
+    def getHoldRequest(self, hold_request_id: str) -> Optional[HoldRequest]:
         path = self.HOLD_REQUEST_ROOT + "/" + hold_request_id
         try:
             data, stat = self.kazoo_client.get(path)
@@ -157,12 +156,12 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if not data:
             return None
 
-        obj = zuul.model.HoldRequest.fromDict(json.loads(data.decode('utf8')))
+        obj = HoldRequest.fromDict(json.loads(data.decode('utf8')))
         obj.id = hold_request_id
         obj.stat = stat
         return obj
 
-    def storeHoldRequest(self, request: zuul.model.HoldRequest):
+    def storeHoldRequest(self, request: HoldRequest) -> None:
         """
         Create or update a hold request.
 
@@ -183,14 +182,14 @@ class ZooKeeperNodepool(ZooKeeperBase):
             path = self.HOLD_REQUEST_ROOT + "/" + request.id
             self.kazoo_client.set(path, request.serialize())
 
-    def _markHeldNodesAsUsed(self, request: zuul.model.HoldRequest):
+    def _markHeldNodesAsUsed(self, request: HoldRequest) -> bool:
         """
         Changes the state for each held node for the hold request to 'used'.
 
         :returns: True if all nodes marked USED, False otherwise.
         """
-        def getHeldNodeIDs(request):
-            node_ids = []
+        def getHeldNodeIDs(request: HoldRequest) -> List[str]:
+            node_ids: List[str] = []
             for data in request.nodes:
                 # TODO(Shrews): Remove type check at some point.
                 # When autoholds were initially changed to be stored in ZK,
@@ -218,7 +217,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
             if 'label' in node:
                 label = node['label']
 
-            node_obj = zuul.model.Node(name, label)
+            node_obj = Node(name, label)
             node_obj.updateFromDict(node)
 
             try:
@@ -240,7 +239,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         return not failure
 
-    def deleteHoldRequest(self, request: zuul.model.HoldRequest):
+    def deleteHoldRequest(self, request: HoldRequest) -> None:
         """
         Delete a hold request.
 
@@ -257,8 +256,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
         except NoNodeError:
             pass
 
-    def lockHoldRequest(self, request: zuul.model.HoldRequest,
-                        blocking: bool=True, timeout: Optional[int]=None):
+    def lockHoldRequest(self, request: HoldRequest, blocking: bool = True,
+                        timeout: Optional[int] = None) -> None:
         """
         Lock a node request.
 
@@ -266,6 +265,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
         lock is successfully acquired.
 
         :param HoldRequest request: The hold request to lock.
+        :param blocking: Block until lock is obtained or return immediately.
+        :param timeout: Don't wait forever to acquire the lock.
         """
         if not request.id:
             raise LockException(
@@ -285,7 +286,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         request.lock = lock
 
-    def unlockHoldRequest(self, request: zuul.model.HoldRequest):
+    def unlockHoldRequest(self, request: HoldRequest) -> None:
         """
         Unlock a hold request.
 
@@ -300,7 +301,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         request.lock.release()
         request.lock = None
 
-    def _holdRequestCacheListener(self, event):
+    def _holdRequestCacheListener(self, event: TreeEvent) -> None:
         """
         Keep the hold request object cache in sync with the TreeCache.
         """
@@ -336,7 +337,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
                     old_request.updateFromDict(d)
                     old_request.stat = event.event_data.stat
                 else:
-                    request = zuul.model.HoldRequest.fromDict(d)
+                    request = HoldRequest.fromDict(d)
                     request.id = request_id
                     request.stat = event.event_data.stat
                     self._cached_hold_requests[request_id] = request
@@ -350,7 +351,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
             self.log.exception(
                 "Exception in hold request cache update for event: %s", event)
 
-    def submitNodeRequest(self, node_request, watcher):
+    def submitNodeRequest(self, node_request: NodeRequest,
+                          watcher: Callable[[NodeRequest, bool], None])\
+            -> None:
         """
         Submit a request for nodes to Nodepool.
 
@@ -384,7 +387,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         self.kazoo_client.DataWatch(path, callback)
 
-    def deleteNodeRequest(self, node_request):
+    def deleteNodeRequest(self, node_request: NodeRequest) -> None:
         """
         Delete a request for nodes.
 
@@ -397,7 +400,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         except NoNodeError:
             pass
 
-    def nodeRequestExists(self, node_request):
+    def nodeRequestExists(self, node_request: NodeRequest) -> bool:
         """
         See if a NodeRequest exists in ZooKeeper.
 
@@ -410,7 +413,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
             return True
         return False
 
-    def storeNodeRequest(self, node_request):
+    def storeNodeRequest(self, node_request: NodeRequest) -> None:
         """
         Store the node request.
 
@@ -423,7 +426,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
         self.kazoo_client.set(
             path, json.dumps(node_request.toDict()).encode('utf8'))
 
-    def updateNodeRequest(self, node_request, data=None):
+    def updateNodeRequest(self, node_request: NodeRequest,
+                          data: Optional[bytes] = None) -> None:
         """
         Refresh an existing node request.
 
@@ -433,14 +437,14 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if data is None:
             path = '%s/%s' % (self.REQUEST_ROOT, node_request.id)
             data, stat = self.kazoo_client.get(path)
-        data = json.loads(data.decode('utf8'))
+        value = json.loads(data.decode('utf8'))
         request_nodes = list(node_request.nodeset.getNodes())
-        for i, nodeid in enumerate(data.get('nodes', [])):
+        for i, nodeid in enumerate(value.get('nodes', [])):
             request_nodes[i].id = nodeid
             self._updateNode(request_nodes[i])
-        node_request.updateFromDict(data)
+        node_request.updateFromDict(value)
 
-    def storeNode(self, node):
+    def storeNode(self, node: Node) -> None:
         """
         Store the node.
 
@@ -452,7 +456,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         path = '%s/%s' % (self.NODES_ROOT, node.id)
         self.kazoo_client.set(path, json.dumps(node.toDict()).encode('utf8'))
 
-    def _updateNode(self, node):
+    def _updateNode(self, node: Node) -> None:
         """
         Refresh an existing node.
 
@@ -463,7 +467,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
         node_data = json.loads(node_data.decode('utf8'))
         node.updateFromDict(node_data)
 
-    def lockNode(self, node, blocking=True, timeout=None):
+    def lockNode(self, node: Node, blocking: bool = True,
+                 timeout: Optional[float] = None) -> None:
         """
         Lock a node.
 
@@ -472,7 +477,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
         used by nodepool to detect if Zuul has gone offline and the
         node should be reclaimed.
 
-        :param Node node: The node which should be locked.
+        :param node: The node which should be locked.
+        :param blocking: Block until lock is obtained or return immediately.
+        :param timeout: Don't wait forever to acquire the lock.
         """
         lock_path = '%s/%s/lock' % (self.NODES_ROOT, node.id)
         try:
@@ -489,7 +496,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         node.lock = lock
 
-    def unlockNode(self, node):
+    def unlockNode(self, node: Node) -> None:
         """
         Unlock a node.
 
@@ -503,7 +510,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
         node.lock.release()
         node.lock = None
 
-    def lockNodeRequest(self, request, blocking=True, timeout=None):
+    def lockNodeRequest(self, request: NodeRequest, blocking: bool = True,
+                        timeout: Optional[float] = None) -> None:
         """
         Lock a node request.
 
@@ -539,7 +547,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         request.lock = lock
         self.updateNodeRequest(request)
 
-    def unlockNodeRequest(self, request):
+    def unlockNodeRequest(self, request: NodeRequest) -> None:
         """
         Unlock a node request.
 
@@ -550,12 +558,11 @@ class ZooKeeperNodepool(ZooKeeperBase):
         :raises: ZKLockException if the request is not currently locked.
         """
         if request.lock is None:
-            raise LockException(
-                "Request %s does not hold a lock" % request)
+            raise LockException("Request %s does not hold a lock" % request)
         request.lock.release()
         request.lock = None
 
-    def heldNodeCount(self, autohold_key):
+    def heldNodeCount(self, autohold_key: Set[str]) -> int:
         """
         Count the number of nodes being held for the given tenant/project/job.
 
