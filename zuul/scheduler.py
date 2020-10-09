@@ -1478,7 +1478,7 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onBuildPaused(event.build)
 
-    def _handleExpiredHoldRequest(self, request):
+    def _handleExpiredHoldRequest(self, request: HoldRequest) -> bool:
         '''
         Check if a hold request is expired and delete it if it is.
 
