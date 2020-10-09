@@ -41,6 +41,9 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd, normalize_statsd_name
 import zuul.lib.queue
 import zuul.lib.repl
+from zuul import nodepool
+from zuul.executor.client import ExecutorClient
+from zuul.merger.client import MergeClient
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
@@ -287,11 +290,12 @@ class Scheduler(threading.Thread):
 
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
+    _merger_client_class = MergeClient
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
 
-    def __init__(self, config, connections, testonly=False):
+    def __init__(self, config, connections, app, testonly=False):
         threading.Thread.__init__(self)
         self.daemon = True
         self.hostname = socket.getfqdn()
@@ -307,9 +311,8 @@ class Scheduler(threading.Thread):
         }
         self._hibernate = False
         self._stopped = False
-        self._zuul_app = None
-        self.executor = None
-        self.merger = None
+
+        self._zuul_app = app
         self.connections = connections
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
@@ -367,6 +370,10 @@ class Scheduler(threading.Thread):
         self.ansible_manager = AnsibleManager(
             default_version=default_ansible_version)
 
+        self.executor = ExecutorClient(self.config, self)
+        self.merger = self._merger_client_class(self.config, self)
+        self.nodepool = nodepool.Nodepool(self)
+
     def start(self):
         super(Scheduler, self).start()
         self._command_running = True
@@ -408,22 +415,6 @@ class Scheduler(threading.Thread):
 
     def stopConnections(self):
         self.connections.stop()
-
-    def setZuulApp(self, app):
-        self._zuul_app = app
-
-    def setExecutor(self, executor):
-        self.executor = executor
-
-    def setMerger(self, merger):
-        self.merger = merger
-
-    def setNodepool(self, nodepool):
-        self.nodepool = nodepool
-
-    def setZooKeeper(self, zk_client):
-        self.zk_client = zk_client
-        self.zk_nodepool = ZooKeeperNodepool(zk_client)
 
     def runStats(self):
         while not self.stats_stop.wait(self._stats_interval):
