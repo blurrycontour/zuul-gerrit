@@ -3245,6 +3245,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
 class TestScheduler(zuul.scheduler.Scheduler):
     _zk_client_class = TestZooKeeperClient
+    _merger_client_class = RecordingMergeClient
 
 
 class FakeGearmanServer(gear.Server):
@@ -4008,8 +4009,7 @@ class SchedulerTestApp:
         )
         self.connections.configure(self.config, source_only=source_only)
 
-        self.sched = TestScheduler(self.config, self.connections)
-        self.sched.setZuulApp(self)
+        self.sched = TestScheduler(self.config, self.connections, app=self)
         self.sched._stats_interval = 1
 
         self.event_queues = [
@@ -4017,15 +4017,6 @@ class SchedulerTestApp:
             self.sched.trigger_event_queue,
             self.sched.management_event_queue
         ]
-
-        executor_client = zuul.executor.client.ExecutorClient(
-            self.config, self.sched)
-        merge_client = RecordingMergeClient(self.config, self.sched)
-        nodepool = zuul.nodepool.Nodepool(self.sched)
-
-        self.sched.setExecutor(executor_client)
-        self.sched.setMerger(merge_client)
-        self.sched.setNodepool(nodepool)
 
     def start(self, validate_tenants: list):
         self.sched.start()
