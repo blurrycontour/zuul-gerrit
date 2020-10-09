@@ -27,6 +27,7 @@ import voluptuous as vs
 from zuul.driver.sql.sqlconnection import SQLConnection
 from zuul import model
 from zuul.lib import ansible
+from zuul.lib.ansible import AnsibleManager
 from zuul.merger.client import MergeClient
 from zuul.lib import yamlutil as yaml
 import zuul.manager.dependent
@@ -41,7 +42,8 @@ from zuul.lib.re2util import filter_allowed_disallowed
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
-from zuul.model import Tenant
+from zuul.model import Tenant, Abide
+
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
     from zuul.scheduler import Scheduler
@@ -1515,7 +1517,7 @@ class TenantParser(object):
     })
 
     @classmethod
-    def getSchema(cls, connections: 'ConnectionRegistry'):
+    def getSchema(cls, connections: 'ConnectionRegistry') -> vs.Schema:
         def validateTenantSources(value, path=None):
             if isinstance(value, dict):
                 for k, val in value.items():
@@ -1541,7 +1543,8 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager) -> Tenant:
+    def fromYaml(self, abide: Abide, conf: Dict[str, Any],
+                 ansible_manager: AnsibleManager) -> Tenant:
         self.getSchema(self.connections)(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -2204,7 +2207,8 @@ class ConfigLoader(object):
         self.admin_rule_parser = AuthorizationRuleParser()
 
     @classmethod
-    def readConfig(cls, config_path: str, from_script: bool = False):
+    def readConfig(cls, config_path: str, from_script: bool = False)\
+            -> model.UnparsedAbideConfig:
         if config_path:
             config_path = os.path.expanduser(config_path)
         if not os.path.exists(config_path):
