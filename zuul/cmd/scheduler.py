@@ -20,11 +20,8 @@ import signal
 
 import zuul.cmd
 import zuul.scheduler
-from zuul.executor.client import ExecutorClient
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd_config
-from zuul.merger.client import MergeClient
-from zuul.nodepool import Nodepool
 
 
 class Scheduler(zuul.cmd.ZuulDaemonApp):
@@ -139,20 +136,9 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.log = logging.getLogger("zuul.Scheduler")
 
         self.configure_connections(require_sql=True)
-        self.sched = zuul.scheduler.Scheduler(self.config, self.connections)
-
-        self.sched.setZuulApp(self)
-        merger = MergeClient(self.config, self.sched)
-        self.sched.setMerger(merger)
-
-        if self.args.validate_tenants is None:
-
-            # Only needed in full mode
-            executor_client = ExecutorClient(self.config, self.sched)
-            nodepool = Nodepool(self.sched)
-
-            self.sched.setExecutor(executor_client)
-            self.sched.setNodepool(nodepool)
+        self.sched = zuul.scheduler.Scheduler(
+            self.config, self.connections, app=self
+        )
 
         self.log.info('Starting scheduler')
         try:
