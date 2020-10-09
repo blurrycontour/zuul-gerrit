@@ -13,8 +13,11 @@
 # under the License.
 
 import abc
+from typing import TYPE_CHECKING, Optional
 
 from zuul.lib.logutil import get_annotated_logger
+if TYPE_CHECKING:
+    from zuul.scheduler import Scheduler
 
 
 class BaseConnection(object, metaclass=abc.ABCMeta):
@@ -42,6 +45,7 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         self.driver = driver
         self.connection_name = connection_name
         self.connection_config = connection_config
+        self.sched: Optional[Scheduler] = None
 
     def logEvent(self, event):
         log = get_annotated_logger(self.log, event.zuul_event_id)
@@ -67,8 +71,9 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
     def onStop(self):
         pass
 
-    def registerScheduler(self, sched):
+    def registerScheduler(self, sched: 'Scheduler') -> None:
         self.sched = sched
+        self.onLoad()
 
     def clearBranchCache(self):
         """Clear the branch cache for this connection.
