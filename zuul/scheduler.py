@@ -28,15 +28,15 @@ import traceback
 import urllib
 from configparser import ConfigParser
 from queue import Queue
-from typing import Dict, Optional, TYPE_CHECKING
+from typing import Callable, Dict, Optional, TYPE_CHECKING
 
-from zuul import (
-    configloader, exceptions, rpclistener
-)
+from statsd import StatsClient
+
+from zuul import configloader, exceptions
 from zuul import version as zuul_version
 from zuul.executor.client import ExecutorClient
-from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
+from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
@@ -54,11 +54,13 @@ from zuul.model import (
     TriggerEvent,
     UnparsedAbideConfig,
 )
+from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 if TYPE_CHECKING:
+    from zuul.cmd import ZuulDaemonApp
     from zuul.lib import connections
 
 
@@ -320,7 +322,7 @@ class Scheduler(threading.Thread):
         self.wake_event = threading.Event()
         self.layout_lock = threading.Lock()
         self.run_handler_lock = threading.Lock()
-        self.command_map = {
+        self.command_map: Dict[str, Callable[[], None]] = {
             'stop': self.stop,
             'full-reconfigure': self.fullReconfigureCommandHandler,
             'smart-reconfigure': self.smartReconfigureCommandHandler,
@@ -329,14 +331,16 @@ class Scheduler(threading.Thread):
         }
         self._hibernate = False
         self._stopped = False
-        self._zuul_app = None
+        self._zuul_app: Optional[ZuulDaemonApp] = None
         self.executor: Optional[ExecutorClient] = None
         self.merger: Optional[MergeClient] = None
         self.connections = connections
-        self.statsd = get_statsd(config)
-        self.rpc = rpclistener.RPCListener(config, self)
-        self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
-        self.repl = None
+        self.statsd: StatsClient = get_statsd(config)
+        self.rpc = RPCListener(config, self)
+        self.rpc_slow = RPCListenerSlow(config, self)
+        self.repl: Optional[REPLServer] = None
+        self.command_thread: Optional[threading.Thread] = None
+        self._command_running = False
         self.stats_thread = threading.Thread(target=self.runStats)
         self.stats_thread.daemon = True
         self.stats_stop = threading.Event()
@@ -365,14 +369,15 @@ class Scheduler(threading.Thread):
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
             '/var/lib/zuul/scheduler.socket')
-        self.command_socket = commandsocket.CommandSocket(command_socket)
+        self.command_socket = CommandSocket(command_socket)
 
         if zuul_version.is_release is False:
             self.zuul_version = "%s %s" % (zuul_version.release_string,
                                            zuul_version.git_version)
         else:
             self.zuul_version = zuul_version.release_string
-        self.last_reconfigured = None
+
+        self.last_reconfigured: Optional[int] = None
         self.tenant_last_reconfigured: Dict[str, float] = {}
         self.use_relative_priority = False
         if self.config.has_option('scheduler', 'relative_priority'):
@@ -381,7 +386,7 @@ class Scheduler(threading.Thread):
         web_root = get_default(self.config, 'web', 'root', None)
         if web_root:
             web_root = urllib.parse.urljoin(web_root, 't/{tenant.name}/')
-        self.web_root = web_root
+        self.web_root: Optional[str] = web_root
 
         default_ansible_version = get_default(
             self.config, 'scheduler', 'default_ansible_version', None)
@@ -432,7 +437,7 @@ class Scheduler(threading.Thread):
     def stopConnections(self):
         self.connections.stop()
 
-    def setZuulApp(self, app):
+    def setZuulApp(self, app: 'ZuulDaemonApp'):
         self._zuul_app = app
 
     def setExecutor(self, executor: ExecutorClient):
