@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_a17a78ec",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 48
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-12T18:45:01Z",
+      "side": 1,
+      "message": "We should process the events only in run above. Instead we can set a wake event here and change time.sleep(1) to a wait on the event with timeout 1.",
+      "revId": "d120b037a74fe2c1f8b07b834c5d40cafe303461",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
