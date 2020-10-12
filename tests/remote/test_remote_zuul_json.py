@@ -43,7 +43,7 @@ class FunctionalZuulJSONMixIn:
             - job:
                 name: {job_name}
                 run: playbooks/{job_name}.yaml
-                ansible-version: {version}
+                ansible-version: "{version}"
                 roles:
                   - zuul: org/common-config
                 nodeset:
@@ -154,6 +154,14 @@ class TestZuulJSON28(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
 
 class TestZuulJSON29(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
     ansible_version = '2.9'
+
+    def setUp(self):
+        super().setUp()
+        self._setUp()
+
+
+class TestZuulJSON210(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
+    ansible_version = '2.10'
 
     def setUp(self):
         super().setUp()

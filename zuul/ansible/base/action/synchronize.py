@@ -15,7 +15,13 @@
 
 
 from zuul.ansible import paths
-synchronize = paths._import_ansible_action_plugin("synchronize")
+try:
+    synchronize = paths._import_ansible_action_plugin("synchronize")
+except ImportError:
+    # Since ansible 2.10 the synchronize module is part of the posix collection
+    import ansible_collections.ansible.posix.plugins.action
+    synchronize = paths._import_ansible_action_plugin(
+        "synchronize", ansible_collections.ansible.posix.plugins.action.__path__)
 
 
 def is_opt_prohibited(rsync_arg):
