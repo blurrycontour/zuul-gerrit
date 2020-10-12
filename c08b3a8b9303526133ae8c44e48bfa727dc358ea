@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_a763a840",
+        "filename": "doc/source/reference/drivers/smtp.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-10-12T21:19:06Z",
+      "side": 1,
+      "message": "nit; for internal links to other attrs, you can do\n\n :attr:`\u003csmtp connection\u003e.use_starttls`\n\nand it should cross-reference with links (not super important when it\u0027s right there, but anyway)",
+      "range": {
+        "startLine": 62,
+        "startChar": 32,
+        "endLine": 62,
+        "endChar": 48
+      },
+      "revId": "c08b3a8b9303526133ae8c44e48bfa727dc358ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
