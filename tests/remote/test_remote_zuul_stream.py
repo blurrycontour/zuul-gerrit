@@ -46,7 +46,7 @@ class FunctionalZuulStreamMixIn:
                 - job:
                     name: {job_name}
                     run: playbooks/{job_name}.yaml
-                    ansible-version: {version}
+                    ansible-version: "{version}"
                     vars:
                       test_console_port: {console_port}
                     roles:
@@ -222,6 +222,14 @@ class TestZuulStream28(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
 
 class TestZuulStream29(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
     ansible_version = '2.9'
+
+    def setUp(self):
+        super().setUp()
+        self._setUp()
+
+
+class TestZuulStream210(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
+    ansible_version = '2.10'
 
     def setUp(self):
         super().setUp()
