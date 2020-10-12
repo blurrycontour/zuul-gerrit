@@ -2978,6 +2978,10 @@ class TestAnsible29(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
     ansible_version = '2.9'
 
 
+class TestAnsible210(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
+    ansible_version = '2.10'
+
+
 class TestPrePlaybooks(AnsibleZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
