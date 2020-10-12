@@ -48,6 +48,21 @@ class TestMergerRepo(ZuulTestCase):
         self.assertIn('refs/heads/foobar', repo.branches)
         self.assertNotIn('refs/heads/refs/heads/foobar', repo.branches)
 
+    def test_create_head_at_char(self):
+        """Test that we can create branches containing the '@' char.
+
+        This is a regression test to make sure we are not using GitPython
+        APIs that interpret the '@' as a special char.
+        """
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        parent_repo = git.Repo(parent_path)
+        parent_repo.create_head("refs/heads/foo@bar")
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        repo = work_repo.createRepoObject(None)
+        self.assertIn('foo@bar', repo.branches)
+
     def test_ensure_cloned(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
 
