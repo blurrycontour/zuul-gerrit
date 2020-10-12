@@ -55,7 +55,7 @@ class FunctionalActionModulesMixIn:
             - job:
                 name: {job_name}
                 run: playbooks/{job_name}.yaml
-                ansible-version: {version}
+                ansible-version: "{version}"
                 roles:
                   - zuul: org/common-config
                 nodeset:
@@ -239,6 +239,14 @@ class TestActionModules28(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
 
 class TestActionModules29(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
     ansible_version = '2.9'
+
+    def setUp(self):
+        super().setUp()
+        self._setUp()
+
+
+class TestActionModules210(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
+    ansible_version = '2.10'
 
     def setUp(self):
         super().setUp()
