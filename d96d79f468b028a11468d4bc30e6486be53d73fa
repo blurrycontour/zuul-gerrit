@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_1b61163a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-12T12:22:31Z",
+      "side": 1,
+      "message": "The actual issue we have is that currently we leak change objects forever. In the past (pre-zuulv3) this method was there to cleanup the cache but in v3 this didn\u0027t work yet. There was already a further attempt to solve the underlying problem using weakrefs [1] which had to be reverted though.\n\nMaybe we should at least leave this comment here to remind us that this is still a problem we should fix at some point in time (regardless what the solution will be).\n\n[1] https://review.opendev.org/#/q/b9704302bdb6857026319ac80df7b490a2282f89",
+      "revId": "d96d79f468b028a11468d4bc30e6486be53d73fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
