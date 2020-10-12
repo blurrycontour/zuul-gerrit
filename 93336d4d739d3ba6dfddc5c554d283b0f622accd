@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_21e028f8",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 41
+      },
+      "lineNbr": 1178,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-12T18:29:24Z",
+      "side": 1,
+      "message": "self.event_loop is a leftover of the transition using asyncio to the threaded cherrypy and is unused.\n\nself.term was used in the same context and is unused as well",
+      "range": {
+        "startLine": 1177,
+        "startChar": 0,
+        "endLine": 1178,
+        "endChar": 59
+      },
+      "revId": "93336d4d739d3ba6dfddc5c554d283b0f622accd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_a12f183c",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 41
+      },
+      "lineNbr": 1183,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-12T18:29:24Z",
+      "side": 1,
+      "message": "Since zuul is \u003e\u003dpy36 I think we should change this to real typings instead of the comment style.",
+      "range": {
+        "startLine": 1174,
+        "startChar": 0,
+        "endLine": 1183,
+        "endChar": 60
+      },
+      "revId": "93336d4d739d3ba6dfddc5c554d283b0f622accd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
