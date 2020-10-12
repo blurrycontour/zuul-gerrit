@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "9f560f44_7ecf6556",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2020-10-12T09:09:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_314a575a",
+      "range": {
+        "startLine": 133,
+        "startChar": 0,
+        "endLine": 134,
+        "endChar": 76
+      },
+      "revId": "fc6ed9a34ab6c9735e1e488a46b5ba98cc3a3f10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_312537af",
         "filename": "zuul/driver/elasticsearch/reporter.py",
         "patchSetId": 2
@@ -36,6 +60,24 @@
       "writtenOn": "2020-10-09T13:56:39Z",
       "side": 1,
       "message": "I think a validation (presence and data type) for this in test_elastic_reporter would be useful.",
+      "revId": "fc6ed9a34ab6c9735e1e488a46b5ba98cc3a3f10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_837ca620",
+        "filename": "zuul/driver/elasticsearch/reporter.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2020-10-12T09:09:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_312537af",
       "revId": "fc6ed9a34ab6c9735e1e488a46b5ba98cc3a3f10",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
