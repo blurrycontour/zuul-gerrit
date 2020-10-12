@@ -19,6 +19,7 @@ import sys
 import zuul.cmd
 import zuul.model
 import zuul.web
+import zuul.driver.bitbucketserver
 import zuul.driver.sql
 import zuul.driver.github
 import zuul.lib.auth
@@ -122,6 +123,7 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         try:
             self.configure_connections(
                 include_drivers=[zuul.driver.sql.SQLDriver,
+                                 zuul.driver.bitbucketserver.BitbucketServerDriver,
                                  zuul.driver.github.GithubDriver,
                                  zuul.driver.pagure.PagureDriver,
                                  zuul.driver.gitlab.GitlabDriver])
