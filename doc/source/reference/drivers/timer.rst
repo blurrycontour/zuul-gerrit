@@ -7,7 +7,7 @@ The timer driver supports triggers only.  It is used for configuring
 pipelines so that jobs run at scheduled times.  No connection
 configuration is required.
 
-Trgger Configuration
+Trigger Configuration
 --------------------
 
 Timers don't require a special connection or driver. Instead they can
