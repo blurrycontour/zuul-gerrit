@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_8244971a",
+        "filename": "doc/source/reference/drivers/smtp.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-12T16:07:56Z",
+      "side": 1,
+      "message": "Maybe mention that this is the client certificate?",
+      "revId": "7490c20a7d149c385ad0b2a08cd920dd666169dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
