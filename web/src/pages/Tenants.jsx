@@ -16,12 +16,26 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
-
+import {
+  BuildIcon,
+  CubeIcon,
+  CubesIcon,
+  DesktopIcon,
+  FolderIcon,
+  HomeIcon,
+  RepositoryIcon,
+  TrendUpIcon
+} from '@patternfly/react-icons'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableVariant,
+} from '@patternfly/react-table'
 import { Fetching } from '../containers/Fetching'
 import { fetchTenantsIfNeeded } from '../actions/tenants'
-
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { IconProperty } from '../containers/build/Misc'
 
 class TenantsPage extends React.Component {
   static propTypes = {
@@ -47,54 +61,65 @@ class TenantsPage extends React.Component {
       return <Fetching />
     }
 
-    const tenants = remoteData.tenants
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = (value) => (
-      <Table.Cell>{value}</Table.Cell>)
-    const columns = []
-    const myColumns = [
-      'name', 'status', 'projects', 'jobs', 'builds', 'buildsets',
-      'projects count', 'queue']
-    myColumns.forEach(column => {
-      let prop = column
-      if (column === 'projects count') {
-        prop = 'projects'
-      } else if (column === 'projects') {
-        prop = 'projects_link'
+    const tenants = remoteData.tenants.map((tenant) => {
+      return {
+        cells: [
+        {title: (<b>{tenant.name}</b>)},
+        {title: (<Link to={'/t/' + tenant.name + '/status'}>Status</Link>)},
+        {title: (<Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)},
+        {title: (<Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)},
+        {title: (<Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)},
+        {title: (<Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)},
+        tenant.projects,
+        tenant.queue
+      ]}})
+    const columns = [
+      {
+        title: <IconProperty icon={<HomeIcon />} value="Name"/>,
+        dataLabel: 'Name',
+      },
+      {
+        title: <IconProperty icon={<DesktopIcon />} value="Status"/>,
+        dataLabel: 'Status',
+      },
+      {
+        title: <IconProperty icon={<CubeIcon />} value="Projects"/>,
+        dataLabel: 'Projects',
+      },
+      {
+        title: <IconProperty icon={<BuildIcon />} value="Jobs"/>,
+        dataLabel: 'Jobs',
+      },
+      {
+        title: <IconProperty icon={<FolderIcon />} value="Builds"/>,
+        dataLabel: 'Builds',
+      },
+      {
+        title: <IconProperty icon={<RepositoryIcon />} value="Buildsets"/>,
+        dataLabel: 'Buildsets',
+      },
+      {
+        title: <IconProperty icon={<CubesIcon />} value="Project count"/>,
+        dataLabel: 'Project count',
+      },
+      {
+        title: <IconProperty icon={<TrendUpIcon />} value="Queue"/>,
+        dataLabel: 'Queue',
       }
-      columns.push({
-        header: {label: column,
-          formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [cellFormat]}
-      })
-    })
-    tenants.forEach(tenant => {
-      tenant.status = (
-        <Link to={'/t/' + tenant.name + '/status'}>Status</Link>)
-      tenant.projects_link = (
-        <Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)
-      tenant.jobs = (
-        <Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)
-      tenant.builds = (
-        <Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)
-      tenant.buildsets = (
-        <Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)
-    })
+    ]
+
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <Table.PfProvider
-          striped
-          bordered
-          hover
-          columns={columns}
-          >
-          <Table.Header/>
-          <Table.Body
-            rows={tenants}
-            rowKey="name"
-            />
-        </Table.PfProvider>
+        <Table
+          aria-label="Tenant Table"
+          variant={TableVariant.compact}
+          cells={columns}
+          rows={tenants}
+          className="zuul-tenant-table"
+        >
+        <TableHeader />
+        <TableBody />
+      </Table>
       </PageSection>
     )
   }
