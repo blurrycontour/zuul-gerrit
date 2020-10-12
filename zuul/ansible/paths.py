@@ -103,7 +103,7 @@ def _fail_if_unsafe(path, allow_trusted=False):
         raise AnsibleError(msg_dict['msg'])
 
 
-def _import_ansible_action_plugin(name):
+def _import_ansible_action_plugin(name, path=ansible.plugins.action.__path__):
     # Ansible forces the import of our action plugins
     # (zuul.ansible.action.foo) as ansible.plugins.action.foo, which
     # is the import path of the ansible implementation.  Our
@@ -118,7 +118,7 @@ def _import_ansible_action_plugin(name):
 
     return imp.load_module(
         'zuul.ansible.protected.action.' + name,
-        *imp.find_module(name, ansible.plugins.action.__path__))
+        *imp.find_module(name, path))
 
 
 def _import_ansible_lookup_plugin(name):

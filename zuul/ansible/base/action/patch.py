@@ -14,7 +14,13 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 from zuul.ansible import paths
-patch = paths._import_ansible_action_plugin("patch")
+try:
+    patch = paths._import_ansible_action_plugin("patch")
+except ImportError:
+    # Since ansible 2.10 the patch module is part of the posix collection
+    import ansible.posix.plugins.action
+    patch = paths._import_ansible_action_plugin(
+        "patch", ansible.posix.plugins.action.__path__)
 
 
 class ActionModule(patch.ActionModule):

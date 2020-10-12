@@ -3669,7 +3669,7 @@ class FunctionalAnsibleMixIn(object):
             - job:
                 name: {job_name}
                 run: playbooks/{job_name}.yaml
-                ansible-version: {ansible_version}
+                ansible-version: "{ansible_version}"
 
             - project:
                 check:
@@ -3759,6 +3759,10 @@ class TestAnsible28(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
 
 class TestAnsible29(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
     ansible_version = '2.9'
+
+
+class TestAnsible210(AnsibleZuulTestCase, FunctionalAnsibleMixIn):
+    ansible_version = '2.10'
 
 
 class TestPrePlaybooks(AnsibleZuulTestCase):
