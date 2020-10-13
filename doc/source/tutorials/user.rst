@@ -5,3 +5,4 @@ User Tutorials
    :maxdepth: 1
 
    gate-your-first-patch
+   use-zuul-jobs
