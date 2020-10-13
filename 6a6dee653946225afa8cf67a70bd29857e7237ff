@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_3ed67654",
+        "filename": "doc/source/tutorials/the-gate-pipeline.rst",
+        "patchSetId": 37
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-13T11:34:58Z",
+      "side": 1,
+      "message": "patch proposals?",
+      "range": {
+        "startLine": 16,
+        "startChar": 16,
+        "endLine": 16,
+        "endChar": 33
+      },
+      "revId": "6a6dee653946225afa8cf67a70bd29857e7237ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
