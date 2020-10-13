@@ -125,6 +125,14 @@
       run_playbooks:
         - gate-first-patch.yaml
 
+- job:
+    name: zuul-tutorial-use-zuul-jobs
+    parent: zuul-quick-start
+    description: Run the commands in the Zuul tutorial use zuul jobs documentation.
+    vars:
+      run_playbooks:
+        - use-zuul-jobs.yaml
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -275,6 +283,10 @@
         - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-tutorial-use-zuul-jobs:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 2700
         - nodepool-zuul-functional:
             voting: false
         - zuul-client-zuul-functional
@@ -320,6 +332,10 @@
         - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
+        - zuul-tutorial-use-zuul-jobs:
+            requires: nodepool-container-image
+            dependencies: zuul-upload-image
+            timeout: 2700
         - zuul-client-zuul-functional
         - zuul-build-python-release
     promote:
