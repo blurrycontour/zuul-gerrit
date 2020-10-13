@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_db6af1e9",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 47
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-13T07:04:18Z",
+      "side": 1,
+      "message": "As I understood this is the representation of the zk god class we have now. I think we should remove that completely since that will cause some problems. Not all components will need all zk data models. Further individual caches should be enabled per use case to restrict load on the zk cluster.\n\nI think the architecture would be cleaner if we have one zk model class per use case (nodepool, executor, pipeline state, etc) and use them individually (they still can all share the same kazoo client in the end). That makes it possible to tune them more fine granular (like fingergw needs executor data, but no caching, etc).",
+      "revId": "1dffaab477a4a2aae6501f75753fb808c9c23bc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
