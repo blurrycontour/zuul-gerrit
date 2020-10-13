@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_630cdb41",
+        "filename": "doc/source/tutorials/use-zuul-jobs.rst",
+        "patchSetId": 44
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-13T11:16:45Z",
+      "side": 1,
+      "message": "other articles",
+      "range": {
+        "startLine": 47,
+        "startChar": 20,
+        "endLine": 47,
+        "endChar": 26
+      },
+      "revId": "00b7b6d5db26b8a8d79e7a67d0cc4cd3f03ee83d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_3e0cb637",
+        "filename": "doc/source/tutorials/use-zuul-jobs.rst",
+        "patchSetId": 44
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-13T11:16:45Z",
+      "side": 1,
+      "message": "nit: trailing whitespace",
+      "revId": "00b7b6d5db26b8a8d79e7a67d0cc4cd3f03ee83d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_fe6d1ecb",
+        "filename": "doc/source/tutorials/use-zuul-jobs.rst",
+        "patchSetId": 44
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-13T11:16:45Z",
+      "side": 1,
+      "message": "Can you explain how this part is related to the scope of this article? I don\u0027t understand why this is needed here.",
+      "revId": "00b7b6d5db26b8a8d79e7a67d0cc4cd3f03ee83d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_fe1fde56",
+        "filename": "doc/source/tutorials/use-zuul-jobs.rst",
+        "patchSetId": 44
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-13T11:16:45Z",
+      "side": 1,
+      "message": "Then?",
+      "range": {
+        "startLine": 103,
+        "startChar": 0,
+        "endLine": 103,
+        "endChar": 3
+      },
+      "revId": "00b7b6d5db26b8a8d79e7a67d0cc4cd3f03ee83d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_3e35d6db",
+        "filename": "doc/source/tutorials/use-zuul-jobs.rst",
+        "patchSetId": 44
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-13T11:16:45Z",
+      "side": 1,
+      "message": "Should that be the same file as mentioned above?",
+      "range": {
+        "startLine": 105,
+        "startChar": 20,
+        "endLine": 105,
+        "endChar": 64
+      },
+      "revId": "00b7b6d5db26b8a8d79e7a67d0cc4cd3f03ee83d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
