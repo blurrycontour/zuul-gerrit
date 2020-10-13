@@ -16,6 +16,24 @@
       "revId": "1dffaab477a4a2aae6501f75753fb808c9c23bc1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_ded01a56",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 47
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-13T11:19:35Z",
+      "side": 1,
+      "message": "Done. Yes, this would be better. Original concern was larger code change. But if thats ok then I will update it in the next patch.",
+      "parentUuid": "9f560f44_db6af1e9",
+      "revId": "1dffaab477a4a2aae6501f75753fb808c9c23bc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
