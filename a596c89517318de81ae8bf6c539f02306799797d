@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9f560f44_56407832",
+        "filename": "zuul/zk/builds.py",
+        "patchSetId": 60
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-13T07:34:42Z",
+      "side": 1,
+      "message": "Is the lock released somewhere else in case persist() fails e.g. because of a BadVersionError?",
+      "revId": "a596c89517318de81ae8bf6c539f02306799797d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_36ad04ea",
+        "filename": "zuul/zk/builds.py",
+        "patchSetId": 60
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-13T07:34:42Z",
+      "side": 1,
+      "message": "I don\u0027t understand the if condition here. How can it happen that when iterating over ZookeeperBuildItems the type changes to something else?",
+      "revId": "a596c89517318de81ae8bf6c539f02306799797d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
