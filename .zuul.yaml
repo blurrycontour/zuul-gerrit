@@ -125,6 +125,14 @@
       run_playbooks:
         - gate-first-patch.yaml
 
+- job:
+    name: zuul-tutorial-use-zuul-jobs
+    parent: zuul-quick-start
+    description: Run the commands in the Zuul tutorial use zuul jobs documentation.
+    vars:
+      run_playbooks:
+        - use-zuul-jobs.yaml
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -231,26 +239,6 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - tox-py36:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-bionic
-            timeout: 4800  # 80 minutes
-            vars: &zuul_tox_vars
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                    YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                    YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
-        - tox-py38:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            timeout: 4800  # 80 minutes
-            nodeset: ubuntu-bionic
-            vars: *zuul_tox_vars
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
@@ -273,6 +261,10 @@
         - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-build-image
+        - zuul-tutorial-use-zuul-jobs:
+            requires: nodepool-container-image
+            dependencies: zuul-build-image
+            timeout: 2700
         - nodepool-zuul-functional:
             voting: false
         - zuul-client-zuul-functional
@@ -284,20 +276,6 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - tox-py36:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            nodeset: ubuntu-bionic
-            timeout: 4800  # 80 minutes
-            vars: *zuul_tox_vars
-        - tox-py38:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
-            timeout: 4800  # 80 minutes
-            nodeset: ubuntu-bionic
-            vars: *zuul_tox_vars
         - zuul-build-dashboard
         - nodejs-run-lint:
             vars:
@@ -318,6 +296,10 @@
         - zuul-tutorial-gate-your-first-patch:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
+        - zuul-tutorial-use-zuul-jobs:
+            requires: nodepool-container-image
+            dependencies: zuul-upload-image
+            timeout: 2700
         - zuul-client-zuul-functional
         - zuul-build-python-release
     promote:
