@@ -45,6 +45,30 @@
       "revId": "2e605863f9913cbd12919a65e86a4fb0aa3ca607",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f6b1bfe_b6cb9d70",
+        "filename": "web/src/pages/Tenants.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-10-13T23:47:51Z",
+      "side": 1,
+      "message": "You\u0027re right, it looks like actually the default (no variant) is the grey i want, and if you want white, you need to specify \"light\".  why this works, i don\u0027t know, i guess it defaults to nothing",
+      "parentUuid": "9f560f44_851e8571",
+      "range": {
+        "startLine": 142,
+        "startChar": 32,
+        "endLine": 142,
+        "endChar": 58
+      },
+      "revId": "2e605863f9913cbd12919a65e86a4fb0aa3ca607",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
