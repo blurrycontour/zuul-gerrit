@@ -33,6 +33,40 @@
       "revId": "a596c89517318de81ae8bf6c539f02306799797d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_8adca471",
+        "filename": "zuul/zk/builds.py",
+        "patchSetId": 60
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-13T08:16:47Z",
+      "side": 1,
+      "message": "I think this can be simplified to:\n\n        # Cleanup nodes where deletion failed\n        self.log.debug(\"Cleanup: Nodes where deletion failed\")\n        for path in list(self._to_delete):\n            self.remove(path)\n\nas remove() is already taking care of node-exists checks and removing it from self._to_delete.\n\nThe NotEmptyError seems to be handled by the `except Exception` clause.",
+      "revId": "a596c89517318de81ae8bf6c539f02306799797d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_2ad8f84f",
+        "filename": "zuul/zk/builds.py",
+        "patchSetId": 60
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-13T08:16:47Z",
+      "side": 1,
+      "message": "I think this can be simplified in a similar way as for the self._to_delete items above.",
+      "revId": "a596c89517318de81ae8bf6c539f02306799797d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
