@@ -22,6 +22,30 @@
       "revId": "c08b3a8b9303526133ae8c44e48bfa727dc358ea",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f560f44_8a2b047a",
+        "filename": "doc/source/reference/drivers/smtp.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-10-13T08:04:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_a763a840",
+      "range": {
+        "startLine": 62,
+        "startChar": 32,
+        "endLine": 62,
+        "endChar": 48
+      },
+      "revId": "c08b3a8b9303526133ae8c44e48bfa727dc358ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
