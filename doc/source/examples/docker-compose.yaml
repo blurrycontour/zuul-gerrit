@@ -111,7 +111,7 @@ services:
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zuul-executor -f'"
     networks:
       - zuul
-  node:
+  node1:
     build:
       dockerfile: node-Dockerfile
       context: ./
@@ -119,6 +119,20 @@ services:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
+    image: zuul-tutorial_node
+    volumes:
+      - "nodessh:/root/.ssh:z"
+    networks:
+      - zuul
+  node2:
+    build:
+      dockerfile: node-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: zuul-tutorial_node
     volumes:
       - "nodessh:/root/.ssh:z"
     networks:
