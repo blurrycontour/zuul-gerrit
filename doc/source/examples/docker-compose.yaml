@@ -90,7 +90,7 @@ services:
       - "./playbooks/:/var/playbooks/:z"
       - "sshkey:/var/ssh:z"
       - "logs:/srv/static/logs:z"
-  node:
+  node1:
     build:
       dockerfile: node-Dockerfile
       context: ./
@@ -98,6 +98,18 @@ services:
         http_proxy: "${http_proxy}"
         https_proxy: "${http_proxy}"
         no_proxy: "${no_proxy},gerrit"
+    image: zuul-tutorial_node
+    volumes:
+      - "nodessh:/root/.ssh:z"
+  node2:
+    build:
+      dockerfile: node-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: zuul-tutorial_node
     volumes:
       - "nodessh:/root/.ssh:z"
   launcher:
@@ -121,6 +133,20 @@ services:
       - "8000:80"
     volumes:
       - "logs:/usr/local/apache2/htdocs:z"
+  merger:
+    privileged: true
+    environment:
+      - http_proxy
+      - https_proxy
+      - no_proxy=${no_proxy},gerrit,scheduler
+      - ZUUL_MYSQL_PASSWORD=secret
+    depends_on:
+      - scheduler
+    image: zuul/zuul-merger
+    volumes:
+      - "./etc_zuul/:/etc/zuul/:z"
+      - "sshkey:/var/ssh:z"
+      - "logs:/srv/static/logs:z"
 
 volumes:
   sshkey:
