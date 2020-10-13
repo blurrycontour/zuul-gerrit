@@ -1,0 +1,19 @@
+- hosts: localhost
+  vars:
+    workspace: /tmp/tutorial-zuul
+    local: true
+    skip_quick_start: no
+    ssh_public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub', errors='ignore') }}"
+    ssh_agent:
+      stdout: ''
+    run_playbooks:
+      - use-zuul-jobs.yaml
+    zuul_tutorial_confignum: 0
+  environment:
+    GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
+  tasks:
+    - block:
+        - name: Run tutorial
+          include_tasks: run-tutorial.yaml
+      always:
+        - include_tasks: post-run-localtest.yaml

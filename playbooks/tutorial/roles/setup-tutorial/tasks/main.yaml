@@ -1,3 +1,8 @@
+- name: Copy nodepool.yaml
+  copy:
+    src: ../../doc/source/examples/etc_nodepool/nodepool-quickstart.yaml
+    dest: "{{ zuul_tutorial_docker_compose_dest_base_dir }}/etc_nodepool/nodepool.yaml"
+
 - name: Run docker-compose up
   when: not local
   shell:
