@@ -1,0 +1,21 @@
+
+- job:
+    name: my-upload-pypi
+    description: Release wheel to pypi using my-pypi-account
+    pre-run: playbooks/publish/pre.yaml
+    run: playbooks/publish/release.yaml
+    post-run: playbooks/publish/pypi.yaml
+    secrets:
+      - name: pypi_info
+        secret: my-pypi-secret
+
+- project:
+    check:
+      jobs:
+        - tox-pep8
+    gate:
+      jobs:
+        - tox-pep8
+    release:
+      jobs:
+        - my-upload-pypi
