@@ -204,6 +204,16 @@
         - gate-pipeline.yaml
       zuul_tutorial_confignum: 1
 
+- job:
+    name: zuul-tutorial-job-secrets
+    parent: zuul-tutorial
+    description: Run the commands in the Zuul tutorial job secrets documentation.
+    timeout: 3000
+    vars:
+      run_playbooks:
+        - job-secrets.yaml
+      zuul_tutorial_confignum: 1
+
 # Image building jobs
 - secret:
     name: zuul-dockerhub
@@ -331,6 +341,7 @@
         - zuul-tutorial-gate-your-first-patch
         - zuul-tutorial-use-zuul-jobs
         - zuul-tutorial-gate-pipeline
+        - zuul-tutorial-job-secrets
         - nodepool-zuul-functional:
             voting: false
         - zuul-tox-zuul-client
@@ -361,6 +372,7 @@
         - zuul-tutorial-gate-your-first-patch
         - zuul-tutorial-use-zuul-jobs
         - zuul-tutorial-gate-pipeline
+        - zuul-tutorial-job-secrets
         - zuul-tox-zuul-client
         - zuul-build-python-release
     promote:
