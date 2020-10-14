@@ -1,0 +1,232 @@
+- name: Init test1 & test2
+  include_tasks: init-repo.yaml
+  loop:
+    - {name: "test1", archive: "jobs-repo-archive.tgz"}
+    - {name: "test2", archive: "jobs-depend-lib.tgz"}
+  loop_control:
+    loop_var: repoinfo
+
+- name: Copy zuul.yaml in test1 & test2
+  copy:
+    src: ../../doc/source/examples/{{ reponame }}-job-dependencies/zuul.yaml
+    dest: "{{ workspace }}/{{ reponame }}/.zuul.yaml"
+  loop:
+    - test1
+    - test2
+  loop_control:
+    loop_var: reponame
+
+- name: Setup repository test1 & test2
+  shell:
+    chdir: "{{ workspace }}/{{ reponame }}/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add .zuul.yaml
+      git commit -m"Initialize CI"
+      git review
+  loop:
+    - test1
+    - test2
+  loop_control:
+    loop_var: reponame
+
+
+- name: Check change is merged test1 & test2
+  include_role:
+    name: change-merged
+  vars:
+    title: "Initialize CI {{ reponame }}"
+    projectname: "{{ reponame }}"
+    check_timeout: 350
+    gate_timeout: 350
+  loop:
+    - test1
+    - test2
+  loop_control:
+    loop_var: reponame
+
+- name: Copy requirements.txt in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/requirements.txt
+    dest: "{{ workspace }}/test1/"
+- name: Copy tox.ini in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/tox.ini
+    dest: "{{ workspace }}/test1/"
+- name: Copy hello.py in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/hello.py
+    dest: "{{ workspace }}/test1/hello/"
+
+- name: Add the dependency relationship between test2 and test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Import demolib"
+      git review
+
+- name: Check test1 change which depends on test2 is merged
+  include_role:
+    name: change-merged
+  vars:
+    title: "Import demolib test1"
+    projectname: test1
+
+- name: Copy zuul_depend in test1
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/zuul_depend.yaml
+    dest: "{{ workspace }}/test1/.zuul.yaml"
+
+- name: Add zuul_depend to test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Add dependent job"
+      git review
+
+- name: Check test1 zuul_depend is merged
+  include_role:
+    name: change-merged
+  vars:
+    title: "Dependent job test1"
+    projectname: test1
+
+- name: Copy zuul_depend in test2
+  copy:
+    src: ../../doc/source/examples/test2-job-dependencies/zuul_depend.yaml
+    dest: "{{ workspace }}/test2/.zuul.yaml"
+
+- name: Add zuul_depend to test2
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Add dependent job in test2 CI"
+      git review
+
+- name: Check test2 zuul_depend is merged
+  include_role:
+    name: change-merged
+  vars:
+    title: "Dependent job test2"
+    projectname: test2
+    check_timeout: 230
+
+- name: Scenario1 Modif test2 uhoh
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git branch -f uhoh master && git checkout -f uhoh
+      sed -i -e "s/Hello Zuul/Hello Dana/" demolib/__init__.py
+      sed -i -e "s/Hello Zuul/Hello Dana/" tests/test_demolib.py
+      git add -A
+      git commit -m"No Zuul, only Dana"
+      git review
+
+- name: Scenario1 Check test2 Zull Dana check status is error
+  include_role:
+    name: check-pipeline
+  vars:
+    title: "Scenario1 zuul/dana test2"
+    projectname: test2
+    pipeline_expected_result: error
+
+- name: Scenario2 Modif test2(lib) goodbye
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git checkout master && git pull origin master
+      git branch -f goodbye master && git checkout -f goodbye
+
+- name: Scenario2 Copy goodbye demolib/__init__.py in test2(lib)
+  copy:
+    src: ../../doc/source/examples/test2-job-dependencies/demolib_init.py
+    dest: "{{ workspace }}/test2/demolib/__init__.py"
+
+- name: Add zuul_depend to test2
+  shell:
+    chdir: "{{ workspace }}/test2/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Bye Zuul"
+      git review
+- name: Scenario2 Check Zuul check status test2(lib) is ok
+  include_role:
+    name: check-pipeline
+  vars:
+    title: "Scenario2 bye zuul test2"
+    projectname: test2
+
+- set_fact:
+    test2_bye_check_result: "{{ changeinfo }}"
+
+- name: Scenario2 Modif test1(app) goodbye
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git checkout master && git pull origin master
+      git branch -f goodbye master && git checkout -f goodbye
+
+- name: Scenario2 Copy goodbye hello/hello.py in test1(app)
+  copy:
+    src: ../../doc/source/examples/test1-job-dependencies/goodbye_hello.py
+    dest: "{{ workspace }}/test1/hello/hello.py"
+
+- name: Add zuul_depend to test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git add -A
+      git commit -m"Bye Zuul"
+      git review
+
+- name: Scenario2 Check Zuul check status test1(app) is error
+  include_role:
+    name: check-pipeline
+  vars:
+    title: "Scenario2 no Depends-On test1"
+    projectname: test1
+    pipeline_expected_result: error
+
+- set_fact:
+    test1_bye_check_result: "{{ changeinfo }}"
+
+- name: Scenario2 Add Depends-On
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git commit --amend -m"Bye Zuul
+
+      Depends-On: http://gerrit:8080/{{ test2_bye_check_result.number }}
+      Change-Id: {{ test1_bye_check_result.change_id }}"
+      git review
+
+- name: Scenario2 Check Zuul check status test1 is ok
+  include_role:
+    name: check-pipeline
+  vars:
+    title: "Scenario2 with Depends-On test1"
+    projectname: test1
+    check_timeout: 230
+    patchset: 2
