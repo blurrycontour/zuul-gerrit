@@ -23,6 +23,7 @@ import zuul.web
 import zuul.rpcclient
 
 from tests.base import iterate_timeout
+from tests.base import ZuulDBTestCase
 from tests.unit.test_web import BaseTestWeb
 
 
@@ -392,3 +393,85 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+
+
+class TestZuulClientBuilds(ZuulDBTestCase, BaseTestWeb):
+    """Test that zuul-client can fetch builds"""
+    config_file = 'zuul-sql-driver.conf'
+    tenant_config_file = 'config/sql-driver/main.yaml'
+
+    def _split_pretty_table(self, output):
+        lines = output.decode().split('\n')
+        # ['ID', 'Job', 'Project', 'Branch', 'Pipeline', 'Change or Ref',
+        #  'Duration (s)', 'Start time', 'Result', 'Event ID']
+        headers = [x.strip() for x in lines[1].split('|') if x != '']
+        # Trim headers and last line of the table
+        return [dict(zip(headers,
+                         [x.strip() for x in l.split('|') if x != '']))
+                for l in lines[3:-1]]
+
+    def test_get_builds(self):
+        """Test querying builds"""
+
+        # Generate some build records in the db.
+        self.add_base_changes()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url, '-v',
+             'builds', '--tenant', 'tenant-one', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(6, len(results), results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--project', 'org/project', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(3, len(results), results)
+        self.assertTrue(all(x['Project'] == 'org/project' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--job', 'project-test1', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(2, len(results), results)
+        self.assertTrue(all(x['Job'] == 'project-test1' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--change', '2', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(3, len(results), results)
+        self.assertTrue(all(x['Change or Ref'] == '3,1' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--change', '1',
+             '--ref', '3', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(0, len(results), results)
