@@ -150,6 +150,19 @@ services:
       - "nodessh:/root/.ssh:z"
     networks:
       - zuul
+  node4:
+    build:
+      dockerfile: node-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    image: zuul-tutorial_node
+    volumes:
+      - "nodessh:/root/.ssh:z"
+    networks:
+      - zuul
   launcher:
     depends_on:
       - zk
