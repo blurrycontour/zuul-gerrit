@@ -1,0 +1,11 @@
+- project:
+    check:
+      jobs:
+        - tox-py38
+        - tox-demorepo
+        - tox-pep8
+    gate:
+      jobs:
+        - tox-py38
+        - tox-demorepo
+        - tox-pep8
