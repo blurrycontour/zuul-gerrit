@@ -1,6 +1,6 @@
 - name: Copy nodepool.yaml
   copy:
-    src: ../../doc/source/examples/etc_nodepool/nodepool-quickstart.yaml
+    src: "../../doc/source/examples/etc_nodepool/{{ zuul_tutorial_config[zuul_tutorial_confignum].nodepool_file }}"
     dest: "{{ zuul_tutorial_docker_compose_dest_base_dir }}/etc_nodepool/nodepool.yaml"
 
 - name: Run docker-compose up
