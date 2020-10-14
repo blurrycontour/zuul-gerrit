@@ -1,0 +1,142 @@
+- name: Init Test1
+  include_role:
+    name: init-repository
+  vars:
+    projectname: test1
+
+- name: Copy gate-pipeline.tgz in workspace
+  copy:
+    src: ../../doc/source/tutorials/archive/gate-pipeline.tgz
+    dest: "{{ workspace }}/"
+- name: Copy tox.ini_ in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-pipeline/tox.ini
+    dest: "{{ workspace }}/test1/tox.ini"
+- name: Copy trigger.sh in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-pipeline/trigger.sh
+    dest: "{{ workspace }}/test1/"
+- name: Copy .zuul.yaml in test1
+  copy:
+    src: ../../doc/source/examples/test1-gate-pipeline/zuul.yaml
+    dest: "{{ workspace }}/test1/.zuul.yaml"
+
+- name: Commit and upload resources in test1
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      tar xzf ../gate-pipeline.tgz -C .
+      chmod +x trigger.sh
+      git add -A .
+      git commit -m"Init test1 pipelines"
+      git review
+
+- include_role:
+    name: change-merged
+  vars:
+    title: "Init demo-repo pipelines"
+    projectname: test1
+
+- name: Extract gate-pipelines-patches.tgz into workspace
+  unarchive:
+    src: ../../doc/source/tutorials/archive/gate-pipelines-patches.tgz
+    dest: "{{ workspace }}/"
+
+- name: Reset local copy to the base commit
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git reset --hard $(git log --pretty=oneline | grep "Init test1 pipelines" | awk {'print $1'} | head -1)
+      git am ../A.patch && git review -i
+
+- name: Query changeA
+  uri:
+    url: http://localhost:8080/a/changes/?q=status:open+project:test1&o=CURRENT_REVISION&n=1
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changea
+
+- set_fact:
+    changea: "{{ {'id': (changea.content[5:]|from_json)[0].id, 'current_revision': (changea.content[5:]|from_json)[0].current_revision} }}"
+
+- name: Reset local copy to the base commit
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git reset --hard HEAD^1
+      git am ../B.patch && git review -i
+
+- name: Query changeB
+  uri:
+    url: http://localhost:8080/a/changes/?q=status:open+project:test1&o=CURRENT_REVISION&n=1
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changeb
+
+- set_fact:
+    changeb: "{{ {'id': (changeb.content[5:]|from_json)[0].id, 'current_revision': (changeb.content[5:]|from_json)[0].current_revision} }}"
+
+- name: Reset local copy to the base commit
+  shell:
+    chdir: "{{ workspace }}/test1/"
+    executable: /bin/bash
+    cmd: |
+      {{ ssh_agent.stdout }}
+      git reset --hard HEAD^1
+      git am ../C.patch && git review -i
+
+- name: Query changeC
+  uri:
+    url: http://localhost:8080/a/changes/?q=status:open+project:test1&o=CURRENT_REVISION&n=1
+    method: GET
+    user: admin
+    password: secret
+    return_content: true
+  register: changec
+- set_fact:
+    changec: "{{ {'id': (changec.content[5:]|from_json)[0].id, 'current_revision': (changec.content[5:]|from_json)[0].current_revision} }}"
+
+- include_role:
+    name: approve-change
+  vars:
+    change_id: "{{ changedata.id }}"
+    change_revision: "{{ changedata.current_revision }}"
+    projectname: test1
+  loop:
+    - "{{ changea }}"
+    - "{{ changeb }}"
+    - "{{ changec }}"
+  loop_control:
+    loop_var: changedata
+
+- name: Wait for Zuul to report changeA and changeC merged
+  include_role:
+    name: gate-pipeline
+  vars:
+    gate_timeout: 300
+    change_id: "{{ changedata.id }}"
+    title: "{{ changedata.title }}"
+  loop:
+    - "{{ changea | combine({'title': 'changeA'}) }}"
+    - "{{ changec | combine({'title': 'changeC'}) }}"
+  loop_control:
+    loop_var: changedata
+
+- name: Wait for Zuul to report changeB is not merged
+  include_role:
+    name: gate-pipeline
+  vars:
+    gate_timeout: 10
+    change_id: "{{ changeb.id }}"
+    title: "changeB"
+    pipeline_expected_result: error
