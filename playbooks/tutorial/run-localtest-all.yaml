@@ -10,6 +10,7 @@
       - use-zuul-jobs.yaml
       - gate-pipeline.yaml
       - job-secrets.yaml
+      - job-dependencies.yaml
   environment:
     GIT_SSH_COMMAND: "ssh -o UserKnownHostsFile={{ workspace }}/known_hosts"
   tasks:
