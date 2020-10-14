@@ -392,3 +392,89 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+
+
+class TestZuulClientBuilds(BaseTestWeb):
+    """Test that zuul-client can fetch builds"""
+    config_file = 'zuul-admin-web.conf'
+
+    def _split_pretty_table(self, output):
+        lines = output.decode().split('\n')
+        # ['ID', 'Job', 'Project', 'Branch', 'Pipeline', 'Change or Ref',
+        #  'Duration (s)', 'Start time', 'Result', 'Event ID']
+        headers = [x.strip() for x in lines[1].split('|') if x != '']
+        # Trim headers and last line of the table
+        return [dict(zip(headers,
+                         [x.strip() for x in l.split('|') if x != '']))
+                for l in lines[3:-1]]
+
+    def test_get_builds(self):
+        """Test querying builds"""
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--project', 'org/project', ],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(6, len(results), results)
+        self.assertTrue(all(x['Project'] == 'org/project' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--job', 'project-test1', ],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(3, len(results), results)
+        self.assertTrue(all(x['Job'] == 'project-test1' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--change', '3', ],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(2, len(results), results)
+        self.assertTrue(all(x['Change or Ref'] == '3,1' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--change', '1',
+             '--ref', '3', ],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(0, len(results), results)
