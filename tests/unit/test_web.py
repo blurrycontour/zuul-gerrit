@@ -55,12 +55,14 @@ class BaseTestWeb(ZuulTestCase):
         self.zuul_ini_config = FakeConfig(self.config_ini_data)
         # Start the web server
         self.web = self.useFixture(
-            ZuulWebFixture(
-                self.gearman_server.port,
-                self.config,
-                self.test_root,
-                info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config),
-                zk_hosts=self.zk_config))
+            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.rpcclient, self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root,
+                           info=zuul.model.WebInfo.fromConfig(
+                               self.zuul_ini_config),
+                           zk_hosts=self.zk_config))
 
         self.executor_server.hold_jobs_in_build = True
 
