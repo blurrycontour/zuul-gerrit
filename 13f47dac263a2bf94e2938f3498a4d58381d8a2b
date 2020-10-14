@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f6b1bfe_1f69b6bd",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-14T19:30:09Z",
+      "side": 1,
+      "message": "What is the purpose to rename this method? It looks to me like it\u0027s still clearing the branch cache.",
+      "range": {
+        "startLine": 79,
+        "startChar": 8,
+        "endLine": 79,
+        "endChar": 18
+      },
+      "revId": "13f47dac263a2bf94e2938f3498a4d58381d8a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f6b1bfe_dfaa9e83",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-14T19:30:09Z",
+      "side": 1,
+      "message": "The name of this class is a bit misleading since the GerritConnection caches branches as well but doesn\u0027t use this class. In fact this class handles the concept of protected branches so it should be named accordingly. I\u0027m just not sure about a good name. Maybe something like BaseConnectionBranchProtection or something shorter/better that is similar.\n\nNot sure, but it might also be worth exploring the idea if it makes sense to make this class a mix in instead of a base class of those connections.",
+      "range": {
+        "startLine": 129,
+        "startChar": 6,
+        "endLine": 129,
+        "endChar": 28
+      },
+      "revId": "13f47dac263a2bf94e2938f3498a4d58381d8a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f6b1bfe_ff903a51",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-14T19:30:09Z",
+      "side": 1,
+      "message": "We\u0027re python3 only so this can be simpler:\n\n  super().__init__(*args, **kwargs)",
+      "revId": "13f47dac263a2bf94e2938f3498a4d58381d8a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f6b1bfe_ff6f9a8f",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-14T19:30:09Z",
+      "side": 1,
+      "message": "This should be camel case to be consistent with the context.",
+      "range": {
+        "startLine": 137,
+        "startChar": 8,
+        "endLine": 137,
+        "endChar": 27
+      },
+      "revId": "13f47dac263a2bf94e2938f3498a4d58381d8a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7f6b1bfe_9f04a6c8",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-14T19:30:09Z",
+      "side": 1,
+      "message": "I find it confusing having a getProjectBranches and a projectBranches method within the same class. It looks like getProjectBranches is meant as an external interface that leverages caching and projectBranches is used internally for fetching them.\n\nWhat do you think about renaming this method to _fetchProjectBranches then? This makes the purpose and also the scope clear.",
+      "range": {
+        "startLine": 151,
+        "startChar": 8,
+        "endLine": 151,
+        "endChar": 23
+      },
+      "revId": "13f47dac263a2bf94e2938f3498a4d58381d8a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
