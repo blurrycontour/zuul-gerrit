@@ -23,6 +23,7 @@ import zuul.web
 import zuul.rpcclient
 
 from tests.base import iterate_timeout
+from tests.base import ZuulDBTestCase
 from tests.unit.test_web import BaseTestWeb
 
 
@@ -392,3 +393,107 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+
+
+class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
+    """Test that zuul-client can fetch builds"""
+    config_file = 'zuul-sql-driver.conf'
+    tenant_config_file = 'config/sql-driver/main.yaml'
+
+    def _split_pretty_table(self, output):
+        lines = output.decode().split('\n')
+        # ['ID', 'Job', 'Project', 'Branch', 'Pipeline', 'Change or Ref',
+        #  'Duration (s)', 'Start time', 'Result', 'Event ID']
+        headers = [x.strip() for x in lines[1].split('|') if x != '']
+        # Trim headers and last line of the table
+        return [dict(zip(headers,
+                         [x.strip() for x in l.split('|') if x != '']))
+                for l in lines[3:-2]]
+
+    def setUp(self):
+        super(TestZuulClientQueryData, self).setUp()
+        self.add_base_changes()
+
+    def add_base_changes(self):
+        # change on org/project will run 5 jobs in check
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # change on org/project1 will run 3 jobs in check per patchset
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        B.addPatchset()
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(2))
+        self.waitUntilSettled()
+        # changes on both projects will run 3 jobs in gate each
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+    def test_get_builds(self):
+        """Test querying builds"""
+
+        self.add_base_changes()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(17, len(results), results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--project', 'org/project', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(8, len(results), results)
+        self.assertTrue(all(x['Project'] == 'org/project' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--job', 'project-test1', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(9, len(results), results)
+        self.assertTrue(all(x['Job'] == 'project-test1' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--change', '2', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(6, len(results), results)
+        self.assertTrue(all(x['Change or Ref'] == '3,1' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--change', '1',
+             '--ref', '3', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(0, len(results), results)
