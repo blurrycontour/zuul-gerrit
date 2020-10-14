@@ -12,8 +12,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
+import cachetools
 import cherrypy
 import socket
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
@@ -918,6 +917,10 @@ class ZuulWebAPI(object):
             })
         return ret
 
+    # Cache the tenant connections for 10 minutes to not bother the scheduler
+    # too much.
+    @cachetools.cached(cache=cachetools.TTLCache(128, 600),
+                       key=lambda self, tenant: tenant)
     def _get_connection(self, tenant):
         # Ask the scheduler which sql connection to use for this tenant
         job = self.rpc.submitJob('zuul:tenant_sql_connection',
