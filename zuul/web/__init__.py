@@ -12,8 +12,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-
+import cachetools
 import cherrypy
 import socket
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
@@ -234,6 +233,9 @@ class ZuulWebAPI(object):
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
         self.status_lock = threading.Lock()
+
+        # Cache map tenant -> connection for 10 minutes
+        self._connection_map = cachetools.TTLCache(128, 600)
 
     def _basic_auth_header_check(self):
         """make sure protected endpoints have a Authorization header with the
@@ -919,6 +921,10 @@ class ZuulWebAPI(object):
         return ret
 
     def _get_connection(self, tenant):
+        connection = self._connection_map.get(tenant)
+        if connection:
+            return connection
+
         # Ask the scheduler which sql connection to use for this tenant
         job = self.rpc.submitJob('zuul:tenant_sql_connection',
                                  {'tenant': tenant})
@@ -927,7 +933,9 @@ class ZuulWebAPI(object):
         if not connection_name:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
 
-        return self.zuulweb.connections.connections[connection_name]
+        connection = self.zuulweb.connections.connections[connection_name]
+        self._connection_map[tenant] = connection
+        return connection
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
