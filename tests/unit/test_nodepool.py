@@ -15,11 +15,12 @@
 
 import time
 
-import zuul.zk
-import zuul.nodepool
 from zuul import model
+import zuul.nodepool
 
 from tests.base import BaseTestCase, ChrootedKazooFixture, FakeNodepool
+from zuul.zk import ZooKeeperClient
+from zuul.zk.nodepool import ZooKeeperNodepool
 
 
 class TestNodepool(BaseTestCase):
@@ -37,9 +38,10 @@ class TestNodepool(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
-        self.addCleanup(self.zk.disconnect)
-        self.zk.connect(self.zk_config)
+        self.zk_client = ZooKeeperClient()
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
+        self.addCleanup(self.zk_client.disconnect)
+        self.zk_client.connect(self.zk_config)
         self.hostname = 'nodepool-test-hostname'
 
         self.provisioned_requests = []
@@ -105,8 +107,8 @@ class TestNodepool(BaseTestCase):
         job.nodeset = nodeset
         self.fake_nodepool.pause()
         request = self.nodepool.requestNodes(None, job, 0)
-        self.zk.client.stop()
-        self.zk.client.start()
+        self.zk_client.client.stop()
+        self.zk_client.client.start()
         self.fake_nodepool.unpause()
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
@@ -161,7 +163,7 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(len(self.provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
-        self.zk.deleteNodeRequest(request)
+        self.zk_nodepool.deleteNodeRequest(request)
 
         # Accept the nodes
         self.nodepool.acceptNodes(request, request.id)
