@@ -31,9 +31,9 @@ class TestNodepoolIntegration(BaseTestCase):
         super(TestNodepoolIntegration, self).setUp()
 
         self.statsd = None
-        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
-        self.addCleanup(self.zk.disconnect)
-        self.zk.connect('localhost:2181')
+        self.zk_client = zuul.zk.ZooKeeperClient()
+        self.addCleanup(self.zk_client.disconnect)
+        self.zk_client.connect('localhost:2181')
         self.hostname = socket.gethostname()
 
         self.provisioned_requests = []
@@ -104,8 +104,8 @@ class TestNodepoolIntegration(BaseTestCase):
         job.nodeset = nodeset
         self.fake_nodepool.paused = True
         request = self.nodepool.requestNodes(None, job, 0)
-        self.zk.client.stop()
-        self.zk.client.start()
+        self.zk_client.client.stop()
+        self.zk_client.client.start()
         self.fake_nodepool.paused = False
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
