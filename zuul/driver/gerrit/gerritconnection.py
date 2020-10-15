@@ -36,7 +36,7 @@ from typing import Dict, List
 from uuid import uuid4
 
 from zuul import version as zuul_version
-from zuul.connection import BaseConnection
+from zuul.connection import CachedBranchConnection
 from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
@@ -240,14 +240,7 @@ class GerritEventConnector(threading.Thread):
             else:
                 event.branch = event.ref
 
-            if event.oldrev == '0' * 40:
-                event.branch_created = True
-                project = self.connection.source.getProject(event.project_name)
-                self.connection._clearBranchCache(project)
-            if event.newrev == '0' * 40:
-                event.branch_deleted = True
-                project = self.connection.source.getProject(event.project_name)
-                self.connection._clearBranchCache(project)
+            self.connection.handle_branch_event(event)
 
         self._getChange(event)
         self.connection.logEvent(event)
@@ -475,7 +468,7 @@ class GerritPoller(threading.Thread):
         self._stop_event.set()
 
 
-class GerritConnection(BaseConnection):
+class GerritConnection(CachedBranchConnection):
     driver_name = 'gerrit'
     log = logging.getLogger("zuul.GerritConnection")
     iolog = logging.getLogger("zuul.GerritConnection.io")
@@ -493,7 +486,6 @@ class GerritConnection(BaseConnection):
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
                                                connection_config)
-        self._project_branch_cache = {}
         if 'server' not in self.connection_config:
             raise Exception('server is required for gerrit connections in '
                             '%s' % self.connection_name)
@@ -668,15 +660,6 @@ class GerritConnection(BaseConnection):
 
     def addProject(self, project: Project) -> None:
         self.projects[project.name] = project
-
-    def clearCache(self):
-        self._project_branch_cache = {}
-
-    def _clearBranchCache(self, project):
-        try:
-            del self._project_branch_cache[project.name]
-        except KeyError:
-            pass
 
     def maintainCache(self, relevant):
         # This lets the user supply a list of change objects that are
@@ -998,17 +981,20 @@ class GerritConnection(BaseConnection):
              not any(part.startswith('.') or part.endswith('.lock')
                      for part in parts))
 
-    def getProjectBranches(self, project: Project, tenant) -> List[str]:
-        branches = self._project_branch_cache.get(project.name)
-        if branches is not None:
-            return branches
+    def _fetchProjectBranches(self, project: Project,
+                              exclude_unprotected: bool) -> List[str]:
+        if exclude_unprotected:
+            raise NotImplementedError
 
         refs = self.getInfoRefs(project)
         heads = [str(k[len('refs/heads/'):]) for k in refs
                  if k.startswith('refs/heads/') and
                  GerritConnection._checkRefFormat(k)]
-        self._project_branch_cache[project.name] = heads
         return heads
+
+    def isBranchProtected(self, project_name: str, branch: str,
+                          zuul_event_id=None) -> bool:
+        return False
 
     def addEvent(self, data):
         return self.event_queue.put((time.time(), data))
