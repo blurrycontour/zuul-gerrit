@@ -1329,7 +1329,6 @@ class GithubConnection(BaseConnection):
             change.project = project
             change.number = number
             change.patchset = patchset
-        self._change_cache[key] = change
         try:
             # This can be called multi-threaded during github event
             # preprocessing. In order to avoid data races perform locking
@@ -1340,6 +1339,10 @@ class GithubConnection(BaseConnection):
             if lock.acquire(blocking=False):
                 try:
                     self._updateChange(change, event)
+
+                    if self.sched:
+                        self.sched.onChangeUpdated(change, event)
+                    self._change_cache[key] = change
                 finally:
                     # We need to remove the lock here again so we don't leak
                     # them.
@@ -1492,9 +1495,6 @@ class GithubConnection(BaseConnection):
         ]
 
         self._updateCanMergeInfo(change, event)
-
-        if self.sched:
-            self.sched.onChangeUpdated(change, event)
 
         return change
 
