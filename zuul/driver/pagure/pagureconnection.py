@@ -25,13 +25,15 @@ import cherrypy
 import traceback
 import voluptuous as v
 
+from typing import List
+
 import gear
 
-from zuul.connection import BaseConnection
+from zuul.connection import CachedBranchConnection
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.lib.config import get_default
-from zuul.model import Ref, Branch, Tag
+from zuul.model import Branch, Project, Ref, Tag
 from zuul.lib import dependson
 
 from zuul.driver.pagure.paguremodel import PagureTriggerEvent, PullRequest
@@ -238,6 +240,7 @@ class PagureEventConnector(threading.Thread):
 
         try:
             event = self.event_handler_mapping[event_type](json_body)
+            self.connection.clearConnectionCacheOnBranchEvent(event)
         except Exception:
             self.log.exception(
                 'Exception when handling event: %s' % event_type)
@@ -358,7 +361,6 @@ class PagureEventConnector(threading.Thread):
         event.ref = 'refs/heads/%s' % event.branch
         event.newrev = data.get('end_commit')
         event.oldrev = data.get('old_commit')
-        event.branch_updated = True
         return event
 
     def _event_ref_created(self, body):
@@ -369,9 +371,6 @@ class PagureEventConnector(threading.Thread):
         event.ref = 'refs/heads/%s' % event.branch
         event.newrev = data.get('rev')
         event.oldrev = '0' * 40
-        event.branch_created = True
-        self.connection.project_branch_cache[
-            event.project_name].append(event.branch)
         return event
 
     def _event_ref_deleted(self, body):
@@ -382,9 +381,6 @@ class PagureEventConnector(threading.Thread):
         event.ref = 'refs/heads/%s' % event.branch
         event.oldrev = data.get('rev')
         event.newrev = '0' * 40
-        event.branch_deleted = True
-        self.connection.project_branch_cache[
-            event.project_name].remove(event.branch)
         return event
 
     def run(self):
@@ -514,7 +510,7 @@ class PagureAPIClient():
         return resp[0]['webhook']['token']
 
 
-class PagureConnection(BaseConnection):
+class PagureConnection(CachedBranchConnection):
     driver_name = 'pagure'
     log = logging.getLogger("zuul.PagureConnection")
 
@@ -522,7 +518,6 @@ class PagureConnection(BaseConnection):
         super(PagureConnection, self).__init__(
             driver, connection_name, connection_config)
         self._change_cache = {}
-        self.project_branch_cache = {}
         self.projects = {}
         self.server = self.connection_config.get('server', 'pagure.io')
         self.canonical_hostname = self.connection_config.get(
@@ -610,9 +605,6 @@ class PagureConnection(BaseConnection):
         for key in remove:
             del self._change_cache[key]
 
-    def clearCache(self):
-        self.project_branch_cache = {}
-
     def getWebController(self, zuul_web):
         return PagureWebController(zuul_web, self)
 
@@ -634,18 +626,18 @@ class PagureConnection(BaseConnection):
             url += '/c/%s' % sha
         return url
 
-    def getProjectBranches(self, project, tenant):
-        branches = self.project_branch_cache.get(project.name)
-
-        if branches is not None:
-            return branches
-
+    def _fetchProjectBranches(self, project: Project,
+                              exclude_unprotected: bool) -> List[str]:
+        if exclude_unprotected:
+            # Not implemented yet: https://pagure.io/pagure/issue/46
+            raise NotImplementedError("Pagure does not provide protected "
+                                      "branch feature")
         pagure = self.get_project_api_client(project.name)
-        branches = pagure.get_project_branches()
-        self.project_branch_cache[project.name] = branches
+        return pagure.get_project_branches()
 
-        self.log.info("Got branches for %s" % project.name)
-        return branches
+    def isBranchProtected(self, project_name: str, branch: str,
+                          zuul_event_id=None) -> bool:
+        return False
 
     def getGitUrl(self, project):
         return '%s/%s' % (self.cloneurl, project.name)
