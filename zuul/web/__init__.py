@@ -28,13 +28,14 @@ import time
 import select
 import threading
 
+from zuul import exceptions
 import zuul.lib.repl
+from zuul.lib import commandsocket
 from zuul.lib.re2util import filter_allowed_disallowed
 import zuul.model
-from zuul import exceptions
 import zuul.rpcclient
-import zuul.zk
-from zuul.lib import commandsocket
+from zuul.zk import ZooKeeperClient
+from zuul.zk.nodepool import ZooKeeperNodepool
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -227,7 +228,8 @@ class ZuulWebAPI(object):
 
     def __init__(self, zuulweb):
         self.rpc = zuulweb.rpc
-        self.zk = zuulweb.zk
+        self.zk_client = zuulweb.zk_client
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.zuulweb = zuulweb
         self.cache = {}
         self.cache_time = {}
@@ -849,7 +851,7 @@ class ZuulWebAPI(object):
             allowed_labels = data['allowed_labels']
             disallowed_labels = data['disallowed_labels']
         labels = set()
-        for launcher in self.zk.getRegisteredLaunchers():
+        for launcher in self.zk_nodepool.getRegisteredLaunchers():
             labels.update(filter_allowed_disallowed(
                 launcher.supported_labels,
                 allowed_labels, disallowed_labels))
@@ -863,7 +865,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def nodes(self, tenant):
         ret = []
-        for node in self.zk.nodeIterator():
+        for node in self.zk_nodepool.nodeIterator():
             node_data = {}
             for key in ("id", "type", "connection_type", "external_id",
                         "provider", "state", "state_time", "comment"):
@@ -1222,11 +1224,11 @@ class ZuulWeb(object):
         self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
                                             ssl_key, ssl_cert, ssl_ca,
                                             client_id='Zuul Web Server')
-        self.zk = zuul.zk.ZooKeeper(enable_cache=True)
+        self.zk_client = ZooKeeperClient()
         if zk_hosts:
-            self.zk.connect(hosts=zk_hosts, read_only=True,
-                            timeout=zk_timeout, tls_cert=zk_tls_cert,
-                            tls_key=zk_tls_key, tls_ca=zk_tls_ca)
+            self.zk_client.connect(hosts=zk_hosts, read_only=True,
+                                   timeout=zk_timeout, tls_cert=zk_tls_cert,
+                                   tls_key=zk_tls_key, tls_ca=zk_tls_ca)
 
         self.connections = connections
         self.authenticators = authenticators
@@ -1383,7 +1385,7 @@ class ZuulWeb(object):
         cherrypy.server.httpserver = None
         self.wsplugin.unsubscribe()
         self.stream_manager.stop()
-        self.zk.disconnect()
+        self.zk_client.disconnect()
         self.stop_repl()
         self._command_running = False
         self.command_socket.stop()
