@@ -34,7 +34,7 @@ export const BUILD_OUTPUT_NOT_AVAILABLE = 'BUILD_OUTPUT_NOT_AVAILABLE'
 export const BUILD_MANIFEST_REQUEST = 'BUILD_MANIFEST_FETCH_REQUEST'
 export const BUILD_MANIFEST_SUCCESS = 'BUILD_MANIFEST_FETCH_SUCCESS'
 export const BUILD_MANIFEST_FAIL = 'BUILD_MANIFEST_FETCH_FAIL'
-export const BUILD_MANIFEST_NOT_AVAILBLE = 'BUILD_MANIFEST_NOT_AVAILABLE'
+export const BUILD_MANIFEST_NOT_AVAILABLE = 'BUILD_MANIFEST_NOT_AVAILABLE'
 
 export const requestBuild = () => ({
   type: BUILD_FETCH_REQUEST
@@ -47,10 +47,11 @@ export const receiveBuild = (buildId, build) => ({
   receivedAt: Date.now()
 })
 
-const failedBuild = (error, url) => {
+const failedBuild = (buildId, error, url) => {
   error.url = url
   return {
     type: BUILD_FETCH_FAIL,
+    buildId,
     error
   }
 }
@@ -210,10 +211,11 @@ export const receiveBuildOutput = (buildId, output) => {
   }
 }
 
-const failedBuildOutput = (error, url) => {
+const failedBuildOutput = (buildId, error, url) => {
   error.url = url
   return {
     type: BUILD_OUTPUT_FAIL,
+    buildId,
     error
   }
 }
@@ -245,20 +247,27 @@ export const receiveBuildManifest = (buildId, manifest) => {
   }
 }
 
-const failedBuildManifest = (error, url) => {
+const failedBuildManifest = (buildId, error, url) => {
   error.url = url
   return {
     type: BUILD_MANIFEST_FAIL,
+    buildId,
     error
   }
 }
 
-function buildOutputNotAvailable() {
-  return { type: BUILD_OUTPUT_NOT_AVAILABLE }
+function buildOutputNotAvailable(buildId) {
+  return {
+    type: BUILD_OUTPUT_NOT_AVAILABLE,
+    buildId: buildId,
+  }
 }
 
-function buildManifestNotAvailable() {
-  return { type: BUILD_MANIFEST_NOT_AVAILBLE }
+function buildManifestNotAvailable(buildId) {
+  return {
+    type: BUILD_MANIFEST_NOT_AVAILABLE,
+    buildId: buildId,
+  }
 }
 
 export function fetchBuild(tenant, buildId, state) {
@@ -276,7 +285,7 @@ export function fetchBuild(tenant, buildId, state) {
       const response = await API.fetchBuild(tenant.apiPrefix, buildId)
       dispatch(receiveBuild(buildId, response.data))
     } catch (error) {
-      dispatch(failedBuild(error, tenant.apiPrefix))
+      dispatch(failedBuild(buildId, error, tenant.apiPrefix))
       // Raise the error again, so fetchBuildAllInfo() doesn't call the
       // remaining fetch methods.
       throw error
@@ -286,18 +295,21 @@ export function fetchBuild(tenant, buildId, state) {
 
 function fetchBuildOutput(buildId, state) {
   return async function (dispatch) {
+    // In case the value is already set in our local state, directly resolve the
+    // promise. A null value means that the output could not be found for this
+    // build id.
+    if (state.build.outputs[buildId] !== undefined) {
+      return Promise.resolve()
+    }
     // As this function is only called after fetchBuild() we can assume that
     // the build is in the state. Otherwise an error would have been thrown and
     // this function wouldn't be called.
     const build = state.build.builds[buildId]
-    if (build.output) {
-      return Promise.resolve()
-    }
     if (!build.log_url) {
       // Don't treat a missing log URL as failure as we don't want to show a
       // toast for that. The UI already informs about the missing log URL in
       // multiple places.
-      return dispatch(buildOutputNotAvailable())
+      return dispatch(buildOutputNotAvailable(buildId))
     }
     const url = build.log_url.substr(0, build.log_url.lastIndexOf('/') + 1)
     dispatch(requestBuildOutput())
@@ -306,7 +318,7 @@ function fetchBuildOutput(buildId, state) {
       dispatch(receiveBuildOutput(buildId, response.data))
     } catch (error) {
       if (!error.request) {
-        dispatch(failedBuildOutput(error, url))
+        dispatch(failedBuildOutput(buildId, error, url))
         // Raise the error again, so fetchBuildAllInfo() doesn't call the
         // remaining fetch methods.
         throw error
@@ -316,7 +328,7 @@ function fetchBuildOutput(buildId, state) {
         const response = await Axios.get(url + 'job-output.json')
         dispatch(receiveBuildOutput(buildId, response.data))
       } catch (error) {
-        dispatch(failedBuildOutput(error, url))
+        dispatch(failedBuildOutput(buildId, error, url))
         // Raise the error again, so fetchBuildAllInfo() doesn't call the
         // remaining fetch methods.
         throw error
@@ -327,13 +339,16 @@ function fetchBuildOutput(buildId, state) {
 
 export function fetchBuildManifest(buildId, state) {
   return async function(dispatch) {
+    // In case the value is already set in our local state, directly resolve the
+    // promise. A null value means that the manifest could not be found for this
+    // build id.
+    if (state.build.manifests[buildId] !== undefined) {
+      return Promise.resolve()
+    }
     // As this function is only called after fetchBuild() we can assume that
     // the build is in the state. Otherwise an error would have been thrown and
     // this function wouldn't be called.
     const build = state.build.builds[buildId]
-    if (build.manifest) {
-      return Promise.resolve()
-    }
     dispatch(requestBuildManifest())
     for (let artifact of build.artifacts) {
       if (
@@ -345,7 +360,7 @@ export function fetchBuildManifest(buildId, state) {
           const response = await Axios.get(artifact.url)
           return dispatch(receiveBuildManifest(buildId, response.data))
         } catch(error) {
-          dispatch(failedBuildManifest(error, artifact.url))
+          dispatch(failedBuildManifest(buildId, error, artifact.url))
           // Raise the error again, so fetchBuildAllInfo() doesn't call
           // fetchLogFile which needs an existing manifest file.
           throw error
@@ -354,7 +369,7 @@ export function fetchBuildManifest(buildId, state) {
     }
     // Don't treat a missing manifest file as failure as we don't want to show a
     // toast for that.
-    dispatch(buildManifestNotAvailable())
+    dispatch(buildManifestNotAvailable(buildId))
   }
 }
 
@@ -363,19 +378,18 @@ export function fetchBuildAllInfo(tenant, buildId, logfileName) {
   // this is the common use case we have when loading the build info.
   return async function (dispatch, getState) {
     try {
-      // Wait for the build info to be available and provide the current status
-      // to the fetchBuildOutput and fetchBuildManifest so they can get the log
-      // url from the fetched build.
+      // Wait for the build to be available as fetchBuildOutput and
+      // fetchBuildManifest require information from the build object.
       await dispatch(fetchBuild(tenant, buildId, getState()))
+      dispatch(fetchBuildOutput(buildId, getState()))
       // Wait for the manifest info to be available as this is needed in case
       // we also download a logfile.
       await dispatch(fetchBuildManifest(buildId, getState()))
-      dispatch(fetchBuildOutput(buildId, getState()))
       if (logfileName) {
         dispatch(fetchLogfile(buildId, logfileName, getState()))
       }
    } catch (error) {
-      dispatch(failedBuild(error, tenant.apiPrefix))
+      dispatch(failedBuild(buildId, error, tenant.apiPrefix))
     }
   }
 }
@@ -391,8 +405,9 @@ export const receiveBuildset = (buildsetId, buildset) => ({
   receivedAt: Date.now()
 })
 
-const failedBuildset = error => ({
+const failedBuildset = (buildsetId, error) => ({
   type: BUILDSET_FETCH_FAIL,
+  buildsetId,
   error
 })
 
@@ -403,7 +418,7 @@ export function fetchBuildset(tenant, buildsetId) {
       const response = await API.fetchBuildset(tenant.apiPrefix, buildsetId)
       dispatch(receiveBuildset(buildsetId, response.data))
     } catch (error) {
-      dispatch(failedBuildset(error))
+      dispatch(failedBuildset(buildsetId, error))
     }
   }
 }
