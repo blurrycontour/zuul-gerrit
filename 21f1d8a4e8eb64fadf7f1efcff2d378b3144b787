@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f6b1bfe_a33504dd",
+        "filename": "web/src/pages/Tenants.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-10-15T05:59:49Z",
+      "side": 1,
+      "message": "The zuul-ci page has\n\n background-image: linear-gradient(top, rgba(0,0,0,0), rgba(0,0,0,0.15)), url(\"images/bg01.png\");\n\nbut I can not figure out how to get react to respect that?  I can put url in here OR linear-gradient, but when I try to have both and separate them with a \",\" it just seems to disappear?",
+      "revId": "21f1d8a4e8eb64fadf7f1efcff2d378b3144b787",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
