@@ -80,13 +80,19 @@ const failedLogfile = (error, url) => {
 }
 
 export function fetchLogfile(buildId, file, state) {
-  return async function(dispatch) {
-    const build = state.build.builds[buildId]
+  return async function (dispatch) {
     // Don't do anything if the logfile is already part of our local state
-    if (buildId in state.logfile.files && file in state.logfile.files[buildId]) {
+    if (
+      buildId in state.logfile.files &&
+      file in state.logfile.files[buildId]
+    ) {
       return Promise.resolve()
     }
-    const item = build.manifest.index['/' + file]
+    // Since this method is only called after fetchBuild() and fetchManifest(),
+    // we can assume both are there.
+    const build = state.build.builds[buildId]
+    const manifest = state.build.manifests[buildId]
+    const item = manifest.index['/' + file]
 
     if (!item) {
       return dispatch(

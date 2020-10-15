@@ -138,10 +138,13 @@ class BuildPage extends React.Component {
     // Get the logfile from react-routers URL parameters
     const logfileName = this.props.match.params.file
 
-    if (!build && isFetching) {
+    // In case the build is not available yet (before the fetching started) or
+    // is currently fetching.
+    if (build === undefined || isFetching) {
       return <Fetching />
     }
 
+    // The build is null, meaning it couldn't be found.
     if (!build) {
       return (
         <EmptyPage
@@ -158,7 +161,7 @@ class BuildPage extends React.Component {
     )
 
     const resultsTabContent =
-      !build.hosts && isFetchingOutput ? (
+      build.hosts === undefined || isFetchingOutput ? (
         <Fetching />
       ) : build.hosts ? (
         <BuildOutput output={build.hosts} />
@@ -183,7 +186,7 @@ class BuildPage extends React.Component {
     )
 
     let logsTabContent = null
-    if (!build.manifest && isFetchingManifest) {
+    if (build.manifest === undefined || isFetchingManifest) {
       logsTabContent = <Fetching />
     } else if (logfileName) {
       logsTabContent = (
@@ -213,7 +216,7 @@ class BuildPage extends React.Component {
     }
 
     const consoleTabContent =
-      !build.output && isFetchingOutput ? (
+      build.output === undefined || isFetchingOutput ? (
         <Fetching />
       ) : build.output ? (
         <Console
@@ -307,15 +310,28 @@ class BuildPage extends React.Component {
 
 function mapStateToProps(state, ownProps) {
   const buildId = ownProps.match.params.buildId
-  const build =
-    buildId && Object.keys(state.build.builds).length > 0
-      ? state.build.builds[buildId]
-      : null
+  // JavaScript will return undefined in case the key is missing in the
+  // dict/object.
+  const buildFromState = state.build.builds[buildId]
+  // Only copy the build if it's a valid object. In case it is null or undefined
+  // directly assign the value. The cloning is necessary as we mutate the build
+  // in the next step when adding the manifest, output, ... information.
+  const build = buildFromState ? { ...buildFromState } : buildFromState
+
+  // If the build is available, extend it with more information. All those
+  // values will be undefined if they are not part of the dict/object.
+  if (build) {
+    build.manifest = state.build.manifests[buildId]
+    build.output = state.build.outputs[buildId]
+    build.hosts = state.build.hosts[buildId]
+    build.errorIds = state.build.errorIds[buildId]
+  }
   const logfileName = ownProps.match.params.file
   const logfile =
-    logfileName && Object.keys(state.logfile.files).length > 0
+    buildId in state.logfile.files
       ? state.logfile.files[buildId][logfileName]
-      : null
+      : undefined
+
   return {
     build,
     logfile,
