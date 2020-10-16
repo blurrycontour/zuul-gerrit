@@ -15,6 +15,7 @@
 import json
 import logging
 import os
+import socket
 import threading
 from abc import ABCMeta
 from configparser import ConfigParser
@@ -29,6 +30,8 @@ from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
 from zuul.merger.merger import nullcontext
+from zuul.zk.components import ZooKeeperComponentRegistry, \
+    ZooKeeperComponentState
 
 COMMANDS = ['stop', 'pause', 'unpause']
 
@@ -56,6 +59,7 @@ class BaseMergeServer(metaclass=ABCMeta):
     _repo_locks_class = BaseRepoLocks
 
     def __init__(self, config: ConfigParser, component: str,
+                 zk_client: ZooKeeperClient,
                  connections: Optional[ConnectionRegistry] = None):
         self.connections = connections or ConnectionRegistry()
         self.merge_email = get_default(config, 'merger', 'git_user_email',
@@ -70,7 +74,9 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.merge_root = get_default(config, component, 'git_dir',
                                       '/var/lib/zuul/{}-git'.format(component))
-        self.zk_client: Optional[ZooKeeperClient] = None
+        self.zk_client: ZooKeeperClient = zk_client
+        self.zk_component_registry: ZooKeeperComponentRegistry =\
+            ZooKeeperComponentRegistry(zk_client)
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -95,9 +101,6 @@ class BaseMergeServer(metaclass=ABCMeta):
             'merger-gearman-worker',
             self.config,
             self.merger_jobs)
-
-    def setZookeeper(self, zk_client: ZooKeeperClient):
-        self.zk_client = zk_client
 
     def _getMerger(self, root, cache_root, logger=None):
         return merger.Merger(
@@ -240,10 +243,12 @@ class BaseMergeServer(metaclass=ABCMeta):
 class MergeServer(BaseMergeServer):
     log = logging.getLogger("zuul.MergeServer")
 
-    def __init__(self, config: ConfigParser,
+    def __init__(self, config: ConfigParser, zk_client: ZooKeeperClient,
                  connections: Optional[ConnectionRegistry] = None):
-        super().__init__(config, 'merger', connections)
-
+        super().__init__(config, 'merger', zk_client, connections)
+        self.hostname = socket.getfqdn()
+        self.zk_component = self.zk_component_registry.register(
+            'mergers', self.hostname)
         self.command_map = dict(
             stop=self.stop,
             pause=self.pause,
@@ -265,9 +270,11 @@ class MergeServer(BaseMergeServer):
             target=self.runCommand, name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
+        self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
     def stop(self):
         self.log.debug("Stopping")
+        self.zk_component.set('state', ZooKeeperComponentState.STOPPED)
         super().stop()
         self._command_running = False
         self.command_socket.stop()
@@ -278,11 +285,13 @@ class MergeServer(BaseMergeServer):
 
     def pause(self):
         self.log.debug('Pausing')
+        self.zk_component.set('state', ZooKeeperComponentState.PAUSED)
         super().pause()
 
     def unpause(self):
         self.log.debug('Resuming')
         super().unpause()
+        self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
     def runCommand(self):
         while self._command_running:
