@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5f681702_986fb991",
+        "filename": "zuul/zk/builds.py",
+        "patchSetId": 60
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-16T07:43:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_8adca471",
+      "revId": "a596c89517318de81ae8bf6c539f02306799797d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_2ad8f84f",
         "filename": "zuul/zk/builds.py",
         "patchSetId": 60
@@ -100,6 +118,24 @@
       "writtenOn": "2020-10-13T08:16:47Z",
       "side": 1,
       "message": "I think this can be simplified in a similar way as for the self._to_delete items above.",
+      "revId": "a596c89517318de81ae8bf6c539f02306799797d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f681702_f86ced9d",
+        "filename": "zuul/zk/builds.py",
+        "patchSetId": 60
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-16T07:43:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_2ad8f84f",
       "revId": "a596c89517318de81ae8bf6c539f02306799797d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
