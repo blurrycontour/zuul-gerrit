@@ -1686,57 +1686,15 @@ class TenantParser(object):
         tpc.branches = branches
 
     def _loadProjectKeys(self, connection_name, project):
-        project.private_secrets_key_file = \
-            self.keystorage.getProjectSecretsKeyFile(
-                connection_name, project.name)
-        project.private_ssh_key_file = \
-            self.keystorage.getProjectSSHKeyFile(
-                connection_name, project.name)
+        project.private_secrets_key, project.public_secrets_key = (
+            self.keystorage.getProjectSecretsKeys(
+                connection_name, project.name
+            )
+        )
 
-        self._generateKeys(project)
-        self._loadKeys(project)
-
-        (project.private_ssh_key, project.public_ssh_key) = \
+        project.private_ssh_key, project.public_ssh_key = (
             self.keystorage.getProjectSSHKeys(connection_name, project.name)
-
-    def _generateKeys(self, project):
-        filename = project.private_secrets_key_file
-        if os.path.isfile(filename):
-            return
-
-        key_dir = os.path.dirname(filename)
-        if not os.path.isdir(key_dir):
-            os.makedirs(key_dir, 0o700)
-
-        self.log.info(
-            "Generating RSA keypair for project %s" % (project.name,)
         )
-        private_key, public_key = encryption.generate_rsa_keypair()
-        pem_private_key = encryption.serialize_rsa_private_key(private_key)
-
-        # Dump keys to filesystem.  We only save the private key
-        # because the public key can be constructed from it.
-        self.log.info(
-            "Saving RSA keypair for project %s to %s" % (
-                project.name, filename)
-        )
-
-        # Ensure private key is read/write for zuul user only.
-        with open(os.open(filename,
-                          os.O_CREAT | os.O_WRONLY, 0o600), 'wb') as f:
-            f.write(pem_private_key)
-
-    def _loadKeys(self, project):
-        # Check the key files specified are there
-        if not os.path.isfile(project.private_secrets_key_file):
-            raise Exception(
-                'Private key file {0} not found'.format(
-                    project.private_secrets_key_file))
-
-        # Load keypair
-        with open(project.private_secrets_key_file, "rb") as f:
-            (project.private_secrets_key, project.public_secrets_key) = \
-                encryption.deserialize_rsa_keypair(f.read())
 
     @staticmethod
     def _getProject(source, conf, current_include):

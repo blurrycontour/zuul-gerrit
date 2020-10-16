@@ -18,6 +18,8 @@ import os
 
 import paramiko
 
+from zuul.lib import encryption
+
 RSA_KEY_SIZE = 2048
 
 
@@ -176,3 +178,45 @@ class KeyStorage(object):
 
         pk = paramiko.RSAKey.generate(bits=RSA_KEY_SIZE)
         pk.write_private_key_file(fn)
+
+    def getProjectSecretsKeys(self, connection_name, project_name):
+        """Return the private and public secrets keys for the project
+
+        A new key will be created if necessary.
+
+        :returns: A tuple (private_key, public_key)
+        """
+
+        private_key_file = self._ensureKeyFile(connection_name, project_name)
+
+        # Load keypair
+        with open(private_key_file, "rb") as f:
+            return encryption.deserialize_rsa_keypair(f.read())
+
+    def _ensureKeyFile(self, connection_name, project_name):
+        filename = self.getProjectSecretsKeyFile(
+            connection_name, project_name
+        )
+        if os.path.isfile(filename):
+            return filename
+
+        key_dir = os.path.dirname(filename)
+        if not os.path.isdir(key_dir):
+            os.makedirs(key_dir, 0o700)
+
+        self.log.info("Generating RSA keypair for project %s", project_name)
+        private_key, public_key = encryption.generate_rsa_keypair()
+        pem_private_key = encryption.serialize_rsa_private_key(private_key)
+
+        # Dump keys to filesystem.  We only save the private key
+        # because the public key can be constructed from it.
+        self.log.info(
+            "Saving RSA keypair for project %s to %s", project_name, filename
+        )
+
+        # Ensure private key is read/write for zuul user only.
+        with open(os.open(filename,
+                          os.O_CREAT | os.O_WRONLY, 0o600), 'wb') as f:
+            f.write(pem_private_key)
+
+        return filename

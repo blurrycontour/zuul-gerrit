@@ -544,6 +544,10 @@ class Project(object):
         self.connection_name = source.connection.connection_name
         self.canonical_hostname = source.canonical_hostname
         self.canonical_name = source.canonical_hostname + '/' + name
+        self.private_secrets_key = None
+        self.public_secrets_key = None
+        self.private_ssh_key = None
+        self.public_ssh_key = None
         # foreign projects are those referenced in dependencies
         # of layout projects, this should matter
         # when deciding whether to enqueue their changes
