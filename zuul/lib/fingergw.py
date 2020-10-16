@@ -23,7 +23,7 @@ import zuul.rpcclient
 from zuul.lib import streamer_utils
 from zuul.lib.commandsocket import CommandSocket
 from zuul.zk import ZooKeeperClient
-
+from zuul.zk.components import ZooKeeperComponentRegistry
 
 COMMANDS = ['stop']
 
@@ -148,6 +148,10 @@ class FingerGateway(object):
 
         self.zk_client = ZooKeeperClient.fromConfig(config)
         self.zk_client.connect()
+        self.hostname = socket.getfqdn()
+        self.zk_component = ZooKeeperComponentRegistry(
+            self.zk_client
+        ).register('finger-gateways', self.hostname)
 
     def _runCommand(self):
         while self.command_running:
@@ -198,9 +202,11 @@ class FingerGateway(object):
         self.server_thread = threading.Thread(target=self._run)
         self.server_thread.daemon = True
         self.server_thread.start()
+        self.zk_component.set('state', self.zk_component.RUNNING)
         self.log.info("Finger gateway is started")
 
     def stop(self):
+        self.zk_component.set('state', self.zk_component.STOPPED)
         if self.server:
             try:
                 self.server.shutdown()
