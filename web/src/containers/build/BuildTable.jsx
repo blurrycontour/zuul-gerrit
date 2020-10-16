@@ -168,10 +168,11 @@ function BuildTable(props) {
             <>
               {buildResultLink}
               <span>
-                {moment
-                  .utc(build.start_time)
-                  .tz(timezone)
-                  .format('YYYY-MM-DD HH:mm:ss')}
+                {build.start_time &&
+                  moment
+                    .utc(build.start_time)
+                    .tz(timezone)
+                    .format('YYYY-MM-DD HH:mm:ss')}
               </span>
             </>
           ),
