@@ -29,12 +29,9 @@ import urllib
 from configparser import ConfigParser
 from queue import Queue
 from threading import Thread
-from typing import Optional, Dict, TYPE_CHECKING, Callable, Any
+from typing import Optional, Dict, TYPE_CHECKING, Callable, Any, Tuple
 
 from statsd import StatsClient
-
-
-from zuul.lib.named_queue import NamedQueue
 
 from zuul import configloader
 from zuul import exceptions
@@ -45,13 +42,14 @@ from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.named_queue import NamedQueue
 from zuul.lib.queue import MergedQueue
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul.merger.client import MergeClient
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent, \
-    UnparsedAbideConfig, Abide, TimeDataBase, Change
+    UnparsedAbideConfig, Abide, TimeDataBase, Change, Project
 from zuul.nodepool import Nodepool
 from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
@@ -97,7 +95,7 @@ class ReconfigureEvent(ManagementEvent):
 
     :arg ConfigParser config: the new configuration
     """
-    def __init__(self, config):
+    def __init__(self, config: ConfigParser):
         super(ReconfigureEvent, self).__init__()
         self.config = config
 
@@ -108,7 +106,7 @@ class SmartReconfigureEvent(ManagementEvent):
 
     :arg ConfigParser config: the new configuration
     """
-    def __init__(self, config, smart=False):
+    def __init__(self, config: ConfigParser, smart: bool = False):
         super().__init__()
         self.config = config
 
@@ -123,7 +121,7 @@ class TenantReconfigureEvent(ManagementEvent):
     :arg Branch branch: if supplied along with project, only remove the
          configuration of the specific branch from the cache
     """
-    def __init__(self, tenant, project, branch):
+    def __init__(self, tenant: Tenant, project: Project, branch: str):
         super(TenantReconfigureEvent, self).__init__()
         self.tenant_name = tenant.name
         self.project_branches = set([(project, branch)])
@@ -595,7 +593,8 @@ class Scheduler(threading.Thread):
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def reconfigureTenant(self, tenant, project, event):
+    def reconfigureTenant(self, tenant: Tenant, project: Project,
+                          event: Optional[Any]) -> None:
         self.log.debug("Submitting tenant reconfiguration event for "
                        "%s due to event %s in project %s",
                        tenant.name, event, project)
@@ -840,9 +839,9 @@ class Scheduler(threading.Thread):
             os._exit(0)
 
     @classmethod
-    def checkTenantSourceConf(cls, config: ConfigParser):
-        tenant_config = None
-        script = False
+    def checkTenantSourceConf(cls, config: ConfigParser) -> Tuple[str, bool]:
+        tenant_config: Optional[str] = None
+        script: bool = False
         if config.has_option(
             'scheduler', 'tenant_config'):
             tenant_config = config.get(
@@ -862,7 +861,7 @@ class Scheduler(threading.Thread):
                 "is missing from the configuration.")
         return tenant_config, script
 
-    def _doReconfigureEvent(self, event):
+    def _doReconfigureEvent(self, event: ReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         self.layout_lock.acquire()
@@ -900,7 +899,7 @@ class Scheduler(threading.Thread):
         self.log.info("Full reconfiguration complete (duration: %s seconds)",
                       duration)
 
-    def _doSmartReconfigureEvent(self, event):
+    def _doSmartReconfigureEvent(self, event: SmartReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         reconfigured_tenants = []
@@ -929,11 +928,11 @@ class Scheduler(threading.Thread):
             tenant_names = {t for t in self.abide.tenants}
             tenant_names.update(self.unparsed_abide.known_tenants)
             for tenant_name in tenant_names:
-                old_tenant = [x for x in old_unparsed_abide.tenants
-                              if x['name'] == tenant_name]
-                new_tenant = [x for x in self.unparsed_abide.tenants
-                              if x['name'] == tenant_name]
-                if old_tenant == new_tenant:
+                old_tenants = [x for x in old_unparsed_abide.tenants
+                               if x['name'] == tenant_name]
+                new_tenants = [x for x in self.unparsed_abide.tenants
+                               if x['name'] == tenant_name]
+                if old_tenants == new_tenants:
                     continue
 
                 reconfigured_tenants.append(tenant_name)
@@ -954,7 +953,7 @@ class Scheduler(threading.Thread):
         self.log.info("Smart reconfiguration of tenants %s complete "
                       "(duration: %s seconds)", reconfigured_tenants, duration)
 
-    def _doTenantReconfigureEvent(self, event):
+    def _doTenantReconfigureEvent(self, event: TenantReconfigureEvent) -> None:
         # This is called in the scheduler loop after another thread submits
         # a request
         self.layout_lock.acquire()

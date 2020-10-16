@@ -21,7 +21,7 @@ import textwrap
 import io
 import re
 import subprocess
-from typing import Dict, Any, Optional, TYPE_CHECKING
+from typing import Dict, Any, Optional, TYPE_CHECKING, Tuple
 import voluptuous as vs
 from zuul import model
 from zuul.lib import ansible
@@ -36,17 +36,16 @@ from zuul.lib import encryption
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
-
-
-# Several forms accept either a single item or a list, this makes
-# specifying that in the schema easy (and explicit).
-from zuul.model import Tenant, Abide
+from zuul.model import Tenant, Abide, LoadingErrors, UnparsedConfig, \
+    SourceContext, ParsedConfig, Project, RepoFiles, Layout
 
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
     from zuul.scheduler import Scheduler
 
 
+# Several forms accept either a single item or a list, this makes
+# specifying that in the schema easy (and explicit).
 def to_list(x):
     return vs.Any([x], x)
 
@@ -365,7 +364,7 @@ class ZuulSafeLoader(yaml.SafeLoader):
                                  'project', 'project-template',
                                  'semaphore', 'pragma'))
 
-    def __init__(self, stream, context):
+    def __init__(self, stream: str, context: SourceContext):
         wrapped_stream = io.StringIO(stream)
         wrapped_stream.name = str(context)
         super(ZuulSafeLoader, self).__init__(wrapped_stream)
@@ -393,7 +392,7 @@ class ZuulSafeLoader(yaml.SafeLoader):
         return r
 
 
-def safe_load_yaml(stream, context):
+def safe_load_yaml(stream: str, context: SourceContext):
     loader = ZuulSafeLoader(stream, context)
     try:
         return loader.get_single_data()
@@ -409,7 +408,7 @@ repo {repo} on branch {branch}.  The error was:
                      error=str(e))
         raise ConfigurationSyntaxError(m)
     finally:
-        loader.dispose()
+        loader.dispose()  # type: ignore
 
 
 class EncryptedPKCS1_OAEP(yaml.YAMLObject):
@@ -1457,12 +1456,17 @@ class ParseContext(object):
 
 
 class TenantParser(object):
-    def __init__(self, connections, scheduler, merger, keystorage):
+    def __init__(self,
+                 connections: 'ConnectionRegistry',
+                 scheduler,  #: 'Scheduler'
+                 merger: Optional[MergeClient],
+                 keystorage: Optional[KeyStorage]):
+
         self.log = logging.getLogger("zuul.TenantParser")
-        self.connections = connections
-        self.scheduler = scheduler
-        self.merger = merger
-        self.keystorage = keystorage
+        self.connections: ConnectionRegistry = connections
+        self.scheduler: Scheduler = scheduler
+        self.merger: Optional[MergeClient] = merger
+        self.keystorage: Optional[KeyStorage] = keystorage
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret')
@@ -1779,8 +1783,11 @@ class TenantParser(object):
 
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors):
+    def _cacheTenantYAML(self, abide: Abide, tenant: Tenant,
+                         loading_errors: LoadingErrors) -> None:
         jobs = []
+        if not self.merger:
+            raise Exception("No merger!")
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
             tpc = tenant.project_configs[project.canonical_name]
@@ -1856,7 +1863,9 @@ class TenantParser(object):
                     branch_cache.put(source_context.path, incdata)
                     unparsed_config.extend(incdata)
 
-    def _loadTenantYAML(self, abide, tenant, loading_errors):
+    def _loadTenantYAML(self, abide: Abide, tenant: Tenant,
+                        loading_errors: LoadingErrors)\
+            -> Tuple[UnparsedConfig, UnparsedConfig]:
         config_projects_config = model.UnparsedConfig()
         untrusted_projects_config = model.UnparsedConfig()
 
@@ -1888,7 +1897,8 @@ class TenantParser(object):
                     untrusted_projects_config.extend(unparsed_branch_config)
         return config_projects_config, untrusted_projects_config
 
-    def loadProjectYAML(self, data, source_context, loading_errors):
+    def loadProjectYAML(self, data: str, source_context: SourceContext,
+                        loading_errors: LoadingErrors) -> UnparsedConfig:
         config = model.UnparsedConfig()
         try:
             with early_configuration_exceptions(source_context):
@@ -2174,9 +2184,8 @@ class ConfigLoader(object):
         self.connections: ConnectionRegistry = connections
         self.scheduler: Scheduler = scheduler
         self.merger = merger
-        self.keystorage: Optional[KeyStorage] = None
-        if key_dir:
-            self.keystorage = KeyStorage(key_dir)
+        self.keystorage: Optional[KeyStorage] = KeyStorage(key_dir)\
+            if key_dir else None
         self.tenant_parser = TenantParser(connections, scheduler,
                                           merger, self.keystorage)
         self.admin_rule_parser = AuthorizationRuleParser()
@@ -2274,9 +2283,11 @@ class ConfigLoader(object):
                 self.log.warning(err.error)
         return new_abide
 
-    def _loadDynamicProjectData(self, config, project,
-                                files, trusted, tenant, loading_errors,
-                                pcontext):
+    def _loadDynamicProjectData(self, config: ParsedConfig, project: Project,
+                                files: RepoFiles, trusted: bool,
+                                tenant: Tenant, loading_errors: LoadingErrors,
+                                pcontext) -> None:
+
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
             branches = ['master']
@@ -2350,9 +2361,10 @@ class ConfigLoader(object):
                     config.extend(self.tenant_parser.parseConfig(
                         tenant, incdata, loading_errors, pcontext))
 
-    def createDynamicLayout(self, tenant, files, ansible_manager,
-                            include_config_projects=False,
-                            zuul_event_id=None):
+    def createDynamicLayout(self, tenant: Tenant, files: RepoFiles,
+                            ansible_manager: AnsibleManager,
+                            include_config_projects: bool = False,
+                            zuul_event_id: Optional[str] = None) -> Layout:
         log = get_annotated_logger(self.log, zuul_event_id)
         pcontext = ParseContext(self.connections, self.scheduler,
                                 tenant, ansible_manager)
@@ -2372,7 +2384,7 @@ class ConfigLoader(object):
         layout = model.Layout(tenant)
         layout.loading_errors = loading_errors
         log.debug("Created layout id %s", layout.uuid)
-        if not include_config_projects:
+        if not include_config_projects and tenant.layout:
             # NOTE: the actual pipeline objects (complete with queues
             # and enqueued items) are copied by reference here.  This
             # allows our shadow dynamic configuration to continue to
