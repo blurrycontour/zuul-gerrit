@@ -52,21 +52,23 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         if self.args.command:
             self.args.nodaemon = True
 
-    def fullReconfigure(self):
+    def fullReconfigure(self) -> None:
         self.log.debug("Reconfiguration triggered")
         self.readConfig()
         self.setup_logging('scheduler', 'log_config')
         try:
-            self.sched.reconfigure(self.config)
+            if self.sched:
+                self.sched.reconfigure(self.config)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
-    def smartReconfigure(self):
+    def smartReconfigure(self) -> None:
         self.log.debug("Smart reconfiguration triggered")
         self.readConfig()
         self.setup_logging('scheduler', 'log_config')
         try:
-            self.sched.reconfigure(self.config, smart=True)
+            if self.sched:
+                self.sched.reconfigure(self.config, smart=True)
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
