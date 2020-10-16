@@ -28,8 +28,7 @@ import {
 import { buildExternalLink } from '../../Misc'
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 
-function Buildset(props) {
-  const { buildset, fetchable } = props
+function Buildset({ buildset }) {
   const buildset_link = buildExternalLink(buildset)
 
   return (
@@ -39,7 +38,6 @@ function Buildset(props) {
           Buildset result
         </BuildResultWithIcon>
         <BuildResultBadge result={buildset.result} />
-        {fetchable}
       </Title>
       {/* We handle the spacing for the body and the flex items by ourselves
             so they go hand in hand. By default, the flex items' spacing only
@@ -132,7 +130,6 @@ function Buildset(props) {
 Buildset.propTypes = {
   buildset: PropTypes.object,
   tenant: PropTypes.object,
-  fetchable: PropTypes.node,
 }
 
 export default connect((state) => ({ tenant: state.tenant }))(Buildset)

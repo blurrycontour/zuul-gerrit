@@ -40,7 +40,7 @@ import {
 import { fetchBuildAllInfo } from '../actions/build'
 import { fetchLogfile } from '../actions/logfile'
 import { EmptyPage } from '../containers/Errors'
-import { Fetchable, Fetching } from '../containers/Fetching'
+import { Fetching } from '../containers/Fetching'
 import ArtifactList from '../containers/build/Artifact'
 import Build from '../containers/build/Build'
 import BuildOutput from '../containers/build/BuildOutput'
@@ -156,10 +156,6 @@ class BuildPage extends React.Component {
       )
     }
 
-    const fetchable = (
-      <Fetchable isFetching={isFetching} fetchCallback={this.updateData} />
-    )
-
     const resultsTabContent =
       build.hosts === undefined || isFetchingOutput ? (
         <Fetching />
@@ -236,12 +232,7 @@ class BuildPage extends React.Component {
     return (
       <>
         <PageSection variant={PageSectionVariants.light}>
-          <Build
-            build={build}
-            active={activeTab}
-            hash={hash}
-            fetchable={fetchable}
-          />
+          <Build build={build} active={activeTab} hash={hash} />
         </PageSection>
         <PageSection variant={PageSectionVariants.light}>
           <Tabs
