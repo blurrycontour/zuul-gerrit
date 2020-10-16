@@ -56,6 +56,8 @@ from zuul.nodepool import Nodepool
 from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
 from zuul.zk import ZooKeeperClient
+from zuul.zk.components import ZooKeeperComponent, ZooKeeperComponentRegistry,\
+    ZooKeeperComponentState
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
@@ -344,6 +346,9 @@ class Scheduler(threading.Thread):
         self.triggers: Dict[str, BaseTrigger] = dict()
         self.config: ConfigParser = config
         self.zk_client: ZooKeeperClient = zk_client
+        self.zk_component: ZooKeeperComponent =\
+            ZooKeeperComponentRegistry(zk_client)\
+            .register('schedulers', self.hostname)
         self.zk_connection_event: ZooKeeperConnectionEvent =\
             ZooKeeperConnectionEvent(zk_client)
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
@@ -400,9 +405,11 @@ class Scheduler(threading.Thread):
         self.rpc.start()
         self.rpc_slow.start()
         self.stats_thread.start()
+        self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
     def stop(self):
         self._stopped = True
+        self.zk_component.set('state', ZooKeeperComponentState.STOPPED)
         self.stats_stop.set()
         self.stopConnections()
         self.wake_event.set()
