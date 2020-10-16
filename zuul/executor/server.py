@@ -59,6 +59,8 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
+from zuul.zk import ZooKeeperClient
+from zuul.zk.components import ZooKeeperComponentState
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -2554,10 +2556,11 @@ class ExecutorServer(BaseMergeServer):
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
 
-    def __init__(self, config, connections=None, jobdir_root=None,
-                 keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT,
+    def __init__(self, config, zk_client: ZooKeeperClient, connections=None,
+                 jobdir_root=None, keep_jobdir=False,
+                 log_streaming_port=DEFAULT_FINGER_PORT,
                  log_console_port=DEFAULT_STREAM_PORT):
-        super().__init__(config, 'executor', connections)
+        super().__init__(config, 'executor', zk_client, connections)
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -2565,6 +2568,8 @@ class ExecutorServer(BaseMergeServer):
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
                                     socket.getfqdn())
+        self.zk_component = self.zk_component_registry.register(
+            'executors', self.hostname)
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
@@ -2756,6 +2761,7 @@ class ExecutorServer(BaseMergeServer):
         self.governor_thread.daemon = True
         self.governor_thread.start()
         self.disk_accountant.start()
+        self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
     def register_work(self):
         if self._running:
@@ -2778,6 +2784,7 @@ class ExecutorServer(BaseMergeServer):
 
     def stop(self):
         self.log.debug("Stopping")
+        self.zk_component.set('state', ZooKeeperComponentState.STOPPED)
         self.connections.stop()
         self.disk_accountant.stop()
         # The governor can change function registration, so make sure
@@ -2845,12 +2852,14 @@ class ExecutorServer(BaseMergeServer):
 
     def pause(self):
         self.log.debug('Pausing')
+        self.zk_component.set('state', ZooKeeperComponentState.PAUSED)
         self.pause_sensor.pause = True
         if self.process_merge_jobs:
             super().pause()
 
     def unpause(self):
         self.log.debug('Resuming')
+        self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
         self.pause_sensor.pause = False
         if self.process_merge_jobs:
             super().unpause()
