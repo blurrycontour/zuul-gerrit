@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f681702_a93a2531",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1345,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-16T11:48:38Z",
+      "side": 1,
+      "message": "This must be of course before onChangeUpdated.",
+      "revId": "81fac27dcd1197493016d32424df6dbb736723a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
