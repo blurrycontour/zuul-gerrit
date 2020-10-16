@@ -162,7 +162,7 @@
   register: result
   until: (result.content[5:]|from_json).messages|length > 1
   delay: 1
-  retries: 120
+  retries: 240
 - name: Find the log URL
   set_fact:
     log_url: "{{ (result.content[5:]|from_json).messages[1].message|regex_search('(http://[^ ]*)') }}"
