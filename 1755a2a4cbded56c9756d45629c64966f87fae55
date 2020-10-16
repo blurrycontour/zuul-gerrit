@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f681702_e10c3144",
+        "filename": "zuul/driver/bbserver/bbservergearman.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 23942
+      },
+      "writtenOn": "2020-10-16T19:52:59Z",
+      "side": 1,
+      "message": "If BB does not provide random UUID then generate one here.",
+      "range": {
+        "startLine": 46,
+        "startChar": 49,
+        "endLine": 46,
+        "endChar": 60
+      },
+      "revId": "1755a2a4cbded56c9756d45629c64966f87fae55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f681702_544cc575",
+        "filename": "zuul/driver/bbserver/bbserversource.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 23942
+      },
+      "writtenOn": "2020-10-16T19:52:59Z",
+      "side": 1,
+      "message": "Get this from config with default to domain from baseurl.",
+      "range": {
+        "startLine": 25,
+        "startChar": 45,
+        "endLine": 25,
+        "endChar": 47
+      },
+      "revId": "1755a2a4cbded56c9756d45629c64966f87fae55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
