@@ -38,6 +38,9 @@ from zuul.lib.repl import REPLServer
 import zuul.model
 import zuul.rpcclient
 from zuul.zk import ZooKeeperClient
+from zuul.zk.components import (
+    ZooKeeperComponent, ZooKeeperComponentRegistry, ZooKeeperComponentState
+)
 from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
@@ -1229,6 +1232,7 @@ class ZuulWeb(object):
         self.static_cache_expiry: int = static_cache_expiry
         self.info: Optional[zuul.model.WebInfo] = info
         self.static_path: str = os.path.abspath(static_path or STATIC_DIR)
+        self.hostname = socket.getfqdn()
         # instanciate handlers
         self.rpc: RPCClient = RPCClient(gear_server, gear_port,
                                         ssl_key, ssl_cert, ssl_ca,
@@ -1242,6 +1246,11 @@ class ZuulWeb(object):
             tls_ca=zk_tls_ca,
         )
         self.zk_client.connect()
+        self.zk_component: ZooKeeperComponent = (
+            ZooKeeperComponentRegistry(self.zk_client).register(
+                'webs', self.hostname
+            )
+        )
 
         self.connections: ConnectionRegistry = connections
         self.authenticators: AuthenticatorRegistry = authenticators
@@ -1387,9 +1396,11 @@ class ZuulWeb(object):
                                                name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
+        self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
     def stop(self):
         self.log.debug("ZuulWeb stopping")
+        self.zk_component.set('state', ZooKeeperComponentState.STOPPED)
         self.rpc.shutdown()
         cherrypy.engine.exit()
         # Not strictly necessary, but without this, if the server is
