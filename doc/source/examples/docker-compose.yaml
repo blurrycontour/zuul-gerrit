@@ -122,8 +122,19 @@ services:
     volumes:
       - "logs:/usr/local/apache2/htdocs:z"
 
+  # bitbucket:
+  #   image: atlassian/bitbucket-server:7.2.0
+  #   volumes:
+  #     - bitbucketdata:/var/atlassian/application-data/bitbucket
+  #   ports:
+  #     - '7990:7990'
+  #     - '7999:7999'
+  #   environment:
+  #     - ELASTICSEARCH_ENABLED=false
+
 volumes:
   sshkey:
   nodessh:
   logs:
   certs:
+  # bitbucketdata:
