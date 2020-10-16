@@ -114,6 +114,7 @@ import zuul.configloader
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web import ZuulWeb
+from zuul.zk import ZooKeeperConnection
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -4061,7 +4062,7 @@ class ZuulTestCase(BaseTestCase):
 
     def _startMerger(self):
         self.merge_server = zuul.merger.server.MergeServer(
-            self.config, self.scheds.first.connections)
+            self.config, self.zk_client, self.scheds.first.connections)
         self.merge_server.start()
 
     def setUp(self):
@@ -4072,6 +4073,7 @@ class ZuulTestCase(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_host,
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
+        self.zk_client = ZooKeeperConnection(hosts=self.zk_config).connect()
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4179,7 +4181,7 @@ class ZuulTestCase(BaseTestCase):
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
-            self.config, executor_connections,
+            self.config, self.zk_client, executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
@@ -4204,6 +4206,7 @@ class ZuulTestCase(BaseTestCase):
 
         # Cleanups are run in reverse order
         self.addCleanup(self.assertNoZkConnections)
+        self.addCleanup(self.zk_client.disconnect)
         self.addCleanup(self.assertCleanShutdown)
         self.addCleanup(self.shutdown)
         self.addCleanup(self.assertFinalState)
