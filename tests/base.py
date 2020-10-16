@@ -4310,6 +4310,7 @@ class ZuulTestCase(BaseTestCase):
 
         # Cleanups are run in reverse order
         self.addCleanup(self.assertNoZkConnections)
+        self.addCleanup(self.zk_client.disconnect)
         self.addCleanup(self.assertCleanShutdown)
         self.addCleanup(self.shutdown)
         self.addCleanup(self.assertFinalState)

@@ -15,6 +15,7 @@
 import json
 import logging
 import os
+import socket
 import threading
 from abc import ABCMeta
 from configparser import ConfigParser
@@ -29,6 +30,8 @@ from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
 from zuul.merger.merger import nullcontext
+from zuul.zk.components import ZooKeeperComponentRegistry, \
+    ZooKeeperComponentState
 
 COMMANDS = ['stop', 'pause', 'unpause']
 
@@ -75,6 +78,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.merge_root = get_default(config, component, 'git_dir',
                                       '/var/lib/zuul/{}-git'.format(component))
         self.zk_client = zk_client
+        self.zk_component_registry = ZooKeeperComponentRegistry(zk_client)
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -248,6 +252,10 @@ class MergeServer(BaseMergeServer):
         connections: Optional[ConnectionRegistry] = None
     ):
         super().__init__(config, 'merger', zk_client, connections)
+        self.hostname = socket.getfqdn()
+        self.zk_component = self.zk_component_registry.register(
+            'mergers', self.hostname
+        )
 
         self.command_map = dict(
             stop=self.stop,
@@ -270,9 +278,11 @@ class MergeServer(BaseMergeServer):
             target=self.runCommand, name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
+        self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
     def stop(self):
         self.log.debug("Stopping")
+        self.zk_component.set('state', ZooKeeperComponentState.STOPPED)
         super().stop()
         self._command_running = False
         self.command_socket.stop()
@@ -283,11 +293,13 @@ class MergeServer(BaseMergeServer):
 
     def pause(self):
         self.log.debug('Pausing')
+        self.zk_component.set('state', ZooKeeperComponentState.PAUSED)
         super().pause()
 
     def unpause(self):
         self.log.debug('Resuming')
         super().unpause()
+        self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
     def runCommand(self):
         while self._command_running:
