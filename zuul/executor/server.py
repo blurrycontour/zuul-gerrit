@@ -2568,6 +2568,9 @@ class ExecutorServer(BaseMergeServer):
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
                                     socket.getfqdn())
+        self.zk_component = self.zk_component_registry.register(
+            'executors', self.hostname
+        )
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
@@ -2782,6 +2785,7 @@ class ExecutorServer(BaseMergeServer):
         self.governor_thread.daemon = True
         self.governor_thread.start()
         self.disk_accountant.start()
+        self.zk_component.set('state', self.zk_component.RUNNING)
 
     def register_work(self):
         if self._running:
@@ -2800,6 +2804,7 @@ class ExecutorServer(BaseMergeServer):
 
     def stop(self):
         self.log.debug("Stopping")
+        self.zk_component.set('state', self.zk_component.STOPPED)
         # Use the BaseMergeServer's stop method to disconnect from ZooKeeper.
         super().stop()
         self.connections.stop()
@@ -2867,12 +2872,14 @@ class ExecutorServer(BaseMergeServer):
 
     def pause(self):
         self.log.debug('Pausing')
+        self.zk_component.set('state', self.zk_component.PAUSED)
         self.pause_sensor.pause = True
         if self.process_merge_jobs:
             super().pause()
 
     def unpause(self):
         self.log.debug('Resuming')
+        self.zk_component.set('state', self.zk_component.RUNNING)
         self.pause_sensor.pause = False
         if self.process_merge_jobs:
             super().unpause()
