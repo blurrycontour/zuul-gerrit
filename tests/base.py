@@ -3887,7 +3887,7 @@ class SchedulerTestApp:
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
-    def smartReconfigure(self, command_socket=False):
+    def smartReconfigure(self, command_socket: bool = False):
         try:
             if command_socket:
                 command_socket = self.config.get('scheduler', 'command_socket')

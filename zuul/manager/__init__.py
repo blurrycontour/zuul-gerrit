@@ -14,12 +14,13 @@ import logging
 import textwrap
 import urllib
 from abc import ABCMeta
-from typing import List, Tuple, TYPE_CHECKING
+from typing import List, Tuple, Optional, TYPE_CHECKING
 
 from zuul import exceptions
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Pipeline, EventFilter, RefFilter, QueueItem, Job, Change
+from zuul.model import Pipeline, EventFilter, RefFilter, QueueItem, Job,\
+    Change, Layout
 if TYPE_CHECKING:
     from zuul.scheduler import Scheduler
 
@@ -551,10 +552,14 @@ class PipelineManager(metaclass=ABCMeta):
                 relevant_errors.append(err)
         return relevant_errors
 
-    def _loadDynamicLayout(self, item):
+    def _loadDynamicLayout(self, item: QueueItem) -> Optional[Layout]:
         log = get_annotated_logger(self.log, item.event)
         # Load layout
         # Late import to break an import loop
+        if not self.sched:
+            raise Exception("PipelineManager has no Scheduler")
+        if not self.sched.connections:
+            raise Exception("Scheduler has no Connections!")
         import zuul.configloader
         loader = zuul.configloader.ConfigLoader(
             self.sched.connections, self.sched, None, None)
@@ -809,7 +814,7 @@ class PipelineManager(metaclass=ABCMeta):
         # a change ahead, a newly generated layout for this change, or
         # None if there was an error that makes the layout unusable.
         # In the last case, it will have set the config_errors on this
-        # item, which may be picked up by the next itme.
+        # item, which may be picked up by the next item.
         if not item.layout:
             item.layout = self.getLayout(item)
         if not item.layout:

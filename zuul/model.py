@@ -19,7 +19,7 @@ import json
 import logging
 import os
 from logging import LoggerAdapter
-from typing import Any, Tuple, Dict, List, Optional
+from typing import Any, Tuple, Dict, List, Optional, Set, TYPE_CHECKING
 
 import re2
 import struct
@@ -41,6 +41,8 @@ from zuul.lib.artifacts import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
 from zuul.trigger import BaseTrigger
+if TYPE_CHECKING:
+    from zuul.configloader import ZuulMark
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -102,10 +104,11 @@ class ConfigurationErrorKey(object):
     sufficient to determine whether we should show an error to a user.
     """
 
-    def __init__(self, context, mark, error_text):
-        self.context = context
-        self.mark = mark
-        self.error_text = error_text
+    def __init__(self, context: 'SourceContext', mark: Optional['ZuulMark'],
+                 error_text: str):
+        self.context: SourceContext = context
+        self.mark: Optional[ZuulMark] = mark
+        self.error_text: str = error_text
         elements = []
         if context:
             elements.extend([
@@ -123,7 +126,7 @@ class ConfigurationErrorKey(object):
         else:
             elements.extend([None, None])
         elements.append(error_text)
-        self._hash = hash('|'.join([str(x) for x in elements]))
+        self._hash: int = hash('|'.join([str(x) for x in elements]))
 
     def __hash__(self):
         return self._hash
@@ -142,25 +145,28 @@ class ConfigurationErrorKey(object):
 class ConfigurationError(object):
 
     """A configuration error"""
-    def __init__(self, context, mark, error, short_error=None):
-        self.error = str(error)
-        self.short_error = short_error
-        self.key = ConfigurationErrorKey(context, mark, self.error)
+    def __init__(self, context: 'SourceContext', mark: Optional['ZuulMark'],
+                 error: Exception, short_error: Optional[str] = None):
+        self.error: str = str(error)
+        self.short_error: Optional[str] = short_error
+        self.key: ConfigurationErrorKey = ConfigurationErrorKey(context, mark,
+                                                                self.error)
 
 
 class LoadingErrors(object):
     """A configuration errors accumalator attached to a layout object
     """
     def __init__(self):
-        self.errors = []
-        self.error_keys = set()
+        self.errors: List[ConfigurationError] = []
+        self.error_keys: Set[ConfigurationErrorKey] = set()
 
-    def addError(self, context, mark, error, short_error=None):
+    def addError(self, context: 'SourceContext', mark: Optional['ZuulMark'],
+                 error: Exception, short_error: Optional[str] = None):
         e = ConfigurationError(context, mark, error, short_error)
         self.errors.append(e)
         self.error_keys.add(e.key)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         return self.errors[index]
 
     def __len__(self):
@@ -930,14 +936,15 @@ class SourceContext(ConfigObject):
     Jobs and playbooks reference this to keep track of where they
     originate."""
 
-    def __init__(self, project, branch, path, trusted):
+    def __init__(self, project: Project, branch: str, path: str,
+                 trusted: bool):
         super(SourceContext, self).__init__()
-        self.project = project
-        self.branch = branch
-        self.path = path
-        self.trusted = trusted
-        self.implied_branch_matchers = None
-        self.implied_branches = None
+        self.project: Project = project
+        self.branch: str = branch
+        self.path: str = path
+        self.trusted: bool = trusted
+        self.implied_branch_matchers: Optional[bool] = None
+        self.implied_branches: Optional[List[str]] = None
 
     def __str__(self):
         return '%s/%s@%s' % (self.project, self.path, self.branch)
@@ -3659,7 +3666,7 @@ class UnparsedAbideConfig(object):
         self.admin_rules = []
         self.known_tenants = set()
 
-    def extend(self, conf):
+    def extend(self, conf: Any) -> None:
         if isinstance(conf, UnparsedAbideConfig):
             self.tenants.extend(conf.tenants)
             self.admin_rules.extend(conf.admin_rules)
@@ -4679,18 +4686,17 @@ class Abide(object):
     def __init__(self):
         self.admin_rules = OrderedDict()
         self.tenants: Dict[str, Tenant] = OrderedDict()
-        # project -> branch -> UnparsedBranchCache
-        self.unparsed_project_branch_cache = {}
+        self.unparsed_project_branch_cache:\
+            Dict[str, Dict[str, UnparsedBranchCache]] = {}
 
-    def hasUnparsedBranchCache(self, canonical_project_name, branch):
+    def hasUnparsedBranchCache(self, canonical_project_name: str, branch: str)\
+            -> bool:
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(
             canonical_project_name, {})
-        cache = project_branch_cache.get(branch)
-        if cache is None:
-            return False
-        return True
+        return project_branch_cache.get(branch) is not None
 
-    def getUnparsedBranchCache(self, canonical_project_name, branch):
+    def getUnparsedBranchCache(self, canonical_project_name: str, branch: str)\
+            -> UnparsedBranchCache:
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(
             canonical_project_name, {})
         cache = project_branch_cache.get(branch)
@@ -4699,7 +4705,8 @@ class Abide(object):
         project_branch_cache[branch] = UnparsedBranchCache()
         return project_branch_cache[branch]
 
-    def clearUnparsedBranchCache(self, canonical_project_name, branch=None):
+    def clearUnparsedBranchCache(self, canonical_project_name: str,
+                                 branch: str = None) -> None:
         if canonical_project_name in self.unparsed_project_branch_cache:
             project_branch_cache = \
                 self.unparsed_project_branch_cache[canonical_project_name]
