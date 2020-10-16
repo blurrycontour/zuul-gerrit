@@ -25,19 +25,21 @@ from typing import Dict, Any, Optional, TYPE_CHECKING, Tuple
 import voluptuous as vs
 from zuul import model
 from zuul.lib import ansible
-from zuul.lib.ansible import AnsibleManager
-from zuul.merger.client import MergeClient
 from zuul.lib import yamlutil as yaml
 import zuul.manager.dependent
 import zuul.manager.independent
 import zuul.manager.supercedent
 import zuul.manager.serial
 from zuul.lib import encryption
+from zuul.lib.ansible import AnsibleManager
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
+from zuul.merger.client import MergeClient
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.model import Tenant, Abide, LoadingErrors, UnparsedConfig, \
     SourceContext, ParsedConfig, Project, RepoFiles, Layout
+from zuul.zk import ZooKeeperClient
+from zuul.zk.unparsed_branch_config import ZooKeeperUnparsedBranchConfig
 
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
@@ -237,7 +239,7 @@ def project_configuration_exceptions(context, accumulator):
 
 
 @contextmanager
-def early_configuration_exceptions(context):
+def early_configuration_exceptions(project: str, branch: str):
     try:
         yield
     except ConfigurationSyntaxError:
@@ -246,8 +248,8 @@ def early_configuration_exceptions(context):
         intro = textwrap.fill(textwrap.dedent("""\
         Zuul encountered a syntax error while parsing its configuration in the
         repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project.name,
-            branch=context.branch,
+            repo=project,
+            branch=branch,
         )))
 
         m = textwrap.dedent("""\
@@ -1467,6 +1469,10 @@ class TenantParser(object):
         self.scheduler: Scheduler = scheduler
         self.merger: Optional[MergeClient] = merger
         self.keystorage: Optional[KeyStorage] = keystorage
+        # Reuse scheduler instances not to duplicate (tree-)caches
+        self.zk_client: ZooKeeperClient = self.scheduler.zk_client
+        self.zk_branch_config: ZooKeeperUnparsedBranchConfig = self.scheduler\
+            .zk_branch_config
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret')
@@ -1523,7 +1529,8 @@ class TenantParser(object):
         return vs.Schema(tenant)
 
     def fromYaml(self, abide: Abide, conf: Dict[str, Any],
-                 ansible_manager: AnsibleManager) -> Tenant:
+                 ansible_manager: AnsibleManager,
+                 zk_version: Optional[int] = None) -> Tenant:
         self.getSchema(self.connections)(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1580,7 +1587,11 @@ class TenantParser(object):
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
         # cache.
-        self._cacheTenantYAML(abide, tenant, loading_errors)
+        if zk_version is None:
+            self._cacheTenantYAML(abide, tenant, loading_errors)
+        else:
+            self._cacheTenantYamlFromZookeeper(abide, tenant, loading_errors,
+                                               zk_version)
 
         # Then collect the appropriate YAML based on this tenant
         # config.
@@ -1829,7 +1840,7 @@ class TenantParser(object):
                            (job, job.files.keys()))
             loaded = False
             files = sorted(job.files.keys())
-            unparsed_config = model.UnparsedConfig()
+            unparsed_config = model.UnparsedConfig()  # TODO JK: Unused?
             tpc = tenant.project_configs[
                 job.source_context.project.canonical_name]
             for conf_root in (
@@ -1855,6 +1866,11 @@ class TenantParser(object):
                     self.log.info(
                         "Loading configuration from %s" %
                         (source_context,))
+                    self.zk_branch_config.save(tenant.name,
+                                               source_context.project.name,
+                                               source_context.branch,
+                                               source_context.path,
+                                               job.files[fn])
                     incdata = self.loadProjectYAML(
                         job.files[fn], source_context, loading_errors)
                     branch_cache = abide.getUnparsedBranchCache(
@@ -1862,6 +1878,36 @@ class TenantParser(object):
                         source_context.branch)
                     branch_cache.put(source_context.path, incdata)
                     unparsed_config.extend(incdata)
+
+        self.zk_branch_config.setVersion(tenant, self.scheduler.hostname)
+
+    def _cacheTenantYamlFromZookeeper(self, abide: Abide, tenant: Tenant,
+                                      loading_errors: LoadingErrors,
+                                      version: int):
+        tenant_path = "%s/%s" % (self.zk_branch_config.CONFIG_ROOT,
+                                 tenant.name)
+        for project in itertools.chain(
+                tenant.config_projects, tenant.untrusted_projects):
+            project_path = "%s/%s" % (tenant_path, project.name)
+
+            for branch in tenant.getProjectBranches(project):
+                branch_path = "%s/%s" % (project_path, branch)
+                branch_cache = abide.getUnparsedBranchCache(
+                    project.name, branch)
+
+                if self.zk_client.client.exists(branch_path):
+                    for node in self.zk_client.client\
+                            .get_children(branch_path):
+                        data, metadata = self.zk_branch_config.load(
+                            tenant.name, project.name, branch, node)
+                        if data:
+                            source_context = model.SourceContext(
+                                project, branch, metadata['path'], False)
+                            incdata = self.loadProjectYAML(
+                                data or '', source_context, loading_errors)
+                            branch_cache.put(metadata['path'], incdata)
+        self.zk_branch_config.setLocalVersion(tenant, self.scheduler.hostname,
+                                              version)
 
     def _loadTenantYAML(self, abide: Abide, tenant: Tenant,
                         loading_errors: LoadingErrors)\
@@ -1901,7 +1947,8 @@ class TenantParser(object):
                         loading_errors: LoadingErrors) -> UnparsedConfig:
         config = model.UnparsedConfig()
         try:
-            with early_configuration_exceptions(source_context):
+            with early_configuration_exceptions(
+                    source_context.project.name, source_context.branch):
                 r = safe_load_yaml(data, source_context)
                 config.extend(r)
         except ConfigurationSyntaxError as e:
@@ -2246,10 +2293,11 @@ class ConfigLoader(object):
                     self.log.warning(err.error)
         return abide
 
-    def reloadTenant(self, abide: model.Abide, tenant: model.Tenant,
-                     ansible_manager: ansible.AnsibleManager,
-                     unparsed_abide: Optional[model.UnparsedAbideConfig] = None
-                     ) -> model.Abide:
+    def reloadTenant(
+            self, abide: model.Abide, tenant: model.Tenant,
+            ansible_manager: ansible.AnsibleManager,
+            unparsed_abide: Optional[model.UnparsedAbideConfig] = None,
+            zk_version: Optional[int] = None) -> model.Abide:
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
         new_abide.admin_rules = abide.admin_rules.copy()
@@ -2271,7 +2319,7 @@ class ConfigLoader(object):
 
         # When reloading a tenant only, use cached data if available.
         new_tenant = self.tenant_parser.fromYaml(
-            new_abide, unparsed_config, ansible_manager)
+            new_abide, unparsed_config, ansible_manager, zk_version=zk_version)
         new_abide.tenants[tenant.name] = new_tenant
         if new_tenant.layout and len(new_tenant.layout.loading_errors):
             self.log.warning(

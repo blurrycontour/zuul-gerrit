@@ -60,6 +60,8 @@ from zuul.zk.components import ZooKeeperComponent, ZooKeeperComponentRegistry,\
 from zuul.zk.builds import ZooKeeperBuilds
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.unparsed_branch_config import ZooKeeperUnparsedBranchConfig
+
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
 
@@ -348,6 +350,8 @@ class Scheduler(threading.Thread):
         self.config: ConfigParser = config
         self.zk_client: ZooKeeperClient = zk_client
         self.zk_builds: ZooKeeperBuilds = self._zk_builds_class(zk_client)
+        self.zk_branch_config: ZooKeeperUnparsedBranchConfig =\
+            ZooKeeperUnparsedBranchConfig(zk_client)
         self.zk_component_registry: ZooKeeperComponentRegistry =\
             ZooKeeperComponentRegistry(zk_client)
         self.zk_component: ZooKeeperComponent =\
@@ -1269,6 +1273,41 @@ class Scheduler(threading.Thread):
                 return
             self.log.debug("Run handler awake")
             self.run_handler_lock.acquire()
+
+            # Update tenants from zookeeper
+            for tenant in self.abide.tenants.values():
+                tenant_lock = self.zk_branch_config.tenantLock(tenant.name)
+                with self.zk_client.withLock(tenant_lock, blocking=False):
+                    new_version = self.zk_branch_config.checkNewVersion(tenant)
+                    if new_version is not None:
+                        if self.zk_branch_config.peersCount(tenant) == 0:
+                            # # Update from git -> we're starting fresh
+                            # loader.reloadTenant(self.abide, tenant,
+                            #                     self.ansible_manager,
+                            #                     self.unparsed_abide,
+                            #                     refresh=True)
+                            # self._reconfigureTenant(tenant)
+                            #
+                            # # intermediate scoped to this tenant:
+                            # event = TenantReconfigureEvent(
+                            #       tenant=tenant.name, project, branch)
+                            # self._doTenantReconfigureEvent(event)
+                            # if not tenant.loaded:
+                            #     # ensure /zuul/layout/versions/<tenant>
+                            #     tenant.loaded = True
+                            pass
+                        else:
+                            # update from zk -> other scheduler already did
+                            # reconfigure so skip self._reconfigureTenant
+                            # Tenant loaded
+                            loader = configloader.ConfigLoader(
+                                self.connections, self, self.merger,
+                                self._get_key_dir())
+                            abide = loader.reloadTenant(
+                                self.abide, tenant, self.ansible_manager,
+                                self.unparsed_abide, zk_version=new_version)
+                            self.abide = abide
+
             try:
                 while (not self.management_event_queue.empty() and
                        not self._stopped):

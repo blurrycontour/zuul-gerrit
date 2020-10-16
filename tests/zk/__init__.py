@@ -26,7 +26,7 @@ class TestZooKeeperClient(ZooKeeperClient):
         self._connection_id: str = ''
 
     def connect(self, *args, **kwargs) -> None:
-        if self.client is None:
+        if self._client is None:
             stack = "\n".join(traceback.format_stack())
             self._connection_id = uuid.uuid4().hex
             TestZooKeeperClient.connections[self._connection_id] = stack
@@ -34,7 +34,7 @@ class TestZooKeeperClient(ZooKeeperClient):
         super().connect(*args, **kwargs)
 
     def disconnect(self):
-        if self.client is not None and self.client.connected:
+        if self._client is not None and self._client.connected:
             if self._connection_id in TestZooKeeperClient.connections:
                 del TestZooKeeperClient.connections[self._connection_id]
                 self.log.debug("ZK Disconnecting (%s)", self._connection_id)

@@ -9,17 +9,18 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import json
 import logging
 import threading
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
 from contextlib import contextmanager
-from typing import Optional, List, Callable, Generator, Dict, Union, Any
+from typing import Optional, List, Callable, Generator, Dict, Union, Any, Tuple
 
 from kazoo.client import KazooClient
 from kazoo.exceptions import LockTimeout, ConnectionClosedError, \
-    ConnectionLossException
+    ConnectionLossException, NoNodeError
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
 from kazoo.recipe.lock import Lock
@@ -29,6 +30,9 @@ from zuul.zk.exceptions import NoClientException
 
 
 class ZooKeeperClient(object):
+    # Node content max size: keep ~100kB as a reserve form the 1MB limit
+    NODE_CONTENT_MAX_SIZE = 1024 * 1024 - 100 * 1024
+
     log = logging.getLogger("zuul.zk.base.ZooKeeperClient")
 
     # Log zookeeper retry every 10 seconds
@@ -38,12 +42,18 @@ class ZooKeeperClient(object):
         """
         Initialize the ZooKeeper base client object.
         """
-        self.client: Optional[KazooClient] = None
+        self._client: Optional[KazooClient] = None
         self.locking_lock: threading.Lock = threading.Lock()
         self._election_locks: Dict[str, Lock] = {}
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners: List[Callable[[], None]] = []
+
+    @property
+    def client(self) -> KazooClient:
+        if not self._client:
+            raise NoClientException()
+        return self._client
 
     def _connectionListener(self, state):
         """
@@ -60,15 +70,15 @@ class ZooKeeperClient(object):
 
     @property
     def connected(self):
-        return self.client and self.client.state == KazooState.CONNECTED
+        return self._client and self._client.state == KazooState.CONNECTED
 
     @property
     def suspended(self):
-        return self.client and self.client.state == KazooState.SUSPENDED
+        return self._client and self._client.state == KazooState.SUSPENDED
 
     @property
     def lost(self):
-        return not self.client or self.client.state == KazooState.LOST
+        return not self._client or self._client.state == KazooState.LOST
 
     def logConnectionRetryEvent(self):
         now = time.monotonic()
@@ -95,19 +105,19 @@ class ZooKeeperClient(object):
         :param str tls_cert: Path to TLS cert
         :param str tls_ca: Path to TLS CA cert
         """
-        if self.client is None:
+        if self._client is None:
             args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
             if tls_key:
                 args['use_ssl'] = True
                 args['keyfile'] = tls_key
                 args['certfile'] = tls_cert
                 args['ca'] = tls_ca
-            self.client = KazooClient(**args)
-            self.client.add_listener(self._connectionListener)
+            self._client = KazooClient(**args)
+            self._client.add_listener(self._connectionListener)
             # Manually retry initial connection attempt
             while True:
                 try:
-                    self.client.start(1)
+                    self._client.start(1)
                     break
                 except KazooTimeoutError:
                     self.logConnectionRetryEvent()
@@ -125,10 +135,10 @@ class ZooKeeperClient(object):
         for listener in self.on_disconnect_listeners:
             listener()
 
-        if self.client is not None and self.client.connected:
-            self.client.stop()
-            self.client.close()
-            self.client = None
+        if self._client is not None and self._client.connected:
+            self._client.stop()
+            self._client.close()
+            self._client = None
 
     def resetHosts(self, hosts):
         """
@@ -137,8 +147,8 @@ class ZooKeeperClient(object):
         :param str hosts: Comma-separated list of hosts to connect to (e.g.
             127.0.0.1:2181,127.0.0.1:2182,[::1]:2183).
         """
-        if self.client is not None:
-            self.client.set_hosts(hosts=hosts)
+        if self._client is not None:
+            self._client.set_hosts(hosts=hosts)
 
     def acquireLock(self, lock: Lock, keep_locked: bool = False,
                     blocking: bool = True, timeout: float = 10.0) -> bool:
@@ -208,7 +218,7 @@ class ZooKeeperClient(object):
 
         :param lock: Lock to unlock
         """
-        if self.client and self.client.exists(lock.path):
+        if self._client and self._client.exists(lock.path):
             lock.release()
 
     def election(self, path: str, func: Callable[[], Optional[bool]],
@@ -252,6 +262,89 @@ class ZooKeeperClient(object):
             if callable(repeat) and not repeat() or repeat is False:
                 return
 
+    def loadShardedContent(self, path: str, including_metadata: bool = False) \
+            -> Tuple[Optional[str], Dict[str, Any]]:
+        """
+        Load large content split over multiple shards `/path/to/node/<shard>`
+
+        :param path: Path to node
+        :param including_metadata: Whether to load metadata or not.
+        :return: Merged sharded content
+        """
+        if not self.client.exists(path):
+            return None, dict()
+
+        parts = []
+        if including_metadata:
+            rawdata, _ = self.client.get(path)
+            metadata = json.loads(rawdata.decode(encoding='UTF-8'))
+        else:
+            metadata = dict()
+        for child in sorted(self.client.get_children(path)):
+            if child.startswith('shard-'):
+                node = "%s/%s" % (path, child)
+                if self.client.exists(node):
+                    data, _ = self.client.get(node)
+                    value = data.decode(encoding='UTF-8') if data else None
+                    if value:
+                        parts.append(value)
+        return "".join(parts) if len(parts) > 0 else None, metadata
+
+    def saveShardedContent(self, path: str, data: Optional[str],
+                           metadata: Optional[Dict[str, Any]] = None) -> None:
+        """
+        Save large content split over multiple shards `/path/to/node/<shard>`
+
+        :param path: Path to node
+        :param data: Raw string to store
+        :param metadata: Metadata of the sharded document. Those will be stored
+                        in the root node.
+        """
+        current, current_metadata = self.loadShardedContent(
+            path, including_metadata=True)
+        metadata_value = json.dumps(metadata or current_metadata) \
+            .encode('utf8')
+
+        if current != data:
+            content = data.encode(encoding='UTF-8') \
+                if data is not None else None
+
+            exists = self.client.exists(path)
+            if exists:  # Delete shards if node already exists
+                for child in self.client.get_children(path):
+                    if child.startswith('shard-'):
+                        try:
+                            self.log.debug("Deleting: %s/%s", path, child)
+                            self.client.delete("%s/%s" % (path, child),
+                                               recursive=True)
+                        except NoNodeError:
+                            pass
+
+            if content is not None:
+                # Write shards if there is something to write
+                stat = self.client.exists(path)
+                if not stat:
+                    self.client.create(path, metadata_value, makepath=True)
+                else:
+                    self.client.set(path, metadata_value, version=stat.version)
+                chunks = [content[i:i + self.NODE_CONTENT_MAX_SIZE]
+                          for i in range(0, len(content),
+                                         self.NODE_CONTENT_MAX_SIZE)]
+                for i, chunk in enumerate(chunks):
+                    self.log.debug("Creating: %s/shard-%d" % (path, i))
+                    self.client.create("%s/shard-%d" % (path, i), chunk)
+
+                timestamp = str(time.time()).encode(encoding='UTF-8')
+                if not exists:
+                    self.client.create("%s/created" % path, timestamp)
+                    self.client.create("%s/updated" % path, timestamp)
+                else:
+                    self.client.set("%s/updated" % path, timestamp)
+            elif exists:
+                # Delete node if node already exists and nothing to write
+                self.client.delete(path, recursive=True,
+                                   version=exists.version)
+
 
 class ZooKeeperBase(metaclass=ABCMeta):
     def __init__(self, client: ZooKeeperClient):
@@ -261,8 +354,6 @@ class ZooKeeperBase(metaclass=ABCMeta):
 
     @property
     def kazoo_client(self) -> KazooClient:
-        if not self.client.client:
-            raise NoClientException()
         return self.client.client
 
     def _onConnect(self) -> None:
