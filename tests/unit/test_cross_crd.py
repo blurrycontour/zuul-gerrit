@@ -239,7 +239,8 @@ class TestGerritToGithubCRD(ZuulTestCase):
     def test_crd_check(self):
         "Test cross-repo dependencies in independent pipelines"
         self.executor_server.hold_jobs_in_build = True
-        self.gearman_server.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_gerrit.addFakeChange('gerrit/project1', 'master', 'A')
         B = self.fake_github.openFakePullRequest(
             'github/project2', 'master', 'B')
@@ -251,8 +252,8 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.executor_server.release('.*-merge')
@@ -334,7 +335,8 @@ class TestGerritToGithubCRD(ZuulTestCase):
     def _test_crd_check_reconfiguration(self, project1, project2):
         "Test cross-repo dependencies re-enqueued in independent pipelines"
 
-        self.gearman_server.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_gerrit.addFakeChange('gerrit/project1', 'master', 'A')
         B = self.fake_github.openFakePullRequest(
             'github/project2', 'master', 'B')
@@ -359,8 +361,8 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.assertFalse(first_item.live)
         self.assertTrue(queue.queue[1].live)
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'NEW')
@@ -694,7 +696,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
     def test_crd_check(self):
         "Test cross-repo dependencies in independent pipelines"
         self.executor_server.hold_jobs_in_build = True
-        self.gearman_server.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_github.openFakePullRequest('github/project2', 'master',
                                                  'A')
         B = self.fake_gerrit.addFakeChange(
@@ -706,8 +709,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
         self.fake_github.emitEvent(A.getPullRequestEditedEvent())
         self.waitUntilSettled()
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.executor_server.release('.*-merge')
@@ -787,7 +790,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
     def _test_crd_check_reconfiguration(self, project1, project2):
         "Test cross-repo dependencies re-enqueued in independent pipelines"
 
-        self.gearman_server.hold_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_queue_sensor.pause = True
+        self.executor_server.manageLoad()
         A = self.fake_github.openFakePullRequest('github/project2', 'master',
                                                  'A')
         B = self.fake_gerrit.addFakeChange(
@@ -812,8 +816,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
         self.assertFalse(first_item.live)
         self.assertTrue(queue.queue[1].live)
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.executor_server.hold_jobs_in_queue_sensor.pause = False
+        self.executor_server.manageLoad()
         self.waitUntilSettled()
 
         self.assertFalse(A.is_merged)
