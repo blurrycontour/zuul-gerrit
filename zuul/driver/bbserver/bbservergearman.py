@@ -14,6 +14,7 @@
 
 import logging
 import json
+from uuid import uuid4
 
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.logutil import get_annotated_logger
@@ -43,7 +44,7 @@ class BitbucketServerGearmanWorker(object):
         headers = args["headers"]
         body = args["body"]
 
-        request_id = headers.get("x-request-id", "undefined")
+        request_id = headers.get("x-request-id", str(uuid4()))
         event = headers["x-event-key"]
 
         log = get_annotated_logger(self.log, request_id)

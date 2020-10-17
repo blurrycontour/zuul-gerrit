@@ -22,6 +22,8 @@ import cherrypy
 import voluptuous as v
 import time
 
+from atlassian import Bitbucket
+
 from zuul.connection import BaseConnection
 from zuul.web.handler import BaseWebController
 
@@ -88,6 +90,10 @@ class BitbucketServerEventConnector(threading.Thread):
                 self.connection.eventDone()
 
 
+class BitbucketServerAPIClientException(Exception):
+    pass
+
+
 class BitbucketServerConnection(BaseConnection):
     driver_name = 'bitbucketserver'
     log = logging.getLogger("zuul.BitbucketServerConnection")
@@ -104,7 +110,7 @@ class BitbucketServerConnection(BaseConnection):
             raise Exception('baseurl is required for Bitbucket '
                             f'connections in {self.connection_name}')
         self.baseurl = self.connection_config.get(
-            'baseurl', 'https://bitbucket:7990')
+            'baseurl', 'https://bitbucket:7990').rstrip(" /")
 
         self.user = self.connection_config.get('user', '')
         self.password = self.connection_config.get('password', '')
@@ -116,6 +122,9 @@ class BitbucketServerConnection(BaseConnection):
         self.event_queue = queue.Queue()
         self.source = driver.getSource(self)
         self.gearman_worker = None
+
+        self.bitbucket = Bitbucket(url=self.baseurl, cloud=False,
+                                   username=self.user, password=self.password)
 
     def _start_event_connector(self):
         self.bitbucketserver_event_connector = \
@@ -149,6 +158,28 @@ class BitbucketServerConnection(BaseConnection):
 
     def eventDone(self):
         self.event_queue.task_done()
+
+    def getProject(self, name):
+        return self.projects.get(name)
+
+    def addProject(self, project):
+        self.projects[project.name] = project
+
+    def getProjectBranches(self, project_name, zuul_event_id=None):
+        project, repo = project_name.split('/', 2)
+        branches = self.bitbucket.get_branches(project, repo, details=False)
+        branches = [ref['id'][len('refs/heads/'):] for ref in
+                    branches if ref['id'].startswith('refs/heads/')]
+        return branches
+
+    def getGitUrl(self, project, proto='ssh'):
+        project, repo = project.name.split('/', 2)
+        repo = self.bitbucket.get_repo(project, repo)
+        for link in repo['links']['clone']:
+            if link['name'] == proto:
+                return link['href']
+        raise BitbucketServerAPIClientException(
+            f'Could not find link for protocol [{proto}]')
 
 
 class BitbucketServerWebController(BaseWebController):
