@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f681702_a8085628",
+        "filename": "requirements.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 23942
+      },
+      "writtenOn": "2020-10-17T19:01:08Z",
+      "side": 1,
+      "message": "Apparently this supports cloud version. Better to drop \u0027server\u0027 from driver as it seems it\u0027s reasonable to expect that this driver can be updated to support Cloud version.",
+      "revId": "2327487a3b0faf4861838830dc9a3e4959840dca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
