@@ -14,6 +14,7 @@
 
 import logging
 
+from zuul.model import Project
 from zuul.source import BaseSource
 
 
@@ -50,13 +51,17 @@ class BitbucketServerSource(BaseSource):
         raise NotImplementedError()
 
     def getGitUrl(self, project):
-        raise NotImplementedError()
+        return self.connection.getGitUrl(project)
 
     def getProject(self, name):
-        raise NotImplementedError()
+        p = self.connection.getProject(name)
+        if not p:
+            p = Project(name, self)
+            self.connection.addProject(p)
+        return p
 
     def getProjectBranches(self, project, tenant):
-        raise NotImplementedError()
+        return self.connection.getProjectBranches(project.name, tenant)
 
     def getRequireFilters(self, config):
         raise NotImplementedError()
