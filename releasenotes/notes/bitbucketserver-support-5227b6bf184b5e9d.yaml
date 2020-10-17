@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Initial support for Bitbucket Server is added. It can be used as a source
+    of events.
