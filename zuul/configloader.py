@@ -12,6 +12,7 @@
 
 import base64
 import collections
+import traceback
 from contextlib import contextmanager
 import copy
 import itertools
@@ -223,8 +224,10 @@ def project_configuration_exceptions(context, accumulator):
 
         {error}""")
 
-        m = m.format(intro=intro,
-                     error=indent(str(e)))
+        m = m.format(
+            intro=intro,
+            error=indent(traceback.format_exception(None, e, e.__traceback__)),
+        )
         accumulator.addError(context, None, m)
 
 
