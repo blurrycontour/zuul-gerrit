@@ -23,7 +23,7 @@ import zuul.web
 import zuul.rpcclient
 
 from tests.base import iterate_timeout
-from tests.base import ZuulDBTestCase
+from tests.base import ZuulDBTestCase, AnsibleZuulTestCase
 from tests.unit.test_web import BaseTestWeb
 
 
@@ -395,15 +395,15 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(C.reported, 2)
 
 
-class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
+class TestZuulClientQueryData(ZuulDBTestCase,
+                              BaseTestWeb,
+                              AnsibleZuulTestCase):
     """Test that zuul-client can fetch builds"""
     config_file = 'zuul-sql-driver.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
 
     def _split_pretty_table(self, output):
         lines = output.decode().split('\n')
-        # ['ID', 'Job', 'Project', 'Branch', 'Pipeline', 'Change or Ref',
-        #  'Duration (s)', 'Start time', 'Result', 'Event ID']
         headers = [x.strip() for x in lines[1].split('|') if x != '']
         # Trim headers and last line of the table
         return [dict(zip(headers,
@@ -532,3 +532,67 @@ class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
         self.assertEqual(6, len(results), results)
         self.assertTrue(all(x['Pipeline'] == 'gate' for x in results),
                         results)
+
+    def _split_build_info_output(self, output):
+        lines = output.decode().split('\n')
+        info = {}
+        for l in lines:
+            if l.startswith('==='):
+                continue
+            try:
+                key, value = l.split(':', 1)
+                info[key] = value.strip()
+            except ValueError:
+                continue
+        return info
+
+    def test_get_build_info(self):
+        """Test querying a specific build"""
+
+        test_build = self.history[-1]
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'build-info', '--tenant', 'tenant-one',
+             '--uuid', test_build.uuid],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        info = self._split_build_info_output(output)
+        self.assertEqual(test_build.uuid, info.get('UUID'), test_build)
+        self.assertEqual(test_build.result, info.get('Result'), test_build)
+        self.assertEqual(test_build.name, info.get('Job'), test_build)
+
+    def test_get_build_artifacts(self):
+        """Test querying a specific build's artifacts"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'builds', '--tenant', 'tenant-one', '--job', 'project-test1',
+             '--limit', '1'],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        uuid = results[0]['ID']
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'build-info', '--tenant', 'tenant-one',
+             '--uuid', uuid,
+             '--show-artifacts'],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        artifacts = self._split_pretty_table(output)
+        self.assertTrue(
+            any(x['name'] == 'tarball' and
+                x['url'] == 'http://example.com/tarball'
+                for x in artifacts),
+            output)
+        self.assertTrue(
+            any(x['name'] == 'docs' and
+                x['url'] == 'http://example.com/docs'
+                for x in artifacts),
+            output)
