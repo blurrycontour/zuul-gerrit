@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f681702_853bb79a",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1840,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-10-19T15:03:05Z",
+      "side": 1,
+      "message": "why not defaultdict(list) ?",
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f681702_45ffdfa9",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1888,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-10-19T15:03:05Z",
+      "side": 1,
+      "message": "could it be \u0027.+/projects/(.+)/(branches|protected_branches)$\u0027 ?",
+      "range": {
+        "startLine": 1885,
+        "startChar": 0,
+        "endLine": 1888,
+        "endChar": 58
+      },
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
