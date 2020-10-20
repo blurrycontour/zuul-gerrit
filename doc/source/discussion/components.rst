@@ -115,6 +115,7 @@ An example ``zuul.conf``:
    status_url=https://zuul.example.com/status
 
    [scheduler]
+   key_store_password=MY_SECRET_PASSWORD
    log_config=/etc/zuul/scheduler-logging.yaml
 
 A minimal Zuul system may consist of a :ref:`scheduler` and
@@ -303,6 +304,11 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       .. TODO: is this effectively required?
 
 .. attr:: scheduler
+
+   .. attr:: key_store_password
+      :required:
+
+      Encryption password for private data stored in Zookeeper.
 
    .. attr:: command_socket
       :default: /var/lib/zuul/scheduler.socket
