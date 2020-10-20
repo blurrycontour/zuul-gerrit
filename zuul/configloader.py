@@ -32,7 +32,6 @@ import zuul.manager.independent
 import zuul.manager.supercedent
 import zuul.manager.serial
 from zuul.lib import encryption
-from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.zk.semaphore import SemaphoreHandler
@@ -2203,14 +2202,11 @@ class TenantParser(object):
 class ConfigLoader(object):
     log = logging.getLogger("zuul.ConfigLoader")
 
-    def __init__(self, connections, scheduler, merger, key_dir):
+    def __init__(self, connections, scheduler, merger, keystorage):
         self.connections = connections
         self.scheduler = scheduler
         self.merger = merger
-        if key_dir:
-            self.keystorage = KeyStorage(key_dir)
-        else:
-            self.keystorage = None
+        self.keystorage = keystorage
         self.tenant_parser = TenantParser(connections, scheduler,
                                           merger, self.keystorage)
         self.admin_rule_parser = AuthorizationRuleParser()

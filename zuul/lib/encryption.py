@@ -37,22 +37,29 @@ def generate_rsa_keypair():
 
 
 # https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/#key-serialization
-def serialize_rsa_private_key(private_key):
+def serialize_rsa_private_key(private_key, password=None):
     """Serialize an RSA private key
 
     This returns a PEM-encoded serialized form of an RSA private key
-    suitable for storing on disk.  It is not password-protected.
+    suitable for storing on disk. In case a password is supplied the
+    encoded key will be encrypted.
 
     :arg private_key: A private key object as returned by
         :func:generate_rsa_keypair()
+    : arg password: A password in case the key should be encrypted
 
     :returns: A PEM-encoded string representation of the private key.
 
     """
+    if password is None:
+        encryption_algorithm = serialization.NoEncryption()
+    else:
+        encryption_algorithm = serialization.BestAvailableEncryption(password)
+
     return private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.TraditionalOpenSSL,
-        encryption_algorithm=serialization.NoEncryption()
+        encryption_algorithm=encryption_algorithm
     )
 
 
@@ -75,20 +82,22 @@ def serialize_rsa_public_key(public_key):
 
 
 # https://cryptography.io/en/latest/hazmat/primitives/asymmetric/rsa/#key-loading
-def deserialize_rsa_keypair(data):
+def deserialize_rsa_keypair(data, password=None):
     """Deserialize an RSA private key
 
     This deserializes an RSA private key and returns the keypair
-    (private and public) for use in decryption.
+    (private and public) for use in decryption. If the given key
+    is encrypted a password must be supplied.
 
     :arg data: A PEM-encoded serialized private key
+    :arg password: Optional password in case the private key is encrypted.
 
     :returns: A tuple (private_key, public_key)
 
     """
     private_key = serialization.load_pem_private_key(
         data,
-        password=None,
+        password=password,
         backend=default_backend()
     )
     public_key = private_key.public_key()
