@@ -37,6 +37,7 @@ from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
+from zuul.lib.keystorage import FileKeyStorage, ZooKeeperKeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
@@ -751,6 +752,12 @@ class Scheduler(threading.Thread):
             os.mkdir(d)
         return d
 
+    def _get_key_store_password(self):
+        try:
+            return self.config["scheduler"]["key_store_password"]
+        except KeyError:
+            raise RuntimeError("No key store password configured!")
+
     def _get_key_dir(self):
         state_dir = get_default(self.config, 'scheduler', 'state_dir',
                                 '/var/lib/zuul', expand_user=True)
@@ -793,6 +800,14 @@ class Scheduler(threading.Thread):
         if os.path.exists(pickle_file):
             self.log.debug("Deleting saved queue")
             os.unlink(pickle_file)
+
+    def getKeyStorage(self):
+        file_key_store = FileKeyStorage(self._get_key_dir())
+        return ZooKeeperKeyStorage(
+            self.zk.client,
+            password=self._get_key_store_password(),
+            backup=file_key_store
+        )
 
     def wakeUp(self) -> None:
         """
@@ -862,7 +877,7 @@ class Scheduler(threading.Thread):
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self.getKeyStorage())
             tenant_config, script = self._checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
@@ -896,7 +911,7 @@ class Scheduler(threading.Thread):
 
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self.getKeyStorage())
             tenant_config, script = self._checkTenantSourceConf(self.config)
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
@@ -951,7 +966,7 @@ class Scheduler(threading.Thread):
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
-                self._get_key_dir())
+                self.getKeyStorage())
             abide = loader.reloadTenant(
                 self.abide, old_tenant, self.ansible_manager)
             tenant = abide.tenants[event.tenant_name]

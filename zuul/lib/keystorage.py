@@ -12,11 +12,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import tempfile
+import abc
+import io
+import json
 import logging
 import os
+import tempfile
+from typing import Optional, Tuple
 
+import kazoo
 import paramiko
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 from zuul.lib import encryption
 
@@ -124,11 +130,40 @@ class MigrationV1(Migration):
         os.rmdir(tmpdir)
 
 
-class KeyStorage(object):
+class KeyStorage(abc.ABC):
     log = logging.getLogger("zuul.KeyStorage")
+
+    @abc.abstractmethod
+    def getProjectSSHKeys(
+        self, connection_name: str, project_name: str
+    ) -> Tuple[str, str]:
+        """Return the private and public SSH keys for the project
+
+        A new key will be created if necessary.
+
+        :returns: A tuple containing the PEM encoded private key and
+                  base64 encoded public key.
+        """
+        pass
+
+    @abc.abstractmethod
+    def getProjectSecretsKeys(
+        self, connection_name: str, project_name: str
+    ) -> Tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
+        """Return the private and public secrets keys for the project
+
+        A new key will be created if necessary.
+
+        :returns: A tuple (private_key, public_key)
+        """
+        pass
+
+
+class FileKeyStorage(KeyStorage):
+    log = logging.getLogger("zuul.FileKeyStorage")
     current_version = MigrationV1
 
-    def __init__(self, root):
+    def __init__(self, root: str):
         self.root = root
         migration = self.current_version()
         migration.verifyAndUpgrade(root)
@@ -149,64 +184,77 @@ class KeyStorage(object):
         return os.path.join(self.root, 'ssh', 'project',
                             connection, project, version + '.pem')
 
-    def getProjectSSHKeys(self, connection, project):
-        """Return the private and public SSH keys for the project
+    def hasProjectSSHKeys(
+        self, connection_name: str, project_name: str
+    ) -> bool:
+        return os.path.isfile(
+            self.getProjectSSHKeyFile(connection_name, project_name)
+        )
 
-        A new key will be created if necessary.
+    def setProjectSSHKey(
+        self,
+        connection_name: str,
+        project_name: str,
+        private_key: paramiko.RSAKey,
+    ) -> str:
+        private_key_file = self.getProjectSSHKeyFile(
+            connection_name, project_name
+        )
+        key_dir = os.path.dirname(private_key_file)
+        if not os.path.isdir(key_dir):
+            os.makedirs(key_dir, 0o700)
 
-        :returns: A tuple containing the PEM encoded private key and
-            base64 encoded public key.
+        private_key.write_private_key_file(private_key_file)
+        return private_key_file
 
-        """
+    def getProjectSSHKeys(
+        self, connection_name: str, project_name: str
+    ) -> Tuple[str, str]:
+        private_key_file = self._ensureSSHKeyFile(
+            connection_name, project_name
+        )
 
-        private_key_file = self.getProjectSSHKeyFile(connection, project)
-        if not os.path.exists(private_key_file):
-            self.log.info(
-                "Generating SSH public key for project %s", project
-            )
-            self._createSSHKey(private_key_file)
         key = paramiko.RSAKey.from_private_key_file(private_key_file)
         with open(private_key_file, 'r') as f:
             private_key = f.read()
         public_key = key.get_base64()
+
         return (private_key, 'ssh-rsa ' + public_key)
 
-    def _createSSHKey(self, fn):
-        key_dir = os.path.dirname(fn)
-        if not os.path.isdir(key_dir):
-            os.makedirs(key_dir, 0o700)
+    def _ensureSSHKeyFile(
+        self, connection_name: str, project_name: str
+    ) -> str:
+        private_key_file = self.getProjectSSHKeyFile(
+            connection_name, project_name
+        )
+        if os.path.exists(private_key_file):
+            return private_key_file
 
+        self.log.info(
+            "Generating SSH public key for project %s", project_name
+        )
         pk = paramiko.RSAKey.generate(bits=RSA_KEY_SIZE)
-        pk.write_private_key_file(fn)
+        return self.setProjectSSHKey(connection_name, project_name, pk)
 
-    def getProjectSecretsKeys(self, connection_name, project_name):
-        """Return the private and public secrets keys for the project
+    def hasProjectSecretsKeys(
+        self, connection_name: str, project_name: str
+    ) -> bool:
+        return os.path.isfile(
+            self.getProjectSecretsKeyFile(connection_name, project_name)
+        )
 
-        A new key will be created if necessary.
-
-        :returns: A tuple (private_key, public_key)
-        """
-
-        private_key_file = self._ensureKeyFile(connection_name, project_name)
-
-        # Load keypair
-        with open(private_key_file, "rb") as f:
-            return encryption.deserialize_rsa_keypair(f.read())
-
-    def _ensureKeyFile(self, connection_name, project_name):
+    def setProjectSecretsKey(
+        self,
+        connection_name: str,
+        project_name: str,
+        private_key: rsa.RSAPrivateKey,
+    ) -> str:
         filename = self.getProjectSecretsKeyFile(
             connection_name, project_name
         )
-        if os.path.isfile(filename):
-            return filename
-
         key_dir = os.path.dirname(filename)
         if not os.path.isdir(key_dir):
             os.makedirs(key_dir, 0o700)
-
-        self.log.info("Generating RSA keypair for project %s", project_name)
-        private_key, public_key = encryption.generate_rsa_keypair()
-        pem_private_key = encryption.serialize_rsa_private_key(private_key)
 
         # Dump keys to filesystem.  We only save the private key
         # because the public key can be constructed from it.
@@ -214,9 +262,187 @@ class KeyStorage(object):
             "Saving RSA keypair for project %s to %s", project_name, filename
         )
 
+        pem_private_key = encryption.serialize_rsa_private_key(private_key)
         # Ensure private key is read/write for zuul user only.
         with open(os.open(filename,
                           os.O_CREAT | os.O_WRONLY, 0o600), 'wb') as f:
             f.write(pem_private_key)
-
         return filename
+
+    def getProjectSecretsKeys(
+        self, connection_name: str, project_name: str
+    ) -> Tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
+        private_key_file = self._ensureSecretsKeyFile(
+            connection_name, project_name
+        )
+
+        # Load keypair
+        with open(private_key_file, "rb") as f:
+            return encryption.deserialize_rsa_keypair(f.read())
+
+    def _ensureSecretsKeyFile(
+        self, connection_name: str, project_name: str
+    ) -> str:
+        filename = self.getProjectSecretsKeyFile(
+            connection_name, project_name
+        )
+        if os.path.isfile(filename):
+            return filename
+
+        self.log.info("Generating RSA keypair for project %s", project_name)
+        private_key, public_key = encryption.generate_rsa_keypair()
+
+        return self.setProjectSecretsKey(
+            connection_name, project_name, private_key
+        )
+
+
+class ZooKeeperKeyStorage(KeyStorage):
+    log = logging.getLogger("zuul.ZooKeeperKeyStorage")
+    SECRETS_PATH = "/keystorage/{}/{}/secrets"
+    SSH_PATH = "/keystorage/{}/{}/ssh"
+
+    def __init__(
+        self,
+        zookeeper_client: kazoo.client.KazooClient,
+        password: str,
+        backup: Optional[FileKeyStorage] = None
+    ):
+        self.zk = zookeeper_client
+        self.password = password
+        self.password_bytes = password.encode("utf-8")
+        self.backup = backup
+
+    def getProjectSSHKeys(
+        self, connection_name: str, project_name: str
+    ) -> Tuple[str, str]:
+        key_path = self.SSH_PATH.format(connection_name, project_name)
+
+        try:
+            key = self._getSSHKey(key_path)
+        except kazoo.exceptions.NoNodeError:
+            self.log.debug(
+                "Could not find existing SSH key for %s/%s",
+                connection_name, project_name
+            )
+            if self.backup and self.backup.hasProjectSSHKeys(
+                connection_name, project_name
+            ):
+                self.log.debug(
+                    "Using SSH key for %s/%s from backup key store",
+                    connection_name, project_name
+                )
+                pk, _ = self.backup.getProjectSSHKeys(
+                    connection_name, project_name
+                )
+                with io.StringIO(pk) as o:
+                    key = paramiko.RSAKey.from_private_key(o, self.password)
+            else:
+                self.log.debug(
+                    "Generating a new SSH key for %s/%s",
+                    connection_name, project_name
+                )
+                key = paramiko.RSAKey.generate(bits=RSA_KEY_SIZE)
+
+            try:
+                self._storeSSHKey(key_path, key)
+            except kazoo.exceptions.NodeExistsError:
+                # Handle race condition between multiple schedulers
+                # creating the same SSH key.
+                key = self._getSSHKey(key_path)
+
+        # Make sure the SSH key is also stored in the backup keystore
+        if self.backup:
+            self.backup.setProjectSSHKey(connection_name, project_name, key)
+
+        with io.StringIO() as o:
+            key.write_private_key(o)
+            private_key = o.getvalue()
+        public_key = "ssh-rsa {}".format(key.get_base64())
+
+        return private_key, public_key
+
+    def _getSSHKey(self, key_path: str) -> paramiko.RSAKey:
+        raw_pk, _ = self.zk.get(key_path)
+        encrypted_key = raw_pk.decode("utf-8")
+        with io.StringIO(encrypted_key) as o:
+            return paramiko.RSAKey.from_private_key(o, self.password)
+
+    def _storeSSHKey(self, key_path: str, key: paramiko.RSAKey) -> None:
+        with io.StringIO() as o:
+            key.write_private_key(o, self.password)
+            private_key = o.getvalue()
+        raw_pk = private_key.encode("utf-8")
+        self.zk.create(key_path, value=raw_pk, makepath=True)
+
+    def getProjectSecretsKeys(
+        self, connection_name: str, project_name: str
+    ) -> Tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
+        key_path = self.SECRETS_PATH.format(connection_name, project_name)
+
+        try:
+            pem_private_key, _ = self._getSecretsKeys(key_path)
+        except kazoo.exceptions.NoNodeError:
+            self.log.debug(
+                "Could not find existing secrets key for %s/%s",
+                connection_name, project_name
+            )
+            if self.backup and self.backup.hasProjectSecretsKeys(
+                connection_name, project_name
+            ):
+                self.log.debug(
+                    "Using secrets key for %s/%s from backup key store",
+                    connection_name, project_name
+                )
+                private_key, public_key = self.backup.getProjectSecretsKeys(
+                    connection_name, project_name
+                )
+            else:
+                self.log.debug(
+                    "Generating a new secrets key for %s/%s",
+                    connection_name, project_name
+                )
+                private_key, public_key = encryption.generate_rsa_keypair()
+
+            pem_private_key = encryption.serialize_rsa_private_key(
+                private_key, self.password_bytes
+            )
+            pem_public_key = encryption.serialize_rsa_public_key(public_key)
+            try:
+                self._storeSecretsKeys(
+                    key_path, pem_private_key, pem_public_key
+                )
+            except kazoo.exceptions.NodeExistsError:
+                # Handle race condition between multiple schedulers
+                # creating the same secrets key.
+                pem_private_key, _ = self._getSecretsKeys(key_path)
+
+        private_key, public_key = encryption.deserialize_rsa_keypair(
+            pem_private_key, self.password_bytes
+        )
+
+        # Make sure the private key is also stored in the backup keystore
+        if self.backup:
+            self.backup.setProjectSecretsKey(
+                connection_name, project_name, private_key
+            )
+
+        return private_key, public_key
+
+    def _getSecretsKeys(self, key_path: str) -> Tuple[bytes, bytes]:
+        data, _ = self.zk.get(key_path)
+        keys = json.loads(data)
+        return (
+            keys["private_key"].encode("utf-8"),
+            keys["public_key"].encode("utf-8"),
+        )
+
+    def _storeSecretsKeys(
+        self, key_path: str, private_key: bytes, public_key: bytes
+    ) -> None:
+        keys = {
+            "private_key": private_key.decode("utf-8"),
+            "public_key": public_key.decode("utf-8"),
+        }
+        data = json.dumps(keys).encode("utf-8")
+        self.zk.create(key_path, value=data, makepath=True)
