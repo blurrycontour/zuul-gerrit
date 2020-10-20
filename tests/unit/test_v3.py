@@ -25,7 +25,6 @@ from unittest import skip, skipIf
 import paramiko
 
 import zuul.configloader
-from zuul.lib import encryption
 from tests.base import (
     AnsibleZuulTestCase,
     ZuulTestCase,
@@ -3686,14 +3685,10 @@ class TestProjectKeys(ZuulTestCase):
             with open(os.path.join(FIXTURE_DIR, fn)) as i:
                 test_keys.append(i.read())
 
-        key_root = os.path.join(self.state_root, 'keys')
-        secrets_key_file = os.path.join(
-            key_root,
-            'secrets/project/gerrit/org/project/0.pem')
-        # Make sure that a proper key was created on startup
-        with open(secrets_key_file, "rb") as f:
-            private_secrets_key, public_secrets_key = \
-                encryption.deserialize_rsa_keypair(f.read())
+        keystore = self.scheds.first.sched.getKeyStorage()
+        private_secrets_key, public_secrets_key = (
+            keystore.getProjectSecretsKeys("gerrit", "org/project")
+        )
 
         # Make sure that we didn't just end up with the static fixture
         # key
@@ -3702,15 +3697,19 @@ class TestProjectKeys(ZuulTestCase):
         # Make sure it's the right length
         self.assertEqual(4096, private_secrets_key.key_size)
 
-        ssh_key_file = os.path.join(
-            key_root,
-            'ssh/project/gerrit/org/project/0.pem')
         # Make sure that a proper key was created on startup
-        ssh_key = paramiko.RSAKey.from_private_key_file(ssh_key_file)
+        private_ssh_key, public_ssh_key = (
+            keystore.getProjectSSHKeys("gerrit", "org/project")
+        )
 
         # Make sure that we didn't just end up with the static fixture
         # key
-        self.assertTrue(private_secrets_key not in test_keys)
+        self.assertTrue(private_ssh_key not in test_keys)
+
+        with io.StringIO(private_ssh_key) as o:
+            ssh_key = paramiko.RSAKey.from_private_key(
+                o, password=keystore.password
+            )
 
         # Make sure it's the right length
         self.assertEqual(2048, ssh_key.get_bits())
