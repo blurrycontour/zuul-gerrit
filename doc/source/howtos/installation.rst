@@ -132,6 +132,7 @@ service in Zuul, and a connection to Gerrit.
 **zuul.conf**::
 
     [scheduler]
+    key_store_password=secret
     tenant_config=/etc/zuul/main.yaml
 
     [gearman_server]
