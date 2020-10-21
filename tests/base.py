@@ -261,6 +261,31 @@ class GithubDriverMock(GithubDriver):
         self.registerGithubProjects(connection)
         return connection
 
+class BitbucketCloudDriverMock(BitbucketCloudDriver):
+    def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
+                 config: ConfigParser, upstream_root: str,
+                 additional_event_queues, rpcclient: RPCClient,):
+        super(BitbucketCloudDriverMock, self).__init__()
+        self.registry = registry
+        self.changes = changes
+        self.config = config
+        self.upstream_root = upstream_root
+        self.additional_event_queues = additional_event_queues
+        self.rpcclient = rpcclient
+
+    def getConnection(self, name, config):
+        server = config.get('server', 'github.com')
+        db = self.changes.setdefault(server, {})
+        connection = FakeBitbucketCloudConnection(
+            self, name, config, self.rpcclient,
+            changes_db=db,
+            upstream_root=self.upstream_root,)
+        self.additional_event_queues.append(connection.event_queue)
+        setattr(self.registry, 'fake_' + name, connection)
+        self.registerBitbucketCloudProjects(connection)
+        return connection
+
+
 
 class PagureDriverMock(PagureDriver):
     def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
