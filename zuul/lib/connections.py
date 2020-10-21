@@ -33,6 +33,7 @@ import zuul.driver.mqtt
 import zuul.driver.pagure
 import zuul.driver.gitlab
 import zuul.driver.elasticsearch
+import zuul.driver.bitbucketcloud
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 
@@ -63,6 +64,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.pagure.PagureDriver())
         self.registerDriver(zuul.driver.gitlab.GitlabDriver())
         self.registerDriver(zuul.driver.elasticsearch.ElasticsearchDriver())
+        self.registerDriver(zuul.driver.bitbucketcloud.BitbucketCloudDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:
