@@ -39,6 +39,63 @@
       "revId": "9036bfa0ae36403598f056697b422110075d8331",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_ddfe3fad",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-10-21T07:58:37Z",
+      "side": 1,
+      "message": "Did you check if there is an event sent by GitLab when a branch protection is added removed ?",
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_7db56bee",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-10-21T07:58:37Z",
+      "side": 1,
+      "message": "Is there an issue in this sentence ? The stable branch is protected line 751",
+      "range": {
+        "startLine": 748,
+        "startChar": 50,
+        "endLine": 749,
+        "endChar": 47
+      },
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_3d893326",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 874,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-10-21T07:58:37Z",
+      "side": 1,
+      "message": "don\u0027t you need this first ? self.create_branch(\u0027org/project2\u0027, \u0027feat-x\u0027)",
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
