@@ -1,0 +1,43 @@
+- pipeline:
+  name: check
+  manager: independent
+  trigger:
+    bitbucketcloud:
+      - event: bc_pull_request
+        action:
+          - created
+          - updated
+      - event: bc_pull_request
+        action: comment
+        comment: ^recheck
+  success:
+    bitbucketcloud:
+      status: INPROGRESS
+      comment: true
+      review: approve
+    sqlreporter:
+  failure:
+    bitbucketcloud:
+      status: FAILED
+      comment: false
+      review: unapprove
+    sqlreporter:
+  start:
+    bitbucketcloud:
+      status: INPROGRESS
+      comment: True
+    sqlreporter:
+
+- pipeline:
+  name: push
+  manager: independent
+  trigger:
+    bitbucketcloud:
+      - event: bc_push
+        ref: ^refs/heads/.*$
+  success:
+    sqlreporter:
+  failure:
+    sqlreporter:
+
+
