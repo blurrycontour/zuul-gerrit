@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_3d2ad3e6",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-21T08:07:24Z",
+      "side": 1,
+      "message": "Looking at this now, I\u0027m wondering why we need a different ZooKeeperConnection class besides the ZooKeeperClient?",
+      "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
