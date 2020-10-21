@@ -61,7 +61,7 @@ Autohold List
 
 Example::
 
-  zuul autohold-list
+  zuul autohold-list --tenant openstack
 
 Dequeue
 ^^^^^^^
