@@ -23,6 +23,7 @@ Zuul includes the following drivers:
    pagure
    gitlab
    git
+   bitbucketcloud
    mqtt
    elasticsearch
    smtp
