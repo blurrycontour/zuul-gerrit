@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_9bd04ccc",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-21T13:20:57Z",
+      "side": 1,
+      "message": "nit: The import order looks a little messy here, but maybe that\u0027s only me :D",
+      "revId": "b8f24e227705f60d89e82435b126c81b674d2f11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_6912cdb3",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-21T13:20:57Z",
+      "side": 1,
+      "message": "nit: Should we rename the parameter to `node_id` (like the comment says) just to make things a little clearer?",
+      "revId": "b8f24e227705f60d89e82435b126c81b674d2f11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_1b027cb5",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-21T13:20:57Z",
+      "side": 1,
+      "message": "Just for clarification: This method is called whenever a hold request is updated in ZooKeeper to also update the corresponding object in the cache?",
+      "revId": "b8f24e227705f60d89e82435b126c81b674d2f11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_5b835457",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-21T13:20:57Z",
+      "side": 1,
+      "message": "This line might fail if the event_data doesn\u0027t provide a path attribute (like checked in line 317). To avoid this and to simplify things a little we could store the path in a variable once and return if it\u0027s None (or raise an Exception if that\u0027s appropriate). We could then also remove line 328.\n\nSomething like this:\n\npath \u003d None\nif hasattr(event.event_data, \u0027path\u0027):\n    # Ignore root node\n    path \u003d event.event_data.path\n\nif path \u003d\u003d self.HOLD_REQUEST_ROOT:\n    return\n\nif event.event_type not in...\n    return\n\nif path is None:\n    return\n\n...",
+      "revId": "b8f24e227705f60d89e82435b126c81b674d2f11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
