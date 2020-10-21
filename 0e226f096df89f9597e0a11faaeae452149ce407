@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_b1aa87cf",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-21T14:16:29Z",
+      "side": 1,
+      "message": "Not related to this change, but I\u0027m also wondering about why we need two different loggers here.",
+      "revId": "0e226f096df89f9597e0a11faaeae452149ce407",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
