@@ -629,3 +629,171 @@ class TestZuulClientBuildInfo(TestZuulClientQueryData,
                 x['url'] == 'http://example.com/docs'
                 for x in artifacts),
             output)
+
+
+class TestZuulClientBuildsets(TestZuulClientQueryData,
+                              AnsibleZuulTestCase):
+    """Test that zuul-client can fetch buildsets"""
+    def test_get_buildsets(self):
+        """Test querying buildsets"""
+
+        # 3 buildsets in check, 2 buildsets in gate
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'buildsets', '--tenant', 'tenant-one', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(5, len(results), results)
+
+        # 1 buildset in check, 1 buildset in gate
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'buildsets', '--tenant', 'tenant-one',
+             '--project', 'org/project', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(2, len(results), results)
+        self.assertTrue(all(x['Project'] == 'org/project' for x in results),
+                        results)
+
+        # 2 buildsets in check, 1 in gate
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'buildsets', '--tenant', 'tenant-one', '--change', '2', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(3, len(results), results)
+        self.assertTrue(all(x['Change or Ref'].startswith('2,')
+                            for x in results),
+                        results)
+
+        # 1,3 does not exist
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'buildsets', '--tenant', 'tenant-one', '--change', '1',
+             '--ref', '3', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(0, len(results), results)
+
+        # 2 buildsets in gate
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'buildsets', '--tenant', 'tenant-one', '--pipeline', 'gate', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(2, len(results), results)
+        self.assertTrue(all(x['Pipeline'] == 'gate' for x in results),
+                        results)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'buildsets', '--tenant', 'tenant-one', '--result', 'SUCCESS', ],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        # TODO the failed job on patch B doesn't always trigger.
+        failures_count = self.countJobResults(self.history, 'FAILURE')
+        failures_count += self.countJobResults(self.history, 'SKIPPED')
+        if failures_count > 0:
+            self.assertEqual(4, len(results), results)
+        else:
+            self.assertEqual(5, len(results), results)
+        self.assertTrue(all(x['Result'] == 'SUCCESS' for x in results),
+                        results)
+
+
+class TestZuulClientBuildsetInfo(TestZuulClientQueryData,
+                                 AnsibleZuulTestCase):
+    """Test that zuul-client can fetch a buildset's details"""
+    def test_get_buildset_info(self):
+        """Test querying a specific buildset"""
+
+        test_build = self.history[-1]
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'build-info', '--tenant', 'tenant-one',
+             '--uuid', test_build.uuid],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        info = self._split_line_output(output)
+        bs_id = info.get('Buildset ID')
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'buildset-info', '--tenant', 'tenant-one',
+             '--uuid', bs_id],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        bs_info = self._split_line_output(output)
+        self.assertEqual(info['Buildset ID'], bs_info['UUID'], output)
+        self.assertEqual(info['Project'], bs_info['Project'], output)
+        self.assertEqual(info['Change'], bs_info['Change'], output)
+        self.assertEqual(info['Pipeline'], bs_info['Pipeline'], output)
+
+    def test_show_builds(self):
+        """Test the --show-builds option"""
+
+        test_build = self.history[-1]
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'build-info', '--tenant', 'tenant-one',
+             '--uuid', test_build.uuid],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        info = self._split_line_output(output)
+        bs_id = info.get('Buildset ID')
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'buildset-info', '--tenant', 'tenant-one',
+             '--uuid', bs_id, '--show-builds'],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, (output, err))
+        builds = self._split_pretty_table(output)
+
+        for x in builds:
+            self.assertTrue(
+                x['Project'] == info['Project'],
+                'Project mismatch: Expected %s, got %s' % (info, x)
+            )
+            self.assertTrue(
+                x['Pipeline'] == info['Pipeline'],
+                'Pipeline mismatch: Expected %s, got %s' % (info, x)
+            )
+            self.assertTrue(
+                x['Change or Ref'] == info['Change'],
+                'Change mismatch: Expected %s, got %s' % (info, x)
+            )
+            if info.get('Event ID'):
+                self.assertTrue(
+                    x['Event ID'] == info['Event ID'],
+                    'Event ID mismatch: Expected %s, got %s' % (info, x)
+                )
