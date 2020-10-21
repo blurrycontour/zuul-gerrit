@@ -16,6 +16,24 @@
       "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_b13727e4",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-21T14:11:10Z",
+      "side": 1,
+      "message": "Same here. I\u0027m a little confused now about ZooKeeperClient vs ZooKeeperConnection.",
+      "parentUuid": "3f65232a_3d2ad3e6",
+      "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
