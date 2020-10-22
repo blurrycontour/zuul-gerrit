@@ -29,6 +29,7 @@ from zuul.zk import ZooKeeperClient
 from zuul.lib import streamer_utils
 from zuul.zk.components import ZooKeeperComponentRegistry, ZooKeeperComponent,\
     ZooKeeperComponentState
+from zuul.zk.work import ZooKeeperWork
 
 COMMANDS = ['stop']
 
@@ -134,6 +135,7 @@ class FingerGateway(object):
         self.zk_component: ZooKeeperComponent = \
             ZooKeeperComponentRegistry(zk_client)\
             .register('finger-gateways', self.hostname)
+        self.zk_work: ZooKeeperWork = ZooKeeperWork(zk_client)
         self.address: Tuple[str, int] = address
         self.user: Optional[str] = user
         self.pid_file: Optional[str] = pid_file
@@ -170,13 +172,7 @@ class FingerGateway(object):
             raise
 
     def start(self):
-        self.rpc = zuul.rpcclient.RPCClient(
-            self.gear_server,
-            self.gear_port,
-            self.gear_ssl_key,
-            self.gear_ssl_cert,
-            self.gear_ssl_ca,
-            client_id='Zuul Finger Gateway')
+        self.rpc = zuul.rpcclient.RPCClient(self.zk_work)
 
         self.server = streamer_utils.CustomThreadingTCPServer(
             self.address,

@@ -244,8 +244,8 @@ class TestTenantGroups4(TenantParserTestCase):
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes
-        cat_jobs = [job for job in self.gearman_server.jobs_history
-                    if job.name == b'merger:cat']
+        cat_jobs = [item for item in self.zk_work.history
+                    if item.name == 'merger:cat']
         self.assertEqual(1, len(cat_jobs))
         old_layout = tenant.layout
 
@@ -279,8 +279,8 @@ class TestTenantGroups5(TenantParserTestCase):
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes
-        cat_jobs = [job for job in self.gearman_server.jobs_history
-                    if job.name == b'merger:cat']
+        cat_jobs = [job for job in self.zk_work.history
+                    if job.name == 'merger:cat']
         self.assertEqual(1, len(cat_jobs))
 
 

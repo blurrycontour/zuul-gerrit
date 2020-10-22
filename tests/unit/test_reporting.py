@@ -25,9 +25,7 @@ class TestReporting(ZuulTestCase):
         """Check that explicitly dequeued items are reported as dequeued"""
 
         # We use the rpcclient to explicitly dequeue the item
-        client = zuul.rpcclient.RPCClient(
-            "127.0.0.1", self.gearman_server.port
-        )
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.executor_server.hold_jobs_in_build = True

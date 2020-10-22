@@ -37,10 +37,13 @@ from zuul.lib.repl import REPLServer
 import zuul.model
 from zuul.rpcclient import RPCClient
 from zuul.zk import ZooKeeperConnection, ZooKeeperClient
+from zuul.zk.cache import WorkState
 from zuul.zk.components import ZooKeeperComponent, ZooKeeperComponentRegistry,\
     ZooKeeperComponentState
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.work import ZooKeeperWork
+
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
 
@@ -235,9 +238,9 @@ class ZuulWebAPI(object):
     log = logging.getLogger("zuul.web")
 
     def __init__(self, zuulweb):
-        self.rpc = zuulweb.rpc
-        self.zk_client = zuulweb.zk_client
-        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
+        self.rpc: RPCClient = zuulweb.rpc
+        self.zk_client: ZooKeeperClient = zuulweb.zk_client
+        self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(self.zk_client)
         self.zuulweb = zuulweb
         self.cache = {}
         self.cache_time = {}
@@ -310,13 +313,14 @@ class ZuulWebAPI(object):
         if 'pipeline' in body and (
             ('change' in body and 'ref' not in body) or
             ('change' not in body and 'ref' in body)):
-            job = self.rpc.submitJob('zuul:dequeue',
-                                     {'tenant': tenant,
-                                      'pipeline': body['pipeline'],
-                                      'project': project,
-                                      'change': body.get('change', None),
-                                      'ref': body.get('ref', None)})
-            result = not job.failure
+            item = self.rpc.submitJob('zuul:dequeue', {
+                'tenant': tenant,
+                'pipeline': body['pipeline'],
+                'project': project,
+                'change': body.get('change', None),
+                'ref': body.get('ref', None),
+            })
+            result = item.state != WorkState.FAILED
             resp = cherrypy.response
             resp.headers['Access-Control-Allow-Origin'] = '*'
             return result
@@ -355,26 +359,28 @@ class ZuulWebAPI(object):
                                      'Invalid request body')
 
     def _enqueue(self, tenant, project, change, pipeline, **kwargs):
-        job = self.rpc.submitJob('zuul:enqueue',
-                                 {'tenant': tenant,
-                                  'pipeline': pipeline,
-                                  'project': project,
-                                  'change': change, })
-        result = not job.failure
+        item = self.rpc.submitJob('zuul:enqueue', {
+            'tenant': tenant,
+            'pipeline': pipeline,
+            'project': project,
+            'change': change,
+        })
+        result = item.state != WorkState.FAILED
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     def _enqueue_ref(self, tenant, project, ref,
                      oldrev, newrev, pipeline, **kwargs):
-        job = self.rpc.submitJob('zuul:enqueue_ref',
-                                 {'tenant': tenant,
-                                  'pipeline': pipeline,
-                                  'project': project,
-                                  'ref': ref,
-                                  'oldrev': oldrev,
-                                  'newrev': newrev, })
-        result = not job.failure
+        item = self.rpc.submitJob('zuul:enqueue_ref', {
+            'tenant': tenant,
+            'pipeline': pipeline,
+            'project': project,
+            'ref': ref,
+            'oldrev': oldrev,
+            'newrev': newrev,
+        })
+        result = item.state != WorkState.FAILED
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
@@ -404,13 +410,12 @@ class ZuulWebAPI(object):
             msg % (claims['__zuul_uid_claim'], 'promote',
                    tenant, pipeline))
 
-        job = self.rpc.submitJob('zuul:promote',
-                                 {
-                                     'tenant': tenant,
-                                     'pipeline': pipeline,
-                                     'change_ids': changes,
-                                 })
-        result = not job.failure
+        item = self.rpc.submitJob('zuul:promote', {
+            'tenant': tenant,
+            'pipeline': pipeline,
+            'change_ids': changes,
+        })
+        result = item.state != WorkState.FAILED
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
@@ -464,16 +469,18 @@ class ZuulWebAPI(object):
             if all(p in jbody for p in ['job', 'change', 'ref',
                                         'count', 'reason',
                                         'node_hold_expiration']):
-                data = {'tenant': tenant,
-                        'project': project,
-                        'job': jbody['job'],
-                        'change': jbody['change'],
-                        'ref': jbody['ref'],
-                        'reason': jbody['reason'],
-                        'count': jbody['count'],
-                        'node_hold_expiration': jbody['node_hold_expiration']}
+                data = {
+                    'tenant': tenant,
+                    'project': project,
+                    'job': jbody['job'],
+                    'change': jbody['change'],
+                    'ref': jbody['ref'],
+                    'reason': jbody['reason'],
+                    'count': jbody['count'],
+                    'node_hold_expiration': jbody['node_hold_expiration'],
+                }
                 result = self.rpc.submitJob('zuul:autohold', data)
-                return not result.failure
+                return result.state != WorkState.FAILED
             else:
                 raise cherrypy.HTTPError(400,
                                          'Invalid request body')
@@ -481,29 +488,29 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(405)
 
     def _autohold_list(self, tenant, project=None):
-        job = self.rpc.submitJob('zuul:autohold_list', {})
-        if job.failure:
+        item = self.rpc.submitJob('zuul:autohold_list', {})
+        if item.state == WorkState.FAILED:
             raise cherrypy.HTTPError(500, 'autohold-list failed')
         else:
-            payload = json.loads(job.data[0])
+            payload = item.result
             result = []
             for request in payload:
                 if tenant == request['tenant']:
                     if (project is None or
                             request['project'].endswith(project)):
-                        result.append(
-                            {'id': request['id'],
-                             'tenant': request['tenant'],
-                             'project': request['project'],
-                             'job': request['job'],
-                             'ref_filter': request['ref_filter'],
-                             'max_count': request['max_count'],
-                             'current_count': request['current_count'],
-                             'reason': request['reason'],
-                             'node_expiration': request['node_expiration'],
-                             'expired': request['expired'],
-                             'nodes': request['nodes']
-                            })
+                        result.append({
+                            'id': request['id'],
+                            'tenant': request['tenant'],
+                            'project': request['project'],
+                            'job': request['job'],
+                            'ref_filter': request['ref_filter'],
+                            'max_count': request['max_count'],
+                            'current_count': request['current_count'],
+                            'reason': request['reason'],
+                            'node_expiration': request['node_expiration'],
+                            'expired': request['expired'],
+                            'nodes': request['nodes'],
+                        })
             resp = cherrypy.response
             resp.headers['Access-Control-Allow-Origin'] = '*'
             return result
@@ -520,12 +527,12 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(405)
 
     def _autohold_info(self, request_id):
-        job = self.rpc.submitJob('zuul:autohold_info',
-                                 {'request_id': request_id})
-        if job.failure:
+        item = self.rpc.submitJob('zuul:autohold_info',
+                                  {'request_id': request_id})
+        if item.state == WorkState.FAILED:
             raise cherrypy.HTTPError(500, 'autohold-info failed')
         else:
-            request = json.loads(job.data[0])
+            request = item.result
             if not request:
                 raise cherrypy.HTTPError(
                     404, 'Hold request %s does not exist.' % request_id)
@@ -562,9 +569,9 @@ class ZuulWebAPI(object):
             msg % (claims['__zuul_uid_claim'], 'autohold-delete',
                    request['tenant'], request['project']))
 
-        job = self.rpc.submitJob('zuul:autohold_delete',
-                                 {'request_id': request_id})
-        if job.failure:
+        item = self.rpc.submitJob('zuul:autohold_delete',
+                                  {'request_id': request_id})
+        if item.state == WorkState.FAILED:
             raise cherrypy.HTTPError(500, 'autohold-delete failed')
 
         cherrypy.response.status = 204
@@ -642,8 +649,8 @@ class ZuulWebAPI(object):
         # Next, get the rules for tenant
         data = {'tenant': tenant, 'claims': claims}
         # TODO: it is probably worth caching
-        job = self.rpc.submitJob('zuul:authorize_user', data)
-        user_authz = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:authorize_user', data)
+        user_authz = item.result
         if not user_authz:
             raise cherrypy.HTTPError(403)
         return user_authz
@@ -662,36 +669,34 @@ class ZuulWebAPI(object):
             return token_error
         if 'zuul' in claims and 'admin' in claims.get('zuul', {}):
             return {'zuul': {'admin': claims['zuul']['admin']}, }
-        job = self.rpc.submitJob('zuul:get_admin_tenants',
-                                 {'claims': claims})
-        admin_tenants = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:get_admin_tenants',
+                                  {'claims': claims})
+        admin_tenants = item.result
         return {'zuul': {'admin': admin_tenants}, }
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def tenants(self):
-        job = self.rpc.submitJob('zuul:tenant_list', {})
-        ret = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:tenant_list', {})
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return ret
+        return item.result
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def connections(self):
-        job = self.rpc.submitJob('zuul:connection_list', {})
-        ret = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:connection_list', {})
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
-        return ret
+        return item.result
 
     def _getStatus(self, tenant):
         with self.status_lock:
             if tenant not in self.cache or \
                (time.time() - self.cache_time[tenant]) > self.cache_expiry:
-                job = self.rpc.submitJob('zuul:status_get',
-                                         {'tenant': tenant})
-                self.cache[tenant] = json.loads(job.data[0])
+                item = self.rpc.submitJob('zuul:status_get',
+                                          {'tenant': tenant})
+                self.cache[tenant] = item.result
                 self.cache_time[tenant] = time.time()
         payload = self.cache[tenant]
         if payload.get('code') == 404:
@@ -723,8 +728,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def jobs(self, tenant):
-        job = self.rpc.submitJob('zuul:job_list', {'tenant': tenant})
-        ret = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:job_list', {'tenant': tenant})
+        ret = item.result
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
@@ -737,7 +742,7 @@ class ZuulWebAPI(object):
     def config_errors(self, tenant):
         config_errors = self.rpc.submitJob(
             'zuul:config_errors_list', {'tenant': tenant})
-        ret = json.loads(config_errors.data[0])
+        ret = config_errors.result
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
@@ -748,9 +753,9 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def job(self, tenant, job_name):
-        job = self.rpc.submitJob(
+        item = self.rpc.submitJob(
             'zuul:job_get', {'tenant': tenant, 'job': job_name})
-        ret = json.loads(job.data[0])
+        ret = item.result
         if not ret:
             raise cherrypy.HTTPError(404, 'Job %s does not exist.' % job_name)
         resp = cherrypy.response
@@ -761,8 +766,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def projects(self, tenant):
-        job = self.rpc.submitJob('zuul:project_list', {'tenant': tenant})
-        ret = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:project_list', {'tenant': tenant})
+        ret = item.result
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
@@ -773,9 +778,9 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def project(self, tenant, project):
-        job = self.rpc.submitJob(
+        item = self.rpc.submitJob(
             'zuul:project_get', {'tenant': tenant, 'project': project})
-        ret = json.loads(job.data[0])
+        ret = item.result
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         if not ret:
@@ -789,8 +794,8 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def pipelines(self, tenant):
-        job = self.rpc.submitJob('zuul:pipeline_list', {'tenant': tenant})
-        ret = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:pipeline_list', {'tenant': tenant})
+        ret = item.result
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
@@ -801,8 +806,9 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def labels(self, tenant):
-        job = self.rpc.submitJob('zuul:allowed_labels_get', {'tenant': tenant})
-        data = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:allowed_labels_get',
+                                  {'tenant': tenant})
+        data = item.result
         if data is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         # TODO(jeblair): The first case can be removed after 3.16.0 is
@@ -841,30 +847,34 @@ class ZuulWebAPI(object):
     @cherrypy.expose
     @cherrypy.tools.save_params()
     def key(self, tenant, project):
-        job = self.rpc.submitJob('zuul:key_get', {'tenant': tenant,
-                                                  'project': project,
-                                                  'key': 'secrets'})
-        if not job.data:
+        item = self.rpc.submitJob('zuul:key_get', {
+            'tenant': tenant,
+            'project': project,
+            'key': 'secrets',
+        })
+        if item.result:
             raise cherrypy.HTTPError(
                 404, 'Project %s does not exist.' % project)
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'text/plain'
-        return job.data[0]
+        return item.result
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
     def project_ssh_key(self, tenant, project):
-        job = self.rpc.submitJob('zuul:key_get', {'tenant': tenant,
-                                                  'project': project,
-                                                  'key': 'ssh'})
-        if not job.data:
+        item = self.rpc.submitJob('zuul:key_get', {
+            'tenant': tenant,
+            'project': project,
+            'key': 'ssh'
+        })
+        if not item.result:
             raise cherrypy.HTTPError(
                 404, 'Project %s does not exist.' % project)
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'text/plain'
-        return job.data[0] + '\n'
+        return item.result + '\n'
 
     def buildToDict(self, build, buildset=None):
         start_time = build.start_time
@@ -930,9 +940,9 @@ class ZuulWebAPI(object):
 
     def _get_connection(self, tenant):
         # Ask the scheduler which sql connection to use for this tenant
-        job = self.rpc.submitJob('zuul:tenant_sql_connection',
-                                 {'tenant': tenant})
-        connection_name = json.loads(job.data[0])
+        item = self.rpc.submitJob('zuul:tenant_sql_connection',
+                                  {'tenant': tenant})
+        connection_name = item.result
 
         if not connection_name:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
@@ -976,7 +986,7 @@ class ZuulWebAPI(object):
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return data
 
-    def buildsetToDict(self, buildset, builds=[]):
+    def buildsetToDict(self, buildset, builds=None):
         ret = {
             'uuid': buildset.uuid,
             'result': buildset.result,
@@ -994,12 +1004,12 @@ class ZuulWebAPI(object):
         if builds:
             ret['builds'] = []
             ret['retry_builds'] = []
-        for build in builds:
-            # Put all non-final (retry) builds under a different key
-            if not build.final:
-                ret['retry_builds'].append(self.buildToDict(build))
-            else:
-                ret['builds'].append(self.buildToDict(build))
+            for build in builds:
+                # Put all non-final (retry) builds under a different key
+                if not build.final:
+                    ret['retry_builds'].append(self.buildToDict(build))
+                else:
+                    ret['builds'].append(self.buildToDict(build))
         return ret
 
     @cherrypy.expose
@@ -1064,7 +1074,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     def project_freeze_jobs(self, tenant, pipeline, project, branch):
-        job = self.rpc.submitJob(
+        item = self.rpc.submitJob(
             'zuul:project_freeze_jobs',
             {
                 'tenant': tenant,
@@ -1073,7 +1083,7 @@ class ZuulWebAPI(object):
                 'branch': branch
             }
         )
-        ret = json.loads(job.data[0])
+        ret = item.result
         if not ret:
             raise cherrypy.HTTPError(404)
         resp = cherrypy.response
@@ -1189,10 +1199,6 @@ class ZuulWeb(object):
         self.info: Optional[zuul.model.WebInfo] = info
         self.static_path: str = os.path.abspath(static_path or STATIC_DIR)
         self.hostname = socket.getfqdn()
-        # instanciate handlers
-        self.rpc: RPCClient = RPCClient(gear_server, gear_port,
-                                        ssl_key, ssl_cert, ssl_ca,
-                                        client_id='Zuul Web Server')
         self.zk_client: ZooKeeperClient = self._zk_connection_class(
             hosts=zk_hosts, read_only=True, timeout=zk_timeout,
             tls_cert=zk_tls_cert, tls_key=zk_tls_key, tls_ca=zk_tls_ca
@@ -1202,6 +1208,9 @@ class ZuulWeb(object):
             .register('webs', self.hostname)
         self.zk_connection_event: ZooKeeperConnectionEvent =\
             ZooKeeperConnectionEvent(self.zk_client)
+        self.zk_work: ZooKeeperWork = ZooKeeperWork(self.zk_client)
+        # instanciate handlers
+        self.rpc: RPCClient = RPCClient(self.zk_work)
 
         self.connections: ConnectionRegistry = connections
         self.authenticators: AuthenticatorRegistry = authenticators

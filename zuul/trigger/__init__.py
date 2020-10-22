@@ -19,6 +19,7 @@ class BaseTrigger(object, metaclass=abc.ABCMeta):
     """Base class for triggers.
 
     Defines the exact public methods that must be supplied."""
+    name = 'base'
 
     def __init__(self, driver, connection, config=None):
         self.driver = driver

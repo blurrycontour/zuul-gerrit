@@ -531,6 +531,8 @@ class Project(object):
         # when deciding whether to enqueue their changes
         # TODOv3 (jeblair): re-add support for foreign projects if needed
         self.foreign = foreign
+        self.public_ssh_key: Optional[str] = None
+        self.public_secrets_key: Optional[str] = None
 
     def __str__(self):
         return self.name
@@ -2181,13 +2183,13 @@ class QueueItem(object):
     produced for this `QueueItem`.
     """
 
-    def __init__(self, queue: ChangeQueue, change: 'Change',
+    def __init__(self, queue: ChangeQueue, change: 'Branch',
                  event: Optional['TriggerEvent']):
         log = logging.getLogger("zuul.QueueItem")
         self.log: LoggerAdapter = get_annotated_logger(log, event)
         self.pipeline: Pipeline = queue.pipeline
         self.queue: ChangeQueue = queue
-        self.change: Change = change  # a ref
+        self.change: Branch = change  # a ref
         self.dequeued_needing_change: bool = False
         self.current_build_set: BuildSet = BuildSet(self)
         self.item_ahead: Optional[QueueItem] = None
@@ -4084,7 +4086,7 @@ class Layout(object):
                 override_checkouts[req.project_name] = req.override_checkout
 
     def _collectJobVariants(self, item: QueueItem, jobname: str,
-                            change: Change, path: List[str], jobs: List[Job],
+                            change: Branch, path: List[str], jobs: List[Job],
                             stack,
                             override_checkouts: Dict[Optional[str],
                                                      Optional[str]],
@@ -4132,7 +4134,7 @@ class Layout(object):
                 jobs.append(variant)
         return matched
 
-    def collectJobs(self, item: QueueItem, jobname: str, change: Change,
+    def collectJobs(self, item: QueueItem, jobname: str, change: Branch,
                     path: Optional[List[str]] = None,
                     jobs: Optional[List[Job]] = None,
                     stack: Optional[List[str]] = None,

@@ -331,8 +331,7 @@ class TestPagureDriver(ZuulTestCase):
     @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
     def test_client_dequeue_change_pagure(self):
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.executor_server.hold_jobs_in_build = True
@@ -364,8 +363,7 @@ class TestPagureDriver(ZuulTestCase):
 
         A = self.fake_pagure.openFakePullRequest('org/project', 'master', 'A')
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.enqueue(tenant='tenant-one',
                            pipeline='check',
@@ -386,8 +384,7 @@ class TestPagureDriver(ZuulTestCase):
         repo = git.Repo(repo_path)
         headsha = repo.head.commit.hexsha
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.enqueue_ref(
             tenant='tenant-one',

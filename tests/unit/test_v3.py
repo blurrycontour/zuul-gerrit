@@ -12,19 +12,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import gc
 import io
 import json
 import logging
 import os
 import sys
 import textwrap
-import gc
 from unittest import skip, skipIf
 
 import paramiko
 
 import zuul.configloader
-from zuul.lib import encryption
+import zuul.model
 from tests.base import (
     AnsibleZuulTestCase,
     ZuulTestCase,
@@ -33,6 +33,9 @@ from tests.base import (
     simple_layout,
     iterate_timeout,
 )
+from zuul.lib import encryption
+from zuul.rpcclient import RPCClient
+from zuul.zk.cache import WorkState
 
 
 class TestMultipleTenants(AnsibleZuulTestCase):
@@ -3004,8 +3007,7 @@ class TestPrePlaybooks(AnsibleZuulTestCase):
                         "The file %s should exist" % post_flag_path)
 
     def test_post_playbook_fail_autohold(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project3', 'python27-node-post',
                             "", "", "reason text", 1)
@@ -3034,8 +3036,7 @@ class TestPrePlaybooks(AnsibleZuulTestCase):
         self.assertEqual(held_node['comment'], "reason text")
 
     def test_pre_playbook_fail_autohold(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project2', 'python27-node',
                             "", "", "reason text", 1)
@@ -3503,7 +3504,8 @@ class TestBrokenMultiTenantConfig(ZuulTestCase):
         # the tenant loads with an error, but proceeds.
 
         # Don't run any merge jobs, so we can run them out of order.
-        self.gearman_server.hold_merge_jobs_in_queue = True
+        self.zk_work.setHold('merger', True)
+        self.scheds.execute(lambda a: a.sched.zk_work.setHold('merger', True))
 
         # Create a first change which modifies the config (and
         # therefore will require a merge job).
@@ -3523,13 +3525,14 @@ class TestBrokenMultiTenantConfig(ZuulTestCase):
         self.waitUntilSettled()
 
         # There should be a merge job for each change.
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
+        self.assertEqual(len(self.scheds.first.sched.merger.work_items), 2)
 
-        jobs = [job for job in self.gearman_server.getQueue()
-                if job.name.startswith(b'merger:')]
+        queue = self.zk_work.inState([WorkState.HOLD, WorkState.REQUESTED])
+        merger_items = [i for _, i in queue if i.name.startswith('merger:')]
         # Release the second merge job.
-        jobs[-1].waiting = False
-        self.gearman_server.wakeConnections()
+        # jobs[-1].waiting = False
+        self.zk_work.release(merger_items[-1])
+        # self.gearman_server.wakeConnections()
         self.waitUntilSettled()
 
         # At this point we should still be waiting on the first
@@ -3537,8 +3540,9 @@ class TestBrokenMultiTenantConfig(ZuulTestCase):
         self.assertHistory([])
 
         # Proceed.
-        self.gearman_server.hold_merge_jobs_in_queue = False
-        self.gearman_server.release()
+        self.zk_work.setHold('merger', False)
+        self.scheds.execute(lambda a: a.sched.zk_work.setHold('merger', False))
+        self.zk_work.release()
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='base', result='SUCCESS', changes='1,1 2,1'),

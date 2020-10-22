@@ -29,7 +29,7 @@ import urllib
 from configparser import ConfigParser
 from queue import Queue
 from threading import Thread
-from typing import Optional, Dict, TYPE_CHECKING, Callable, Any
+from typing import Optional, Dict, TYPE_CHECKING, Callable, Any, List
 
 from statsd import StatsClient
 
@@ -43,7 +43,6 @@ from zuul.executor.client import ExecutorClient
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
-from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.queue import MergedQueue
 from zuul.lib.statsd import get_statsd
@@ -62,6 +61,8 @@ from zuul.zk.components import ZooKeeperComponent, ZooKeeperComponentRegistry,\
 from zuul.zk.builds import ZooKeeperBuilds
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.work import ZooKeeperWork
+
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
 
@@ -308,6 +309,7 @@ class Scheduler(threading.Thread):
     _stats_interval = 30
     _merger_client_class = MergeClient
     _zk_builds_class = ZooKeeperBuilds
+    _zk_work_class = ZooKeeperWork
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
@@ -332,8 +334,6 @@ class Scheduler(threading.Thread):
         self._zuul_app = app
         self.connections: ConnectionRegistry = connections
         self.statsd: StatsClient = get_statsd(config)
-        self.rpc: RPCListener = RPCListener(config, self)
-        self.rpc_slow: RPCListenerSlow = RPCListenerSlow(config, self)
         self.repl: Optional[zuul.lib.repl.REPLServer] = None
         self.command_thread: Optional[Thread] = None
         self._command_running: bool = False
@@ -357,6 +357,10 @@ class Scheduler(threading.Thread):
         self.zk_connection_event: ZooKeeperConnectionEvent =\
             ZooKeeperConnectionEvent(zk_client)
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
+        self.zk_work: ZooKeeperWork = self._zk_work_class(zk_client)
+
+        self.rpc: RPCListener = RPCListener(config, self)
+        self.rpc_slow: RPCListenerSlow = RPCListenerSlow(config, self)
 
         self.trigger_event_queue: Queue = NamedQueue('TriggerEventQueue')
         self.result_event_queue: Queue = NamedQueue('ResultEventQueue')
@@ -428,7 +432,6 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
-        self.zk_client.disconnect()
 
     def runCommand(self):
         while self._command_running:
@@ -452,17 +455,17 @@ class Scheduler(threading.Thread):
     def _runStats(self):
         if not self.statsd:
             return
-        functions = getGearmanFunctions(self.rpc.gearworker.gearman)
-        functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
-        mergers_online = 0
+        mergers_online = len(self.zk_component_registry.all('mergers'))\
+            + len(self.zk_component_registry.all('executors'))
         merge_queue = 0
         merge_running = 0
-        for (name, (queued, running, registered)) in functions.items():
-            if name == 'merger:merge':
-                mergers_online = registered
-            if name.startswith('merger:'):
-                merge_queue += queued - running
-                merge_running += running
+        for cached in self.zk_work.getAllCached():
+            if cached.name.startswith('merger:'):
+                if cached.state in [WorkState.REQUESTED, WorkState.HOLD]:
+                    merge_queue += 1
+                if cached.state in [WorkState.RUNNING, WorkState.PAUSED]:
+                    merge_running += 1
+
         self.statsd.gauge('zuul.mergers.online', mergers_online)
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
@@ -1706,9 +1709,9 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onNodesProvisioned(event)
 
-    def formatStatusJSON(self, tenant_name):
+    def formatStatus(self, tenant_name: str) -> Dict[str, Any]:
         # TODOv3(jeblair): use tenants
-        data = {}
+        data: Dict[str, Any] = {}
 
         data['zuul_version'] = self.zuul_version
         websocket_url = get_default(self.config, 'web', 'websocket_url', None)
@@ -1731,22 +1734,27 @@ class Scheduler(threading.Thread):
         if self.last_reconfigured:
             data['last_reconfigured'] = self.last_reconfigured * 1000
 
-        pipelines = []
+        pipelines: List[str] = []
         data['pipelines'] = pipelines
         tenant = self.abide.tenants.get(tenant_name)
         if not tenant:
             if tenant_name not in self.unparsed_abide.known_tenants:
-                return json.dumps({
+                return {
                     "message": "Unknown tenant",
                     "code": 404
-                })
+                }
             self.log.warning("Tenant %s isn't loaded" % tenant_name)
-            return json.dumps({
+            return {
                 "message": "Tenant %s isn't ready" % tenant_name,
                 "code": 204
-            })
-        for pipeline in tenant.layout.pipelines.values():
-            pipelines.append(pipeline.formatStatusJSON(websocket_url))
+            }
+        if tenant.layout:
+            for pipeline in tenant.layout.pipelines.values():
+                pipelines.append(pipeline.formatStatusJSON(websocket_url))
+        return data
+
+    def formatStatusJSON(self, tenant_name: str):
+        data = self.formatStatus(tenant_name)
         return json.dumps(data)
 
     def onChangeUpdated(self, change, event):

@@ -38,7 +38,7 @@ import re
 import git
 from urllib.parse import urlsplit
 
-from kazoo.exceptions import NoNodeError
+from kazoo.exceptions import NoNodeError, ConnectionLossException
 from kazoo.recipe.cache import TreeEvent
 
 from zuul.executor.sensors import SensorInterface
@@ -2774,8 +2774,8 @@ class ExecutorServer(BaseMergeServer):
         self.governor_stop_event.set()
         self.governor_thread.join()
         # Stop accepting new jobs
-        if self.merger_gearworker is not None:
-            self.merger_gearworker.gearman.setFunctions([])
+        # if self.merger_gearworker is not None:
+        #     self.merger_gearworker.gearman.setFunctions([])
         # Tell the executor worker to abort any jobs it just accepted,
         # and grab the list of currently running job workers.
         with self.run_lock:
@@ -2928,21 +2928,26 @@ class ExecutorServer(BaseMergeServer):
             lock = self.repo_locks.getRepoLock(
                 task.connection_name, task.project_name)
             with lock:
-                log.info("Updating repo %s/%s",
-                         task.connection_name, task.project_name)
+                log.error("Updating repo %s/%s", task.connection_name,
+                          task.project_name)
                 self.merger.updateRepo(
                     task.connection_name, task.project_name,
                     repo_state=task.repo_state,
                     zuul_event_id=task.zuul_event_id, build=task.build,
                     process_worker=self.process_worker)
+                log.error("updateRepo finished")
                 repo = self.merger.getRepo(
                     task.connection_name, task.project_name)
+                log.error("getRepo finished")
                 source = self.connections.getSource(task.connection_name)
+                log.error("getSource finished")
                 project = source.getProject(task.project_name)
+                log.error("getProject finished")
                 task.canonical_name = project.canonical_name
                 task.branches = repo.getBranches()
+                log.error("getBranches finished")
                 task.refs = [r.name for r in repo.getRefs()]
-                log.debug("Finished updating repo %s/%s",
+                log.error("Finished updating repo %s/%s",
                           task.connection_name, task.project_name)
                 task.success = True
         except BrokenProcessPool:
@@ -2996,13 +3001,18 @@ class ExecutorServer(BaseMergeServer):
 
     def _buildJobWorkerLoop(self):
         while self._running:
-            self.zk_builds.cleanup()
-            items = list(self._build_items.items())
-            for node_path, build_item in items:
-                self.zk_builds.resumeAttempt(node_path, self.resumeJob)
-                self.zk_builds.cancelAttempt(node_path, self.stopJob)
-                if not self.zk_builds.isLocked(node_path):
-                    del self._build_items[node_path]
+            try:
+                self.zk_builds.cleanup()
+                items = list(self._build_items.items())
+                for node_path, build_item in items:
+                    self.zk_builds.resumeAttempt(node_path, self.resumeJob)
+                    self.zk_builds.cancelAttempt(node_path, self.stopJob)
+                    if not self.zk_builds.isLocked(node_path):
+                        del self._build_items[node_path]
+            except ConnectionLossException:
+                self.log.warning("Connection to Zookeeper lost")
+            except NoClientException:
+                self.log.warning("Zookeeper not connected")
 
             if self.zk_component['accepting_work']:
                 try:

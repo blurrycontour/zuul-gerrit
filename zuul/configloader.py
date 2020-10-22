@@ -21,7 +21,7 @@ import textwrap
 import io
 import re
 import subprocess
-from typing import Dict, Any, Optional, TYPE_CHECKING
+from typing import Dict, Any, Optional, TYPE_CHECKING, Tuple, List
 import voluptuous as vs
 from zuul import model
 from zuul.lib import ansible
@@ -40,11 +40,13 @@ from zuul.lib.re2util import filter_allowed_disallowed
 
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
-from zuul.model import Tenant, Abide
+from zuul.model import Tenant, Abide, SourceContext
+from zuul.zk import ZooKeeperClient
 
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
     from zuul.scheduler import Scheduler
+    from zuul.zk.work import ZooKeeperWork
 
 
 def to_list(x):
@@ -1457,12 +1459,18 @@ class ParseContext(object):
 
 
 class TenantParser(object):
-    def __init__(self, connections, scheduler, merger, keystorage):
+    def __init__(self, connections: 'ConnectionRegistry',
+                 scheduler: 'Scheduler',
+                 merger: Optional[MergeClient],
+                 keystorage: Optional[KeyStorage]):
         self.log = logging.getLogger("zuul.TenantParser")
-        self.connections = connections
-        self.scheduler = scheduler
-        self.merger = merger
-        self.keystorage = keystorage
+        self.connections: ConnectionRegistry = connections
+        self.scheduler: Scheduler = scheduler
+        self.merger: Optional[MergeClient] = merger
+        self.keystorage: Optional[KeyStorage] = keystorage
+        self.source_contexts: Dict[str, SourceContext] = {}  # TODO make local
+        self.zk_client: ZooKeeperClient = self.scheduler.zk_client
+        self.zk_work: ZooKeeperWork = self.scheduler.zk_work
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret')
@@ -1780,7 +1788,7 @@ class TenantParser(object):
         return config_projects, untrusted_projects
 
     def _cacheTenantYAML(self, abide, tenant, loading_errors):
-        jobs = []
+        work_nodes: List[Tuple[str, str]] = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
             tpc = tenant.project_configs[project.canonical_name]
@@ -1799,57 +1807,59 @@ class TenantParser(object):
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
                     continue
-                job = self.merger.getFiles(
+                work_node, work_uuid = self.merger.getFiles(
                     project.source.connection.connection_name,
                     project.name, branch,
                     files=(['zuul.yaml', '.zuul.yaml'] +
                            list(tpc.extra_config_files)),
                     dirs=['zuul.d', '.zuul.d'] + list(tpc.extra_config_dirs))
                 self.log.debug("Submitting cat job %s for %s %s %s" % (
-                    job, project.source.connection.connection_name,
+                    work_node, project.source.connection.connection_name,
                     project.name, branch))
-                job.source_context = model.SourceContext(
+                self.source_contexts[work_node] = SourceContext(
                     project, branch, '', False)
-                jobs.append(job)
+                work_nodes.append((work_node, work_uuid))
                 branch_cache.setValidFor(tpc)
 
-        for job in jobs:
-            self.log.debug("Waiting for cat job %s" % (job,))
-            job.wait(self.merger.git_timeout)
-            if not job.updated:
-                raise Exception("Cat job %s failed" % (job,))
+        for work_node, work_uuid in work_nodes:
+            self.log.debug("Waiting for cat job %s" % (work_node,))
+            self.merger.waitFor(work_uuid, timeout=self.merger.git_timeout)
+            result = self.merger.results[work_node]
+            work_node_source_context = self.source_contexts[work_node]
+            if not result['updated']:
+                raise Exception("Cat job %s failed" % (work_node,))
             self.log.debug("Cat job %s got files %s" %
-                           (job, job.files.keys()))
+                           (work_node, result['files'].keys()))
             loaded = False
-            files = sorted(job.files.keys())
+            files = sorted(result['files'].keys())
             unparsed_config = model.UnparsedConfig()
             tpc = tenant.project_configs[
-                job.source_context.project.canonical_name]
+                work_node_source_context.project.canonical_name]
             for conf_root in (
                     ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
                     tpc.extra_config_files + tpc.extra_config_dirs):
                 for fn in files:
                     fn_root = fn.split('/')[0]
-                    if fn_root != conf_root or not job.files.get(fn):
+                    if fn_root != conf_root or not result['files'].get(fn):
                         continue
                     # Don't load from more than one configuration in a
                     # project-branch (unless an "extra" file/dir).
-                    if (conf_root not in tpc.extra_config_files and
-                        conf_root not in tpc.extra_config_dirs):
-                        if (loaded and loaded != conf_root):
+                    if conf_root not in tpc.extra_config_files\
+                            and conf_root not in tpc.extra_config_dirs:
+                        if loaded and loaded != conf_root:
                             self.log.warning(
                                 "Multiple configuration files in %s" %
-                                (job.source_context,))
+                                (work_node_source_context,))
                             continue
                         loaded = conf_root
                     # Create a new source_context so we have unique filenames.
-                    source_context = job.source_context.copy()
+                    source_context = work_node_source_context.copy()
                     source_context.path = fn
                     self.log.info(
                         "Loading configuration from %s" %
                         (source_context,))
                     incdata = self.loadProjectYAML(
-                        job.files[fn], source_context, loading_errors)
+                        result['files'][fn], source_context, loading_errors)
                     branch_cache = abide.getUnparsedBranchCache(
                         source_context.project.canonical_name,
                         source_context.branch)
