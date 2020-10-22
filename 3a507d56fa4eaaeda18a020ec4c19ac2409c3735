@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_75629018",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-22T07:48:26Z",
+      "side": 1,
+      "message": "Do we need the string version of the type annotation here when it worked without quotes in line 48?",
+      "revId": "3a507d56fa4eaaeda18a020ec4c19ac2409c3735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
