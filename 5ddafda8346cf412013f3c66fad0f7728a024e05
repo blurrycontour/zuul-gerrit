@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_cd879cd7",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-22T11:13:25Z",
+      "side": 1,
+      "message": "Do you have a use case in mind for a read-only ZooKeeperComponent or is this just here to make things easier extendable?",
+      "revId": "5ddafda8346cf412013f3c66fad0f7728a024e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_2d3e1029",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-22T11:13:25Z",
+      "side": 1,
+      "message": "Not sure if I like the usage of __setitem__ here. It makes using the ZooKeeperComponent a little misleading IMHO since it looks like a dict but doesn\u0027t work like a dict in all occasions (e.g. when using len() or an iterator).\n\nI like the idea of directly updating the value of the znode when an attribute changes, but I think this could also be achieved by defining custom methods like `get()` and `set()` which don\u0027t imply any dictionary magic. IMHO this would make the usage of this class a little more explicit.\n\nI don\u0027t see this as a blocker and leave this comment up for discussion.",
+      "revId": "5ddafda8346cf412013f3c66fad0f7728a024e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_cd04bc7e",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-22T11:13:25Z",
+      "side": 1,
+      "message": "Can\u0027t we directly use the ZooKeeperComponenState.STOPPED here? I think if we get rid of the `.name` here we could also remove the if/else branch in the __setitem__ method checking if either the enum value or the name is provided.",
+      "revId": "5ddafda8346cf412013f3c66fad0f7728a024e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
