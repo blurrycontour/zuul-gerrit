@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_3592d8f7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-22T07:43:13Z",
+      "side": 1,
+      "message": "Might not be part of this change and/or is already handled in a later change: When we set the ZooKeeperNodepool now also directly in the __init__(), this method shouldn\u0027t be needed anymore either, or?",
+      "revId": "2fd55cafeb916c367bf27289475be99294b7e25f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
