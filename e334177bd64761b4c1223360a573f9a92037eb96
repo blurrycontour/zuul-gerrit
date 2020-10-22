@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_8351f311",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-22T13:10:40Z",
+      "side": 1,
+      "message": "typo: filesystem",
+      "range": {
+        "startLine": 13,
+        "startChar": 21,
+        "endLine": 13,
+        "endChar": 30
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_e340a70a",
+        "filename": "tests/unit/test_keystorage.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-22T13:10:40Z",
+      "side": 1,
+      "message": "Since this is part of the scale-out scheduler would it make sense to put it on top of 754360? The connecting to Zookeeper is unified there.",
+      "range": {
+        "startLine": 87,
+        "startChar": 16,
+        "endLine": 87,
+        "endChar": 23
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_c3a92be0",
+        "filename": "zuul/lib/encryption.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-22T13:10:40Z",
+      "side": 1,
+      "message": "nit: if you are changing this line anyway you could also add the rest of the typings (including return type). Otherwise the linter will not check here.",
+      "range": {
+        "startLine": 42,
+        "startChar": 30,
+        "endLine": 42,
+        "endChar": 41
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_03704372",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-22T13:10:40Z",
+      "side": 1,
+      "message": "Could this follow the same pattern from 744416, e.g. inherit ZooKeeperBase?",
+      "range": {
+        "startLine": 300,
+        "startChar": 6,
+        "endLine": 300,
+        "endChar": 25
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_0394c38a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-22T13:10:40Z",
+      "side": 1,
+      "message": "nit: I guess those need to be camel cased. Also this one is called outside this class tree and should be without \"_\"?",
+      "range": {
+        "startLine": 755,
+        "startChar": 8,
+        "endLine": 755,
+        "endChar": 24
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
