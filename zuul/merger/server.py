@@ -12,25 +12,30 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import os
 import socket
 import threading
+import time
+import traceback
 from abc import ABCMeta
 from configparser import ConfigParser
+from typing import Dict, Any, Callable
 
-from zuul.zk import ZooKeeperClient
+from kazoo.exceptions import ConnectionLossException
+
+from zuul.zk import ZooKeeperClient, NoClientException
 
 from zuul.lib.connections import ConnectionRegistry
 
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
-from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
 from zuul.merger.merger import nullcontext
+from zuul.zk.cache import ZooKeeperWorkItem
 from zuul.zk.components import ZooKeeperComponentRegistry, \
     ZooKeeperComponentState
+from zuul.zk.work import ZooKeeperWork
 
 COMMANDS = ['stop', 'pause', 'unpause']
 
@@ -60,6 +65,8 @@ class BaseMergeServer(metaclass=ABCMeta):
     def __init__(self, config: ConfigParser, component: str,
                  zk_client: ZooKeeperClient, connections: ConnectionRegistry):
         self.connections = connections or ConnectionRegistry()
+        self.hostname = get_default(config, 'executor', 'hostname',
+                                    socket.getfqdn())
         self.merge_email = get_default(config, 'merger', 'git_user_email',
                                        'zuul.merger.default@example.com')
         self.merge_name = get_default(config, 'merger', 'git_user_name',
@@ -75,6 +82,8 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.zk_client: ZooKeeperClient = zk_client
         self.zk_component_registry: ZooKeeperComponentRegistry =\
             ZooKeeperComponentRegistry(zk_client)
+        self.zk_work: ZooKeeperWork = ZooKeeperWork(zk_client)
+        self.zk_work.registerAllZones()
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -87,18 +96,50 @@ class BaseMergeServer(metaclass=ABCMeta):
         # Repo locking is needed on the executor
         self.repo_locks = self._repo_locks_class()
 
-        self.merger_jobs = {
+        self.merger_jobs: Dict[str, Callable[[ZooKeeperWorkItem], None]] = {
             'merger:merge': self.merge,
             'merger:cat': self.cat,
             'merger:refstate': self.refstate,
             'merger:fileschanges': self.fileschanges,
         }
-        self.merger_gearworker = ZuulGearWorker(
-            'Zuul Merger',
-            'zuul.BaseMergeServer',
-            'merger-gearman-worker',
-            self.config,
-            self.merger_jobs)
+        self.merger_running: bool = False
+        self._merger_paused: bool = False
+        self._work_items: Dict[str, ZooKeeperWorkItem] = {}
+        self.merger_worker: threading.Thread = threading.Thread(
+            target=self._workJobWorkerLoop,
+            name='ExecutorServerBuildWorkerThread')
+
+    def _workJobWorkerLoop(self):
+        while self.merger_running:
+            try:
+                self.zk_work.cleanup()
+                items = list(self._work_items.items())
+                for node_path, build_item in items:
+                    # self.zk_work.resumeAttempt(node_path, self.resumeJob)
+                    # self.zk_work.cancelAttempt(node_path, self.stopJob)
+                    if not self.zk_work.isLocked(node_path):
+                        del self._work_items[node_path]
+            except ConnectionLossException:
+                self.log.warning("Connection to Zookeeper lost")
+            except NoClientException:
+                self.log.warning("Zookeeper not connected")
+
+            if not self._merger_paused:
+                try:
+                    next_item = self.zk_work.next(self.merger_jobs.keys())
+                    if next_item:
+                        self._work_items[next_item.path] = next_item
+                        try:
+                            self.log.debug("Next executed job: %s", next_item)
+                            self.merger_jobs[next_item.name](next_item)
+                        except Exception:
+                            self.log.exception('Exception while running job')
+                            self.zk_work.complete(
+                                next_item.path, traceback.format_exc(),
+                                success=False)
+                except Exception:
+                    self.log.exception('Exception while getting job')
+            time.sleep(1.0)
 
     def _getMerger(self, root, cache_root, logger=None):
         return merger.Merger(
@@ -118,6 +159,7 @@ class BaseMergeServer(metaclass=ABCMeta):
     def start(self):
         self.log.debug('Starting merger worker')
         self.log.debug('Cleaning any stale git index.lock files')
+        self.merger_running = True
         for (dirpath, dirnames, filenames) in os.walk(self.merge_root):
             if '.git' in dirnames:
                 # Only recurse into .git dirs
@@ -135,89 +177,97 @@ class BaseMergeServer(metaclass=ABCMeta):
                         self.log.exception(
                             'Unable to remove stale git lock: '
                             '%s this may result in failed merges' % fp)
-        self.merger_gearworker.start()
+        self.merger_worker.start()
 
     def stop(self):
         self.log.debug('Stopping merger worker')
-        self.merger_gearworker.stop()
+        self.merger_running = False
+        try:
+            self.merger_worker.join()
+        except Exception:
+            self.log.exception("Failed to join merger worker")
 
     def join(self):
-        # self.zookeeper.disconnect()
-        self.merger_gearworker.join()
+        self.merger_running = False
+        try:
+            self.merger_worker.join()
+        except Exception:
+            self.log.exception("Failed to join merger worker")
 
     def pause(self):
         self.log.debug('Pausing merger worker')
-        self.merger_gearworker.unregister()
+        self._merger_paused = True
 
     def unpause(self):
         self.log.debug('Resuming merger worker')
-        self.merger_gearworker.register()
+        self._merger_paused = False
 
-    def cat(self, job):
-        self.log.debug("Got cat job: %s" % job.unique)
-        args = json.loads(job.arguments)
+    def cat(self, work_item: ZooKeeperWorkItem):
+        self.log.debug("Got cat job: %s", work_item.content['uuid'])
 
-        connection_name = args['connection']
-        project_name = args['project']
+        connection_name = work_item.content['params']['connection']
+        project_name = work_item.content['params']['project']
         self._update(connection_name, project_name)
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
         try:
             self._update(connection_name, project_name)
             with lock:
-                files = self.merger.getFiles(connection_name, project_name,
-                                             args['branch'], args['files'],
-                                             args.get('dirs'))
+                files = self.merger.getFiles(
+                    connection_name, project_name,
+                    work_item.content['params']['branch'],
+                    work_item.content['params']['files'],
+                    work_item.content['params'].get('dirs'))
         except Exception:
             result = dict(update=False)
         else:
             result = dict(updated=True, files=files)
 
-        job.sendWorkComplete(json.dumps(result))
+        self.zk_work.complete(work_item.path, result=result)
+        # job.sendWorkComplete(json.dumps(result))
 
-    def merge(self, job):
-        self.log.debug("Got merge job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
+    def merge(self, work_item: ZooKeeperWorkItem):
+        self.log.debug("Got merge job: %s", work_item.content['uuid'])
+        zuul_event_id = work_item.content['params'].get('zuul_event_id')
 
         ret = self.merger.mergeChanges(
-            args['items'], args.get('files'),
-            args.get('dirs', []),
-            args.get('repo_state'),
-            branches=args.get('branches'),
+            work_item.content['params']['items'],
+            work_item.content['params'].get('files'),
+            work_item.content['params'].get('dirs', []),
+            work_item.content['params'].get('repo_state'),
+            branches=work_item.content['params'].get('branches'),
             repo_locks=self.repo_locks,
             zuul_event_id=zuul_event_id)
 
-        result = dict(merged=(ret is not None))
+        result: Dict[str, Any] = dict(merged=(ret is not None))
         if ret is None:
             result['commit'] = result['files'] = result['repo_state'] = None
         else:
             (result['commit'], result['files'], result['repo_state'],
              recent, orig_commit) = ret
         result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        self.zk_work.complete(work_item.path, result=result)
 
-    def refstate(self, job):
-        self.log.debug("Got refstate job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
+    def refstate(self, work_item: ZooKeeperWorkItem):
+        self.log.debug("Got refstate job: %s", work_item.content['uuid'])
+        zuul_event_id = work_item.content['params'].get('zuul_event_id')
         success, repo_state, item_in_branches = \
             self.merger.getRepoState(
-                args['items'], branches=args.get('branches'),
+                work_item.content['params']['items'],
+                branches=work_item.content['params'].get('branches'),
                 repo_locks=self.repo_locks)
         result = dict(updated=success,
                       repo_state=repo_state,
                       item_in_branches=item_in_branches)
         result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        self.zk_work.complete(work_item.path, result=result)
 
-    def fileschanges(self, job):
-        self.log.debug("Got fileschanges job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
+    def fileschanges(self, work_item: ZooKeeperWorkItem):
+        self.log.debug("Got fileschanges job: %s", work_item.content['uuid'])
+        zuul_event_id = work_item.content['params'].get('zuul_event_id')
 
-        connection_name = args['connection']
-        project_name = args['project']
+        connection_name = work_item.content['params']['connection']
+        project_name = work_item.content['params']['project']
         self._update(connection_name, project_name,
                      zuul_event_id=zuul_event_id)
 
@@ -228,7 +278,8 @@ class BaseMergeServer(metaclass=ABCMeta):
             with lock:
                 files = self.merger.getFilesChanges(
                     connection_name, project_name,
-                    args['branch'], args['tosha'],
+                    work_item.content['params']['branch'],
+                    work_item.content['params']['tosha'],
                     zuul_event_id=zuul_event_id)
         except Exception:
             result = dict(update=False)
@@ -236,7 +287,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             result = dict(updated=True, files=files)
 
         result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        self.zk_work.complete(work_item.path, result=result)
 
 
 class MergeServer(BaseMergeServer):
@@ -276,7 +327,10 @@ class MergeServer(BaseMergeServer):
         self.zk_component['state'] = ZooKeeperComponentState.STOPPED
         super().stop()
         self._command_running = False
-        self.command_socket.stop()
+        try:
+            self.command_socket.stop()
+        except Exception:
+            self.log.exception("Failed to stop command socket")
         self.log.debug("Stopped")
 
     def join(self):

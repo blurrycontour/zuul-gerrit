@@ -116,39 +116,37 @@ class TestAuthorizeViaRPC(ZuulTestCase):
     tenant_config_file = 'config/authorization/single-tenant/main.yaml'
 
     def test_authorize_via_rpc(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         claims = {'__zuul_uid_claim': 'venkman'}
         authorized = client.submitJob('zuul:authorize_user',
                                       {'tenant': 'tenant-one',
-                                       'claims': claims}).data[0]
-        self.assertTrue(json.loads(authorized))
+                                       'claims': claims}).result
+        self.assertTrue(authorized)
         claims = {'sub': 'gozer'}
         authorized = client.submitJob('zuul:authorize_user',
                                       {'tenant': 'tenant-one',
-                                       'claims': claims}).data[0]
-        self.assertTrue(not json.loads(authorized))
+                                       'claims': claims}).result
+        self.assertTrue(not authorized)
         claims = {'sub': 'stantz',
                   'iss': 'columbia.edu'}
         authorized = client.submitJob('zuul:authorize_user',
                                       {'tenant': 'tenant-one',
-                                       'claims': claims}).data[0]
-        self.assertTrue(json.loads(authorized))
+                                       'claims': claims}).result
+        self.assertTrue(authorized)
         claims = {'sub': 'slimer',
                   'groups': ['ghostbusters', 'ectoplasms']}
         authorized = client.submitJob('zuul:authorize_user',
                                       {'tenant': 'tenant-one',
-                                       'claims': claims}).data[0]
-        self.assertTrue(json.loads(authorized))
+                                       'claims': claims}).result
+        self.assertTrue(authorized)
 
 
 class TestAuthorizeWithTemplatingViaRPC(ZuulTestCase):
     tenant_config_file = 'config/authorization/rules-templating/main.yaml'
 
     def test_authorize_via_rpc(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         tenants = ['tenant-zero', 'tenant-one', 'tenant-two']
         for t_claim in tenants:
@@ -156,15 +154,15 @@ class TestAuthorizeWithTemplatingViaRPC(ZuulTestCase):
             for tenant in tenants:
                 authorized = client.submitJob('zuul:authorize_user',
                                               {'tenant': tenant,
-                                               'claims': claims}).data[0]
+                                               'claims': claims}).result
                 if t_claim == tenant:
                     self.assertTrue(
-                        json.loads(authorized),
+                        authorized,
                         "Failed for t_claim: %s, tenant: %s" % (t_claim,
                                                                 tenant))
                 else:
                     self.assertTrue(
-                        not json.loads(authorized),
+                        not authorized,
                         "Failed for t_claim: %s, tenant: %s" % (t_claim,
                                                                 tenant))
 
@@ -183,8 +181,7 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         Test that the hold request node expiration will default to the
         value specified in the configuration file.
         '''
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         # Add a autohold with no hold expiration.
@@ -214,8 +211,7 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         Test that the hold request node expiration will be set to the custom
         value specified in the request.
         '''
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         # Add a autohold with a custom hold expiration.
@@ -245,8 +241,7 @@ class TestSchedulerAutoholdHoldExpiration(ZuulTestCase):
         Test that if the custom hold request node expiration is higher than our
         configured max, it will be lowered to the max.
         '''
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         # Add a autohold with a custom hold expiration that is higher than our
@@ -390,11 +385,6 @@ class TestScheduler(ZuulTestCase):
     def test_branch_deletion(self):
         "Test the correct variant of a job runs on a branch"
         self._startMerger()
-        merger_gear = self.executor_server.merger_gearworker.gearman
-        for f in list(merger_gear.functions.keys()):
-            f = f.decode('utf8')
-            if f.startswith('merger:'):
-                merger_gear.unRegisterFunction(f)
 
         self.create_branch('org/project', 'stable')
         self.fake_gerrit.addEvent(
@@ -1789,8 +1779,7 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
@@ -1894,8 +1883,7 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_info(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         # Empty dict should be returned for "not found"
@@ -1924,8 +1912,7 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_delete(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
@@ -1944,8 +1931,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual([], request_list)
 
     def _test_autohold_scoped(self, change_obj, change, ref):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         # create two changes on the same project, and autohold request
@@ -2027,8 +2013,7 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_scoping(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -2083,8 +2068,7 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_ignores_aborted_jobs(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
@@ -2126,8 +2110,7 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_hold_expiration(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1, node_hold_expiration=30)
@@ -2158,8 +2141,7 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_list(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
@@ -2186,8 +2168,7 @@ class TestScheduler(ZuulTestCase):
 
         self.addCleanup(reset_exp)
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         # Temporarily shorten the hold request expiration time
@@ -3940,12 +3921,9 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.builds), 2)
 
         merge_count_project1 = 0
-        for job in self.gearman_server.jobs_history:
-            if job.name == b'merger:refstate':
-                args = job.arguments
-                if isinstance(args, bytes):
-                    args = args.decode('utf-8')
-                args = json.loads(args)
+        for job in self.zk_work.history:
+            if job.name == 'merger:refstate':
+                args = job.content['params']
                 if args["items"][0]["project"] == "org/project1":
                     merge_count_project1 += 1
         self.assertEquals(merge_count_project1, 0,
@@ -3989,12 +3967,9 @@ class TestScheduler(ZuulTestCase):
                 break
 
         merge_count_project1 = 0
-        for job in self.gearman_server.jobs_history:
-            if job.name == b'merger:refstate':
-                args = job.arguments
-                if isinstance(args, bytes):
-                    args = args.decode('utf-8')
-                args = json.loads(args)
+        for job in self.zk_work.history:
+            if job.name == 'merger:refstate':
+                args = job.content['params']
                 if args["items"][0]["project"] == "org/project1":
                     merge_count_project1 += 1
         self.assertEquals(merge_count_project1, 0,
@@ -4259,8 +4234,7 @@ class TestScheduler(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         A.addApproval('Approved', 1)
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.enqueue(tenant='tenant-one',
                            pipeline='gate',
@@ -4285,8 +4259,7 @@ class TestScheduler(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         A.addApproval('Approved', 1)
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.enqueue(tenant='tenant-one',
                            pipeline='gate',
@@ -4315,8 +4288,7 @@ class TestScheduler(ZuulTestCase):
         B.addApproval('Code-Review', 2)
         B.addApproval('Approved', 1)
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         with testtools.ExpectedException(
             zuul.rpcclient.RPCFailure,
@@ -4338,8 +4310,7 @@ class TestScheduler(ZuulTestCase):
         A_commit = str(upstream[p].commit('master'))
         self.log.debug("A commit: %s" % A_commit)
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.enqueue_ref(
             tenant='tenant-one',
@@ -4358,8 +4329,7 @@ class TestScheduler(ZuulTestCase):
     def test_client_dequeue_ref(self):
         "Test that the RPC client can dequeue a ref"
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.executor_server.hold_jobs_in_build = True
@@ -4417,8 +4387,7 @@ class TestScheduler(ZuulTestCase):
 
     def test_client_dequeue_dependent_change(self):
         "Test that the RPC client can dequeue a change"
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.executor_server.hold_jobs_in_build = True
@@ -4460,8 +4429,7 @@ class TestScheduler(ZuulTestCase):
     def test_client_dequeue_independent_change(self):
         "Test that the RPC client can dequeue a change"
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.executor_server.hold_jobs_in_build = True
@@ -4499,8 +4467,7 @@ class TestScheduler(ZuulTestCase):
     def test_client_dequeue_wrong_project(self):
         "Test that dequeue fails if change and project do not match"
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.executor_server.hold_jobs_in_build = True
@@ -4540,8 +4507,7 @@ class TestScheduler(ZuulTestCase):
         "Test that the RPC client can dequeue a change by ref"
         # Test this on the periodic pipeline, where it makes most sense to
         # use ref
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.create_branch('org/project', 'stable')
@@ -4578,8 +4544,7 @@ class TestScheduler(ZuulTestCase):
 
     def test_client_enqueue_negative(self):
         "Test that the RPC client returns errors"
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
                                          "Invalid tenant"):
@@ -4623,8 +4588,7 @@ class TestScheduler(ZuulTestCase):
 
     def test_client_enqueue_ref_negative(self):
         "Test that the RPC client returns errors"
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
                                          "New rev must be 40 character sha1"):
@@ -4693,8 +4657,7 @@ class TestScheduler(ZuulTestCase):
         for item in items:
             enqueue_times[str(item.change)] = item.enqueue_time
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.promote(tenant='tenant-one',
                            pipeline='gate',
@@ -4767,8 +4730,7 @@ class TestScheduler(ZuulTestCase):
 
         self.waitUntilSettled()
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.promote(tenant='tenant-one',
                            pipeline='gate',
@@ -4822,8 +4784,7 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         with testtools.ExpectedException(zuul.rpcclient.RPCFailure):
@@ -5510,8 +5471,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         # Wait for gearman server to send the initial workData back to zuul
@@ -6156,18 +6116,21 @@ For CI problems and help debugging, contact ci@example.org"""
     def test_pending_merge_in_reconfig(self):
         # Test that if we are waiting for an outstanding merge on
         # reconfiguration that we continue to do so.
-        self.gearman_server.hold_merge_jobs_in_queue = True
+        self.zk_work.setHold('merger', True)
+        self.scheds.execute(lambda a: a.sched.zk_work.setHold('merger', True))
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         A.setMerged()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
-        gearJob = next(iter(self.scheds.first.sched.merger.jobs))
-        self.assertEqual(gearJob.complete, False)
+        self.assertEqual(len(self.scheds.first.sched.merger.work_items), 1)
+        work_item = self.zk_work.getCached(
+            next(iter(self.scheds.first.sched.merger.work_items)))
+        self.assertEqual(work_item.state, WorkState.HOLD)
 
         # Reconfigure while we still have an outstanding merge job
-        self.gearman_server.hold_merge_jobs_in_queue = False
+        self.zk_work.setHold('merger', False)
+        self.scheds.execute(lambda a: a.sched.zk_work.setHold('merger', False))
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         self.scheds.first.sched.reconfigureTenant(
@@ -6177,16 +6140,16 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # Verify the merge job is still running and that the item is
         # in the pipeline
-        self.assertEqual(gearJob.complete, False)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        self.assertEqual(work_item.state, WorkState.HOLD)
+        self.assertEqual(len(self.scheds.first.sched.merger.work_items), 1)
 
         pipeline = tenant.layout.pipelines['post']
         self.assertEqual(len(pipeline.getAllItems()), 1)
-        self.gearman_server.release()
+        self.zk_work.release()
         self.waitUntilSettled()
 
-        self.assertEqual(gearJob.complete, True)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 0)
+        self.assertEqual(work_item.state, WorkState.COMPLETED)
+        self.assertEqual(len(self.scheds.first.sched.merger.work_items), 0)
 
     @simple_layout('layouts/parent-matchers.yaml')
     def test_parent_matchers(self):
@@ -6526,8 +6489,7 @@ class TestAmbiguousProjectNames(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         A.addApproval('Approved', 1)
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.enqueue(tenant='tenant-one',
                            pipeline='check',

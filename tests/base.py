@@ -31,7 +31,8 @@ import random
 import re
 from logging import Logger
 from queue import Queue
-from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
+from typing import Callable, Optional, Any, Iterable, Generator, List, Dict, \
+    Tuple
 
 import requests
 import select
@@ -70,6 +71,7 @@ from tests.zk import TestZooKeeperClient, TestZooKeeperConnection
 from psutil import Popen
 
 from tests.zk.builds import TestZooKeeperBuilds
+from tests.zk.work import TestZooKeeperWork
 from zuul.driver.zuul import ZuulDriver
 from zuul.driver.git import GitDriver
 from zuul.driver.smtp import SMTPDriver
@@ -85,13 +87,13 @@ from zuul.driver.gerrit import GerritDriver
 from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.executor.sensors.pause import PauseSensor
 from zuul.executor.server import JobDir
-from zuul.lib.config import get_default
 from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.named_queue import NamedQueue
+from zuul.merger.server import MergeServer
 from zuul.model import Change
 from zuul.rpcclient import RPCClient
 from zuul.zk import ZooKeeperConnection
-from zuul.zk.cache import ZooKeeperBuildItem, WorkState
+from zuul.zk.cache import ZooKeeperBuildItem, ZooKeeperWorkItem, WorkState
 from zuul.zk.client import event_type_str
 
 import tests.fakegithub
@@ -1049,7 +1051,7 @@ class FakeGerritPoller(gerritconnection.GerritPoller):
     :py:class:`~zuul.connection.gerrit.GerritPoller`.
     """
 
-    poll_interval = 1
+    poll_interval = 5
 
     def _run(self, *args, **kw):
         r = super(FakeGerritPoller, self)._run(*args, **kw)
@@ -2982,7 +2984,8 @@ class RecordingMergeClient(zuul.merger.client.MergeClient):
         self.history = {}
 
     def submitJob(self, name, data, build_set,
-                  precedence=zuul.model.PRECEDENCE_NORMAL, event=None):
+                  precedence=zuul.model.PRECEDENCE_NORMAL, event=None)\
+            -> Tuple[str, str]:
         self.history.setdefault(name, [])
         self.history[name].append((data, build_set))
         return super().submitJob(
@@ -3742,6 +3745,7 @@ def cpu_times(self):
 class TestScheduler(zuul.scheduler.Scheduler):
     _merger_client_class = RecordingMergeClient
     _zk_builds_class = TestZooKeeperBuilds
+    _zk_work_class = TestZooKeeperWork
 
 
 class BaseTestCase(testtools.TestCase):
@@ -3917,6 +3921,7 @@ class SchedulerTestManager:
                git_url_with_auth: bool, source_only: bool,
                add_cleanup: Callable[[Callable[[], None]], None])\
             -> SchedulerTestApp:
+        self.log = log
         app = SchedulerTestApp(log, config, zk_config, changes,
                                additional_event_queues, upstream_root,
                                rpcclient, poller_events, git_url_with_auth,
@@ -4063,7 +4068,10 @@ class ZuulTestCase(BaseTestCase):
         self.zk_client = ZooKeeperConnection(hosts=self.zk_config).connect()
         self.zk_builds = TestZooKeeperBuilds(self.zk_client)
         self.zk_builds.registerAllZones()
-        self.zk_builds.registerCacheListener(self._treeCacheListener)
+        self.zk_builds.registerCacheListener(self._buildTreeCacheListener)
+        self.zk_work = TestZooKeeperWork(self.zk_client)
+        self.zk_work.registerAllZones()
+        self.zk_work.registerCacheListener(self._workTreeCacheListener)
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4145,12 +4153,7 @@ class ZuulTestCase(BaseTestCase):
                 'gearman', 'ssl_key',
                 os.path.join(FIXTURE_DIR, 'gearman/client.key'))
 
-        self.rpcclient = zuul.rpcclient.RPCClient(
-            self.config.get('gearman', 'server'),
-            self.gearman_server.port,
-            get_default(self.config, 'gearman', 'ssl_key'),
-            get_default(self.config, 'gearman', 'ssl_cert'),
-            get_default(self.config, 'gearman', 'ssl_ca'))
+        self.rpcclient = zuul.rpcclient.RPCClient(self.zk_work)
 
         gerritsource.GerritSource.replication_timeout = 1.5
         gerritsource.GerritSource.replication_retry_interval = 0.5
@@ -4191,7 +4194,7 @@ class ZuulTestCase(BaseTestCase):
             self.additional_event_queues.append(
                 self.fake_github.github_event_connector._event_forward_queue)
 
-        self.merge_server = None
+        self.merge_server: Optional[MergeServer] = None
 
         # Cleanups are run in reverse order
         self.addCleanup(self.assertNoZkConnections)
@@ -4200,10 +4203,16 @@ class ZuulTestCase(BaseTestCase):
         self.addCleanup(self.shutdown)
         self.addCleanup(self.assertFinalState)
 
-    def _treeCacheListener(
+    def _buildTreeCacheListener(
             self, segments: List[str], event: TreeEvent,
             item: Optional[ZooKeeperBuildItem]) -> None:
-        self.log.debug("TreeEvent (%s) [%s]: %s", event_type_str(event),
+        self.log.debug("BuildTreeEvent (%s) [%s]: %s", event_type_str(event),
+                       segments, item)
+
+    def _workTreeCacheListener(
+            self, segments: List[str], event: TreeEvent,
+            item: Optional[ZooKeeperWorkItem]) -> None:
+        self.log.debug("WorkTreeEvent (%s) [%s]: %s", event_type_str(event),
                        segments, item)
 
     def __event_queues(self, matcher) -> List[Queue]:
@@ -4759,23 +4768,42 @@ class ZuulTestCase(BaseTestCase):
     def __areAllMergeJobsWaiting(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
             merge_client = app.sched.merger
-            for client_job in list(merge_client.jobs):
-                if not client_job.handle:
-                    self.log.debug("%s has no handle" % client_job)
-                    return False
-                server_job = self.gearman_server.jobs.get(client_job.handle)
-                if not server_job:
-                    self.log.debug("%s is not known to the gearman server" %
+            for client_job in list(merge_client.work_items):
+                cached = self.zk_work.getCached(client_job)
+                if not cached:
+                    self.log.debug("%s is not known to the zookeeper",
                                    client_job)
                     return False
-                if not hasattr(server_job, 'waiting'):
-                    self.log.debug("%s is being enqueued" % server_job)
-                    return False
-                if server_job.waiting:
-                    self.log.debug("%s is waiting" % server_job)
+                if cached.state in [WorkState.COMPLETED,
+                                    WorkState.CANCELED,
+                                    WorkState.FAILED,
+                                    WorkState.REMOVED]:
+                    self.log.debug("%s is finished", client_job)
                     continue
-                self.log.debug("%s is not waiting" % server_job)
+                if cached.state == WorkState.REQUESTED:
+                    self.log.debug("%s is being enqueued", client_job)
+                    return False
+                if cached.state == WorkState.HOLD:
+                    self.log.debug("%s is waiting", client_job)
+                    continue
+                self.log.debug("%s is not waiting", client_job)
                 return False
+                # if not client_job.handle:
+                #     self.log.debug("%s has no handle" % client_job)
+                #     return False
+                # server_job = self.gearman_server.jobs.get(client_job.handle)
+                # if not server_job:
+                #     self.log.debug("%s is not known to the gearman server" %
+                #                    client_job)
+                #     return False
+                # if not hasattr(server_job, 'waiting'):
+                #     self.log.debug("%s is being enqueued" % server_job)
+                #     return False
+                # if server_job.waiting:
+                #     self.log.debug("%s is waiting" % server_job)
+                #     continue
+                # self.log.debug("%s is not waiting" % server_job)
+                # return False
         return True
 
     def __eventQueuesEmpty(self, matcher=None) -> Generator[bool, None, None]:
@@ -4906,7 +4934,7 @@ class ZuulTestCase(BaseTestCase):
         logger("All event queues empty: %s" % allEventQueuesEmpty)
         for app in self.scheds.filter(matcher):
             logger("[Sched: %s] Merge client jobs: %s" %
-                   (app.sched, app.sched.merger.jobs))
+                   (app.sched, app.sched.merger.work_items))
 
     def waitForPoll(self, poller, timeout=30):
         self.log.debug("Wait for poll on %s", poller)

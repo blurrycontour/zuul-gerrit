@@ -800,8 +800,7 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(404, resp.status_code)
 
     def test_autohold_info(self):
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
@@ -833,8 +832,7 @@ class TestWeb(BaseTestWeb):
 
     def test_autohold_list(self):
         """test listing autoholds through zuul-web"""
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
@@ -1462,8 +1460,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
             headers={'Authorization': 'Bearer %s' % good_token},
             json=args)
         self.assertEqual(200, req.status_code, req.text)
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         autohold_requests = client.autohold_list()
         self.assertNotEqual([], autohold_requests)
@@ -1500,8 +1497,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(True, data)
 
         # Check result in rpc client
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         autohold_requests = client.autohold_list()
         self.assertNotEqual([], autohold_requests)
@@ -1525,8 +1521,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256').decode('utf-8')
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
@@ -2073,8 +2068,7 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
         self.assertEqual(True, data)
 
         # Check result in rpc client
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         autohold_requests = client.autohold_list()
@@ -2095,8 +2089,7 @@ class TestHeldAttributeInBuildInfo(ZuulDBTestCase, BaseTestWeb):
 
     def test_autohold_and_retrieve_held_build_info(self):
         """Ensure the "held" attribute can be used to filter builds"""
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.autohold('tenant-one', 'org/project', 'project-test2',
                             "", "", "reason text", 1)
@@ -2178,8 +2171,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         output = p.communicate()
         self.assertEqual(p.returncode, 0, output[0])
         # Check result in rpc client
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         autohold_requests = client.autohold_list()
         self.assertNotEqual([], autohold_requests)

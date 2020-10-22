@@ -735,8 +735,9 @@ class TestMerger(ZuulTestCase):
     def test_stale_index_lock_cleanup(self):
         # Stop the running executor's merger. We needed it running to merge
         # things during test boostrapping but now it is just in the way.
-        self.executor_server.merger_gearworker.stop()
-        self.executor_server.merger_gearworker.join()
+        self.executor_server.merger_running = False
+        self.executor_server.merger_worker.join()
+
         # Start the merger and do a merge to populate the repo on disk
         self._startMerger()
 

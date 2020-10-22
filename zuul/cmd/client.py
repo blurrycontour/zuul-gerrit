@@ -32,6 +32,10 @@ from zuul.lib.config import get_default
 
 
 # todo This should probably live somewhere else
+from zuul.zk import ZooKeeperConnection
+from zuul.zk.work import ZooKeeperWork
+
+
 class ZuulRESTClient(object):
     """Basic client for Zuul's REST API"""
     def __init__(self, url, verify=False, auth_token=None):
@@ -411,15 +415,9 @@ class Client(zuul.cmd.ZuulApp):
         conf_sections = self.config.sections()
         if 'gearman' in conf_sections:
             self.log.debug('gearman section found in config, using RPC client')
-            server = self.config.get('gearman', 'server')
-            port = get_default(self.config, 'gearman', 'port', 4730)
-            ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-            ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-            ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-            client = zuul.rpcclient.RPCClient(
-                server, port, ssl_key,
-                ssl_cert, ssl_ca,
-                client_id=self.app_description)
+            zk_client = ZooKeeperConnection.fromConfig(self.config).connect()
+            zk_work = ZooKeeperWork(zk_client)
+            client = zuul.rpcclient.RPCClient(zk_work)
         elif 'webclient' in conf_sections:
             self.log.debug('web section found in config, using REST client')
             server = get_default(self.config, 'webclient', 'url', None)
@@ -427,12 +425,12 @@ class Client(zuul.cmd.ZuulApp):
                                  self.args.insecure_ssl)
             client = ZuulRESTClient(server, verify,
                                     self.args.auth_token)
+            if server is None:
+                print('Missing "server" configuration value')
+                sys.exit(1)
         else:
             print('Unable to find a way to connect to Zuul, add a "gearman" '
                   'or "web" section to your configuration file')
-            sys.exit(1)
-        if server is None:
-            print('Missing "server" configuration value')
             sys.exit(1)
         return client
 

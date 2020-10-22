@@ -54,8 +54,7 @@ class TestZuulClient(BaseTestWeb):
         output = p.communicate()
         self.assertEqual(p.returncode, 0, output)
         # Check result in rpc client
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         autohold_requests = client.autohold_list()
         self.assertNotEqual([], autohold_requests)

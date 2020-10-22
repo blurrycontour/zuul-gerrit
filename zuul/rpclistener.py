@@ -15,16 +15,21 @@
 
 import json
 import logging
+import threading
 import time
+import traceback
 from abc import ABCMeta
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING, Callable, Dict
 
 from zuul import model
 from zuul.connection import BaseConnection
 from zuul.lib import encryption
-from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
 from zuul.model import Build
+from zuul.zk import ZooKeeperClient
+from zuul.zk.cache import ZooKeeperWorkItem
+from zuul.zk.work import ZooKeeperWork
+
 if TYPE_CHECKING:
     from zuul.scheduler import Scheduler
 
@@ -37,29 +42,47 @@ class RPCListenerBase(metaclass=ABCMeta):
     def __init__(self, config, sched):
         self.config = config
         self.sched: Scheduler = sched
+        self.zk_client: ZooKeeperClient = self.sched.zk_client
+        self.zk_work: ZooKeeperWork = self.sched.zk_work
+        self._running: bool = False
+        self._thread: Optional[threading.Thread] = None
 
-        self.jobs = {}
+        self.jobs: Dict[str, Callable[[ZooKeeperWorkItem], None]] = {}
 
         for func in self.functions:
             f = getattr(self, 'handle_%s' % func)
             self.jobs['zuul:%s' % func] = f
-        self.gearworker = ZuulGearWorker(
-            'Zuul RPC Listener',
-            self.log.name,
-            self.thread_name,
-            self.config,
-            self.jobs)
 
     def start(self):
-        self.gearworker.start()
+        self._running = True
+        if not self._thread:
+            self._thread = threading.Thread(name=self.thread_name,
+                                            target=self._run)
+            self._thread.daemon = True
+            self._thread.start()
 
     def stop(self):
-        self.log.debug("Stopping")
-        self.gearworker.stop()
-        self.log.debug("Stopped")
+        self._running = False
 
     def join(self):
-        self.gearworker.join()
+        self._running = False
+        if self._thread:
+            self._thread.join()
+
+    def _run(self):
+        while self._running:
+            next_item = self.zk_work.next(self.jobs.keys())
+            if next_item:
+                try:
+                    self.log.debug("Next executed job: %s", next_item)
+                    self.jobs[next_item.name](next_item)
+                except Exception:
+                    self.log.exception('Exception while running job %s',
+                                       next_item.name)
+                    self.zk_work.complete(
+                        next_item.path, traceback.format_exc(),
+                        success=False)
+            time.sleep(1.0)
 
 
 class RPCListenerSlow(RPCListenerBase):
@@ -72,32 +95,29 @@ class RPCListenerSlow(RPCListenerBase):
         'promote',
     ]
 
-    def handle_dequeue(self, job):
-        args = json.loads(job.arguments)
-        tenant_name = args['tenant']
-        pipeline_name = args['pipeline']
-        project_name = args['project']
-        change = args['change']
-        ref = args['ref']
+    def handle_dequeue(self, work_item: ZooKeeperWorkItem):
+        tenant_name = work_item.content['params']['tenant']
+        pipeline_name = work_item.content['params']['pipeline']
+        project_name = work_item.content['params']['project']
+        change = work_item.content['params']['change']
+        ref = work_item.content['params']['ref']
         try:
             self.sched.dequeue(
                 tenant_name, pipeline_name, project_name, change, ref)
         except Exception as e:
-            job.sendWorkException(str(e).encode('utf8'))
+            self.zk_work.complete(work_item.path, str(e), success=False)
             return
-        job.sendWorkComplete()
+        self.zk_work.complete(work_item.path)
 
-    def _common_enqueue(self, job):
-        args = json.loads(job.arguments)
+    def _common_enqueue(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         event = model.TriggerEvent()
         event.timestamp = time.time()
         errors = ''
-        tenant = None
         project = None
-        pipeline = None
 
         tenant = self.sched.abide.tenants.get(args['tenant'])
-        if tenant:
+        if tenant and tenant.layout:
             event.tenant_name = args['tenant']
 
             (trusted, project) = tenant.getProject(args['project'])
@@ -117,8 +137,8 @@ class RPCListenerSlow(RPCListenerBase):
 
         return (args, event, errors, project)
 
-    def handle_enqueue(self, job):
-        (args, event, errors, project) = self._common_enqueue(job)
+    def handle_enqueue(self, work_item: ZooKeeperWorkItem):
+        (args, event, errors, project) = self._common_enqueue(work_item)
 
         if not errors:
             event.change_number, event.patch_number = args['change'].split(',')
@@ -131,13 +151,13 @@ class RPCListenerSlow(RPCListenerBase):
                 errors += 'Invalid change: %s\n' % (args['change'],)
 
         if errors:
-            job.sendWorkException(errors.encode('utf8'))
+            self.zk_work.complete(work_item.path, errors, success=False)
         else:
             self.sched.enqueue(event)
-            job.sendWorkComplete()
+            self.zk_work.complete(work_item.path)
 
-    def handle_enqueue_ref(self, job):
-        (args, event, errors, project) = self._common_enqueue(job)
+    def handle_enqueue_ref(self, work_item: ZooKeeperWorkItem):
+        (args, event, errors, project) = self._common_enqueue(work_item)
 
         if not errors:
             event.ref = args['ref']
@@ -161,18 +181,18 @@ class RPCListenerSlow(RPCListenerBase):
                           '%s\n' % event.newrev
 
         if errors:
-            job.sendWorkException(errors.encode('utf8'))
+            self.zk_work.complete(work_item.path, errors, success=False)
         else:
             self.sched.enqueue(event)
-            job.sendWorkComplete()
+            self.zk_work.complete(work_item.path)
 
-    def handle_promote(self, job):
-        args = json.loads(job.arguments)
+    def handle_promote(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant_name = args['tenant']
         pipeline_name = args['pipeline']
         change_ids = args['change_ids']
         self.sched.promote(tenant_name, pipeline_name, change_ids)
-        job.sendWorkComplete()
+        self.zk_work.complete(work_item.path)
 
 
 class RPCListener(RPCListenerBase):
@@ -203,42 +223,40 @@ class RPCListener(RPCListenerBase):
     ]
 
     def start(self):
-        self.gearworker.start()
+        super().start()
 
     def stop(self):
-        self.log.debug("Stopping")
-        self.gearworker.stop()
-        self.log.debug("Stopped")
+        super().stop()
 
     def join(self):
-        self.gearworker.join()
+        super().join()
 
-    def handle_autohold_info(self, job):
-        args = json.loads(job.arguments)
+    def handle_autohold_info(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         request_id = args['request_id']
         try:
             data = self.sched.autohold_info(request_id)
         except Exception as e:
-            job.sendWorkException(str(e).encode('utf8'))
+            self.zk_work.complete(work_item.path, str(e), success=False)
             return
-        job.sendWorkComplete(json.dumps(data))
+        self.zk_work.complete(work_item.path, data)
 
-    def handle_autohold_delete(self, job):
-        args = json.loads(job.arguments)
+    def handle_autohold_delete(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         request_id = args['request_id']
         try:
             self.sched.autohold_delete(request_id)
         except Exception as e:
-            job.sendWorkException(str(e).encode('utf8'))
+            self.zk_work.complete(work_item.path, str(e), success=False)
             return
-        job.sendWorkComplete()
+        self.zk_work.complete(work_item.path)
 
-    def handle_autohold_list(self, job):
+    def handle_autohold_list(self, work_item: ZooKeeperWorkItem):
         data = self.sched.autohold_list()
-        job.sendWorkComplete(json.dumps(data))
+        self.zk_work.complete(work_item.path, data)
 
-    def handle_autohold(self, job):
-        args = json.loads(job.arguments)
+    def handle_autohold(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         params = {}
 
         tenant = self.sched.abide.tenants.get(args['tenant'])
@@ -246,7 +264,7 @@ class RPCListener(RPCListenerBase):
             params['tenant_name'] = args['tenant']
         else:
             error = "Invalid tenant: %s" % args['tenant']
-            job.sendWorkException(error.encode('utf8'))
+            self.zk_work.complete(work_item.path, error, success=False)
             return
 
         (trusted, project) = tenant.getProject(args['project'])
@@ -254,12 +272,14 @@ class RPCListener(RPCListenerBase):
             params['project_name'] = project.canonical_name
         else:
             error = "Invalid project: %s" % args['project']
-            job.sendWorkException(error.encode('utf8'))
+            self.zk_work.complete(work_item.path, error, success=False)
             return
 
         if args['change'] and args['ref']:
-            job.sendWorkException("Change and ref can't be both used "
-                                  "for the same request")
+            self.zk_work.complete(
+                work_item.path,
+                "Change and ref can't be both used for the same request",
+                success=False)
 
         if args['change']:
             # Convert change into ref based on zuul connection
@@ -275,28 +295,29 @@ class RPCListener(RPCListenerBase):
 
         if args['count'] < 0:
             error = "Invalid count: %d" % args['count']
-            job.sendWorkException(error.encode('utf8'))
+            self.zk_work.complete(work_item.path, error, success=False)
             return
 
         params['count'] = args['count']
         params['node_hold_expiration'] = args['node_hold_expiration']
 
         self.sched.autohold(**params)
-        job.sendWorkComplete()
+        self.zk_work.complete(work_item.path)
 
-    def handle_get_running_jobs(self, job):
+    def handle_get_running_jobs(self, work_item: ZooKeeperWorkItem):
         # args = json.loads(job.arguments)
         # TODO: use args to filter by pipeline etc
         running_items = []
         for tenant in self.sched.abide.tenants.values():
-            for pipeline_name, pipeline in tenant.layout.pipelines.items():
-                for queue in pipeline.queues:
-                    for item in queue.queue:
-                        running_items.append(item.formatJSON())
+            if tenant.layout:
+                for pipeline_name, pipeline in tenant.layout.pipelines.items():
+                    for queue in pipeline.queues:
+                        for item in queue.queue:
+                            running_items.append(item.formatJSON())
 
-        job.sendWorkComplete(json.dumps(running_items))
+        self.zk_work.complete(work_item.path, running_items)
 
-    def handle_get_job_log_stream_address(self, job):
+    def handle_get_job_log_stream_address(self, work_item: ZooKeeperWorkItem):
         # TODO: map log files to ports. Currently there is only one
         #       log stream for a given job. But many jobs produce many
         #       log files, so this is forwards compatible with a future
@@ -304,15 +325,17 @@ class RPCListener(RPCListenerBase):
         #       "console.log"
         def find_build(uuid: str) -> Optional[Build]:
             for tenant in self.sched.abide.tenants.values():
-                for pipeline_name, pipeline in tenant.layout.pipelines.items():
-                    for queue in pipeline.queues:
-                        for item in queue.queue:
-                            for bld in item.current_build_set.getBuilds():
-                                if bld.uuid == uuid:
-                                    return bld
+                if tenant.layout:
+                    for pipeline_name, pipeline in tenant.layout.pipelines\
+                            .items():
+                        for queue in pipeline.queues:
+                            for item in queue.queue:
+                                for bld in item.current_build_set.getBuilds():
+                                    if bld.uuid == uuid:
+                                        return bld
             return None
 
-        args = json.loads(job.arguments)
+        args = work_item.content['params']
         uuid = args['uuid']
         # TODO: logfile = args['logfile']
         job_log_stream_address = {}
@@ -320,7 +343,7 @@ class RPCListener(RPCListenerBase):
         if build:
             job_log_stream_address['server'] = build.worker.hostname
             job_log_stream_address['port'] = build.worker.log_port
-        job.sendWorkComplete(json.dumps(job_log_stream_address))
+        self.zk_work.complete(work_item.path, job_log_stream_address)
 
     def _is_authorized(self, tenant, claims):
         authorized = False
@@ -347,75 +370,81 @@ class RPCListener(RPCListenerBase):
                     break
         return authorized
 
-    def handle_authorize_user(self, job):
-        args = json.loads(job.arguments)
+    def handle_authorize_user(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant_name = args['tenant']
         claims = args['claims']
         tenant = self.sched.abide.tenants.get(tenant_name)
         authorized = self._is_authorized(tenant, claims)
-        job.sendWorkComplete(json.dumps(authorized))
+        self.zk_work.complete(work_item.path, authorized)
 
-    def handle_get_admin_tenants(self, job):
-        args = json.loads(job.arguments)
+    def handle_get_admin_tenants(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         claims = args['claims']
         admin_tenants = []
         for tenant_name, tenant in self.sched.abide.tenants.items():
             if self._is_authorized(tenant, claims):
                 admin_tenants.append(tenant_name)
-        job.sendWorkComplete(json.dumps(admin_tenants))
+        self.zk_work.complete(work_item.path, admin_tenants)
 
-    def handle_tenant_list(self, job):
+    def handle_tenant_list(self, work_item: ZooKeeperWorkItem):
         output = []
         for tenant_name, tenant in self.sched.abide.tenants.items():
             queue_size = 0
-            for pipeline_name, pipeline in tenant.layout.pipelines.items():
-                for queue in pipeline.queues:
-                    for item in queue.queue:
-                        if item.live:
-                            queue_size += 1
+            if tenant.layout:
+                for pipeline_name, pipeline in tenant.layout.pipelines.items():
+                    for queue in pipeline.queues:
+                        for item in queue.queue:
+                            if item.live:
+                                queue_size += 1
 
             output.append({'name': tenant_name,
                            'projects': len(tenant.untrusted_projects),
                            'queue': queue_size})
-        job.sendWorkComplete(json.dumps(output))
+        self.zk_work.complete(work_item.path, output)
 
-    def handle_tenant_sql_connection(self, job):
-        args = json.loads(job.arguments)
+    def handle_tenant_sql_connection(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         sql_driver = self.sched.connections.drivers['sql']
         conn = sql_driver.tenant_connections.get(args['tenant'])
         if conn:
             name = conn.connection_name
         else:
             name = ''
-        job.sendWorkComplete(json.dumps(name))
+        self.zk_work.complete(work_item.path, name)
 
-    def handle_status_get(self, job):
-        args = json.loads(job.arguments)
-        output = self.sched.formatStatusJSON(args.get("tenant"))
-        job.sendWorkComplete(output)
+    def handle_status_get(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
+        output = self.sched.formatStatus(args.get("tenant"))
+        self.zk_work.complete(work_item.path, output)
 
-    def handle_job_get(self, gear_job):
-        args = json.loads(gear_job.arguments)
+    def handle_job_get(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
         if not tenant:
-            gear_job.sendWorkComplete(json.dumps(None))
+            self.zk_work.complete(work_item.path, None)
             return
-        jobs = tenant.layout.jobs.get(args.get("job"), [])
+        jobs = tenant.layout.jobs.get(args.get("job"), [])\
+            if tenant.layout else []  # TODO JK
         output = []
         for job in jobs:
             output.append(job.toDict(tenant))
-        gear_job.sendWorkComplete(json.dumps(output, cls=ZuulJSONEncoder))
+        self.zk_work.complete(work_item.path,
+                              json.dumps(output, cls=ZuulJSONEncoder))
 
-    def handle_job_list(self, job):
-        args = json.loads(job.arguments)
+    def handle_job_list(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
         output = []
-        if not tenant:
-            job.sendWorkComplete(json.dumps(None))
+        if not tenant or not tenant.layout:
+            self.zk_work.complete(work_item.path, None)
+            return
         for job_name in sorted(tenant.layout.jobs):
             desc = None
             tags = set()
             variants = []
+            if not tenant.layout:
+                continue  # TODO JK
             for variant in tenant.layout.jobs[job_name]:
                 if not desc and variant.description:
                     desc = variant.description.split('\n')[0]
@@ -426,7 +455,8 @@ class RPCListener(RPCListenerBase):
                     if variant.parent:
                         job_variant['parent'] = str(variant.parent)
                     else:
-                        job_variant['parent'] = tenant.default_base_job
+                        job_variant['parent'] = tenant.default_base_job\
+                            if tenant else None  # TODO JK
                 branches = variant.getBranches()
                 if branches:
                     job_variant['branches'] = branches
@@ -443,21 +473,22 @@ class RPCListener(RPCListenerBase):
             if tags:
                 job_output["tags"] = list(tags)
             output.append(job_output)
-        job.sendWorkComplete(json.dumps(output))
+        self.zk_work.complete(work_item.path, output)
 
-    def handle_project_get(self, gear_job):
-        args = json.loads(gear_job.arguments)
+    def handle_project_get(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args["tenant"])
         if not tenant:
-            gear_job.sendWorkComplete(json.dumps(None))
+            self.zk_work.complete(work_item.path, None)
             return
         trusted, project = tenant.getProject(args["project"])
         if not project:
-            gear_job.sendWorkComplete(json.dumps({}))
+            self.zk_work.complete(work_item.path, {})
             return
         result = project.toDict()
         result['configs'] = []
-        configs = tenant.layout.getAllProjectConfigs(project.canonical_name)
+        configs = tenant.layout.getAllProjectConfigs(project.canonical_name)\
+            if tenant.layout else []  # TODO JK
         for config_obj in configs:
             config = config_obj.toDict()
             config['pipelines'] = []
@@ -474,13 +505,14 @@ class RPCListener(RPCListenerBase):
                 config['pipelines'].append(pipeline)
             result['configs'].append(config)
 
-        gear_job.sendWorkComplete(json.dumps(result, cls=ZuulJSONEncoder))
+        self.zk_work.complete(work_item.path,
+                              json.dumps(result, cls=ZuulJSONEncoder))
 
-    def handle_project_list(self, job):
-        args = json.loads(job.arguments)
+    def handle_project_list(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
         if not tenant:
-            job.sendWorkComplete(json.dumps(None))
+            self.zk_work.complete(work_item.path, None)
             return
         output = []
         for project in tenant.config_projects:
@@ -491,108 +523,115 @@ class RPCListener(RPCListenerBase):
             pobj = project.toDict()
             pobj['type'] = "untrusted"
             output.append(pobj)
-        job.sendWorkComplete(json.dumps(
-            sorted(output, key=lambda project: project["name"])))
+        self.zk_work.complete(
+            work_item.path, sorted(output, key=lambda p: p["name"]))
 
-    def handle_project_freeze_jobs(self, gear_job):
-        args = json.loads(gear_job.arguments)
+    def handle_project_freeze_jobs(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
         project = None
         pipeline = None
         if tenant:
             (trusted, project) = tenant.getProject(args.get("project"))
-            pipeline = tenant.layout.pipelines.get(args.get("pipeline"))
+            pipeline = tenant.layout.pipelines.get(args.get("pipeline"))\
+                if tenant.layout else None  # TODO JK
         if not project or not pipeline:
-            gear_job.sendWorkComplete(json.dumps(None))
+            self.zk_work.complete(work_item.path, None)
             return
 
         change = model.Branch(project)
         change.branch = args.get("branch", "master")
         queue = model.ChangeQueue(pipeline)
         item = model.QueueItem(queue, change, None)
-        item.layout = tenant.layout
+        item.layout = tenant.layout if tenant else None
         item.freezeJobGraph(skip_file_matcher=True)
 
         output = []
 
-        for job in item.job_graph.getJobs():
-            job.setBase(tenant.layout)
-            output.append({
-                'name': job.name,
-                'dependencies':
-                    list(map(lambda x: x.toDict(), job.dependencies)),
-            })
+        if item.job_graph:
+            for job in item.job_graph.getJobs():
+                if not tenant:
+                    continue
+                job.setBase(tenant.layout)
+                output.append({
+                    'name': job.name,
+                    'dependencies':
+                        list(map(lambda x: x.toDict(), job.dependencies)),
+                })
 
-        gear_job.sendWorkComplete(json.dumps(output))
+        self.zk_work.complete(work_item.path, output)
 
-    def handle_allowed_labels_get(self, job):
-        args = json.loads(job.arguments)
+    def handle_allowed_labels_get(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
         if not tenant:
-            job.sendWorkComplete(json.dumps(None))
+            self.zk_work.complete(work_item.path, None)
             return
         ret = {}
         ret['allowed_labels'] = tenant.allowed_labels or []
         ret['disallowed_labels'] = tenant.disallowed_labels or []
-        job.sendWorkComplete(json.dumps(ret))
+        self.zk_work.complete(work_item.path, ret)
 
-    def handle_pipeline_list(self, job):
-        args = json.loads(job.arguments)
+    def handle_pipeline_list(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
         if not tenant:
-            job.sendWorkComplete(json.dumps(None))
+            self.zk_work.complete(work_item.path, None)
             return
         output = []
-        for pipeline, pipeline_config in tenant.layout.pipelines.items():
-            triggers = []
-            for trigger in pipeline_config.triggers:
-                if isinstance(trigger.connection, BaseConnection):
-                    name = trigger.connection.connection_name
-                else:
-                    # Trigger not based on a connection doesn't use this attr
-                    name = trigger.name
-                triggers.append({
-                    "name": name,
-                    "driver": trigger.driver.name,
-                })
-            output.append({"name": pipeline, "triggers": triggers})
-        job.sendWorkComplete(json.dumps(output))
+        if tenant.layout:
+            for pipeline, pipeline_config in tenant.layout.pipelines.items():
+                triggers = []
+                for trigger in pipeline_config.triggers:
+                    if isinstance(trigger.connection, BaseConnection):
+                        name = trigger.connection.connection_name
+                    else:
+                        # Trigger not based on a connection doesn't use this
+                        # attr
+                        name = trigger.name
+                    triggers.append({
+                        "name": name,
+                        "driver": trigger.driver.name,
+                    })
+                output.append({"name": pipeline, "triggers": triggers})
+        self.zk_work.complete(work_item.path, output)
 
-    def handle_key_get(self, job):
-        args = json.loads(job.arguments)
+    def handle_key_get(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
         project = None
         if tenant:
             (trusted, project) = tenant.getProject(args.get("project"))
         if not project:
-            job.sendWorkComplete("")
+            self.zk_work.complete(work_item.path, "")
             return
         keytype = args.get('key', 'secrets')
         if keytype == 'secrets':
-            job.sendWorkComplete(
-                encryption.serialize_rsa_public_key(
-                    project.public_secrets_key))
+            self.zk_work.complete(work_item.path,
+                                  encryption.serialize_rsa_public_key(
+                                      project.public_secrets_key))
         elif keytype == 'ssh':
-            job.sendWorkComplete(project.public_ssh_key)
+            self.zk_work.complete(work_item.path, project.public_ssh_key)
         else:
-            job.sendWorkComplete("")
+            self.zk_work.complete(work_item.path, "")
             return
 
-    def handle_config_errors_list(self, job):
-        args = json.loads(job.arguments)
+    def handle_config_errors_list(self, work_item: ZooKeeperWorkItem):
+        args = work_item.content['params']
         tenant = self.sched.abide.tenants.get(args.get("tenant"))
         output = []
         if not tenant:
-            job.sendWorkComplete(json.dumps(None))
+            self.zk_work.complete(work_item.path, None)
             return
-        for err in tenant.layout.loading_errors.errors:
-            output.append({
-                'source_context': err.key.context.toDict(),
-                'error': err.error})
-        job.sendWorkComplete(json.dumps(output))
+        if tenant.layout:
+            for err in tenant.layout.loading_errors.errors:
+                output.append({
+                    'source_context': err.key.context.toDict(),
+                    'error': err.error})
+        self.zk_work.complete(work_item.path, output)
 
-    def handle_connection_list(self, job):
+    def handle_connection_list(self, work_item: ZooKeeperWorkItem):
         output = []
         for source in self.sched.connections.getSources():
             output.append(source.connection.toDict())
-        job.sendWorkComplete(json.dumps(output))
+        self.zk_work.complete(work_item.path, output)

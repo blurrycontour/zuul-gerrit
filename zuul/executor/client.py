@@ -105,13 +105,13 @@ class ExecutorClient(object):
         if hasattr(item.change, 'tag'):
             zuul_params['tag'] = getattr(item.change, 'tag')
         if hasattr(item.change, 'number'):
-            zuul_params['change'] = str(item.change.number)
+            zuul_params['change'] = str(getattr(item.change, 'number'))
         if hasattr(item.change, 'url'):
-            zuul_params['change_url'] = item.change.url
+            zuul_params['change_url'] = getattr(item.change, 'url')
         if hasattr(item.change, 'patchset'):
-            zuul_params['patchset'] = str(item.change.patchset)
+            zuul_params['patchset'] = str(getattr(item.change, 'patchset'))
         if hasattr(item.change, 'message'):
-            zuul_params['message'] = item.change.message
+            zuul_params['message'] = getattr(item.change, 'message')
         if (hasattr(item.change, 'oldrev') and item.change.oldrev
             and item.change.oldrev != '0' * 40):
             zuul_params['oldrev'] = item.change.oldrev

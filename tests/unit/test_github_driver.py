@@ -971,7 +971,7 @@ class TestGithubDriver(ZuulTestCase):
         if expected_cat_jobs is not None:
             # clear the gearman jobs history so we can count the cat jobs
             # issued during reconfiguration
-            self.gearman_server.jobs_history.clear()
+            self.zk_work.history.clear()
 
         self.fake_github.emitEvent(pevent)
         self.waitUntilSettled()
@@ -988,8 +988,8 @@ class TestGithubDriver(ZuulTestCase):
         if expected_cat_jobs is not None:
             # Check the expected number of cat jobs here as the (empty) config
             # of org/project should be cached.
-            cat_jobs = set([job for job in self.gearman_server.jobs_history
-                           if job.name == b'merger:cat'])
+            cat_jobs = set([job for job in self.zk_work.history
+                           if job.name == 'merger:cat'])
             self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
@@ -1141,8 +1141,7 @@ class TestGithubDriver(ZuulTestCase):
     def test_client_dequeue_change_github(self):
         "Test that the RPC client can dequeue a github pull request"
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.executor_server.hold_jobs_in_build = True
@@ -1174,8 +1173,7 @@ class TestGithubDriver(ZuulTestCase):
         "Test that the RPC client can enqueue a pull request"
         A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
 
-        client = zuul.rpcclient.RPCClient('127.0.0.1',
-                                          self.gearman_server.port)
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
         r = client.enqueue(tenant='tenant-one',
                            pipeline='check',
@@ -1540,7 +1538,7 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         if expected_cat_jobs is not None:
             # clear the gearman jobs history so we can count the cat jobs
             # issued during reconfiguration
-            self.gearman_server.jobs_history.clear()
+            self.zk_work.history.clear()
 
         self.fake_github.emitEvent(pevent)
         self.waitUntilSettled()
@@ -1557,8 +1555,8 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         if expected_cat_jobs is not None:
             # Check the expected number of cat jobs here as the (empty) config
             # of org/project should be cached.
-            cat_jobs = set([job for job in self.gearman_server.jobs_history
-                           if job.name == b'merger:cat'])
+            cat_jobs = set([job for job in self.zk_work.history
+                           if job.name == 'merger:cat'])
             self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
 
     def test_push_event_reconfigure_complex_branch(self):
@@ -1857,9 +1855,7 @@ class TestGithubAppDriver(ZuulGithubAppTestCase):
         project = "org/project3"
         github = self.fake_github.getGithubClient(None)
 
-        client = zuul.rpcclient.RPCClient(
-            "127.0.0.1", self.gearman_server.port
-        )
+        client = zuul.rpcclient.RPCClient(self.zk_work)
         self.addCleanup(client.shutdown)
 
         self.executor_server.hold_jobs_in_build = True

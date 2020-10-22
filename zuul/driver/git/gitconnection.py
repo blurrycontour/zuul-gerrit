@@ -65,15 +65,17 @@ class GitConnection(BaseConnection):
         self.projects[project.name] = project
 
     def getChangeFilesUpdated(self, project_name, branch, tosha):
-        job = self.sched.merger.getFilesChanges(
+        work_node, work_uuid = self.sched.merger.getFilesChanges(
             self.connection_name, project_name, branch, tosha)
-        self.log.debug("Waiting for fileschanges job %s" % job)
-        job.wait()
-        if not job.updated:
-            raise Exception("Fileschanges job %s failed" % job)
+        self.log.debug("Waiting for fileschanges job %s", work_node)
+        self.sched.merger.waitFor(work_uuid)
+        # job.wait()
+        result = self.sched.merger.results[work_node]
+        if not result['updated']:
+            raise Exception("Fileschanges job %s failed" % work_node)
         self.log.debug("Fileschanges job %s got changes on files %s" %
-                       (job, job.files))
-        return job.files
+                       (work_node, result['files']))
+        return result['files']
 
     def lsRemote(self, project):
         refs = {}

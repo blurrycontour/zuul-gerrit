@@ -12,62 +12,22 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import threading
+from typing import Any, Dict, Optional, List, Set, TYPE_CHECKING, Tuple
 from uuid import uuid4
 
-import gear
+from kazoo.recipe.cache import TreeEvent
 
 import zuul.model
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
-
-
-def getJobData(job):
-    if not len(job.data):
-        return {}
-    d = job.data[-1]
-    if not d:
-        return {}
-    return json.loads(d)
-
-
-class MergeGearmanClient(gear.Client):
-    def __init__(self, merge_client):
-        super(MergeGearmanClient, self).__init__('Zuul Merge Client')
-        self.__merge_client = merge_client
-
-    def handleWorkComplete(self, packet):
-        job = super(MergeGearmanClient, self).handleWorkComplete(packet)
-        self.__merge_client.onBuildCompleted(job)
-        return job
-
-    def handleWorkFail(self, packet):
-        job = super(MergeGearmanClient, self).handleWorkFail(packet)
-        self.__merge_client.onBuildCompleted(job)
-        return job
-
-    def handleWorkException(self, packet):
-        job = super(MergeGearmanClient, self).handleWorkException(packet)
-        self.__merge_client.onBuildCompleted(job)
-        return job
-
-    def handleDisconnect(self, job):
-        job = super(MergeGearmanClient, self).handleDisconnect(job)
-        self.__merge_client.onBuildCompleted(job)
-
-
-class MergeJob(gear.TextJob):
-    def __init__(self, *args, **kw):
-        super(MergeJob, self).__init__(*args, **kw)
-        self.__event = threading.Event()
-
-    def setComplete(self):
-        self.__event.set()
-
-    def wait(self, timeout=300):
-        return self.__event.wait(timeout)
+from zuul.model import PRIORITY_MAP, BuildSet, QueueItem, TriggerEvent
+from zuul.zk import ZooKeeperClient
+from zuul.zk.cache import ZooKeeperWorkItem
+from zuul.zk.client import event_type_str
+if TYPE_CHECKING:
+    from zuul.zk.work import ZooKeeperWork
 
 
 class MergeClient(object):
@@ -76,47 +36,64 @@ class MergeClient(object):
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
-        server = self.config.get('gearman', 'server')
-        port = get_default(self.config, 'gearman', 'port', 4730)
-        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-        self.log.debug("Connecting to gearman at %s:%s" % (server, port))
-        self.gearman = MergeGearmanClient(self)
-        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
-                               keepalive=True, tcp_keepidle=60,
-                               tcp_keepintvl=30, tcp_keepcnt=5)
+        self.zk_client: ZooKeeperClient = self.sched.zk_client
+        self.zk_work: ZooKeeperWork = self.sched.zk_work
+        self.zk_work.registerAllZones()
         self.git_timeout = get_default(
             self.config, 'merger', 'git_timeout', 300)
-        self.log.debug("Waiting for gearman")
-        self.gearman.waitForServer()
-        self.jobs = set()
+        self.work_items: Set[str] = set()
+        self.build_sets: Dict[str, BuildSet] = {}
+        self._wait_events: Dict[str, threading.Event] = {}
+        self.results: Dict[str, Dict[str, Any]] = {}
+        self.zk_work.registerCacheListener(self._treeCacheListener)
+
+    def _treeCacheListener(self, segments: List[str], event: TreeEvent,
+                           item: Optional[ZooKeeperWorkItem]) -> None:
+
+        if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED)\
+                and item\
+                and item.path in self.work_items:
+
+            log = get_annotated_logger(self.log, None,
+                                       build=item.content['uuid'])
+            log.debug("TreeEvent (%s) [%s]: %s", event_type_str(event),
+                      segments, item)
+            if len(segments) == 2 and segments[1] == 'result':
+                self.onBuildCompleted(item)
+            elif len(segments) == 2 and segments[1] == 'exception':
+                self.onBuildCompleted(item)
 
     def stop(self):
-        self.gearman.shutdown()
+        pass
 
     def areMergesOutstanding(self):
-        if self.jobs:
+        if self.work_items:
             return True
         return False
 
-    def submitJob(self, name, data, build_set,
-                  precedence=zuul.model.PRECEDENCE_NORMAL, event=None):
+    def submitJob(self, name: str, data: Dict[str, Any],
+                  build_set: Optional[BuildSet],
+                  precedence: int = zuul.model.PRECEDENCE_NORMAL, event=None)\
+            -> Tuple[str, str]:
         log = get_annotated_logger(self.log, event)
         uuid = str(uuid4().hex)
-        job = MergeJob(name,
-                       json.dumps(data),
-                       unique=uuid)
-        job.build_set = build_set
-        log.debug("Submitting job %s with data %s", job, data)
-        self.jobs.add(job)
-        self.gearman.submitJob(job, precedence=precedence,
-                               timeout=300)
-        return job
+        log.debug("Submitting job %s with data %s", uuid, data)
+        self._wait_events[uuid] = threading.Event()
+        node = self.zk_work.submit(uuid=uuid, name=name, params=data,
+                                   zone=self.zk_work.DEFAULT_ZONE,
+                                   precedence=PRIORITY_MAP[precedence])
+        if build_set:
+            self.build_sets[node] = build_set
+        self.work_items.add(node)
+        return node, uuid
 
-    def mergeChanges(self, items, build_set, files=None, dirs=None,
-                     repo_state=None, precedence=zuul.model.PRECEDENCE_NORMAL,
-                     branches=None, event=None):
+    def mergeChanges(self, items: List[QueueItem], build_set: BuildSet,
+                     files: Optional[List[str]] = None,
+                     dirs: Optional[List[str]] = None,
+                     repo_state: Optional[Dict[str, Any]] = None,
+                     precedence: int = zuul.model.PRECEDENCE_NORMAL,
+                     branches: Optional[List[str]] = None,
+                     event: Optional[TriggerEvent] = None) -> None:
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
@@ -130,9 +107,10 @@ class MergeClient(object):
         self.submitJob('merger:merge', data, build_set, precedence,
                        event=event)
 
-    def getRepoState(self, items, build_set,
-                     precedence=zuul.model.PRECEDENCE_NORMAL,
-                     branches=None, event=None):
+    def getRepoState(self, items: List[QueueItem], build_set: BuildSet,
+                     precedence: int = zuul.model.PRECEDENCE_NORMAL,
+                     branches: Optional[List[str]] = None,
+                     event: Optional[TriggerEvent] = None) -> None:
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
@@ -143,8 +121,10 @@ class MergeClient(object):
         self.submitJob('merger:refstate', data, build_set, precedence,
                        event=event)
 
-    def getFiles(self, connection_name, project_name, branch, files, dirs=[],
-                 precedence=zuul.model.PRECEDENCE_HIGH, event=None):
+    def getFiles(self, connection_name: str, project_name: str, branch: str,
+                 files: Optional[List[str]], dirs: Optional[List[str]] = None,
+                 precedence: int = zuul.model.PRECEDENCE_HIGH,
+                 event: Optional[TriggerEvent] = None) -> Tuple[str, str]:
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
@@ -154,14 +134,17 @@ class MergeClient(object):
                     project=project_name,
                     branch=branch,
                     files=files,
-                    dirs=dirs,
+                    dirs=dirs or [],
                     zuul_event_id=zuul_event_id)
-        job = self.submitJob('merger:cat', data, None, precedence, event=event)
-        return job
+        return self.submitJob('merger:cat', data, None, precedence,
+                              event=event)
 
-    def getFilesChanges(self, connection_name, project_name, branch,
-                        tosha=None, precedence=zuul.model.PRECEDENCE_HIGH,
-                        build_set=None, event=None):
+    def getFilesChanges(self, connection_name: str, project_name: str,
+                        branch: str, tosha=None,
+                        precedence: int = zuul.model.PRECEDENCE_HIGH,
+                        build_set: Optional[BuildSet] = None,
+                        event: Optional[TriggerEvent] = None)\
+            -> Tuple[str, str]:
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
@@ -172,33 +155,45 @@ class MergeClient(object):
                     branch=branch,
                     tosha=tosha,
                     zuul_event_id=zuul_event_id)
-        job = self.submitJob('merger:fileschanges', data, build_set,
-                             precedence, event=event)
-        return job
+        return self.submitJob('merger:fileschanges', data, build_set,
+                              precedence, event=event)
 
-    def onBuildCompleted(self, job):
-        data = getJobData(job)
-        zuul_event_id = data.get('zuul_event_id')
+    def waitFor(self, unique: str, timeout: float = 300):
+        if unique in self._wait_events:
+            self._wait_events[unique].wait(timeout)
+
+    def onBuildCompleted(self, work_item: ZooKeeperWorkItem):
+        result = {}
+        zuul_event_id = work_item.result.get('zuul_event_id')\
+            if work_item.result else None
         log = get_annotated_logger(self.log, zuul_event_id)
 
-        merged = data.get('merged', False)
-        job.updated = data.get('updated', False)
-        commit = data.get('commit')
-        files = data.get('files', {})
-        repo_state = data.get('repo_state', {})
-        item_in_branches = data.get('item_in_branches', [])
-        job.files = files
+        merged = work_item.result.get('merged', False)
+        result['updated'] = work_item.result.get('updated', False)
+        commit = work_item.result.get('commit')
+        files = work_item.result.get('files', {})
+        repo_state = work_item.result.get('repo_state', {})
+        item_in_branches = work_item.result.get('item_in_branches', [])
+        result['files'] = files
+        self.results[work_item.path] = result
         log.info("Merge %s complete, merged: %s, updated: %s, "
-                 "commit: %s, branches: %s", job, merged, job.updated, commit,
-                 item_in_branches)
-        job.setComplete()
-        if job.build_set:
-            if job.name == 'merger:fileschanges':
-                self.sched.onFilesChangesCompleted(job.build_set, files)
+                 "commit: %s, branches: %s", work_item.path, merged,
+                 result['updated'], commit, item_in_branches)
+        if work_item.path in self.build_sets:
+            if work_item.content['name'] == 'merger:fileschanges':
+                self.sched.onFilesChangesCompleted(
+                    self.build_sets[work_item.path], files)
             else:
-                self.sched.onMergeCompleted(job.build_set,
-                                            merged, job.updated, commit, files,
-                                            repo_state, item_in_branches)
+                self.sched.onMergeCompleted(self.build_sets[work_item.path],
+                                            merged, result['updated'], commit,
+                                            files, repo_state,
+                                            item_in_branches)
+        # TODO JK: del self.build_sets[work_item.path]
         # The test suite expects the job to be removed from the
         # internal account after the wake flag is set.
-        self.jobs.remove(job)
+        self.zk_work.remove(work_item.path)
+        unique = work_item.content['uuid']
+        if unique in self._wait_events:
+            self._wait_events[unique].set()
+            del self._wait_events[unique]
+        self.work_items.remove(work_item.path)

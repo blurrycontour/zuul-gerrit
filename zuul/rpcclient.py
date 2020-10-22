@@ -12,11 +12,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import time
+from copy import deepcopy
+from threading import Event
+from typing import Any, Dict, Optional, List
 
-import gear
+from kazoo.recipe.cache import TreeEvent
+
+from zuul.zk.cache import ZooKeeperWorkItem, WorkState
+from zuul.zk.work import ZooKeeperWork
 
 
 class RPCFailure(Exception):
@@ -26,30 +31,43 @@ class RPCFailure(Exception):
 class RPCClient(object):
     log = logging.getLogger("zuul.RPCClient")
 
-    def __init__(self, server, port, ssl_key=None, ssl_cert=None, ssl_ca=None,
-                 client_id='Zuul RPC Client'):
-        self.log.debug("Connecting to gearman at %s:%s" % (server, port))
-        self.gearman = gear.Client(client_id)
-        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
-                               keepalive=True, tcp_keepidle=60,
-                               tcp_keepintvl=30, tcp_keepcnt=5)
-        self.log.debug("Waiting for gearman")
-        self.gearman.waitForServer()
+    def __init__(self, zk_work: ZooKeeperWork):
+        """
+        Constructor
+        :param zk_work: ZooKeeper work module
+        """
+        self._work_item_events: Dict[str, Event] = {}
+        self.zk_work: ZooKeeperWork = zk_work
+        self.zk_work.registerCacheListener(self._treeCacheListener)
 
-    def submitJob(self, name, data):
+    def _treeCacheListener(self, segments: List[str], event: TreeEvent,
+                           item: Optional[ZooKeeperWorkItem]) -> None:
+
+        if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED)\
+                and item\
+                and item.path in self._work_item_events\
+                and len(segments) == 2 \
+                and segments[1] in ['result', 'exception']:
+            self._work_item_events[item.path].set()
+            del self._work_item_events[item.path]
+
+    def submitJob(self, name: str, data: Dict[str, Any]) -> ZooKeeperWorkItem:
         self.log.debug("Submitting job %s with data %s" % (name, data))
-        job = gear.TextJob(name,
-                           json.dumps(data),
-                           unique=str(time.time()))
-        self.gearman.submitJob(job, timeout=300)
+        work_node = self.zk_work.submit(uuid=(str(time.time())), name=name,
+                                        params=data)
 
         self.log.debug("Waiting for job completion")
-        while not job.complete:
-            time.sleep(0.1)
-        if job.exception:
-            raise RPCFailure(job.exception)
-        self.log.debug("Job complete, success: %s" % (not job.failure))
-        return job
+        self._work_item_events[work_node] = Event()
+        self._work_item_events[work_node].wait()
+        cached = deepcopy(self.zk_work.getCached(work_node))
+        try:
+            if not cached or cached.state == WorkState.FAILED:
+                raise RPCFailure(str(cached.exception if cached else None))
+            self.log.debug("Job complete, success: %s",
+                           cached.state != WorkState.FAILED)
+            return cached
+        finally:
+            self.zk_work.remove(work_node)
 
     def autohold(self, tenant, project, job, change, ref, reason, count,
                  node_hold_expiration=None):
@@ -61,30 +79,32 @@ class RPCClient(object):
                 'reason': reason,
                 'count': count,
                 'node_hold_expiration': node_hold_expiration}
-        return not self.submitJob('zuul:autohold', data).failure
+        return self.submitJob('zuul:autohold', data).state != WorkState.FAILED
 
     def autohold_delete(self, request_id):
         data = {'request_id': request_id}
-        return not self.submitJob('zuul:autohold_delete', data).failure
+        return self.submitJob('zuul:autohold_delete', data)\
+                   .state != WorkState.FAILED
 
     def autohold_info(self, request_id):
         data = {'request_id': request_id}
-        job = self.submitJob('zuul:autohold_info', data)
-        if job.failure:
+        work_item = self.submitJob('zuul:autohold_info', data)
+        if work_item.state == WorkState.FAILED:
             return False
         else:
-            return json.loads(job.data[0])
+            return work_item.result
 
     # todo allow filtering per tenant, like in the REST API
     def autohold_list(self, *args, **kwargs):
         data = {}
-        job = self.submitJob('zuul:autohold_list', data)
-        if job.failure:
+        work_item = self.submitJob('zuul:autohold_list', data)
+        if work_item.state == WorkState.FAILED:
             return False
         else:
-            return json.loads(job.data[0])
+            return work_item.result
 
-    def enqueue(self, tenant, pipeline, project, trigger, change):
+    def enqueue(self, tenant: str, pipeline: str, project: str,
+                trigger: Optional[str], change: str) -> bool:
         if trigger is not None:
             self.log.info('enqueue: the "trigger" argument is deprecated')
         data = {'tenant': tenant,
@@ -93,7 +113,7 @@ class RPCClient(object):
                 'trigger': trigger,
                 'change': change,
                 }
-        return not self.submitJob('zuul:enqueue', data).failure
+        return self.submitJob('zuul:enqueue', data).state != WorkState.FAILED
 
     def enqueue_ref(
             self, tenant, pipeline, project, trigger, ref, oldrev, newrev):
@@ -107,7 +127,8 @@ class RPCClient(object):
                 'oldrev': oldrev,
                 'newrev': newrev,
                 }
-        return not self.submitJob('zuul:enqueue_ref', data).failure
+        return self.submitJob('zuul:enqueue_ref', data)\
+                   .state != WorkState.FAILED
 
     def dequeue(self, tenant, pipeline, project, change, ref):
         data = {'tenant': tenant,
@@ -116,30 +137,31 @@ class RPCClient(object):
                 'change': change,
                 'ref': ref,
                 }
-        return not self.submitJob('zuul:dequeue', data).failure
+        return self.submitJob('zuul:dequeue', data).state != WorkState.FAILED
 
     def promote(self, tenant, pipeline, change_ids):
         data = {'tenant': tenant,
                 'pipeline': pipeline,
                 'change_ids': change_ids,
                 }
-        return not self.submitJob('zuul:promote', data).failure
+        return self.submitJob('zuul:promote', data).state != WorkState.FAILED
 
     def get_running_jobs(self):
         data = {}
-        job = self.submitJob('zuul:get_running_jobs', data)
-        if job.failure:
+        work_item = self.submitJob('zuul:get_running_jobs', data)
+        if work_item.state == WorkState.FAILED:
             return False
         else:
-            return json.loads(job.data[0])
+            return work_item.result
 
     def shutdown(self):
-        self.gearman.shutdown()
+        # self.gearman.shutdown()
+        pass
 
     def get_job_log_stream_address(self, uuid, logfile='console.log'):
         data = {'uuid': uuid, 'logfile': logfile}
-        job = self.submitJob('zuul:get_job_log_stream_address', data)
-        if job.failure:
+        work_item = self.submitJob('zuul:get_job_log_stream_address', data)
+        if work_item.state == WorkState.FAILED:
             return False
         else:
-            return json.loads(job.data[0])
+            return work_item.result
