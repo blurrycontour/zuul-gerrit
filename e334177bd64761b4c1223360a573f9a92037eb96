@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_037323e9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-22T14:05:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_8351f311",
+      "range": {
+        "startLine": 13,
+        "startChar": 21,
+        "endLine": 13,
+        "endChar": 30
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_e340a70a",
         "filename": "tests/unit/test_keystorage.py",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2020-10-22T13:10:40Z",
       "side": 1,
       "message": "Since this is part of the scale-out scheduler would it make sense to put it on top of 754360? The connecting to Zookeeper is unified there.",
+      "range": {
+        "startLine": 87,
+        "startChar": 16,
+        "endLine": 87,
+        "endChar": 23
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_e39ee705",
+        "filename": "tests/unit/test_keystorage.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-22T14:05:36Z",
+      "side": 1,
+      "message": "I\u0027d rather keep this independent for the time being. Adapting this to the new ZooKeeperClient should be no big deal.",
+      "parentUuid": "3f65232a_e340a70a",
       "range": {
         "startLine": 87,
         "startChar": 16,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_a3898f27",
+        "filename": "zuul/lib/encryption.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-22T14:05:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_c3a92be0",
+      "range": {
+        "startLine": 42,
+        "startChar": 30,
+        "endLine": 42,
+        "endChar": 41
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_03704372",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 5
@@ -94,6 +166,30 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_c3712be3",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-22T14:05:36Z",
+      "side": 1,
+      "message": "Currently I don\u0027t see a benefit of inheriting from ZooKeeperBase as the Keystore doesn\u0027t need the connect/disconnect lifecycle.",
+      "parentUuid": "3f65232a_03704372",
+      "range": {
+        "startLine": 300,
+        "startChar": 6,
+        "endLine": 300,
+        "endChar": 25
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_0394c38a",
         "filename": "zuul/scheduler.py",
         "patchSetId": 5
@@ -105,6 +201,30 @@
       "writtenOn": "2020-10-22T13:10:40Z",
       "side": 1,
       "message": "nit: I guess those need to be camel cased. Also this one is called outside this class tree and should be without \"_\"?",
+      "range": {
+        "startLine": 755,
+        "startChar": 8,
+        "endLine": 755,
+        "endChar": 24
+      },
+      "revId": "e334177bd64761b4c1223360a573f9a92037eb96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_43451bb3",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-22T14:05:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_0394c38a",
       "range": {
         "startLine": 755,
         "startChar": 8,
