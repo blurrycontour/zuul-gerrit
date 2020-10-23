@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_8ae3b105",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-23T17:27:43Z",
+      "side": 1,
+      "message": "Thanks, then this makes sense.",
+      "parentUuid": "7f6b1bfe_29355547",
+      "range": {
+        "startLine": 129,
+        "startChar": 6,
+        "endLine": 129,
+        "endChar": 28
+      },
+      "revId": "13f47dac263a2bf94e2938f3498a4d58381d8a2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7f6b1bfe_ff903a51",
         "filename": "zuul/connection/__init__.py",
         "patchSetId": 2
