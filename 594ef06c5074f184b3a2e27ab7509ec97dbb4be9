@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f65232a_b59413ea",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T12:44:55Z",
+      "side": 1,
+      "message": "While reviewing and jumping back and forth between files I was always confused that this is in zk/cache.py and not in zk/work.py",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_bf7874f8",
         "filename": "zuul/zk/cache.py",
         "patchSetId": 4
@@ -13,6 +30,57 @@
       "writtenOn": "2020-10-23T10:38:59Z",
       "side": 1,
       "message": "nit: Block can be simplified to:\n\n    try:\n        return WorkState[self.content[\u0027state\u0027]]\n    except KeyError:\n        return WorkState.UNKNOWN",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_350da33e",
+        "filename": "zuul/zk/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T12:44:55Z",
+      "side": 1,
+      "message": "nit: -\u003e str",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_951e376e",
+        "filename": "zuul/zk/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T12:44:55Z",
+      "side": 1,
+      "message": "Just wondering if some kind of enum would make more sense than using chars?",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_d80d8638",
+        "filename": "zuul/zk/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T12:44:55Z",
+      "side": 1,
+      "message": "nit: this could be an @abstractmethod",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -115,6 +183,74 @@
       "writtenOn": "2020-10-23T10:38:59Z",
       "side": 1,
       "message": "nit: you could avoid creating a throw-away list by extending the result\n\n    result.extend(cache.values())",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_d539cf41",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 540,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T12:44:55Z",
+      "side": 1,
+      "message": "This can be simplified to:\n\n    for path in list(self._to_delete):\n        self.remove(path)\n\nas the remove() method is taking care of removing it from the _to_delete list.",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_d5126fb1",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T12:44:55Z",
+      "side": 1,
+      "message": "This can also be simplified to:\n\n    for path, _ in self.inState(WorkState.REMOVED):\n        self.remove(path)",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_95675726",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T12:44:55Z",
+      "side": 1,
+      "message": "Do we expect the caller to handle the BadVersionError or do we need to deal with it here?",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_5545bfb2",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T12:44:55Z",
+      "side": 1,
+      "message": "To be consistent I think we should also remove it from the _to_delete list here.",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
