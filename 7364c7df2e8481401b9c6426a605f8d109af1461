@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_a707d01c",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-10-23T07:54:12Z",
+      "side": 1,
+      "message": "Maybe add a comment about that\u0027s an unavailable feature on Pagure.",
+      "revId": "7364c7df2e8481401b9c6426a605f8d109af1461",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_d22c489b",
+        "filename": "zuul/driver/pagure/pagureconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-10-23T07:54:12Z",
+      "side": 1,
+      "message": "NotImplementedError(\"Pagure does not provide protected branch feature\")",
+      "revId": "7364c7df2e8481401b9c6426a605f8d109af1461",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
