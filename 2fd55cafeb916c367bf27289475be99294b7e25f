@@ -16,6 +16,24 @@
       "revId": "2fd55cafeb916c367bf27289475be99294b7e25f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_a754f0cb",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-23T06:54:39Z",
+      "side": 1,
+      "message": "This part is refactored in https://review.opendev.org/c/757149 together with other setters. Could be moved here if there is a benefit. This change is focusing on making ZooKeeper mandatory. I guess the same argument could be then made for executor and merger too which would then merge those 2 changes.",
+      "parentUuid": "3f65232a_3592d8f7",
+      "revId": "2fd55cafeb916c367bf27289475be99294b7e25f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
