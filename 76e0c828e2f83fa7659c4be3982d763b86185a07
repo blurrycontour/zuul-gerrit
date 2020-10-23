@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_8a7a9121",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 987,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-23T17:33:07Z",
+      "side": 1,
+      "message": "nit: maybe add a message to this exception as well.",
+      "revId": "76e0c828e2f83fa7659c4be3982d763b86185a07",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
