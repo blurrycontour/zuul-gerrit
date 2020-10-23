@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_e7d26834",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-23T07:13:33Z",
+      "side": 1,
+      "message": "I guess this can be renamed. Original: https://review.opendev.org/c/717269/53/zuul/zk.py.\n\nIn that case I would do it in separate change, same way as typing improvements.",
+      "parentUuid": "3f65232a_6912cdb3",
+      "revId": "b8f24e227705f60d89e82435b126c81b674d2f11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_1b027cb5",
         "filename": "zuul/zk/nodepool.py",
         "patchSetId": 53
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_87745437",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-23T07:13:33Z",
+      "side": 1,
+      "message": "Yes (line: 60)",
+      "parentUuid": "3f65232a_1b027cb5",
+      "revId": "b8f24e227705f60d89e82435b126c81b674d2f11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_5b835457",
         "filename": "zuul/zk/nodepool.py",
         "patchSetId": 53
@@ -64,6 +100,24 @@
       "writtenOn": "2020-10-21T13:20:57Z",
       "side": 1,
       "message": "This line might fail if the event_data doesn\u0027t provide a path attribute (like checked in line 317). To avoid this and to simplify things a little we could store the path in a variable once and return if it\u0027s None (or raise an Exception if that\u0027s appropriate). We could then also remove line 328.\n\nSomething like this:\n\npath \u003d None\nif hasattr(event.event_data, \u0027path\u0027):\n    # Ignore root node\n    path \u003d event.event_data.path\n\nif path \u003d\u003d self.HOLD_REQUEST_ROOT:\n    return\n\nif event.event_type not in...\n    return\n\nif path is None:\n    return\n\n...",
+      "revId": "b8f24e227705f60d89e82435b126c81b674d2f11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_07896422",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-23T07:13:33Z",
+      "side": 1,
+      "message": "I guess event types \"NODE_ADDED\", \"NODE_UPDATED\" and \"NODE_REMOVED\" always provide a path. The original implementation is the same. The only change is that the methods \"holdRequestCacheListener\" and \"_holdRequestCacheListener\" were merged together. Check https://review.opendev.org/c/717269/53/zuul/zk.py\n\nAlthough this file was renamed from \"zk.py\" and git is showing that, gerrit is marking it as \"new\" and \"zk.py\" as deleted.",
+      "parentUuid": "3f65232a_5b835457",
       "revId": "b8f24e227705f60d89e82435b126c81b674d2f11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
