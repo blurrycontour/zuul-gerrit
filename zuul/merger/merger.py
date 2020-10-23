@@ -184,7 +184,12 @@ class Repo(object):
             for ref in origin.refs:
                 if ref.remote_head == 'HEAD':
                     continue
-                repo.create_head(ref.remote_head, ref, force=True)
+
+                # GitPython is trying to be nice and thinks that
+                # we want the head '<name>' when trying to create
+                # the head 'refs/heads/<name>'.
+                # Avoid this by always prepending 'refs/heads/'.
+                repo.create_head('refs/heads/' + ref.remote_head, ref, force=True)
         with repo.config_writer() as config_writer:
             if self.email:
                 config_writer.set_value('user', 'email', self.email)
