@@ -35,6 +35,19 @@ class TestMergerRepo(ZuulTestCase):
         super(TestMergerRepo, self).setUp()
         self.workspace_root = os.path.join(self.test_root, 'workspace')
 
+    def test_create_head_path(self):
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        parent_repo = git.Repo(parent_path)
+        parent_repo.create_head("refs/heads/foobar")
+        parent_repo.create_head("refs/heads/refs/heads/foobar")
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        repo = work_repo.createRepoObject(None)
+        self.assertIn('foobar', repo.branches)
+        self.assertIn('refs/heads/foobar', repo.branches)
+        self.assertNotIn('refs/heads/refs/heads/foobar', repo.branches)
+
     def test_ensure_cloned(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
 

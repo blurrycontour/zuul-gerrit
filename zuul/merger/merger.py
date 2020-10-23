@@ -184,7 +184,9 @@ class Repo(object):
             for ref in origin.refs:
                 if ref.remote_head == 'HEAD':
                     continue
-                repo.create_head(ref.remote_head, ref, force=True)
+                repo.create_head('refs/heads/' + ref.remote_head,
+                                 ref,
+                                 force=True)
         with repo.config_writer() as config_writer:
             if self.email:
                 config_writer.set_value('user', 'email', self.email)
@@ -384,7 +386,7 @@ class Repo(object):
         for ref in origin.refs:
             if ref.remote_head == 'HEAD':
                 continue
-            repo.create_head(ref.remote_head, ref, force=True)
+            repo.create_head('refs/heads/' + ref.remote_head, ref, force=True)
         return messages
 
     def reset(self, zuul_event_id=None, build=None, process_worker=None):
