@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_47cd1c5c",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-23T07:19:58Z",
+      "side": 1,
+      "message": "Another idea would be to implement also other methods like __len__ and __iter__ to make it also work like a dict (see https://docs.python.org/3.8/library/collections.abc.html#collections-abstract-base-classes)",
+      "parentUuid": "3f65232a_2d3e1029",
+      "revId": "5ddafda8346cf412013f3c66fad0f7728a024e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_cd04bc7e",
         "filename": "zuul/zk/components.py",
         "patchSetId": 2
