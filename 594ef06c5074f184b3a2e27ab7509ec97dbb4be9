@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_bf7874f8",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T10:38:59Z",
+      "side": 1,
+      "message": "nit: Block can be simplified to:\n\n    try:\n        return WorkState[self.content[\u0027state\u0027]]\n    except KeyError:\n        return WorkState.UNKNOWN",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_7f809c8c",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T10:38:59Z",
+      "side": 1,
+      "message": "Is there a reason for keeping a list of registered zones? I don\u0027t see where this is necessary, but maybe that\u0027s needed in one of the follow up patches?\n\nFor the use-case of registering all zones this could simply be a flag (e.g. self._register_all_zones \u003d False)",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_e20d3338",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T10:38:59Z",
+      "side": 1,
+      "message": "Not sure if it\u0027s a good idea to reach into the dict to pull out the uuid here. I\u0027m wondering if we should instead have the uuid (and maybe also other attributes that are needed for the ZooKeeperWorkBase) as a mandatory attribute of the WorkItem? This way we don\u0027t have to care e.g. about missing keys because the API is clear.",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_824a7f52",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T10:38:59Z",
+      "side": 1,
+      "message": "Related to my comment above: this seems to be the only place we use the list of registered zones, but the actual registration below is done in any case.",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_82bf1ffa",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T10:38:59Z",
+      "side": 1,
+      "message": "nit: maybe the WorkItem can have a property that returns the ordering.\n\n    @property\n    def priority(self):\n        return self.path.rsplit(\"/\", 1)[-1]\n\nBtw. any reason for reversing the list of split parts instead of just returning the last element?",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_c25f57e3",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T10:38:59Z",
+      "side": 1,
+      "message": "nit: you could avoid looping over the cache and the \"if path\" check when the string is empty by having a guard clause at the top:\n\n    if not path:\n        return None\n\n    for cache in self._cache.values():\n        cached \u003d cache[path]\n        ...",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_2270cb72",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-23T10:38:59Z",
+      "side": 1,
+      "message": "nit: you could avoid creating a throw-away list by extending the result\n\n    result.extend(cache.values())",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
