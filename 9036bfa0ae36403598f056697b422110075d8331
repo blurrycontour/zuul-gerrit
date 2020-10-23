@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_cc515311",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1840,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-10-23T03:25:59Z",
+      "side": 1,
+      "message": "IterableList is handy and allows to simplify test code using for example:\nif branch_name in self.gl_client.fake_repos[(owner, project)]",
+      "parentUuid": "5f681702_853bb79a",
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f681702_45ffdfa9",
         "filename": "tests/base.py",
         "patchSetId": 7
@@ -30,6 +48,30 @@
       "writtenOn": "2020-10-19T15:03:05Z",
       "side": 1,
       "message": "could it be \u0027.+/projects/(.+)/(branches|protected_branches)$\u0027 ?",
+      "range": {
+        "startLine": 1885,
+        "startChar": 0,
+        "endLine": 1888,
+        "endChar": 58
+      },
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_cc2cb39b",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1888,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-10-23T03:25:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f681702_45ffdfa9",
       "range": {
         "startLine": 1885,
         "startChar": 0,
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_0c2d0b43",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 725,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-10-23T03:25:59Z",
+      "side": 1,
+      "message": "Yes (using GitLab Community Edition 13.4.2), there isn\u0027t any event when a branch is protected or unprotected :-/",
+      "parentUuid": "3f65232a_ddfe3fad",
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_7db56bee",
         "filename": "tests/unit/test_gitlab_driver.py",
         "patchSetId": 7
@@ -82,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_8c191b7b",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-10-23T03:25:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_7db56bee",
+      "range": {
+        "startLine": 748,
+        "startChar": 50,
+        "endLine": 749,
+        "endChar": 47
+      },
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_3d893326",
         "filename": "tests/unit/test_gitlab_driver.py",
         "patchSetId": 7
@@ -93,6 +177,24 @@
       "writtenOn": "2020-10-21T07:58:37Z",
       "side": 1,
       "message": "don\u0027t you need this first ? self.create_branch(\u0027org/project2\u0027, \u0027feat-x\u0027)",
+      "revId": "9036bfa0ae36403598f056697b422110075d8331",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_ec27efb5",
+        "filename": "tests/unit/test_gitlab_driver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 874,
+      "author": {
+        "id": 25403
+      },
+      "writtenOn": "2020-10-23T03:25:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_3d893326",
       "revId": "9036bfa0ae36403598f056697b422110075d8331",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
