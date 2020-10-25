@@ -16,6 +16,24 @@
       "revId": "0e226f096df89f9597e0a11faaeae452149ce407",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_b418871d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 53
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-25T19:58:03Z",
+      "side": 1,
+      "message": "The parent_logger is passed to \"Repo\" couple lines before. This is probably if one wants to use an explicitely annotated logger. The Repo also creates a default logger but it may be probably confusing if the logs from \"Repo\" would look like they are from \"Merger\". On the other hand it this is completely wrapped in an explicitly defined logger both will share it.",
+      "parentUuid": "3f65232a_b1aa87cf",
+      "revId": "0e226f096df89f9597e0a11faaeae452149ce407",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
