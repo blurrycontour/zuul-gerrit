@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_94e62b16",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-25T20:12:57Z",
+      "side": 1,
+      "message": "Yes, the ZooKeeperComponentRegistry#all will return ZooKeeperComponentReadOnly. The reason is that components can read other components but only the component which called the ZooKeeperComponentRegistry#register method will get a r/w access. This makes it easier to cache values (one does not have to check what is the state in ZK) and enables better prevention that a component changes attributes which it does not own.",
+      "parentUuid": "3f65232a_cd879cd7",
+      "revId": "5ddafda8346cf412013f3c66fad0f7728a024e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_2d3e1029",
         "filename": "zuul/zk/components.py",
         "patchSetId": 2
@@ -54,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_74e38f06",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-25T20:12:57Z",
+      "side": 1,
+      "message": "Done. Changed to set/get methods.",
+      "parentUuid": "3f65232a_47cd1c5c",
+      "revId": "5ddafda8346cf412013f3c66fad0f7728a024e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_cd04bc7e",
         "filename": "zuul/zk/components.py",
         "patchSetId": 2
@@ -65,6 +101,24 @@
       "writtenOn": "2020-10-22T11:13:25Z",
       "side": 1,
       "message": "Can\u0027t we directly use the ZooKeeperComponenState.STOPPED here? I think if we get rid of the `.name` here we could also remove the if/else branch in the __setitem__ method checking if either the enum value or the name is provided.",
+      "revId": "5ddafda8346cf412013f3c66fad0f7728a024e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_14bcdbda",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-25T20:12:57Z",
+      "side": 1,
+      "message": "This is going to be serialized to json and store in the zk node. Thats why the \".name\" is needed here. The if/else in line 56 enables to use different representations of ZooKeeperComponentState. One may argue that we only need one but I left it open for the developer to decide, based on context which representation he/she wants to use.",
+      "parentUuid": "3f65232a_cd04bc7e",
       "revId": "5ddafda8346cf412013f3c66fad0f7728a024e05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
