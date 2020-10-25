@@ -16,6 +16,24 @@
       "revId": "3a507d56fa4eaaeda18a020ec4c19ac2409c3735",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_54ddb340",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-25T20:00:49Z",
+      "side": 1,
+      "message": "Yes we do. Line 48 is lazy, but in method signature is eager. This will then fail since Scheduler is only imported for TYPE_CHECKING. Without the condition above you get cyclic import.",
+      "parentUuid": "3f65232a_75629018",
+      "revId": "3a507d56fa4eaaeda18a020ec4c19ac2409c3735",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
