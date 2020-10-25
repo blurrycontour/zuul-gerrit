@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_54b653fc",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-25T20:32:41Z",
+      "side": 1,
+      "message": "Because it is the cache entity. I was trying to avoid too big files from the start.",
+      "parentUuid": "3f65232a_b59413ea",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_bf7874f8",
         "filename": "zuul/zk/cache.py",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2020-10-23T10:38:59Z",
       "side": 1,
       "message": "nit: Block can be simplified to:\n\n    try:\n        return WorkState[self.content[\u0027state\u0027]]\n    except KeyError:\n        return WorkState.UNKNOWN",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_34bbd7e2",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-25T20:32:41Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "3f65232a_bf7874f8",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
