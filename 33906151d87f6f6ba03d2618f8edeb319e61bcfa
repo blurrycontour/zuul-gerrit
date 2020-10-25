@@ -34,6 +34,24 @@
       "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_342d9743",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-25T19:55:48Z",
+      "side": 1,
+      "message": "ZooKeeperConnection was done to unify/simplify creating a ZooKeeperClient. It provides a way to configure connection using a ConfigParser and using parameters in constructor and can be used with a \"with\" block. It is a replacement of the previously used \"connect_zookeeper\" sugar function.",
+      "parentUuid": "3f65232a_b13727e4",
+      "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
