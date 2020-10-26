@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_27b0cbf4",
+        "filename": "zuul/zk/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_350da33e",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_951e376e",
         "filename": "zuul/zk/client.py",
         "patchSetId": 4
@@ -100,6 +118,24 @@
       "writtenOn": "2020-10-23T12:44:55Z",
       "side": 1,
       "message": "Just wondering if some kind of enum would make more sense than using chars?",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_87943f46",
+        "filename": "zuul/zk/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Was thinking about it too. But I am no sure if this function will survive till it this gets merged. It is used only in logs which are definitely too chatty and will be most probably removed at some point.",
+      "parentUuid": "3f65232a_951e376e",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -123,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_67912353",
+        "filename": "zuul/zk/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_d80d8638",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_7f809c8c",
         "filename": "zuul/zk/work.py",
         "patchSetId": 4
@@ -134,6 +188,24 @@
       "writtenOn": "2020-10-23T10:38:59Z",
       "side": 1,
       "message": "Is there a reason for keeping a list of registered zones? I don\u0027t see where this is necessary, but maybe that\u0027s needed in one of the follow up patches?\n\nFor the use-case of registering all zones this could simply be a flag (e.g. self._register_all_zones \u003d False)",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_e73253a7",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "3f65232a_7f809c8c",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -157,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_47286733",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "This can be done. The WorkItem is constructed in ZooKeeperTreeCacheClient#_treeCacheListener/_createCacheValue. Lates there we will have to reach into the deserialized dict.",
+      "parentUuid": "3f65232a_e20d3338",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_824a7f52",
         "filename": "zuul/zk/work.py",
         "patchSetId": 4
@@ -168,6 +258,24 @@
       "writtenOn": "2020-10-23T10:38:59Z",
       "side": 1,
       "message": "Related to my comment above: this seems to be the only place we use the list of registered zones, but the actual registration below is done in any case.",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_8721df50",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "3f65232a_824a7f52",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -191,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_671e430d",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "3f65232a_82bf1ffa",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_c25f57e3",
         "filename": "zuul/zk/work.py",
         "patchSetId": 4
@@ -202,6 +328,24 @@
       "writtenOn": "2020-10-23T10:38:59Z",
       "side": 1,
       "message": "nit: you could avoid looping over the cache and the \"if path\" check when the string is empty by having a guard clause at the top:\n\n    if not path:\n        return None\n\n    for cache in self._cache.values():\n        cached \u003d cache[path]\n        ...",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_a7185b1d",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_c25f57e3",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -225,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_07d30f3a",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_2270cb72",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_d539cf41",
         "filename": "zuul/zk/work.py",
         "patchSetId": 4
@@ -236,6 +398,24 @@
       "writtenOn": "2020-10-23T12:44:55Z",
       "side": 1,
       "message": "This can be simplified to:\n\n    for path in list(self._to_delete):\n        self.remove(path)\n\nas the remove() method is taking care of removing it from the _to_delete list.",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_e7d7f322",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 540,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_d539cf41",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -259,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_47dd0741",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 546,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_d5126fb1",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_95675726",
         "filename": "zuul/zk/work.py",
         "patchSetId": 4
@@ -276,6 +474,24 @@
     },
     {
       "key": {
+        "uuid": "3f65232a_27e28b04",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Good question. If we deal with it here we need to think about max-retries/timeout probably.",
+      "parentUuid": "3f65232a_95675726",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3f65232a_5545bfb2",
         "filename": "zuul/zk/work.py",
         "patchSetId": 4
@@ -287,6 +503,24 @@
       "writtenOn": "2020-10-23T12:44:55Z",
       "side": 1,
       "message": "To be consistent I think we should also remove it from the _to_delete list here.",
+      "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_47ab4788",
+        "filename": "zuul/zk/work.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-10-26T04:37:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f65232a_5545bfb2",
       "revId": "594ef06c5074f184b3a2e27ab7509ec97dbb4be9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
