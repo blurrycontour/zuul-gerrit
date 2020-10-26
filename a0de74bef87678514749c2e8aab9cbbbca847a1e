@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_a504d318",
+        "filename": "tests/base.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 5084,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-10-26T10:42:00Z",
+      "side": 0,
+      "message": "Thinking about it I think I\u0027ll try to keep the ZuulDBTestCase and mock the db connection in ZuulTestCase so we have no impact on the test duration.",
+      "revId": "a0de74bef87678514749c2e8aab9cbbbca847a1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
