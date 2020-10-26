@@ -88,6 +88,24 @@
       "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_c01bbd18",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-26T11:14:54Z",
+      "side": 1,
+      "message": "I think at this point there was no ZooKeeperClient or at least I did not fully see how they interact. Now with a ZooKeeperClient and a ZooKeeperConnection I was just wondering if they could be combined so that we only have one class responsible for working with a Zookeeper connection. Also just making suggestions here to start a discussion :)",
+      "parentUuid": "3f65232a_65211bb5",
+      "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
