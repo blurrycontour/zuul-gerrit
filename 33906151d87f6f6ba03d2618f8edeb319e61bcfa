@@ -52,6 +52,24 @@
       "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f65232a_e799b31f",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-26T06:34:44Z",
+      "side": 1,
+      "message": "I think we are both wondering if this could be part of the ZooKeeperClient itself.",
+      "parentUuid": "3f65232a_342d9743",
+      "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
