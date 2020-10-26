@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_f6a03fa8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 67
+      },
+      "lineNbr": 3001,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-10-26T14:05:15Z",
+      "side": 1,
+      "message": "I\u0027m not sure it\u0027s necessary to run the cleanup on every iteration of the executor main loop on every single executor. Can we maybe do this periodically in a separate thread? Maybe it makes sense to also use the kazoo leader election feature so we only have one executor taking care of the cleanup.",
+      "revId": "17a4efe81282dcb4b734a4688449d28b44ff8585",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
