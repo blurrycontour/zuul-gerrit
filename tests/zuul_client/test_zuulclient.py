@@ -411,10 +411,7 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(C.reported, 2)
 
 
-class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
-    """Test that zuul-client can fetch builds"""
-    config_file = 'zuul-sql-driver-mysql.conf'
-    tenant_config_file = 'config/sql-driver/main.yaml'
+class CLIOutputTest(object):
 
     def _split_pretty_table(self, output):
         lines = output.decode().split('\n')
@@ -436,6 +433,13 @@ class TestZuulClientQueryData(ZuulDBTestCase, BaseTestWeb):
             except ValueError:
                 continue
         return info
+
+
+class TestZuulClientQueryData(ZuulDBTestCase,
+                              BaseTestWeb,
+                              CLIOutputTest):
+    config_file = 'zuul-sql-driver-mysql.conf'
+    tenant_config_file = 'config/sql-driver/main.yaml'
 
     def setUp(self):
         super(TestZuulClientQueryData, self).setUp()
@@ -783,3 +787,65 @@ class TestZuulClientBuildsetInfo(TestZuulClientQueryData,
             self.assertTrue(
                 all(x['Event ID'] == info['Event ID'] for x in builds),
                 output)
+
+
+class TestZuulClientChangeStatus(BaseTestWeb, CLIOutputTest):
+    """Test the change-status command of zuul-client"""
+    config_file = 'zuul-admin-web.conf'
+
+    def test_change_status(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'change-status', '--tenant', 'tenant-one', '--change', '1,1'],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(1, len(results), results)
+        result = results[0]
+        self.assertEqual(
+            'https://review.example.com/1',
+            result['URL'],
+            result
+        )
+        self.assertEqual(
+            'username',
+            result['Owner'],
+            result
+        )
+        self.assertEqual(
+            'org/project',
+            result['Project'],
+            result
+        )
+
+    def test_change_status_show_jobs(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'change-status', '--tenant', 'tenant-one', '--change', '1,1',
+             '--show-jobs'],
+            stdout=subprocess.PIPE)
+        output, err = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+        results = self._split_pretty_table(output)
+        self.assertEqual(3, len(results), results)
+        self.assertTrue(any(
+            [r['Job Name'] == 'project-merge' for r in results]
+        ))
+        self.assertTrue(any(
+            [r['Job Name'] == 'project-test1' for r in results]
+        ))
+        self.assertTrue(any(
+            [r['Job Name'] == 'project-test2' for r in results]
+        ))
