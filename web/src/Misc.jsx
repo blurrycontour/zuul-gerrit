@@ -16,6 +16,11 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { ExternalLinkAltIcon } from '@patternfly/react-icons'
 
+function removeHash() {
+  // Remove location hash from url
+  window.history.pushState('', document.title, window.location.pathname)
+}
+
 function ExternalLink(props) {
   const { target } = props
 
@@ -87,4 +92,4 @@ function buildExternalTableLink(buildish) {
   return null
 }
 
-export { ExternalLink, buildExternalLink, buildExternalTableLink }
+export { removeHash, ExternalLink, buildExternalLink, buildExternalTableLink }
