@@ -27,6 +27,7 @@ from zuul.lib.streamer_utils import CustomThreadingTCPServer
 from zuul.rpcclient import RPCClient
 from zuul.zk import ZooKeeperClient
 from zuul.lib import streamer_utils
+from zuul.version import get_version_string
 from zuul.zk.components import ZooKeeperComponentRegistry, ZooKeeperComponent,\
     ZooKeeperComponentState
 
@@ -131,9 +132,11 @@ class FingerGateway(object):
         self.gear_ssl_ca: Optional[str] = gearman[4]
         self.hostname = socket.getfqdn()
         self.zk_client: ZooKeeperClient = zk_client
-        self.zk_component: ZooKeeperComponent = \
-            ZooKeeperComponentRegistry(zk_client)\
-            .register('finger-gateways', self.hostname)
+        self.zk_component: ZooKeeperComponent = ZooKeeperComponentRegistry(
+            zk_client
+        ).register(
+            'finger-gateways', self.hostname, version=get_version_string()
+        )
         self.address: Tuple[str, int] = address
         self.user: Optional[str] = user
         self.pid_file: Optional[str] = pid_file

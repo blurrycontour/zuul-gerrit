@@ -59,6 +59,7 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
+from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponentState
 
@@ -2565,8 +2566,10 @@ class ExecutorServer(BaseMergeServer):
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
                                     socket.getfqdn())
+
         self.zk_component = self.zk_component_registry.register(
-            'executors', self.hostname)
+            'executors', self.hostname, version=get_version_string()
+        )
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()

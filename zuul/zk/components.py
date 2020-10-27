@@ -131,7 +131,18 @@ class ZooKeeperComponentRegistry(ZooKeeperBase):
 
     log = logging.getLogger("zuul.zk.components.ZooKeeperComponents")
 
-    def all(self, kind: str) -> List[ZooKeeperComponentReadOnly]:
+    def all(self) -> List[ZooKeeperComponentReadOnly]:
+        """
+        Get all registered components grouped by kind Componentes obtained
+        sing this method cannot be updated.
+        """
+        result = {}
+        self.kazoo_client.ensure_path(self.ROOT)
+        for kind_node in self.kazoo_client.get_children(self.ROOT):
+            result[kind_node] = self.all_of_kind(kind_node)
+        return result
+
+    def all_of_kind(self, kind: str) -> List[ZooKeeperComponentReadOnly]:
         """
         Get all registered components of a given kind. Components obtained
         using this method cannot be updated.
@@ -150,7 +161,9 @@ class ZooKeeperComponentRegistry(ZooKeeperBase):
             result.append(ZooKeeperComponentReadOnly(self.client, content))
         return result
 
-    def register(self, kind: str, hostname: str) -> ZooKeeperComponent:
+    def register(
+        self, kind: str, hostname: str, version: str = None
+    ) -> ZooKeeperComponent:
         """
         Register component with a hostname. This method returns an updateable
         component object.
@@ -160,6 +173,9 @@ class ZooKeeperComponentRegistry(ZooKeeperBase):
         :return: Path representing the components's ZNode
         """
         return ZooKeeperComponent(self.client, kind, hostname, dict(
+            # TODO (felix): Do we need to store the hostname also in the value
+            # of the znode if it's already used as key?
             hostname=hostname,
             state=ZooKeeperComponentState.STOPPED.name,
+            version=version,
         ))

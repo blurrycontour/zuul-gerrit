@@ -30,6 +30,7 @@ from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
 from zuul.merger.merger import nullcontext
+from zuul.version import get_version_string
 from zuul.zk.components import ZooKeeperComponentRegistry, \
     ZooKeeperComponentState
 
@@ -248,7 +249,8 @@ class MergeServer(BaseMergeServer):
         super().__init__(config, 'merger', zk_client, connections)
         self.hostname = socket.getfqdn()
         self.zk_component = self.zk_component_registry.register(
-            'mergers', self.hostname)
+            'mergers', self.hostname, version=get_version_string()
+        )
         self.command_map = dict(
             stop=self.stop,
             pause=self.pause,

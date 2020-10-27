@@ -38,7 +38,6 @@ from zuul.lib.named_queue import NamedQueue
 
 from zuul import configloader
 from zuul import exceptions
-from zuul import version as zuul_version
 from zuul.executor.client import ExecutorClient
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.commandsocket import CommandSocket
@@ -55,6 +54,7 @@ from zuul.model import Build, HoldRequest, Tenant, TriggerEvent, \
 from zuul.nodepool import Nodepool
 from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
+from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponent, ZooKeeperComponentRegistry,\
     ZooKeeperComponentState
@@ -346,9 +346,11 @@ class Scheduler(threading.Thread):
         self.triggers: Dict[str, BaseTrigger] = dict()
         self.config: ConfigParser = config
         self.zk_client: ZooKeeperClient = zk_client
-        self.zk_component: ZooKeeperComponent =\
-            ZooKeeperComponentRegistry(zk_client)\
-            .register('schedulers', self.hostname)
+        self.zuul_version: str = get_version_string()
+
+        self.zk_component: ZooKeeperComponent = ZooKeeperComponentRegistry(
+            zk_client
+        ).register('schedulers', self.hostname, version=self.zuul_version)
         self.zk_connection_event: ZooKeeperConnectionEvent =\
             ZooKeeperConnectionEvent(zk_client)
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
@@ -366,11 +368,6 @@ class Scheduler(threading.Thread):
             self.config, 'scheduler', 'command_socket',
             '/var/lib/zuul/scheduler.socket')
         self.command_socket: CommandSocket = CommandSocket(command_socket)
-
-        self.zuul_version: str = "%s %s" % (zuul_version.release_string,
-                                            zuul_version.git_version)\
-            if zuul_version.is_release is False\
-            else zuul_version.release_string
 
         self.last_reconfigured: Optional[int] = None
         self.tenant_last_reconfigured: Dict[str, float] = {}

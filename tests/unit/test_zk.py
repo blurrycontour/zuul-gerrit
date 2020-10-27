@@ -13,13 +13,15 @@
 # under the License.
 
 
+from zuul import scheduler
 import testtools
 
 from tests.zk import TestZooKeeperConnection
 from zuul import model
+from zuul.zk.components import ZooKeeperComponentRegistry
 import zuul.zk.exceptions
 
-from tests.base import BaseTestCase, ChrootedKazooFixture
+from tests.base import BaseTestCase, ChrootedKazooFixture, ZuulTestCase
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 
@@ -83,3 +85,22 @@ class TestZK(BaseTestCase):
         # Test deleting the request
         self.zk_nodepool.deleteHoldRequest(req1)
         self.assertEqual([], self.zk_nodepool.getHoldRequests())
+
+
+class TestZKComponentRegistry(ZuulTestCase):
+
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_component_registry(self):
+        components = ZooKeeperComponentRegistry(self.zk_client).all()
+        print(components)
+        # By default, one scheduler and one executor should be connected...
+        self.assertEqual(len(components), 2)
+        self.assertEqual(len(components["schedulers"]), 1)
+        self.assertEqual(len(components["executors"]), 1)
+
+        # ...and both should be in RUNNING state
+        scheduler_comp = components["schedulers"][0]
+        self.assertEqual(scheduler_comp.get("state"), "RUNNING")
+        executor_comp = components["executors"][0]
+        self.assertEqual(executor_comp.get("state"), "RUNNING")

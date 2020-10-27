@@ -36,6 +36,7 @@ from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.lib.repl import REPLServer
 import zuul.model
 from zuul.rpcclient import RPCClient
+from zuul.version import get_version_string
 from zuul.zk import ZooKeeperConnection, ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponent, ZooKeeperComponentRegistry,\
     ZooKeeperComponentState
@@ -1198,9 +1199,9 @@ class ZuulWeb(object):
             tls_cert=zk_tls_cert, tls_key=zk_tls_key, tls_ca=zk_tls_ca
         ).connect()
         self.zk_connection_event = ZooKeeperConnectionEvent(self.zk_client)
-        self.zk_component: ZooKeeperComponent = \
-            ZooKeeperComponentRegistry(self.zk_client)\
-            .register('webs', self.hostname)
+        self.zk_component: ZooKeeperComponent = ZooKeeperComponentRegistry(
+            self.zk_client
+        ).register('webs', self.hostname, version=get_version_string())
 
         self.connections: ConnectionRegistry = connections
         self.authenticators: AuthenticatorRegistry = authenticators
