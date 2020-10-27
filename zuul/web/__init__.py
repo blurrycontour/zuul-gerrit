@@ -594,6 +594,7 @@ class ZuulWebAPI(object):
         return {
             'info': '/api/info',
             'connections': '/api/connections',
+            'components': '/api/components',
             'tenants': '/api/tenants',
             'tenant_info': '/api/tenant/{tenant}/info',
             'status': '/api/tenant/{tenant}/status',
@@ -748,6 +749,21 @@ class ZuulWebAPI(object):
         ret = json.loads(job.data[0])
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type="application/json; charset=utf-8")
+    def components(self):
+        ret = {}
+        for kind, components in self.zuulweb.component_registry.all():
+            for comp in components:
+                comp_json = {
+                    "hostname": comp.hostname,
+                    "state": comp.state,
+                }
+                ret.setdefault(kind, []).append(comp_json)
+        resp = cherrypy.response
+        resp.headers["Access_Control-Allow-Origin"] = "*"
         return ret
 
     def _getStatus(self, tenant):
@@ -1345,6 +1361,8 @@ class ZuulWeb(object):
                           controller=api, action='info')
         route_map.connect('api', '/api/connections',
                           controller=api, action='connections')
+        route_map.connect('api', '/api/components',
+                          controller=api, action='components')
         route_map.connect('api', '/api/tenants',
                           controller=api, action='tenants')
         route_map.connect('api', '/api/tenant/{tenant}/info',
