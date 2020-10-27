@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f65232a_9c064286",
+        "filename": "zuul/zk/connection_event.py",
+        "patchSetId": 56
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-10-27T12:53:41Z",
+      "side": 1,
+      "message": "I just noticed during development that these \"hasEvents[]\" log messages are extremely spoiling the log. Maybe that\u0027s different in a productively running Zuul instance, but in my local dev instance those are now nearly the only log messages which are visible. Maybe we could at least combine those messages? Currently, I see always these three:\n\nscheduler_1     | 2020-10-27 12:52:21,854 DEBUG zuul.zk.zuul.ZooKeeperConnectionEvent: hasEvents[github]: Locked\nscheduler_1     | 2020-10-27 12:52:21,857 DEBUG zuul.zk.zuul.ZooKeeperConnectionEvent: hasEvents[github]: 0\nscheduler_1     | 2020-10-27 12:52:21,862 DEBUG zuul.zk.zuul.ZooKeeperConnectionEvent: hasEvents[github]: released",
+      "revId": "a0e8715a61fb641cfb31b633b6d5bf413dfb8d32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
