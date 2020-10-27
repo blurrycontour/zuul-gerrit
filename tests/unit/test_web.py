@@ -221,6 +221,23 @@ class TestWeb(BaseTestWeb):
         self.assertIn('project-merge', status_jobs[1]['dependencies'])
         self.assertIn('project-merge', status_jobs[2]['dependencies'])
 
+    def test_web_components(self):
+        "Test that we can retrieve the list of connected components"
+        resp = self.get_url("api/components")
+        data = resp.json()
+
+        # The list should contain one of each kind: executor, scheduler, web
+        self.assertEqual(len(data), 3)
+        self.assertEqual(len(data["executors"]), 1)
+        self.assertEqual(len(data["schedulers"]), 1)
+        self.assertEqual(len(data["webs"]), 1)
+
+        # Each component should contain hostname, state and version information
+        for key in ["hostname", "state", "version"]:
+            self.assertIn(key, data["executors"][0])
+            self.assertIn(key, data["schedulers"][0])
+            self.assertIn(key, data["webs"][0])
+
     def test_web_tenants(self):
         "Test that we can retrieve JSON status info"
         self.add_base_changes()
