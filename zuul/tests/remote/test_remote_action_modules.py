@@ -14,6 +14,7 @@
 
 import os
 import textwrap
+from typing import Union
 
 from tests.base import AnsibleZuulTestCase, FIXTURE_DIR
 
@@ -26,7 +27,9 @@ ERROR_SCHEME_INVALID = "file urls are not allowed from localhost."
 
 
 class FunctionalActionModulesMixIn:
-    tenant_config_file = 'config/remote-action-modules/main.yaml'
+    tenant_config_file: Union[str, None] = (
+        'config/remote-action-modules/main.yaml'
+    )
     # This should be overriden in child classes.
     ansible_version = '2.9'
     wait_timeout = 120

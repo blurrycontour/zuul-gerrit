@@ -15,12 +15,15 @@
 import os
 import re
 import textwrap
+from typing import Union
 
 from tests.base import AnsibleZuulTestCase
 
 
 class FunctionalZuulStreamMixIn:
-    tenant_config_file = 'config/remote-zuul-stream/main.yaml'
+    tenant_config_file: Union[str, None] = (
+        'config/remote-zuul-stream/main.yaml'
+    )
     # This should be overriden in child classes.
     ansible_version = '2.9'
     wait_timeout = 120

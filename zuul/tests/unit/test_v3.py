@@ -20,6 +20,7 @@ import sys
 import textwrap
 import gc
 from unittest import skip, skipIf
+from typing import Union
 
 import paramiko
 
@@ -2769,7 +2770,7 @@ class TestInRepoJoin(ZuulTestCase):
 class FunctionalAnsibleMixIn(object):
     # A temporary class to hold new tests while others are disabled
 
-    tenant_config_file = 'config/ansible/main.yaml'
+    tenant_config_file: Union[str, None] = 'config/ansible/main.yaml'
     # This should be overriden in child classes.
     ansible_version = '2.9'
 

@@ -22,6 +22,7 @@ import time
 import jwt
 import sys
 import subprocess
+from typing import Dict, Any
 
 import requests
 
@@ -47,7 +48,7 @@ class FakeConfig(object):
 
 class BaseTestWeb(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
-    config_ini_data = {}
+    config_ini_data: Dict[Any, Any] = {}
 
     def setUp(self):
         super(BaseTestWeb, self).setUp()

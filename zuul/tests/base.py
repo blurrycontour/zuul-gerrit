@@ -32,7 +32,8 @@ import random
 import re
 from logging import Logger
 from queue import Queue
-from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
+from typing import Callable, Optional, Any, Iterable
+from typing import Union, Generator, List, Dict
 
 import requests
 import select
@@ -4004,6 +4005,7 @@ class ZuulTestCase(BaseTestCase):
     git_url_with_auth: bool = False
     log_console_port: int = 19885
     source_only: bool = False
+    tenant_config_file: Union[str, None] = None
 
     def __getattr__(self, name):
         """Allows to access fake connections the old way, e.g., using
@@ -4250,8 +4252,8 @@ class ZuulTestCase(BaseTestCase):
 
         files = {}
         path = os.path.join(FIXTURE_DIR, path)
-        with open(path) as f:
-            data = f.read()
+        with open(path) as f_path:
+            data = f_path.read()
             layout = yaml.safe_load(data)
             files['zuul.yaml'] = data
         untrusted_projects = []

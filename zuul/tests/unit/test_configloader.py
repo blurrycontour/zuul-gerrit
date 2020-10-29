@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 from configparser import ConfigParser
+from typing import Union
 
 import fixtures
 import logging
@@ -35,7 +36,7 @@ class TenantParserTestCase(ZuulTestCase):
 
 
 class TestTenantSimple(TenantParserTestCase):
-    tenant_config_file = 'config/tenant-parser/simple.yaml'
+    tenant_config_file: Union[str, None] = 'config/tenant-parser/simple.yaml'
 
     def test_tenant_simple(self):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')

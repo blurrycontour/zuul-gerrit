@@ -16,12 +16,13 @@ import dateutil
 import json
 import os
 import textwrap
+from typing import Union
 
 from tests.base import AnsibleZuulTestCase
 
 
 class FunctionalZuulJSONMixIn:
-    tenant_config_file = 'config/remote-zuul-json/main.yaml'
+    tenant_config_file: Union[str, None] = 'config/remote-zuul-json/main.yaml'
     ansible_version = '2.6'
 
     def _setUp(self):
