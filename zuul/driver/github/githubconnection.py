@@ -104,8 +104,15 @@ class GithubRequestLogger:
                 fields[key] = value
         info = ', '.join(['%s: %s' % (key, value)
                           for key, value in fields.items()])
-        self.log.debug('%s %s %s',
-                       response.request.method, response.url, info)
+
+        # Debugging for tracking down occasional 422 unprocessable entity
+        if response.status_code == 422:
+            self.log.debug('%s %s %s %s',
+                           response.request.method, response.url, info,
+                           response.content)
+        else:
+            self.log.debug('%s %s %s',
+                           response.request.method, response.url, info)
 
 
 class GithubRateLimitHandler:
