@@ -34,3 +34,13 @@ jsonpath-rw
 urllib3!=1.25.4,!=1.25.5  # https://github.com/urllib3/urllib3/pull/1684
 cheroot!=8.1.*,!=8.2.*,!=8.3.0 # https://github.com/cherrypy/cheroot/issues/263
 elasticsearch
+
+# zuul.tests requirements
+coverage>=3.6
+fixtures>=0.3.14
+stestr>=1.0.0 # Apache-2.0
+testtools>=0.9.32
+PyMySQL
+psycopg2-binary
+beautifulsoup4
+graphene
