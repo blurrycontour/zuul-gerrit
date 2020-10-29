@@ -25,10 +25,14 @@ import TenantsPage from './pages/Tenants'
 import StatusPage from './pages/Status'
 import * as api from './api'
 
-api.fetchInfo = jest.fn()
-api.fetchTenants = jest.fn()
-api.fetchStatus = jest.fn()
-api.fetchConfigErrors = jest.fn()
+jest.mock('./api', () => ({
+  fetchInfo: jest.fn(),
+  fetchTenants: jest.fn(),
+  fetchStatus: jest.fn(),
+  fetchConfigErrors: jest.fn()
+}))
+
+
 api.fetchConfigErrors.mockImplementation(() => Promise.resolve({data: []}))
 
 const store = configureStore()
