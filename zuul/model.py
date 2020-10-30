@@ -3308,6 +3308,9 @@ _AbstractEventT = TypeVar("_AbstractEventT", bound="AbstractEvent")
 class AbstractEvent(abc.ABC):
     """Base class defining the interface for all events."""
 
+    # Opaque identifier in order to acknowledge an event
+    ack_ref: Optional[Any]
+
     @abc.abstractmethod
     def toDict(self) -> Dict[str, Any]:
         pass
