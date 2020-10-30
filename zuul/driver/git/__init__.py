@@ -12,16 +12,22 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from typing import Dict, Any
+from typing import Dict, Any, Type
+
 from zuul.connection import BaseConnection
-from zuul.driver import Driver, ConnectionInterface, SourceInterface
+from zuul.driver import (
+    Driver, ConnectionInterface, SourceInterface, TriggerInterface
+)
 from zuul.driver.git import gitconnection
+from zuul.driver.git import gitmodel
 from zuul.driver.git import gitsource
 from zuul.driver.git import gittrigger
 from zuul.source import BaseSource
 
 
-class GitDriver(Driver, ConnectionInterface, SourceInterface):
+class GitDriver(
+    Driver, ConnectionInterface, SourceInterface, TriggerInterface
+):
     name: str = 'git'
 
     def getConnection(self, name: str, config: Dict[str, Any])\
@@ -36,6 +42,9 @@ class GitDriver(Driver, ConnectionInterface, SourceInterface):
 
     def getTriggerSchema(self):
         return gittrigger.getSchema()
+
+    def getTriggerEventClass(self) -> Type[gitmodel.GitTriggerEvent]:
+        return gitmodel.GitTriggerEvent
 
     def getRequireSchema(self):
         return {}
