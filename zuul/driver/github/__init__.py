@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Type
 import voluptuous
 from zuul import model
 from zuul.driver.github.githubreporter import GithubReporter
@@ -20,6 +20,7 @@ from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.github import githubconnection
+from zuul.driver.github import githubmodel
 from zuul.driver.github import githubtrigger
 from zuul.driver.github import githubsource
 from zuul.driver.github import githubreporter
@@ -36,6 +37,9 @@ class GithubDriver(Driver, ConnectionInterface, TriggerInterface,
 
     def getTrigger(self, connection, config=None):
         return githubtrigger.GithubTrigger(self, connection, config)
+
+    def getTriggerEventClass(self) -> Type[githubmodel.GithubTriggerEvent]:
+        return githubmodel.GithubTriggerEvent
 
     def getSource(self, connection: BaseConnection) -> BaseSource:
         return githubsource.GithubSource(self, connection)
