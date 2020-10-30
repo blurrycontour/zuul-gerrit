@@ -18,6 +18,7 @@ from uuid import uuid4
 
 from zuul.driver import Driver, TriggerInterface
 from zuul.driver.zuul.zuulmodel import ZuulTriggerEvent
+from zuul.driver.zuul import zuulmodel
 from zuul.driver.zuul import zuultrigger
 from zuul.lib.logutil import get_annotated_logger
 
@@ -139,3 +140,6 @@ class ZuulDriver(Driver, TriggerInterface):
 
     def getTriggerSchema(self):
         return zuultrigger.getSchema()
+
+    def getTriggerEventClass(self):
+        return zuulmodel.ZuulTriggerEvent
