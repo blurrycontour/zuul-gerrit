@@ -187,10 +187,10 @@ class ConnectionRegistry(object):
         return connection.driver.getTrigger(connection, config)
 
     def getTriggerEventClass(
-        self, connection_name: str
-) -> Type[model.TriggerEvent]:
-        connection = self.connections[connection_name]
-        return connection.driver.getTriggerEventClass()
+        self, driver_name: str
+    ) -> Type[model.TriggerEvent]:
+        driver = self.drivers[driver_name]
+        return driver.getTriggerEventClass()
 
     def getSourceByHostname(self, hostname):
         for connection in self.connections.values():
