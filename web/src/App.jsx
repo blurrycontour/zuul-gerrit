@@ -54,6 +54,7 @@ import {
   BellIcon,
   BookIcon,
   CodeIcon,
+  ServiceIcon,
   UsersIcon,
 } from '@patternfly/react-icons'
 
@@ -198,6 +199,11 @@ class App extends React.Component {
     })
   }
 
+  handleComponentsLink = () => {
+    const { history } = this.props
+    history.push('/components')
+  }
+
   handleApiLink = () => {
     const { history } = this.props
     history.push('/openapi')
@@ -306,6 +312,12 @@ class App extends React.Component {
     const nav = this.renderMenu()
 
     const kebabDropdownItems = [
+      <DropdownItem
+        key="components"
+        onClick={event => this.handleComponentsLink(event)}
+      >
+        <ServiceIcon /> Components
+      </DropdownItem>,
       <DropdownItem key="api" onClick={event => this.handleApiLink(event)}>
         <CodeIcon /> API
       </DropdownItem>,
@@ -335,6 +347,13 @@ class App extends React.Component {
         <PageHeaderToolsGroup
           visibility={{ default: 'hidden', lg: 'visible' }}
         >
+          <PageHeaderToolsItem>
+            <Link to='/components'>
+              <Button variant={ButtonVariant.plain}>
+                <ServiceIcon /> Components
+              </Button>
+            </Link>
+          </PageHeaderToolsItem>
           <PageHeaderToolsItem>
             <Link to='/openapi'>
               <Button variant={ButtonVariant.plain}>
