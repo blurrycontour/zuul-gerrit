@@ -15,7 +15,7 @@
 import logging
 import re
 from collections import OrderedDict
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from typing import Any, Dict, Optional, Type, TYPE_CHECKING
 from urllib.parse import urlparse
 
 import zuul.driver.zuul
@@ -33,7 +33,7 @@ import zuul.driver.gitlab
 import zuul.driver.elasticsearch
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
-from zuul.model import Pipeline
+from zuul.model import Pipeline, TriggerEvent
 from zuul.reporter import BaseReporter
 from zuul.source import BaseSource
 
@@ -190,6 +190,12 @@ class ConnectionRegistry(object):
     def getTrigger(self, connection_name, config=None):
         connection = self.connections[connection_name]
         return connection.driver.getTrigger(connection, config)
+
+    def getTriggerEventClass(
+        self, driver_name: str
+    ) -> Type[TriggerEvent]:
+        driver = self.drivers[driver_name]
+        return driver.getTriggerEventClass()
 
     def getSourceByHostname(self, hostname):
         for connection in self.connections.values():
