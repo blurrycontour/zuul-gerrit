@@ -60,3 +60,12 @@ class TimerTriggerEvent(TriggerEvent):
     def __init__(self):
         super(TimerTriggerEvent, self).__init__()
         self.timespec = None
+
+    def toDict(self):
+        d = super().toDict()
+        d["timespec"] = self.timespec
+        return d
+
+    def updateFromDict(self, d):
+        super().updateFromDict(d)
+        self.timespec = d["timespec"]
