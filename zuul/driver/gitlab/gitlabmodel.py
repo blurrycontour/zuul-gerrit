@@ -13,7 +13,6 @@
 # under the License.
 
 import re
-
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
@@ -65,6 +64,25 @@ class GitlabTriggerEvent(TriggerEvent):
         self.labels = []
         self.change_number = None
         self.tag = None
+
+    def toDict(self):
+        d = super().toDict()
+        d["trigger_name"] = self.trigger_name
+        d["title"] = self.title
+        d["action"] = self.action
+        d["labels"] = self.labels
+        d["change_number"] = self.change_number
+        d["tag"] = self.tag
+        return d
+
+    def updateFromDict(self, d):
+        super().updateFromDict(d)
+        self.trigger_name = d["trigger_name"]
+        self.title = d["title"]
+        self.action = d["action"]
+        self.labels = d["labels"]
+        self.change_number = d["change_number"]
+        self.tag = d["tag"]
 
     def _repr(self):
         r = [super(GitlabTriggerEvent, self)._repr()]

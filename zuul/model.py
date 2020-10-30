@@ -3800,7 +3800,7 @@ class NodesProvisionedEvent(ResultEvent):
         self.request_id = request.id
 
 
-class TriggerEvent(object):
+class TriggerEvent(AbstractEvent):
     """Incoming event from an external system."""
     def __init__(self):
         # TODO(jeblair): further reduce this list
@@ -3835,6 +3835,58 @@ class TriggerEvent(object):
         # For logging
         self.zuul_event_id = None
         self.timestamp = None
+
+    def toDict(self):
+        return {
+            "data": self.data,
+            "type": self.type,
+            "branch_updated": self.branch_updated,
+            "branch_created": self.branch_created,
+            "branch_deleted": self.branch_deleted,
+            "branch_protected": self.branch_protected,
+            "ref": self.ref,
+            "tenant_name": self.tenant_name,
+            "project_hostname": self.project_hostname,
+            "project_name": self.project_name,
+            "trigger_name": self.trigger_name,
+            "account": self.account,
+            "change_number": self.change_number,
+            "change_url": self.change_url,
+            "patch_number": self.patch_number,
+            "branch": self.branch,
+            "comment": self.comment,
+            "state": self.state,
+            "oldrev": self.oldrev,
+            "newrev": self.newrev,
+            "forced_pipeline": self.forced_pipeline,
+            "zuul_event_id": self.zuul_event_id,
+            "timestamp": self.timestamp,
+        }
+
+    def updateFromDict(self, d):
+        self.data = d["data"]
+        self.type = d["type"]
+        self.branch_updated = d["branch_updated"]
+        self.branch_created = d["branch_created"]
+        self.branch_deleted = d["branch_deleted"]
+        self.branch_protected = d["branch_protected"]
+        self.ref = d["ref"]
+        self.tenant_name = d["tenant_name"]
+        self.project_hostname = d["project_hostname"]
+        self.project_name = d["project_name"]
+        self.trigger_name = d["trigger_name"]
+        self.account = d["account"]
+        self.change_number = d["change_number"]
+        self.change_url = d["change_url"]
+        self.patch_number = d["patch_number"]
+        self.branch = d["branch"]
+        self.comment = d["comment"]
+        self.state = d["state"]
+        self.oldrev = d["oldrev"]
+        self.newrev = d["newrev"]
+        self.forced_pipeline = d["forced_pipeline"]
+        self.zuul_event_id = d["zuul_event_id"]
+        self.timestamp = d["timestamp"]
 
     @property
     def canonical_project_name(self):
