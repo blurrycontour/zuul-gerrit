@@ -15,6 +15,7 @@
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.pagure import pagureconnection
+from zuul.driver.pagure import paguremodel
 from zuul.driver.pagure import paguresource
 from zuul.driver.pagure import pagurereporter
 from zuul.driver.pagure import paguretrigger
@@ -29,6 +30,9 @@ class PagureDriver(Driver, ConnectionInterface, TriggerInterface,
 
     def getTrigger(self, connection, config=None):
         return paguretrigger.PagureTrigger(self, connection, config)
+
+    def getTriggerEventClass(self):
+        return paguremodel.PagureTriggerEvent
 
     def getSource(self, connection):
         return paguresource.PagureSource(self, connection)
