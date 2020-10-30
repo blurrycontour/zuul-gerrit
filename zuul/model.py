@@ -3800,7 +3800,7 @@ class NodesProvisionedEvent(ResultEvent):
         )
 
 
-class TriggerEvent(object):
+class TriggerEvent(AbstractEvent):
     """Incoming event from an external system."""
     def __init__(self):
         # TODO(jeblair): further reduce this list
@@ -3835,6 +3835,58 @@ class TriggerEvent(object):
         # For logging
         self.zuul_event_id = None
         self.timestamp = None
+
+    def toDict(self) -> Dict[str, Any]:
+        return {
+            "data": self.data,
+            "type": self.type,
+            "branch_updated": self.branch_updated,
+            "branch_created": self.branch_created,
+            "branch_deleted": self.branch_deleted,
+            "branch_protected": self.branch_protected,
+            "ref": self.ref,
+            "tenant_name": self.tenant_name,
+            "project_hostname": self.project_hostname,
+            "project_name": self.project_name,
+            "trigger_name": self.trigger_name,
+            "account": self.account,
+            "change_number": self.change_number,
+            "change_url": self.change_url,
+            "patch_number": self.patch_number,
+            "branch": self.branch,
+            "comment": self.comment,
+            "state": self.state,
+            "oldrev": self.oldrev,
+            "newrev": self.newrev,
+            "forced_pipeline": self.forced_pipeline,
+            "zuul_event_id": self.zuul_event_id,
+            "timestamp": self.timestamp,
+        }
+
+    def updateFromDict(self, d: Dict[str, Any]) -> None:
+        self.data = d.get("data")
+        self.type = d.get("type")
+        self.branch_updated = d.get("branch_updated", False)
+        self.branch_created = d.get("branch_created", False)
+        self.branch_deleted = d.get("branch_deleted", False)
+        self.branch_protected = d.get("branch_protected", True)
+        self.ref = d.get("ref")
+        self.tenant_name = d.get("tenant_name")
+        self.project_hostname = d.get("project_hostname")
+        self.project_name = d.get("project_name")
+        self.trigger_name = d.get("trigger_name")
+        self.account = d.get("account")
+        self.change_number = d.get("change_number")
+        self.change_url = d.get("change_url")
+        self.patch_number = d.get("patch_number")
+        self.branch = d.get("branch")
+        self.comment = d.get("comment")
+        self.state = d.get("state")
+        self.oldrev = d.get("oldrev")
+        self.newrev = d.get("newrev")
+        self.forced_pipeline = d.get("forced_pipeline")
+        self.zuul_event_id = d.get("zuul_event_id")
+        self.timestamp = d.get("timestamp")
 
     @property
     def canonical_project_name(self):
