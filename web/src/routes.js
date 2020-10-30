@@ -12,6 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
+import ComponentsPage from './pages/Components'
 import StatusPage from './pages/Status'
 import ChangeStatusPage from './pages/ChangeStatus'
 import ProjectPage from './pages/Project'
@@ -127,7 +128,12 @@ const routes = () => [
     to: '/openapi',
     component: OpenApiPage,
     noTenantPrefix: true,
-  }
+  },
+  {
+    to: '/components',
+    component: ComponentsPage,
+    noTenantPrefix: true,
+  },
 ]
 
 export { routes }
