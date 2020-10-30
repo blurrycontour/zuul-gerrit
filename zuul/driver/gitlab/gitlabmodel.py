@@ -13,6 +13,7 @@
 # under the License.
 
 import re
+from typing import Any, Dict
 
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
@@ -65,6 +66,25 @@ class GitlabTriggerEvent(TriggerEvent):
         self.labels = []
         self.change_number = None
         self.tag = None
+
+    def toDict(self) -> Dict[str, Any]:
+        d = super().toDict()
+        d["trigger_name"] = self.trigger_name
+        d["title"] = self.title
+        d["action"] = self.action
+        d["labels"] = list(self.labels)
+        d["change_number"] = self.change_number
+        d["tag"] = self.tag
+        return d
+
+    def updateFromDict(self, d: Dict[str, Any]) -> None:
+        super().updateFromDict(d)
+        self.trigger_name = d.get("trigger_name", "gitlab")
+        self.title = d.get("title")
+        self.action = d.get("action")
+        self.labels = list(d.get("labels", []))
+        self.change_number = d.get("change_number")
+        self.tag = d.get("tag")
 
     def _repr(self):
         r = [super(GitlabTriggerEvent, self)._repr()]
