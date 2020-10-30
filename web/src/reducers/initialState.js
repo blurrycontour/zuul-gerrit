@@ -16,6 +16,10 @@ export default {
     isFetchingOutput: false,
     isFetchingManifest: false,
   },
+  component: {
+    components: undefined,
+    isFetching: false,
+  },
   logfile: {
     // Store files by buildId->filename->content
     files: {},
