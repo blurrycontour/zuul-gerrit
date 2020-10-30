@@ -15,6 +15,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {
+  Button,
+  EmptyState,
+  EmptyStateBody,
+  EmptyStateIcon,
+  EmptyStateSecondaryActions,
+  Title,
+} from '@patternfly/react-core'
+import {
   Table,
   TableBody,
   TableHeader,
@@ -26,6 +34,7 @@ import {
   OutlinedHddIcon,
   PauseCircleIcon,
   QuestionIcon,
+  SearchIcon,
   ServiceIcon,
   StopCircleIcon,
 } from '@patternfly/react-icons'
@@ -75,7 +84,7 @@ function ComponentState({ state }) {
   return <span style={{ color: iconConfig.color }}>{state}</span>
 }
 
-function ComponentTable({ components }) {
+function ComponentTable({ components, onClearFilters }) {
   // TODO (felix): We could change this to an expandable table and show some
   // details about the component in the expandable row. E.g. similar to what
   // OpenShift shows in for deployments and pods (metrics, performance,
@@ -99,13 +108,13 @@ function ComponentTable({ components }) {
     },
   ]
 
-  function createComponentRow(kind, component) {
+  function createComponentRow(component) {
     return {
       cells: [
         {
           title: (
             <>
-              <ComponentStateIcon state={component.state} /> {kind}
+              <ComponentStateIcon state={component.state} /> {component.kind}
             </>
           ),
         },
@@ -118,12 +127,7 @@ function ComponentTable({ components }) {
     }
   }
 
-  const rows = []
-  for (const [kind, _components] of Object.entries(components)) {
-    for (const component of _components) {
-      rows.push(createComponentRow(kind, component))
-    }
-  }
+  const rows = components.map((component) => createComponentRow(component))
 
   return (
     <>
@@ -137,12 +141,31 @@ function ComponentTable({ components }) {
         <TableHeader />
         <TableBody />
       </Table>
+      {
+        // Show an empty state in case no rows match the filters
+        rows.length === 0 && (
+          <EmptyState>
+            <EmptyStateIcon icon={SearchIcon} />
+            <Title headingLevel="h1">No components found</Title>
+            <EmptyStateBody>
+              No components match this filter criteria. Remove some filters or
+              clear all to show results.
+            </EmptyStateBody>
+            <EmptyStateSecondaryActions>
+              <Button variant="link" onClick={onClearFilters}>
+                Clear all filters
+              </Button>
+            </EmptyStateSecondaryActions>
+          </EmptyState>
+        )
+      }
     </>
   )
 }
 
 ComponentTable.propTypes = {
-  components: PropTypes.object.isRequired,
+  components: PropTypes.array.isRequired,
+  onClearFilters: PropTypes.func.isRequired,
 }
 
 export default ComponentTable
