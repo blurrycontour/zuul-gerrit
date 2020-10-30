@@ -17,12 +17,14 @@
 import logging
 import time
 from uuid import uuid4
+from typing import Type
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from zuul.driver import Driver, TriggerInterface
 from zuul.driver.timer import timertrigger
+from zuul.driver.timer import timermodel
 from zuul.driver.timer.timermodel import TimerTriggerEvent
 from zuul.lib.logutil import get_annotated_logger
 
@@ -141,3 +143,6 @@ class TimerDriver(Driver, TriggerInterface):
 
     def getTriggerSchema(self):
         return timertrigger.getSchema()
+
+    def getTriggerEventClass(self) -> Type[timermodel.TimerTriggerEvent]:
+        return timermodel.TimerTriggerEvent
