@@ -6,4 +6,8 @@ export default {
     isFetchingOutput: false,
     isFetchingManifest: false,
   },
+  component: {
+    components: undefined,
+    isFetching: false,
+  },
 }

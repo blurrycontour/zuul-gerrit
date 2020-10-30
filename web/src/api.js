@@ -106,6 +106,11 @@ function getStreamUrl (apiPrefix) {
 function fetchInfo () {
   return Axios.get(apiUrl + 'info')
 }
+
+function fetchComponents() {
+  return Axios.get(apiUrl + 'components')
+}
+
 function fetchOpenApi () {
   return Axios.get(getHomepageUrl () + 'openapi.yaml')
 }
@@ -179,5 +184,6 @@ export {
   fetchNodes,
   fetchOpenApi,
   fetchTenants,
-  fetchInfo
+  fetchInfo,
+  fetchComponents,
 }
