@@ -48,7 +48,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
-from zuul.scheduler import DequeueEvent
+from zuul.model import DequeueEvent
 
 GITHUB_BASE_URL = 'https://api.github.com'
 PREVIEW_JSON_ACCEPT = 'application/vnd.github.machine-man-preview+json'
