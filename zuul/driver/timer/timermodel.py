@@ -13,6 +13,7 @@
 # under the License.
 
 import re
+from typing import Any, Dict
 
 from zuul.model import EventFilter, TriggerEvent
 
@@ -60,3 +61,12 @@ class TimerTriggerEvent(TriggerEvent):
     def __init__(self):
         super(TimerTriggerEvent, self).__init__()
         self.timespec = None
+
+    def toDict(self) -> Dict[str, Any]:
+        d = super().toDict()
+        d["timespec"] = self.timespec
+        return d
+
+    def updateFromDict(self, d: Dict[str, Any]) -> None:
+        super().updateFromDict(d)
+        self.timespec = d.get("timespec")
