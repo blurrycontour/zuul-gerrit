@@ -16,7 +16,6 @@ import copy
 import re
 import time
 import urllib.parse
-
 import dateutil.parser
 
 from zuul.model import EventFilter, RefFilter
@@ -164,6 +163,21 @@ class GerritTriggerEvent(TriggerEvent):
         self.uuid = None
         self.scheme = None
         self.patchsetcomments = None
+
+    def toDict(self):
+        d = super().toDict()
+        d["approvals"] = list(self.approvals)
+        d["uuid"] = self.uuid
+        d["scheme"] = self.scheme
+        d["patchsetcomments"] = self.patchsetcomments
+        return d
+
+    def updateFromDict(self, d):
+        super().updateFromDict(d)
+        self.approvals = list(d.get("approvals", []))
+        self.uuid = d.get("uuid")
+        self.scheme = d.get("scheme")
+        self.patchsetcomments = d.get("patchsetcomments")
 
     def __repr__(self):
         ret = '<GerritTriggerEvent %s %s' % (self.type,

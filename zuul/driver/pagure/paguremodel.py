@@ -13,6 +13,7 @@
 # under the License.
 
 import re
+
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
@@ -70,6 +71,25 @@ class PagureTriggerEvent(TriggerEvent):
         self.status = None
         self.tags = []
         self.tag = None
+
+    def toDict(self):
+        d = super().toDict()
+        d["trigger_name"] = self.trigger_name
+        d["title"] = self.title
+        d["action"] = self.action
+        d["status"] = self.status
+        d["tags"] = list(self.tags)
+        d["tag"] = self.tag
+        return d
+
+    def updateFromDict(self, d):
+        super().updateFromDict(d)
+        self.trigger_name = d.get("trigger_name", "pagure")
+        self.title = d.get("title")
+        self.action = d.get("action")
+        self.status = d.get("status")
+        self.tags = list(d.get("tags", []))
+        self.tag = d.get("tag")
 
     def _repr(self):
         r = [super(PagureTriggerEvent, self)._repr()]

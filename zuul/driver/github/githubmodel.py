@@ -78,6 +78,29 @@ class GithubTriggerEvent(TriggerEvent):
         self.status = None
         self.commits = []
 
+    def toDict(self):
+        d = super().toDict()
+        d["title"] = self.title
+        d["label"] = self.label
+        d["unlabel"] = self.unlabel
+        d["action"] = self.action
+        d["delivery"] = self.delivery
+        d["check_run"] = self.check_run
+        d["status"] = self.status
+        d["commits"] = list(self.commits)
+        return d
+
+    def updateFromDict(self, d):
+        super().updateFromDict(d)
+        self.title = d.get("title")
+        self.label = d.get("label")
+        self.unlabel = d.get("unlabel")
+        self.action = d.get("action")
+        self.delivery = d.get("delivery")
+        self.check_run = d.get("check_run")
+        self.status = d.get("status")
+        self.commits = list(d.get("commits", []))
+
     def isPatchsetCreated(self):
         if self.type == 'pull_request':
             return self.action in ['opened', 'changed']
