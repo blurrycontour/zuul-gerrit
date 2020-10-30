@@ -61,3 +61,12 @@ class ZuulTriggerEvent(TriggerEvent):
     def __init__(self):
         super(ZuulTriggerEvent, self).__init__()
         self.pipeline_name = None
+
+    def toDict(self):
+        d = super().toDict()
+        d["pipeline_name"] = self.pipeline_name
+        return d
+
+    def updateFromDict(self, d):
+        super().updateFromDict(d)
+        self.pipeline_name = d.get("pipeline_name")
