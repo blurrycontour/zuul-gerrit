@@ -228,6 +228,10 @@ class ConnectionRegistry(object):
         connection = self.connections[connection_name]
         return connection.driver.getTrigger(connection, config)
 
+    def getTriggerEventClass(self, driver_name: str):
+        driver = self.drivers[driver_name]
+        return driver.getTriggerEventClass()
+
     def getSourceByHostname(self, hostname):
         for connection in self.connections.values():
             if hasattr(connection, 'canonical_hostname'):
