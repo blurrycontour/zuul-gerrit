@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Type
 
 import voluptuous as vs
 
@@ -25,7 +25,7 @@ from zuul.driver import (
     TriggerInterface,
 )
 from zuul.driver.gitlab import (
-    gitlabconnection, gitlabreporter, gitlabsource, gitlabtrigger
+    gitlabconnection, gitlabmodel, gitlabreporter, gitlabsource, gitlabtrigger
 )
 from zuul.model import Pipeline
 from zuul.source import BaseSource
@@ -44,6 +44,9 @@ class GitlabDriver(Driver, ConnectionInterface, TriggerInterface,
 
     def getTrigger(self, connection, config=None):
         return gitlabtrigger.GitlabTrigger(self, connection, config)
+
+    def getTriggerEventClass(self) -> Type[gitlabmodel.GitlabTriggerEvent]:
+        return gitlabmodel.GitlabTriggerEvent
 
     def getSource(self, connection: BaseConnection) -> BaseSource:
         return gitlabsource.GitlabSource(self, connection)
