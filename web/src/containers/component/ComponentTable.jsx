@@ -16,6 +16,14 @@ import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { capitalize } from '@patternfly/react-core'
 import {
+  Button,
+  EmptyState,
+  EmptyStateBody,
+  EmptyStateIcon,
+  EmptyStateSecondaryActions,
+  Title,
+} from '@patternfly/react-core'
+import {
   expandable,
   Table,
   TableBody,
@@ -29,6 +37,7 @@ import {
   PauseCircleIcon,
   RunningIcon,
   QuestionIcon,
+  SearchIcon,
   StopCircleIcon,
 } from '@patternfly/react-icons'
 
@@ -87,7 +96,7 @@ ComponentState.propTypes = {
   state: PropTypes.string.isRequired,
 }
 
-function ComponentTable({ components }) {
+function ComponentTable({ components, onClearFilters }) {
   // We have to keep the rows in state to be complient to how the PF4
   // expandable/collapsible table works (see the handleCollapse function).
   const [rows, setRows] = useState([])
@@ -112,7 +121,7 @@ function ComponentTable({ components }) {
         i++
         const sectionRows = []
         for (const component of [..._components].sort(sortComponents)) {
-          sectionRows.push(createComponentRow(kind, component, sectionIndex))
+          sectionRows.push(createComponentRow(component, sectionIndex))
           i++
         }
         allRows.push(createSectionRow(kind, sectionRows.length))
@@ -163,7 +172,7 @@ function ComponentTable({ components }) {
     }
   }
 
-  function createComponentRow(kind, component, parent_id) {
+  function createComponentRow(component, parent_id) {
     return {
       parent: parent_id,
       cells: [
@@ -213,12 +222,31 @@ function ComponentTable({ components }) {
         <TableHeader />
         <TableBody />
       </Table>
+      {
+        // Show an empty state in case no rows match the filters
+        rows.length === 0 && (
+          <EmptyState>
+            <EmptyStateIcon icon={SearchIcon} />
+            <Title headingLevel="h1">No components found</Title>
+            <EmptyStateBody>
+              No components match this filter criteria. Remove some filters or
+              clear all to show results.
+            </EmptyStateBody>
+            <EmptyStateSecondaryActions>
+              <Button variant="link" onClick={onClearFilters}>
+                Clear all filters
+              </Button>
+            </EmptyStateSecondaryActions>
+          </EmptyState>
+        )
+      }
     </>
   )
 }
 
 ComponentTable.propTypes = {
-  components: PropTypes.object.isRequired,
+  components: PropTypes.array.isRequired,
+  onClearFilters: PropTypes.func.isRequired,
 }
 
 export default ComponentTable

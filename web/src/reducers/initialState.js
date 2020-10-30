@@ -17,7 +17,7 @@ export default {
     isFetchingManifest: false,
   },
   component: {
-    components: undefined,
+    components: {},
     isFetching: false,
   },
   logfile: {
