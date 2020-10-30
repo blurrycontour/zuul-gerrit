@@ -3675,10 +3675,12 @@ class EnqueueEvent(ManagementEvent):
         )
 
 
-class ResultEvent:
+class ResultEvent(AbstractEvent):
     """An event that needs to modify the pipeline state due to a
     result from an external system."""
-    pass
+
+    def updateFromDict(self, d) -> None:
+        pass
 
 
 class BuildStartedEvent(ResultEvent):
@@ -3690,6 +3692,17 @@ class BuildStartedEvent(ResultEvent):
     def __init__(self, build):
         self.build = build
 
+    def toDict(self):
+        return {
+            "build": self.build,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build"),
+        )
+
 
 class BuildPausedEvent(ResultEvent):
     """A build has been paused.
@@ -3699,6 +3712,17 @@ class BuildPausedEvent(ResultEvent):
 
     def __init__(self, build):
         self.build = build
+
+    def toDict(self):
+        return {
+            "build": self.build,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build"),
+        )
 
 
 class BuildCompletedEvent(ResultEvent):
@@ -3710,6 +3734,19 @@ class BuildCompletedEvent(ResultEvent):
     def __init__(self, build, result):
         self.build = build
         self.result = result
+
+    def toDict(self):
+        return {
+            "build": self.build,
+            "result": self.result,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build"),
+            data.get("result"),
+        )
 
 
 class MergeCompletedEvent(ResultEvent):
@@ -3734,6 +3771,29 @@ class MergeCompletedEvent(ResultEvent):
         self.repo_state = repo_state
         self.item_in_branches = item_in_branches
 
+    def toDict(self):
+        return {
+            "build_set": self.build_set,
+            "merged": self.merged,
+            "updated": self.updated,
+            "commit": self.commit,
+            "files": list(self.files),
+            "repo_state": dict(self.repo_state),
+            "item_in_branches": list(self.item_in_branches),
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build_set"),
+            data.get("merged"),
+            data.get("updated"),
+            data.get("commit"),
+            list(data.get("files", [])),
+            dict(data.get("repo_state", {})),
+            list(data.get("item_in_branches", [])),
+        )
+
 
 class FilesChangesCompletedEvent(ResultEvent):
     """A remote fileschanges operation has completed
@@ -3746,17 +3806,40 @@ class FilesChangesCompletedEvent(ResultEvent):
         self.build_set = build_set
         self.files = files
 
+    def toDict(self):
+        return {
+            "build_set": self.build_set,
+            "files": list(self.files),
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build_set"),
+            list(data.get("files", [])),
+        )
+
 
 class NodesProvisionedEvent(ResultEvent):
     """Nodes have been provisioned for a build_set
 
-    :arg BuildSet build_set: The build_set which has nodes.
-    :arg list of Node objects nodes: The provisioned nodes
+    :arg NodeRequest request: The fulfilled node request.
     """
 
     def __init__(self, request):
         self.request = request
         self.request_id = request.id
+
+    def toDict(self):
+        return {
+            "request": self.request,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("request"),
+        )
 
 
 class TriggerEvent(object):
