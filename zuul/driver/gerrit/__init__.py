@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Type
 import voluptuous
 from zuul.driver.gerrit.gerritreporter import GerritReporter
 from zuul import model
@@ -20,6 +20,7 @@ from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.gerrit import gerritconnection
+from zuul.driver.gerrit import gerritmodel
 from zuul.driver.gerrit import gerrittrigger
 from zuul.driver.gerrit import gerritsource
 from zuul.driver.gerrit import gerritreporter
@@ -55,6 +56,9 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
 
     def getTrigger(self, connection, config=None):
         return gerrittrigger.GerritTrigger(self, connection, config)
+
+    def getTriggerEventClass(self) -> Type[gerritmodel.GerritTriggerEvent]:
+        return gerritmodel.GerritTriggerEvent
 
     def getSource(self, connection: BaseConnection) -> BaseSource:
         return gerritsource.GerritSource(self, connection)

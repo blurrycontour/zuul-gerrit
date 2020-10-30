@@ -12,7 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Type
 import voluptuous
 from zuul import model
 from zuul.driver.pagure.pagurereporter import PagureReporter
@@ -20,6 +20,7 @@ from zuul.connection import BaseConnection
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.pagure import pagureconnection
+from zuul.driver.pagure import paguremodel
 from zuul.driver.pagure import paguresource
 from zuul.driver.pagure import pagurereporter
 from zuul.driver.pagure import paguretrigger
@@ -36,6 +37,9 @@ class PagureDriver(Driver, ConnectionInterface, TriggerInterface,
 
     def getTrigger(self, connection, config=None):
         return paguretrigger.PagureTrigger(self, connection, config)
+
+    def getTriggerEventClass(self) -> Type[paguremodel.PagureTriggerEvent]:
+        return paguremodel.PagureTriggerEvent
 
     def getSource(self, connection: BaseConnection) -> BaseSource:
         return paguresource.PagureSource(self, connection)

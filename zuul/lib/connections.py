@@ -15,8 +15,7 @@
 import logging
 import re
 from collections import OrderedDict
-from typing import Optional, TYPE_CHECKING
-from typing import Dict, Any
+from typing import Any, Dict, Optional, Type, TYPE_CHECKING
 from urllib.parse import urlparse
 from zuul.reporter import BaseReporter
 import zuul.driver.zuul
@@ -35,6 +34,7 @@ from zuul import model
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 from zuul.source import BaseSource
+
 if TYPE_CHECKING:
     from zuul.scheduler import Scheduler
 
@@ -185,6 +185,12 @@ class ConnectionRegistry(object):
     def getTrigger(self, connection_name, config=None):
         connection = self.connections[connection_name]
         return connection.driver.getTrigger(connection, config)
+
+    def getTriggerEventClass(
+        self, connection_name: str
+) -> Type[model.TriggerEvent]:
+        connection = self.connections[connection_name]
+        return connection.driver.getTriggerEventClass()
 
     def getSourceByHostname(self, hostname):
         for connection in self.connections.values():
