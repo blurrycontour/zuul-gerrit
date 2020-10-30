@@ -13,7 +13,8 @@
 # under the License.
 
 import abc
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Type
+
 import voluptuous
 from zuul.reporter import BaseReporter
 from zuul import model
@@ -166,6 +167,11 @@ class TriggerInterface(object, metaclass=abc.ABCMeta):
         :rtype: dict or Schema
 
         """
+        pass
+
+    @abc.abstractmethod
+    def getTriggerEventClass(self) -> Type[model.TriggerEvent]:
+        """Get the drivers's trigger event class."""
         pass
 
 
