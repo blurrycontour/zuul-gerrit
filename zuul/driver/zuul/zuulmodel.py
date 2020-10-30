@@ -13,6 +13,7 @@
 # under the License.
 
 import re
+from typing import Any, Dict
 
 from zuul.model import EventFilter, TriggerEvent
 
@@ -61,3 +62,12 @@ class ZuulTriggerEvent(TriggerEvent):
     def __init__(self):
         super(ZuulTriggerEvent, self).__init__()
         self.pipeline_name = None
+
+    def toDict(self) -> Dict[str, Any]:
+        d = super().toDict()
+        d["pipeline_name"] = self.pipeline_name
+        return d
+
+    def updateFromDict(self, d: Dict[str, Any]) -> None:
+        super().updateFromDict(d)
+        self.pipeline_name = d.get("pipeline_name")
