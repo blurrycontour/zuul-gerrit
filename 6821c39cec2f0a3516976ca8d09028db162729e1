@@ -1,0 +1,135 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_8abefb62",
+        "filename": "doc/source/reference/drivers/elasticsearch.rst",
+        "patchSetId": 45
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-11-02T18:00:29Z",
+      "side": 1,
+      "message": "I think this was mentioned long ago when this work first started, but it would probably be a good idea to have some form of rotation on the indexes too. In order to clear out old data you essentially have to delete indexes. Also corrupted indexes are not easily recovered.\n\nI don\u0027t think that needs to go in the initial implementation, but it would be good to think about adding it.",
+      "revId": "6821c39cec2f0a3516976ca8d09028db162729e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_8a31db0e",
+        "filename": "doc/source/reference/drivers/elasticsearch.rst",
+        "patchSetId": 45
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-11-02T18:00:29Z",
+      "side": 1,
+      "message": "Does this include secrets? We should probably warn users here if so.",
+      "revId": "6821c39cec2f0a3516976ca8d09028db162729e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_8a4c3b9f",
+        "filename": "requirements.txt",
+        "patchSetId": 45
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-11-02T18:00:29Z",
+      "side": 1,
+      "message": "This library will install an elasticsearch lib that is only compatible with elasticsearch 7 clusters according to the docs. We might want to add to our docs that you can replace the ES library with the appropriate version for your cluster? Can be added in a follow on.",
+      "revId": "6821c39cec2f0a3516976ca8d09028db162729e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_7502600b",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 45
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-11-02T18:00:29Z",
+      "side": 1,
+      "message": "Do these need to recursively call JSONSerializer.deafault() on d now that it has been sanitized?",
+      "revId": "6821c39cec2f0a3516976ca8d09028db162729e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_d509b42c",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 45
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-11-02T18:00:29Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "6821c39cec2f0a3516976ca8d09028db162729e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_f564b0e7",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 45
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-11-02T18:00:29Z",
+      "side": 1,
+      "message": "Related to the earlier questions about the encoder: do we need a special encoder at all? it seems like we\u0027re curating the inputs to elasticsearch in the reporter to exclude this extra info?",
+      "range": {
+        "startLine": 105,
+        "startChar": 22,
+        "endLine": 105,
+        "endChar": 40
+      },
+      "revId": "6821c39cec2f0a3516976ca8d09028db162729e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_d557f401",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 45
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2020-11-02T18:00:29Z",
+      "side": 1,
+      "message": "This should probably be debug level as we don\u0027t need info logs for all the data storage?",
+      "range": {
+        "startLine": 144,
+        "startChar": 21,
+        "endLine": 144,
+        "endChar": 25
+      },
+      "revId": "6821c39cec2f0a3516976ca8d09028db162729e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
