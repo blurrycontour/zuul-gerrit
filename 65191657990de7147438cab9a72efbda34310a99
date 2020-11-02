@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_bc022ab3",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4462,
+      "author": {
+        "id": 2475
+      },
+      "writtenOn": "2020-11-02T11:36:30Z",
+      "side": 1,
+      "message": "The, now merged, parent change added some debug logging showing how long it took to settle and how many times that looped ( https://review.opendev.org/#/c/704380/2/tests/base.py\n )\n\nThis change is the fix: the wait() call does NOT wait at all while there are events in the scheduler.   That causes a fast infinite loop until the events get purged.  The debug log show up something such as:\n\n ...settled after 120ms / 10000 loops",
+      "range": {
+        "startLine": 4462,
+        "startChar": 16,
+        "endLine": 4462,
+        "endChar": 79
+      },
+      "revId": "65191657990de7147438cab9a72efbda34310a99",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
