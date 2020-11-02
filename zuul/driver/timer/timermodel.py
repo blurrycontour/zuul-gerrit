@@ -18,8 +18,8 @@ from zuul.model import EventFilter, TriggerEvent
 
 
 class TimerEventFilter(EventFilter):
-    def __init__(self, trigger, types=[], timespecs=[]):
-        EventFilter.__init__(self, trigger)
+    def __init__(self, connection_name, trigger, types=[], timespecs=[]):
+        EventFilter.__init__(self, connection_name, trigger)
 
         self._types = types
         self.types = [re.compile(x) for x in types]
@@ -27,6 +27,7 @@ class TimerEventFilter(EventFilter):
 
     def __repr__(self):
         ret = '<TimerEventFilter'
+        ret += ' connection: %s' % self.connection_name
 
         if self._types:
             ret += ' types: %s' % ', '.join(self._types)

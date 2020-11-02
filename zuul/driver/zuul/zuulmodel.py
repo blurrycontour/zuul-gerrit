@@ -18,8 +18,8 @@ from zuul.model import EventFilter, TriggerEvent
 
 
 class ZuulEventFilter(EventFilter):
-    def __init__(self, trigger, types=[], pipelines=[]):
-        EventFilter.__init__(self, trigger)
+    def __init__(self, connection_name, trigger, types=[], pipelines=[]):
+        EventFilter.__init__(self, connection_name, trigger)
 
         self._types = types
         self._pipelines = pipelines
@@ -28,6 +28,7 @@ class ZuulEventFilter(EventFilter):
 
     def __repr__(self):
         ret = '<ZuulEventFilter'
+        ret += ' connection: %s' % self.connection_name
 
         if self._types:
             ret += ' types: %s' % ', '.join(self._types)
@@ -38,6 +39,9 @@ class ZuulEventFilter(EventFilter):
         return ret
 
     def matches(self, event, change):
+        if not super().matches(event, change):
+            return False
+
         # event types are ORed
         matches_type = False
         for etype in self.types:
