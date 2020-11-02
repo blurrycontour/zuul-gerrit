@@ -23,7 +23,7 @@ class GerritTrigger(BaseTrigger):
     name = 'gerrit'
     log = logging.getLogger("zuul.GerritTrigger")
 
-    def getEventFilters(self, trigger_conf):
+    def getEventFilters(self, connection_name, trigger_conf):
         efilters = []
         for trigger in to_list(trigger_conf):
             approvals = {}
@@ -42,6 +42,7 @@ class GerritTrigger(BaseTrigger):
                 usernames = to_list(trigger.get('username_filter'))
             ignore_deletes = trigger.get('ignore-deletes', True)
             f = GerritEventFilter(
+                connection_name=connection_name,
                 trigger=self,
                 types=to_list(trigger['event']),
                 branches=to_list(trigger.get('branch')),

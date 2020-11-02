@@ -493,6 +493,16 @@ class TestMultipleGerrits(ZuulTestCase):
     def test_multiple_project_separate_gerrits_common_pipeline(self):
         self.executor_server.hold_jobs_in_build = True
 
+        self.create_branch('org/project2', 'develop')
+        self.fake_another_gerrit.addEvent(
+            self.fake_another_gerrit.getFakeBranchCreatedEvent(
+                'org/project2', 'develop'))
+
+        self.fake_another_gerrit.addEvent(
+            self.fake_review_gerrit.getFakeBranchCreatedEvent(
+                'org/project2', 'develop'))
+        self.waitUntilSettled()
+
         A = self.fake_another_gerrit.addFakeChange(
             'org/project2', 'master', 'A')
         self.fake_another_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -512,8 +522,27 @@ class TestMultipleGerrits(ZuulTestCase):
         self.fake_review_gerrit.change_number = 50
 
         B = self.fake_review_gerrit.addFakeChange(
-            'org/project2', 'master', 'B')
+            'org/project2', 'develop', 'B')
         self.fake_review_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+        self.waitUntilSettled()
+
+        self.assertBuilds([
+            dict(name='project-test2',
+                 changes='1,1',
+                 project='org/project2',
+                 pipeline='common_check'),
+            dict(name='project-test1',
+                 changes='51,1',
+                 project='org/project2',
+                 pipeline='common_check'),
+        ])
+
+        # NOTE(avass): This last change should not trigger any pipelines since
+        # common_check is configured to only run on master for another_gerrit
+        C = self.fake_another_gerrit.addFakeChange(
+            'org/project2', 'develop', 'C')
+        self.fake_another_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
 
         self.waitUntilSettled()
 
