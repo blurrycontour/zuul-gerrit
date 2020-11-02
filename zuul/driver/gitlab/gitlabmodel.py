@@ -84,9 +84,10 @@ class GitlabTriggerEvent(TriggerEvent):
 
 class GitlabEventFilter(EventFilter):
     def __init__(
-            self, trigger, types=None, actions=None,
+            self, connection_name, trigger, types=None, actions=None,
             comments=None, refs=None, labels=None, ignore_deletes=True):
         super(GitlabEventFilter, self).__init__(self)
+        self.connection_name = connection_name
         self._types = types or []
         self.types = [re.compile(x) for x in self._types]
         self.actions = actions or []
@@ -122,6 +123,9 @@ class GitlabEventFilter(EventFilter):
             if etype.match(event.type):
                 matches_type = True
         if self.types and not matches_type:
+            return False
+
+        if self.connection_name != event.connection_name:
             return False
 
         matches_ref = False
