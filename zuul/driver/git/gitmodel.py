@@ -40,12 +40,13 @@ class GitTriggerEvent(TriggerEvent):
 
 
 class GitEventFilter(EventFilter):
-    def __init__(self, trigger, types=None, refs=None,
+    def __init__(self, connection_name, trigger, types=None, refs=None,
                  ignore_deletes=True):
 
         super().__init__(trigger)
 
         self._refs = refs
+        self.connection_name = connection_name
         self.types = types if types is not None else []
         refs = refs if refs is not None else []
         self.refs = [re.compile(x) for x in refs]
@@ -71,6 +72,9 @@ class GitEventFilter(EventFilter):
             if etype == event.type:
                 matches_type = True
         if self.types and not matches_type:
+            return False
+    
+        if self.connection_name != event.trigger_name:
             return False
 
         # refs are ORed
