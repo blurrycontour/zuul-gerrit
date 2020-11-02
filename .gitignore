@@ -24,3 +24,5 @@ zuul/web/static/*
 !.keep
 node_modules
 yarn-error.log
+# Generated json-server database to test/develop against a mocked API
+web/tools/db.json
