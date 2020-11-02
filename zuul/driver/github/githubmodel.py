@@ -234,8 +234,8 @@ class GithubCommonFilter(object):
 
 
 class GithubEventFilter(EventFilter, GithubCommonFilter):
-    def __init__(self, trigger, types=[], branches=[], refs=[],
-                 comments=[], actions=[], labels=[], unlabels=[],
+    def __init__(self, connection_name, trigger, types=[], branches=[],
+                 refs=[], comments=[], actions=[], labels=[], unlabels=[],
                  states=[], statuses=[], required_statuses=[],
                  check_runs=[], ignore_deletes=True):
 
@@ -247,6 +247,7 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
         self._branches = branches
         self._refs = refs
         self._comments = comments
+        self.connection_name = connection_name
         self.types = [re.compile(x) for x in types]
         self.branches = [re.compile(x) for x in branches]
         self.refs = [re.compile(x) for x in refs]
@@ -300,6 +301,9 @@ class GithubEventFilter(EventFilter, GithubCommonFilter):
         if self.types and not matches_type:
             return FalseWithReason("Types %s doesn't match %s" % (
                 self.types, event.type))
+
+        if self.connection_name != event.trigger_name:
+            return False
 
         # branches are ORed
         matches_branch = False
