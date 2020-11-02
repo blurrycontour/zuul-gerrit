@@ -281,12 +281,12 @@ class GerritApprovalFilter(object):
 
 
 class GerritEventFilter(EventFilter, GerritApprovalFilter):
-    def __init__(self, trigger, types=[], branches=[], refs=[],
-                 event_approvals={}, comments=[], emails=[], usernames=[],
-                 required_approvals=[], reject_approvals=[], uuid=None,
-                 scheme=None, ignore_deletes=True):
+    def __init__(self, connection_name, trigger, types=[], branches=[],
+                 refs=[], event_approvals={}, comments=[], emails=[],
+                 usernames=[], required_approvals=[], reject_approvals=[],
+                 uuid=None, scheme=None, ignore_deletes=True):
 
-        EventFilter.__init__(self, trigger)
+        EventFilter.__init__(self, connection_name, trigger)
 
         GerritApprovalFilter.__init__(self,
                                       required_approvals=required_approvals,
@@ -311,6 +311,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
 
     def __repr__(self):
         ret = '<GerritEventFilter'
+        ret += ' connection: %s' % self.connection_name
 
         if self._types:
             ret += ' types: %s' % ', '.join(self._types)
@@ -344,6 +345,8 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
         return ret
 
     def matches(self, event, change):
+        return super(GerritEventFilter, self).matches(event, change)
+
         # event types are ORed
         matches_type = False
         for etype in self.types:
@@ -357,6 +360,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
                 return False
             if self.scheme and event.uuid.split(':')[0] != self.scheme:
                 return False
+
 
         # branches are ORed
         matches_branch = False

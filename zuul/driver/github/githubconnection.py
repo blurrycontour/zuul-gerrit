@@ -457,6 +457,7 @@ class GithubEventProcessor(object):
         base_repo = self.body.get('repository')
 
         event = GithubTriggerEvent()
+        event.connection_name = self.connection.connection_name
         event.trigger_name = 'github'
         event.project_name = base_repo.get('full_name')
         event.type = 'push'
@@ -665,6 +666,7 @@ class GithubEventProcessor(object):
 
     def _pull_request_to_event(self, pr_body):
         event = GithubTriggerEvent()
+        event.connection_name = self.connection.connection_name
         event.trigger_name = 'github'
 
         base = pr_body.get('base')

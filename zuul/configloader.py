@@ -1335,7 +1335,8 @@ class PipelineParser(object):
                 trigger_name, trigger_config)
             pipeline.triggers.append(trigger)
             manager.event_filters.extend(
-                trigger.getEventFilters(conf['trigger'][trigger_name]))
+                trigger.getEventFilters(trigger_name,
+                                        conf['trigger'][trigger_name]))
 
         # Pipelines don't get frozen
         return pipeline
