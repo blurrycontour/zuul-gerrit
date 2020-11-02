@@ -16,6 +16,24 @@
       "revId": "a0e8715a61fb641cfb31b633b6d5bf413dfb8d32",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_660ac526",
+        "filename": "zuul/zk/connection_event.py",
+        "patchSetId": 56
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-11-02T10:40:08Z",
+      "side": 1,
+      "message": "Yes I will remove those, there were useful for dev/debugging but now are definitely too much.",
+      "parentUuid": "3f65232a_9c064286",
+      "revId": "a0e8715a61fb641cfb31b633b6d5bf413dfb8d32",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
