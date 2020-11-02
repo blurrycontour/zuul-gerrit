@@ -18,8 +18,8 @@ from zuul.model import EventFilter, TriggerEvent
 
 
 class ZuulEventFilter(EventFilter):
-    def __init__(self, trigger, types=[], pipelines=[]):
-        EventFilter.__init__(self, trigger)
+    def __init__(self, connection_name, trigger, types=[], pipelines=[]):
+        EventFilter.__init__(self, connection_name, trigger)
 
         self._types = types
         self._pipelines = pipelines
