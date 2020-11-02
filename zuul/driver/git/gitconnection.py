@@ -137,6 +137,7 @@ class GitConnection(BaseConnection):
 
     def watcherCallback(self, data):
         event = GitTriggerEvent()
+        event.connection_name = self.connection_name
         event.type = 'ref-updated'
         event.timestamp = time.time()
         event.project_hostname = self.canonical_hostname
