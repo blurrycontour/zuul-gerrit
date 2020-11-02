@@ -23,10 +23,11 @@ class GitTrigger(BaseTrigger):
     name = 'git'
     log = logging.getLogger("zuul.GitTrigger")
 
-    def getEventFilters(self, trigger_conf):
+    def getEventFilters(self, connection_name, trigger_conf):
         efilters = []
         for trigger in to_list(trigger_conf):
             f = GitEventFilter(
+                connection_name=connection_name,
                 trigger=self,
                 types=to_list(trigger['event']),
                 refs=to_list(trigger.get('ref')),
