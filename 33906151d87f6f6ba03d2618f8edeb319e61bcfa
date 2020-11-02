@@ -106,6 +106,24 @@
       "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_86b1e192",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-11-02T10:37:49Z",
+      "side": 1,
+      "message": "We can do that. The ZooKeeperConnection now deals with parsing configuration while ZooKeeperClient expects already prepared parameters. If there is no benefit of such separation merging those two should not be a problem.",
+      "parentUuid": "3f65232a_c01bbd18",
+      "revId": "33906151d87f6f6ba03d2618f8edeb319e61bcfa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
