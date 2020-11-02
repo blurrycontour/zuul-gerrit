@@ -4,6 +4,5 @@
       git:
         config-projects:
           - common-config
-      gerrit:
         untrusted-projects:
           - org/project
