@@ -277,7 +277,7 @@ class GerritApprovalFilter(object):
 
 
 class GerritEventFilter(EventFilter, GerritApprovalFilter):
-    def __init__(self, trigger, types=[], branches=[], refs=[],
+    def __init__(self, connection_name, trigger, types=[], branches=[], refs=[],
                  event_approvals={}, comments=[], emails=[], usernames=[],
                  required_approvals=[], reject_approvals=[], uuid=None,
                  scheme=None, ignore_deletes=True):
@@ -294,6 +294,7 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
         self._comments = comments
         self._emails = emails
         self._usernames = usernames
+        self.connection_name = connection_name
         self.types = [re.compile(x) for x in types]
         self.branches = [re.compile(x) for x in branches]
         self.refs = [re.compile(x) for x in refs]
@@ -353,6 +354,10 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
                 return False
             if self.scheme and event.uuid.split(':')[0] != self.scheme:
                 return False
+
+        # Event came from wrong connection
+        if self.connection_name != event.connection_name:
+            return False
 
         # branches are ORed
         matches_branch = False

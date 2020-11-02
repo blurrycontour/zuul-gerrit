@@ -29,7 +29,7 @@ class ZuulTrigger(BaseTrigger):
         self._handle_parent_change_enqueued_events = False
         self._handle_project_change_merged_events = False
 
-    def getEventFilters(self, trigger_conf):
+    def getEventFilters(self, trigger_name, trigger_conf):
         efilters = []
         for trigger in to_list(trigger_conf):
             f = ZuulEventFilter(
