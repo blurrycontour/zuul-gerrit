@@ -23,10 +23,11 @@ from zuul.driver.util import to_list
 class TimerTrigger(BaseTrigger):
     name = 'timer'
 
-    def getEventFilters(self, trigger_conf):
+    def getEventFilters(self, connection_name, trigger_conf):
         efilters = []
         for trigger in to_list(trigger_conf):
-            f = TimerEventFilter(trigger=self,
+            f = TimerEventFilter(connection_name=connection_name,
+                                 trigger=self,
                                  types=['timer'],
                                  timespecs=to_list(trigger['time']))
 
