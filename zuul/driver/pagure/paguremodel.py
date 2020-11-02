@@ -90,11 +90,13 @@ class PagureTriggerEvent(TriggerEvent):
 
 
 class PagureEventFilter(EventFilter):
-    def __init__(self, trigger, types=[], refs=[], statuses=[],
-                 comments=[], actions=[], tags=[], ignore_deletes=True):
+    def __init__(self, connection_name, trigger, types=[], refs=[],
+                 statuses=[], comments=[], actions=[], tags=[],
+                 ignore_deletes=True):
 
         EventFilter.__init__(self, trigger)
 
+        self.connection_name = connection_name
         self._types = types
         self._refs = refs
         self._comments = comments
@@ -133,6 +135,9 @@ class PagureEventFilter(EventFilter):
             if etype.match(event.type):
                 matches_type = True
         if self.types and not matches_type:
+            return False
+
+        if self.connection_name != event.connection_name:
             return False
 
         matches_ref = False
