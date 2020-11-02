@@ -40,20 +40,23 @@ class TestGitDriver(ZuulTestCase):
         # gerrit source for the project.
         self.assertEqual('git', tenant.config_projects[0].source.name)
         self.assertEqual('common-config', tenant.config_projects[0].name)
-        self.assertEqual('gerrit', tenant.untrusted_projects[0].source.name)
+        self.assertEqual('git', tenant.untrusted_projects[0].source.name)
         self.assertEqual('org/project', tenant.untrusted_projects[0].name)
+        self.assertEqual('gerrit', tenant.untrusted_projects[1].source.name)
+        self.assertEqual('org/project-gerrit',
+                         tenant.untrusted_projects[1].name)
 
         # The configuration for this test is accessed via the git
         # driver (in common-config), rather than the gerrit driver, so
         # if the job runs, it worked.
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A = self.fake_gerrit.addFakeChange('org/project-gerrit', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
         self.assertEqual(A.reported, 1)
 
     def test_config_refreshed(self):
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A = self.fake_gerrit.addFakeChange('org/project-gerrit', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
@@ -64,7 +67,7 @@ class TestGitDriver(ZuulTestCase):
         path = os.path.join(self.upstream_root, 'common-config', 'zuul.yaml')
         config = yaml.safe_load(open(path, 'r').read())
         change = {
-            'name': 'org/project',
+            'name': 'org/project-gerrit',
             'check': {
                 'jobs': [
                     'project-test2'
@@ -80,7 +83,7 @@ class TestGitDriver(ZuulTestCase):
         count = self.waitForEvent()
         self.waitUntilSettled()
 
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A = self.fake_gerrit.addFakeChange('org/project-gerrit', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 2)
@@ -95,7 +98,7 @@ class TestGitDriver(ZuulTestCase):
             .watcher_thread._pause = True
         # Add a config change
         change = {
-            'name': 'org/project',
+            'name': 'org/project-gerrit',
             'check': {
                 'jobs': [
                     'project-test1'
@@ -121,7 +124,7 @@ class TestGitDriver(ZuulTestCase):
         self.waitForEvent(count)
         self.waitUntilSettled()
 
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A = self.fake_gerrit.addFakeChange('org/project-gerrit', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 3)
