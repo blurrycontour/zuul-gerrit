@@ -29,10 +29,11 @@ class ZuulTrigger(BaseTrigger):
         self._handle_parent_change_enqueued_events = False
         self._handle_project_change_merged_events = False
 
-    def getEventFilters(self, trigger_conf):
+    def getEventFilters(self, connection_name, trigger_conf):
         efilters = []
         for trigger in to_list(trigger_conf):
             f = ZuulEventFilter(
+                connection_name=connection_name,
                 trigger=self,
                 types=to_list(trigger['event']),
                 pipelines=to_list(trigger.get('pipeline')),

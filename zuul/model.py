@@ -3897,12 +3897,18 @@ class BaseFilter(ConfigObject):
 
 class EventFilter(BaseFilter):
     """Allows a Pipeline to only respond to certain events."""
-    def __init__(self, trigger):
+    def __init__(self, connection_name, trigger):
         super(EventFilter, self).__init__()
+        self.connection_name = connection_name
         self.trigger = trigger
 
     def matches(self, event, ref):
         # TODO(jeblair): consider removing ref argument
+
+        # Event came from wrong connection
+        if self.connection_name != event.connection_name:
+            return False
+
         return True
 
 

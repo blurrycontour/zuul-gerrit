@@ -23,10 +23,11 @@ class GithubTrigger(BaseTrigger):
     name = 'github'
     log = logging.getLogger("zuul.trigger.GithubTrigger")
 
-    def getEventFilters(self, trigger_config):
+    def getEventFilters(self, connection_name, trigger_config):
         efilters = []
         for trigger in to_list(trigger_config):
             f = GithubEventFilter(
+                connection_name=connection_name,
                 trigger=self,
                 types=to_list(trigger['event']),
                 actions=to_list(trigger.get('action')),

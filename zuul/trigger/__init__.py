@@ -26,7 +26,7 @@ class BaseTrigger(object, metaclass=abc.ABCMeta):
         self.config = config or {}
 
     @abc.abstractmethod
-    def getEventFilters(self, trigger_conf):
+    def getEventFilters(self, connection_name, trigger_conf):
         """Return a list of EventFilter's for the scheduler to match against.
         """
 

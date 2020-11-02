@@ -86,6 +86,7 @@ class GitlabEventConnector(threading.Thread):
 
     def _event_base(self, body):
         event = GitlabTriggerEvent()
+        event.connection_name = self.connection.connection_name
         attrs = body.get('object_attributes')
         if attrs:
             event.updated_at = int(dateutil.parser.parse(
