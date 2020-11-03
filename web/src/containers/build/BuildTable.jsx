@@ -15,7 +15,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import {
   Button,
   EmptyState,
@@ -47,8 +46,14 @@ import * as moment from 'moment'
 import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalTableLink } from '../../Misc'
 
-function BuildTable(props) {
-  const { builds, fetching, onClearFilters, tenant, timezone } = props
+function BuildTable({
+  builds,
+  fetching,
+  onClearFilters,
+  tenant,
+  timezone,
+  history,
+}) {
   const columns = [
     {
       title: <IconProperty icon={<BuildIcon />} value="Job" />,
@@ -87,28 +92,23 @@ function BuildTable(props) {
   ]
 
   function createBuildRow(build) {
-    // This link will be defined on each cell of the current row as this is the
-    // only way to define a valid HTML link on a table row. Although we could
-    // simply define an onClick handler on the whole row and programatically
-    // switch to the buildresult page, this wouldn't provide the same
-    // look-and-feel as a plain HTML link.
-    const buildResultLink = (
-      <Link
-        to={`${tenant.linkPrefix}/build/${build.uuid}`}
-        className="zuul-stretched-link"
-      />
-    )
-    const build_link = buildExternalTableLink(build)
+    const changeOrRefLink = buildExternalTableLink(build)
 
     return {
+      // Pass the build's uuid as row id, so we can use it later on in the
+      // action handler to build the link to the build result page for each row.
+      id: build.uuid,
       cells: [
         {
           // To allow passing anything else than simple string values to a table
           // cell, we must use the title attribute.
           title: (
             <>
-              {buildResultLink}
-              <BuildResultWithIcon result={build.result} colored={build.voting}>
+              <BuildResultWithIcon
+                result={build.result}
+                colored={build.voting}
+                link={`${tenant.linkPrefix}/build/${build.uuid}`}
+              >
                 {build.job_name}
                 {!build.voting && ' (non-voting)'}
               </BuildResultWithIcon>
@@ -116,74 +116,36 @@ function BuildTable(props) {
           ),
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>{build.project}</span>
-            </>
-          ),
+          title: build.project,
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>{build.branch ? build.branch : build.ref}</span>
-            </>
-          ),
+          title: build.branch ? build.branch : build.ref,
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>{build.pipeline}</span>
-            </>
-          ),
+          title: build.pipeline,
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              {build_link && (
-                <span style={{ zIndex: 1, position: 'relative' }}>
-                  {build_link}
-                </span>
-              )}
-            </>
-          ),
+          title: changeOrRefLink && changeOrRefLink,
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>
-                {moment
-                  .duration(build.duration, 'seconds')
-                  .format('h [hr] m [min] s [sec]')}
-              </span>
-            </>
-          ),
+          title: moment
+            .duration(build.duration, 'seconds')
+            .format('h [hr] m [min] s [sec]'),
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>
-                {build.start_time &&
-                  moment
-                    .utc(build.start_time)
-                    .tz(timezone)
-                    .format('YYYY-MM-DD HH:mm:ss')}
-              </span>
-            </>
-          ),
+          title: moment
+            .utc(build.start_time)
+            .tz(timezone)
+            .format('YYYY-MM-DD HH:mm:ss'),
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <BuildResult result={build.result} colored={build.voting} />
-            </>
-          ),
+            title: (
+              <BuildResult
+                result={build.result}
+                link={`${tenant.linkPrefix}/build/${build.uuid}`}
+                colored={build.voting}
+              />
+            ),
         },
       ],
     }
@@ -209,6 +171,9 @@ function BuildTable(props) {
   }
 
   let rows = []
+  // For the fetching row we don't need any actions, so we keep them empty by
+  // default.
+  let actions = []
   if (fetching) {
     rows = createFetchingRow()
     // The dataLabel property is used to show the column header in a list-like
@@ -219,6 +184,18 @@ function BuildTable(props) {
     columns[0].dataLabel = ''
   } else {
     rows = builds.map((build) => createBuildRow(build))
+    // This list of actions will be applied to each row in the table. For
+    // row-specific actions we must evaluate the individual row data provided to
+    // the onClick handler.
+    actions = [
+      {
+        title: 'Show build result',
+        onClick: (event, rowId, rowData) =>
+          // The row's id contains the build's uuid, so we can use this to build
+          // the correct link.
+          history.push(`${tenant.linkPrefix}/build/${rowData.id}`),
+      },
+    ]
   }
 
   return (
@@ -228,6 +205,7 @@ function BuildTable(props) {
         variant={TableVariant.compact}
         cells={columns}
         rows={rows}
+        actions={actions}
         className="zuul-build-table"
       >
         <TableHeader />
@@ -261,6 +239,7 @@ BuildTable.propTypes = {
   onClearFilters: PropTypes.func.isRequired,
   tenant: PropTypes.object.isRequired,
   timezone: PropTypes.string.isRequired,
+  history: PropTypes.object.isRequired,
 }
 
 export default connect((state) => ({
