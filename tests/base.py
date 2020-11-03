@@ -3952,14 +3952,12 @@ class SchedulerTestApp:
 
         self.event_queues = [
             self.sched.result_event_queue,
-            self.sched.trigger_event_queue,
             self.sched.management_event_queue
         ]
 
         self.sched.start()
         self.sched.executor.gearman.waitForServer()
         self.sched.reconfigure(self.config)
-        self.sched.wakeUp()
 
     def fullReconfigure(self):
         try:
@@ -4839,6 +4837,14 @@ class ZuulTestCase(BaseTestCase):
                 if sched.zk_connection_event.hasEvents(
                         connection.connection_name, keep_locked=True):
                     return False
+            if sched.trigger_events.hasEvents():
+                return False
+            for tenant in sched.abide.tenants.values():
+                for pipeline_name in tenant.layout.pipelines:
+                    if sched.pipeline_trigger_events[tenant.name][
+                        pipeline_name
+                    ].hasEvents():
+                        return False
         return True
 
     def _acquireZookeeperWorkerLocks(self, matcher=None):
