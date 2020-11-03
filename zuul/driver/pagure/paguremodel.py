@@ -69,6 +69,7 @@ class PagureTriggerEvent(TriggerEvent):
         self.action = None
         self.status = None
         self.tags = []
+        self.tag = None
 
     def _repr(self):
         r = [super(PagureTriggerEvent, self)._repr()]
