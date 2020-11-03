@@ -713,13 +713,7 @@ class GithubEventProcessor(object):
         return event
 
     def _get_sender(self, body):
-        login = body.get('sender').get('login')
-        if login:
-            # TODO(tobiash): it might be better to plumb in the installation id
-            project = body.get('repository', {}).get('full_name')
-            user = self.connection.getUser(login, project)
-            self.log.debug("Got user %s", user)
-            return user
+        return body.get('sender').get('login')
 
 
 class GithubEventConnector:
@@ -781,9 +775,16 @@ class GithubEventConnector:
             if future is None:
                 return
             event = future.result()
-            if event:
-                self.connection.logEvent(event)
-                self.connection.sched.addEvent(event)
+            if not event:
+                return
+            self.connection.logEvent(event)
+            if isinstance(event, DequeueEvent):
+                self.connection.sched.addManagementEvent(event)
+            else:
+                self.connection.sched.addTriggerEvent(
+                    self.connection.driver_name, event
+                )
+
         except Exception:
             self.log.exception("Exception moving GitHub event:")
         finally:
