@@ -73,7 +73,9 @@ class GithubTriggerEvent(TriggerEvent):
         self.unlabel = None
         self.action = None
         self.delivery = None
-        self.check_runs = None
+        self.check_run = None
+        self.status = None
+        self.commits = []
 
     def isPatchsetCreated(self):
         if self.type == 'pull_request':
@@ -94,8 +96,8 @@ class GithubTriggerEvent(TriggerEvent):
             r.append('%s,%s' % (self.change_number, self.patch_number))
         if self.delivery:
             r.append('delivery: %s' % self.delivery)
-        if self.check_runs:
-            r.append('check_runs: %s' % self.check_runs)
+        if self.check_run:
+            r.append('check_run: %s' % self.check_run)
         return ' '.join(r)
 
 
