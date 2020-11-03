@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_e2eea6b2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1065,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-11-03T18:18:59Z",
+      "side": 1,
+      "message": "`refresh_change` argument can be removed as we always need to refresh the change.",
+      "revId": "d00b5952384b03ac5992b972ff04b97d7cf84bf9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
