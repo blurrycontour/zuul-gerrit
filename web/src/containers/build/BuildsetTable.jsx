@@ -31,6 +31,7 @@ import {
   CodeIcon,
   CubeIcon,
   PollIcon,
+  SearchIcon,
   StreamIcon,
 } from '@patternfly/react-icons'
 import {
@@ -69,18 +70,7 @@ function BuildsetTable(props) {
   ]
 
   function createBuildsetRow(buildset) {
-    // This link will be defined on each cell of the current row as this is the
-    // only way to define a valid HTML link on a table row. Although we could
-    // simply define an onClick handler on the whole row and programatically
-    // switch to the buildresult page, this wouldn't provide the same
-    // look-and-feel as a plain HTML link.
-    const buildsetResultLink = (
-      <Link
-        to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
-        className="zuul-stretched-link"
-      />
-    )
-    const buildset_link = buildExternalTableLink(buildset)
+    const changeOrRefLink = buildExternalTableLink(buildset)
 
     return {
       cells: [
@@ -89,7 +79,12 @@ function BuildsetTable(props) {
           // cell, we must use the title attribute.
           title: (
             <>
-              {buildsetResultLink}
+              <Link
+                to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
+                className="zuul-build-link"
+              >
+                <SearchIcon />
+              </Link>
               <BuildResultWithIcon result={buildset.result}>
                 {buildset.project}
               </BuildResultWithIcon>
@@ -97,40 +92,16 @@ function BuildsetTable(props) {
           ),
         },
         {
-          title: (
-            <>
-              {buildsetResultLink}
-              <span>{buildset.branch ? buildset.branch : buildset.ref}</span>
-            </>
-          ),
+          title: buildset.branch ? buildset.branch : buildset.ref,
         },
         {
-          title: (
-            <>
-              {buildsetResultLink}
-              <span>{buildset.pipeline}</span>
-            </>
-          ),
+          title: buildset.pipeline,
         },
         {
-          title: (
-            <>
-              {buildsetResultLink}
-              {buildset_link && (
-                <span style={{ zIndex: 1, position: 'relative' }}>
-                  {buildset_link}
-                </span>
-              )}
-            </>
-          ),
+          title: changeOrRefLink && changeOrRefLink,
         },
         {
-          title: (
-            <>
-              {buildsetResultLink}
-              <BuildResult result={buildset.result} />
-            </>
-          ),
+          title: <BuildResult result={buildset.result} />,
         },
       ],
     }

@@ -33,6 +33,7 @@ import {
   OutlinedCalendarAltIcon,
   OutlinedClockIcon,
   PollIcon,
+  SearchIcon,
   StreamIcon,
 } from '@patternfly/react-icons'
 import {
@@ -87,18 +88,7 @@ function BuildTable(props) {
   ]
 
   function createBuildRow(build) {
-    // This link will be defined on each cell of the current row as this is the
-    // only way to define a valid HTML link on a table row. Although we could
-    // simply define an onClick handler on the whole row and programatically
-    // switch to the buildresult page, this wouldn't provide the same
-    // look-and-feel as a plain HTML link.
-    const buildResultLink = (
-      <Link
-        to={`${tenant.linkPrefix}/build/${build.uuid}`}
-        className="zuul-stretched-link"
-      />
-    )
-    const build_link = buildExternalTableLink(build)
+    const changeOrRefLink = buildExternalTableLink(build)
 
     return {
       cells: [
@@ -107,7 +97,12 @@ function BuildTable(props) {
           // cell, we must use the title attribute.
           title: (
             <>
-              {buildResultLink}
+              <Link
+                to={`${tenant.linkPrefix}/build/${build.uuid}`}
+                className="zuul-build-link"
+              >
+                <SearchIcon />
+              </Link>
               <BuildResultWithIcon result={build.result} colored={build.voting}>
                 {build.job_name}
                 {!build.voting && ' (non-voting)'}
@@ -116,73 +111,30 @@ function BuildTable(props) {
           ),
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>{build.project}</span>
-            </>
-          ),
+          title: build.project,
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>{build.branch ? build.branch : build.ref}</span>
-            </>
-          ),
+          title: build.branch ? build.branch : build.ref,
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>{build.pipeline}</span>
-            </>
-          ),
+          title: build.pipeline,
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              {build_link && (
-                <span style={{ zIndex: 1, position: 'relative' }}>
-                  {build_link}
-                </span>
-              )}
-            </>
-          ),
+          title: changeOrRefLink && changeOrRefLink,
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>
-                {moment
-                  .duration(build.duration, 'seconds')
-                  .format('h [hr] m [min] s [sec]')}
-              </span>
-            </>
-          ),
+          title: moment
+            .duration(build.duration, 'seconds')
+            .format('h [hr] m [min] s [sec]'),
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <span>
-                {moment
-                  .utc(build.start_time)
-                  .tz(timezone)
-                  .format('YYYY-MM-DD HH:mm:ss')}
-              </span>
-            </>
-          ),
+          title: moment
+            .utc(build.start_time)
+            .tz(timezone)
+            .format('YYYY-MM-DD HH:mm:ss'),
         },
         {
-          title: (
-            <>
-              {buildResultLink}
-              <BuildResult result={build.result} colored={build.voting} />
-            </>
-          ),
+          title: <BuildResult result={build.result} colored={build.voting} />,
         },
       ],
     }
