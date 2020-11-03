@@ -23,12 +23,16 @@ from typing import (
     Dict,
     Generic,
     Generator,
+    List,
+    Optional,
+    Set,
     TypeVar,
     Tuple,
     Type,
 )
 
 from kazoo.exceptions import NoNodeError
+from kazoo.protocol.states import EventType, WatchedEvent
 
 from zuul import model
 from zuul.lib.connections import ConnectionRegistry
@@ -54,6 +58,58 @@ MANAGEMENT_EVENT_TYPE_MAP: Dict[str, Type[model.ManagementEvent]] = {
 }
 
 _AbstractEventT = TypeVar("_AbstractEventT", bound=model.AbstractEvent)
+
+
+class ZooKeeperEventWatcher(ZooKeeperBase):
+
+    log = logging.getLogger("zuul.zk.event_queues.ZooKeeperEventWatcher")
+
+    TENANT_ROOT = "/zuul/events/tenant"
+    QUEUES = (
+        "management",
+        "results",
+        "triggers",
+    )
+
+    def __init__(self, client: ZooKeeperClient, callback: Callable[[], Any]):
+        super().__init__(client)
+        self.callback: Callable[[], Any] = callback
+        self.watched_queues: Set[str] = set()
+        self.kazoo_client.ensure_path(self.TENANT_ROOT)
+        self.kazoo_client.ChildrenWatch(self.TENANT_ROOT, self._tenantWatch)
+
+    def _tenantWatch(
+        self,
+        tenants: List[str],
+    ) -> None:
+        for tenant_name in tenants:
+            for queue_name in self.QUEUES:
+                queue_path = "/".join(
+                    (self.TENANT_ROOT, tenant_name, queue_name)
+                )
+                if queue_path in self.watched_queues:
+                    continue
+
+                self.kazoo_client.ensure_path(queue_path)
+                self.kazoo_client.ChildrenWatch(
+                    queue_path,
+                    self._queueWatch,
+                    send_event=True,
+                )
+                self.watched_queues.add(queue_path)
+
+    def _queueWatch(
+        self,
+        event_list: List[str],
+        event: Optional[WatchedEvent] = None,
+    ) -> None:
+        if event is None:
+            # Handle initial call when the watch is created. If there are
+            # already events in the queue we trigger the callback.
+            if event_list:
+                self.callback()
+        elif event.type == EventType.CHILD:
+            self.callback()
 
 
 class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
