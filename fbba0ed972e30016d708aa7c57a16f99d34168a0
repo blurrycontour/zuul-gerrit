@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_96d1f8d0",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3312,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-11-03T14:55:28Z",
+      "side": 1,
+      "message": "Maybe this could raise a NotImplementedError? Then you need to not call the super().toDict() below.",
+      "range": {
+        "startLine": 3312,
+        "startChar": 8,
+        "endLine": 3312,
+        "endChar": 17
+      },
+      "revId": "fbba0ed972e30016d708aa7c57a16f99d34168a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_5631200b",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3354,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-11-03T14:55:28Z",
+      "side": 1,
+      "message": "nit: noop?",
+      "range": {
+        "startLine": 3354,
+        "startChar": 8,
+        "endLine": 3354,
+        "endChar": 33
+      },
+      "revId": "fbba0ed972e30016d708aa7c57a16f99d34168a0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
