@@ -166,13 +166,22 @@ class TestGitlabDriver(ZuulTestCase):
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_updated_during_build(self):
+        self.executor_server.hold_jobs_in_build = True
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
         self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+
+        # Wait until the trigger event was processed and the change
+        # won't be refreshed anymore.
+        self.waitUntilSettled()
+
         old = A.sha
         A.addCommit()
         new = A.sha
         self.assertNotEqual(old, new)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
         self.waitUntilSettled()
 
         self.assertEqual(2, len(self.history))
