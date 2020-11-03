@@ -3999,14 +3999,12 @@ class SchedulerTestApp:
 
         self.event_queues = [
             self.sched.result_event_queue,
-            self.sched.trigger_event_queue,
             self.sched.management_event_queue
         ]
 
         self.sched.start()
         self.sched.executor.gearman.waitForServer()
         self.sched.reconfigure(self.config)
-        self.sched.wakeUp()
 
     def fullReconfigure(self):
         try:
@@ -4878,6 +4876,18 @@ class ZuulTestCase(BaseTestCase):
         for event_queue in self.additional_event_queues:
             event_queue.join()
 
+    def __areZooKeeperEventQueuesEmpty(self, matcher=None) -> bool:
+        for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
+            if sched.trigger_events.hasEvents():
+                return False
+            for tenant in sched.abide.tenants.values():
+                for pipeline_name in tenant.layout.pipelines:
+                    if sched.pipeline_trigger_events[tenant.name][
+                        pipeline_name
+                    ].hasEvents():
+                        return False
+        return True
+
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
         start = time.time()
@@ -4890,6 +4900,10 @@ class ZuulTestCase(BaseTestCase):
                 for event_queue in self.__event_queues(matcher):
                     self.log.error("  %s: %s" %
                                    (event_queue, event_queue.empty()))
+                self.log.error(
+                    "All ZK event queues empty: %s",
+                    self.__areZooKeeperEventQueuesEmpty(matcher),
+                )
                 self.log.error("All builds waiting: %s" %
                                (self.__areAllBuildsWaiting(matcher),))
                 self.log.error("All merge jobs waiting: %s" %
@@ -4915,7 +4929,8 @@ class ZuulTestCase(BaseTestCase):
                 self.__eventQueuesJoin(matcher)
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.acquire())
-                if (self.__areAllMergeJobsWaiting(matcher) and
+                if (self.__areZooKeeperEventQueuesEmpty(matcher) and
+                    self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported(matcher) and
                     self.__areAllBuildsWaiting(matcher) and
                     self.__areAllNodeRequestsComplete(matcher) and
