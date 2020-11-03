@@ -262,7 +262,9 @@ class GitlabEventConnector(threading.Thread):
                                            event=event)
             event.project_hostname = self.connection.canonical_hostname
             self.connection.logEvent(event)
-            self.connection.sched.addEvent(event)
+            self.connection.sched.addTriggerEvent(
+                self.connection.driver_name, event
+            )
 
     def run(self):
         while True:
