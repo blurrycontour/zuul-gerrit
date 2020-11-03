@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_014be458",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 22720
+      },
+      "writtenOn": "2020-11-03T15:05:05Z",
+      "side": 1,
+      "message": "Are the single quotes necessary? I used to think that HTML has a double-quote-for-attrs convention.",
+      "revId": "9f758f3869d810d3ba2dc3394b16d51d8cab3361",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
