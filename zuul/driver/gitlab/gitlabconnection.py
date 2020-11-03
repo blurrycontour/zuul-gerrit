@@ -237,7 +237,9 @@ class GitlabEventConnector(threading.Thread):
                 self.connection.checkBranchCache(event.project_name, event)
 
             self.connection.logEvent(event)
-            self.connection.sched.addEvent(event)
+            self.connection.sched.addTriggerEvent(
+                self.connection.driver_name, event
+            )
 
     def run(self):
         while True:

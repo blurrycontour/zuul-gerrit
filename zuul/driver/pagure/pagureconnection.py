@@ -255,7 +255,9 @@ class PagureEventConnector(threading.Thread):
                                            event=event)
             event.project_hostname = self.connection.canonical_hostname
             self.connection.logEvent(event)
-            self.connection.sched.addEvent(event)
+            self.connection.sched.addTriggerEvent(
+                self.connection.driver_name, event
+            )
 
     def _event_base(self, body, pull_data_field='pullrequest'):
         event = PagureTriggerEvent()
