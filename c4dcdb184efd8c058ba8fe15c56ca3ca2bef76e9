@@ -17,6 +17,29 @@
       "revId": "c4dcdb184efd8c058ba8fe15c56ca3ca2bef76e9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_b81a287a",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2020-11-03T07:37:07Z",
+      "side": 1,
+      "message": "You want to parse it from the node path \"/.../[hostname]-[sequence]\"?",
+      "range": {
+        "startLine": 176,
+        "startChar": 12,
+        "endLine": 177,
+        "endChar": 55
+      },
+      "revId": "c4dcdb184efd8c058ba8fe15c56ca3ca2bef76e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
