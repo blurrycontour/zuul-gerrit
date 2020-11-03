@@ -88,7 +88,7 @@ class GitlabTriggerEvent(TriggerEvent):
         r = [super(GitlabTriggerEvent, self)._repr()]
         if self.action:
             r.append("action:%s" % self.action)
-        r.append("project:%s" % self.canonical_project_name)
+        r.append("project:%s" % self.project_name)
         if self.change_number:
             r.append("mr:%s" % self.change_number)
         if self.labels:
