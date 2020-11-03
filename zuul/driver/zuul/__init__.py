@@ -97,7 +97,7 @@ class ZuulDriver(Driver, TriggerInterface):
         event.ref = change.ref
         event.zuul_event_id = str(uuid4().hex)
         event.timestamp = time.time()
-        self.sched.addEvent(event)
+        self.sched.addTriggerEvent(self.name, event)
 
     def _createParentChangeEnqueuedEvents(self, change, pipeline, tenant,
                                           event):
@@ -134,7 +134,7 @@ class ZuulDriver(Driver, TriggerInterface):
         event.patch_number = change.patchset
         event.ref = change.ref
         event.zuul_event_id = str(uuid4().hex)
-        self.sched.addEvent(event)
+        self.sched.addTriggerEvent(self.name, event)
 
     def getTrigger(self, connection_name, config=None):
         return zuultrigger.ZuulTrigger(self, config)
