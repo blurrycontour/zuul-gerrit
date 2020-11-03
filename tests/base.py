@@ -4485,7 +4485,8 @@ class ZuulTestCase(BaseTestCase):
                     self.assertTrue(f.read() in test_keys)
 
     def assertNoZkConnections(self):
-        open_count = len(TestZooKeeperClient.connections.values())
+        open_count = len(TestZooKeeperClient.connections)
+        TestZooKeeperClient.connections.clear()
         if open_count > 0:
             for uid, stack in TestZooKeeperClient.connections.items():
                 self.log.error("ZK Not disconnected (%s): %s", uid, stack)
