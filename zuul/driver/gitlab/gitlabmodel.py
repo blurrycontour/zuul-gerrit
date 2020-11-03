@@ -64,6 +64,7 @@ class GitlabTriggerEvent(TriggerEvent):
         self.action = None
         self.labels = []
         self.change_number = None
+        self.tag = None
 
     def _repr(self):
         r = [super(GitlabTriggerEvent, self)._repr()]
