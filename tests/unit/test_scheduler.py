@@ -1222,8 +1222,10 @@ class TestScheduler(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(A.queried, 2)  # Initial and isMerged
-        self.assertEqual(B.queried, 3)  # Initial A, refresh from B, isMerged
+        # Initial, refresh in main loop and isMerged
+        self.assertEqual(A.queried, 3)
+        # Initial A, refresh from B, refresh in main loop and isMerged
+        self.assertEqual(B.queried, 4)
 
     def test_can_merge(self):
         "Test whether a change is ready to merge"
