@@ -16,6 +16,24 @@
       "revId": "9f758f3869d810d3ba2dc3394b16d51d8cab3361",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_41b83cc7",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-11-03T15:18:53Z",
+      "side": 1,
+      "message": "Nope. In fact ts is quite strict about what it expects and I see no reason for me change them. probably there from multiple rebases but i will drop them.",
+      "parentUuid": "1f621f24_014be458",
+      "revId": "9f758f3869d810d3ba2dc3394b16d51d8cab3361",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
