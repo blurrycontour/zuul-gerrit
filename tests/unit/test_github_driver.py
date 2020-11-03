@@ -174,7 +174,8 @@ class TestGithubDriver(ZuulTestCase):
                 mock.MagicMock())
             self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
             self.waitUntilSettled()
-        self.assertEqual(1, files_mock.call_count)
+        # Initial update of change + refresh in main loop
+        self.assertEqual(2, files_mock.call_count)
         self.assertEqual(2, len(self.history))
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
