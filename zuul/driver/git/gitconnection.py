@@ -151,7 +151,7 @@ class GitConnection(BaseConnection):
         self.getChange(event)
         self.logEvent(event)
         # Pass the event to the scheduler
-        self.sched.addEvent(event)
+        self.sched.addTriggerEvent(self.driver_name, event)
 
     def onLoad(self):
         self.log.debug("Starting Git Watcher")
