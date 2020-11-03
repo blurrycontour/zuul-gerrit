@@ -66,7 +66,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             self.log.exception("Reconfiguration failed:")
 
     def exit_handler(self, signum, frame):
-        self.sched.exit()
         self.sched.join()
         self.stop_gear_server()
         sys.exit(0)
@@ -138,7 +137,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         try:
             self.sched.start()
             self.sched.reconfigure(self.config)
-            self.sched.wakeUp()
         except Exception:
             self.log.exception("Error starting Zuul:")
             # TODO(jeblair): If we had all threads marked as daemon,
