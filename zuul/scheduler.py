@@ -18,7 +18,6 @@
 import json
 import logging
 import os
-import pickle
 import re
 import queue
 import socket
@@ -53,19 +52,22 @@ from zuul.model import (
     EnqueueEvent,
     FilesChangesCompletedEvent,
     HoldRequest,
-    ManagementEvent,
     MergeCompletedEvent,
     NodesProvisionedEvent,
     PromoteEvent,
     ReconfigureEvent,
-    ResultEvent,
     SmartReconfigureEvent,
     Tenant,
     TenantReconfigureEvent,
-    TriggerEvent,
 )
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponentRegistry
+from zuul.zk.event_queues import (
+    GlobalEventWatcher,
+    GlobalTriggerEventQueue,
+    PipelineEventWatcher,
+    PipelineTriggerEventQueue,
+)
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -113,7 +115,6 @@ class Scheduler(threading.Thread):
             'repl': self.start_repl,
             'norepl': self.stop_repl,
         }
-        self._hibernate = False
         self._stopped = False
 
         self._zuul_app = app
@@ -143,9 +144,22 @@ class Scheduler(threading.Thread):
             )
         )
 
-        self.trigger_event_queue = queue.Queue()
         self.result_event_queue = queue.Queue()
         self.management_event_queue = zuul.lib.queue.MergedQueue()
+        self.global_watcher = GlobalEventWatcher(
+            self.zk_client, self.wake_event.set
+        )
+        self.pipeline_watcher = PipelineEventWatcher(
+            self.zk_client, self.wake_event.set
+        )
+        self.trigger_events = GlobalTriggerEventQueue(
+            self.zk_client, self.connections
+        )
+        self.pipeline_trigger_events = (
+            PipelineTriggerEventQueue.createRegistry(
+                self.zk_client, self.connections
+            )
+        )
         self.abide = model.Abide()
         self.unparsed_abide = model.UnparsedAbideConfig()
 
@@ -298,38 +312,23 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
         self.statsd.gauge('zuul.scheduler.eventqueues.trigger',
-                          self.trigger_event_queue.qsize())
+                          len(self.trigger_events))
         self.statsd.gauge('zuul.scheduler.eventqueues.result',
                           self.result_event_queue.qsize())
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           self.management_event_queue.qsize())
 
-    def addEvent(self, event):
-        # Check the event type and put it in the corresponding queue
-        if isinstance(event, TriggerEvent):
-            return self._addTriggerEvent(event)
-
-        if isinstance(event, ManagementEvent):
-            return self._addManagementEvent(event)
-
-        if isinstance(event, ResultEvent):
-            return self._addResultEvent(event)
-
-        self.log.warning(
-            "Unable to found appropriate queue for event %s", event
-        )
-
-    def _addTriggerEvent(self, event):
+    def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()
-        self.trigger_event_queue.put(event)
+        self.trigger_events.put(driver_name, event)
         self.wake_event.set()
 
-    def _addManagementEvent(self, event):
+    def addManagementEvent(self, event):
         self.management_event_queue.put(event)
         self.wake_event.set()
         event.wait()
 
-    def _addResultEvent(self, event):
+    def addResultEvent(self, event):
         self.result_event_queue.put(event)
         self.wake_event.set()
 
@@ -570,17 +569,6 @@ class Scheduler(threading.Thread):
         event.wait()
         self.log.debug("Enqueue complete")
 
-    def exit(self):
-        self.log.debug("Prepare to exit")
-        self._hibernate = True
-        self.wake_event.set()
-        self.log.debug("Waiting for exit")
-
-    def _get_queue_pickle_file(self):
-        state_dir = get_default(self.config, 'scheduler', 'state_dir',
-                                '/var/lib/zuul', expand_user=True)
-        return os.path.join(state_dir, 'queue.pickle')
-
     def _get_time_database_dir(self):
         state_dir = get_default(self.config, 'scheduler', 'state_dir',
                                 '/var/lib/zuul', expand_user=True)
@@ -601,60 +589,6 @@ class Scheduler(threading.Thread):
             raise Exception("Project key directory %s must be mode 0700; "
                             "current mode is %o" % (key_dir, mode))
         return key_dir
-
-    def _save_queue(self) -> None:
-        # TODO JK: Remove when queues in ZK
-        pickle_file = self._get_queue_pickle_file()
-        events = []
-        while not self.trigger_event_queue.empty():
-            events.append(self.trigger_event_queue.get())
-        self.log.debug("Queue length is %s" % len(events))
-        if events:
-            self.log.debug("Saving queue")
-            pickle.dump(events, open(pickle_file, 'wb'))
-
-    def _load_queue(self) -> None:
-        # TODO JK: Remove when queues in ZK
-        pickle_file = self._get_queue_pickle_file()
-        if os.path.exists(pickle_file):
-            self.log.debug("Loading queue")
-            events = pickle.load(open(pickle_file, 'rb'))
-            self.log.debug("Queue length is %s" % len(events))
-            for event in events:
-                self.trigger_event_queue.put(event)
-        else:
-            self.log.debug("No queue file found")
-
-    def _delete_queue(self) -> None:
-        # TODO JK: Remove when queues in ZK
-        pickle_file = self._get_queue_pickle_file()
-        if os.path.exists(pickle_file):
-            self.log.debug("Deleting saved queue")
-            os.unlink(pickle_file)
-
-    def wakeUp(self) -> None:
-        """
-        Wakes up scheduler by loading pickled queue.
-
-        TODO JK: Remove when queues in ZK
-        """
-        try:
-            self._load_queue()
-        except Exception:
-            self.log.exception("Unable to load queue")
-        try:
-            self._delete_queue()
-        except Exception:
-            self.log.exception("Unable to delete saved queue")
-        self.log.debug("Resuming queue processing")
-        self.wake_event.set()
-
-    def _doHibernate(self) -> None:
-        # TODO JK: Remove when queues in ZK
-        if self._hibernate:
-            self.log.debug("Exiting")
-            self._save_queue()
-            os._exit(0)
 
     def _checkTenantSourceConf(self, config):
         tenant_config = None
@@ -1109,13 +1043,11 @@ class Scheduler(threading.Thread):
                        not self._stopped):
                     self.process_result_queue()
 
-                if not self._hibernate:
-                    while (not self.trigger_event_queue.empty() and
-                           not self._stopped):
-                        self.process_event_queue()
+                if not self._stopped:
+                    self.process_global_trigger_queue()
 
-                if self._hibernate and self._areAllBuildsComplete():
-                    self._doHibernate()
+                if not self._stopped:
+                    self.process_trigger_queue()
 
                 for tenant in self.abide.tenants.values():
                     for pipeline in tenant.layout.pipelines.values():
@@ -1154,72 +1086,126 @@ class Scheduler(threading.Thread):
                 "End maintain connection cache for: %s" % connection)
         self.log.debug("Connection cache size: %s" % len(relevant))
 
-    def process_event_queue(self):
-        self.log.debug("Fetching trigger event")
-        event = self.trigger_event_queue.get()
-        log = get_annotated_logger(self.log, event.zuul_event_id)
-        log.debug("Processing trigger event %s" % event)
+    def process_global_trigger_queue(self):
+        for event in self.trigger_events:
+            log = get_annotated_logger(
+                self.log, event.zuul_event_id
+            )
+            log.debug("Forwarding trigger event %s", event)
+            try:
+                for tenant in self.abide.tenants.values():
+                    self._forward_trigger_event(event, tenant)
+            finally:
+                self.trigger_events.ack(event)
+
+    def _forward_trigger_event(self, event, tenant):
+        log = get_annotated_logger(
+            self.log, event.zuul_event_id
+        )
+        _, project = tenant.getProject(
+            event.canonical_project_name
+        )
+        if project is None:
+            return
+
         try:
-            full_project_name = ('/'.join([event.project_hostname,
-                                           event.project_name]))
-            for tenant in self.abide.tenants.values():
-                (trusted, project) = tenant.getProject(full_project_name)
-                if project is None:
-                    continue
-                try:
-                    change = project.source.getChange(event)
-                except exceptions.ChangeNotFound as e:
-                    log.debug("Unable to get change %s from source %s",
-                              e.change, project.source)
-                    continue
-                reconfigure_tenant = False
-                if ((event.branch_updated and
-                     hasattr(change, 'files') and
-                     change.updatesConfig(tenant)) or
-                    (event.branch_deleted and
-                     self.abide.hasUnparsedBranchCache(project.canonical_name,
-                                                       event.branch))):
-                    reconfigure_tenant = True
+            change = project.source.getChange(event)
+        except exceptions.ChangeNotFound as e:
+            log.debug("Unable to get change %s from source %s",
+                      e.change, project.source)
+            return
 
-                # The branch_created attribute is also true when a tag is
-                # created. Since we load config only from branches only trigger
-                # a tenant reconfiguration if the branch is set as well.
-                if event.branch_created and event.branch:
-                    reconfigure_tenant = True
+        reconfigure_tenant = False
+        if ((event.branch_updated and
+             hasattr(change, 'files') and
+             change.updatesConfig(tenant)) or
+            (event.branch_deleted and
+             self.abide.hasUnparsedBranchCache(project.canonical_name,
+                                               event.branch))):
+            reconfigure_tenant = True
 
-                # If the driver knows the branch but we don't have a config, we
-                # also need to reconfigure. This happens if a GitHub branch
-                # was just configured as protected without a push in between.
-                if (event.branch in project.source.getProjectBranches(
-                        project, tenant)
-                    and not self.abide.hasUnparsedBranchCache(
-                        project.canonical_name, event.branch)):
-                    reconfigure_tenant = True
+        # The branch_created attribute is also true when a tag is
+        # created. Since we load config only from branches only trigger
+        # a tenant reconfiguration if the branch is set as well.
+        if event.branch_created and event.branch:
+            reconfigure_tenant = True
 
-                # If the branch is unprotected and unprotected branches
-                # are excluded from the tenant for that project skip reconfig.
-                if (reconfigure_tenant and not
-                    event.branch_protected and
-                    tenant.getExcludeUnprotectedBranches(project)):
+        # If the driver knows the branch but we don't have a config, we
+        # also need to reconfigure. This happens if a GitHub branch
+        # was just configured as protected without a push in between.
+        if (event.branch in project.source.getProjectBranches(
+                project, tenant)
+            and not self.abide.hasUnparsedBranchCache(
+                project.canonical_name, event.branch)):
+            reconfigure_tenant = True
 
-                    reconfigure_tenant = False
+        # If the branch is unprotected and unprotected branches
+        # are excluded from the tenant for that project skip reconfig.
+        if (reconfigure_tenant and not
+            event.branch_protected and
+            tenant.getExcludeUnprotectedBranches(project)):
 
-                if reconfigure_tenant:
-                    # The change that just landed updates the config
-                    # or a branch was just created or deleted.  Clear
-                    # out cached data for this project and perform a
-                    # reconfiguration.
-                    self.reconfigureTenant(tenant, change.project, event)
-                for pipeline in tenant.layout.pipelines.values():
-                    if event.isPatchsetCreated():
-                        pipeline.manager.removeOldVersionsOfChange(
-                            change, event)
-                    elif event.isChangeAbandoned():
-                        pipeline.manager.removeAbandonedChange(change, event)
-                    if pipeline.manager.eventMatches(event, change):
-                        pipeline.manager.addChange(change, event)
-        finally:
-            self.trigger_event_queue.task_done()
+            reconfigure_tenant = False
+
+        if reconfigure_tenant:
+            # The change that just landed updates the config
+            # or a branch was just created or deleted.  Clear
+            # out cached data for this project and perform a
+            # reconfiguration.
+            self.reconfigureTenant(tenant, change.project, event)
+
+        for pipeline in tenant.layout.pipelines.values():
+            if (
+                pipeline.manager.eventMatches(event, change)
+                or pipeline.manager.isChangeAlreadyInPipeline(change)
+                or pipeline.manager.findOldVersionOfChangeAlreadyInQueue(
+                    change
+                )
+            ):
+                self.pipeline_trigger_events[tenant.name][
+                    pipeline.name
+                ].put(event.driver_name, event)
+
+    def process_trigger_queue(self):
+        for tenant in self.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                for event in self.pipeline_trigger_events[tenant.name][
+                    pipeline.name
+                ]:
+                    if self._stopped:
+                        return
+                    log = get_annotated_logger(
+                        self.log, event.zuul_event_id
+                    )
+                    log.debug("Processing trigger event %s", event)
+                    try:
+                        self._process_trigger_event(tenant, pipeline, event)
+                    finally:
+                        self.pipeline_trigger_events[tenant.name][
+                            pipeline.name
+                        ].ack(event)
+
+    def _process_trigger_event(self, tenant, pipeline, event):
+        log = get_annotated_logger(
+            self.log, event.zuul_event_id
+        )
+        trusted, project = tenant.getProject(event.canonical_project_name)
+        if project is None:
+            return
+        try:
+            change = project.source.getChange(event)
+        except exceptions.ChangeNotFound as e:
+            log.debug("Unable to get change %s from source %s",
+                      e.change, project.source)
+            return
+
+        if event.isPatchsetCreated():
+            pipeline.manager.removeOldVersionsOfChange(
+                change, event)
+        elif event.isChangeAbandoned():
+            pipeline.manager.removeAbandonedChange(change, event)
+        if pipeline.manager.eventMatches(event, change):
+            pipeline.manager.addChange(change, event)
 
     def process_management_queue(self):
         self.log.debug("Fetching management event")
@@ -1545,14 +1531,8 @@ class Scheduler(threading.Thread):
         data['zuul_version'] = self.zuul_version
         websocket_url = get_default(self.config, 'web', 'websocket_url', None)
 
-        if self._hibernate:
-            data['message'] = 'Queue only mode: preparing to hibernate,' \
-                              ' queue length: %s'\
-                              % self.trigger_event_queue.qsize()
-
         data['trigger_event_queue'] = {}
-        data['trigger_event_queue']['length'] = \
-            self.trigger_event_queue.qsize()
+        data['trigger_event_queue']['length'] = len(self.trigger_events)
         data['result_event_queue'] = {}
         data['result_event_queue']['length'] = \
             self.result_event_queue.qsize()

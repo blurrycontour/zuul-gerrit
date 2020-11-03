@@ -146,7 +146,7 @@ class GitlabEventConnector(threading.Thread):
                 label["title"] for
                 label in body["changes"]["labels"]["current"]]
             new_labels = set(current_labels) - set(previous_labels)
-            event.labels = new_labels
+            event.labels = list(new_labels)
         elif attrs['action'] in ('approved', 'unapproved'):
             event.action = attrs['action']
         else:
@@ -237,7 +237,9 @@ class GitlabEventConnector(threading.Thread):
                 self.connection.checkBranchCache(event.project_name, event)
 
             self.connection.logEvent(event)
-            self.connection.sched.addEvent(event)
+            self.connection.sched.addTriggerEvent(
+                self.connection.driver_name, event
+            )
 
     def run(self):
         while True:
