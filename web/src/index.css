@@ -51,10 +51,6 @@ a.refresh {
     font-weight: bold;
 }
 
-.zuul-build-list:hover a {
-    text-decoration: none;
-}
-
 /* Keep the normal font-size for compact tables */
 .zuul-build-table td {
     font-size: var(--pf-global--FontSize--md);
@@ -64,6 +60,11 @@ a.refresh {
 .zuul-build-table tbody tr:hover {
     box-shadow: var(--pf-global--BoxShadow--sm-top),
       var(--pf-global--BoxShadow--sm-bottom);
+}
+
+/* Hide the details link on the builds table by default (mobile use case) */
+.zuul-build-table .zuul-build-link {
+    display: none;
 }
 
 @media screen and (max-width: 768px) {
@@ -95,23 +96,35 @@ a.refresh {
         transition: var(--pf-global--Transition);
     }
 
+    /* Show the details link icon when hovering over the table row and indicate
+       that it's clickable by making it grow a little */
+    .zuul-build-table .zuul-build-link {
+        display: inline-block;
+        color: white;
+        margin-right: 5px;
+        transform: perspective(1px) translateZ(0);
+        -webkit-transform: perspective(1px) translateZ(0);
+    }
+
+    .zuul-build-table tbody tr:hover .zuul-build-link {
+        color: black;
+    }
+
+    .zuul-build-table tbody tr .zuul-build-link:hover svg {
+        -webkit-transform: scale(1.3) translateZ(0);
+        transform: scale(1.3) translateZ(0);
+    }
+
     .zuul-build-table tbody tr:hover td:first-child::before {
         background-color: var(--pf-global--active-color--100);
     }
-}
 
-/* Make a link stretch the whole parent element (in this case the whole table
-   cell) */
-.zuul-stretched-link::after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 0;
-    pointer-events: auto;
-    content: "";
-    background-color: rgba(0,0,0,0);
+    /* Hide the action column with the build link on larger screen. This is only
+       needed for the mobile version as we can't use the "magnifying-glass icon
+       on hover" effect there. */
+    .zuul-build-table .pf-c-table__action {
+        display: none;
+    }
 }
 
 /*
