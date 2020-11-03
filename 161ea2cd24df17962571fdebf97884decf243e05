@@ -22,6 +22,30 @@
       "revId": "161ea2cd24df17962571fdebf97884decf243e05",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_615a982a",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-11-03T15:04:16Z",
+      "side": 1,
+      "message": "I fixed this already, but merged it into one of the following changes by accident.",
+      "parentUuid": "1f621f24_c1128c58",
+      "range": {
+        "startLine": 191,
+        "startChar": 0,
+        "endLine": 191,
+        "endChar": 30
+      },
+      "revId": "161ea2cd24df17962571fdebf97884decf243e05",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
