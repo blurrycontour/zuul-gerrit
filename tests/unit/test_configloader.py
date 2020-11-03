@@ -433,17 +433,25 @@ class TestSplitConfig(ZuulTestCase):
                                                files=file_dict)
             self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
             self.waitUntilSettled()
+            return A
 
         log_fixture = self.useFixture(
             fixtures.FakeLogger(level=logging.WARNING))
 
         log_fixture._output.truncate(0)
-        add_file("common-config", "zuul.yaml")
-        self.assertIn("Multiple configuration", log_fixture.output)
+        A = add_file("common-config", "zuul.yaml")
+        self.assertIn("Configuration in common-config/zuul.d/jobs.yaml@master "
+                      "ignored because project-branch is already configured",
+                      log_fixture.output)
+        self.assertIn("Configuration in common-config/zuul.d/jobs.yaml@master "
+                      "ignored because project-branch is already configured",
+                      A.messages[0])
 
         log_fixture._output.truncate(0)
         add_file("org/project1", ".zuul.yaml")
-        self.assertIn("Multiple configuration", log_fixture.output)
+        self.assertIn("Configuration in org/project1/.zuul.d/gate.yaml@master "
+                      "ignored because project-branch is already configured",
+                      log_fixture.output)
 
 
 class TestConfigConflict(ZuulTestCase):
