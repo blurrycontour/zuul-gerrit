@@ -34,6 +34,24 @@
       "revId": "d93a72e953d6a4ff34bc1b52856c02c9dc40e10d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_7b035874",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 923,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-11-04T09:15:16Z",
+      "side": 1,
+      "message": "That feels problematic ... i don\u0027t really understand why it would work like this but not as a decorator, but it seems the general problem of calling it twice in tests and expecting different answers might be broken, and this hides it somehow?\n\nA random stackoverflow suggests that maybe the test infrastructure should be calling cache_clear() in between calls to the function, which to me feels overall a safer solution anyway ...",
+      "parentUuid": "1f621f24_60ff2901",
+      "revId": "d93a72e953d6a4ff34bc1b52856c02c9dc40e10d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
