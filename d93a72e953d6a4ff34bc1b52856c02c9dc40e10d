@@ -16,6 +16,24 @@
       "revId": "d93a72e953d6a4ff34bc1b52856c02c9dc40e10d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_60ff2901",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 923,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-11-04T07:24:42Z",
+      "side": 1,
+      "message": "That was my first attempt but this breaks the tests since in this case cachetools uses global vars that don\u0027t get cleaned up between test cases.",
+      "parentUuid": "1f621f24_ca9d7c58",
+      "revId": "d93a72e953d6a4ff34bc1b52856c02c9dc40e10d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
