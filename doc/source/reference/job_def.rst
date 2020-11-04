@@ -128,8 +128,9 @@ Here is an example of two job definitions:
       :default: false
 
       When set to ``true`` only jobs defined in the same project may inherit
-      from this job. Once this is set to ``true`` it cannot be reset to
-      ``false``.
+      from this job. This includes changing execution-related attributes when
+      this job is specified in a project's pipeline. Once this is set to
+      ``true`` it cannot be reset to ``false``.
 
       .. warning::
 
