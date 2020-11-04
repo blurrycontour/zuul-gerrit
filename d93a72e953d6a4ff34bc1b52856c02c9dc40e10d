@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_ca9d7c58",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 923,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-11-04T03:40:58Z",
+      "side": 1,
+      "message": "can\u0027t you just decorate this with\n\n @cachetools.func.ttl_cache(maxsize\u003d128, ttl\u003d600)\n\nhttps://cachetools.readthedocs.io/en/latest/#cachetools.func.ttl_cache",
+      "revId": "d93a72e953d6a4ff34bc1b52856c02c9dc40e10d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
