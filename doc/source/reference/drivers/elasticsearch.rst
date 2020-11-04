@@ -17,8 +17,14 @@ detection for those fields.
 Elasticsearch supports a number of different datatypes for the fields in a
 document. Please refer to its `documentation`_.
 
+The Elasticsearch reporter uses new ES client, that is only supporting
+`current version`_ of Elastisearch. In that case the
+reporter  has been tested on ES cluster version 7. Lower version may
+be working, but we can not give tu any guarantee of that.
+
 
 .. _documentation: https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+.. _current version: https://www.elastic.co/support/eol
 
 Connection Configuration
 ------------------------
@@ -111,7 +117,12 @@ The Elasticsearch reporter does nothing on :attr:`pipeline.start` or
 
       The Elasticsearch index to be used to index the data. To prevent
       any name collisions between Zuul tenants, the tenant name is used as index
-      name prefix. The real index name will be <index-name>.<tenant-name>.
+      name prefix. The real index name will be:
+
+.. code-block::
+
+   <index-name>.<tenant-name>-<YYYY>.<MM>.<DD>
+
       The index will be created if it does not exist.
 
    .. attr:: index-vars
@@ -119,6 +130,7 @@ The Elasticsearch reporter does nothing on :attr:`pipeline.start` or
 
       Boolean value that determines if the reporter should add job's vars
       to the exported build doc.
+      NOTE: The index-vars is not including the secrets.
 
    .. attr:: index-returned-vars
       :default: false

@@ -33,7 +33,8 @@ class ElasticsearchReporter(BaseReporter):
     def report(self, item):
         """Create an entry into a database."""
         docs = []
-        index = '%s.%s' % (self.index, item.pipeline.tenant.name)
+        index = '%s.%s-%s' % (self.index, item.pipeline.tenant.name,
+                              time.strftime("%Y.%m.%d"))
         buildset_doc = {
             "uuid": item.current_build_set.uuid,
             "build_type": "buildset",
