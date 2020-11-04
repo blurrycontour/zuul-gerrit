@@ -13,6 +13,7 @@
 # under the License.
 
 import textwrap
+import time
 
 import sqlalchemy as sa
 
@@ -658,6 +659,13 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
     config_file = 'zuul-elastic-driver.conf'
     tenant_config_file = 'config/elasticsearch-driver/main.yaml'
 
+    def _getSecrets(self, job, pbtype):
+        secrets = []
+        build = self.getJobFromHistory(job)
+        for pb in build.parameters[pbtype]:
+            secrets.append(pb['secrets'])
+        return secrets
+
     def test_elastic_reporter(self):
         "Test the Elasticsearch reporter"
         # Add a success result
@@ -671,8 +679,8 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
             'elasticsearch'].index
 
         self.assertEqual(len(indexed_docs), 2)
-        self.assertEqual(index, 'zuul-index.tenant-one')
-
+        self.assertEqual(index, ('zuul-index.tenant-one.%s' %
+                                 time.strftime("%m-%Y")))
         buildset_doc = [doc for doc in indexed_docs if
                         doc['build_type'] == 'buildset'][0]
         self.assertEqual(buildset_doc['tenant'], 'tenant-one')
@@ -695,3 +703,29 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
             build_doc['job_returned_vars'], {'foo': 'bar'})
 
         self.assertEqual(self.history[0].uuid, build_doc['uuid'])
+
+    def test_elasticsearch_secret_leak(self):
+        expected_secret = [{
+            'test_secret': {
+                'username': 'test-username',
+                'password': 'test-password'
+            }
+        }]
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        indexed_docs = self.scheds.first.connections.connections[
+            'elasticsearch'].source_it
+
+        build_doc = [doc for doc in indexed_docs if
+                     doc['build_type'] == 'build'][0]
+
+        # Ensure that job include secret
+        self.assertEqual(
+            self._getSecrets('test', 'playbooks'),
+            expected_secret)
+
+        # Check if there is a secret leak
+        self.assertFalse('test_secret' in build_doc['job_vars'])
