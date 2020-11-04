@@ -13,34 +13,17 @@
 # under the License.
 
 import yaml
-import types
 import logging
 
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
 from elasticsearch.helpers import BulkIndexError
-from elasticsearch.serializer import JSONSerializer
 
 import zuul.configloader
 import zuul.model
 
 from zuul.connection import BaseConnection
-
-
-class Encoder(JSONSerializer):
-    def default(self, obj):
-        if isinstance(obj, types.MappingProxyType):
-            d = dict(obj)
-            # Always remove SafeLoader left-over
-            d.pop('_source_context', None)
-            d.pop('_start_mark', None)
-            return d
-        elif (
-                isinstance(obj, zuul.model.SourceContext) or
-                isinstance(obj, zuul.configloader.ZuulMark)):
-            return {}
-        return JSONSerializer.default(self, obj)
 
 
 class ElasticsearchConnection(BaseConnection):
@@ -102,7 +85,7 @@ class ElasticsearchConnection(BaseConnection):
             self.cnx_opts['client_key'] = self.connection_config.get(
                 'client_key', None)
         self.es = Elasticsearch(
-            self.uri, serializer=Encoder(), **self.cnx_opts)
+            self.uri, **self.cnx_opts)
         try:
             self.log.debug("Elasticsearch info: %s" % self.es.info())
         except Exception as e:
@@ -141,7 +124,7 @@ class ElasticsearchConnection(BaseConnection):
         try:
             bulk(self.es, self.gen(source_it, index))
             self.es.indices.refresh(index=index)
-            self.log.info('%s docs indexed to %s' % (
+            self.log.debug('%s docs indexed to %s' % (
                 len(source_it), self.connection_name))
         except BulkIndexError as exc:
             self.log.warn("Some docs failed to be indexed (%s)" % exc)
