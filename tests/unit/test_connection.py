@@ -13,6 +13,7 @@
 # under the License.
 
 import textwrap
+import time
 
 import sqlalchemy as sa
 
@@ -671,8 +672,8 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
             'elasticsearch'].index
 
         self.assertEqual(len(indexed_docs), 2)
-        self.assertEqual(index, 'zuul-index.tenant-one')
-
+        self.assertEqual(index, ('zuul-index.tenant-one.%s' %
+                                 time.strftime("%m-%Y")))
         buildset_doc = [doc for doc in indexed_docs if
                         doc['build_type'] == 'buildset'][0]
         self.assertEqual(buildset_doc['tenant'], 'tenant-one')
