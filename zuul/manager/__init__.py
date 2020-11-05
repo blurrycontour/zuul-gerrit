@@ -552,8 +552,11 @@ class PipelineManager(metaclass=ABCMeta):
         # In case a item is dequeued that doesn't have a result yet
         # (success/failed/...) we report it as dequeued.
         # Without this check, all items with a valid result would be reported
-        # twice.
-        if not item.current_build_set.result and item.live:
+        # twice. This only applies to items that have reported start because
+        # we don't know if zuul was supposed to act on the item at all
+        # otherwise.
+        if not item.current_build_set.result and item.live and \
+                item.reported_start:
             item.setReportedResult('DEQUEUED')
             self.reportDequeue(item)
 
