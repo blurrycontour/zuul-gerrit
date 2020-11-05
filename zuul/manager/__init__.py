@@ -194,10 +194,6 @@ class PipelineManager(metaclass=ABCMeta):
                 self.log.error(
                     "Reporting item dequeue %s received: %s", item, ret
                 )
-        # This might be called after canceljobs, which also sets a
-        # non-final 'cancel' result.
-        self.sql.reportBuildsetEnd(item.current_build_set, 'dequeue',
-                                   final=False)
 
     def sendReport(self, action_reporters, item, message=None):
         """Sends the built message off to configured reporters.
@@ -552,10 +548,20 @@ class PipelineManager(metaclass=ABCMeta):
         # In case a item is dequeued that doesn't have a result yet
         # (success/failed/...) we report it as dequeued.
         # Without this check, all items with a valid result would be reported
-        # twice.
-        if not item.current_build_set.result and item.live:
+        # twice. This only applies to items that have reported start because
+        # we don't know if zuul was supposed to act on the item at all
+        # otherwise.
+        if not item.current_build_set.result and item.live and \
+                item.reported_start:
             item.setReportedResult('DEQUEUED')
             self.reportDequeue(item)
+
+        if not item.current_build_set.result and item.live and \
+                and item.job_graph and len(item.job_graph.jobs) > 0:
+            # This might be called after canceljobs, which also sets a
+            # non-final 'cancel' result.
+            self.sql.reportBuildsetEnd(item.current_build_set, 'dequeue',
+                                       final=False)
 
     def removeItem(self, item):
         log = get_annotated_logger(self.log, item.event)
