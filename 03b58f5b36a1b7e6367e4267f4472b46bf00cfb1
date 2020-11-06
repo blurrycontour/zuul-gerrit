@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "1f621f24_64039d10",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 726,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2020-11-06T12:56:56Z",
+      "side": 1,
+      "message": "ok",
+      "parentUuid": "1f621f24_24c7e547",
+      "range": {
+        "startLine": 725,
+        "startChar": 0,
+        "endLine": 726,
+        "endChar": 57
+      },
+      "revId": "03b58f5b36a1b7e6367e4267f4472b46bf00cfb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f621f24_2468851f",
         "filename": "tests/unit/test_connection.py",
         "patchSetId": 3
@@ -36,6 +60,30 @@
       "writtenOn": "2020-11-06T08:44:23Z",
       "side": 1,
       "message": "I don\u0027t see the point of that test.",
+      "range": {
+        "startLine": 731,
+        "startChar": 0,
+        "endLine": 733,
+        "endChar": 28
+      },
+      "revId": "03b58f5b36a1b7e6367e4267f4472b46bf00cfb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_2409a530",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2020-11-06T12:56:56Z",
+      "side": 1,
+      "message": "here we ensure that the secret is in the job without looking into the fixture",
+      "parentUuid": "1f621f24_2468851f",
       "range": {
         "startLine": 731,
         "startChar": 0,
@@ -76,6 +124,24 @@
       "writtenOn": "2020-11-06T08:52:00Z",
       "side": 1,
       "message": "Maybe build_doc[\u0027jobs_vars\u0027].get(\u0027test_secret\u0027)",
+      "parentUuid": "1f621f24_e4868ddb",
+      "revId": "03b58f5b36a1b7e6367e4267f4472b46bf00cfb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_9f2ba080",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2020-11-06T12:56:56Z",
+      "side": 1,
+      "message": "the job_vars are also not including the secrets",
       "parentUuid": "1f621f24_e4868ddb",
       "revId": "03b58f5b36a1b7e6367e4267f4472b46bf00cfb1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
