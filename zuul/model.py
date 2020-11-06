@@ -18,7 +18,6 @@ import copy
 import json
 import logging
 import os
-import threading
 from logging import LoggerAdapter
 from typing import Any, Tuple, Dict, List, Optional, Type, TypeVar
 
@@ -3330,25 +3329,16 @@ class AbstractEvent(abc.ABC):
 
 class ManagementEvent(AbstractEvent):
     """An event that should be processed within the main queue run loop"""
+
+    # Opaque identifier in order to report the result of an event
+    result_id: Optional[Any]
+
     def __init__(self):
-        self._wait_event = threading.Event()
-        self._exc_info = None
+        self.traceback: Optional[str] = None
         self.zuul_event_id = None
 
-    def exception(self, exc_info):
-        self._exc_info = exc_info
-        self._wait_event.set()
-
-    def done(self):
-        self._wait_event.set()
-
-    def wait(self, timeout=None):
-        self._wait_event.wait(timeout)
-        if self._exc_info:
-            # sys.exc_info returns (type, value, traceback)
-            type_, exception_instance, traceback = self._exc_info
-            raise exception_instance.with_traceback(traceback)
-        return self._wait_event.is_set()
+    def exception(self, tb: str):
+        self.traceback = tb
 
     def toDict(self) -> Dict[str, Any]:
         return {
@@ -3408,15 +3398,15 @@ class TenantReconfigureEvent(ManagementEvent):
     the path specified in the configuration.
 
     :arg str tenant_name: the tenant to reconfigure
-    :arg Project project: if supplied, clear the cached configuration
+    :arg str project_name: if supplied, clear the cached configuration
          from this project first
-    :arg Branch branch: if supplied along with project, only remove the
+    :arg str branch_name: if supplied along with project, only remove the
          configuration of the specific branch from the cache
     """
-    def __init__(self, tenant_name, project, branch):
+    def __init__(self, tenant_name, project_name, branch_name):
         super(TenantReconfigureEvent, self).__init__()
         self.tenant_name = tenant_name
-        self.project_branches = set([(project, branch)])
+        self.project_branches = set([(project_name, branch_name)])
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -3553,7 +3543,7 @@ class EnqueueEvent(ManagementEvent):
 
     def toDict(self) -> Dict[str, Any]:
         d = super().toDict()
-        d["trigger_event"] = self.trigger_event
+        d["trigger_event"] = self.trigger_event.toDict()
         return d
 
     @classmethod
@@ -3561,7 +3551,7 @@ class EnqueueEvent(ManagementEvent):
         cls: Type["EnqueueEvent"], data: Dict[str, Any]
     ) -> "EnqueueEvent":
         return cls(
-            data.get("trigger_event"),
+            TriggerEvent.fromDict(data["trigger_event"]),
         )
 
 

@@ -14,6 +14,8 @@
 
 import json
 import logging
+import threading
+import uuid
 from collections import defaultdict
 from collections.abc import Iterable
 from contextlib import suppress
@@ -32,7 +34,7 @@ from typing import (
 )
 
 from kazoo.exceptions import NoNodeError
-from kazoo.protocol.states import EventType, WatchedEvent
+from kazoo.protocol.states import EventType, WatchedEvent, ZnodeStat
 
 from zuul import model
 from zuul.lib.connections import ConnectionRegistry
@@ -178,10 +180,61 @@ class ZooKeeperEventQueueRegistry(defaultdict):
         return queue
 
 
+class ManagementEventResultFuture(ZooKeeperBase):
+
+    log = logging.getLogger(
+        "zuul.zk.event_queues.MangementEventResultFuture"
+    )
+
+    def __init__(self, client: ZooKeeperClient, result_path: str):
+        super().__init__(client)
+        self._result_path = result_path
+        self._wait_event = threading.Event()
+        self.kazoo_client.DataWatch(
+            self._result_path,
+            self._result_callback
+        )
+
+    def _result_callback(
+        self, data: Optional[bytes],
+        stat: Optional[ZnodeStat],
+        event: Optional[WatchedEvent]
+    ) -> Optional[bool]:
+        if data is None:
+            # Igore events w/o any data
+            return None
+        self._wait_event.set()
+        # Stop the watch if we got a result
+        return False
+
+    def wait(self, timeout: Optional[float] = None) -> bool:
+        try:
+            if not self._wait_event.wait(timeout):
+                return False
+            try:
+                data, _ = self.kazoo_client.get(self._result_path)
+                result = json.loads(data.decode("utf-8"))
+            except json.JSONDecodeError:
+                self.log.exception(
+                    "Malformed result data in %s", self._result_path
+                )
+                raise
+            tb = result.get("traceback")
+            if tb is not None:
+                # TODO: raise some kind of ManagementEventException here
+                raise RuntimeError(tb)
+        finally:
+            with suppress(NoNodeError):
+                self.kazoo_client.delete(self._result_path)
+        return True
+
+
 class ZooKeeperManagementEventQueue(
     ZooKeeperEventQueue[model.ManagementEvent]
 ):
     """Management events via ZooKeeper"""
+
+    RESULTS_ROOT = "/zuul/results/management"
 
     log = logging.getLogger(
         "zuul.zk.event_queues.ZooKeeperManagementEventQueue"
@@ -199,25 +252,55 @@ class ZooKeeperManagementEventQueue(
     ) -> Dict[str, "ZooKeeperManagementEventQueue"]:
         return ZooKeeperEventQueueRegistry(lambda t: cls(client, t))
 
-    def put(self, event: model.ManagementEvent) -> None:
+    def put(
+        self, event: model.ManagementEvent, needs_result=True
+    ) -> Optional[ManagementEventResultFuture]:
+        result_path = None
+        if needs_result:
+            result_path = "/".join((self.RESULTS_ROOT, str(uuid.uuid4())))
+
         data = {
             "event_type": type(event).__name__,
             "event_data": event.toDict(),
+            "result_path": result_path,
         }
-        event.ack_id = self._put(data)
+        self._put(data)
+        if result_path is not None:
+            return ManagementEventResultFuture(self.client, result_path)
+        return None
 
     def __iter__(self) -> Generator[model.ManagementEvent, None, None]:
         for path, data in self._iter_events():
             try:
                 event_class = MANAGEMENT_EVENT_TYPE_MAP[data["event_type"]]
                 event_data = data["event_data"]
+                result_path = data["result_path"]
             except KeyError:
                 self.log.warning("Malformed event found: %s", data)
                 self._remove(path)
                 continue
             event = event_class.fromDict(event_data)
             event.ack_id = path
+            event.result_id = result_path
             yield event
+
+    def ack(self, event: model.ManagementEvent) -> None:
+        try:
+            self.kazoo_client.delete(event.ack_id, recursive=True)
+        except NoNodeError:
+            self.log.warning("Event %s was already acknowledged", event)
+            return
+
+        if not event.result_id:
+            return
+
+        result_data = {"traceback": event.traceback}
+        self.kazoo_client.create(
+            event.result_id,
+            json.dumps(result_data).encode("utf-8"),
+            ephemeral=True,
+            makepath=True,
+        )
 
 
 class ZooKeeperResultEventQueue(ZooKeeperEventQueue[model.ResultEvent]):
