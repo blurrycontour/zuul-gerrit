@@ -64,8 +64,10 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponentRegistry
 from zuul.zk.event_queues import (
     GlobalEventWatcher,
+    GlobalManagementEventQueue,
     GlobalTriggerEventQueue,
     PipelineEventWatcher,
+    PipelineManagementEventQueue,
     PipelineTriggerEventQueue,
 )
 from zuul.zk.nodepool import ZooKeeperNodepool
@@ -145,12 +147,17 @@ class Scheduler(threading.Thread):
         )
 
         self.result_event_queue = queue.Queue()
-        self.management_event_queue = zuul.lib.queue.MergedQueue()
         self.global_watcher = GlobalEventWatcher(
             self.zk_client, self.wake_event.set
         )
         self.pipeline_watcher = PipelineEventWatcher(
             self.zk_client, self.wake_event.set
+        )
+        self.management_events = GlobalManagementEventQueue(self.zk_client)
+        self.pipeline_management_events = (
+            PipelineManagementEventQueue.createRegistry(
+                self.zk_client
+            )
         )
         self.trigger_events = GlobalTriggerEventQueue(
             self.zk_client, self.connections
@@ -316,7 +323,7 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.scheduler.eventqueues.result',
                           self.result_event_queue.qsize())
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
-                          self.management_event_queue.qsize())
+                          len(self.management_events))
 
     def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()
@@ -324,9 +331,7 @@ class Scheduler(threading.Thread):
         self.wake_event.set()
 
     def addManagementEvent(self, event):
-        self.management_event_queue.put(event)
-        self.wake_event.set()
-        event.wait()
+        self.management_events.put(event, needs_result=False)
 
     def addResultEvent(self, event):
         self.result_event_queue.put(event)
@@ -416,9 +421,10 @@ class Scheduler(threading.Thread):
                        "%s due to event %s in project %s",
                        tenant.name, event, project)
         branch = event.branch if event is not None else None
-        event = TenantReconfigureEvent(tenant.name, project, branch)
-        self.management_event_queue.put(event)
-        self.wake_event.set()
+        event = TenantReconfigureEvent(
+            tenant.name, project.canonical_name, branch
+        )
+        self.management_events.put(event, needs_result=False)
 
     def fullReconfigureCommandHandler(self):
         self._zuul_app.fullReconfigure()
@@ -438,16 +444,24 @@ class Scheduler(threading.Thread):
         self.repl.stop()
         self.repl = None
 
-    def reconfigure(self, config, smart=False, validate_tenants=None):
+    def prime(self, config, validate_tenants=None):
+        self.log.debug("Priming scheduler config")
+        event = ReconfigureEvent(validate_tenants=validate_tenants)
+        self._doReconfigureEvent(event)
+        self.log.debug("Config priming complete")
+        self.last_reconfigured = int(time.time())
+
+    def reconfigure(self, config, smart=False):
         self.log.debug("Submitting reconfiguration event")
         if smart:
-            event = SmartReconfigureEvent(config)
+            event = SmartReconfigureEvent()
         else:
-            event = ReconfigureEvent(config, validate_tenants=validate_tenants)
-        self.management_event_queue.put(event)
-        self.wake_event.set()
+            event = ReconfigureEvent()
+
+        result = self.management_events.put(event)
+
         self.log.debug("Waiting for reconfiguration")
-        event.wait()
+        result.wait()
         self.log.debug("Reconfiguration complete")
         self.last_reconfigured = int(time.time())
         # TODOv3(jeblair): reconfigure time should be per-tenant
@@ -546,27 +560,24 @@ class Scheduler(threading.Thread):
 
     def promote(self, tenant_name, pipeline_name, change_ids):
         event = PromoteEvent(tenant_name, pipeline_name, change_ids)
-        self.management_event_queue.put(event)
-        self.wake_event.set()
+        result = self.management_events.put(event)
         self.log.debug("Waiting for promotion")
-        event.wait()
+        result.wait()
         self.log.debug("Promotion complete")
 
     def dequeue(self, tenant_name, pipeline_name, project_name, change, ref):
         event = DequeueEvent(
             tenant_name, pipeline_name, project_name, change, ref)
-        self.management_event_queue.put(event)
-        self.wake_event.set()
+        result = self.management_events.put(event)
         self.log.debug("Waiting for dequeue")
-        event.wait()
+        result.wait()
         self.log.debug("Dequeue complete")
 
     def enqueue(self, trigger_event):
         event = EnqueueEvent(trigger_event)
-        self.management_event_queue.put(event)
-        self.wake_event.set()
+        result = self.management_events.put(event)
         self.log.debug("Waiting for enqueue")
-        event.wait()
+        result.wait()
         self.log.debug("Enqueue complete")
 
     def _get_time_database_dir(self):
@@ -616,7 +627,7 @@ class Scheduler(threading.Thread):
         # This is called in the scheduler loop after another thread submits
         # a request
         self.layout_lock.acquire()
-        self.config = event.config
+        self.config = self._zuul_app.config
         try:
             self.log.info("Full reconfiguration beginning")
             start = time.monotonic()
@@ -666,7 +677,7 @@ class Scheduler(threading.Thread):
         # a request
         reconfigured_tenants = []
         with self.layout_lock:
-            self.config = event.config
+            self.config = self._zuul_app.config
             self.log.info("Smart reconfiguration beginning")
             start = time.monotonic()
 
@@ -726,11 +737,11 @@ class Scheduler(threading.Thread):
             start = time.monotonic()
             # If a change landed to a project, clear out the cached
             # config of the changed branch before reconfiguring.
-            for (project, branch) in event.project_branches:
+            for project_name, branch_name in event.project_branches:
                 self.log.debug("Clearing unparsed config: %s @%s",
-                               project.canonical_name, branch)
-                self.abide.clearUnparsedBranchCache(project.canonical_name,
-                                                    branch)
+                               project_name, branch_name)
+                self.abide.clearUnparsedBranchCache(project_name,
+                                                    branch_name)
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
@@ -1033,8 +1044,10 @@ class Scheduler(threading.Thread):
             self.log.debug("Run handler awake")
             self.run_handler_lock.acquire()
             try:
-                while (not self.management_event_queue.empty() and
-                       not self._stopped):
+                if not self._stopped:
+                    self.process_global_management_queue()
+
+                if not self._stopped:
                     self.process_management_queue()
 
                 # Give result events priority -- they let us stop builds,
@@ -1207,18 +1220,77 @@ class Scheduler(threading.Thread):
         if pipeline.manager.eventMatches(event, change):
             pipeline.manager.addChange(change, event)
 
+    def process_global_management_queue(self):
+        for event in self.management_events:
+            event_forwarded = False
+            try:
+                if isinstance(event, ReconfigureEvent):
+                    self._doReconfigureEvent(event)
+                elif isinstance(event, SmartReconfigureEvent):
+                    self._doSmartReconfigureEvent(event)
+                elif isinstance(event, TenantReconfigureEvent):
+                    self._doTenantReconfigureEvent(event)
+                elif isinstance(event, (PromoteEvent, DequeueEvent)):
+                    try:
+                        tenant = self.abide.tenants[event.tenant_name]
+                        pipeline = tenant.layout.pipelines[event.pipeline_name]
+                        self.pipeline_management_events[tenant.name][
+                            pipeline.name
+                        ].put(event)
+                        event_forwarded = True
+                    except Exception:
+                        event.exception(
+                            "".join(
+                                traceback.format_exception(*sys.exc_info())
+                            )
+                        )
+                elif isinstance(event, EnqueueEvent):
+                    try:
+                        trigger_event = event.trigger_event
+                        tenant = self.abide.tenants[trigger_event.tenant_name]
+                        pipeline = tenant.layout.pipelines[
+                            trigger_event.forced_pipeline
+                        ]
+                        self.pipeline_management_events[tenant.name][
+                            pipeline.name
+                        ].put(event)
+                        event_forwarded = True
+                    except Exception:
+                        event.exception(
+                            "".join(
+                                traceback.format_exception(*sys.exc_info())
+                            )
+                        )
+                else:
+                    self.log.error("Unable to handle event %s", event)
+            finally:
+                if event_forwarded:
+                    self.management_events.ackWithoutResult(event)
+                else:
+                    self.management_events.ack(event)
+
     def process_management_queue(self):
-        self.log.debug("Fetching management event")
-        event = self.management_event_queue.get()
-        self.log.debug("Processing management event %s" % event)
+        for tenant in self.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                for event in self.pipeline_management_events[tenant.name][
+                    pipeline.name
+                ]:
+                    if self._stopped:
+                        return
+                    log = get_annotated_logger(
+                        self.log, event.zuul_event_id
+                    )
+                    log.debug("Processing management event %s", event)
+                    try:
+                        self._process_management_event(event)
+                    finally:
+                        self.pipeline_management_events[tenant.name][
+                            pipeline.name
+                        ].ack(event)
+
+    def _process_management_event(self, event):
         try:
-            if isinstance(event, ReconfigureEvent):
-                self._doReconfigureEvent(event)
-            elif isinstance(event, SmartReconfigureEvent):
-                self._doSmartReconfigureEvent(event)
-            elif isinstance(event, TenantReconfigureEvent):
-                self._doTenantReconfigureEvent(event)
-            elif isinstance(event, PromoteEvent):
+            if isinstance(event, PromoteEvent):
                 self._doPromoteEvent(event)
             elif isinstance(event, DequeueEvent):
                 self._doDequeueEvent(event)
@@ -1226,15 +1298,11 @@ class Scheduler(threading.Thread):
                 self._doEnqueueEvent(event.trigger_event)
             else:
                 self.log.error("Unable to handle event %s" % event)
-            event.done()
         except Exception:
             self.log.exception("Exception in management event:")
-            type, val, tb = sys.exc_info()
-            # Remove local variables from the traceback to prevent leaking
-            # large objects.
-            traceback.clear_frames(tb)
-            event.exception((type, val, tb))
-        self.management_event_queue.task_done()
+            event.exception(
+                "".join(traceback.format_exception(*sys.exc_info()))
+            )
 
     def process_result_queue(self):
         self.log.debug("Fetching result event")
@@ -1537,8 +1605,7 @@ class Scheduler(threading.Thread):
         data['result_event_queue']['length'] = \
             self.result_event_queue.qsize()
         data['management_event_queue'] = {}
-        data['management_event_queue']['length'] = \
-            self.management_event_queue.qsize()
+        data['management_event_queue']['length'] = len(self.management_events)
 
         if self.last_reconfigured:
             data['last_reconfigured'] = self.last_reconfigured * 1000
