@@ -3896,12 +3896,11 @@ class SchedulerTestApp:
 
         self.event_queues = [
             self.sched.result_event_queue,
-            self.sched.management_event_queue
         ]
 
         self.sched.start()
         self.sched.executor.gearman.waitForServer()
-        self.sched.reconfigure(self.config)
+        self.sched.prime(self.config)
 
     def fullReconfigure(self):
         try:
@@ -4781,9 +4780,16 @@ class ZuulTestCase(BaseTestCase):
                 if sched.zk_connection_event.hasEvents(
                         connection.connection_name, keep_locked=True):
                     return False
+            if sched.management_events.hasEvents():
+                return False
             if sched.trigger_events.hasEvents():
                 return False
             for tenant_name in sched.abide.tenants:
+                if any(
+                    q.hasEvents() for q in
+                    sched.pipeline_management_events[tenant_name].values()
+                ):
+                    return False
                 if any(
                     q.hasEvents() for q in
                     sched.pipeline_trigger_events[tenant_name].values()
