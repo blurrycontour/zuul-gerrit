@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "1f621f24_46d5c4e4",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 733,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-11-06T12:58:18Z",
+      "side": 1,
+      "message": "ok got it.",
+      "parentUuid": "1f621f24_2409a530",
+      "range": {
+        "startLine": 731,
+        "startChar": 0,
+        "endLine": 733,
+        "endChar": 28
+      },
+      "revId": "03b58f5b36a1b7e6367e4267f4472b46bf00cfb1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1f621f24_e4868ddb",
         "filename": "tests/unit/test_connection.py",
         "patchSetId": 3
