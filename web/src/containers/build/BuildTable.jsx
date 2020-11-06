@@ -24,6 +24,7 @@ import {
   EmptyStateSecondaryActions,
   Spinner,
   Title,
+  Tooltip,
 } from '@patternfly/react-core'
 import {
   BuildIcon,
@@ -106,12 +107,20 @@ function BuildTable({
           // cell, we must use the title attribute.
           title: (
             <>
-              <Link
-                to={`${tenant.linkPrefix}/build/${build.uuid}`}
-                className="zuul-build-link"
-              >
-                <SearchIcon />
-              </Link>
+              {build.uuid ? (
+                <Link
+                  to={`${tenant.linkPrefix}/build/${build.uuid}`}
+                  className="zuul-build-link"
+                >
+                  <SearchIcon />
+                </Link>
+              ) : (
+                <Tooltip
+                  content={<div>Skipped builds don't provide a result.</div>}
+                >
+                  <SearchIcon className="zuul-build-link disabled" />
+                </Tooltip>
+              )}
               <BuildResultWithIcon result={build.result} colored={build.voting}>
                 {build.job_name}
                 {!build.voting && ' (non-voting)'}
