@@ -500,6 +500,79 @@ class TestMergerRepo(ZuulTestCase):
         commit = work_repo_object.commit('FETCH_HEAD')
         self.assertIsNotNone(commit)
 
+    def test_delete_upstream_tag(self):
+        # Test that we can delete a tag from upstream and that our
+        # working dir will prune it.
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        parent_repo = git.Repo(parent_path)
+
+        # Tag upstream
+        self.addTagToRepo('org/project1', 'testtag', 'HEAD')
+        commit = parent_repo.commit('testtag')
+
+        # Update downstream and verify tag matches
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        work_repo_underlying = git.Repo(work_repo.local_path)
+        work_repo.update()
+        result = work_repo_underlying.commit('testtag')
+        self.assertEqual(commit, result)
+
+        # Delete tag upstream
+        self.delTagFromRepo('org/project1', 'testtag')
+
+        # Update downstream and verify tag is gone
+        work_repo.update()
+        with testtools.ExpectedException(git.exc.BadName):
+            result = work_repo_underlying.commit('testtag')
+
+        # Make a new empty commit
+        new_commit = parent_repo.index.commit('test commit')
+        self.assertNotEqual(commit, new_commit)
+
+        # Tag the new commit
+        self.addTagToRepo('org/project1', 'testtag', new_commit)
+        new_tag_commit = parent_repo.commit('testtag')
+        self.assertEqual(new_commit, new_tag_commit)
+
+        # Verify that the downstream tag matches
+        work_repo.update()
+        new_result = work_repo_underlying.commit('testtag')
+        self.assertEqual(new_commit, new_result)
+
+    def test_move_upstream_tag(self):
+        # Test that if an upstream tag moves, our local copy moves
+        # too.
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        parent_repo = git.Repo(parent_path)
+
+        # Tag upstream
+        self.addTagToRepo('org/project1', 'testtag', 'HEAD')
+        commit = parent_repo.commit('testtag')
+
+        # Update downstream and verify tag matches
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        work_repo_underlying = git.Repo(work_repo.local_path)
+        work_repo.update()
+        result = work_repo_underlying.commit('testtag')
+        self.assertEqual(commit, result)
+
+        # Make an empty commit
+        new_commit = parent_repo.index.commit('test commit')
+        self.assertNotEqual(commit, new_commit)
+
+        # Re-tag upstream
+        self.delTagFromRepo('org/project1', 'testtag')
+        self.addTagToRepo('org/project1', 'testtag', new_commit)
+        new_tag_commit = parent_repo.commit('testtag')
+        self.assertEqual(new_commit, new_tag_commit)
+
+        # Verify our downstream tag has moved
+        work_repo.update()
+        new_result = work_repo_underlying.commit('testtag')
+        self.assertEqual(new_commit, new_result)
+
 
 class TestMergerWithAuthUrl(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
