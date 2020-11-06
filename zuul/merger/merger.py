@@ -598,7 +598,8 @@ class Repo(object):
             # --tags' is all that is necessary.  See
             # https://github.com/git/git/blob/master/Documentation/RelNotes/1.9.0.txt#L18-L20
             self._git_fetch(repo, 'origin', zuul_event_id)
-        self._git_fetch(repo, 'origin', zuul_event_id, tags=True, prune=True)
+        self._git_fetch(repo, 'origin', zuul_event_id, tags=True,
+                        prune=True, prune_tags=True)
 
     def isUpdateNeeded(self, repo_state, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
