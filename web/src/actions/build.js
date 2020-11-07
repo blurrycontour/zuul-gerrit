@@ -166,7 +166,9 @@ export const receiveBuildOutput = (buildId, output) => {
                     hosts[host].failed.push(result)
                   }
                 })
-              } else if (task.hosts[host].rc || task.hosts[host].failed) {
+              } else if (task.hosts[host].rc
+                        && task.hosts[host].failed_when_result !== false
+                        || task.hosts[host].failed) {
                 let result = task.hosts[host]
                 result.name = task.task.name
                 hosts[host].failed.push(result)
