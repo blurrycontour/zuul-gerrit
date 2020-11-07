@@ -142,6 +142,13 @@ export function taskPathMatches (ref, test) {
 
 export const receiveBuildOutput = (buildId, output) => {
   const hosts = {}
+
+  const taskFailed = (taskResult) => {
+    if(taskResult.rc && taskResult.failed_when_result !== false) return true
+    else if(taskResult.failed) return true
+    else return false
+  }
+
   // Compute stats
   output.forEach(phase => {
     Object.entries(phase.stats).forEach(([host, stats]) => {
@@ -161,12 +168,12 @@ export const receiveBuildOutput = (buildId, output) => {
               if (task.hosts[host].results &&
                   task.hosts[host].results.length > 0) {
                 task.hosts[host].results.forEach(result => {
-                  if (result.failed) {
+                  if (taskFailed(result)) {
                     result.name = task.task.name
                     hosts[host].failed.push(result)
                   }
                 })
-              } else if (task.hosts[host].rc || task.hosts[host].failed) {
+              } else if (taskFailed(task.hosts[host])) {
                 let result = task.hosts[host]
                 result.name = task.task.name
                 hosts[host].failed.push(result)
