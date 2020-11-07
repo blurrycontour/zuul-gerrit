@@ -42,6 +42,8 @@ elif type zypper; then
     $SUDO npm install yarn
 elif type brew; then
     brew install nodejs yarn
+elif type pamac; then
+    $SUDO pamac install nodejs yarn --no-confirm
 else
     echo "Unsupported platform"
 fi
