@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_570c3593",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-11-09T22:45:17Z",
+      "side": 1,
+      "message": "Should be camel case to match.",
+      "revId": "b02bb5f9f46162def96c76ba010d2feb7662a401",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_3711b9ad",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-11-09T22:45:17Z",
+      "side": 1,
+      "message": "This comment should be in the docstring for this method, with a note indicating when implementing drivers should call it.  The base driver classes are the one place in Zuul where we try to keep a pretty high standard for docstrings for the benefit of driver authors.\n\nI\u0027d also prefer a more descriptive name for this method, perhaps \"clearConnectionCacheOnBranchEvent\" or something like that at least something to connect this to the connection cache so it\u0027s clear this isn\u0027t doing something like forwarding an event to the scheduler.",
+      "revId": "b02bb5f9f46162def96c76ba010d2feb7662a401",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_9729ade7",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-11-09T22:45:17Z",
+      "side": 1,
+      "message": "Each of the 3 previous methods should have docstrings.",
+      "revId": "b02bb5f9f46162def96c76ba010d2feb7662a401",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_77269117",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-11-09T22:45:17Z",
+      "side": 1,
+      "message": "Docstring.",
+      "revId": "b02bb5f9f46162def96c76ba010d2feb7662a401",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
