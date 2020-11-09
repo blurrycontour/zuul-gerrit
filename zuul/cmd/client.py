@@ -228,7 +228,7 @@ class Client(zuul.cmd.ZuulApp):
         cmd_autohold_list = subparsers.add_parser(
             'autohold-list', help='list autohold requests')
         cmd_autohold_list.add_argument('--tenant', help='tenant name',
-                                       required=False)
+                                       required=True)
         cmd_autohold_list.set_defaults(func=self.autohold_list)
 
         cmd_enqueue = subparsers.add_parser('enqueue', help='enqueue a change')
