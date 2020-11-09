@@ -362,8 +362,8 @@ Access Rule
 An access rule is a set of conditions the claims of a user's JWT must match
 in order to be allowed to perform protected actions at a tenant's level.
 
-The protected actions available at tenant level are **autohold**, **enqueue**
-or **dequeue**.
+The protected actions available at tenant level are **autohold**, **enqueue**,
+**dequeue** or **promote**.
 
 .. note::
 
