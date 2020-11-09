@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_76fd01b0",
+        "filename": "web/src/actions/build.js",
+        "patchSetId": 6
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-11-09T00:12:32Z",
+      "side": 1,
+      "message": "Just a nit, but every other \"if\" here has spaces, newlines, etc.\n\nI think we should at least follow the code-style in the rest of the file",
+      "range": {
+        "startLine": 147,
+        "startChar": 0,
+        "endLine": 149,
+        "endChar": 21
+      },
+      "revId": "d5647ef67b4843ac61aa91d4dc6be46900e74625",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
