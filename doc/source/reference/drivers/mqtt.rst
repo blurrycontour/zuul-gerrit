@@ -4,7 +4,13 @@ MQTT
 ====
 
 The MQTT driver supports reporters only. It is used to send MQTT
-message when items report.
+message related to buildset lifecycle events.
+
+Keep in mind that events are created only for buildsets and not for individual
+jobs.
+
+A 'start' action means that the buildset was enqueued, which can be long time
+before any job effectively start to run.
 
 Message Schema
 --------------
@@ -15,7 +21,7 @@ An MQTT report uses this schema:
 
    .. attr:: action
 
-      The reporter action name, e.g.: 'start', 'success', 'failure',
+      The reporter builset action name, e.g.: 'start', 'success', 'failure',
       'merge-failure', ...
 
    .. attr:: tenant
