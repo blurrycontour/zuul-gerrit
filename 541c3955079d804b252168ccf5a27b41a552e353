@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_96da4648",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3321,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-11-10T13:32:35Z",
+      "side": 1,
+      "message": "nit: Although I\u0027m a fan of type annotations, I\u0027m not sure if we also need them for cls parameters. As this is a classmethod it should be self-explaining, or? I find it a little hard to read with the additional Type[...].",
+      "revId": "541c3955079d804b252168ccf5a27b41a552e353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_36c2525a",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3377,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-11-10T13:32:35Z",
+      "side": 1,
+      "message": "Maybe I\u0027m a little lost in the class hierarchy here, but shouldn\u0027t the subclasses of ManagementEvent also call the updateFromDict() method in their fromDict() so the self.zuul_event_id is set accordingly?",
+      "revId": "541c3955079d804b252168ccf5a27b41a552e353",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
