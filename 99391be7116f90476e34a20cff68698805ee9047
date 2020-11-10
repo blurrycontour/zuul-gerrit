@@ -69,6 +69,24 @@
       "revId": "99391be7116f90476e34a20cff68698805ee9047",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_dc0e9d39",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-11-10T16:04:27Z",
+      "side": 1,
+      "message": "This was fixed in last review and now variable type is not assumed to be a list, it will print regardless what it contains.",
+      "parentUuid": "ff570b3c_a11ccbc1",
+      "revId": "99391be7116f90476e34a20cff68698805ee9047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
