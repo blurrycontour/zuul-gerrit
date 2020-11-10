@@ -39,12 +39,12 @@ from jenkins_jobs.parser import matches
 import jenkins_jobs.parser
 import yaml
 
-JOB_MATCHERS = {}  # type: Dict[str, Dict[str, Dict]]
-TEMPLATES_TO_EXPAND = {}  # type: Dict[str, List]
-JOBS_FOR_EXPAND = collections.defaultdict(dict)  # type: ignore
-JOBS_BY_ORIG_TEMPLATE = {}  # type: ignore
-SUFFIXES = []  # type: ignore
-SKIP_MACROS = []  # type: ignore
+JOB_MATCHERS: Dict[str, Dict[str, Dict]] = {}
+TEMPLATES_TO_EXPAND: Dict[str, List] = {}
+JOBS_FOR_EXPAND: Dict = collections.defaultdict(dict)
+JOBS_BY_ORIG_TEMPLATE: Dict = {}
+SUFFIXES: List[str] = []
+SKIP_MACROS: List[str] = []
 ENVIRONMENT = '{{ zuul | zuul_legacy_vars }}'
 DESCRIPTION = """Migrate zuul v2 and Jenkins Job Builder to Zuul v3.
 
