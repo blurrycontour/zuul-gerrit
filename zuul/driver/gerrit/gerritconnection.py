@@ -1390,14 +1390,14 @@ class GerritConnection(BaseConnection):
         if self.anonymous_git:
             url = ('%s/%s' % (self.baseurl, project.name))
         elif self.session:
-            baseurl = list(urllib.parse.urlparse(self.baseurl))
+            baseurl_parsed = list(urllib.parse.urlparse(self.baseurl))
             # Make sure we escape '/' symbols, otherwise git's url
             # parser will think the username is a hostname.
-            baseurl[1] = '%s:%s@%s' % (
+            baseurl_parsed[1] = '%s:%s@%s' % (
                 urllib.parse.quote(self.user, safe=''),
                 urllib.parse.quote(self.password, safe=''),
-                baseurl[1])
-            baseurl = urllib.parse.urlunparse(baseurl)
+                baseurl_parsed[1])
+            baseurl = urllib.parse.urlunparse(baseurl_parsed)
             url = ('%s/%s' % (baseurl, project.name))
         else:
             url = 'ssh://%s@%s:%s/%s' % (self.user, self.server, self.port,
