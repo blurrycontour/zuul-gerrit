@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "1f621f24_502431af",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-11-10T16:10:04Z",
+      "side": 1,
+      "message": "Last version of the patch is displaying the field regardless its format, so it will render regardless if is a list, multiline string or even a dictionary.",
+      "parentUuid": "9f560f44_1d6273ae",
+      "revId": "99391be7116f90476e34a20cff68698805ee9047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff570b3c_a11ccbc1",
         "filename": "web/src/containers/build/BuildOutput.jsx",
         "patchSetId": 1
