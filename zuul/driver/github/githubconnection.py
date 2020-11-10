@@ -1818,9 +1818,10 @@ class GithubConnection(BaseConnection):
         # remaining missing required status.
         return required_contexts.difference(change.successful_contexts)
 
+    # type ignore due to: Cannot infer type argument 1 of "cached"
     @cachetools.cached(cache=cachetools.TTLCache(maxsize=2048, ttl=3600),
                        key=lambda self, login, project:
-                       (self.connection_name, login))
+                       (self.connection_name, login))  # type: ignore
     def getUser(self, login, project_name):
         """
         Get a Github user
