@@ -1139,7 +1139,7 @@ class ProjectParser(object):
         default_branch = conf.get('default-branch', 'master')
         project_config.default_branch = default_branch
 
-        variables = conf.get('vars', {})
+        variables = conf.get('vars', {})    
         if variables:
             if 'zuul' in variables or 'nodepool' in variables:
                 raise Exception("Variables named 'zuul' or 'nodepool' "
@@ -2265,7 +2265,7 @@ class ConfigLoader(object):
         tenant = item.pipeline.tenant
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
-            branches = ['master']
+            branches = [tpc.load_branch if tpc.load_branch else 'master']
         else:
             # Use the cached branch list; since this is a dynamic
             # reconfiguration there should not be any branch changes.
