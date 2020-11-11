@@ -16,7 +16,7 @@ import json
 import logging
 import threading
 import uuid
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 from collections.abc import Iterable
 from contextlib import suppress
 from typing import (
@@ -37,6 +37,7 @@ from kazoo.exceptions import NoNodeError
 from kazoo.protocol.states import EventType, WatchedEvent, ZnodeStat
 
 from zuul import model
+from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import ZooKeeperClient, ZooKeeperBase
 
@@ -180,16 +181,6 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
             self.kazoo_client.delete(path, recursive=True)
 
 
-class ZooKeeperEventQueueRegistry(defaultdict):
-    def __init__(self, queue_factory: Callable[[str], ZooKeeperEventQueue]):
-        self.queue_factory = queue_factory
-
-    def __missing__(self, key: str) -> ZooKeeperEventQueue:
-        queue = self.queue_factory(key)
-        self[key] = queue
-        return queue
-
-
 class ManagementEventResultFuture(ZooKeeperBase):
 
     log = logging.getLogger("zuul.zk.event_queues.MangementEventResultFuture")
@@ -255,8 +246,8 @@ class ZooKeeperManagementEventQueue(
     @classmethod
     def create_registry(
         cls, client: ZooKeeperClient
-    ) -> Dict[str, "ZooKeeperManagementEventQueue"]:
-        return ZooKeeperEventQueueRegistry(lambda t: cls(client, t))
+    ) -> DefaultKeyDict["ZooKeeperManagementEventQueue"]:
+        return DefaultKeyDict(lambda t: cls(client, t))
 
     def put(
         self, event: model.ManagementEvent, needs_result=True
@@ -345,8 +336,8 @@ class ZooKeeperResultEventQueue(ZooKeeperEventQueue[model.ResultEvent]):
     @classmethod
     def create_registry(
         cls, client: ZooKeeperClient
-    ) -> Dict[str, "ZooKeeperResultEventQueue"]:
-        return ZooKeeperEventQueueRegistry(lambda t: cls(client, t))
+    ) -> DefaultKeyDict["ZooKeeperResultEventQueue"]:
+        return DefaultKeyDict(lambda t: cls(client, t))
 
     def put(self, event: model.ResultEvent) -> None:
         data = {
@@ -389,10 +380,8 @@ class ZooKeeperTriggerEventQueue(ZooKeeperEventQueue[model.TriggerEvent]):
     @classmethod
     def create_registry(
         cls, client: ZooKeeperClient, connections: ConnectionRegistry
-    ) -> Dict[str, "ZooKeeperTriggerEventQueue"]:
-        return ZooKeeperEventQueueRegistry(
-            lambda t: cls(client, t, connections)
-        )
+    ) -> DefaultKeyDict["ZooKeeperTriggerEventQueue"]:
+        return DefaultKeyDict(lambda t: cls(client, t, connections))
 
     def put(self, driver_name: str, event: model.TriggerEvent) -> None:
         data = {
