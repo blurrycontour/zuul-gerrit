@@ -1,0 +1,7 @@
+- hosts: all
+  tasks:
+    - name: Echo rainbow text
+      command: bash -c 'echo -e "\E[31mr\E[32ma\E[33mi\E[34mn\E[35mb\E[36mo\E[37mw\E[0m"'
+  tasks:
+    - name: Colorized directory listing
+      command: bash -c 'ls -l --color=always /'
