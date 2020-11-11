@@ -2265,9 +2265,10 @@ class ConfigLoader(object):
         tenant = item.pipeline.tenant
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
-            branches = ['master']
+            branches = [tpc.load_branch if tpc.load_branch else 'master']
         else:
-            # Use the cached branch list; since this is a dynamic
+            # Use the cached branch lisdf
+            # t; since this is a dynamic
             # reconfiguration there should not be any branch changes.
             branches = tenant.getProjectBranches(project)
 
