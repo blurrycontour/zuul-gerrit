@@ -93,9 +93,14 @@ function BuildsetTable({
               >
                 <SearchIcon />
               </Link>
+              <Link
+                to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
+                  style={{ textDecoration: 'none' }}
+              >
               <BuildResultWithIcon result={buildset.result}>
                 {buildset.project}
               </BuildResultWithIcon>
+              </Link>
             </>
           ),
         },
@@ -109,7 +114,16 @@ function BuildsetTable({
           title: changeOrRefLink && changeOrRefLink,
         },
         {
-          title: <BuildResult result={buildset.result} />,
+            title: (
+                <>
+                  <Link
+                    to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                  <BuildResult result={buildset.result} />
+                  </Link>
+                </>
+            ),
         },
       ],
     }

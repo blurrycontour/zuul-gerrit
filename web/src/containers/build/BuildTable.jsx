@@ -112,10 +112,15 @@ function BuildTable({
               >
                 <SearchIcon />
               </Link>
+              <Link
+                to={`${tenant.linkPrefix}/build/${build.uuid}`}
+                  style={{ textDecoration: 'none' }}
+              >
               <BuildResultWithIcon result={build.result} colored={build.voting}>
                 {build.job_name}
                 {!build.voting && ' (non-voting)'}
               </BuildResultWithIcon>
+              </Link>
             </>
           ),
         },
@@ -143,7 +148,16 @@ function BuildTable({
             .format('YYYY-MM-DD HH:mm:ss'),
         },
         {
-          title: <BuildResult result={build.result} colored={build.voting} />,
+            title: (
+                <>
+                  <Link
+                    to={`${tenant.linkPrefix}/build/${build.uuid}`}
+                    style={{ textDecoration: 'none' }}
+                   >
+                     <BuildResult result={build.result} colored={build.voting} />
+                  </Link>
+               </>
+            ),
         },
       ],
     }
