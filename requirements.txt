@@ -33,5 +33,7 @@ cherrypy
 ws4py
 routes
 jsonpath-rw
-urllib3!=1.25.4,!=1.25.5  # https://github.com/urllib3/urllib3/pull/1684
+# For requests (via openstacksdk, etc.); until v2.25.0 release which fixes this
+#  https://github.com/psf/requests/pull/5651
+urllib3!=1.25.4,!=1.25.5,<1.26  # https://github.com/urllib3/urllib3/pull/1684
 cheroot!=8.1.*,!=8.2.*,!=8.3.0 # https://github.com/cherrypy/cheroot/issues/263
