@@ -205,6 +205,8 @@ class ZooKeeperClient(object):
         :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)
         """
         try:
+            # TODO (felix): In case blocking is False, acquireLock just returns
+            # False if the lock could not be acquired.
             self.acquireLock(lock, blocking=blocking, timeout=timeout)
             self.log.debug("ZK Lock %s locked", lock.path)
             yield lock

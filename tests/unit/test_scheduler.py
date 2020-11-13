@@ -853,7 +853,7 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
 
         self.waitUntilSettled()
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 1)
         self.assertEqual(self.zk_builds.DEFAULT_ZONE,
@@ -867,7 +867,7 @@ class TestScheduler(ZuulTestCase):
                             .waitUntilReleased('.*-merge'))
         self.waitUntilSettled()
 
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 3)
 
@@ -876,7 +876,7 @@ class TestScheduler(ZuulTestCase):
                             .waitUntilReleased('.*-merge'))
         self.waitUntilSettled()
 
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 5)
 
@@ -884,7 +884,7 @@ class TestScheduler(ZuulTestCase):
         self.scheds.execute(lambda app: app.sched.zk_builds
                             .waitUntilReleased('.*-merge'))
         self.waitUntilSettled()
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
 
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 6)
@@ -902,7 +902,7 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 0)
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
         self.assertEqual(len(queue), 2)  # project-test2, project-merge for B
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 0)
 
@@ -1357,7 +1357,7 @@ class TestScheduler(ZuulTestCase):
 
         # A merges while B and C are queued in check
         # Release A project-merge
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
         self.zk_builds.release(queue[0][1])
         self.scheds.execute(lambda app: app.sched.zk_builds
                             .waitUntilReleased(queue[0][1]))
@@ -1366,7 +1366,7 @@ class TestScheduler(ZuulTestCase):
         # Release A project-test*
         # gate has higher precedence, so A's test jobs are added in
         # front of the merge jobs for B and C
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
         self.zk_builds.release(queue[0][1])
         self.scheds.execute(lambda app: app.sched.zk_builds
                             .waitUntilReleased(queue[0][1]))
@@ -1389,7 +1389,7 @@ class TestScheduler(ZuulTestCase):
 
         # B and C report merge conflicts
         # Release B project-merge
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
         self.zk_builds.release(queue[0][1])
         self.scheds.execute(lambda app: app.sched.zk_builds
                             .waitUntilReleased(queue[0][1]))
@@ -2231,7 +2231,7 @@ class TestScheduler(ZuulTestCase):
     def test_dependent_behind_dequeue(self):
         # This particular test does a large amount of merges and needs a little
         # more time to complete
-        self.wait_timeout = 120
+        self.wait_timeout = 300
         "test that dependent changes behind dequeued changes work"
         # This complicated test is a reproduction of a real life bug
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
@@ -2957,7 +2957,7 @@ class TestScheduler(ZuulTestCase):
                             .waitUntilReleased('gate-noop'))
         self.waitUntilSettled()
         # asserting that project-merge is removed from queue
-        queue = self.zk_builds.inState([BuildState.HOLD, BuildState.REQUESTED])
+        queue = self.zk_builds.inState(BuildState.HOLD, BuildState.REQUESTED)
         self.assertEqual(len(queue), 0)
         self.assertTrue(self.scheds.first.sched._areAllBuildsComplete())
 

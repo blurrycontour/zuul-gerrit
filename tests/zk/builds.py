@@ -48,6 +48,7 @@ class TestZooKeeperBuilds(ZooKeeperBuilds):
     def _createNewState(self) -> BuildState:
         return BuildState.HOLD if self.hold_in_queue else BuildState.REQUESTED
 
+    # TODO (felix): Assign value directly
     def setHoldInQueue(self, hold: bool):
         self.hold_in_queue = hold
 
@@ -65,17 +66,18 @@ class TestZooKeeperBuilds(ZooKeeperBuilds):
                 json.dumps(what.content).encode(encoding="UTF-8"),
                 version=what.stat.version,
             )
-        else:
-            for path, cached in self.inState(BuildState.HOLD):
-                # Either release all builds in HOLD state or the ones matching
-                # the given job name pattern.
-                if not what or re.match(what, cached.content["params"]["job"]):
-                    cached.state = BuildState.REQUESTED
-                    self.kazoo_client.set(
-                        path,
-                        json.dumps(cached.content).encode(encoding="UTF-8"),
-                        version=cached.stat.version,
-                    )
+            return
+
+        for path, cached in self.inState(BuildState.HOLD):
+            # Either release all builds in HOLD state or the ones matching
+            # the given job name pattern.
+            if what is None or re.match(what, cached.content["params"]["job"]):
+                cached.state = BuildState.REQUESTED
+                self.kazoo_client.set(
+                    path,
+                    json.dumps(cached.content).encode(encoding="UTF-8"),
+                    version=cached.stat.version,
+                )
 
     def waitUntilReleased(self, what: Union[None, str, BuildItem] = None):
         paths: List[str] = []
@@ -96,7 +98,7 @@ class TestZooKeeperBuilds(ZooKeeperBuilds):
                 for path, cached in list(cache.items()):
                     if path in paths and cached.state == BuildState.HOLD:
                         on_hold.append(path)
-            if len(on_hold) == 0:
+            if not on_hold:
                 self.log.debug("%s released", what)
                 return
             else:

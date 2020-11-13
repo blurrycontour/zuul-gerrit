@@ -169,7 +169,6 @@ class ZooKeeperBuildTreeCacheClient(ZooKeeperTreeCacheClient[BuildItem]):
         self,
         client: KazooClient,
         zone: Optional[str] = None,
-        multilevel: bool = False,
         listener: Optional[TreeCacheListener] = None,
     ):
         root = (
@@ -177,7 +176,7 @@ class ZooKeeperBuildTreeCacheClient(ZooKeeperTreeCacheClient[BuildItem]):
             if zone
             else ZooKeeperBuilds.ROOT
         )
-        super().__init__(client, root, multilevel, listener)
+        super().__init__(client, root, listener)
 
     def _createCachedValue(
         self, path: str, content: Union[Dict[str, Any], bool], stat: ZnodeStat
@@ -203,6 +202,7 @@ class ZooKeeperBuilds(ZooKeeperBase):
         super().__init__(client)
 
         self._cache_started: bool = False
+        # The cache contains a TreeCacheClient per zone
         self._cache: Dict[str, ZooKeeperBuildTreeCacheClient] = {}
         self._cache_listeners: List[TreeCacheListener] = []
         self._locks: Dict[str, Lock] = {}
@@ -307,6 +307,9 @@ class ZooKeeperBuilds(ZooKeeperBase):
     def submit(
         self,
         uuid: str,
+        build_set_uuid: str,
+        tenant_name: str,
+        pipeline_name: str,
         params: Dict[str, Any],
         zone: Optional[str] = None,
         precedence: int = 200,
@@ -334,6 +337,9 @@ class ZooKeeperBuilds(ZooKeeperBase):
         content = json_dumps(
             dict(
                 uuid=uuid,
+                build_set_uuid=build_set_uuid,
+                tenant_name=tenant_name,
+                pipeline_name=pipeline_name,
                 zone=zone or self.DEFAULT_ZONE,
                 precedence=precedence,
                 state=self._createNewState().name,
@@ -360,6 +366,7 @@ class ZooKeeperBuilds(ZooKeeperBase):
             self.log, event=None, build=item.content["uuid"]
         )
         log.debug("Refreshing: %s", item.path)
+        # TODO (felix): Catch NoNodeError?
         data, stat = self.kazoo_client.get(item.path)
         content = json.loads(data.decode("UTF-8"))
         item.content = content
@@ -379,6 +386,10 @@ class ZooKeeperBuilds(ZooKeeperBase):
         :param refresh: Refresh build item after persisting to ensure fresh
                         cache. Otherwise risk of inconsistency lag.
         """
+        # TODO (felix): Should we also persist the build's subnodes here?
+        # I don't understand why we need to differentiate between the build
+        # node and it's subnodes on every get/persist/refesh operation. In the
+        # end, everything must be up-to-date in ZK, not only parts of the build
         log = get_annotated_logger(
             self.log, event=None, build=item.content["uuid"]
         )
@@ -413,10 +424,13 @@ class ZooKeeperBuilds(ZooKeeperBase):
         :return: Item or None if no next build item is available
         """
         for path, cached in self.inState(
-            [BuildState.REQUESTED, BuildState.RUNNING, BuildState.PAUSED],
+            BuildState.REQUESTED, BuildState.RUNNING, BuildState.PAUSED,
         ):
             # First filter to significantly lower node count
             if self.kazoo_client.exists(path) and cached.state not in [
+                # TODO (felix): Do we need this check if we already checked for
+                # the other three result types above? Do we need the cached.state
+                # here at all?
                 BuildState.HOLD,
                 BuildState.COMPLETED,
                 BuildState.FAILED,
@@ -443,38 +457,74 @@ class ZooKeeperBuilds(ZooKeeperBase):
                         log.warning(
                             "Next: [%s] Lock could not be acquired!", path
                         )
+            # TODO (felix): What about builds where the executor died?
         return None
 
-    def inState(
-        self, state: Union[None, BuildState, List[BuildState]] = None
-    ) -> List[Tuple[str, BuildItem]]:
+    def inState(self, *states: BuildState) -> List[Tuple[str, BuildItem]]:
         """
-        Gets build in given state(s) ordered by their Znode name
-        (`{PRECEDENCE}-{SEQUENCE}`).
-
-        :param state: One or more state the build should be in or None for
-                      all states.
-        :return: List of build (tuple path and object) satisfying given state
-                 condition.
+        Gets build in given states ordered by their Znode name
+        (`{PRECEDENCE}-{SEQUENCE}`). If no states are provided, all builds will
+        be returned.
         """
-        if state is None:
+        if not states:
+            # If no states are provided, build a list containing all available
+            # ones to always match.
             states = list(BuildState)
-        elif isinstance(state, BuildState):
-            states = [state]
-        else:
-            states = state
 
         items = []
-        for cache in list(self._cache.values()):
-            for path, cached in list(cache.items()):
+        for cache in self._cache.values():
+            for path, cached in cache.items():
                 if cached.state in states:
                     items.append((path, cached))
-        # Make sure this is sorted by last element of the path (first item in
-        # the tuple) which contains precedence and sequence in ascending order.
-        # Last path element instead of whole path is used to ignore zones
-        # which may lead to inter-zone starving
+        # Sort the list by path in ascending order. We only use the last part
+        # of the path to ignore the zone as this might lead to inter-zone
+        # starving otherwise.
         return sorted(items, key=lambda b: b[0].rsplit("/", 1)[-1])
 
+    def get(self, path: str, cached: bool = False) -> Optional[BuildItem]:
+        if cached:
+            # Directly return the builditem from the cache (if found)
+            for cache in self._cache.values():
+                build = cache[path]
+                if build:
+                    return build
+
+        try:
+            data, stat = self.kazoo_client.get(path)
+        except NoNodeError:
+            return None
+
+        if not data:
+            return None
+
+        # TODO (felix): Serialize BuildItem from json value
+        content = json.loads(data.decode("utf-8"))
+
+        build = BuildItem(path, content, stat)
+        # TODO (felix): Also get the subnodes (status, data and result)
+
+        try:
+            status_data, status_stat = self.kazoo_client.get(f"{path}/status")
+            build.status = json.loads(status_data.decode("utf-8"))
+        except NoNodeError:
+            pass
+
+        try:
+            data_data, data_stat = self.kazoo_client.get(f"{path}/data")
+            build.data = json.loads(data_data.decode("utf-8"))
+        except NoNodeError:
+            pass
+
+        try:
+            result_data, result_stat = self.kazoo_client.get(f"{path}/result")
+            build.result = json.loads(result_data.decode("utf-8"))
+        except NoNodeError:
+            pass
+
+        return build
+
+    # TODO (felix): Remove. Since we have a get() method now, this shouldn't be
+    # used anymore.
     def getCached(self, path: str) -> Optional[BuildItem]:
         """
         Gets a cached build represented by the given "path".
@@ -490,6 +540,7 @@ class ZooKeeperBuilds(ZooKeeperBase):
                 return cached
         return None
 
+    # TODO (felix): Remove? I can't find any usage for this one.
     def getAllCached(self, zone: Optional[str] = None) -> List[BuildItem]:
         """
         Returns all cached build items.
@@ -517,6 +568,11 @@ class ZooKeeperBuilds(ZooKeeperBase):
             self._locks[path] = self.kazoo_client.Lock(path)
         return self._locks.get(path)
 
+    # TODO (felix): I don't fully understand the usage of this function. It
+    # does exactly the same like the code parts that acquire the lock for
+    # further usage. However, this function just checks if the lock can be
+    # acquired and then returns True. Which would mean it actually returns
+    # whether the resource can be locked, but not if it was already locked.
     def isLocked(self, path: str) -> bool:
         """
         Checks if the build represented by the given "path" is locked or not.
@@ -546,10 +602,12 @@ class ZooKeeperBuilds(ZooKeeperBase):
         log.debug("Pause: %s", path)
         lock = self.getLock(path)
         if lock and lock.is_acquired:
-            # Make sure resume request node does not exist
+            # Make sure the resume request node does not exist
             resume_node = "%s/resume" % path
-            if self.kazoo_client.exists(resume_node):
+            try:
                 self.kazoo_client.delete(resume_node)
+            except NoNodeError:
+                pass
 
             cached = self._cachedItem(path)
             if cached and cached.state == BuildState.RUNNING:
@@ -706,8 +764,10 @@ class ZooKeeperBuilds(ZooKeeperBase):
         self.log.debug("Cleaning up builds...")
 
         # Cleanup build with lost executors
+        # TODO (felix): Just clean up all those nodes which aren't locked in ZK
+        # instead of storing those in a local _to_delete list.
         for path, cached in self.inState(
-            [BuildState.RUNNING, BuildState.PAUSED]
+            BuildState.RUNNING, BuildState.PAUSED
         ):
             if self.kazoo_client.exists(path):
                 lock = self.getLock(path)
@@ -717,6 +777,9 @@ class ZooKeeperBuilds(ZooKeeperBase):
                         # which started that build died -> update state
                         # accordingly
                         with self.client.withLock(lock, timeout=1.0):
+                            # TODO (felix): picking up a running build from an
+                            # executor that died (which is not locked), should
+                            # be done in the executor, not here.
                             cached.state = BuildState.FAILED
                             self.kazoo_client.set(
                                 path,
@@ -906,6 +969,8 @@ class ZooKeeperBuilds(ZooKeeperBase):
             # in executor client. Therefore, the executor server obtains the
             # lock, executes the build and sends results. The executor client
             # releases the lock of finished build.
+            # TODO (felix): If we server keeps holding the lock, how can the
+            # client release it?
             return True
         return False
 
@@ -914,7 +979,7 @@ class ZooKeeperBuilds(ZooKeeperBase):
         Removes a build's Znode. This should be called after the final
         "result"/"exception" information is transmitted.
 
-        This will also released the lock on the build node.
+        This will also release the lock on the build node.
 
         This method does not require the caller to hold a lock to the
         build's Znode and can therefore be called from anywhere, e.g.,
@@ -931,6 +996,8 @@ class ZooKeeperBuilds(ZooKeeperBase):
         log = get_annotated_logger(
             self.log, event=None, build=self._uuid(path)
         )
+        # TODO (felix): Why are we trying to acquire the lock just to
+        # immediately release and delete it?
         lock = self.getLock(path)
         if lock:
             log.debug("Remove: Unlocking %s", path)
@@ -952,8 +1019,19 @@ class ZooKeeperBuilds(ZooKeeperBase):
             log.exception("Remove: Failed to remove %s", path)
             # Fallback, if for some reason node could not be removed we
             # try to mark it as removed and remove it later
+            # TODO (felix): Do we need all this "mark for later deletion" part
+            # or could we just add a periodic cleanup job that deals with those
+            # cases? E.g. in case the executor crashes, marking the build
+            # doesn't help much.
             data, stat = self.kazoo_client.get(path)
             content = json.loads(data.decode("UTF-8"))
+            # TODO (felix): Seeing all those BuildState.X.name usages now, I
+            # come to think if it wouldn't be easier to provide a custom JSON
+            # serializer that is able to deal with Enums for the whole ZK
+            # serialization part.
+            # TODO (felix): Better: Provide a proper Build object with a
+            # toDict() and fromDict() method. We could implement the
+            # serialization directly in the BuildItem class.
             if content and content["state"] in [
                 BuildState.COMPLETED.name,
                 BuildState.CANCELED.name,
@@ -989,4 +1067,3 @@ class ZooKeeperBuilds(ZooKeeperBase):
                 log.debug(
                     "Remove: Could not mark as deleted non existing %s!", path
                 )
-

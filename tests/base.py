@@ -30,8 +30,7 @@ import os
 import random
 import re
 from logging import Logger
-from queue import Queue
-from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
+from typing import Callable, Generator, Optional, Any, Iterable, List, Dict
 
 import requests
 import select
@@ -63,7 +62,6 @@ import testtools.content_type
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
-from kazoo.recipe.cache import TreeEvent
 
 from tests.zk import TestZooKeeperClient, TestZooKeeperConnection
 
@@ -91,7 +89,6 @@ from zuul.lib.named_queue import NamedQueue
 from zuul.model import Change
 from zuul.rpcclient import RPCClient
 from zuul.zk import ZooKeeperConnection
-from zuul.zk.cache import event_type_str
 from zuul.zk.builds import BuildState
 from zuul.zk.builds import BuildItem
 
@@ -3022,6 +3019,10 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         self.return_data: Dict[str, Any] = {}
         self.job_builds: Dict[str, FakeBuild] = {}
 
+        # TODO (felix): Can we replace this in the tests by
+        #  self.zk_builds.setHoldInQueue(True)
+        # which would be more equivalent to the old approach:
+        # self.gearman_server.hold_jobs_in_queue = True
         self.hold_jobs_in_queue_sensor = PauseSensor(False)
         self.resumed_jobs_in_queue = []
         self.sensors.append(self.hold_jobs_in_queue_sensor)
@@ -3879,10 +3880,6 @@ class SchedulerTestApp:
                                    app=self)
         self.sched._stats_interval = 1
 
-        self.event_queues = [
-            self.sched.result_event_queue,
-        ]
-
         self.sched.start()
         self.sched.prime(self.config)
 
@@ -4061,7 +4058,6 @@ class ZuulTestCase(BaseTestCase):
         self.zk_client = ZooKeeperConnection(hosts=self.zk_config).connect()
         self.zk_builds = TestZooKeeperBuilds(self.zk_client)
         self.zk_builds.registerAllZones()
-        self.zk_builds.registerCacheListener(self._treeCacheListener)
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4197,18 +4193,6 @@ class ZuulTestCase(BaseTestCase):
         self.addCleanup(self.assertCleanShutdown)
         self.addCleanup(self.shutdown)
         self.addCleanup(self.assertFinalState)
-
-    def _treeCacheListener(
-            self, segments: List[str], event: TreeEvent,
-            item: Optional[BuildItem]) -> None:
-        self.log.debug("TreeEvent (%s) [%s]: %s", event_type_str(event),
-                       segments, item)
-
-    def __event_queues(self, matcher) -> List[Queue]:
-        sched_queues = map(lambda app: app.event_queues,
-                           self.scheds.filter(matcher))
-        return [item for sublist in sched_queues for item in sublist] + \
-            self.additional_event_queues
 
     def _configureSmtp(self):
         # Set up smtp related fakes
@@ -4650,9 +4634,12 @@ class ZuulTestCase(BaseTestCase):
     def release(self, job):
         if isinstance(job, FakeBuild):
             job.release()
+        # TODO (felix): Why should this be called on a BuildItem directly?
         elif isinstance(job, BuildItem):
             pass
         else:
+            # TODO (felix): Is that a gearman job? If so, it could also be
+            # removed.
             job.waiting = False
             self.log.debug("Queued job %s released", job.unique)
             self.gearman_server.wakeConnections()
@@ -4773,13 +4760,10 @@ class ZuulTestCase(BaseTestCase):
         return True
 
     def __eventQueuesEmpty(self, matcher=None) -> Generator[bool, None, None]:
-        for event_queue in self.__event_queues(matcher):
+        for event_queue in self.additional_event_queues:
             yield event_queue.empty()
 
-    def __eventQueuesJoin(self, matcher) -> None:
-        for app in self.scheds.filter(matcher):
-            for event_queue in app.event_queues:
-                event_queue.join()
+    def __eventQueuesJoin(self) -> None:
         for event_queue in self.additional_event_queues:
             event_queue.join()
 
@@ -4802,6 +4786,12 @@ class ZuulTestCase(BaseTestCase):
                 if any(
                     q.hasEvents() for q in
                     sched.pipeline_trigger_events[tenant_name].values()
+                ):
+                    return False
+                if any(
+                    q.hasEvents() for q in
+                    sched.pipeline_result_events[tenant_name].values()
+
                 ):
                     return False
         return True
@@ -4839,7 +4829,8 @@ class ZuulTestCase(BaseTestCase):
                         matcher, show_unreported_builds=True),
                     self.__areAllBuildsWaiting(matcher),
                     self.__areAllNodeRequestsComplete(matcher),
-                    all(self.__eventQueuesEmpty(matcher)))
+                    all(self.__eventQueuesEmpty()),
+                )
                 raise Exception("Timeout waiting for Zuul to settle")
 
             # Make sure no new events show up while we're checking
@@ -4851,7 +4842,7 @@ class ZuulTestCase(BaseTestCase):
                                             show_unreported_builds=True):
                 # Join ensures that the queue is empty _and_ events have been
                 # processed
-                self.__eventQueuesJoin(matcher)
+                self.__eventQueuesJoin()
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.acquire())
                 self.log.debug("Scheduler run handler: Locked")
@@ -4865,7 +4856,7 @@ class ZuulTestCase(BaseTestCase):
                 areAllBuildsWaiting = self.__areAllBuildsWaiting(matcher)
                 areAllNodeRequestsComplete = self\
                     .__areAllNodeRequestsComplete(matcher)
-                allEventQueuesEmpty = all(self.__eventQueuesEmpty(matcher))
+                allEventQueuesEmpty = all(self.__eventQueuesEmpty())
                 self._releaseZookeeperLockingLocks(matcher)
 
                 self._logQueueStatus(
@@ -4905,7 +4896,7 @@ class ZuulTestCase(BaseTestCase):
                         areAllBuildsWaiting, areAllNodeRequestsComplete,
                         allEventQueuesEmpty):
         logger("Queue status:")
-        for event_queue in self.__event_queues(matcher):
+        for event_queue in self.additional_event_queues:
             self.log.debug("  %s: %s" % (event_queue, event_queue.empty()))
         logger("All ZK event queues empty: %s" % areZookeeperEventQueuesEmpty)
         logger("All merge jobs waiting: %s" % areAllMergeJobsWaiting)
@@ -5095,10 +5086,10 @@ class ZuulTestCase(BaseTestCase):
                         getattr(self.builds[i], k), v,
                         "Element %i in builds does not match" % (i,))
         except Exception:
+            if not self.builds:
+                self.log.error("No running builds")
             for build in self.builds:
                 self.log.error("Running build: %s" % build)
-            else:
-                self.log.error("No running builds")
             raise
 
     def assertHistory(self, history, ordered=True):

@@ -102,7 +102,6 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
         self,
         client: KazooClient,
         root: str,
-        multilevel: bool = False,
         listener: Optional[TreeCacheListener] = None,
     ):
         class_name = self.__class__.__name__
@@ -111,7 +110,6 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
         self._root: str = root
         self._tree_cache: Optional[TreeCache] = None
         self._cache: Dict[str, CacheItem] = {}
-        self._multilevel: bool = multilevel
         self._listeners: List[TreeCacheListener] = [
             listener
         ] if listener else []
@@ -122,8 +120,8 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
             hex(hash(self)),
         )
 
-    def __getitem__(self, item: Union[str, List[str]]) -> Optional[CacheItem]:
-        segments = self._getSegments(item) if isinstance(item, str) else item
+    def __getitem__(self, item: str) -> Optional[CacheItem]:
+        segments = self._getSegments(item)
         cache_key = self._getKey(segments)
         return self._cache.get(cache_key)
 
@@ -152,12 +150,12 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
             self._listeners.append(listener)
 
     def _getKey(self, segments: List[str]) -> str:
-        relative = "/".join(segments) if self._multilevel else segments[0]
+        relative = segments[0]
         return "%s/%s" % (self._root, relative)
 
     def _getSegments(self, path: str) -> List[str]:
         return (
-            path[len(self._root) + 1 :]
+            path[len(self._root) + 1:]
             if path.startswith(self._root)
             else path
         ).split("/")
@@ -168,7 +166,7 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
         # Only first level props are relevant
         prop = (
             "stat"
-            if self._multilevel or len(segments) == 1
+            if len(segments) == 1
             else "%s_stat" % segments[1]
         )
         return getattr(cached, prop, None)
@@ -179,7 +177,7 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
         # Only first level props are relevant
         prop = (
             "stat"
-            if self._multilevel or len(segments) == 1
+            if len(segments) == 1
             else "%s_stat" % segments[1]
         )
         setattr(cached, prop, stat)
@@ -190,7 +188,7 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
         # Only first level props are relevant
         prop = (
             "content"
-            if self._multilevel or len(segments) == 1
+            if len(segments) == 1
             else segments[1]
         )
         if hasattr(cached, prop) and isinstance(getattr(cached, prop), bool):
@@ -211,17 +209,18 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
         :param stat: ZnodeStat of the new ZNode
         :return: New cache item
         """
+        # TODO (felix): abstractmethod
         raise Exception("Not implemented!")
 
-    def _deleteCachedValue(self, segments: List[str]) -> None:
-        if self._multilevel or len(segments) == 1:
+    def _deleteCachedValue(self, path: str, segments: List[str]) -> None:
+        if len(segments) == 1:
             try:
                 del self._cache[self._getKey(segments)]
             except KeyError:
                 pass
         else:
             try:
-                cached = self[segments]
+                cached = self[path]
                 prop = segments[1]  # Only first level props are relevant
                 value = getattr(cached, prop, False)
                 setattr(cached, prop, False if type(value) == bool else None)
@@ -230,30 +229,33 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
 
     def _treeCacheListener(self, event: TreeEvent) -> None:
         try:
+            path = None
             if hasattr(event.event_data, "path"):
                 path = event.event_data.path
-                if path == self._root:
-                    return  # Ignore root node
-            else:
-                return  # Ignore events without path
+
+            if not path:
+                # Ignore events without path
+                return
+
+            if path == self._root:
+                # Ignore root node
+                return
 
             if event.event_type not in (
                 TreeEvent.NODE_ADDED,
                 TreeEvent.NODE_UPDATED,
                 TreeEvent.NODE_REMOVED,
             ):
-                return  # Ignore non node events
+                # Ignore non node events
+                return
 
-            if not event.event_data.path.startswith(self._root):
-                return  # Ignore events outside root path
-
-            segments = self._getSegments(event.event_data.path)
+            segments = self._getSegments(path)
 
             # Ignore lock nodes: last segment = /[0-9a-f]{32}__lock__\d{10}/
             if "_lock_" in segments[-1]:
                 return
 
-            cached = self[segments]
+            cached = self[path]
 
             if event.event_data.data and event.event_type in (
                 TreeEvent.NODE_ADDED,
@@ -265,6 +267,8 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
                 try:
                     data = json.loads(data_value.decode(encoding="UTF-8"))
                 except Exception:
+                    # TODO (felix): Do we need to check for data_value here?
+                    # This branch will only be called when data_value is set.
                     data = data_value and data_value.decode(encoding="UTF-8")
 
                 if cached:
@@ -305,11 +309,15 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
                             pass
 
             elif event.event_type == TreeEvent.NODE_REMOVED:
-                self._deleteCachedValue(segments)
-                cached = None
+                # TODO (felix): Currently, provide both parameters as this
+                # method needs both and we don't want to split the segments
+                # again.
+                self._deleteCachedValue(path, segments)
 
             for listener in self._listeners:
                 try:
+                    # TODO (felix): The listener should get a proper API and not
+                    # the raw segments. Something like a BuildStateEvent()
                     listener(segments, event, cached)
                 except Exception:
                     self.log.exception(
