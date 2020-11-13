@@ -33,5 +33,14 @@ cherrypy
 ws4py
 routes
 jsonpath-rw
-urllib3!=1.25.4,!=1.25.5  # https://github.com/urllib3/urllib3/pull/1684
+# zuul-client pins to requests==1.24.0 which is incompatible
+# with urllib >= 1.26.0.  We can not simply remove that pin
+# in zuul-client because it runs the zuul-client-zuul-functional
+# job, which runs a tox environment.  Our tox role first installs
+# everything without tests, before installing siblings.  This means
+# it tries to install the released zuul-client first; ignoring any
+# changes to the requirements that might be in the change.
+# By pinning urllib3 here we can get that test working, which
+# allows us to merge the removal to zuul-client.
+urllib3!=1.25.4,!=1.25.5,<1.26.0  # https://github.com/urllib3/urllib3/pull/1684
 cheroot!=8.1.*,!=8.2.*,!=8.3.0 # https://github.com/cherrypy/cheroot/issues/263
