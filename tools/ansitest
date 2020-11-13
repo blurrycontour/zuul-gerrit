@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+def print_format_table():
+    """
+    Prints a table of formatted text format options using 3/4 bit ANSI
+    base colors:
+    https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+    """
+    foregrounds = [*range(30, 38), *range(90, 98)]
+    backgrounds = [
+        [None, *range(40, 48), *range(100, 108)],
+        # [None, *range(100, 108)]
+    ]
+    styles = {
+        0: "normal",
+        1: "bold",
+        7: "reverse",
+    }
+
+    for style, style_name in styles.items():
+        print(f"== {style_name} style ==")
+        for fg in foregrounds:
+            for b in backgrounds:
+                s1 = ''
+                for bg in b:
+                    codes = [str(style), str(fg)]
+                    if bg is not None:
+                        codes.append(str(bg))
+                    format = ';'.join(codes)
+                    legend = ';'.join(codes[1:])
+                    s1 += f'\x1b[{format}m {legend:6} \x1b[0m'
+                print(s1)
+        print('\n')
+
+
+print_format_table()
