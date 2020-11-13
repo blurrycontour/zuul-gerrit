@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_117bb227",
+        "filename": "doc/source/reference/drivers/elasticsearch.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-11-13T13:53:43Z",
+      "side": 1,
+      "message": "Index patterns of logstash and probably others is \u0027\u003cname\u003e_yyyy-mm-dd\u0027\n\nIs there a reason to not follow this convention?",
+      "revId": "fb10b2cdf27b7f479529439a38c9df2c6d4fb3eb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
