@@ -157,7 +157,7 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
 
     def _getSegments(self, path: str) -> List[str]:
         return (
-            path[len(self._root) + 1 :]
+            path[len(self._root) + 1:]
             if path.startswith(self._root)
             else path
         ).split("/")
@@ -244,6 +244,7 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
             ):
                 return  # Ignore non node events
 
+            # TODO (felix): Can this happen?
             if not event.event_data.path.startswith(self._root):
                 return  # Ignore events outside root path
 

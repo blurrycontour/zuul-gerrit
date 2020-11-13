@@ -1071,13 +1071,43 @@ class PipelineManager(metaclass=ABCMeta):
         return True
 
     def onFilesChangesCompleted(self, event):
-        build_set = event.build_set
+        build_set = None
+        queues = [
+            q for q in self.pipeline.queues if q.name == event.queue_name
+        ]
+        for queue in queues:
+            # Look up the build set from the queue
+            for item in queue.queue:
+                if item.current_build_set.uuid == event.build_set_uuid:
+                    build_set = item.current_build_set
+                    break
+
+        if not build_set:
+            self.log.warning("Build set %s is not current", build_set)
+            return
+
         item = build_set.item
         item.change.files = event.files
         build_set.files_state = build_set.COMPLETE
 
     def onMergeCompleted(self, event):
-        build_set = event.build_set
+        build_set = None
+        queues = [
+            q for q in self.pipeline.queues if q.name == event.queue_name
+        ]
+        for queue in queues:
+            # Look up the build set from the queue
+            for item in queue.queue:
+                # If the provided buildset UUID doesn't match the current one,
+                # we assume that it's not current anymore.
+                if item.current_build_set.uuid == event.build_set_uuid:
+                    build_set = item.current_build_set
+                    break
+
+        if not build_set:
+            self.log.warning("Build set %s is not current", build_set)
+            return
+
         item = build_set.item
         item.change.containing_branches = event.item_in_branches
         build_set.merge_state = build_set.COMPLETE
@@ -1097,11 +1127,33 @@ class PipelineManager(metaclass=ABCMeta):
             item.setUnableToMerge()
 
     def onNodesProvisioned(self, event):
+        build_set = None
+        # TODO (felix): Deal with no queue found?
+        queues = [
+            q for q in self.pipeline.queues if q.name == event.queue_name
+        ]
+
+        for queue in queues:
+            for item in queue.queue:
+                if item.current_build_set.uuid == event.build_set_uuid:
+                    build_set = item.current_build_set
+                    break
+
+        request_id = event.request_id
         # TODOv3(jeblair): handle provisioning failure here
-        request = event.request
+        request = build_set.node_requests.get(event.job_name)
         log = get_annotated_logger(self.log, request.event_id)
 
-        build_set = request.build_set
+        if not build_set:
+            log.warning(
+                "Build set %s is not current for node request %s",
+                build_set,
+                request_id,
+            )
+
+        # TODO (felix): Check if this is already handled in the build
+        # TODO (felix): STore a reference to the node request in the build in
+        # ZooKeeper.
         build_set.jobNodeRequestComplete(request.job.name,
                                          request.nodeset)
         if request.failed or not request.fulfilled:

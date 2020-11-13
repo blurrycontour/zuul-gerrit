@@ -14,17 +14,23 @@
 
 import logging
 import os
-from typing import Dict, List, Optional, Set
+from typing import Dict, Optional, Set
 from uuid import uuid4
 
-from kazoo.recipe.cache import TreeEvent
-
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Build, Job, Pipeline, Project, QueueItem, PRIORITY_MAP
+from zuul.model import (
+    Build,
+    BuildCompletedEvent,
+    Job,
+    Pipeline,
+    Project,
+    QueueItem,
+    PRIORITY_MAP,
+)
 from zuul.source import BaseSource
 from zuul.zk import ZooKeeperClient
-from zuul.zk.builds import BuildItem, ZooKeeperBuilds
-from zuul.zk.cache import event_type_str
+from zuul.zk.builds import ZooKeeperBuilds
+from zuul.zk.event_queues import PipelineResultEventQueue
 
 
 class ExecutorClient(object):
@@ -36,30 +42,12 @@ class ExecutorClient(object):
         self.zk_client: ZooKeeperClient = self.sched.zk_client
         self.zk_builds: ZooKeeperBuilds = self.sched.zk_builds
         self.builds: Dict[str, Build] = {}
-
-        self.zk_builds.registerCacheListener(self._treeCacheListener)
+        self.result_events = PipelineResultEventQueue.create_registry(
+            self.zk_client
+        )
 
     def stop(self):
         self.log.debug("Stopping")
-
-    def _treeCacheListener(self, segments: List[str], event: TreeEvent,
-                           item: Optional[BuildItem]) -> None:
-
-        if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED)\
-                and item:
-
-            log = get_annotated_logger(self.log, None,
-                                       build=item.content['uuid'])
-            log.debug("TreeEvent (%s) [%s]: %s", event_type_str(event),
-                      segments, item)
-            if len(segments) == 2 and segments[1] == 'data':
-                self.onWorkStatus(item)
-            elif len(segments) == 2 and segments[1] == 'status':
-                self.onWorkStatus(item)
-            elif len(segments) == 2 and segments[1] == 'result':
-                self.onBuildCompleted(item)
-            elif len(segments) == 2 and segments[1] == 'exception':
-                self.onBuildCompleted(item)
 
     def execute(self, job: Job, item: QueueItem, pipeline: Pipeline,
                 dependent_changes=None, merger_items=None):
@@ -245,12 +233,23 @@ class ExecutorClient(object):
         item.addBuild(build)
 
         if job.name == 'noop':
-            self.sched.onBuildStarted(build)
-            self.sched.onBuildCompleted(build, 'SUCCESS', {}, [])
-            return build
+            # Provide fake "noop" events to the scheduler to directly
+            # start/complete noop builds.
+            # TODO (felix): If this doesn't work in all occassions, we could
+            # "fake" both events with build_item_path="noop" and handle that
+            # separately in the scheduler methods. We would then have to create
+            # the Build() object also in the scheduler because the executor
+            # client doesn't store noop builds in self.builds (which we use to
+            # look up the build objects in the scheduler).
+            pipeline.manager.onBuildStarted(build)
+            build.result = "SUCCESS"
+            pipeline.manager.onBuildCompleted(build)
+            return
 
         # Update zuul attempts after addBuild above to ensure build_set
         # is up to date.
+        # TODO (felix): Is this check really necessary? IMHO something really
+        # went wrong if the build is not assigned to a buildset.
         if not build.build_set:
             raise Exception("Build set undefined for %s" % build)
         attempts = build.build_set.getTries(job.name)
@@ -267,8 +266,14 @@ class ExecutorClient(object):
         self.builds[uuid] = build
 
         build.zookeeper_node = self.zk_builds.submit(
-            uuid=uuid, params=params, zone=executor_zone,
-            precedence=PRIORITY_MAP[pipeline.precedence])
+            uuid=uuid,
+            build_set_uuid=build.build_set.uuid,
+            tenant_name=build.build_set.item.pipeline.tenant.name,
+            pipeline_name=build.build_set.item.pipeline.name,
+            params=params,
+            zone=executor_zone,
+            precedence=PRIORITY_MAP[pipeline.precedence]
+        )
         return build
 
     def cancel(self, build: Build) -> bool:
@@ -283,16 +288,25 @@ class ExecutorClient(object):
         if build_zk_node:
             log.debug("Canceling build: %s", build_zk_node)
             lock = self.zk_builds.getLock(build_zk_node)
+            # If we can acquire the build lock here, this means that the build
+            # didn't start on the executor server yet. With acquiring the lock
+            # we prevent the executor server from picking up the build so we
+            # can cancel/delete it before it will run.
+            # TODO (felix): With lock (context manager)
             if lock and self.zk_client.acquireLock(lock, blocking=False):
+                # Mark the build as complete and forward the event to the
+                # scheduler, so the executor server doesn't pick up the build.
+                # The build will be deleted from the scheduler when it picks
+                # up the BuildCompletedEvent.
                 try:
-                    self.zk_builds.remove(build_zk_node)
-                    build.zookeeper_node = None
-                    try:
-                        if build.uuid:
-                            del self.builds[build.uuid]
-                    except KeyError:
-                        pass
-                    self.sched.onBuildCompleted(build, 'CANCELED', {}, [])
+                    result = {"result": "CANCELED"}
+                    self.zk_builds.complete(
+                        build_zk_node, result, success=False
+                    )
+                    tenant_name = build.build_set.item.pipeline.tenant.name
+                    pipeline_name = build.build_set.item.pipeline.name
+                    event = BuildCompletedEvent(build_zk_node)
+                    self.result_events[tenant_name][pipeline_name].put(event)
                 finally:
                     self.zk_client.releaseLock(lock)
             else:
@@ -303,110 +317,6 @@ class ExecutorClient(object):
         else:
             log.debug("Build has not been submitted")
             return False
-
-    def onBuildCompleted(self, build_item: BuildItem, result=None):
-        build = self.builds.get(build_item.content['uuid'])
-        if build:
-            log = get_annotated_logger(self.log, build.zuul_event_id,
-                                       build=build_item.content['uuid'])
-
-            if not build.build_set:
-                raise Exception("Build set undefined for %s" % build)
-
-            build.node_labels = build_item.result.get('node_labels', [])
-            build.node_name = build_item.result.get('node_name')
-            if result is None:
-                result = build_item.result.get('result')
-                build.error_detail = build_item.result.get('error_detail')
-            if result is None:
-                if (build.build_set.getTries(build.job.name) >=
-                        build.job.attempts):
-                    result = 'RETRY_LIMIT'
-                else:
-                    build.retry = True
-            if result in ('DISCONNECT', 'ABORTED'):
-                # Always retry if the executor just went away
-                build.retry = True
-            if result == 'MERGER_FAILURE':
-                # The build result MERGER_FAILURE is a bit misleading here
-                # because when we got here we know that there are no merge
-                # conflicts. Instead this is most likely caused by some
-                # infrastructure failure. This can be anything like connection
-                # issue, drive corruption, full disk, corrupted git cache, etc.
-                # This may or may not be a recoverable failure so we should
-                # retry here respecting the max retries. But to be able to
-                # distinguish from RETRY_LIMIT which normally indicates pre
-                # playbook failures we keep the build result after the max
-                # attempts.
-                if (build.build_set.getTries(build.job.name) <
-                        build.job.attempts):
-                    build.retry = True
-
-            result_data = build_item.result.get('data', {})
-            warnings = build_item.result.get('warnings', [])
-            log.info("Build complete, result %s, warnings %s",
-                     result, warnings)
-
-            if build.retry:
-                result = 'RETRY'
-
-            # If the build was canceled, we did actively cancel the job so
-            # don't overwrite the result and don't retry.
-            if build.canceled:
-                result = build.result
-                build.retry = False
-
-            if build.zookeeper_node:
-                log.debug("Removing: %s", build)
-                try:
-                    self.zk_builds.remove(build.zookeeper_node)
-                    build.zookeeper_node = None
-                    log.debug("Removed: %s", build)
-                except Exception:
-                    log.exception("Failed to remove: %s", build)
-                # finally:
-                #     # Removing anyway, ZNode will be cleanup in executor
-                #     # server loop
-                #     build.zookeeper_node = None
-            try:
-                self.sched.onBuildCompleted(build, result, result_data,
-                                            warnings)
-            except Exception:
-                log.exception("Failed to complete: %s", build)
-            # The test suite expects the build to be removed from the
-            # internal dict after it's added to the report queue.
-            log.debug("Deleting %s from builds", build_item.content['uuid'])
-            del self.builds[build_item.content['uuid']]
-        elif not build_item.cancel:
-            self.log.error("Unable to find build %s" %
-                           build_item.content['uuid'])
-
-    def onWorkStatus(self, build_item: BuildItem):
-        self.log.debug("Build %s update %s on %s", build_item.content,
-                       build_item.data, self)
-        build = self.builds.get(build_item.content['uuid'])
-        if build:
-            started = (build.url is not None)
-            # Allow URL to be updated
-            self.log.debug("Build %s url update: %s -> %s on %s", build,
-                           build.url, build_item.data.get('url'), self)
-            build.url = build_item.data.get('url', build.url)
-            # Update information about worker
-            build.worker.updateFromData(build_item.data)
-
-            if 'paused' in build_item.data and\
-                    build.paused != build_item.data['paused']:
-                build.paused = build_item.data['paused']
-                if build.paused:
-                    result_data = build_item.data.get('data', {})
-                    self.sched.onBuildPaused(build, result_data)
-
-            if not started:
-                self.log.info("Build %s started" % build_item.content)
-                self.sched.onBuildStarted(build)
-        else:
-            self.log.error("Unable to find build %s" %
-                           build_item.content['uuid'])
 
     def resumeBuild(self, build: Build) -> bool:
         log = get_annotated_logger(self.log, build.zuul_event_id)
