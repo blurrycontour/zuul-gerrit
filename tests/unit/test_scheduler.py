@@ -2231,7 +2231,7 @@ class TestScheduler(ZuulTestCase):
     def test_dependent_behind_dequeue(self):
         # This particular test does a large amount of merges and needs a little
         # more time to complete
-        self.wait_timeout = 120
+        self.wait_timeout = 300
         "test that dependent changes behind dequeued changes work"
         # This complicated test is a reproduction of a real life bug
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
