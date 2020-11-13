@@ -307,6 +307,9 @@ class ZooKeeperBuilds(ZooKeeperBase):
     def submit(
         self,
         uuid: str,
+        build_set_uuid: str,
+        tenant_name: str,
+        pipeline_name: str,
         params: Dict[str, Any],
         zone: Optional[str] = None,
         precedence: int = 200,
@@ -334,9 +337,14 @@ class ZooKeeperBuilds(ZooKeeperBase):
         content = json_dumps(
             dict(
                 uuid=uuid,
+                build_set_uuid=build_set_uuid,
+                tenant_name=tenant_name,
+                pipeline_name=pipeline_name,
                 zone=zone or self.DEFAULT_ZONE,
                 precedence=precedence,
                 state=self._createNewState().name,
+                # TODO (felix): What is the difference between content, params
+                # and data?
                 params=params,
             )
         ).encode(encoding="UTF-8")

@@ -244,6 +244,7 @@ class ZooKeeperTreeCacheClient(Generic[CacheItem]):
             ):
                 return  # Ignore non node events
 
+            # TODO (felix): Can this happen?
             if not event.event_data.path.startswith(self._root):
                 return  # Ignore events outside root path
 

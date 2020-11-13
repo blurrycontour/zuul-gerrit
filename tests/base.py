@@ -3879,10 +3879,6 @@ class SchedulerTestApp:
                                    app=self)
         self.sched._stats_interval = 1
 
-        self.event_queues = [
-            self.sched.result_event_queue,
-        ]
-
         self.sched.start()
         self.sched.prime(self.config)
 
@@ -4203,12 +4199,6 @@ class ZuulTestCase(BaseTestCase):
             item: Optional[BuildItem]) -> None:
         self.log.debug("TreeEvent (%s) [%s]: %s", event_type_str(event),
                        segments, item)
-
-    def __event_queues(self, matcher) -> List[Queue]:
-        sched_queues = map(lambda app: app.event_queues,
-                           self.scheds.filter(matcher))
-        return [item for sublist in sched_queues for item in sublist] + \
-            self.additional_event_queues
 
     def _configureSmtp(self):
         # Set up smtp related fakes
@@ -4772,17 +4762,6 @@ class ZuulTestCase(BaseTestCase):
                 return False
         return True
 
-    def __eventQueuesEmpty(self, matcher=None) -> Generator[bool, None, None]:
-        for event_queue in self.__event_queues(matcher):
-            yield event_queue.empty()
-
-    def __eventQueuesJoin(self, matcher) -> None:
-        for app in self.scheds.filter(matcher):
-            for event_queue in app.event_queues:
-                event_queue.join()
-        for event_queue in self.additional_event_queues:
-            event_queue.join()
-
     def _areZookeeperEventQueuesEmpty(self, matcher=None) -> bool:
         for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
             for connection in list(sched.connections.connections.values()):
@@ -4802,6 +4781,12 @@ class ZuulTestCase(BaseTestCase):
                 if any(
                     q.hasEvents() for q in
                     sched.pipeline_trigger_events[tenant_name].values()
+                ):
+                    return False
+                if any(
+                    q.hasEvents() for q in
+                    sched.pipeline_result_events[tenant_name].values()
+
                 ):
                     return False
         return True
@@ -4838,8 +4823,8 @@ class ZuulTestCase(BaseTestCase):
                     self.__haveAllBuildsReported(
                         matcher, show_unreported_builds=True),
                     self.__areAllBuildsWaiting(matcher),
-                    self.__areAllNodeRequestsComplete(matcher),
-                    all(self.__eventQueuesEmpty(matcher)))
+                    self.__areAllNodeRequestsComplete(matcher)
+                )
                 raise Exception("Timeout waiting for Zuul to settle")
 
             # Make sure no new events show up while we're checking
@@ -4851,7 +4836,6 @@ class ZuulTestCase(BaseTestCase):
                                             show_unreported_builds=True):
                 # Join ensures that the queue is empty _and_ events have been
                 # processed
-                self.__eventQueuesJoin(matcher)
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.acquire())
                 self.log.debug("Scheduler run handler: Locked")
@@ -4865,21 +4849,20 @@ class ZuulTestCase(BaseTestCase):
                 areAllBuildsWaiting = self.__areAllBuildsWaiting(matcher)
                 areAllNodeRequestsComplete = self\
                     .__areAllNodeRequestsComplete(matcher)
-                allEventQueuesEmpty = all(self.__eventQueuesEmpty(matcher))
                 self._releaseZookeeperLockingLocks(matcher)
 
                 self._logQueueStatus(
                     self.log.debug, matcher, areZookeeperEventQueuesEmpty,
                     areAllMergeJobsWaiting, haveAllBuildsReported,
                     areAllBuildsWaiting, areAllNodeRequestsComplete,
-                    allEventQueuesEmpty)
+                )
 
                 if (areZookeeperEventQueuesEmpty and
                         areAllMergeJobsWaiting and
                         haveAllBuildsReported and
                         areAllBuildsWaiting and
-                        areAllNodeRequestsComplete and
-                        allEventQueuesEmpty):
+                        areAllNodeRequestsComplete
+                    ):
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
                     # when locked the run handler and checked that the
@@ -4902,17 +4885,13 @@ class ZuulTestCase(BaseTestCase):
 
     def _logQueueStatus(self, logger, matcher, areZookeeperEventQueuesEmpty,
                         areAllMergeJobsWaiting, haveAllBuildsReported,
-                        areAllBuildsWaiting, areAllNodeRequestsComplete,
-                        allEventQueuesEmpty):
+                        areAllBuildsWaiting, areAllNodeRequestsComplete):
         logger("Queue status:")
-        for event_queue in self.__event_queues(matcher):
-            self.log.debug("  %s: %s" % (event_queue, event_queue.empty()))
         logger("All ZK event queues empty: %s" % areZookeeperEventQueuesEmpty)
         logger("All merge jobs waiting: %s" % areAllMergeJobsWaiting)
         logger("All builds reported: %s" % haveAllBuildsReported)
         logger("All builds waiting: %s" % areAllBuildsWaiting)
         logger("All requests completed: %s" % areAllNodeRequestsComplete)
-        logger("All event queues empty: %s" % allEventQueuesEmpty)
         for app in self.scheds.filter(matcher):
             logger("[Sched: %s] Merge client jobs: %s" %
                    (app.sched, app.sched.merger.jobs))
@@ -5098,6 +5077,7 @@ class ZuulTestCase(BaseTestCase):
             for build in self.builds:
                 self.log.error("Running build: %s" % build)
             else:
+                # TODO (felix): This shouldn't be in an for/else
                 self.log.error("No running builds")
             raise
 

@@ -61,8 +61,15 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
+from zuul.model import (
+    BuildCompletedEvent,
+    BuildPausedEvent,
+    BuildStartedEvent,
+    BuildStatusEvent,
+)
 from zuul.zk import ZooKeeperClient
 from zuul.zk.builds import BuildItem, ZooKeeperBuilds
+from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.cache import event_type_str
 from zuul.zk.components import ZooKeeperComponentState
 
@@ -915,7 +922,7 @@ class AnsibleJob(object):
         self.paused = True
 
         data = {'paused': self.paused, 'data': self.getResultData()}
-        self.executor_server.zk_builds.data(self.build_item.path, data)
+        self.executor_server.pauseBuild(self.build_item, data)
         self._resume_event.wait()
 
     def resume(self):
@@ -944,8 +951,9 @@ class AnsibleJob(object):
             self.time_starting_build = time.monotonic()
 
             # report that job has been taken
-            self.executor_server.zk_builds.data(
-                self.build_item.path, self._base_job_data())
+            self.executor_server.startBuild(
+                self.build_item, self._base_job_data()
+            )
 
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
@@ -964,14 +972,15 @@ class AnsibleJob(object):
         except ExecutorError as e:
             result = dict(result='ERROR', error_detail=e.args[0])
             self.log.debug("Sending result: %s", result)
-            self.executor_server.zk_builds.complete(
-                self.build_item.path,
-                dict(result='ERROR', error_detail=e.args[0]),
-                success=True)
+
+            self.executor_server.completeBuild(
+                self.build_item, result, success=True
+            )
         except Exception:
             self.log.exception("Exception while executing job")
-            self.executor_server.zk_builds.complete(
-                self.build_item.path, traceback.format_exc(), success=False)
+            self.executor_server.completeBuild(
+                self.build_item, traceback.format_exc(), success=False
+            )
         finally:
             self.running = False
             if self.jobdir:
@@ -1010,8 +1019,9 @@ class AnsibleJob(object):
 
     def _send_aborted(self):
         result = dict(result='ABORTED')
-        self.executor_server.zk_builds.complete(
-            self.build_item.path, result, success=True)
+        self.executor_server.completeBuild(
+            self.build_item, result, success=True
+        )
 
     def _execute(self):
         args = self.arguments
@@ -1176,9 +1186,7 @@ class AnsibleJob(object):
                 hostname=self.executor_server.hostname,
                 uuid=self.build_item.content['uuid'])
 
-        self.executor_server.zk_builds.data(
-            self.build_item.path, data)
-        self.executor_server.zk_builds.status(self.build_item.path, 0, 100)
+        self.executor_server.updateBuildStatus(self.build_item, data, 0, 100)
 
         result = self.runPlaybooks(args)
         success = result == 'SUCCESS'
@@ -1197,8 +1205,9 @@ class AnsibleJob(object):
         result_value = dict(result=result, warnings=warnings, data=data)
         self.log.debug("Sending result: %s", result_value)
         try:
-            self.executor_server.zk_builds.complete(
-                self.build_item.path, result_value, success=True)
+            self.executor_server.completeBuild(
+                self.build_item, result_value, success=True
+            )
         except NoNodeError as e:
             self.log.warning("NoNodeError[%s]: %s" % (self.build_item.path, e))
 
@@ -1293,16 +1302,18 @@ class AnsibleJob(object):
             # can't fetch them, it should resolve itself.
             self.log.exception("Could not fetch refs to merge from remote")
             result = dict(result='ABORTED')
-            self.executor_server.zk_builds.complete(
-                self.build_item.path, result, success=True)
+            self.executor_server.completeBuild(
+                self.build_item, result, success=True
+            )
             return None
         if not ret:  # merge conflict
             result = dict(result='MERGER_FAILURE')
             if self.executor_server.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
                 self.executor_server.statsd.incr(base_key + ".FAILURE")
-            self.executor_server.zk_builds.complete(
-                self.build_item.path, result, success=True)
+            self.executor_server.completeBuild(
+                self.build_item, result, success=True
+            )
             return None
 
         if self.executor_server.statsd:
@@ -2578,6 +2589,9 @@ class ExecutorServer(BaseMergeServer):
         self.hostname = get_default(self.config, 'executor', 'hostname',
                                     socket.getfqdn())
         self.zk_builds: ZooKeeperBuilds = self._zk_builds_class(zk_client)
+        self.result_events = PipelineResultEventQueue.create_registry(
+            zk_client
+        )
         self.zk_component = self.zk_component_registry.register(
             'executors', self.hostname)
         self.log_streaming_port = log_streaming_port
@@ -3007,6 +3021,13 @@ class ExecutorServer(BaseMergeServer):
             # self.zk_builds.cleanup()
             items = list(self._build_items.items())
             for node_path, build_item in items:
+                # TODO (felix): Do we always have to "attempt" this? Can't we
+                # use a treecachelistener to listen for relevant changes (e.g.
+                # resume or cancel node added)?
+                # TODO (felix): This looks kind of unnecessary, as these
+                # methods are only calling stopJob() or resumeJob() which is
+                # also done in the treecachelistener above which is already
+                # called when the relevant znodes are created.
                 self.zk_builds.resumeAttempt(node_path, self.resumeJob)
                 self.zk_builds.cancelAttempt(node_path, self.stopJob)
                 if not self.zk_builds.isLocked(node_path):
@@ -3025,9 +3046,11 @@ class ExecutorServer(BaseMergeServer):
                             self.executeJob(next_item)
                         except Exception:
                             log.exception('Exception while running job')
-                            self.zk_builds.complete(
-                                next_item.path, traceback.format_exc(),
-                                success=False)
+                            self.completeBuild(
+                                next_item,
+                                traceback.format_exc(),
+                                success=False
+                            )
                 except Exception:
                     self.log.exception('Exception while getting job')
             time.sleep(1.0)
@@ -3133,6 +3156,7 @@ class ExecutorServer(BaseMergeServer):
             self.resumeJobByUnique(unique, zuul_event_id=zuul_event_id)
         finally:
             # job.sendWorkComplete()
+            # TODO (felix): Should we notify the scheduler here as well?
             pass
 
     def stopJob(self, build_item: BuildItem):
@@ -3145,6 +3169,12 @@ class ExecutorServer(BaseMergeServer):
             self.stopJobByUnique(unique, zuul_event_id=zuul_event_id)
         finally:
             # job.sendWorkComplete()
+            # TODO (felix): Put buildcompleted event with result ABORTED/CANCELED
+            # into the result event queue to notify the scheduler about this.
+            # The "old" way via the executor client doesn't seem to work / be
+            # used any longer.
+            """result = dict(result="CANCELED")
+            self.completeBuild(build_item, result, success=False)"""
             pass
 
     def resumeJobByUnique(self, unique, zuul_event_id=None):
@@ -3168,3 +3198,51 @@ class ExecutorServer(BaseMergeServer):
             job_worker.stop(reason)
         except Exception:
             log.exception("Exception sending stop command to worker:")
+
+    def updateBuildStatus(self, build_item, data, current, total):
+        self.zk_builds.data(build_item.path, data)
+        self.zk_builds.status(build_item.path, current, total)
+
+        tenant_name = build_item.content["tenant_name"]
+        pipeline_name = build_item.content["pipeline_name"]
+
+        event = BuildStatusEvent(build_item.path)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def startBuild(self, build_item, data):
+        self.zk_builds.data(build_item.path, data)
+
+        tenant_name = build_item.content["tenant_name"]
+        pipeline_name = build_item.content["pipeline_name"]
+
+        event = BuildStartedEvent(build_item.path)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def pauseBuild(self, build_item, data):
+        self.zk_builds.data(build_item.path, data)
+
+        tenant_name = build_item.content["tenant_name"]
+        pipeline_name = build_item.content["pipeline_name"]
+
+        event = BuildPausedEvent(build_item.path)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def completeBuild(self, build_item, result, success):
+        # Update the build item in Zookeper
+        self.zk_builds.complete(build_item.path, result, success)
+
+        build_set_uuid = build_item.content["build_set_uuid"]
+        tenant_name = build_item.content["tenant_name"]
+        pipeline_name = build_item.content["pipeline_name"]
+
+        # TODO (felix): Is this needed? It looks like it was added by the
+        # "use ZooKeeper instead of gearman for jobs" change.
+        # TODO (felix): If not, we could also remove the build_set_uuid from
+        # the build_item for now as this could be looked up in the scheduler
+        # from the local build object if needed.
+        if not build_set_uuid:
+            raise Exception("Build set undefined for %s" % build_item)
+
+        # Notify the scheduler about the completed build
+        event = BuildCompletedEvent(build_item.path)
+        self.result_events[tenant_name][pipeline_name].put(event)
