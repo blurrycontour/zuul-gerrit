@@ -1,0 +1,15 @@
+Code-Review+1: Albin Vass <albin.vass@gmail.com>
+Code-Review+1: Jesse Pretorius (odyssey4me) <jesse@odyssey4.me>
+Code-Review+1: Andy Ladjadj <andy.ladjadj@adevinta.com>
+Code-Review+1: Sviatoslav Sydorenko <webknjaz@redhat.com>
+Code-Review+1: Arx Cruz <arxcruz@redhat.com>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+1: Fabien Boucher <fboucher@redhat.com>
+Code-Review+2: Tobias Henkel <tobias.henkel@bmw.de>
+Workflow+1: Ian Wienand <iwienand@redhat.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Fri, 13 Nov 2020 06:49:33 +0000
+Reviewed-on: https://review.opendev.org/739444
+Project: zuul/zuul
+Branch: refs/heads/master
