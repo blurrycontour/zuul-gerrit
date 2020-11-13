@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_20ce5e59",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-11-13T09:03:37Z",
+      "side": 1,
+      "message": "To be consistent this method should have the type annotation too.",
+      "revId": "e6f13561475095715c02e412b8122fa0595036ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
