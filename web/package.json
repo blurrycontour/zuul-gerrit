@@ -19,7 +19,6 @@
     "patternfly-react": "^2.39.16",
     "prop-types": "^15.6.2",
     "react": "^16.13.1",
-    "react-ansi": "^1.8.1",
     "react-dom": "^16.13.1",
     "react-height": "^3.0.0",
     "react-json-view": "^1.19.1",
@@ -28,6 +27,7 @@
     "react-router-dom": "^4.3.1",
     "react-scripts": "3.4.1",
     "react-select": "3.1.0",
+    "reason-react": "^0.9.1",
     "redux": "^4.0.5",
     "redux-immutable-state-invariant": "^2.1.0",
     "redux-thunk": "^2.3.0",
@@ -43,6 +43,7 @@
     "eslint-plugin-jest": "^23.8.2",
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-standard": "^4.0.1",
+    "bs-platform": "^8.2.0",
     "yarn": "^1.16.0"
   },
   "scripts": {
@@ -50,7 +51,7 @@
     "start:openstack": "REACT_APP_ZUUL_API='https://zuul.openstack.org/api/' react-scripts start",
     "start:multi": "REACT_APP_ZUUL_API='https://softwarefactory-project.io/zuul/api/' react-scripts start",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "bsb -make-world && react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .js --ext .jsx src"
