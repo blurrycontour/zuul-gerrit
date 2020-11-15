@@ -15,7 +15,7 @@
 import * as moment from 'moment'
 import 'moment-duration-format'
 import * as React from 'react'
-import ReactAnsi from 'react-ansi'
+import ReactAnsi from '../Ansi.cjs'
 import PropTypes from 'prop-types'
 import ReactJson from 'react-json-view'
 import {
