@@ -202,6 +202,14 @@ To run eslint tests locally:
 
   yarn lint
 
+Some components are written with `Reason-React`_, make sure to check the
+`ResSript language overview`_. To update ``.re`` file, starts the rescript
+compiler in another terminal:
+
+.. code-block:: bash
+
+  yarn re:watch
+
 Deploying
 ---------
 
@@ -215,6 +223,8 @@ build outputs into the ``zuul/web/static`` directory, as long as
 As long as `yarn`_ is installed, the installation of zuul will run
 ``yarn build`` appropriately.
 
+.. _Reason-React: https://reasonml.github.io/reason-react/docs/en/components
+.. _ResSript language overview: https://rescript-lang.org/docs/manual/v8.0.0/overview
 .. _yarn: https://yarnpkg.com/en/
 .. _nodejs: https://nodejs.org/
 .. _webpack: https://webpack.js.org/
