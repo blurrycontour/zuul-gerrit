@@ -37,6 +37,7 @@ which is described below.
       Merger -- Gearman
       Executor -- Gearman
       Executor -- Statsd
+      Executor -- "Job Node"
       Web -- Database
       Web -- Gearman
       Web -- GitHub
