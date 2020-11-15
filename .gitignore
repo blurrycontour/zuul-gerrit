@@ -24,3 +24,5 @@ zuul/web/static/*
 !.keep
 node_modules
 yarn-error.log
+web/lib/
+*.bs.js
