@@ -326,12 +326,26 @@ class TestMergerRepo(ZuulTestCase):
     def test_files_changes(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         self.create_branch('org/project1', 'feature')
+        self.create_commit('org/project1', head='feature',
+                           files={"file1.txt": "file1\n"})
+        self.create_commit('org/project1', head='feature',
+                           files={"file2.txt": "file2\n"})
 
         work_repo = Repo(parent_path, self.workspace_root,
                          'none@example.org', 'User Name', '0', '0')
         changed_files = work_repo.getFilesChanges('feature', 'master')
+        self.assertEqual(['README', 'file1.txt', 'file2.txt'],
+                         sorted(changed_files))
 
-        self.assertEqual(['README'], changed_files)
+        repo = git.Repo(parent_path)
+        repo.head.reference = repo.heads['feature']
+        repo.head.reset(index=True, working_tree=True)
+        repo.index.remove(["file1.txt"], working_tree=True)
+        repo.index.commit('remove file1')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         'none@example.org', 'User Name', '0', '0')
+        changed_files = work_repo.getFilesChanges('feature', 'master')
+        self.assertEqual(['README', 'file2.txt'], sorted(changed_files))
 
     def test_files_changes_master_fork_merges(self):
         """Regression test for getFilesChanges()

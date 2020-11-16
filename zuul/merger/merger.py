@@ -18,6 +18,7 @@ from urllib.parse import urlsplit, urlunsplit, urlparse
 import hashlib
 import logging
 import os
+from pathlib import Path
 import re
 import shutil
 import time
@@ -665,12 +666,24 @@ class Repo(object):
             self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
         files = set()
 
-        if tosha:
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+       if tosha:
+            self.fetch(tosha, zuul_event_id=zuul_event_id)
+            tosha_commit = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+            for x in head.diff(tosha_commit):
+                if x.a_blob is not None and x.a_blob.path not in files:
+                    files.add(x.a_blob.path)
+                if x.b_blob is not None and x.b_blob.path not in files:
+                    files.add(x.b_blob.path)
         else:
-            files.update(head.stats.files.keys())
+            def list_paths(root_tree, path=Path(".")):
+                for blob in root_tree.blobs:
+                    yield str(path / blob.name)
+                for tree in root_tree.trees:
+                    yield from list_paths(tree, path / tree.name)
+
+            for commit_tree_file in list_paths(head.tree):
+                files.add(commit_tree_file)
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
