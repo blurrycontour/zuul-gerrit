@@ -6,4 +6,10 @@ export default {
     isFetchingOutput: false,
     isFetchingManifest: false,
   },
+  logfile: {
+    // Store files by buildId->filename->content
+    files: {},
+    isFetching: false,
+    url: null,
+  },
 }

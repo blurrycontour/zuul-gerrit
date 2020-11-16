@@ -16,6 +16,8 @@ import Axios from 'axios'
 
 import * as API from '../api'
 
+import { fetchLogfile } from './logfile'
+
 export const BUILD_FETCH_REQUEST = 'BUILD_FETCH_REQUEST'
 export const BUILD_FETCH_SUCCESS = 'BUILD_FETCH_SUCCESS'
 export const BUILD_FETCH_FAIL = 'BUILD_FETCH_FAIL'
@@ -298,12 +300,14 @@ function fetchBuildOutput(buildId, state) {
     // the build is in the state. Otherwise an error would have been thrown and
     // this function wouldn't be called.
     const build = state.build.builds[buildId]
+    if (build.output) {
+      return Promise.resolve()
+    }
     if (!build.log_url) {
       // Don't treat a missing log URL as failure as we don't want to show a
       // toast for that. The UI already informs about the missing log URL in
       // multiple places.
-      dispatch(buildOutputNotAvailable())
-      return Promise.resolve()
+      return dispatch(buildOutputNotAvailable())
     }
     const url = build.log_url.substr(0, build.log_url.lastIndexOf('/') + 1)
     dispatch(requestBuildOutput())
@@ -331,29 +335,40 @@ function fetchBuildOutput(buildId, state) {
   }
 }
 
-export const fetchBuildManifest = (buildId, state) => (dispatch) => {
-  // As this function is only called after fetchBuild() we can assume that
-  // the build is in the state. Otherwise an error would have been thrown and
-  // this function wouldn't be called.
-  const build = state.build.builds[buildId]
-  dispatch(requestBuildManifest())
-  for (let artifact of build.artifacts) {
-    if ('metadata' in artifact &&
-        'type' in artifact.metadata &&
-        artifact.metadata.type === 'zuul_manifest') {
-      return Axios.get(artifact.url)
-        .then(manifest => {
-          dispatch(receiveBuildManifest(buildId, manifest.data))
-        })
-        .catch(error => dispatch(failedBuildManifest(error, artifact.url)))
+export function fetchBuildManifest(buildId, state) {
+  return async function(dispatch) {
+    // As this function is only called after fetchBuild() we can assume that
+    // the build is in the state. Otherwise an error would have been thrown and
+    // this function wouldn't be called.
+    const build = state.build.builds[buildId]
+    if (build.manifest) {
+      return Promise.resolve()
     }
+    dispatch(requestBuildManifest())
+    for (let artifact of build.artifacts) {
+      if (
+        'metadata' in artifact &&
+        'type' in artifact.metadata &&
+        artifact.metadata.type === 'zuul_manifest'
+      ) {
+        try {
+          const response = await Axios.get(artifact.url)
+          return dispatch(receiveBuildManifest(buildId, response.data))
+        } catch(error) {
+          dispatch(failedBuildManifest(error, artifact.url))
+          // Raise the error again, so fetchBuildAllInfo() doesn't call
+          // fetchLogFile which needs an existing manifest file.
+          throw error
+        }
+      }
+    }
+    // Don't treat a missing manifest file as failure as we don't want to show a
+    // toast for that.
+    dispatch(buildManifestNotAvailable())
   }
-  // Don't treat a missing manifest file as failure as we don't want to show a
-  // toast for that.
-  dispatch(buildManifestNotAvailable())
 }
 
-export function fetchBuildAllInfo(tenant, buildId) {
+export function fetchBuildAllInfo(tenant, buildId, logfileName) {
   // This wraps the calls to fetch the build, output and manifest together as
   // this is the common use case we have when loading the build info.
   return async function (dispatch, getState) {
@@ -362,9 +377,14 @@ export function fetchBuildAllInfo(tenant, buildId) {
       // to the fetchBuildOutput and fetchBuildManifest so they can get the log
       // url from the fetched build.
       await dispatch(fetchBuild(tenant, buildId, getState()))
+      // Wait for the manifest info to be available as this is needed in case
+      // we also download a logfile.
+      await dispatch(fetchBuildManifest(buildId, getState()))
       dispatch(fetchBuildOutput(buildId, getState()))
-      dispatch(fetchBuildManifest(buildId, getState()))
-    } catch (error) {
+      if (logfileName) {
+        dispatch(fetchLogfile(buildId, logfileName, getState()))
+      }
+   } catch (error) {
       dispatch(failedBuild(error, tenant.apiPrefix))
     }
   }

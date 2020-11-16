@@ -12,32 +12,32 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import update from 'immutability-helper'
-
 import {
   LOGFILE_FETCH_FAIL,
   LOGFILE_FETCH_REQUEST,
   LOGFILE_FETCH_SUCCESS,
 } from '../actions/logfile'
 
+import initialState from './initialState'
 
-export default (state = {
-  isFetching: false,
-  url: null,
-  data: null
-}, action) => {
+export default (state = initialState.logfile, action) => {
   switch (action.type) {
     case LOGFILE_FETCH_REQUEST:
-      return update(state, {$merge: {isFetching: true,
-                                     url: action.url,
-                                     data: null}})
-    case LOGFILE_FETCH_SUCCESS:
-      return update(state, {$merge: {isFetching: false,
-                                     data: action.data}})
+      return { ...state, isFetching: true, url: action.url }
+    case LOGFILE_FETCH_SUCCESS: {
+      let filesForBuild = state.files[action.buildId] || {}
+      filesForBuild = {
+        ...filesForBuild,
+        [action.fileName]: action.fileContent,
+      }
+      return {
+        ...state,
+        isFetching: false,
+        files: { ...state.files, [action.buildId]: filesForBuild },
+      }
+    }
     case LOGFILE_FETCH_FAIL:
-      return update(state, {$merge: {isFetching: false,
-                                     url: null,
-                                     data: null}})
+      return { ...state, isFetching: false }
     default:
       return state
   }
