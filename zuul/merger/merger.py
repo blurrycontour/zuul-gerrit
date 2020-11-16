@@ -666,11 +666,18 @@ class Repo(object):
         files = set()
 
         if tosha:
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+            self.fetch(tosha, zuul_event_id=zuul_event_id)
+            tosha_commit = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+            for x in head.diff(tosha_commit):
+                if x.a_blob is not None:
+                    files.add(x.a_blob.path)
+                if x.b_blob is not None:
+                    files.add(x.b_blob.path)
         else:
-            files.update(head.stats.files.keys())
+            for item in head.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
