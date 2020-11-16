@@ -16,6 +16,24 @@
       "revId": "fb10b2cdf27b7f479529439a38c9df2c6d4fb3eb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1f621f24_6475f4f9",
+        "filename": "doc/source/reference/drivers/elasticsearch.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2020-11-16T14:19:20Z",
+      "side": 1,
+      "message": "The reason was that compared to a logs aggregator Zuul will probably generate less EL docs. So splitting by month seems to be OK. But yes let\u0027s follow that convention. See the new PS please.",
+      "parentUuid": "1f621f24_117bb227",
+      "revId": "fb10b2cdf27b7f479529439a38c9df2c6d4fb3eb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
