@@ -22,7 +22,8 @@ import queue
 import threading
 import time
 import json
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
+from itertools import chain
 from json.decoder import JSONDecodeError
 
 import cherrypy
@@ -2223,7 +2224,30 @@ class GithubConnection(BaseConnection):
                     continue
 
                 annotations.append(annotation)
-        return annotations
+
+        def _sortUniqueness(annotations):
+            """
+            This method is intended to spread the annotations by uniqueness
+            so we have an as diverse as possible list of annotations.
+            """
+            # First group
+            per_message = defaultdict(list)
+            for annotation in annotations:
+                per_message[annotation['message']].append(annotation)
+
+            # Sort the lists by length. This way we get the messages that
+            # occur less frequently at first.
+            annotation_lists = sorted(list(per_message.values()),
+                                      key=lambda l: len(l))
+
+            return list(chain(*annotation_lists))
+
+        if len(annotations) > 50:
+            # We cannot report more than 50 file comments so sort them by
+            # uniqueness in order to gibe the user a diverse set of annotations
+            annotations = _sortUniqueness(annotations)
+
+        return annotations[:50]
 
     def getPushedFileNames(self, event):
         files = set()
