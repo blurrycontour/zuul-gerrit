@@ -18,7 +18,7 @@ it('should fetch a build', () => {
   expect(fetchedBuild).toEqual(build)
 })
 
-it('should fetch output and update the build in the store', () => {
+it('should fetch an output', () => {
   const store = createStore(rootReducer, initialState)
   const build = {
     uuid: '1234',
@@ -93,14 +93,13 @@ it('should fetch output and update the build in the store', () => {
     },
   ]
 
-  // Fetch the build
-  store.dispatch(buildActions.receiveBuild(build.uuid, build))
-
   // Fetch the output
   store.dispatch(buildActions.receiveBuildOutput(build.uuid, output))
 
   const newState = store.getState()
-  expect(Object.keys(newState.build.builds).length).toEqual(1)
+  expect(Object.keys(newState.build.outputs).length).toEqual(1)
+  expect(Object.keys(newState.build.hosts).length).toEqual(1)
+  expect(Object.keys(newState.build.errorIds).length).toEqual(1)
 
   const expectedHosts = {
     localhost: {
@@ -125,13 +124,15 @@ it('should fetch output and update the build in the store', () => {
     },
   }
 
-  const fetchedBuild = newState.build.builds[build.uuid]
-  expect(fetchedBuild.errorIds).toEqual(new Set())
-  expect(fetchedBuild.hosts).toEqual(expectedHosts)
-  expect(fetchedBuild.output).toEqual(output)
+  const fetchedOutput = newState.build.outputs[build.uuid]
+  const fetchedHosts = newState.build.hosts[build.uuid]
+  const fetchedErrorIds = newState.build.errorIds[build.uuid]
+  expect(fetchedOutput).toEqual(output)
+  expect(fetchedHosts).toEqual(expectedHosts)
+  expect(fetchedErrorIds).toEqual(new Set())
 })
 
-it('should fetch manifest and update the build in the store', () => {
+it('should fetch a manifest file', () => {
   const store = createStore(rootReducer, initialState)
   const build = {
     uuid: '1234',
@@ -184,14 +185,11 @@ it('should fetch manifest and update the build in the store', () => {
     ],
   }
 
-  // Fetch the build
-  store.dispatch(buildActions.receiveBuild(build.uuid, build))
-
   // Fetch the manifest
   store.dispatch(buildActions.receiveBuildManifest(build.uuid, manifest))
 
   const newState = store.getState()
-  expect(Object.keys(newState.build.builds).length).toEqual(1)
+  expect(Object.keys(newState.build.manifests).length).toEqual(1)
 
   const expectedManifestIndex = {
     '/zuul-info/host-info.ubuntu-bionic.yaml': {
@@ -231,8 +229,8 @@ it('should fetch manifest and update the build in the store', () => {
     },
   }
 
-  const fetchedBuild = newState.build.builds[build.uuid]
-  expect(fetchedBuild.manifest).toEqual({
+  const fetchedManifest = newState.build.manifests[build.uuid]
+  expect(fetchedManifest).toEqual({
     index: expectedManifestIndex,
     tree: manifest.tree,
   })

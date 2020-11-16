@@ -66,7 +66,7 @@ class BuildsetPage extends React.Component {
     const { buildset, isFetching, tenant } = this.props
 
     // Initial page load
-    if (!buildset && isFetching) {
+    if (buildset === undefined || isFetching) {
       return <Fetching />
     }
 
@@ -131,10 +131,9 @@ class BuildsetPage extends React.Component {
 
 function mapStateToProps(state, ownProps) {
   const buildsetId = ownProps.match.params.buildsetId
-  const buildset =
-    buildsetId && Object.keys(state.build.buildsets).length > 0
-      ? state.build.buildsets[buildsetId]
-      : null
+  // This will be undefined if the data is not available yet or null if no
+  // buildset could be fetched for the given id.
+  const buildset = state.build.buildsets[buildsetId]
   return {
     buildset,
     tenant: state.tenant,
