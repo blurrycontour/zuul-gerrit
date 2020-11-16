@@ -27,7 +27,7 @@ import { BuildIcon } from '@patternfly/react-icons'
 
 import { fetchBuildset } from '../actions/build'
 import { EmptyPage } from '../containers/Errors'
-import { Fetchable, Fetching } from '../containers/Fetching'
+import { Fetching } from '../containers/Fetching'
 import BuildList from '../containers/build/BuildList'
 import Buildset from '../containers/build/Buildset'
 
@@ -103,14 +103,10 @@ class BuildsetPage extends React.Component {
       </>
     )
 
-    const fetchable = (
-      <Fetchable isFetching={isFetching} fetchCallback={this.updateData} />
-    )
-
     return (
       <>
         <PageSection variant={PageSectionVariants.light}>
-          <Buildset buildset={buildset} fetchable={fetchable} />
+          <Buildset buildset={buildset} />
         </PageSection>
         <PageSection variant={PageSectionVariants.light}>
           <Title headingLevel="h3">

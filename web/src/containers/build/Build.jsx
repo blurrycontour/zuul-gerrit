@@ -16,13 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import {
-  Flex,
-  FlexItem,
-  List,
-  ListItem,
-  Title,
-} from '@patternfly/react-core'
+import { Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
 import {
   BookIcon,
   BuildIcon,
@@ -42,8 +36,7 @@ import 'moment-duration-format'
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalLink, ExternalLink } from '../../Misc'
 
-function Build(props) {
-  const { build, tenant, timezone, fetchable } = props
+function Build({ build, tenant, timezone }) {
   const build_link = buildExternalLink(build)
 
   return (
@@ -64,7 +57,6 @@ function Build(props) {
           {build.job_name} {!build.voting && ' (non-voting)'}
         </BuildResultWithIcon>
         <BuildResultBadge result={build.result} />
-        {fetchable}
       </Title>
       {/* We handle the spacing for the body and the flex items by ourselves
           so they go hand in hand. By default, the flex items' spacing only
@@ -244,7 +236,6 @@ Build.propTypes = {
   tenant: PropTypes.object,
   hash: PropTypes.array,
   timezone: PropTypes.string,
-  fetchable: PropTypes.node,
 }
 
 export default connect((state) => ({
