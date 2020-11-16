@@ -663,7 +663,7 @@ class Repo(object):
 
         if tosha:
             commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
+            for cmt in repo.iter_commits(commit_diff):
                 files.update(cmt.stats.files.keys())
         else:
             files.update(head.stats.files.keys())
