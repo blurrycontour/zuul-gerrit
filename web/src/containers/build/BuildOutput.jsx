@@ -14,7 +14,7 @@
 
 import * as React from 'react'
 import { Fragment } from 'react'
-import ReactAnsi from 'react-ansi'
+import ReactAnsi from '@softwarefactory-project/re-ansi'
 import PropTypes from 'prop-types'
 import {
     Card,
