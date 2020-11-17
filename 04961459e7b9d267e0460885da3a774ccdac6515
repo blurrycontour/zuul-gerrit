@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_b09f384e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2247,
+      "author": {
+        "id": 29739
+      },
+      "writtenOn": "2020-11-17T09:50:57Z",
+      "side": 1,
+      "message": "typo: give",
+      "range": {
+        "startLine": 2247,
+        "startChar": 37,
+        "endLine": 2247,
+        "endChar": 41
+      },
+      "revId": "04961459e7b9d267e0460885da3a774ccdac6515",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
