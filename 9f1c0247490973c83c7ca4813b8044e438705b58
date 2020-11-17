@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_59a6c810",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-11-17T17:01:00Z",
+      "side": 1,
+      "message": "You said it right there, the \"result\" page.  This is, in fact, why the previous link to the result page was the result itself.",
+      "revId": "9f1c0247490973c83c7ca4813b8044e438705b58",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
