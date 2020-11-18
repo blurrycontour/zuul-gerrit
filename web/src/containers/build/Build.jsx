@@ -35,9 +35,22 @@ import 'moment-duration-format'
 
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalLink, ExternalLink } from '../../Misc'
+import useCopy from '@react-hook/copy'
 
 function Build({ build, tenant, timezone }) {
   const build_link = buildExternalLink(build)
+
+  const FingerprintIconCopy = (props) => {
+    const {copy} = useCopy(
+      props.value
+    )
+    return <a title="Copy to clipboard" href="#/" onClick={copy}><FingerprintIcon/></a>
+
+  }
+
+  FingerprintIconCopy.propTypes = {
+    value: PropTypes.string.isRequired,
+  }
 
   return (
     <>
@@ -109,11 +122,9 @@ function Build({ build, tenant, timezone }) {
               />
               <IconProperty
                 WrapElement={ListItem}
-                icon={<FingerprintIcon />}
+                icon={<FingerprintIconCopy value={build.uuid}/>}
                 value={
-                  <span>
-                    <strong>UUID </strong> {build.uuid} <br />
-                    <strong>Event ID </strong> {build.event_id} <br />
+                  <span><strong>UUID </strong>{build.uuid}
                   </span>
                 }
               />
