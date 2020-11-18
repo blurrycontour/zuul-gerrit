@@ -38,7 +38,7 @@ const severityMap = {
 }
 
 const OSLO_LOGMATCH = new RegExp(`^(${DATEFMT})(( \\d+)? (${STATUSFMT}).*)`)
-const SYSTEMD_LOGMATCH = new RegExp(`^(${SYSLOGDATE})( (\\S+) \\S+\\[\\d+\\]\\: (${STATUSFMT})?.*)`)
+const SYSTEMD_LOGMATCH = new RegExp(`^(${SYSLOGDATE})( (\\S+) \\S+\\[\\d+\\]\\: (${STATUSFMT}).*)`)
 
 const receiveLogfile = (buildId, file, data) => {
 
