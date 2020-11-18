@@ -111,9 +111,8 @@ function Build({ build, tenant, timezone }) {
                 WrapElement={ListItem}
                 icon={<FingerprintIcon />}
                 value={
-                  <span>
-                    <strong>UUID </strong> {build.uuid} <br />
-                    <strong>Event ID </strong> {build.event_id} <br />
+                  <span><strong>UUID </strong><span className="guid">{build.uuid}</span>
+                  <strong> Event ID </strong><span className="guid">{build.event_id}</span>
                   </span>
                 }
               />
