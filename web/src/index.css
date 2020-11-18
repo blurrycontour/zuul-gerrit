@@ -443,3 +443,46 @@ details.foldable[open] summary::before {
         );
     }
 }
+
+/* Hacks cliboardcopy element to hide the text being copied.
+https://github.com/patternfly/patternfly-design/issues/956
+*/
+div.clipboardcopy-minimal > div > input {
+    display: none !important;
+}
+
+span.guid {
+    width: 4em;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+/* Reduce whitespace padding in order to make better use of screen
+on the summary page, reducing the need to have to scroll to find useful
+information.
+*/
+section.pf-c-page__main-section {
+    padding-top: 0.5em;
+    padding-bottom: 0;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+h2.pf-c-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    line-height: normal;
+}
+
+button.pf-tabs__link {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* avoid extra spacing between list items */
+ul.pf-c-list li + li {
+    margin-top: 0;
+}
