@@ -669,7 +669,7 @@ class GerritConnection(BaseConnection):
     def addProject(self, project: Project) -> None:
         self.projects[project.name] = project
 
-    def clearBranchCache(self):
+    def clearCache(self):
         self._project_branch_cache = {}
 
     def _clearBranchCache(self, project):
