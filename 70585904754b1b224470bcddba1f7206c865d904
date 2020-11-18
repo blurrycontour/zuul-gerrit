@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f621f24_abe5f4de",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-11-18T16:04:28Z",
+      "side": 1,
+      "message": "Technically it\u0027s not default since it\u0027s dependent on the tickTime (20*tickTime) and that doesn\u0027t seem to have a default value.\n\nBut the recommended starting point is 2000ms (which is also what is shown in the zuul docs) which would lead to a 40sec maxSessionTimeout.",
+      "range": {
+        "startLine": 12,
+        "startChar": 15,
+        "endLine": 13,
+        "endChar": 7
+      },
+      "revId": "70585904754b1b224470bcddba1f7206c865d904",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
