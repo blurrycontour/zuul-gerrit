@@ -152,7 +152,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         zookeeper_tls_cert = get_default(self.config, 'zookeeper', 'tls_cert')
         zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
         zookeeper_timeout = float(get_default(self.config, 'zookeeper',
-                                              'session_timeout', 10.0))
+                                              'session_timeout', 40.0))
         zookeeper.connect(
             zookeeper_hosts,
             timeout=zookeeper_timeout,

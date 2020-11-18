@@ -189,7 +189,7 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
       with Nodepool.
 
    .. attr:: session_timeout
-      :default: 10.0
+      :default: 40.0
 
       The ZooKeeper session timeout, in seconds.
 

@@ -115,7 +115,7 @@ class ZooKeeper(object):
             self.log.warning("Retrying zookeeper connection")
             self._last_retry_log = now
 
-    def connect(self, hosts, read_only=False, timeout=10.0,
+    def connect(self, hosts, read_only=False, timeout=40.0,
                 tls_cert=None, tls_key=None, tls_ca=None):
         '''
         Establish a connection with ZooKeeper cluster.
