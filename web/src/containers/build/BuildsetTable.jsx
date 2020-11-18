@@ -31,7 +31,6 @@ import {
   CodeIcon,
   CubeIcon,
   PollIcon,
-  SearchIcon,
   StreamIcon,
 } from '@patternfly/react-icons'
 import {
@@ -87,12 +86,6 @@ function BuildsetTable({
           // cell, we must use the title attribute.
           title: (
             <>
-              <Link
-                to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
-                className="zuul-build-link"
-              >
-                <SearchIcon />
-              </Link>
               <Link
                 to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
                   style={{ textDecoration: 'none' }}

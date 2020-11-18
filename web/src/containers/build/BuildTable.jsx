@@ -33,7 +33,6 @@ import {
   OutlinedCalendarAltIcon,
   OutlinedClockIcon,
   PollIcon,
-  SearchIcon,
   StreamIcon,
 } from '@patternfly/react-icons'
 import {
@@ -106,12 +105,6 @@ function BuildTable({
           // cell, we must use the title attribute.
           title: (
             <>
-              <Link
-                to={`${tenant.linkPrefix}/build/${build.uuid}`}
-                className="zuul-build-link"
-              >
-                <SearchIcon />
-              </Link>
               <Link
                 to={`${tenant.linkPrefix}/build/${build.uuid}`}
                   style={{ textDecoration: 'none' }}
