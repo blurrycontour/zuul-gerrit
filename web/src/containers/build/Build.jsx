@@ -16,12 +16,13 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
+import { Button, ClipboardCopy, Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
 import {
   BookIcon,
   BuildIcon,
   CodeBranchIcon,
   CodeIcon,
+  CopyIcon,
   CubeIcon,
   FileCodeIcon,
   FingerprintIcon,
@@ -111,9 +112,8 @@ function Build({ build, tenant, timezone }) {
                 WrapElement={ListItem}
                 icon={<FingerprintIcon />}
                 value={
-                  <span>
-                    <strong>UUID </strong> {build.uuid} <br />
-                    <strong>Event ID </strong> {build.event_id} <br />
+                  <span><strong>UUID </strong><span class="guid">{build.uuid}</span> <Button icon={<CopyIcon />} variant="link" isInline isSmall></Button>
+                  <strong>Event ID </strong><span class="guid">{build.event_id}</span> <Button icon={<CopyIcon />} variant="link" isInline isSmall></Button>
                   </span>
                 }
               />
