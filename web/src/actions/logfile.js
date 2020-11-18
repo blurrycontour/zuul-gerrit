@@ -44,7 +44,7 @@ const receiveLogfile = (buildId, file, data) => {
 
   const out = data.split(/\r?\n/).map((line, idx) => {
     let m = null
-    let sev = null
+    let sev = 0
 
     m = SYSTEMD_LOGMATCH.exec(line)
     if (m) {
