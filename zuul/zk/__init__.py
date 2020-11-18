@@ -33,7 +33,7 @@ class ZooKeeperClient(object):
         self,
         hosts: str,
         read_only: bool = False,
-        timeout: float = 10.0,
+        timeout: float = 120.0,
         tls_cert: Optional[str] = None,
         tls_key: Optional[str] = None,
         tls_ca: Optional[str] = None,
