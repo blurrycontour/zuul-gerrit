@@ -16,6 +16,24 @@
       "revId": "5688c782a0e393dee33920b2262414f8528dc094",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fffc6b78_7b5913fd",
+        "filename": "web/src/actions/logfile.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2020-11-18T23:41:12Z",
+      "side": 1,
+      "message": "We tracked this down to \n\nhttps://review.opendev.org/#/c/455831/2/os_loganalyze/filter.py\n\nwhere the comment says \n\n\"We also have to realize that status might not be in a systemd line,\nand that\u0027s ok, but still match it, given that otherwise we run the\nrisk of falling into the syslog match.\"\n\nIn our case, we\u0027re really only interested in marking the line with a severity, whereas the os-loganalyze change was trying to parse out the date, host, etc.\n\nSo I don\u0027t think we want to ever match if there\u0027s no severity?",
+      "parentUuid": "fffc6b78_9bc15784",
+      "revId": "5688c782a0e393dee33920b2262414f8528dc094",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
