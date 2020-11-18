@@ -22,6 +22,7 @@ import {
   BuildIcon,
   CodeBranchIcon,
   CodeIcon,
+  CopyIcon,
   CubeIcon,
   FileCodeIcon,
   FingerprintIcon,
@@ -35,9 +36,22 @@ import 'moment-duration-format'
 
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalLink, ExternalLink } from '../../Misc'
+import useCopy from '@react-hook/copy'
 
 function Build({ build, tenant, timezone }) {
   const build_link = buildExternalLink(build)
+
+  const ClipboardCopy = (props) => {
+    const {copy} = useCopy(
+      props.value
+    )
+    return <a title="Copy to clipboard" href="#/" onClick={copy}><CopyIcon/></a>
+
+  }
+
+  ClipboardCopy.propTypes = {
+    value: PropTypes.string.isRequired,
+  }
 
   return (
     <>
@@ -111,9 +125,10 @@ function Build({ build, tenant, timezone }) {
                 WrapElement={ListItem}
                 icon={<FingerprintIcon />}
                 value={
-                  <span>
-                    <strong>UUID </strong> {build.uuid} <br />
-                    <strong>Event ID </strong> {build.event_id} <br />
+                  <span><strong>UUID </strong><span className="guid">{build.uuid}</span>
+                    <ClipboardCopy value={build.uuid}/>
+                    <strong> Event ID </strong><span className="guid">{build.event_id}</span>
+                    <ClipboardCopy value={build.event_id}/>
                   </span>
                 }
               />

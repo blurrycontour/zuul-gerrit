@@ -443,3 +443,40 @@ details.foldable[open] summary::before {
         );
     }
 }
+
+span.guid {
+    width: 4em;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+/* Reduce whitespace padding in order to make better use of screen
+on the summary page, reducing the need to have to scroll to find useful
+information.
+*/
+section.pf-c-page__main-section {
+    padding-top: 0.5em;
+    padding-bottom: 0;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+
+h2.pf-c-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    line-height: normal;
+}
+
+button.pf-tabs__link {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* Reduce leading between list items to 1/3 of patternfly defaults. This saves
+previous space while not keeping the readability.*/
+ul.pf-c-list li + li {
+    margin-top: calc(var(--pf-c-list--li--MarginTop) / 3);
+}
