@@ -51,7 +51,7 @@
     "start:multi": "REACT_APP_ZUUL_API='https://softwarefactory-project.io/zuul/api/' react-scripts start",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test --env=jsdom --watchAll=false",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .js --ext .jsx src"
   },
