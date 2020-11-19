@@ -31,7 +31,6 @@ import {
 } from '@patternfly/react-core'
 import {
   BuildIcon,
-  FileArchiveIcon,
   FileCodeIcon,
   TerminalIcon,
   PollIcon,
@@ -41,7 +40,6 @@ import { fetchBuildAllInfo } from '../actions/build'
 import { fetchLogfile } from '../actions/logfile'
 import { EmptyPage } from '../containers/Errors'
 import { Fetching } from '../containers/Fetching'
-import ArtifactList from '../containers/build/Artifact'
 import Build from '../containers/build/Build'
 import BuildOutput from '../containers/build/BuildOutput'
 import Console from '../containers/build/Console'
@@ -170,17 +168,6 @@ class BuildPage extends React.Component {
         </EmptyState>
       )
 
-    const artifactsTabContent = build.artifacts.length ? (
-      <ArtifactList artifacts={build.artifacts} />
-    ) : (
-      <EmptyState variant={EmptyStateVariant.small}>
-        <EmptyStateIcon icon={FileArchiveIcon} />
-        <Title headingLevel="h4" size="lg">
-          This build does not provide any artifacts
-        </Title>
-      </EmptyState>
-    )
-
     let logsTabContent = null
     if (build.manifest === undefined || isFetchingManifest) {
       logsTabContent = <Fetching />
@@ -252,19 +239,6 @@ class BuildPage extends React.Component {
               }
             >
               {resultsTabContent}
-            </Tab>
-            <Tab
-              eventKey="artifacts"
-              title={
-                <>
-                  <TabTitleIcon>
-                    <FileArchiveIcon />
-                  </TabTitleIcon>
-                  <TabTitleText>Artifacts</TabTitleText>
-                </>
-              }
-            >
-              {artifactsTabContent}
             </Tab>
             <Tab
               eventKey="logs"

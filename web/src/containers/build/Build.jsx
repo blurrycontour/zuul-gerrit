@@ -16,7 +16,8 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
+import { EmptyState,
+  EmptyStateVariant, EmptyStateIcon, Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
 import {
   BookIcon,
   BuildIcon,
@@ -25,6 +26,7 @@ import {
   CubeIcon,
   FileCodeIcon,
   FingerprintIcon,
+  FileArchiveIcon,
   HistoryIcon,
   OutlinedCalendarAltIcon,
   OutlinedClockIcon,
@@ -35,9 +37,22 @@ import 'moment-duration-format'
 
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalLink, ExternalLink } from '../../Misc'
+import ArtifactList from '../../containers/build/Artifact'
+
 
 function Build({ build, tenant, timezone }) {
   const build_link = buildExternalLink(build)
+
+  const artifactsTabContent = build.artifacts.length ? (
+    <ArtifactList artifacts={build.artifacts} />
+  ) : (
+    <EmptyState variant={EmptyStateVariant.small}>
+      <EmptyStateIcon icon={FileArchiveIcon} />
+      <Title headingLevel="h4" size="lg">
+        This build does not provide any artifacts
+      </Title>
+    </EmptyState>
+    )
 
   return (
     <>
@@ -116,12 +131,6 @@ function Build({ build, tenant, timezone }) {
                   </span>
                 }
               />
-            </List>
-          </FlexItem>
-        </Flex>
-        <Flex flex={{ lg: 'flex_1' }}>
-          <FlexItem>
-            <List style={{ listStyle: 'none' }}>
               <IconProperty
                 WrapElement={ListItem}
                 icon={<OutlinedCalendarAltIcon />}
@@ -150,6 +159,21 @@ function Build({ build, tenant, timezone }) {
                     {moment
                       .duration(build.duration, 'seconds')
                       .format('h [hr] m [min] s [sec]')}
+                  </>
+                }
+              />
+            </List>
+          </FlexItem>
+        </Flex>
+        <Flex flex={{ lg: 'flex_1' }}>
+          <FlexItem>
+            <List style={{ listStyle: 'none' }}>
+              <IconProperty
+                WrapElement={ListItem}
+                icon={<FileArchiveIcon />}
+                value={
+                  <><strong>Artifacts</strong>
+                    {artifactsTabContent}
                   </>
                 }
               />
