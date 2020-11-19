@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import threading
 from unittest.mock import patch
 
 import testtools
@@ -21,7 +22,7 @@ from zuul.driver import Driver, TriggerInterface
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import ZooKeeperClient, event_queues
 
-from tests.base import BaseTestCase
+from tests.base import BaseTestCase, iterate_timeout
 
 
 class EventQueueBaseTestCase(BaseTestCase):
@@ -365,3 +366,66 @@ class TestResultEventQueue(EventQueueBaseTestCase):
         self.assertEqual(acked, 1)
         self.assertEqual(len(queue), 0)
         self.assertFalse(queue.hasEvents())
+
+
+@patch.dict(event_queues.RESULT_EVENT_TYPE_MAP,
+            {"DummyResultEvent": DummyResultEvent})
+class TestEventWatchers(EventQueueBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.driver = DummyDriver()
+        self.connections.registerDriver(self.driver)
+
+    def _wait_for_event(self, event):
+        for _ in iterate_timeout(5, "event set"):
+            if event.is_set():
+                break
+
+    def test_global_event_watcher(self):
+        event = threading.Event()
+        event_queues.GlobalEventWatcher(self.zk_client, event.set)
+
+        management_queue = event_queues.GlobalManagementEventQueue(
+            self.zk_client
+        )
+        trigger_queue = event_queues.GlobalTriggerEventQueue(
+            self.zk_client, self.connections
+        )
+        self.assertFalse(event.is_set())
+
+        management_queue.put(model.ReconfigureEvent(None), needs_result=False)
+        self._wait_for_event(event)
+        event.clear()
+
+        trigger_queue.put(self.driver.driver_name, DummyTriggerEvent())
+        self._wait_for_event(event)
+
+    def test_pipeline_event_watcher(self):
+        event = threading.Event()
+        event_queues.PipelineEventWatcher(self.zk_client, event.set)
+
+        management_queues = (
+            event_queues.PipelineManagementEventQueue.createRegistry(
+                self.zk_client
+            )
+        )
+        trigger_queues = event_queues.PipelineTriggerEventQueue.createRegistry(
+            self.zk_client, self.connections
+        )
+        result_queues = event_queues.PipelineResultEventQueue.createRegistry(
+            self.zk_client
+        )
+        self.assertFalse(event.is_set())
+
+        management_queues["tenant"]["check"].put(model.ReconfigureEvent(None))
+        self._wait_for_event(event)
+        event.clear()
+
+        trigger_queues["tenant"]["gate"].put(self.driver.driver_name,
+                                             DummyTriggerEvent())
+        self._wait_for_event(event)
+        event.clear()
+
+        result_queues["other-tenant"]["post"].put(DummyResultEvent())
+        self._wait_for_event(event)
