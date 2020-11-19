@@ -3856,7 +3856,7 @@ class TestScheduler(zuul.scheduler.Scheduler):
 
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
-    wait_timeout = 90
+    wait_timeout = 120
 
     def attachLogs(self, *args):
         def reader():
