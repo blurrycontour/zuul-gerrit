@@ -15,7 +15,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import {
   Button,
   EmptyState,
@@ -85,16 +84,11 @@ function BuildsetTable({
           // To allow passing anything else than simple string values to a table
           // cell, we must use the title attribute.
           title: (
-            <>
-              <Link
-                to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
-                  style={{ textDecoration: 'none' }}
-              >
-              <BuildResultWithIcon result={buildset.result}>
-                {buildset.project}
-              </BuildResultWithIcon>
-              </Link>
-            </>
+            <BuildResultWithIcon
+              result={buildset.result}
+              link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}>
+              {buildset.project}
+            </BuildResultWithIcon>
           ),
         },
         {
@@ -108,14 +102,11 @@ function BuildsetTable({
         },
         {
             title: (
-                <>
-                  <Link
-                    to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
-                    style={{ textDecoration: 'none' }}
-                  >
-                  <BuildResult result={buildset.result} />
-                  </Link>
-                </>
+              <BuildResult
+                result={buildset.result}
+                link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
+              >
+              </BuildResult>
             ),
         },
       ],

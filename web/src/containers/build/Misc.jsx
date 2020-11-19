@@ -14,13 +14,17 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
-import { Label } from '@patternfly/react-core'
+import { Link } from 'react-router-dom'
+import {
+    Label,
+} from '@patternfly/react-core'
 import {
   CheckIcon,
   ExclamationIcon,
   QuestionIcon,
   TimesIcon,
 } from '@patternfly/react-icons'
+import { ConditionalWrapper } from '../../Misc'
 
 const RESULT_ICON_CONFIGS = {
   SUCCESS: {
@@ -82,15 +86,25 @@ const DEFAULT_RESULT_ICON_CONFIG = {
 }
 
 function BuildResult(props) {
-  const { result, colored = true } = props
+  const { result, link = undefined, colored = true } = props
   const iconConfig = RESULT_ICON_CONFIGS[result] || DEFAULT_RESULT_ICON_CONFIG
   const color = colored ? iconConfig.color : 'inherit'
 
-  return <span style={{ color: color }}>{result}</span>
+  return (
+    <span style={{ color: color }}>
+      <ConditionalWrapper
+        condition={link}
+        wrapper={children => <Link to={link} style={{ color: color }}>{children}</Link>}
+      >
+        {result}
+      </ConditionalWrapper>
+    </span>
+  )
 }
 
 BuildResult.propTypes = {
   result: PropTypes.string,
+  link: PropTypes.string,
   colored: PropTypes.bool,
 }
 
@@ -117,7 +131,7 @@ BuildResultBadge.propTypes = {
 }
 
 function BuildResultWithIcon(props) {
-  const { result, colored = true, size = 'sm' } = props
+  const { result, link = undefined, colored = true, size = 'sm' } = props
   const iconConfig = RESULT_ICON_CONFIGS[result] || DEFAULT_RESULT_ICON_CONFIG
 
   // Define the verticalAlign based on the size
@@ -132,20 +146,26 @@ function BuildResultWithIcon(props) {
 
   return (
     <span style={{ color: color }}>
-      <Icon
-        size={size}
-        style={{
-          marginRight: 'var(--pf-global--spacer--sm)',
-          verticalAlign: verticalAlign,
-        }}
-      />
-      {props.children}
+      <ConditionalWrapper
+        condition={link}
+        wrapper={children => <Link to={link} style={{ color: color }}>{children}</Link>}
+      >
+        <Icon
+          size={size}
+          style={{
+            marginRight: 'var(--pf-global--spacer--sm)',
+            verticalAlign: verticalAlign,
+          }}
+        />
+        {props.children}
+      </ConditionalWrapper>
     </span>
   )
 }
 
 BuildResultWithIcon.propTypes = {
   result: PropTypes.string,
+  link: PropTypes.string,
   colored: PropTypes.bool,
   size: PropTypes.string,
   children: PropTypes.node,
