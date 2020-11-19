@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fffc6b78_4907171e",
+        "filename": "web/src/actions/logfile.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-11-19T22:11:59Z",
+      "side": 0,
+      "message": "Nonetheless, shouldn\u0027t null still be replaced by 0?",
+      "range": {
+        "startLine": 47,
+        "startChar": 14,
+        "endLine": 47,
+        "endChar": 18
+      },
+      "revId": "8f0ade64e7072be0bc36deb852aa9e74ca45d211",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
