@@ -3865,7 +3865,7 @@ def cpu_times(self):
 
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
-    wait_timeout = 90
+    wait_timeout = 120
 
     def attachLogs(self, *args):
         def reader():
