@@ -15,7 +15,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import {
   Button,
   EmptyState,
@@ -105,15 +104,14 @@ function BuildTable({
           // cell, we must use the title attribute.
           title: (
             <>
-              <Link
-                to={`${tenant.linkPrefix}/build/${build.uuid}`}
-                  style={{ textDecoration: 'none' }}
+              <BuildResultWithIcon
+                result={build.result}
+                colored={build.voting}
+                link={`${tenant.linkPrefix}/build/${build.uuid}`}
               >
-              <BuildResultWithIcon result={build.result} colored={build.voting}>
                 {build.job_name}
                 {!build.voting && ' (non-voting)'}
               </BuildResultWithIcon>
-              </Link>
             </>
           ),
         },
@@ -142,14 +140,11 @@ function BuildTable({
         },
         {
             title: (
-                <>
-                  <Link
-                    to={`${tenant.linkPrefix}/build/${build.uuid}`}
-                    style={{ textDecoration: 'none' }}
-                   >
-                     <BuildResult result={build.result} colored={build.voting} />
-                  </Link>
-               </>
+              <BuildResult
+                result={build.result}
+                link={`${tenant.linkPrefix}/build/${build.uuid}`}
+                colored={build.voting}
+              />
             ),
         },
       ],
