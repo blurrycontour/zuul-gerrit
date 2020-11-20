@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fffc6b78_478edb78",
+        "filename": "web/src/containers/build/Misc.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2020-11-20T07:30:19Z",
+      "side": 1,
+      "message": "I would use a simple `null` value here.",
+      "revId": "2a7b820e02c832119cfbc1a62e537916b43ecc6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
