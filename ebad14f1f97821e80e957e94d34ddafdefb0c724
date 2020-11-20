@@ -22,6 +22,23 @@
       "revId": "ebad14f1f97821e80e957e94d34ddafdefb0c724",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fffc6b78_365147da",
+        "filename": "web/.eslintrc",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-11-20T14:46:39Z",
+      "side": 0,
+      "message": "We disagree about this, and that\u0027s okay.  I stand by the commit message which represents the traditional shared values of the Zuul maintainers of avoiding nitpicky arguments in favor of substance.  However, if the majority of maintainers have changed their feelings and would prefer to impose a style on contributors, then I will not oppose that as long as someone has done the work to reconcile editor settings and the eslint config.  As it stands, the eslint config contradicts the default in emacs which is used by at least 2 of the original js contributors.",
+      "revId": "ebad14f1f97821e80e957e94d34ddafdefb0c724",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
