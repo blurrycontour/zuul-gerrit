@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fffc6b78_16aec3e6",
+        "filename": "web/.eslintrc",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-11-20T14:38:37Z",
+      "side": 0,
+      "message": "I am ok to respect any kind of indentation as long it is consistent. Having noise about it is a waste of time and makes harder to integrate changes.\n\nIf the cores decide they want foo-style, it should be enforced. Eslint is very good at reformatting.",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 41
+      },
+      "revId": "ebad14f1f97821e80e957e94d34ddafdefb0c724",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
