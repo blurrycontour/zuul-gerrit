@@ -661,26 +661,38 @@ class Repo(object):
                             'utf-8')
         return (ret, commit_hexsha)
 
-    def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
+    def getFilesChanges(self, refA, refB=None, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
-        self.fetch(branch, zuul_event_id=zuul_event_id)
-        head = repo.commit(
-            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
-        files = set()
-
-        if tosha:
-            self.fetch(tosha, zuul_event_id=zuul_event_id)
-            tosha_commit = repo.commit(
+        commitA = None
+        commitB = None
+        if refA and refA != (40 * '0'):
+            self.fetch(refA, zuul_event_id=zuul_event_id)
+            commitA = repo.commit(
                 self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
-            for x in head.diff(tosha_commit):
+        if refB and refB != (40 * '0'):
+            self.fetch(refB, zuul_event_id=zuul_event_id)
+            commitB = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+
+        files = set()
+        if commitA and commitB:
+            for x in commitA.diff(commitB):
                 if x.a_blob is not None:
                     files.add(x.a_blob.path)
                 if x.b_blob is not None:
                     files.add(x.b_blob.path)
-        else:
-            for item in head.tree.traverse():
+        elif commitA:
+            for item in commitA.tree.traverse():
                 if item.type == 'blob':
                     files.add(item.path)
+        elif commitB:
+            for item in commitB.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
+        else:
+            log.warning("refA:%s and refB:%s are not valid", refA, refB)
+
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
