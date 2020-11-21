@@ -664,28 +664,36 @@ class Repo(object):
 
     def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
-        self.fetch(branch, zuul_event_id=zuul_event_id)
-        head = repo.commit(
-            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
-        files = set()
-
-        if tosha:
+        branch_commit = None
+        tosha_commit = None
+        if branch and branch != (40 * '0'):
+            self.fetch(branch, zuul_event_id=zuul_event_id)
+            branch_commit = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+        if tosha and tosha != (40 * '0'):
             self.fetch(tosha, zuul_event_id=zuul_event_id)
             tosha_commit = repo.commit(
                 self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
-            for x in head.diff(tosha_commit):
+
+        files = set()
+
+        def list_paths(root_tree, path=Path(".")):
+            for blob in root_tree.blobs:
+                yield str(path / blob.name)
+            for tree in root_tree.trees:
+                yield from list_paths(tree, path / tree.name)
+
+        if branch_commit and tosha_commit:
+            for x in branch_commit.diff(tosha_commit):
                 if x.a_blob is not None and x.a_blob.path not in files:
                     files.add(x.a_blob.path)
                 if x.b_blob is not None and x.b_blob.path not in files:
                     files.add(x.b_blob.path)
-        else:
-            def list_paths(root_tree, path=Path(".")):
-                for blob in root_tree.blobs:
-                    yield str(path / blob.name)
-                for tree in root_tree.trees:
-                    yield from list_paths(tree, path / tree.name)
-
-            for commit_tree_file in list_paths(head.tree):
+        elif branch_commit:
+            for commit_tree_file in list_paths(branch_commit.tree):
+                files.add(commit_tree_file)
+        elif tosha_commit:
+            for commit_tree_file in list_paths(tosha_commit.tree):
                 files.add(commit_tree_file)
         return list(files)
 
