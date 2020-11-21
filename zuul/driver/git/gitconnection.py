@@ -64,9 +64,9 @@ class GitConnection(BaseConnection):
     def addProject(self, project):
         self.projects[project.name] = project
 
-    def getChangeFilesUpdated(self, project_name, branch, tosha):
+    def getChangeFilesUpdated(self, project_name, oldrev, newrev):
         job = self.sched.merger.getFilesChanges(
-            self.connection_name, project_name, branch, tosha)
+            self.connection_name, project_name, oldrev, newrev)
         self.log.debug("Waiting for fileschanges job %s" % job)
         job.wait()
         if not job.updated:
@@ -113,7 +113,7 @@ class GitConnection(BaseConnection):
                 setattr(change, attr, getattr(event, attr))
             change.url = ""
             change.files = self.getChangeFilesUpdated(
-                event.project_name, change.branch, event.oldrev)
+                event.project_name, event.oldrev, event.newrev)
             self._change_cache.setdefault(branch, {})[event.newrev] = change
         elif event.ref and event.ref.startswith('refs/tags/'):
             # catch-all ref (ie, not a branch or head)
