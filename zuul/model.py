@@ -3308,15 +3308,20 @@ class AbstractEvent(abc.ABC):
     """Base class defining the interface for all events."""
 
     # Opaque identifier in order to acknowledge an event
-    ack_ref: Optional[Any]
+    ack_ref: Optional[Any] = None
+    zuul_event_id: Optional[str] = None
+    # Logical timestamp of the event.
+    zuul_cache_ltime: int = 0
 
-    @abc.abstractmethod
     def toDict(self) -> Dict[str, Any]:
-        pass
+        return {
+            "zuul_event_id": self.zuul_event_id,
+            "zuul_cache_ltime": self.zuul_cache_ltime,
+        }
 
-    @abc.abstractmethod
     def updateFromDict(self, d: Dict[str, Any]) -> None:
-        pass
+        self.zuul_event_id = d.get("zuul_event_id")
+        self.zuul_cache_ltime = d.get("zuul_cache_ltime", 0)
 
     @classmethod
     def fromDict(
@@ -3332,20 +3337,11 @@ class ManagementEvent(AbstractEvent):
 
     def __init__(self):
         self.traceback: Optional[str] = None
-        self.zuul_event_id = None
         # Opaque identifier in order to report the result of an event
         self.result_ref: Optional[Any] = None
 
     def exception(self, tb: str):
         self.traceback = tb
-
-    def toDict(self) -> Dict[str, Any]:
-        return {
-            "zuul_event_id": self.zuul_event_id,
-        }
-
-    def updateFromDict(self, d: Dict[str, Any]) -> None:
-        self.zuul_event_id = d.get("zuul_event_id")
 
 
 class ReconfigureEvent(ManagementEvent):
@@ -3735,12 +3731,12 @@ class TriggerEvent(AbstractEvent):
         # an admin command, etc):
         self.forced_pipeline = None
         # For logging
-        self.zuul_event_id = None
         self.timestamp = None
         self.driver_name: Optional[str] = None
 
     def toDict(self) -> Dict[str, Any]:
-        return {
+        d = super().toDict()
+        d.update({
             "data": self.data,
             "type": self.type,
             "branch_updated": self.branch_updated,
@@ -3762,11 +3758,12 @@ class TriggerEvent(AbstractEvent):
             "oldrev": self.oldrev,
             "newrev": self.newrev,
             "forced_pipeline": self.forced_pipeline,
-            "zuul_event_id": self.zuul_event_id,
             "timestamp": self.timestamp,
-        }
+        })
+        return d
 
     def updateFromDict(self, d: Dict[str, Any]) -> None:
+        super().updateFromDict(d)
         self.data = d.get("data")
         self.type = d.get("type")
         self.branch_updated = d.get("branch_updated", False)
@@ -3788,7 +3785,6 @@ class TriggerEvent(AbstractEvent):
         self.oldrev = d.get("oldrev")
         self.newrev = d.get("newrev")
         self.forced_pipeline = d.get("forced_pipeline")
-        self.zuul_event_id = d.get("zuul_event_id")
         self.timestamp = d.get("timestamp")
 
     @property
