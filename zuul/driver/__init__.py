@@ -13,7 +13,7 @@
 # under the License.
 
 import abc
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Generic, NamedTuple, Optional, Type, TypeVar
 
 import voluptuous
 from zuul.reporter import BaseReporter
@@ -312,3 +312,11 @@ class AuthenticatorInterface(object, metaclass=abc.ABCMeta):
         :rtype: list
         """
         raise NotImplementedError
+
+
+ChangeT = TypeVar("ChangeT", bound=model.Change)
+
+
+class ChangeCacheItem(NamedTuple, Generic[ChangeT]):
+    change: ChangeT
+    ltime: int

@@ -217,7 +217,7 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
 
     def _iter_events(
         self,
-    ) -> Generator[Tuple[Dict[str, Any], EventAckRef], None, None]:
+    ) -> Generator[Tuple[Dict[str, Any], ZnodeStat, EventAckRef], None, None]:
         try:
             events = self.kazoo_client.get_children(self.event_root)
         except NoNodeError:
@@ -238,7 +238,7 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
                 self.log.exception("Malformed event data in %s", path)
                 self._remove(path)
                 continue
-            yield event, EventAckRef(path, zstat.version)
+            yield event, zstat, EventAckRef(path, zstat.version)
 
     def _remove(self, path: str) -> None:
         with suppress(NoNodeError):
@@ -320,7 +320,7 @@ class ManagementEventQueue(ZooKeeperEventQueue[model.ManagementEvent]):
 
     def __iter__(self) -> Generator[model.ManagementEvent, None, None]:
         event_list: List[model.ManagementEvent] = []
-        for data, ack_ref in self._iter_events():
+        for data, zstat, ack_ref in self._iter_events():
             try:
                 event_class = MANAGEMENT_EVENT_TYPE_MAP[data["event_type"]]
                 event_data = data["event_data"]
@@ -332,6 +332,7 @@ class ManagementEventQueue(ZooKeeperEventQueue[model.ManagementEvent]):
             event = event_class.fromDict(event_data)
             event.ack_ref = ack_ref
             event.result_ref = result_path
+            event.zuul_cache_ltime = event.zuul_cache_ltime or zstat.czxid
 
             with suppress(ValueError):
                 other_event = event_list[event_list.index(event)]
@@ -431,7 +432,7 @@ class PipelineResultEventQueue(ZooKeeperEventQueue[model.ResultEvent]):
         self._put(data)
 
     def __iter__(self) -> Generator[model.ResultEvent, None, None]:
-        for data, ack_ref in self._iter_events():
+        for data, zstat, ack_ref in self._iter_events():
             try:
                 event_class = RESULT_EVENT_TYPE_MAP[data["event_type"]]
                 event_data = data["event_data"]
@@ -441,6 +442,7 @@ class PipelineResultEventQueue(ZooKeeperEventQueue[model.ResultEvent]):
                 continue
             event = event_class.fromDict(event_data)
             event.ack_ref = ack_ref
+            event.zuul_cache_ltime = event.zuul_cache_ltime or zstat.czxid
             yield event
 
 
@@ -466,7 +468,7 @@ class TriggerEventQueue(ZooKeeperEventQueue[model.TriggerEvent]):
         self._put(data)
 
     def __iter__(self) -> Generator[model.TriggerEvent, None, None]:
-        for data, ack_ref in self._iter_events():
+        for data, zstat, ack_ref in self._iter_events():
             try:
                 event_class = self.connections.getTriggerEventClass(
                     data["driver_name"]
@@ -479,6 +481,7 @@ class TriggerEventQueue(ZooKeeperEventQueue[model.TriggerEvent]):
             event = event_class.fromDict(event_data)
             event.ack_ref = ack_ref
             event.driver_name = data["driver_name"]
+            event.zuul_cache_ltime = event.zuul_cache_ltime or zstat.czxid
             yield event
 
 
