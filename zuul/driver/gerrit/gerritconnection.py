@@ -36,6 +36,7 @@ from uuid import uuid4
 
 from zuul import version as zuul_version
 from zuul.connection import BaseConnection
+from zuul.driver import ChangeCacheItem
 from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
@@ -542,7 +543,9 @@ class GerritConnection(BaseConnection):
                                                   default_gitweb_url_template)
         self.gitweb_url_template = url_template
 
-        self._change_cache = {}
+        self._change_cache: Dict[
+            str, Dict[str, ChangeCacheItem[GerritChange]]
+        ] = {}
         self.projects = {}
         self.gerrit_event_connector = None
         self.source = driver.getSource(self)
@@ -693,8 +696,8 @@ class GerritConnection(BaseConnection):
         # list should be safe to remove from the cache.
         remove = {}
         for change_number, patchsets in self._change_cache.items():
-            for patchset, change in patchsets.items():
-                if change not in relevant:
+            for patchset, cache_item in patchsets.items():
+                if cache_item.change not in relevant:
                     remove.setdefault(change_number, [])
                     remove[change_number].append(patchset)
         for change_number, patchsets in remove.items():
@@ -751,17 +754,27 @@ class GerritConnection(BaseConnection):
         # Ensure number and patchset are str
         number = str(number)
         patchset = str(patchset)
-        change = self._change_cache.get(number, {}).get(patchset)
-        if change and not refresh:
-            return change
-        if not change:
+        cache_item = self._change_cache.get(number, {}).get(patchset)
+        if cache_item:
+            outdated = (
+                cache_item.ltime < event.zuul_cache_ltime if event else False
+            )
+            if not (refresh or outdated):
+                return cache_item.change
+            change = cache_item.change
+        else:
             change = GerritChange(None)
             change.number = number
             change.patchset = patchset
+        ltime = self.sched.zk_client.zxid
         self._change_cache.setdefault(change.number, {})
-        self._change_cache[change.number][change.patchset] = change
+        self._change_cache[change.number][change.patchset] = (
+            ChangeCacheItem(change, ltime)
+        )
         try:
             self._updateChange(change, event, history)
+            if event:
+                event.zuul_cache_ltime = ltime
         except Exception:
             if self._change_cache.get(change.number, {}).get(change.patchset):
                 del self._change_cache[change.number][change.patchset]

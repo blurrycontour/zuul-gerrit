@@ -1094,7 +1094,7 @@ class Scheduler(threading.Thread):
             return
 
         try:
-            change = project.source.getChange(event, refresh=True)
+            change = project.source.getChange(event)
         except exceptions.ChangeNotFound as e:
             log.debug("Unable to get change %s from source %s",
                       e.change, project.source)
@@ -1178,9 +1178,7 @@ class Scheduler(threading.Thread):
         if project is None:
             return
         try:
-            # We need to refresh the changes here as we can not be sure it is
-            # up to date in a multi-scheduler setup.
-            change = project.source.getChange(event, refresh=True)
+            change = project.source.getChange(event)
         except exceptions.ChangeNotFound as e:
             log.debug("Unable to get change %s from source %s",
                       e.change, project.source)
