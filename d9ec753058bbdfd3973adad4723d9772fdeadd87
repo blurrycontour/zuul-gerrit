@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d03c9d30_3f1807e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-11-23T14:46:05Z",
+      "side": 1,
+      "message": "nit: duplicated message",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 40
+      },
+      "revId": "d9ec753058bbdfd3973adad4723d9772fdeadd87",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c82014fa_bf1a4407",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-11-23T14:46:05Z",
+      "side": 1,
+      "message": "Doesn\u0027t python typing infer those simple types? Mypy seems to work without the annotation, for example:\n\n  class Test:\n      def __init__(self) -\u003e None:\n          self.daemon \u003d True\n\n  reveal_type(Test().daemon)\n  # note: Revealed type is \u0027builtins.bool\u0027",
+      "range": {
+        "startLine": 309,
+        "startChar": 8,
+        "endLine": 309,
+        "endChar": 32
+      },
+      "revId": "d9ec753058bbdfd3973adad4723d9772fdeadd87",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
