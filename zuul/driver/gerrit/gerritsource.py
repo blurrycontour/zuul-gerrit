@@ -110,7 +110,7 @@ class GerritSource(BaseSource):
     def getCachedChanges(self):
         for x in list(self.connection._change_cache.values()):
             for y in list(x.values()):
-                yield y
+                yield y.change
 
     def getProject(self, name: str) -> Project:
         p = self.connection.getProject(name)

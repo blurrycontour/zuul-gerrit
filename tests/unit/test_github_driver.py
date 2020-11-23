@@ -176,7 +176,7 @@ class TestGithubDriver(ZuulTestCase):
             self.waitUntilSettled()
         # Initial update of change, refresh in global trigger queue and
         # refresh in pipeline queue.
-        self.assertEqual(3, files_mock.call_count)
+        self.assertEqual(1, files_mock.call_count)
         self.assertEqual(2, len(self.history))
 
     @simple_layout('layouts/basic-github.yaml', driver='github')

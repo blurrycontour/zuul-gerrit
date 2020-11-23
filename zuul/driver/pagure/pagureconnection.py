@@ -19,13 +19,14 @@ import threading
 import time
 import re
 import json
-from typing import List
+from typing import Any, Dict, List, Tuple
 import requests
 import cherrypy
 import kazoo.exceptions
 import voluptuous as v
 
 from zuul.connection import BaseConnection
+from zuul.driver import ChangeCacheItem
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.named_queue import NamedQueue
 from zuul.web.handler import BaseWebController
@@ -514,7 +515,7 @@ class PagureConnection(BaseConnection):
     def __init__(self, driver, connection_name, connection_config):
         super(PagureConnection, self).__init__(
             driver, connection_name, connection_config)
-        self._change_cache = {}
+        self._change_cache: Dict[Tuple[Any], ChangeCacheItem[PullRequest]] = {}
         self.project_branch_cache = {}
         self.projects = {}
         self.server = self.connection_config.get('server', 'pagure.io')
@@ -598,8 +599,8 @@ class PagureConnection(BaseConnection):
 
     def maintainCache(self, relevant):
         remove = set()
-        for key, change in self._change_cache.items():
-            if change not in relevant:
+        for key, cache_item in self._change_cache.items():
+            if cache_item.change not in relevant:
                 remove.add(key)
         for key in remove:
             del self._change_cache[key]
@@ -682,11 +683,16 @@ class PagureConnection(BaseConnection):
     def _getChange(self, project, number, patchset=None,
                    refresh=False, url=None, event=None):
         key = (project.name, number, patchset)
-        change = self._change_cache.get(key)
-        if change and not refresh:
-            self.log.debug("Getting change from cache %s" % str(key))
-            return change
-        if not change:
+        cache_item = self._change_cache.get(key)
+        if cache_item:
+            outdated = (
+                cache_item.ltime < event.zuul_cache_ltime if event else False
+            )
+            if not (refresh or outdated):
+                self.log.debug("Getting change from cache %s", key)
+                return cache_item.change
+            change = cache_item.change
+        else:
             change = PullRequest(project.name)
             change.project = project
             change.number = number
@@ -696,11 +702,14 @@ class PagureConnection(BaseConnection):
             change.uris = [
                 '%s/%s/pull/%s' % (self.baseurl, project, number),
             ]
-        self._change_cache[key] = change
+        ltime = self.sched.zk_client.zxid
+        self._change_cache[key] = ChangeCacheItem(change, ltime)
         try:
             self.log.debug("Getting change pr#%s from project %s" % (
                 number, project.name))
             self._updateChange(change, event)
+            if event:
+                event.zuul_cache_ltime = ltime
         except Exception:
             if key in self._change_cache:
                 del self._change_cache[key]
@@ -839,7 +848,8 @@ class PagureConnection(BaseConnection):
         # a the depends-on string in PR initial message. Not a blocker
         # for now, let's workaround using the local change cache !
         changes_dependencies = []
-        for cached_change_id, _change in self._change_cache.items():
+        for cached_change_id, cache_item in self._change_cache.items():
+            _change = cache_item.change
             for dep_header in dependson.find_dependency_headers(
                     _change.message):
                 if change.url in dep_header:
