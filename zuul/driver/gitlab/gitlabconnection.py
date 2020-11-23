@@ -25,9 +25,10 @@ import requests
 import dateutil.parser
 
 from urllib.parse import quote_plus
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from zuul.connection import CachedBranchConnection
+from zuul.driver import ChangeCacheItem
 from zuul.lib.named_queue import NamedQueue
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
@@ -431,7 +432,7 @@ class GitlabConnection(CachedBranchConnection):
         super(GitlabConnection, self).__init__(
             driver, connection_name, connection_config)
         self.projects = {}
-        self._change_cache = {}
+        self._change_cache: Dict[str, ChangeCacheItem[MergeRequest]] = {}
         self.server = self.connection_config.get('server', 'gitlab.com')
         self.baseurl = self.connection_config.get(
             'baseurl', 'https://%s' % self.server).rstrip('/')
@@ -548,11 +549,16 @@ class GitlabConnection(CachedBranchConnection):
                    refresh=False, url=None, event=None):
         log = get_annotated_logger(self.log, event)
         key = (project.name, str(number), str(patch_number))
-        change = self._change_cache.get(key)
-        if change and not refresh:
-            log.debug("Getting change from cache %s" % str(key))
-            return change
-        if not change:
+        cache_item = self._change_cache.get(key)
+        if cache_item:
+            outdated = (
+                cache_item.ltime < event.zuul_cache_ltime if event else False
+            )
+            if not (refresh or outdated):
+                self.log.debug("Getting change from cache %s", key)
+                return cache_item.change
+            change = cache_item.change
+        else:
             change = MergeRequest(project.name)
             change.project = project
             change.number = number
@@ -560,11 +566,14 @@ class GitlabConnection(CachedBranchConnection):
             change.patchset = patch_number
             change.url = url or self.getMRUrl(project.name, number)
             change.uris = [change.url.split('://', 1)[-1]]  # remove scheme
-        self._change_cache[key] = change
+        ltime = self.sched.zk_client.zxid
+        self._change_cache[key] = ChangeCacheItem(change, ltime)
         try:
             log.debug("Getting change mr#%s from project %s" % (
                 number, project.name))
             self._updateChange(change, event)
+            if event:
+                event.zuul_cache_ltime = ltime
         except Exception:
             if key in self._change_cache:
                 del self._change_cache[key]

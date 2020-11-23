@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import logging
+import re
 import threading
 import time
 from abc import ABCMeta
@@ -119,6 +120,19 @@ class ZooKeeperClient(object):
     @property
     def lost(self):
         return not self.client or self.client.state == KazooState.LOST
+
+    @property
+    def zxid(self) -> int:
+        """Current logical timestamp as seen by the Zookeeper cluster."""
+        if not self.client:
+            raise NoClientException()
+
+        result = self.client.command(b"srvr")
+        for line in result.splitlines():
+            match = re.match(r"zxid:\s+0x(?P<zxid>[a-f0-9])", line, re.I)
+            if match:
+                return int(match.group("zxid"), 16)
+        raise RuntimeError("Could not find zxid in Zookeeper stat output")
 
     def logConnectionRetryEvent(self):
         now = time.monotonic()
