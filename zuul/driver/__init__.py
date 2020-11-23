@@ -13,6 +13,7 @@
 # under the License.
 
 import abc
+from collections import namedtuple
 from typing import Any, Dict, Optional, Type
 
 import voluptuous
@@ -312,3 +313,13 @@ class AuthenticatorInterface(object, metaclass=abc.ABCMeta):
         :rtype: list
         """
         raise NotImplementedError
+
+
+# FIXME(swest):
+# use proper type annotations after Zuul has dropped support for Python 3.6
+#
+# ChangeT = TypeVar("ChangeT", bound=model.Change)
+# class ChangeCacheItem(Generic[ChangeT], NamedTuple):
+    # change: ChangeT
+    # ltime: int
+ChangeCacheItem = namedtuple("ChangeCacheItem", ["change", "ltime"])
