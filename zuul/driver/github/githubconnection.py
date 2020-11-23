@@ -23,7 +23,7 @@ import time
 import json
 from collections import OrderedDict
 from json.decoder import JSONDecodeError
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import cherrypy
 import cachecontrol
@@ -40,6 +40,7 @@ import github3.pulls
 from github3.session import AppInstallationTokenAuth
 
 from zuul.connection import CachedBranchConnection
+from zuul.driver import ChangeCacheItem
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.lib.named_queue import NamedQueue
 from zuul.web.handler import BaseWebController
@@ -1183,7 +1184,7 @@ class GithubConnection(CachedBranchConnection):
     def __init__(self, driver, connection_name, connection_config):
         super(GithubConnection, self).__init__(driver, connection_name,
                                                connection_config)
-        self._change_cache = {}
+        self._change_cache: Dict[str, ChangeCacheItem[PullRequest]] = {}
         self._change_update_lock = {}
         self.projects = {}
         self.git_ssh_key = self.connection_config.get('sshkey')
@@ -1275,8 +1276,8 @@ class GithubConnection(CachedBranchConnection):
 
     def maintainCache(self, relevant):
         remove = set()
-        for key, change in self._change_cache.items():
-            if change not in relevant:
+        for key, cache_item in self._change_cache.items():
+            if cache_item.change not in relevant:
                 remove.add(key)
         for key in remove:
             del self._change_cache[key]
@@ -1319,15 +1320,24 @@ class GithubConnection(CachedBranchConnection):
         # enqueue event) where some might just parse the string and forward it.
         number = int(number)
         key = (project.name, number, patchset)
-        change = self._change_cache.get(key)
-        if change and not refresh:
-            return change
-        if not change:
+        cache_item = self._change_cache.get(key)
+        if cache_item:
+            event_ltime = getattr(event, "zuul_cache_ltime", None)
+            outdated = (
+                cache_item.ltime < event_ltime
+                if event_ltime is not None else False
+            )
+            if not (refresh or outdated):
+                return cache_item.change
+            change = cache_item.change
+        else:
             change = PullRequest(project.name)
             change.project = project
             change.number = number
             change.patchset = patchset
-        self._change_cache[key] = change
+
+        ltime = self.sched.zk_client.zxid
+        self._change_cache[key] = ChangeCacheItem(change, ltime)
         try:
             # This can be called multi-threaded during github event
             # preprocessing. In order to avoid data races perform locking
@@ -1338,6 +1348,8 @@ class GithubConnection(CachedBranchConnection):
             if lock.acquire(blocking=False):
                 try:
                     self._updateChange(change, event)
+                    if hasattr(event, "zuul_cache_ltime"):
+                        event.zuul_cache_ltime = ltime
                 finally:
                     # We need to remove the lock here again so we don't leak
                     # them.
