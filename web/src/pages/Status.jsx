@@ -28,6 +28,7 @@ import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'
 import { Fetchable } from '../containers/Fetching'
+import { removeHash } from '../Misc'
 
 
 class StatusPage extends React.Component {
@@ -57,7 +58,6 @@ class StatusPage extends React.Component {
   constructor () {
     super()
 
-    this.filterLoaded = false
     this.timer = null
     this.visible = true
 
@@ -125,9 +125,15 @@ class StatusPage extends React.Component {
   }
 
   setFilter = (filter) => {
+    // Update form ref value
     this.filter.value = filter
+    // Store value in location
+    if (filter) {
+      window.location.hash = '#' + filter
+    } else {
+      removeHash()
+    }
     this.setState({filter: filter})
-    localStorage.setItem('zuul_filter_string', filter)
   }
 
   handleKeyPress = (e) => {
@@ -144,14 +150,10 @@ class StatusPage extends React.Component {
   }
 
   loadState = () => {
-    let filter = localStorage.getItem('zuul_filter_string') || ''
+    const filter = this.props.location.hash ? this.props.location.hash.slice(1) : null
     let expanded = localStorage.getItem('zuul_expand_by_default') || false
     if (typeof expanded === 'string') {
       expanded = (expanded === 'true')
-    }
-
-    if (this.props.location.hash) {
-      filter = this.props.location.hash.slice(1)
     }
     if (filter || expanded) {
       this.setState({
@@ -193,10 +195,6 @@ class StatusPage extends React.Component {
     const { remoteData } = this.props
     const { filter, expanded } = this.state
     const status = remoteData.status
-    if (this.filter && !this.filterLoaded && filter) {
-      this.filterLoaded = true
-      this.filter.value = filter
-    }
     const statusControl = (
       <Form inline>
         <FormGroup controlId='status'>
