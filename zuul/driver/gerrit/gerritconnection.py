@@ -1156,7 +1156,7 @@ class GerritConnection(BaseConnection):
         args = '--all-approvals --comments --commit-message'
         args += ' --current-patch-set --dependencies --files'
         args += ' --patch-sets --submit-records'
-        cmd = 'gerrit query --format json %s %s' % (args, number)
+        cmd = 'gerrit query --format json %s change:%s' % (args, number)
         out, err = self._ssh(cmd)
         if not out:
             return False
