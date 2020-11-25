@@ -12,18 +12,25 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 
 import testtools
 
-from zuul import model
-import zuul.zk.exceptions
-
 from tests.base import BaseTestCase
+
+from zuul import model
 from zuul.zk import ZooKeeperClient
+from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.sharding import (
+    RawShardIO,
+    BufferedShardReader,
+    BufferedShardWriter,
+    NODE_BYTE_SIZE_LIMIT,
+)
 
 
-class TestZK(BaseTestCase):
+class ZooKeeperBaseTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
@@ -35,9 +42,15 @@ class TestZK(BaseTestCase):
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
             tls_key=self.zk_chroot_fixture.zookeeper_key,
             tls_ca=self.zk_chroot_fixture.zookeeper_ca)
-        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
+
+
+class TestNodepool(ZooKeeperBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
 
     def _createRequest(self):
         req = model.HoldRequest()
@@ -72,8 +85,7 @@ class TestZK(BaseTestCase):
         # Test lock operations
         self.zk_nodepool.lockHoldRequest(req2, blocking=False)
         with testtools.ExpectedException(
-            zuul.zk.exceptions.LockException,
-            "Timeout trying to acquire lock .*"
+            LockException, "Timeout trying to acquire lock .*"
         ):
             self.zk_nodepool.lockHoldRequest(req2, blocking=True, timeout=2)
         self.zk_nodepool.unlockHoldRequest(req2)
@@ -82,3 +94,63 @@ class TestZK(BaseTestCase):
         # Test deleting the request
         self.zk_nodepool.deleteHoldRequest(req1)
         self.assertEqual([], self.zk_nodepool.getHoldRequests())
+
+
+class TestSharding(ZooKeeperBaseTestCase):
+
+    def test_reader(self):
+        shard_io = RawShardIO(self.zk_client.client, "/test/shards")
+        self.assertEqual(len(shard_io._shards), 0)
+
+        with BufferedShardReader(
+            self.zk_client.client, "/test/shards"
+        ) as shard_reader:
+            self.assertEqual(shard_reader.read(), b"")
+            shard_io.write(b"foobar")
+            self.assertEqual(len(shard_io._shards), 1)
+
+            self.assertEqual(shard_io.read(), b"foobar")
+
+    def test_writer(self):
+        shard_io = RawShardIO(self.zk_client.client, "/test/shards")
+        self.assertEqual(len(shard_io._shards), 0)
+
+        with BufferedShardWriter(
+            self.zk_client.client, "/test/shards"
+        ) as shard_writer:
+            shard_writer.write(b"foobar")
+
+        self.assertEqual(len(shard_io._shards), 1)
+        self.assertEqual(shard_io.read(), b"foobar")
+
+    def test_truncate(self):
+        shard_io = RawShardIO(self.zk_client.client, "/test/shards")
+        shard_io.write(b"foobar")
+        self.assertEqual(len(shard_io._shards), 1)
+
+        with BufferedShardWriter(
+            self.zk_client.client, "/test/shards"
+        ) as shard_writer:
+            shard_writer.truncate(0)
+
+        self.assertEqual(len(shard_io._shards), 0)
+
+    def test_shard_bytes_limit(self):
+        with BufferedShardWriter(
+            self.zk_client.client, "/test/shards"
+        ) as shard_writer:
+            shard_writer.write(b"x" * (NODE_BYTE_SIZE_LIMIT + 1))
+            shard_writer.flush()
+            self.assertEqual(len(shard_writer.raw._shards), 2)
+
+    def test_json(self):
+        data = {"key": "value"}
+        with BufferedShardWriter(
+            self.zk_client.client, "/test/shards"
+        ) as shard_io:
+            shard_io.write(json.dumps(data).encode("utf8"))
+
+        with BufferedShardReader(
+            self.zk_client.client, "/test/shards"
+        ) as shard_io:
+            self.assertDictEqual(json.load(shard_io), data)
