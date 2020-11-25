@@ -12,16 +12,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 
 import testtools
 
+from tests.base import BaseTestCase, ChrootedKazooFixture, iterate_timeout
 from tests.zk import TestZooKeeperClient
 from zuul import model
-import zuul.zk.exceptions
-
-from tests.base import BaseTestCase, ChrootedKazooFixture, iterate_timeout
 from zuul.zk.builds import BuildQueue, BuildState
+from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepool
+from zuul.zk.sharding import BufferedShardIO, NODE_BYTE_SIZE_LIMIT
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -77,8 +78,7 @@ class TestZK(ZooKeeperBaseTestCase):
         # Test lock operations
         self.zk_nodepool.lockHoldRequest(req2, blocking=False)
         with testtools.ExpectedException(
-            zuul.zk.exceptions.LockException,
-            "Timeout trying to acquire lock .*"
+            LockException, "Timeout trying to acquire lock .*"
         ):
             self.zk_nodepool.lockHoldRequest(req2, blocking=True, timeout=2)
         self.zk_nodepool.unlockHoldRequest(req2)
@@ -151,3 +151,30 @@ class TestBuilds(ZooKeeperBaseTestCase):
         self.assertEqual(
             0, len(uncached_build_queue._zone_tree_caches.values())
         )
+
+
+class TestSharding(ZooKeeperBaseTestCase):
+
+    def test_read_write(self):
+        with BufferedShardIO(
+            self.zk_client.client, "/test/shards"
+        ) as shard_io:
+            self.assertEqual(shard_io.read(), "")
+            self.assertEqual(len(shard_io._raw._shards), 0)
+            shard_io.write("foobar")
+            self.assertEqual(shard_io.read(), "foobar")
+            self.assertEqual(len(shard_io._raw._shards), 1)
+            shard_io.truncate()
+            self.assertEqual(shard_io.read(), "")
+            self.assertEqual(len(shard_io._raw._shards), 0)
+            shard_io.write("x" * (NODE_BYTE_SIZE_LIMIT + 1))
+            shard_io.flush()
+            self.assertEqual(len(shard_io._raw._shards), 2)
+
+    def test_json(self):
+        data = {"key": "value"}
+        with BufferedShardIO(
+            self.zk_client.client, "/test/shards"
+        ) as shard_io:
+            json.dump(data, shard_io)
+            self.assertDictEqual(json.load(shard_io), data)
