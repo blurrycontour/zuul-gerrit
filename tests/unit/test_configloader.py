@@ -696,7 +696,6 @@ class TestTenantExtra(TenantParserTestCase):
                                            files=file_dict)
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
-        self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 

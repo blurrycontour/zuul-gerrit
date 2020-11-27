@@ -6222,7 +6222,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
         gearJob = next(iter(self.scheds.first.sched.merger.jobs))
         self.assertEqual(gearJob.complete, False)
 
@@ -6238,10 +6238,10 @@ For CI problems and help debugging, contact ci@example.org"""
         # Verify the merge job is still running and that the item is
         # in the pipeline
         self.assertEqual(gearJob.complete, False)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
+        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
 
         pipeline = tenant.layout.pipelines['post']
-        self.assertEqual(len(pipeline.getAllItems()), 1)
+        self.assertEqual(len(pipeline.getAllItems()), 0)
         self.gearman_server.release()
         self.waitUntilSettled()
 
@@ -6420,6 +6420,7 @@ class TestChangeQueues(ZuulTestCase):
                                            files=file_dict)
         C.setMerged()
         self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(C.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         self.executor_server.hold_jobs_in_build = True
@@ -8254,6 +8255,7 @@ class TestSemaphoreInRepo(ZuulTestCase):
 
         # send change-merged event as the gerrit mock doesn't send it
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         # now that change A was merged, the new semaphore max must be effective
@@ -8787,7 +8789,6 @@ class TestTenantReconfiguration(ZuulTestCase):
             self.waitUntilSettled()
             A.setMerged()
             self.fake_gerrit.addEvent(A.getChangeMergedEvent())
-            self.waitUntilSettled()
             self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         else:
             self.waitForPoll('gerrit-ref')
@@ -8911,7 +8912,7 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -8927,7 +8928,7 @@ class TestTenantReconfigurationSshHttp(TestTenantReconfiguration):
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(True)
 
@@ -8976,7 +8977,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -8998,11 +8999,11 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -9018,7 +9019,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         self._changeAddFile()
         self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(True)
 
@@ -9028,7 +9029,7 @@ class TestTenantReconfigurationSsh(TestTenantReconfiguration):
         '''
         self._setupTenantReconfigureTime()
         self._createBranch()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._changeAddConfig()
         self._expectReconfigure(True)
         self._directRemoveAllFiles()
@@ -9092,9 +9093,9 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         self._createBranch()
         self._expectReconfigure(False)
         self._changeAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(False)
 
@@ -9108,9 +9109,9 @@ class TestTenantReconfigurationHttp(TestTenantReconfiguration):
         self._createBranch()
         self._expectReconfigure(True)
         self._changeAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._directAddFile()
-        self._expectReconfigure(True)
+        self._expectReconfigure(False)
         self._deleteBranch()
         self._expectReconfigure(True)
 
