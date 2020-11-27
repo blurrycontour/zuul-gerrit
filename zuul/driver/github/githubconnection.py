@@ -1264,6 +1264,8 @@ class GithubConnection(CachedBranchConnection):
             elif event.ref and event.ref.startswith('refs/heads/'):
                 change = Branch(project)
                 change.branch = event.ref[len('refs/heads/'):]
+                if hasattr(event, 'files'):
+                    change.files = event.files
             else:
                 change = Ref(project)
             change.ref = event.ref
