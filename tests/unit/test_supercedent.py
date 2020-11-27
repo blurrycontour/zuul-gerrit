@@ -88,6 +88,7 @@ class TestSupercedent(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         # We should never run jobs for more than one change at a time
@@ -97,6 +98,7 @@ class TestSupercedent(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         B.setMerged()
         self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(B.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 1)
@@ -104,6 +106,7 @@ class TestSupercedent(ZuulTestCase):
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
         C.setMerged()
         self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(C.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 1)

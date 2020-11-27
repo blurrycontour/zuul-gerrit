@@ -159,6 +159,7 @@ class TestZuulClientEncrypt(BaseTestWeb):
         self.waitUntilSettled()
         self.assertEqual(A.data['status'], 'MERGED')
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
         # check that the secret is used from there on
         B = self.fake_gerrit.addFakeChange('org/project2', 'master',

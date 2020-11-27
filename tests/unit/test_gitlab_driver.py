@@ -307,7 +307,7 @@ class TestGitlabDriver(ZuulTestCase):
         new = self.scheds.first.sched.tenant_layout_state.get(
             'tenant-one', EMPTY_LAYOUT_STATE)
         # New timestamp should be greater than the old timestamp
-        self.assertLess(old, new)
+        self.assertEqual(old, new)
         self.assertEqual(1, len(self.history))
         self.assertEqual(
             'SUCCESS',

@@ -416,6 +416,7 @@ class TestBranchDeletion(ZuulTestCase):
                                            files=file_dict)
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         oldrev = self.delete_branch('org/project', 'stable/queens')
@@ -465,6 +466,7 @@ class TestBranchDeletion(ZuulTestCase):
                                            files=file_dict)
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         self.delete_branch('org/project', 'stable/queens')
@@ -554,6 +556,7 @@ class TestBranchTag(ZuulTestCase):
                                            files=file_dict)
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         event = self.fake_gerrit.addFakeTag(
@@ -784,6 +787,7 @@ class TestBranchVariants(ZuulTestCase):
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(C.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         A = self.fake_gerrit.addFakeChange('puppet-integration', 'master', 'A')
@@ -977,6 +981,7 @@ class TestCentralJobs(ZuulTestCase):
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(C.getRefUpdatedEvent())
         self.waitUntilSettled()
 
     def _test_central_job_on_branch(self, branch, other_branch):
@@ -1151,6 +1156,7 @@ class TestInRepoConfig(ZuulTestCase):
         ], ordered=False)
 
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         # Now that the config change is landed, it should be live for
@@ -1442,6 +1448,7 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertHistory([
             dict(name='project-test2', result='SUCCESS', changes='1,1')])
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         # The config change should not affect master.
@@ -1509,6 +1516,7 @@ class TestInRepoConfig(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='project-test2', result='SUCCESS', changes='1,1')])
@@ -1531,6 +1539,7 @@ class TestInRepoConfig(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(B.data['status'], 'MERGED')
         self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(B.getRefUpdatedEvent())
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
@@ -2347,6 +2356,7 @@ class TestInRepoConfig(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(A.data['status'], 'MERGED')
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
         in_repo_conf = textwrap.dedent(
             """
@@ -2372,6 +2382,7 @@ class TestInRepoConfig(ZuulTestCase):
                                            files=file_dict)
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
         # Then propose a change to delete the job from one repo...
         file_dict = {'.zuul.yaml': None}
@@ -2433,6 +2444,7 @@ class TestInRepoConfig(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         upstream_repo_conf = textwrap.dedent(
@@ -2460,6 +2472,7 @@ class TestInRepoConfig(ZuulTestCase):
 
         self.assertEqual(B.data['status'], 'MERGED')
         self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(B.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
@@ -4367,6 +4380,7 @@ class TestRoleBranches(RoleTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
         return A.patchsets[-1]['ref']
 
@@ -4385,6 +4399,7 @@ class TestRoleBranches(RoleTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
         return A.patchsets[-1]['ref']
 
@@ -5006,6 +5021,7 @@ class TestPragma(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         # This is an untrusted repo with 2 branches, so it should have
@@ -5033,6 +5049,7 @@ class TestPragma(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         # This is an untrusted repo with 2 branches, so it would
@@ -5089,6 +5106,7 @@ class TestPragmaMultibranch(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         # Now verify that when we propose a change to jewel, we get
@@ -5143,6 +5161,7 @@ class TestPragmaMultibranch(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
         # Now verify that when we propose a change to jewel, we get
         # the pike/jewel jobs.
@@ -5232,6 +5251,7 @@ class TestSecrets(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(A.data['status'], 'MERGED')
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         in_repo_conf = textwrap.dedent(
@@ -5836,6 +5856,7 @@ class TestNodesets(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(A.data['status'], 'MERGED')
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         in_repo_conf = textwrap.dedent(
@@ -5973,6 +5994,7 @@ class TestSemaphoreBranches(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(A.data['status'], 'MERGED')
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         in_repo_conf = textwrap.dedent(
@@ -7489,7 +7511,6 @@ class TestForceMergeMissingTemplate(ZuulTestCase):
         # Now force merge the change
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
-        self.waitUntilSettled()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
