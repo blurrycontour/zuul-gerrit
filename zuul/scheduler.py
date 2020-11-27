@@ -1691,6 +1691,18 @@ class Scheduler(threading.Thread):
             # out cached data for this project and perform a
             # reconfiguration.
             self.reconfigureTenant(tenant, change.project, event)
+        else:
+            if event.need_files_update:
+                self.merger.getFilesChanges(
+                    project.source.connection.connection_name,
+                    project.name,
+                    branch=change.branch,
+                    tosha=change.ref,
+                    oldrev=change.oldrev,
+                    newrev=change.newrev,
+                    build_set=event,
+                    event=event,
+                )
 
         for pipeline in tenant.layout.pipelines.values():
             if (
@@ -1699,6 +1711,7 @@ class Scheduler(threading.Thread):
                 or pipeline.manager.findOldVersionOfChangeAlreadyInQueue(
                     change
                 )
+                # event.need_files_update is not True):
             ):
                 self.pipeline_trigger_events[tenant.name][
                     pipeline.name
@@ -1706,23 +1719,26 @@ class Scheduler(threading.Thread):
 
     def _testReconfigure(self, tenant, event, change, project):
         reconfigure_tenant = False
-
+        no_update_files = False
         if (event.branch_created and event.branch) or event.branch_updated:
             reconfigure_tenant = self._testReconfigureFiles(
                 change, tenant, project, event)
         elif event.branch_deleted:
             reconfigure_tenant = self._testReconfigureRemove(
                 tenant, project, event)
+        else:
+            no_update_files = True
 
         reconfigure_tenant = project.source.testReconfigureTenant(
             event, project, tenant, self.abide, reconfigure_tenant)
-
+        if reconfigure_tenant or no_update_files:
+            event.need_files_update = False
         return reconfigure_tenant
 
     def _testReconfigureFiles(self, change, tenant, project, event):
         reconfigure_tenant = False
 
-        if hasattr(change, 'files'):
+        if hasattr(change, 'files') and change.files is not None:
             if change.updatesConfig(tenant):
                 if event.newrev != self.abide.getProjectBranchRevision(
                         project.canonical_name, event.branch):
@@ -1734,16 +1750,14 @@ class Scheduler(threading.Thread):
                 self.abide.setProjectBranchRevision(
                     project.canonical_name,
                     event.branch, event.newrev)
-
-                # create cache to avoid triggering a reconfigure in
-                # specific tenant reconfigure test
-                self.abide.getUnparsedBranchCache(
-                    project.canonical_name,
-                    event.branch)
         else:
             if event.newrev != self.abide.getProjectBranchRevision(
                     project.canonical_name, event.branch):
-                reconfigure_tenant = True
+                if event.need_files_update is None:
+                    # not able to get files, trigger fileschange
+                    event.need_files_update = True
+                elif event.need_files_update is False:
+                    reconfigure_tenant = True
 
         return reconfigure_tenant
 

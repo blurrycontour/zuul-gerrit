@@ -887,6 +887,7 @@ class TestExecutorFacts(AnsibleZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         self.assertEqual(self.getJobFromHistory('datetime-fact').result,
@@ -910,6 +911,7 @@ class TestAnsibleCallbackConfigs(AnsibleZuulTestCase):
         A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         callbacks = [
@@ -954,6 +956,7 @@ class TestExecutorEnvironment(AnsibleZuulTestCase):
         A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A')
         A.setMerged()
         self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         self.assertEqual(

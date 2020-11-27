@@ -4238,6 +4238,7 @@ class TriggerEvent(AbstractEvent):
         self.timestamp = None
         self.arrived_at_scheduler_timestamp = None
         self.driver_name = None
+        self.need_files_update = None
 
     def toDict(self):
         return {
@@ -4268,6 +4269,7 @@ class TriggerEvent(AbstractEvent):
             "arrived_at_scheduler_timestamp": (
                 self.arrived_at_scheduler_timestamp
             ),
+            "need_files_update": self.need_files_update,
         }
 
     def updateFromDict(self, d):
@@ -4298,6 +4300,7 @@ class TriggerEvent(AbstractEvent):
         self.arrived_at_scheduler_timestamp = (
             d["arrived_at_scheduler_timestamp"]
         )
+        self.need_files_update = d["need_files_update"]
 
     @property
     def canonical_project_name(self):
