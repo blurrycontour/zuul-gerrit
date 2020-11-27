@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "963d69c0_a1e2fcc3",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-11-27T12:41:30Z",
+      "side": 1,
+      "message": "I am ok with dumping unexpected codes for debugging but I think we should make the message much easier to find in logs, now we even fail to dump the result code, making grep a real challanged.\n\nI propose a format like \"HTTP_{code}: ...\" so we can filter by it easier. This will also make it easy to add other codes to the list in case we need it.",
+      "range": {
+        "startLine": 110,
+        "startChar": 12,
+        "endLine": 110,
+        "endChar": 41
+      },
+      "revId": "c43dbb6dbe33fd72aaab5f7df3284d2f1e59ce28",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
