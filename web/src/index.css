@@ -1,6 +1,12 @@
 body {
   margin: 0;
   padding: 0;
+  /*
+  Prevent scroll-bar from adding-up to the page width and causing reflow.
+  This is easily visible on the console page when user may press expand or
+  collapse rows. https://stackoverflow.com/a/43912420/99834
+  */
+  overflow-y: overlay;
 }
 
 .pf-c-title {
