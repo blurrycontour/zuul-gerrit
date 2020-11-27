@@ -378,12 +378,14 @@ class FakeGerritChange(object):
         self.number = number
         self.project = project
         self.branch = branch
+        self.initial_parent = parent or 'refs/heads/' + branch
         self.subject = subject
         self.latest_patchset = 0
         self.depends_on_change = None
         self.depends_on_patchset = None
         self.needed_by_changes = []
         self.fail_merge = False
+        self.head_sha = None
         self.messages = []
         self.comments = []
         self.checks = {}
@@ -408,15 +410,14 @@ class FakeGerritChange(object):
             'url': '%s/%s' % (self.gerrit.baseurl.rstrip('/'), number)}
 
         self.upstream_root = upstream_root
-        self.addPatchset(files=files, parent=parent)
+        self.addPatchset(files=files, parent=self.initial_parent)
         self.data['submitRecords'] = self.getSubmitRecords()
         self.open = status == 'NEW'
 
     def addFakeChangeToRepo(self, msg, files, large, parent):
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
-        if parent is None:
-            parent = 'refs/tags/init'
+        parent = parent or self.initial_parent
         ref = GerritChangeReference.create(
             repo, '%s/%s/%s' % (str(self.number).zfill(2)[-2:],
                                 self.number,
@@ -479,6 +480,7 @@ class FakeGerritChange(object):
                                                self.number,
                                                self.latest_patchset),
              'revision': c.hexsha,
+             'parents': [parent.hexsha for parent in c.parents],
              'uploader': {'email': 'user@example.com',
                           'name': 'User name',
                           'username': 'user'}}
@@ -601,9 +603,13 @@ class FakeGerritChange(object):
         return event
 
     def getChangeMergedEvent(self):
+        if self.head_sha is None:
+            raise Exception("Cannot create change-merged event, "
+                            "Change is not merged")
+
         event = {"submitter": {"name": "Jenkins",
                                "username": "jenkins"},
-                 "newRev": "29ed3b5f8f750a225c5be70235230e3a6ccb04d9",
+                 "newRev": self.head_sha,
                  "patchSet": self.patchsets[-1],
                  "change": self.data,
                  "type": "change-merged",
@@ -611,9 +617,9 @@ class FakeGerritChange(object):
         return event
 
     def getRefUpdatedEvent(self):
-        path = os.path.join(self.upstream_root, self.project)
-        repo = git.Repo(path)
-        oldrev = repo.heads[self.branch].commit.hexsha
+        if self.head_sha is None:
+            raise Exception("Cannot create ref-updated event, "
+                            "Change is not merged")
 
         event = {
             "type": "ref-updated",
@@ -621,8 +627,8 @@ class FakeGerritChange(object):
                 "name": "User Name",
             },
             "refUpdate": {
-                "oldRev": oldrev,
-                "newRev": self.patchsets[-1]['revision'],
+                "oldRev": self.patchsets[-1]['parents'][0],
+                "newRev": self.head_sha,
                 "refName": self.branch,
                 "project": self.project,
             }
@@ -774,10 +780,14 @@ class FakeGerritChange(object):
             if f['file'] == '/COMMIT_MSG':
                 continue
             files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
-        parent = '0000000000000000000000000000000000000000'
+        parents = self.patchsets[-1]['parents']
         if self.depends_on_change:
-            parent = self.depends_on_change.patchsets[
-                self.depends_on_patchset - 1]['revision']
+            parents = [self.depends_on_change.patchsets[
+                self.depends_on_patchset - 1]['revision']]
+        commit_parents = []
+        for parent in parents:
+            commit_parents.append({"commit": parent})
+
         revisions[rev['revision']] = {
             "kind": "REWORK",
             "_number": num,
@@ -787,9 +797,7 @@ class FakeGerritChange(object):
             "commit": {
                 "subject": self.subject,
                 "message": self.data['commitMessage'],
-                "parents": [{
-                    "commit": parent,
-                }]
+                "parents": commit_parents
             },
             "files": files
         }
@@ -844,7 +852,7 @@ class FakeGerritChange(object):
         if (self.depends_on_change and
                 self.depends_on_change.data['status'] != 'MERGED'):
             return
-        if self.fail_merge:
+        if self.fail_merge or self.data['status'] == 'MERGED':
             return
         self.data['status'] = 'MERGED'
         self.open = False
@@ -856,6 +864,8 @@ class FakeGerritChange(object):
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.merge('-s', 'resolve', self.patchsets[-1]['ref'])
         repo.heads[self.branch].commit = repo.head.commit
+
+        self.head_sha = repo.head.commit.hexsha
 
     def setReported(self):
         self.reported += 1
@@ -1214,8 +1224,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
-    def getFakeBranchDeletedEvent(self, project, branch):
-        oldrev = '4abd38457c2da2a72d4d030219ab180ecdb04bf0'
+    def getFakeBranchDeletedEvent(self, project, branch, oldrev):
         newrev = 40 * '0'
 
         event = {
@@ -1730,12 +1739,13 @@ class FakePagureConnection(pagureconnection.PagureConnection):
         repo_path = os.path.join(self.upstream_root, project)
         repo = git.Repo(repo_path)
         headsha = repo.head.commit.hexsha
+        parentsha = repo.head.commit.parents[0].hexsha
         data = {
             'msg': {
                 'project_fullname': project,
                 'branch': 'master',
                 'end_commit': headsha,
-                'old_commit': '1' * 40,
+                'old_commit': parentsha,
             },
             'msg_id': str(uuid.uuid4()),
             'timestamp': 1427459070,
@@ -1835,7 +1845,7 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         self.zuul_web_port = port
 
     def getPushEvent(
-            self, project, before=None, after=None,
+            self, project, before, after=None,
             branch='refs/heads/master'):
         name = 'gl_push'
         if not after:
@@ -1844,7 +1854,7 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
             after = repo.head.commit.hexsha
         data = {
             'object_kind': 'push',
-            'before': before or '1' * 40,
+            'before': before,
             'after': after,
             'ref': branch,
             'project': {
@@ -2075,10 +2085,20 @@ class FakeGitlabMergeRequest(object):
         self._updateTimeStamp()
 
     def mergeMergeRequest(self):
+        repo = self._getRepo()
+        repo.head.reference = self.branch
+        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.heads[self.branch].checkout()
+        repo.git.merge('-s', 'resolve', repo.references[self.getMRReference()])
+
         self.state = 'merged'
         self.is_merged = True
         self._updateTimeStamp()
         self.merged_at = self.updated_at
+
+        repo.head.reference = 'master'
+        repo.git.clean('-x', '-f', '-d')
+        repo.heads['master'].checkout()
 
     def reopenMergeRequest(self):
         self.state = 'opened'
@@ -2117,6 +2137,10 @@ class FakeGitlabMergeRequest(object):
 
     def _updateTimeStamp(self):
         self.updated_at = datetime.datetime.now()
+
+    def getBranchHeadSha(self):
+        repo = self._getRepo()
+        return repo.heads[self.branch].commit.hexsha
 
     def getMergeRequestEvent(self, action, include_labels=False):
         name = 'gl_merge_request'
@@ -4646,18 +4670,22 @@ class ZuulTestCase(BaseTestCase):
         f.write("test %s\n" % branch)
         f.close()
         repo.index.add([fn])
-        repo.index.commit('%s commit' % branch)
+        hexsha = repo.index.commit('%s commit' % branch).hexsha
 
         repo.head.reference = repo.heads['master']
         zuul.merger.merger.reset_repo_to_head(repo)
         repo.git.clean('-x', '-f', '-d')
+        return hexsha
 
     def delete_branch(self, project, branch):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
-        repo.head.reference = repo.heads['master']
-        zuul.merger.merger.reset_repo_to_head(repo)
+        if branch != 'master':
+            repo.head.reference = repo.heads['master']
+            zuul.merger.merger.reset_repo_to_head(repo)
+        hexsha = repo.heads[branch].commit.hexsha
         repo.delete_head(repo.heads[branch], force=True)
+        return hexsha
 
     def create_commit(self, project, files=None, head='master',
                       message='Creating a fake commit', **kwargs):
