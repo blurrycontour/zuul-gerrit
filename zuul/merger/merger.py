@@ -658,19 +658,48 @@ class Repo(object):
                             'utf-8')
         return ret
 
-    def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
+    def getFilesChanges(self, refBase, refTo=None, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
-        self.fetch(branch, zuul_event_id=zuul_event_id)
-        head = repo.commit(
-            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
         files = set()
+        commitBase = None
+        commitTo = None
 
-        if tosha:
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+        if refBase and refBase != (40 * '0'):
+            self.fetch(refBase, zuul_event_id=zuul_event_id)
+            commitBase = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+        if refTo and refTo != (40 * '0'):
+            self.fetch(refTo, zuul_event_id=zuul_event_id)
+            commitTo = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+
+        if commitBase and commitTo:
+            if (repo.is_ancestor(commitBase, commitTo) or
+                    repo.is_ancestor(commitTo, commitBase)):
+                for x in commitBase.diff(commitTo):
+                    if x.a_blob is not None:
+                        files.add(x.a_blob.path)
+                    if x.b_blob is not None:
+                        files.add(x.b_blob.path)
+            else:
+                filesDiffList = []
+                for mergeBase in repo.merge_base(commitBase, commitTo,
+                                                 all=True):
+                    filesDiff = set()
+                    for x in mergeBase.diff(commitTo):
+                        if x.a_blob is not None:
+                            filesDiff.add(x.a_blob.path)
+                        if x.b_blob is not None:
+                            filesDiff.add(x.b_blob.path)
+                    filesDiffList.append(filesDiff)
+                files.update(set.intersection(*filesDiffList))
+        elif commitBase or commitTo:
+            commit = commitBase or commitTo
+            for item in commit.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
         else:
-            files.update(head.stats.files.keys())
+            raise
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
