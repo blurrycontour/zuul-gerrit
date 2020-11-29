@@ -273,14 +273,17 @@ class SshAgent(object):
         env.update(self.env)
         key_path = os.path.expanduser(key_path)
         self.log.debug('Adding SSH Key {}'.format(key_path))
-        try:
-            subprocess.check_output(['ssh-add', key_path], env=env,
-                                    stderr=subprocess.PIPE)
-        except subprocess.CalledProcessError as e:
-            self.log.exception('ssh-add failed. stdout: %s, stderr: %s',
-                               e.output, e.stderr)
-            raise
-        self.log.info('Added SSH Key {}'.format(key_path))
+        if os.path.isfile(key_path):
+            try:
+                subprocess.check_output(['ssh-add', key_path], env=env,
+                                        stderr=subprocess.PIPE)
+            except subprocess.CalledProcessError as e:
+                self.log.exception('ssh-add failed. stdout: %s, stderr: %s',
+                                   e.output, e.stderr)
+                raise
+            self.log.info('Added SSH Key {}'.format(key_path))
+        else:
+            self.log.warning('SSH Key %s does not exist', key_path)
 
     def addData(self, name, key_data):
         env = os.environ.copy()
