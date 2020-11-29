@@ -277,9 +277,8 @@ class SshAgent(object):
             subprocess.check_output(['ssh-add', key_path], env=env,
                                     stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
-            self.log.exception('ssh-add failed. stdout: %s, stderr: %s',
+            self.log.warning('ssh-add failed. stdout: %s, stderr: %s',
                                e.output, e.stderr)
-            raise
         self.log.info('Added SSH Key {}'.format(key_path))
 
     def addData(self, name, key_data):
