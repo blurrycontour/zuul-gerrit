@@ -831,9 +831,14 @@ class AnsibleJob(object):
         self._resume_event = threading.Event()
         self.thread = None
         self.project_info = {}
+
         self.private_key_file = get_default(self.executor_server.config,
                                             'executor', 'private_key_file',
                                             '~/.ssh/id_rsa')
+        if not os.path.isfile(self.private_key_file):
+            self.private_key_file = None
+            self.log.warning('SSH Key %s does not exist', key_path)
+
         self.winrm_key_file = get_default(self.executor_server.config,
                                           'executor', 'winrm_cert_key_file',
                                           '~/.winrm/winrm_client_cert.key')
@@ -934,7 +939,8 @@ class AnsibleJob(object):
             self.job.sendWorkData(json.dumps(self._base_job_data()))
 
             self.ssh_agent.start()
-            self.ssh_agent.add(self.private_key_file)
+            if self.private_key_file:
+                self.ssh_agent.add(self.private_key_file)
             for key in self.arguments.get('ssh_keys', []):
                 self.ssh_agent.addData(key['name'], key['key'])
             self.jobdir = JobDir(self.executor_server.jobdir_root,
