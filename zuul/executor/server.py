@@ -912,9 +912,9 @@ class AnsibleJob(object):
         self._resume_event = threading.Event()
         self.thread = None
         self.project_info = {}
-        self.private_key_file = get_default(self.executor_server.config,
-                                            'executor', 'private_key_file',
-                                            '~/.ssh/id_rsa')
+
+        self.private_key_file = self.executor_server.private_key_file
+
         self.winrm_key_file = get_default(self.executor_server.config,
                                           'executor', 'winrm_cert_key_file',
                                           '~/.winrm/winrm_client_cert.key')
@@ -1032,7 +1032,8 @@ class AnsibleJob(object):
             self.setNodeInfo()
 
             self.ssh_agent.start()
-            self.ssh_agent.add(self.private_key_file)
+            if self.private_key_file:
+                self.ssh_agent.add(self.private_key_file)
             for key in self.arguments.get('ssh_keys', []):
                 private_ssh_key, public_ssh_key = \
                     self.executor_server.keystore.getProjectSSHKeys(
@@ -3167,6 +3168,14 @@ class ExecutorServer(BaseMergeServer):
             RAMSensor(config),
             StartingBuildsSensor(self, cpu_sensor.max_load_avg, config)
         ]
+
+        self.private_key_file = get_default(self.config, 'executor',
+                                            'private_key_file',
+                                            '~/.ssh/id_rsa')
+        if not os.path.isfile(self.private_key_file):
+            self.log.warning('SSH Key %s does not exist',
+                             self.private_key_file)
+            self.private_key_file = None
 
         manage_ansible = get_default(
             self.config, 'executor', 'manage_ansible', True)
