@@ -19,7 +19,9 @@ from typing import List, Tuple, TYPE_CHECKING
 from zuul import exceptions
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Pipeline, EventFilter, RefFilter, QueueItem, Job, Change
+from zuul.model import (
+    Change, DequeueEvent, EventFilter, Job, Pipeline, QueueItem, RefFilter
+)
 if TYPE_CHECKING:
     from zuul.scheduler import Scheduler
 
@@ -424,9 +426,19 @@ class PipelineManager(metaclass=ABCMeta):
                     found = other_item
                     break
             if found:
-                self.log.info("Item %s is superceded by %s, removing" %
-                              (found, item))
-                other_pipeline.manager.removeItem(found)
+                self.log.info(
+                    "Item %s is superceded by %s, adding dequeue event",
+                    found, item
+                )
+                self.sched.addManagementEvent(
+                    DequeueEvent(
+                        other_pipeline.tenant.name,
+                        other_pipeline.name,
+                        found.change.project.canonical_name,
+                        found.change._id(),
+                        found.change.ref
+                    )
+                )
 
     def updateCommitDependencies(self, change, change_queue, event):
         log = get_annotated_logger(self.log, event)
