@@ -912,12 +912,12 @@ the elements of `zuul.file_comments` from each invocation will be appended.
 Pausing the job
 ~~~~~~~~~~~~~~~
 
-A job can be paused after the run phase. In this case the child jobs can start
-and the parent job stays paused until all child jobs are finished. This for
-example can be useful to start a docker registry in a parent job that will be
-used by the child job. To indicate that the job should be paused use
+A job can be paused after the run phase. In this case the dependent jobs can start
+and the prior job stays paused until all dependent jobs are finished. This for
+example can be useful to start a docker registry in a job that will be
+used by the dependent job. To indicate that the job should be paused use
 *zuul_return* to set the **zuul.pause** value. You still can at the same time
-supply any arbitrary data to the child jobs. For example:
+supply any arbitrary data to the dependent jobs. For example:
 
 .. code-block:: yaml
 
