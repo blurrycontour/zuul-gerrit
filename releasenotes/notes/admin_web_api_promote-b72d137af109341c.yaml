@@ -1,5 +1,0 @@
----
-features:
-  - |
-    The action "promote" is now available via the tenant-scoped REST API using
-    the zuul cli.
