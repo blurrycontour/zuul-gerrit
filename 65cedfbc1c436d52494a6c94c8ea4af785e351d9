@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "07116e0b_3ea6dc2f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-01T17:49:02Z",
+      "side": 1,
+      "message": "I think we would like the add function to raise an exception if it fails. Could you check if the key_path exists before using the SshAgent instead?",
+      "revId": "65cedfbc1c436d52494a6c94c8ea4af785e351d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
