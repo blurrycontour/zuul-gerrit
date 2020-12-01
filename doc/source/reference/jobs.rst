@@ -287,7 +287,7 @@ of item.
 
    .. var:: child_jobs
 
-      A list of the first level child jobs to be run after this job
+      A list of the first level dependent jobs to be run after this job
       has finished successfully.
 
    .. var:: ref
@@ -759,7 +759,7 @@ Return Values
 -------------
 
 A job may return some values to Zuul to affect its behavior and for
-use by child jobs.  To return a value, use the ``zuul_return``
+use by dependent jobs.  To return a value, use the ``zuul_return``
 Ansible module in a job playbook.
 For example:
 
@@ -784,7 +784,7 @@ path to a JSON-formatted file with that data. For example:
 .. TODO: xref to section describing formatting
 
 Any values other than those in the ``zuul`` hierarchy will be supplied
-as Ansible variables to child jobs.  These variables have less
+as Ansible variables to dependent jobs.  These variables have less
 precedence than any other type of variable in Zuul, so be sure their
 names are not shared by any job variables.  If more than one parent
 job returns the same variable, the value from the later job in the job
@@ -843,10 +843,18 @@ If *zuul_return* is invoked multiple times (e.g., via multiple
 playbooks), then the elements of :var:`zuul.artifacts` from each
 invocation will be appended.
 
-Skipping child jobs
-~~~~~~~~~~~~~~~~~~~
+.. _skipping child jobs:
 
-To skip a child job for the current build, use *zuul_return* to set the
+Skipping dependent jobs
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+   In the follow section the use of 'child jobs' refers to dependent jobs
+   configured by `job.dependencies` and should not be confused with jobs
+   that inherit from a parent job.
+
+To skip a dependent job for the current build, use *zuul_return* to set the
 :var:`zuul.child_jobs` value. For example:
 
 .. code-block:: yaml
@@ -856,12 +864,12 @@ To skip a child job for the current build, use *zuul_return* to set the
         data:
           zuul:
             child_jobs:
-              - child_jobA
-              - child_jobC
+              - dependent_jobA
+              - dependent_jobC
 
-Will tell zuul to only run the child_jobA and child_jobC for pre-configured
-child jobs. If child_jobB was configured, it would be now marked as SKIPPED. If
-zuul.child_jobs is empty, all jobs will be marked as SKIPPED. Invalid child jobs
+Will tell zuul to only run the dependent_jobA and dependent_jobC for pre-configured
+dependent jobs. If dependent_jobB was configured, it would be now marked as SKIPPED. If
+zuul.child_jobs is empty, all jobs will be marked as SKIPPED. Invalid dependent jobs
 are stripped and ignored, if only invalid jobs are listed it is the same as
 providing an empty list to zuul.child_jobs.
 
