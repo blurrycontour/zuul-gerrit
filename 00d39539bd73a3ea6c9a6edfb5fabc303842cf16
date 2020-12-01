@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6948d60b_788e0e72",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 846,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-01T18:51:55Z",
+      "side": 1,
+      "message": "Nit: When renaming a section heading, it\u0027s sometimes a good idea to add the old heading name as an anchor so that existing links (in discussion logs and mailing list posts, for example) continue to land here rather than at the top of the document.",
+      "revId": "00d39539bd73a3ea6c9a6edfb5fabc303842cf16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60bffea4_a34e36b8",
+        "filename": "doc/source/reference/jobs.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 849,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-01T18:51:55Z",
+      "side": 1,
+      "message": "Nit: You could clean up the trailing space on this line.",
+      "revId": "00d39539bd73a3ea6c9a6edfb5fabc303842cf16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
