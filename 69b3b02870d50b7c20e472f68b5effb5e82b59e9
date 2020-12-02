@@ -52,6 +52,24 @@
       "revId": "69b3b02870d50b7c20e472f68b5effb5e82b59e9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ca7c7886_5288c171",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1220,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-12-02T12:13:18Z",
+      "side": 1,
+      "message": "I think we can drop the started log. If it blocks indefinitely zuul is blocked completely and a thread dump can reveal where it\u0027s blocked anyway (which is easier than spotting the last started message in a giant log).",
+      "parentUuid": "9f560f44_3215d43e",
+      "revId": "69b3b02870d50b7c20e472f68b5effb5e82b59e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
