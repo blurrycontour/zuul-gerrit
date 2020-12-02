@@ -184,6 +184,10 @@ class GerritEventConnector(threading.Thread):
             if patchset:
                 event.patch_number = str(patchset.get('number'))
                 event.ref = patchset.get('ref')
+                event.newrev = str(patchset.get('revision'))
+                parents = patchset.get('parents')
+                if parents:
+                    event.oldrev = str(parents[0])
             event.approvals = data.get('approvals', [])
             event.comment = data.get('comment')
         refupdate = data.get('refUpdate')
