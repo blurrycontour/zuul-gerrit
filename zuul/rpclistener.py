@@ -138,6 +138,8 @@ class RPCListenerSlow(RPCListenerBase):
 
         if not errors:
             event.ref = args['ref']
+            if args['ref'].startswith('refs/heads/'):
+                event.branch = args['ref'][len('refs/heads/'):]
             event.oldrev = args['oldrev']
             event.newrev = args['newrev']
             try:
