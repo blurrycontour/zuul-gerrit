@@ -160,7 +160,8 @@ class MergeClient(object):
         return job
 
     def getFilesChanges(self, connection_name, project_name, branch,
-                        tosha=None, precedence=zuul.model.PRECEDENCE_HIGH,
+                        tosha=None, oldrev=None, newrev=None,
+                        precedence=zuul.model.PRECEDENCE_HIGH,
                         build_set=None, event=None):
         if event is not None:
             zuul_event_id = event.zuul_event_id
@@ -171,6 +172,8 @@ class MergeClient(object):
                     project=project_name,
                     branch=branch,
                     tosha=tosha,
+                    oldrev=oldrev,
+                    newrev=newrev,
                     zuul_event_id=zuul_event_id)
         job = self.submitJob('merger:fileschanges', data, build_set,
                              precedence, event=event)
