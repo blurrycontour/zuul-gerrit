@@ -64,6 +64,7 @@ from zuul.model import (
 )
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponentRegistry
+from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.event_queues import (
     GlobalEventWatcher,
     GlobalManagementEventQueue,
@@ -151,6 +152,7 @@ class Scheduler(threading.Thread):
                 "schedulers", self.hostname
             )
         )
+        self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
 
         self.result_event_queue = NamedQueue("ResultEventQueue")
         self.global_watcher = GlobalEventWatcher(
@@ -217,6 +219,7 @@ class Scheduler(threading.Thread):
             self.zk_client,
             password=self._get_key_store_password(),
             backup=FileKeyStorage(self._get_key_dir()))
+        self.unparsed_config_cache.start()
 
         self._command_running = True
         self.log.debug("Starting command processor")
@@ -235,6 +238,7 @@ class Scheduler(threading.Thread):
     def stop(self):
         self._stopped = True
         self.zk_component.set('state', self.zk_component.STOPPED)
+        self.unparsed_config_cache.stop()
         self.stats_stop.set()
         self.cleanup_stop.set()
         self.stopConnections()
@@ -815,6 +819,18 @@ class Scheduler(threading.Thread):
                                project_name, branch_name)
                 self.abide.clearUnparsedBranchCache(project_name,
                                                     branch_name)
+                if branch_name is None:
+                    self.log.debug("Clearing Zookeeper project cache: %s",
+                                   project_name)
+                    self.unparsed_config_cache.clearProject(event.tenant_name,
+                                                            project_name)
+                else:
+                    self.log.debug("Clearing Zookeeper branch cache: %s @%s",
+                                   project_name, branch_name)
+                    self.unparsed_config_cache.clearBranch(event.tenant_name,
+                                                           project_name,
+                                                           branch_name)
+
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
@@ -1011,6 +1027,7 @@ class Scheduler(threading.Thread):
                       (tenant,))
         for pipeline in tenant.layout.pipelines.values():
             self._reconfigureDeletePipeline(pipeline)
+        self.unparsed_config_cache.clearTenant(tenant.name)
 
     def _reconfigureDeletePipeline(self, pipeline):
         self.log.info("Removing pipeline %s during reconfiguration" %

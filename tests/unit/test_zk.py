@@ -20,6 +20,7 @@ from tests.base import BaseTestCase
 
 from zuul import model
 from zuul.zk import ZooKeeperClient
+from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import (
@@ -151,3 +152,77 @@ class TestSharding(ZooKeeperBaseTestCase):
             self.zk_client.client, "/test/shards"
         ) as shard_io:
             self.assertDictEqual(json.load(shard_io), data)
+
+
+class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+
+        self.setupZK()
+
+        self.config_cache = UnparsedConfigCache(self.zk_client)
+        self.addCleanup(self.config_cache.stop)
+        self.config_cache.start()
+
+    def test_files_cache(self):
+        master_files = self.config_cache.getFilesCache(
+            "tenant1", "project", "master")
+
+        self.assertEqual(len(master_files), 0)
+        self.assertFalse(master_files.isValid())
+        master_files["/path/to/file"] = "content"
+        self.config_cache.waitForSync(timeout=5)
+        self.assertEqual(master_files["/path/to/file"], "content")
+        self.assertEqual(len(master_files), 1)
+        self.assertTrue(master_files.isValid())
+
+    def test_branch_cleanup(self):
+        master_files = self.config_cache.getFilesCache(
+            "tenant1", "project", "master")
+        release_files = self.config_cache.getFilesCache(
+            "tenant1", "project", "release")
+
+        master_files["/path/to/file"] = "content"
+        release_files["/path/to/file"] = "content"
+
+        self.config_cache.clearBranch("tenant1", "project", "master")
+        self.config_cache.waitForSync(timeout=5)
+        self.assertEqual(len(master_files), 0)
+        self.assertEqual(len(release_files), 1)
+
+    def test_project_cleanup(self):
+        project_files = self.config_cache.getFilesCache(
+            "tenant1", "project", "master")
+        other_files = self.config_cache.getFilesCache(
+            "tenant1", "other", "master")
+
+        self.assertEqual(len(project_files), 0)
+        project_files["/path/to/file"] = "content"
+        other_files["/path/to/file"] = "content"
+        self.config_cache.waitForSync(timeout=5)
+        self.assertEqual(len(project_files), 1)
+        self.assertEqual(len(other_files), 1)
+
+        self.config_cache.clearBranch("tenant1", "project", "master")
+        self.config_cache.waitForSync(timeout=5)
+        self.assertEqual(len(project_files), 0)
+        self.assertEqual(len(other_files), 1)
+
+    def test_tenant_cleanup(self):
+        project_files = self.config_cache.getFilesCache(
+            "tenant1", "project", "master")
+        other_tenant_project = self.config_cache.getFilesCache(
+            "tenant2", "project", "master")
+
+        self.assertEqual(len(project_files), 0)
+        project_files["/path/to/file"] = "content"
+        other_tenant_project["/path/to/file"] = "content"
+        self.config_cache.waitForSync(timeout=5)
+        self.assertEqual(len(project_files), 1)
+        self.assertEqual(len(other_tenant_project), 1)
+
+        self.config_cache.clearTenant("tenant1")
+        self.config_cache.waitForSync(timeout=5)
+        self.assertEqual(len(other_tenant_project), 1)
+        self.assertEqual(len(project_files), 0)

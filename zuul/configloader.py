@@ -1518,6 +1518,7 @@ class TenantParser(object):
         self.scheduler = scheduler
         self.merger = merger
         self.keystorage = keystorage
+        self.unparsed_config_cache = self.scheduler.unparsed_config_cache
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret', 'queue')
@@ -1579,7 +1580,7 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager):
+    def fromYaml(self, abide, conf, ansible_manager, use_cache=False):
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1636,7 +1637,7 @@ class TenantParser(object):
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
         # cache.
-        self._cacheTenantYAML(abide, tenant, loading_errors)
+        self._cacheTenantYAML(abide, tenant, loading_errors, use_cache)
 
         # Then collect the appropriate YAML based on this tenant
         # config.
@@ -1801,7 +1802,7 @@ class TenantParser(object):
 
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors):
+    def _cacheTenantYAML(self, abide, tenant, loading_errors, use_cache):
         jobs = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
@@ -1821,6 +1822,22 @@ class TenantParser(object):
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
                     continue
+                files_cache = self.unparsed_config_cache.getFilesCache(
+                    tenant.name, project.canonical_name, branch)
+                if use_cache and files_cache.isValid():
+                    self.log.debug("Using files from cache for project %s @%s",
+                                   project.canonical_name, branch)
+                    for fn in files_cache:
+                        source_context = model.SourceContext(
+                            project, branch, fn, False)
+                        self.log.info("Loading configuration from %s",
+                                      source_context)
+                        incdata = self.loadProjectYAML(
+                            files_cache[fn], source_context, loading_errors)
+                        branch_cache.put(source_context.path, incdata)
+                    branch_cache.setValidFor(tpc)
+                    continue
+
                 job = self.merger.getFiles(
                     project.source.connection.connection_name,
                     project.name, branch,
@@ -1844,9 +1861,12 @@ class TenantParser(object):
                            (job, job.files.keys()))
             loaded = False
             files = sorted(job.files.keys())
-            unparsed_config = model.UnparsedConfig()
             tpc = tenant.project_configs[
                 job.source_context.project.canonical_name]
+            files_cache = self.unparsed_config_cache.getFilesCache(
+                tenant.name, job.source_context.project.canonical_name,
+                job.source_context.branch)
+
             for conf_root in (
                     ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
                     tpc.extra_config_files + tpc.extra_config_dirs):
@@ -1876,7 +1896,9 @@ class TenantParser(object):
                         source_context.project.canonical_name,
                         source_context.branch)
                     branch_cache.put(source_context.path, incdata)
-                    unparsed_config.extend(incdata)
+                    # Cache file in Zookeeper
+                    files_cache[source_context.path] = job.files[fn]
+            files_cache.markValid()
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()
@@ -2297,9 +2319,10 @@ class ConfigLoader(object):
         else:
             unparsed_config = tenant.unparsed_config
 
+        self.scheduler.unparsed_config_cache.waitForSync(timeout=60)
         # When reloading a tenant only, use cached data if available.
         new_tenant = self.tenant_parser.fromYaml(
-            new_abide, unparsed_config, ansible_manager)
+            new_abide, unparsed_config, ansible_manager, use_cache=True)
         new_abide.tenants[tenant.name] = new_tenant
         if len(new_tenant.layout.loading_errors):
             self.log.warning(
