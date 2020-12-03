@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7be20779_75bc291f",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 61
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2020-12-03T12:18:36Z",
+      "side": 1,
+      "message": "It seems that this has a race condition that can lead to hanging tests:\n\n\t(gdb) py-list\n\t 179            :param blocking: Block until lock is obtained or return immediately.\n\t 180            :param timeout: Timeout to obtain zookeeper lock (default 10 seconds)\n\t 181            \"\"\"\n\t 182\n\t 183            if not keep_locked or not self.locking_lock.locked():\n\t\u003e184                self.locking_lock.acquire()\n\t 185\n\t 186            try:  # Make sure request does not hang\n\t 187                return lock.acquire(blocking\u003dblocking, timeout\u003dtimeout)\n\t 188            except LockTimeout:\n\t 189                self.log.debug(\"Could not acquire lock %s\" % lock.path)\n\n\t(gdb) py-bt\n\tTraceback (most recent call first):\n\t  File \"/tmp/zuul/zuul/zk/__init__.py\", line 184, in acquireLock\n\t\tself.locking_lock.acquire()\n\t  File \"/tmp/zuul/zuul/zk/connection_event.py\", line 71, in hasEvents\n\t\tself.client.acquireLock(lock, keep_locked\u003dkeep_locked)\n\t  File \"/tmp/zuul/zuul/driver/github/githubconnection.py\", line 340, in _run\n\t\tself._connection.connection_name):\n\t  File \"/tmp/zuul/zuul/zk/__init__.py\", line 253, in election\n\t\tinterrupt \u003d func()\n\t  File \"/tmp/zuul/zuul/driver/github/githubconnection.py\", line 335, in run\n\t\trepeat\u003dlambda: not self._stopped)\n\t  File \"/usr/lib/python3.7/threading.py\", line 926, in _bootstrap_inner\n\t\tself.run()\n\t  File \"/usr/lib/python3.7/threading.py\", line 890, in _bootstrap\n\t\tself._bootstrap_inner()\n\nJust leaving this as a quick note so we can fix it later.",
+      "range": {
+        "startLine": 169,
+        "startChar": 0,
+        "endLine": 170,
+        "endChar": 39
+      },
+      "revId": "1197b50f496bbfaa68ffa0cf219b00349b81b7d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
