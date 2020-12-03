@@ -8497,6 +8497,10 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
                              .get('tenant-four'),
                              'Tenant tenant-four should exist now.')
 
+        # Test that the cached config of tenant-three was removed
+        cache = self.scheds.first.sched.unparsed_config_cache
+        self.assertNotIn("tenant-three", cache._cache_registry)
+
         # Test that the new tenant-four actually works
         D = self.fake_gerrit.addFakeChange('org/project4', 'master', 'D')
         self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))

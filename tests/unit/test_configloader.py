@@ -520,6 +520,46 @@ class TestConfigConflict(ZuulTestCase):
             jobs)
 
 
+class TestUnparsedConfigCache(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_config_caching(self):
+        cache = self.scheds.first.sched. unparsed_config_cache
+        cache.waitForSync(timeout=5)
+
+        common_cache = cache.getFilesCache("tenant-one",
+                                           "review.example.com/common-config",
+                                           "master")
+        self.assertTrue(common_cache.isValid())
+        self.assertEqual(len(common_cache), 1)
+        self.assertIn("zuul.yaml", common_cache)
+        self.assertTrue(len(common_cache["zuul.yaml"]) > 0)
+
+        project_cache = cache.getFilesCache("tenant-one",
+                                            "review.example.com/org/project",
+                                            "master")
+        # Cache of org/project should be valid but empty (no in-repo config)
+        self.assertTrue(project_cache.isValid())
+        self.assertEqual(len(project_cache), 0)
+
+    def test_cache_use(self):
+        sched = self.scheds.first.sched
+        tenant = sched.abide.tenants['tenant-one']
+        _, project = tenant.getProject('org/project2')
+
+        # Clear the unparsed branch cache in order to force the
+        # configloader to get the data from Zookeeper.
+        sched.abide.unparsed_project_branch_cache.clear()
+        self.gearman_server.jobs_history.clear()
+        sched.reconfigureTenant(tenant, project, event=None)
+        self.waitUntilSettled()
+
+        # We only expect a cat job for org/project2
+        cat_jobs = [job for job in self.gearman_server.jobs_history
+                    if job.name == b"merger:cat"]
+        self.assertEqual(len(cat_jobs), 1)
+
+
 class TestAuthorizationRuleParser(ZuulTestCase):
     tenant_config_file = 'config/tenant-parser/authorizations.yaml'
 
