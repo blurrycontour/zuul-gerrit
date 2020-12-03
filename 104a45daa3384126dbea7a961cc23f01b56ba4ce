@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a2bb758f_4a3087a3",
+        "filename": "doc/source/howtos/installation.rst",
+        "patchSetId": 33
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-03T15:44:27Z",
+      "side": 1,
+      "message": "Should we think about changing this from a standard connection entry to a new section?  Like:\n\n  [database]\n  dburi\u003d...\n\nThe big advantage of making this change would be to eliminate the suggestion of being able to have more than one sql connection.\n\nUnless we want to keep the door open for multiple connections?  I don\u0027t think we\u0027d ever have more than one per tenant, but I could see someone wanting a different connection for one or more tenants...\n\nIf we were to do this, we should add the new syntax now while supporting the old, then remove the old in 4.1.0, based on my reading of  http://lists.zuul-ci.org/pipermail/zuul-discuss/2020-March/001158.html",
+      "revId": "104a45daa3384126dbea7a961cc23f01b56ba4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf5d9998_10d7b906",
+        "filename": "doc/source/reference/connections.rst",
+        "patchSetId": 33
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-03T15:44:27Z",
+      "side": 1,
+      "message": "I think the sql driver docs need an update to add the \u0027default\u0027 parameter.",
+      "revId": "104a45daa3384126dbea7a961cc23f01b56ba4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e85c068c_e1abfce0",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-03T15:44:27Z",
+      "side": 1,
+      "message": "s/whether/either/",
+      "revId": "104a45daa3384126dbea7a961cc23f01b56ba4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f4e23f0_45e6aef2",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 33
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-03T15:44:27Z",
+      "side": 1,
+      "message": "s/defatul/default/",
+      "revId": "104a45daa3384126dbea7a961cc23f01b56ba4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
