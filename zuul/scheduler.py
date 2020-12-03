@@ -621,16 +621,32 @@ class Scheduler(threading.Thread):
             tenant_config, script = self.checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
-            abide = loader.loadConfig(
-                self.unparsed_abide, self.ansible_manager)
-            for tenant in abide.tenants.values():
-                self._reconfigureTenant(tenant)
-            # Clean up tenants which were removed by the reconfiguration event
+
+            # Use a new abide without any cached data
+            abide = Abide()
+            loader.loadAdminRules(abide, self.unparsed_abide)
+            for tenant_name in self.unparsed_abide.tenants:
+                with suppress(KeyError):
+                    # Clear the unparsed files cache in Zookeeper
+                    del self.unparsed_files_cache[tenant_name]
+                loader.loadTenant(
+                    abide,
+                    tenant_name,
+                    self.ansible_manager,
+                    self.unparsed_abide,
+                )
+                tenant = abide.tenants.get(tenant_name)
+                old_tenant = self.abide.tenants.get(tenant_name)
+                if tenant is not None:
+                    self._reconfigureTenant(tenant, old_tenant)
+
+            # Clean up tenants which were removed by the reconfiguration
             old_tenants = set(self.abide.tenants.keys())
             new_tenants = set(abide.tenants.keys())
             remove_tenants = old_tenants - new_tenants
             for tenant in remove_tenants:
                 self._cleanupTenant(self.abide.tenants[tenant])
+
             self.abide = abide
         finally:
             self.layout_lock.release()
@@ -675,22 +691,21 @@ class Scheduler(threading.Thread):
 
                 reconfigured_tenants.append(tenant_name)
                 old_tenant = self.abide.tenants.get(tenant_name)
-                if old_tenant is None:
-                    # If there is no old tenant, use a fake tenant with the
-                    # correct name
-                    old_tenant = Tenant(tenant_name)
-                abide = loader.reloadTenant(
-                    self.abide, old_tenant, self.ansible_manager,
-                    self.unparsed_abide)
+                loader.loadTenant(
+                    self.abide,
+                    tenant_name,
+                    self.ansible_manager,
+                    self.unparsed_abide,
+                )
 
-                tenant = abide.tenants.get(tenant_name)
+                tenant = self.abide.tenants.get(tenant_name)
                 if tenant is not None:
-                    self._reconfigureTenant(tenant)
+                    self._reconfigureTenant(tenant, old_tenant)
                 else:
                     # Clean up the old tenant before it's removed from the
                     # current abide in the next step.
-                    self._cleanupTenant(self.abide.tenants[tenant_name])
-                self.abide = abide
+                    self._cleanupTenant(old_tenant)
+
         duration = round(time.monotonic() - start, 3)
         self.log.info("Smart reconfiguration of tenants %s complete "
                       "(duration: %s seconds)", reconfigured_tenants, duration)
@@ -729,19 +744,19 @@ class Scheduler(threading.Thread):
                             project_name
                         ][branch_name]
 
-            old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
                 self._get_key_dir())
-            abide = loader.reloadTenant(
+            old_tenant = self.abide.tenants.get(event.tenant_name)
+            loader.loadTenant(
                 self.abide,
-                old_tenant,
+                event.tenant_name,
                 self.ansible_manager,
+                self.unparsed_abide,
                 zuul_cache_ltime=event.zuul_cache_ltime,
             )
-            tenant = abide.tenants[event.tenant_name]
-            self._reconfigureTenant(tenant)
-            self.abide = abide
+            tenant = self.abide.tenants[event.tenant_name]
+            self._reconfigureTenant(tenant, old_tenant)
         finally:
             self.layout_lock.release()
         duration = round(time.monotonic() - start, 3)
@@ -934,11 +949,9 @@ class Scheduler(threading.Thread):
             f"{TENANT_ROOT}/{tenant.name}", recursive=True
         )
 
-    def _reconfigureTenant(self, tenant):
+    def _reconfigureTenant(self, tenant, old_tenant=None):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
-        old_tenant = self.abide.tenants.get(tenant.name)
-
         if old_tenant:
             # Copy over semaphore handler so we don't loose the currently
             # held semaphores.
