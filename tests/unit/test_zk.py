@@ -18,8 +18,12 @@ import testtools
 
 from tests.base import BaseTestCase, ChrootedKazooFixture, iterate_timeout
 from tests.zk import TestZooKeeperClient
+
 from zuul import model
 from zuul.zk.builds import BuildQueue, BuildState
+from zuul.zk.config_cache import (
+    create_unparsed_files_cache, UnparsedFilesCache
+)
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import BufferedShardIO, NODE_BYTE_SIZE_LIMIT
@@ -178,3 +182,57 @@ class TestSharding(ZooKeeperBaseTestCase):
         ) as shard_io:
             json.dump(data, shard_io)
             self.assertDictEqual(json.load(shard_io), data)
+
+
+class TestConfigCache(ZooKeeperBaseTestCase):
+
+    def test_unparsed_files(self):
+        files = UnparsedFilesCache(self.zk_client, "/test")
+        self.assertEqual(len(files), 0)
+        files["/path/to/file"] = "content"
+        self.assertEqual(files["/path/to/file"], "content")
+        self.assertEqual(len(files), 1)
+
+        other_files = UnparsedFilesCache(self.zk_client, "/test")
+        self.assertEqual(len(other_files), 1)
+        self.assertEqual(other_files["/path/to/file"], "content")
+
+        other_files["/path/to/other"] = "content"
+        self.assertEqual(len(files), 2)
+
+        other_files["/path/to/file"] = "changed"
+        self.assertEqual(other_files["/path/to/file"], "changed")
+        self.assertEqual(files["/path/to/file"], "changed")
+
+        files.clear()
+        self.assertEqual(len(files), 0)
+        self.assertEqual(len(other_files), 0)
+
+    def test_unparsed_files_cache(self):
+        branch_cache = create_unparsed_files_cache(self.zk_client)
+        master_files = branch_cache["tenant1"]["project"]["master"]
+        release_files = branch_cache["tenant1"]["project"]["release"]
+        other_files = branch_cache["tenant1"]["other"]["master"]
+        other_tenant_project = branch_cache["tenant2"]["project"]["master"]
+
+        self.assertEqual(len(master_files), 0)
+        master_files["/path/to/file"] = "content"
+        self.assertEqual(master_files["/path/to/file"], "content")
+        self.assertEqual(len(master_files), 1)
+
+        release_files["/path/to/file"] = "content"
+        other_files["/path/to/file"] = "content"
+        del branch_cache["tenant1"]["project"]["master"]
+        master_files = branch_cache["project"]["master"]
+        self.assertEqual(len(master_files), 0)
+        self.assertEqual(len(release_files), 1)
+        self.assertEqual(len(other_files), 1)
+
+        del branch_cache["tenant1"]["project"]
+        self.assertEqual(len(release_files), 0)
+        self.assertEqual(len(other_files), 1)
+
+        other_tenant_project["/path/to/file"] = "content"
+        del branch_cache["tenant1"]
+        self.assertEqual(len(other_files), 0)
+        self.assertEqual(len(other_tenant_project), 1)
