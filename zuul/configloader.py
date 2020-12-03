@@ -36,6 +36,7 @@ from zuul.lib import encryption
 from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
+from zuul.zk import ZooKeeperClient
 
 
 # Several forms accept either a single item or a list, this makes
@@ -1457,12 +1458,20 @@ class ParseContext(object):
 
 
 class TenantParser(object):
-    def __init__(self, connections, scheduler, merger, keystorage):
+    def __init__(
+        self,
+        connections,
+        scheduler,
+        merger,
+        keystorage,
+    ):
         self.log = logging.getLogger("zuul.TenantParser")
         self.connections = connections
         self.scheduler = scheduler
         self.merger = merger
         self.keystorage = keystorage
+        self.zk_client: ZooKeeperClient = self.scheduler.zk_client
+        self.unparsed_files_cache = self.scheduler.unparsed_files_cache
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret')
@@ -1518,8 +1527,13 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide: Abide, conf: Dict[str, Any],
-                 ansible_manager: AnsibleManager) -> Tenant:
+    def fromYaml(
+        self,
+        abide: Abide,
+        conf: Dict[str, Any],
+        ansible_manager: AnsibleManager,
+        zuul_cache_ltime: Optional[int] = None,
+    ) -> Tenant:
         self.getSchema(self.connections)(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1576,7 +1590,7 @@ class TenantParser(object):
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
         # cache.
-        self._cacheTenantYAML(abide, tenant, loading_errors)
+        self._cacheTenantYAML(abide, tenant, loading_errors, zuul_cache_ltime)
 
         # Then collect the appropriate YAML based on this tenant
         # config.
@@ -1779,7 +1793,9 @@ class TenantParser(object):
 
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors):
+    def _cacheTenantYAML(
+        self, abide, tenant, loading_errors, zuul_cache_ltime
+    ):
         jobs = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
@@ -1799,6 +1815,34 @@ class TenantParser(object):
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
                     continue
+                files_cache = self.unparsed_files_cache[tenant.name][
+                    project.canonical_name
+                ][branch]
+                if (
+                    zuul_cache_ltime is not None
+                    and files_cache.ltime > zuul_cache_ltime
+                ):
+                    self.log.debug(
+                        "Using files from cache for project %s @%s",
+                        project.canonical_name, branch
+                    )
+                    for fn in files_cache:
+                        source_context = model.SourceContext(
+                            project, branch, fn, False
+                        )
+                        self.log.info(
+                            "Loading configuration from %s", source_context
+                        )
+                        incdata = self.loadProjectYAML(
+                            files_cache[fn],
+                            source_context,
+                            loading_errors
+                        )
+                        branch_cache.put(source_context.path, incdata)
+                    branch_cache.setValidFor(tpc)
+                    continue
+
+                cache_ltime = self.zk_client.zxid
                 job = self.merger.getFiles(
                     project.source.connection.connection_name,
                     project.name, branch,
@@ -1810,6 +1854,7 @@ class TenantParser(object):
                     project.name, branch))
                 job.source_context = model.SourceContext(
                     project, branch, '', False)
+                job.cache_ltime = cache_ltime
                 jobs.append(job)
                 branch_cache.setValidFor(tpc)
 
@@ -1822,12 +1867,15 @@ class TenantParser(object):
                            (job, job.files.keys()))
             loaded = False
             files = sorted(job.files.keys())
-            unparsed_config = model.UnparsedConfig()
             tpc = tenant.project_configs[
                 job.source_context.project.canonical_name]
             for conf_root in (
                     ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
                     tpc.extra_config_files + tpc.extra_config_dirs):
+
+                files_cache = self.unparsed_files_cache[tenant.name][
+                    job.source_context.project.canonical_name
+                ][job.source_context.branch]
                 for fn in files:
                     fn_root = fn.split('/')[0]
                     if fn_root != conf_root or not job.files.get(fn):
@@ -1854,7 +1902,9 @@ class TenantParser(object):
                         source_context.project.canonical_name,
                         source_context.branch)
                     branch_cache.put(source_context.path, incdata)
-                    unparsed_config.extend(incdata)
+                    # Cache file in Zookeeper
+                    files_cache[source_context.path] = job.files[fn]
+                files_cache.ltime = job.cache_ltime
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()
@@ -2237,10 +2287,14 @@ class ConfigLoader(object):
                     self.log.warning(err.error)
         return abide
 
-    def reloadTenant(self, abide: model.Abide, tenant: model.Tenant,
-                     ansible_manager: ansible.AnsibleManager,
-                     unparsed_abide: Optional[model.UnparsedAbideConfig] = None
-                     ) -> model.Abide:
+    def reloadTenant(
+        self,
+        abide: model.Abide,
+        tenant: model.Tenant,
+        ansible_manager: ansible.AnsibleManager,
+        unparsed_abide: Optional[model.UnparsedAbideConfig] = None,
+        zuul_cache_ltime: Optional[int] = None,
+    ) -> model.Abide:
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
         new_abide.admin_rules = abide.admin_rules.copy()
@@ -2262,7 +2316,8 @@ class ConfigLoader(object):
 
         # When reloading a tenant only, use cached data if available.
         new_tenant = self.tenant_parser.fromYaml(
-            new_abide, unparsed_config, ansible_manager)
+            new_abide, unparsed_config, ansible_manager, zuul_cache_ltime,
+        )
         new_abide.tenants[tenant.name] = new_tenant
         if new_tenant.layout and len(new_tenant.layout.loading_errors):
             self.log.warning(
