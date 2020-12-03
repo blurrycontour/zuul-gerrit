@@ -26,6 +26,7 @@ import time
 import traceback
 import urllib
 from configparser import ConfigParser
+from contextlib import suppress
 from threading import Thread
 from typing import Optional, Dict, TYPE_CHECKING, Callable, Any
 
@@ -74,6 +75,7 @@ from zuul.nodepool import Nodepool
 from zuul.rpclistener import RPCListener, RPCListenerSlow
 from zuul.trigger import BaseTrigger
 from zuul.zk import ZooKeeperClient
+from zuul.zk.config_cache import create_unparsed_files_cache
 from zuul.zk.components import ZooKeeperComponent, ZooKeeperComponentRegistry,\
     ZooKeeperComponentState
 from zuul.zk.event_queues import (
@@ -171,6 +173,7 @@ class Scheduler(threading.Thread):
         self.zk_connection_event: ZooKeeperConnectionEvent =\
             ZooKeeperConnectionEvent(zk_client)
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
+        self.unparsed_files_cache = create_unparsed_files_cache(self.zk_client)
 
         self.global_watcher = GlobalEventWatcher(
             self.zk_client, self.wake_event.set
@@ -707,12 +710,34 @@ class Scheduler(threading.Thread):
                                project_name, branch_name)
                 self.abide.clearUnparsedBranchCache(project_name,
                                                     branch_name)
+                if branch_name is None:
+                    self.log.debug(
+                        "Clearing Zookeeper branch cache: %s @%s",
+                        project_name, branch_name
+                    )
+                    with suppress(KeyError):
+                        del self.unparsed_files_cache[event.tenant_name][
+                            project_name
+                        ]
+                else:
+                    self.log.debug(
+                        "Clearing Zookeeper project cache: %s", project_name
+                    )
+                    with suppress(KeyError):
+                        del self.unparsed_files_cache[event.tenant_name][
+                            project_name
+                        ][branch_name]
+
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
                 self._get_key_dir())
             abide = loader.reloadTenant(
-                self.abide, old_tenant, self.ansible_manager)
+                self.abide,
+                old_tenant,
+                self.ansible_manager,
+                zuul_cache_ltime=event.zuul_cache_ltime,
+            )
             tenant = abide.tenants[event.tenant_name]
             self._reconfigureTenant(tenant)
             self.abide = abide
