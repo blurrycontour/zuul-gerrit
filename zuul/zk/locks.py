@@ -61,3 +61,11 @@ def tenant_write_lock(
 ) -> WriteLock:
     lock_path = "/".join((TENANT_LOCK_ROOT, tenant_name))
     return client.kazoo_client.WriteLock(lock_path)
+
+
+def pipeline_lock(
+    client: ZooKeeperClient, tenant_name: str, pipeline_name: str
+) -> Lock:
+    return client.kazoo_client.Lock(
+        "/zuul/locks/pipeline/{}/{}".format(tenant_name, pipeline_name)
+    )
