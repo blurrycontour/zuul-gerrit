@@ -2267,67 +2267,44 @@ class ConfigLoader(object):
         unparsed_abide.extend(data)
         return unparsed_abide
 
-    def loadConfig(self, unparsed_abide, ansible_manager):
-        abide = model.Abide()
+    def loadAdminRules(
+        self,
+        abide: model.Abide,
+        unparsed_abide: model.UnparsedAbideConfig
+    ) -> None:
         for conf_admin_rule in unparsed_abide.admin_rules:
             admin_rule = self.admin_rule_parser.fromYaml(conf_admin_rule)
             abide.admin_rules[admin_rule.name] = admin_rule
-        for conf_tenant in unparsed_abide.tenants:
-            # When performing a full reload, do not use cached data.
-            tenant = self.tenant_parser.fromYaml(
-                abide, conf_tenant, ansible_manager)
-            abide.tenants[tenant.name] = tenant
-            if len(tenant.layout.loading_errors):
-                self.log.warning(
-                    "%s errors detected during %s tenant "
-                    "configuration loading" % (
-                        len(tenant.layout.loading_errors), tenant.name))
-                # Log accumulated errors
-                for err in tenant.layout.loading_errors.errors[:10]:
-                    self.log.warning(err.error)
-        return abide
 
-    def reloadTenant(
+    def loadTenant(
         self,
         abide: model.Abide,
-        tenant: model.Tenant,
+        tenant_name: str,
         ansible_manager: ansible.AnsibleManager,
-        unparsed_abide: Optional[model.UnparsedAbideConfig] = None,
+        unparsed_abide: model.UnparsedAbideConfig,
         zuul_cache_ltime: Optional[int] = None,
-    ) -> model.Abide:
-        new_abide = model.Abide()
-        new_abide.tenants = abide.tenants.copy()
-        new_abide.admin_rules = abide.admin_rules.copy()
-        new_abide.unparsed_project_branch_cache = \
-            abide.unparsed_project_branch_cache
+    ) -> None:
+        # First check if the tenant is still existing and if not remove
+        # from the abide.
+        if tenant_name not in unparsed_abide.tenants:
+            del abide.tenants[tenant_name]
+            return
 
-        if unparsed_abide:
-            # We got a new unparsed abide so re-load the tenant completely.
-            # First check if the tenant is still existing and if not remove
-            # from the abide.
-            if tenant.name not in unparsed_abide.known_tenants:
-                del new_abide.tenants[tenant.name]
-                return new_abide
-
-            unparsed_config = next(t for t in unparsed_abide.tenants
-                                   if t['name'] == tenant.name)
-        else:
-            unparsed_config = tenant.unparsed_config
+        unparsed_config = unparsed_abide.tenants[tenant_name]
 
         # When reloading a tenant only, use cached data if available.
         new_tenant = self.tenant_parser.fromYaml(
-            new_abide, unparsed_config, ansible_manager, zuul_cache_ltime,
+            abide, unparsed_config, ansible_manager, zuul_cache_ltime
         )
-        new_abide.tenants[tenant.name] = new_tenant
+        abide.tenants[tenant_name] = new_tenant
         if new_tenant.layout and len(new_tenant.layout.loading_errors):
             self.log.warning(
-                "%s errors detected during %s tenant "
-                "configuration re-loading" % (
-                    len(new_tenant.layout.loading_errors), tenant.name))
+                "%s errors detected during %s tenant configuration loading",
+                len(new_tenant.layout.loading_errors), tenant_name
+            )
             # Log accumulated errors
             for err in new_tenant.layout.loading_errors.errors[:10]:
                 self.log.warning(err.error)
-        return new_abide
 
     def _loadDynamicProjectData(self, config, project,
                                 files, trusted, item, loading_errors,
