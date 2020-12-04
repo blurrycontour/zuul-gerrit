@@ -762,12 +762,10 @@ class Scheduler(threading.Thread):
             # We need to handle new and deleted tenants so we need to process
             # all tenants from the currently known and the new ones.
             tenant_names = {t for t in self.abide.tenants}
-            tenant_names.update(self.unparsed_abide.known_tenants)
+            tenant_names.update(self.unparsed_abide.tenants.keys())
             for tenant_name in tenant_names:
-                old_tenant = [x for x in old_unparsed_abide.tenants
-                              if x['name'] == tenant_name]
-                new_tenant = [x for x in self.unparsed_abide.tenants
-                              if x['name'] == tenant_name]
+                old_tenant = old_unparsed_abide.tenants.get(tenant_name)
+                new_tenant = self.unparsed_abide.tenants.get(tenant_name)
                 if old_tenant == new_tenant:
                     continue
 
@@ -1845,7 +1843,7 @@ class Scheduler(threading.Thread):
         data['pipelines'] = pipelines
         tenant = self.abide.tenants.get(tenant_name)
         if not tenant:
-            if tenant_name not in self.unparsed_abide.known_tenants:
+            if tenant_name not in self.unparsed_abide.tenants:
                 return json.dumps({
                     "message": "Unknown tenant",
                     "code": 404
