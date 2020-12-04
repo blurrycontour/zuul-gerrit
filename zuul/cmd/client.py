@@ -732,7 +732,7 @@ class Client(zuul.cmd.ZuulApp):
                                                  from_script=script)
         err_code = 0
         try:
-            for conf_tenant in unparsed_abide.tenants:
+            for conf_tenant in unparsed_abide.tenants.values():
                 TenantParser.getSchema(self.connections)(conf_tenant)
             print("Tenants config validated with success")
         except Exception as e:
