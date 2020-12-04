@@ -55,9 +55,7 @@ encryption tag may be a list rather than a scalar.  For example:
           - HdWDS9lCBaBJnhMsm/O9tpzCq+GKRELpRzUwVgU5k822uBwhZemeSrUOLQ8hQ7q/vVHln
             ...
 
-Zuul provides a standalone script to make encrypting values easy; it
-can be found at `tools/encrypt_secret.py` in the Zuul source
-directory.
+The `zuul-client utility <https://zuul-ci.org/docs/zuul-client/>`_` provides a
+simple way to encrypt secrets for a Zuul project:
 
-.. program-output:: python3 ../../tools/encrypt_secret.py --help
-
+.. program-output:: zuul-client encrypt --help
