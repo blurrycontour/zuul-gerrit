@@ -1397,8 +1397,8 @@ class GerritConnection(BaseConnection):
                 urllib.parse.quote(self.user, safe=''),
                 urllib.parse.quote(self.password, safe=''),
                 baseurl[1])
-            baseurl = urllib.parse.urlunparse(baseurl)
-            url = ('%s/%s' % (baseurl, project.name))
+            baseurl_str = urllib.parse.urlunparse(baseurl)
+            url = ('%s/%s' % (baseurl_str, project.name))
         else:
             url = 'ssh://%s@%s:%s/%s' % (self.user, self.server, self.port,
                                          project.name)
