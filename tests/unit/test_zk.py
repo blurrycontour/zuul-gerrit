@@ -13,6 +13,7 @@
 # under the License.
 
 import json
+from contextlib import suppress
 
 import testtools
 
@@ -25,6 +26,7 @@ from zuul.zk.config_cache import (
     create_unparsed_files_cache, UnparsedFilesCache
 )
 from zuul.zk.exceptions import LockException
+from zuul.zk.locks import locked, LockFailedError
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import BufferedShardIO, NODE_BYTE_SIZE_LIMIT
 
@@ -236,3 +238,25 @@ class TestConfigCache(ZooKeeperBaseTestCase):
         del branch_cache["tenant1"]
         self.assertEqual(len(other_files), 0)
         self.assertEqual(len(other_tenant_project), 1)
+
+
+class TestLocks(ZooKeeperBaseTestCase):
+
+    def test_locked_context_manager(self):
+        lock1 = self.zk_client.client.Lock("/lock1")
+        lock2 = self.zk_client.client.Lock("/lock2")
+
+        with locked(lock1, lock2, blocking=False):
+            pass
+        self.assertFalse(lock1.is_acquired)
+        self.assertFalse(lock2.is_acquired)
+
+    def test_already_locked(self):
+        lock1 = self.zk_client.client.Lock("/lock1")
+        lock2 = self.zk_client.client.Lock("/lock2")
+
+        lock2.acquire(blocking=False)
+        with suppress(LockFailedError):
+            with locked(lock1, lock2, blocking=False):
+                raise Exception("This should not happen")
+        self.assertFalse(lock1.is_acquired)
