@@ -94,6 +94,12 @@ from zuul.zk.event_queues import (
     PipelineTriggerEventQueue,
     TENANT_ROOT,
 )
+from zuul.zk.locks import (
+    locked,
+    LockFailedError,
+    tenant_read_lock,
+    tenant_write_lock,
+)
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 if TYPE_CHECKING:
@@ -626,19 +632,21 @@ class Scheduler(threading.Thread):
             abide = Abide()
             loader.loadAdminRules(abide, self.unparsed_abide)
             for tenant_name in self.unparsed_abide.tenants:
-                with suppress(KeyError):
-                    # Clear the unparsed files cache in Zookeeper
-                    del self.unparsed_files_cache[tenant_name]
-                loader.loadTenant(
-                    abide,
-                    tenant_name,
-                    self.ansible_manager,
-                    self.unparsed_abide,
-                )
-                tenant = abide.tenants.get(tenant_name)
-                old_tenant = self.abide.tenants.get(tenant_name)
-                if tenant is not None:
-                    self._reconfigureTenant(tenant, old_tenant)
+                tlock = tenant_write_lock(self.zk_client, tenant_name)
+                with locked(tlock):
+                    with suppress(KeyError):
+                        # Clear the unparsed files cache in Zookeeper
+                        del self.unparsed_files_cache[tenant_name]
+                    loader.loadTenant(
+                        abide,
+                        tenant_name,
+                        self.ansible_manager,
+                        self.unparsed_abide,
+                    )
+                    tenant = abide.tenants.get(tenant_name)
+                    old_tenant = self.abide.tenants.get(tenant_name)
+                    if tenant is not None:
+                        self._reconfigureTenant(tenant, old_tenant)
 
             # Clean up tenants which were removed by the reconfiguration
             old_tenants = set(self.abide.tenants.keys())
@@ -691,20 +699,22 @@ class Scheduler(threading.Thread):
 
                 reconfigured_tenants.append(tenant_name)
                 old_tenant = self.abide.tenants.get(tenant_name)
-                loader.loadTenant(
-                    self.abide,
-                    tenant_name,
-                    self.ansible_manager,
-                    self.unparsed_abide,
-                )
+                tlock = tenant_write_lock(self.zk_client, tenant_name)
+                with locked(tlock):
+                    loader.loadTenant(
+                        self.abide,
+                        tenant_name,
+                        self.ansible_manager,
+                        self.unparsed_abide,
+                    )
 
-                tenant = self.abide.tenants.get(tenant_name)
-                if tenant is not None:
-                    self._reconfigureTenant(tenant, old_tenant)
-                else:
-                    # Clean up the old tenant before it's removed from the
-                    # current abide in the next step.
-                    self._cleanupTenant(old_tenant)
+                    tenant = self.abide.tenants.get(tenant_name)
+                    if tenant is not None:
+                        self._reconfigureTenant(tenant, old_tenant)
+                    else:
+                        # Clean up the old tenant before it's removed from the
+                        # current abide in the next step.
+                        self._cleanupTenant(old_tenant)
 
         duration = round(time.monotonic() - start, 3)
         self.log.info("Smart reconfiguration of tenants %s complete "
@@ -1106,37 +1116,61 @@ class Scheduler(threading.Thread):
                 if not self._stopped:
                     self.process_global_trigger_queue()
 
-                for tenant in self.abide.tenants.values():
-                    for pipeline in tenant.layout.pipelines.values():
-                        if not self._stopped:
-                            self.process_management_queue(tenant, pipeline)
-
-                        if not self._stopped:
-                            # Give result events priority -- they let us stop
-                            # builds, whereas trigger events cause us to
-                            # execute builds.
-                            self.process_result_queue(tenant, pipeline)
-
-                        if not self._stopped:
-                            self.process_trigger_queue(tenant, pipeline)
-
-                        try:
-                            while not self._stopped:
-                                if not pipeline.manager.processQueue():
-                                    break
-                        except Exception:
-                            self.log.exception(
-                                "Exception in pipeline processing:")
-                            pipeline.state = pipeline.STATE_ERROR
-                            # Continue processing other pipelines+tenants
-                        else:
-                            pipeline.state = pipeline.STATE_NORMAL
+                if not self._stopped:
+                    self.process_pipelines()
             except Exception:
                 self.log.exception("Exception in run handler:")
                 # There may still be more events to process
                 self.wake_event.set()
             finally:
                 self.run_handler_lock.release()
+
+    def process_pipelines(self) -> None:
+        for tenant in self.abide.tenants.values():
+            if tenant.layout is None:
+                continue
+
+            tlock = tenant_read_lock(self.zk_client, tenant.name)
+            for pipeline in tenant.layout.pipelines.values():
+                if self._stopped:
+                    return
+                try:
+                    self.log.debug("Locking tenant %s", tenant.name)
+                    # We (re-)lock the tenant for every pipeline so the
+                    # scheduler has a chance to get the write lock if needed.
+                    with locked(tlock, blocking=False):
+                        self._process_pipeline(tenant, pipeline)
+                except LockFailedError:
+                    self.log.debug("Skipping locked tenant: %s", tenant.name)
+                    break
+
+    def _process_pipeline(self, tenant: Tenant, pipeline: Pipeline) -> None:
+        if pipeline.manager is None:
+            return
+
+        if not self._stopped:
+            self.process_management_queue(tenant, pipeline)
+
+        if not self._stopped:
+            # Give result events priority -- they let us stop
+            # builds, whereas trigger events cause us to
+            # execute builds.
+            self.process_result_queue(tenant, pipeline)
+
+        if not self._stopped:
+            self.process_trigger_queue(tenant, pipeline)
+
+        try:
+            while not self._stopped:
+                if not pipeline.manager.processQueue():
+                    break
+        except Exception:
+            self.log.exception(
+                "Exception in pipeline processing:")
+            pipeline.state = pipeline.STATE_ERROR
+            # Continue processing other pipelines+tenants
+        else:
+            pipeline.state = pipeline.STATE_NORMAL
 
     def maintainConnectionCache(self):
         # TODOv3(jeblair): update for tenants
