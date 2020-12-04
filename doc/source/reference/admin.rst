@@ -7,4 +7,4 @@ Admin Reference
    tenants
    connections
    drivers/index
-   client
+   old-client
