@@ -69,3 +69,7 @@ def pipeline_lock(
     return client.kazoo_client.Lock(
         "/zuul/locks/pipeline/{}/{}".format(tenant_name, pipeline_name)
     )
+
+
+def event_queue_lock(client: ZooKeeperClient, queue_name: str) -> Lock:
+    return client.kazoo_client.Lock("/zuul/locks/events/{}".format(queue_name))
