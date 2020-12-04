@@ -2309,8 +2309,7 @@ class ConfigLoader(object):
                 del new_abide.tenants[tenant.name]
                 return new_abide
 
-            unparsed_config = next(t for t in unparsed_abide.tenants
-                                   if t['name'] == tenant.name)
+            unparsed_config = unparsed_abide.tenants[tenant.name]
         else:
             unparsed_config = tenant.unparsed_config
 
