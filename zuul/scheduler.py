@@ -97,6 +97,7 @@ from zuul.zk.event_queues import (
 from zuul.zk.locks import (
     locked,
     LockFailedError,
+    pipeline_lock,
     tenant_read_lock,
     tenant_write_lock,
 )
@@ -1134,12 +1135,23 @@ class Scheduler(threading.Thread):
             for pipeline in tenant.layout.pipelines.values():
                 if self._stopped:
                     return
+                plock = pipeline_lock(
+                    self.zk_client, tenant.name, pipeline.name
+                )
                 try:
                     self.log.debug("Locking tenant %s", tenant.name)
                     # We (re-)lock the tenant for every pipeline so the
                     # scheduler has a chance to get the write lock if needed.
                     with locked(tlock, blocking=False):
-                        self._process_pipeline(tenant, pipeline)
+                        self.log.debug("Locking pipeline %s", pipeline.name)
+                        try:
+                            with locked(plock, blocking=False):
+                                self._process_pipeline(tenant, pipeline)
+                        except LockFailedError:
+                            self.log.debug(
+                                "Skipping locked pipeline %s in tenant",
+                                pipeline.name, tenant.name
+                            )
                 except LockFailedError:
                     self.log.debug("Skipping locked tenant: %s", tenant.name)
                     break
