@@ -95,6 +95,7 @@ from zuul.zk.event_queues import (
     TENANT_ROOT,
 )
 from zuul.zk.locks import (
+    event_queue_lock,
     locked,
     LockFailedError,
     pipeline_lock,
@@ -191,12 +192,16 @@ class Scheduler(threading.Thread):
         self.pipeline_watcher = PipelineEventWatcher(
             self.zk_client, self.wake_event.set
         )
+        self.management_queue_lock = event_queue_lock(
+            self.zk_client, "management"
+        )
         self.management_events = GlobalManagementEventQueue(self.zk_client)
         self.pipeline_management_events = (
             PipelineManagementEventQueue.create_registry(
                 self.zk_client
             )
         )
+        self.trigger_queue_lock = event_queue_lock(self.zk_client, "trigger")
         self.trigger_events = GlobalTriggerEventQueue(
             self.zk_client, self.connections
         )
@@ -1112,10 +1117,20 @@ class Scheduler(threading.Thread):
             self.run_handler_lock.acquire()
             try:
                 if not self._stopped:
-                    self.process_global_management_queue()
+                    try:
+                        with locked(
+                            self.management_queue_lock, blocking=False
+                        ):
+                            self.process_global_management_queue()
+                    except LockFailedError:
+                        self.log.debug("Skipping locked management queue")
 
                 if not self._stopped:
-                    self.process_global_trigger_queue()
+                    try:
+                        with locked(self.trigger_queue_lock, blocking=False):
+                            self.process_global_trigger_queue()
+                    except LockFailedError:
+                        self.log.debug("Skipping locked trigger queue")
 
                 if not self._stopped:
                     self.process_pipelines()
