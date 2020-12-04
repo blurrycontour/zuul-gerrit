@@ -2278,10 +2278,9 @@ class ConfigLoader(object):
             abide.admin_rules[admin_rule.name] = admin_rule
 
         if tenants:
-            tenants_to_load = [t for t in unparsed_abide.tenants
-                               if t.get('name') in tenants]
+            tenants_to_load = [unparsed_abide.tenants[t] for t in tenants]
         else:
-            tenants_to_load = unparsed_abide.tenants
+            tenants_to_load = unparsed_abide.tenants.values()
 
         for conf_tenant in tenants_to_load:
             # When performing a full reload, do not use cached data.
@@ -2310,12 +2309,11 @@ class ConfigLoader(object):
             # We got a new unparsed abide so re-load the tenant completely.
             # First check if the tenant is still existing and if not remove
             # from the abide.
-            if tenant.name not in unparsed_abide.known_tenants:
+            if tenant.name not in unparsed_abide.tenants:
                 del new_abide.tenants[tenant.name]
                 return new_abide
 
-            unparsed_config = next(t for t in unparsed_abide.tenants
-                                   if t['name'] == tenant.name)
+            unparsed_config = unparsed_abide.tenants[tenant.name]
         else:
             unparsed_config = tenant.unparsed_config
 

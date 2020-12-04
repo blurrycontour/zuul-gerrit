@@ -4192,13 +4192,12 @@ class UnparsedAbideConfig(object):
     """
 
     def __init__(self):
-        self.tenants = []
+        self.tenants = {}
         self.admin_rules = []
-        self.known_tenants = set()
 
     def extend(self, conf):
         if isinstance(conf, UnparsedAbideConfig):
-            self.tenants.extend(conf.tenants)
+            self.tenants.update(conf.tenants)
             self.admin_rules.extend(conf.admin_rules)
             return
 
@@ -4212,9 +4211,7 @@ class UnparsedAbideConfig(object):
                 raise ConfigItemMultipleKeysError(item)
             key, value = list(item.items())[0]
             if key == 'tenant':
-                self.tenants.append(value)
-                if 'name' in value:
-                    self.known_tenants.add(value['name'])
+                self.tenants[value["name"]] = value
             elif key == 'admin-rule':
                 self.admin_rules.append(value)
             else:
