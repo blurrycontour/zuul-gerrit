@@ -2272,7 +2272,7 @@ class ConfigLoader(object):
         for conf_admin_rule in unparsed_abide.admin_rules:
             admin_rule = self.admin_rule_parser.fromYaml(conf_admin_rule)
             abide.admin_rules[admin_rule.name] = admin_rule
-        for conf_tenant in unparsed_abide.tenants:
+        for conf_tenant in unparsed_abide.tenants.values():
             # When performing a full reload, do not use cached data.
             tenant = self.tenant_parser.fromYaml(
                 abide, conf_tenant, ansible_manager)
@@ -2305,12 +2305,11 @@ class ConfigLoader(object):
             # We got a new unparsed abide so re-load the tenant completely.
             # First check if the tenant is still existing and if not remove
             # from the abide.
-            if tenant.name not in unparsed_abide.known_tenants:
+            if tenant.name not in unparsed_abide.tenants:
                 del new_abide.tenants[tenant.name]
                 return new_abide
 
-            unparsed_config = next(t for t in unparsed_abide.tenants
-                                   if t['name'] == tenant.name)
+            unparsed_config = unparsed_abide.tenants[tenant.name]
         else:
             unparsed_config = tenant.unparsed_config
 
