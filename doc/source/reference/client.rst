@@ -1,12 +1,17 @@
-:title: Zuul Client
+:title: Zuul Admin Client (Deprecated)
 
-Zuul Client
-===========
+Zuul Admin Client (Deprecated)
+==============================
+
+Zuul Admin Client is the old command line used to help with Zuul administrative
+tasks and it is going to be replaced by the newer `zuul-client`_
 
 Zuul includes a simple command line client that may be used to affect Zuul's
 behavior while running. It must be run on a host that has access to the Gearman
 server (e.g., locally on the Zuul host), or on a host with access to Zuul's web
 server.
+
+.. _zuul-client: https://zuul-ci.org/docs/zuul-client/
 
 Configuration
 -------------

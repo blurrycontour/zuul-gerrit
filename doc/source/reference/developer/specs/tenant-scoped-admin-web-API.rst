@@ -419,8 +419,8 @@ At DEBUG level the log entry will also contain the JSON body passed to the query
 The events will be logged at zuul.web's level but a new handler focused on auditing
 could also be created.
 
-Zuul Client CLI and Admin Web API
-.................................
+Zuul Admin Client CLI and Admin Web API
+.......................................
 
 The CLI will be modified to call the REST API instead of using a Gearman server
 if the CLI's configuration file is lacking a ``[gearman]`` section but has a
