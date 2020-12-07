@@ -4559,6 +4559,23 @@ class TestScheduler(ZuulTestCase):
         self.assertIn('project-post', job_names)
         self.assertEqual(r, True)
 
+        r = client.enqueue_ref(
+            tenant='tenant-one',
+            pipeline='post',
+            project='org/project',
+            trigger=None,
+            ref='master',
+            oldrev='0' * 40,
+            newrev='0' * 40)
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 2)
+        self.assertHistory([
+            dict(name='project-post', result='SUCCESS',
+                 ref='refs/heads/master'),
+            dict(name='project-post', result='SUCCESS',
+                 ref='refs/heads/master'),
+        ], ordered=False)
+
     def test_client_dequeue_ref(self):
         "Test that the RPC client can dequeue a ref"
 

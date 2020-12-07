@@ -1177,7 +1177,9 @@ class Merger(object):
                     self._saveRepoState(item['connection'], item['project'],
                                         repo, repo_state, recent, branches)
 
-                if item.get('newrev'):
+                if (item.get('newrev') and not (item.get('oldrev') and
+                    item['newrev'] == NULL_REF and
+                    item['oldrev'] == NULL_REF)):
                     # This is a ref update rather than a branch tip, so make
                     # sure our returned state includes this change.
                     self._alterRepoState(
