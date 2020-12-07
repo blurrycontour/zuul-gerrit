@@ -138,6 +138,17 @@ class RPCListenerSlow(RPCListenerBase):
 
         if not errors:
             event.ref = args['ref']
+            if event.ref.startswith('refs/heads/'):
+                event.branch = event.ref[len('refs/heads/'):]
+            elif not event.ref.startswith('refs/'):
+                branch = event.ref
+                tenant = self.sched.abide.tenants.get(args['tenant'])
+                if tenant:
+                    project_branches = project.source.\
+                        getProjectBranches(project, tenant)
+                    if branch in project_branches:
+                        event.branch = branch
+                        event.ref = 'refs/heads/' + branch
             event.oldrev = args['oldrev']
             event.newrev = args['newrev']
             try:
