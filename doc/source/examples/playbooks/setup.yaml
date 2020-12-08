@@ -109,4 +109,4 @@
           ssh_key: "{{ lookup('file', '/var/ssh/zuul.pub') }}"
           http_password: secret
           groups:
-            - "Non-Interactive Users"
+            - "Service Users"
