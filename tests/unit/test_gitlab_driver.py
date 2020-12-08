@@ -19,11 +19,14 @@ import yaml
 import socket
 
 import zuul.rpcclient
+from zuul.zk.layout import LayoutState
 
 from tests.base import random_sha1, simple_layout
 from tests.base import ZuulTestCase, ZuulWebFixture
 
 from testtools.matchers import MatchesRegex
+
+EMPTY_LAYOUT_STATE = LayoutState("", "unknown", 0)
 
 
 class TestGitlabWebhook(ZuulTestCase):
@@ -302,12 +305,14 @@ class TestGitlabDriver(ZuulTestCase):
         event = self.fake_gitlab.getPushEvent(
             'org/project', branch='refs/heads/stable-1.0',
             before='0' * 40, after=newrev)
-        old = self.scheds.first.sched.tenant_last_reconfigured.get(
-            'tenant-one', 0)
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         self.fake_gitlab.emitEvent(event)
         self.waitUntilSettled()
-        new = self.scheds.first.sched.tenant_last_reconfigured.get(
-            'tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         # New timestamp should be greater than the old timestamp
         self.assertLess(old, new)
         self.assertEqual(1, len(self.history))
@@ -391,8 +396,9 @@ class TestGitlabDriver(ZuulTestCase):
     def test_ref_updated_and_tenant_reconfigure(self):
 
         self.waitUntilSettled()
-        old = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
 
         zuul_yaml = [
             {'job': {
@@ -418,8 +424,9 @@ class TestGitlabDriver(ZuulTestCase):
         self.fake_gitlab.emitEvent(event)
         self.waitUntilSettled()
 
-        new = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         # New timestamp should be greater than the old timestamp
         self.assertLess(old, new)
 
@@ -845,14 +852,16 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
                                                branch='refs/heads/master')
 
         # record previous tenant reconfiguration time, which may not be set
-        old = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         self.waitUntilSettled()
 
         self.fake_gitlab.emitEvent(pevent)
         self.waitUntilSettled()
-        new = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
 
         # We don't expect a reconfiguration because the push was to an
         # unprotected branch
@@ -863,8 +872,9 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         self.fake_gitlab.emitEvent(pevent)
         self.waitUntilSettled()
-        new = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
 
         # We now expect that zuul reconfigured itself
         self.assertLess(old, new)
@@ -889,8 +899,9 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
         self.waitUntilSettled()
 
         # record previous tenant reconfiguration time, which may not be set
-        old = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         self.waitUntilSettled()
 
         # Delete the branch
@@ -903,8 +914,9 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         self.fake_gitlab.emitEvent(pevent)
         self.waitUntilSettled()
-        new = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
 
         # We now expect that zuul reconfigured itself as we deleted a protected
         # branch
@@ -963,8 +975,9 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
             after=new_sha)
 
         # record previous tenant reconfiguration time, which may not be set
-        old = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         self.waitUntilSettled()
 
         if expected_cat_jobs is not None:
@@ -974,8 +987,9 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
 
         self.fake_gitlab.emitEvent(pevent)
         self.waitUntilSettled()
-        new = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
 
         if expect_reconfigure:
             # New timestamp should be greater than the old timestamp
