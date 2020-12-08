@@ -21,9 +21,12 @@ import socket
 from testtools.matchers import MatchesRegex
 
 import zuul.rpcclient
+from zuul.zk.layout import LayoutState
 
 from tests.base import ZuulTestCase, simple_layout
 from tests.base import ZuulWebFixture
+
+EMPTY_LAYOUT_STATE = LayoutState("", "unknown", 0)
 
 
 class TestPagureDriver(ZuulTestCase):
@@ -213,12 +216,14 @@ class TestPagureDriver(ZuulTestCase):
         newrev = repo.commit('refs/heads/stable-1.0').hexsha
         event = self.fake_pagure.getGitBranchEvent(
             'org/project', 'stable-1.0', 'creation', newrev)
-        old = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         self.fake_pagure.emitEvent(event)
         self.waitUntilSettled()
-        new = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         # New timestamp should be greater than the old timestamp
         self.assertLess(old, new)
         self.assertEqual(1, len(self.history))
@@ -246,8 +251,9 @@ class TestPagureDriver(ZuulTestCase):
     def test_ref_updated_and_tenant_reconfigure(self):
 
         self.waitUntilSettled()
-        old = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
 
         zuul_yaml = [
             {'job': {
@@ -273,8 +279,9 @@ class TestPagureDriver(ZuulTestCase):
         self.fake_pagure.emitEvent(event)
         self.waitUntilSettled()
 
-        new = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE
+        )
         # New timestamp should be greater than the old timestamp
         self.assertLess(old, new)
 
