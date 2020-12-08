@@ -21,8 +21,10 @@ import voluptuous as v
 import time
 import uuid
 import requests
+
+import dateutil.parser
+
 from urllib.parse import quote_plus
-from datetime import datetime
 
 from zuul.connection import BaseConnection
 from zuul.web.handler import BaseWebController
@@ -110,10 +112,10 @@ class GitlabEventConnector(threading.Thread):
         event = GitlabTriggerEvent()
         attrs = body.get('object_attributes')
         if attrs:
-            event.updated_at = int(datetime.strptime(
-                attrs['updated_at'], '%Y-%m-%d %H:%M:%S %Z').strftime('%s'))
-            event.created_at = int(datetime.strptime(
-                attrs['created_at'], '%Y-%m-%d %H:%M:%S %Z').strftime('%s'))
+            event.updated_at = int(dateutil.parser.parse(
+                attrs['updated_at']).timestamp())
+            event.created_at = int(dateutil.parser.parse(
+                attrs['created_at']).timestamp())
         event.project_name = body['project']['path_with_namespace']
         return event
 
@@ -539,8 +541,8 @@ class GitlabConnection(BaseConnection):
         change.approved = change.mr['approved']
         change.message = change.mr['description']
         change.labels = change.mr['labels']
-        change.updated_at = int(datetime.strptime(
-            change.mr['updated_at'], '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%s'))
+        change.updated_at = dateutil.parser.parse(
+            change.mr['updated_at']).timestamp()
         log.info("Updated change from Gitlab %s" % change)
 
         if self.sched:
