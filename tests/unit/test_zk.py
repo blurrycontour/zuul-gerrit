@@ -23,6 +23,7 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi, BuildRequestEvent
+from zuul.zk.layout import LayoutStateStore, LayoutState
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import (
     RawShardIO,
@@ -639,3 +640,14 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(len(reqs), 1)
         a = reqs[0]
         self.assertEqual(a.uuid, 'A')
+
+
+class TestLayoutStore(ZooKeeperBaseTestCase):
+
+    def test_layout_state(self):
+        store = LayoutStateStore(self.zk_client)
+        state = LayoutState("tenant", "hostname", 0)
+        store["tenant"] = state
+        self.assertEqual(state, store["tenant"])
+        self.assertNotEqual(state.ltime, -1)
+        self.assertNotEqual(store["tenant"].ltime, -1)
