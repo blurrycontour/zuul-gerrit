@@ -4,7 +4,7 @@ version: '2'
 
 services:
   gerrit:
-    image: gerritcodereview/gerrit
+    image: zuul/gerrit
     ports:
       - "8080:8080"
       - "29418:29418"
@@ -28,13 +28,13 @@ services:
     # default version of ansible for Zuul.
     command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/playbooks/setup.yaml"
   zk:
-    image: zookeeper
+    image: zuul/zookeeper
     hostname: examples_zk_1.examples_default
     volumes:
       - "certs:/var/certs:z"
       - "./zoo.cfg:/conf/zoo.cfg:z"
   mysql:
-    image: mariadb
+    image: zuul/mariadb
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: zuul
