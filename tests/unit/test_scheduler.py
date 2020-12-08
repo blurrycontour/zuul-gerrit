@@ -46,6 +46,9 @@ from tests.base import (
     RecordingExecutorServer,
     TestConnectionRegistry,
 )
+from zuul.zk.layout import LayoutState
+
+EMPTY_LAYOUT_STATE = LayoutState("", "unknown", 0)
 
 
 class TestSchedulerSSL(SSLZuulTestCase):
@@ -3655,9 +3658,9 @@ class TestScheduler(ZuulTestCase):
     def test_live_reconfiguration_command_socket(self):
         "Test that live reconfiguration via command socket works"
 
-        # record previous tenant reconfiguration time, which may not be set
-        old = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        # record previous tenant reconfiguration state, which may not be set
+        old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
         self.waitUntilSettled()
 
         command_socket = self.scheds.first.config.get(
@@ -3673,8 +3676,8 @@ class TestScheduler(ZuulTestCase):
         while True:
             if time.time() - start > 15:
                 raise Exception("Timeout waiting for full reconfiguration")
-            new = self.scheds.first.sched.tenant_last_reconfigured\
-                .get('tenant-one', 0)
+            new = self.scheds.first.sched.tenant_layout_state.get(
+                'tenant-one', EMPTY_LAYOUT_STATE)
             if old < new:
                 break
             else:
@@ -8794,10 +8797,10 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
 
         # record previous tenant reconfiguration time, which may not be set
-        old_one = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
-        old_two = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-two', 0)
+        old_one = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
+        old_two = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-two', EMPTY_LAYOUT_STATE)
         self.waitUntilSettled()
 
         self.newTenantConfig('config/multi-tenant/main-reconfig.yaml')
@@ -8813,8 +8816,8 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
         while True:
             if time.time() - start > 15:
                 raise Exception("Timeout waiting for smart reconfiguration")
-            new_two = self.scheds.first.sched.tenant_last_reconfigured\
-                .get('tenant-two', 0)
+            new_two = self.scheds.first.sched.tenant_layout_state.get(
+                'tenant-two', EMPTY_LAYOUT_STATE)
             if old_two < new_two:
                 break
             else:
@@ -8822,8 +8825,8 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
 
         # Ensure that tenant-one has not been reconfigured
         self.waitUntilSettled()
-        new_one = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new_one = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
         self.assertEqual(old_one, new_one)
 
         self.executor_server.hold_jobs_in_build = False
@@ -8842,9 +8845,10 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
         self.assertEqual(expected_tenants,
                          self.scheds.first.sched.abide.tenants.keys())
 
-        self.assertIsNotNone(self.scheds.first.sched.tenant_last_reconfigured
-                             .get('tenant-four'),
-                             'Tenant tenant-four should exist now.')
+        self.assertIsNotNone(
+            self.scheds.first.sched.tenant_layout_state.get('tenant-four'),
+            'Tenant tenant-four should exist now.'
+        )
 
         # Test that the new tenant-four actually works
         D = self.fake_gerrit.addFakeChange('org/project4', 'master', 'D')
@@ -8870,8 +8874,8 @@ class TestSchedulerSmartReconfiguration(ZuulTestCase):
 class TestReconfigureBranch(ZuulTestCase):
 
     def _setupTenantReconfigureTime(self):
-        self.old = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        self.old = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
 
     def _createBranch(self):
         self.create_branch('org/project1', 'stable')
@@ -8888,8 +8892,8 @@ class TestReconfigureBranch(ZuulTestCase):
         self.waitUntilSettled()
 
     def _expectReconfigure(self, doReconfigure):
-        new = self.scheds.first.sched.tenant_last_reconfigured\
-            .get('tenant-one', 0)
+        new = self.scheds.first.sched.tenant_layout_state.get(
+            'tenant-one', EMPTY_LAYOUT_STATE)
         if doReconfigure:
             self.assertLess(self.old, new)
         else:
