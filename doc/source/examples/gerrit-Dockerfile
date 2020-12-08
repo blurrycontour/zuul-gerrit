@@ -1,1 +1,1 @@
-FROM gerritcodereview/gerrit:latest
+FROM gerritcodereview/gerrit:3.3.0
