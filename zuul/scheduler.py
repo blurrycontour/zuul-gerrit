@@ -90,6 +90,7 @@ from zuul.zk.event_queues import (
 )
 from zuul.zk.builds import BuildQueue, BuildResult, BuildState
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
+from zuul.zk.layout import LayoutState, LayoutStateStore
 from zuul.zk.locks import (
     event_queue_lock,
     locked,
@@ -212,6 +213,7 @@ class Scheduler(threading.Thread):
         )
         self.abide: Abide = Abide()
         self.unparsed_abide: UnparsedAbideConfig = UnparsedAbideConfig()
+        self.tenant_layout_state = LayoutStateStore(self.zk_client)
 
         time_dir = self._get_time_database_dir()
         self.time_database: TimeDataBase = TimeDataBase(time_dir)
@@ -227,7 +229,6 @@ class Scheduler(threading.Thread):
             else zuul_version.release_string
 
         self.last_reconfigured: Optional[int] = None
-        self.tenant_last_reconfigured: Dict[str, float] = {}
         self.use_relative_priority: bool = False
         if self.config.has_option('scheduler', 'relative_priority'):
             if self.config.getboolean('scheduler', 'relative_priority'):
@@ -982,7 +983,15 @@ class Scheduler(threading.Thread):
                 trigger.postConfig(pipeline)
             for reporter in pipeline.actions:
                 reporter.postConfig()
-        self.tenant_last_reconfigured[tenant.name] = time.time()
+
+        layout_state = LayoutState(
+            ltime=self.zk_client.zxid,
+            tenant_name=tenant.name,
+            hostname=self.hostname,
+            last_reconfigured=int(time.time()),
+        )
+        self.tenant_layout_state[tenant.name] = layout_state
+
         if self.statsd:
             try:
                 for pipeline in tenant.layout.pipelines.values():
