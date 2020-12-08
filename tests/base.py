@@ -64,6 +64,7 @@ import testtools.content_type
 from git.exc import NoSuchPathError
 import yaml
 import paramiko
+import dateutil.parser
 
 from zuul.model import Change
 from zuul.rpcclient import RPCClient
@@ -1933,7 +1934,7 @@ class FakeGitlabMergeRequest(object):
         self.description = description
         self.upstream_root = upstream_root
         self.number_of_commits = 0
-        self.created_at = datetime.datetime.now()
+        self.created_at = datetime.datetime.now(datetime.timezone.utc)
         self.updated_at = self.created_at
         self.merged_at = None
         self.sha = None
@@ -2018,7 +2019,7 @@ class FakeGitlabMergeRequest(object):
         repo.heads['master'].checkout()
 
     def _updateTimeStamp(self):
-        self.updated_at = datetime.datetime.now()
+        self.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
     def getMergeRequestEvent(self, action, include_labels=False):
         name = 'gl_merge_request'
@@ -2029,10 +2030,8 @@ class FakeGitlabMergeRequest(object):
             },
             'object_attributes': {
                 'title': self.subject,
-                'created_at': self.created_at.strftime(
-                    '%Y-%m-%d %H:%M:%S UTC'),
-                'updated_at': self.updated_at.strftime(
-                    '%Y-%m-%d %H:%M:%S UTC'),
+                'created_at': dateutil.parser.parse(self.created_at),
+                'updated_at': dateutil.parser.parse(self.updated_at),
                 'iid': self.number,
                 'target_branch': self.branch,
                 'last_commit': {'id': self.sha},
