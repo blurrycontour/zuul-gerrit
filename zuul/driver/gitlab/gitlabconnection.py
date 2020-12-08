@@ -33,6 +33,32 @@ from zuul.model import Ref, Branch, Tag
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
 
 
+def _parse_to_epoch(dt):
+    formats = [
+        '%Y-%m-%d %H:%M:%S %Z',
+        '%Y-%m-%d %H:%M:%S %z',
+        '%Y-%m-%dT%H:%M:%S.%fZ',
+        '%Y-%m-%dT%H:%M:%S.%fz',
+        '%Y-%m-%dT%H:%M:%S.%f%Z',
+        '%Y-%m-%dT%H:%M:%S.%f%z',
+    ]
+    parsed = None
+    for fmt in formats:
+        try:
+            parsed = datetime.strptime(dt, fmt)
+            break
+        except ValueError:
+            pass
+
+    if parsed is None:
+        raise ValueError(
+            "time data '%s' does not match any of formats %s"
+            % (dt, formats)
+        )
+
+    return int(parsed.strftime('%s'))
+
+
 class GitlabGearmanWorker(object):
     """A thread that answers gearman requests"""
     log = logging.getLogger("zuul.GitlabGearmanWorker")
@@ -110,10 +136,8 @@ class GitlabEventConnector(threading.Thread):
         event = GitlabTriggerEvent()
         attrs = body.get('object_attributes')
         if attrs:
-            event.updated_at = int(datetime.strptime(
-                attrs['updated_at'], '%Y-%m-%d %H:%M:%S %Z').strftime('%s'))
-            event.created_at = int(datetime.strptime(
-                attrs['created_at'], '%Y-%m-%d %H:%M:%S %Z').strftime('%s'))
+            event.updated_at = _parse_to_epoch(attrs['updated_at'])
+            event.created_at = _parse_to_epoch(attrs['created_at'])
         event.project_name = body['project']['path_with_namespace']
         return event
 
@@ -539,8 +563,7 @@ class GitlabConnection(BaseConnection):
         change.approved = change.mr['approved']
         change.message = change.mr['description']
         change.labels = change.mr['labels']
-        change.updated_at = int(datetime.strptime(
-            change.mr['updated_at'], '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%s'))
+        change.updated_at = _parse_to_epoch(change.mr['updated_at'])
         log.info("Updated change from Gitlab %s" % change)
 
         if self.sched:
