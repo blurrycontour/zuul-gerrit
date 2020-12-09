@@ -3,6 +3,8 @@
     description: |
       Newly uploaded patchsets enter this pipeline to receive an
       initial +/-1 Verified vote.
+    success-message: Build succeeded (check pipeline).
+    failure-message: Build failed (check pipeline).
     manager: independent
     require:
       gerrit:
@@ -28,6 +30,8 @@
     description: |
       Changes that have been approved are enqueued in order in this
       pipeline, and if they pass tests, will be merged.
+    success-message: Build succeeded (gate pipeline).
+    failure-message: Build failed (gate pipeline).
     manager: dependent
     post-review: True
     require:

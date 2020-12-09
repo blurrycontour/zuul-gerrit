@@ -110,3 +110,14 @@
           http_password: secret
           groups:
             - "Service Users"
+
+    - name: Install Gerrit Zuul Results Summary plugin
+      uri:
+        url: http://gerrit:8080/a/plugins/zuul-results-summary.js
+        method: PUT
+        user: admin
+        password: secret
+        status_code: 201,405
+        body_format: json
+        body:
+          url: https://raw.githubusercontent.com/g-chauvel/zuul-results-summary/main/zuul-results-summary/zuul-results-summary.js
