@@ -1,6 +1,5 @@
 pbr>=1.1.0
-# Temporary fix for https://gitlab.com/python-devs/importlib_resources/issues/83
-importlib-resources==1.0.2
+importlib-resources>=3.3.0; python_version < "3.9"
 # Early virtualenv 20 had bad file location assumptions
 virtualenv!=20.0.0,!=20.0.1,>20
 
