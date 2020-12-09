@@ -46,7 +46,8 @@ libre2-1v5 [platform:ubuntu-xenial]
 re2-devel [compile test platform:rpm]
 re2-dev [platform:apk]
 re2 [platform:rpm platform:apk]
-yarn [compile test platform:apk]
+yarn [compile test doc platform:apk]
+yarnpkg [compile test doc platform:dpkg platform:rpm]
 nodejs-npm [compile test platform:apk]
 git
 rsync
