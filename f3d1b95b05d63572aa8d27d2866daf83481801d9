@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "819bebf5_de9ec3d3",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1401,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-09T15:08:47Z",
+      "side": 1,
+      "message": "Is this really necessary?  The code seems fine as written.  Is there anyway to have mypy let us change types at runtime?  I think this paradigm is very useful and quite readable (promoting variables through types and discarding unused versions).  In other situations, one might go through 3 or 4 type transitions to get to the final version, and there\u0027s no need to keep all of those.",
+      "revId": "f3d1b95b05d63572aa8d27d2866daf83481801d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
