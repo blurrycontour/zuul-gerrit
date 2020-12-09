@@ -219,7 +219,9 @@
     check:
       jobs:
         - zuul-build-image
-        - zuul-tox-docs
+        - zuul-tox-docs:
+            roles:
+              - ensure-yarn
         - tox-linters:
             vars:
               tox_install_bindep: false
