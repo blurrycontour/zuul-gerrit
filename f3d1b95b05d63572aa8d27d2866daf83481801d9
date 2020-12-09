@@ -34,6 +34,24 @@
       "revId": "f3d1b95b05d63572aa8d27d2866daf83481801d9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2ac2ad65_9217e8cb",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1401,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-12-09T15:23:04Z",
+      "side": 1,
+      "message": "\u003e In other situations, one might go through 3 or 4 type transitions to get to the final version, and there\u0027s no need to keep all of those.\n\nI\u0027d argue this is a micro optimization and the focus should be more to make the code easy to read. Going from `baseurls` to a single `baseurl` makes it clear that the variable was a list of baseurls and has transitioned to a single one.\n\nThough that causes more problems when the function is larger than this.",
+      "parentUuid": "1beb43de_434fd67a",
+      "revId": "f3d1b95b05d63572aa8d27d2866daf83481801d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
