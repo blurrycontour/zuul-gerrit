@@ -52,6 +52,23 @@
       "revId": "f3d1b95b05d63572aa8d27d2866daf83481801d9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "adc7dca8_8be37d8a",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1401,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-09T15:46:21Z",
+      "side": 1,
+      "message": "Baseurls sounds like a good solution, though it also sounds like there\u0027s more than one url, but urlparse splits it into components.  But still, I don\u0027t have any problem with variables being redefined.  I don\u0027t think it\u0027s unclear at all.  We know that \"\u003d\" in python is an assignment operator.  After line 1400, baseurl is the result of urlunparse; it doesn\u0027t matter what it was before that line.   So if it was ever okay to write \"baseurl \u003d urlunparse(baseurls)\" then it should be okay to write \"baseurl \u003d urlunparse(baseurl)\".\n\nSome people don\u0027t agree with that, which is why in the MS world Hungarian notation is traditionally popular.  This would be \"strBaseURL \u003d urlunparse(arrBaseURL)\".  That\u0027s very similar to what is suggested here.  I am part of the group that actively reacted against that and moved to Python.\n\nTo be clear, I\u0027d never argue about this stylistic choice normally.  I would not -1 any of the ways anyone here has suggested writing this code.  I only bring it up now since we\u0027re evaluating how useful mypy is.",
+      "revId": "f3d1b95b05d63572aa8d27d2866daf83481801d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
