@@ -16,6 +16,7 @@
 FROM docker.io/opendevorg/python-builder:3.8 as builder
 ENV DEBIAN_FRONTEND=noninteractive
 
+
 # Optional location of Zuul API endpoint.
 ARG REACT_APP_ZUUL_API
 # Optional flag to enable React Service Worker. (set to true to enable)
