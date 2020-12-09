@@ -16,6 +16,24 @@
       "revId": "f3d1b95b05d63572aa8d27d2866daf83481801d9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1beb43de_434fd67a",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1401,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-09T15:16:01Z",
+      "side": 1,
+      "message": "There is `--allow-redefinition` which seems like useful for zuul code-base.",
+      "parentUuid": "819bebf5_de9ec3d3",
+      "revId": "f3d1b95b05d63572aa8d27d2866daf83481801d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
