@@ -273,7 +273,8 @@
     check:
       jobs:
         - zuul-build-image
-        - zuul-tox-docs
+        - zuul-tox-docs:
+            pre-run: playbooks/zuul-tox-docs/pre.yaml
         - tox-linters:
             vars:
               tox_install_bindep: false
@@ -304,7 +305,8 @@
     gate:
       jobs:
         - zuul-upload-image
-        - zuul-tox-docs
+        - zuul-tox-docs:
+            pre-run: playbooks/zuul-tox-docs/pre.yaml
         - tox-linters:
             vars:
               tox_install_bindep: false
