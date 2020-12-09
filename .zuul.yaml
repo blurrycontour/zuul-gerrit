@@ -273,7 +273,9 @@
     check:
       jobs:
         - zuul-build-image
-        - zuul-tox-docs
+        - zuul-tox-docs: &docs
+            # needs yarnpkg
+            nodeset: ubuntu-focal
         - tox-linters:
             vars:
               tox_install_bindep: false
@@ -304,7 +306,7 @@
     gate:
       jobs:
         - zuul-upload-image
-        - zuul-tox-docs
+        - zuul-tox-docs: *docs
         - tox-linters:
             vars:
               tox_install_bindep: false
