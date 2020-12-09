@@ -1,7 +1,8 @@
 ansible
+tox<4  # tox 4 will require running `tox list` instead of `tox -va` to list envs.
 sphinx>=1.6.1
 sphinxcontrib-blockdiag>=1.1.0
-sphinxcontrib-programoutput
+sphinxcontrib-programoutput>=0.17
 sphinx-autodoc-typehints
 sphinxcontrib-openapi>=0.4.0
 reno>=2.8.0 # Apache-2.0
