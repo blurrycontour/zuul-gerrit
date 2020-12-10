@@ -22,6 +22,74 @@
       "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "282b3616_856e9d5b",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1235,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-10T16:03:09Z",
+      "side": 1,
+      "message": "We should put a comment here saying \"Job variables have priority over parent data.\"",
+      "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb1192ad_4e7a1c68",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1458,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-10T16:03:09Z",
+      "side": 1,
+      "message": "This comment doesn\u0027t makes sense here anymore.  Below, we\u0027re actually giving the *new* parent data priority over the old parent data.  We do still give the job vars priority over all parent data, but that now happens in combined_variables.\n\nWe should just say \"Give new parent vars priority over old in case the job was retried and new, updated data are returned.\"",
+      "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff522c46_f658ab59",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1461,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-10T16:03:09Z",
+      "side": 1,
+      "message": "It looks like the order of args here is changed so that a retried build will have priority and update the vars.  However, there\u0027s another change that seems like it would zero out the parent_data every time.  Do we need both?",
+      "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b6c0a25c_d0d55fad",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2551,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-10T16:03:09Z",
+      "side": 1,
+      "message": "Why is this necessary if we have reversed the order of arguments when we update the data?",
+      "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
