@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "2933e61c_1b2d4d02",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2020-12-10T02:03:34Z",
+      "side": 1,
+      "message": "It\u0027s probably obvious, but the zuul-executor should do little more than collect the job and run the zuul runner (at least in terms of code path, I wouldn\u0027t suggest the implementation necessarily call out to a zuul-runner binary).",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "40f53eae_f74eced7",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2020-12-10T02:03:34Z",
+      "side": 1,
+      "message": "One of the big use cases I was originally designing this for was to try out new job definitions locally.\n\nBeing able to take an uncommitted set of changes to zuul.d/, point zuul-runner at an API endpoint, and have everything calculated and ran as if it were merged.\n\nPerhaps that\u0027s not the scope of this spec though and could be future work.",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "04ebd5a0_8f46335d",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2020-12-10T02:03:34Z",
+      "side": 1,
+      "message": "Perfect for the scope of this work, but I also envisioned it\u0027d be awesome if a user could launch nodes in a cloud using images from nodepool or something just by supplying their own credentials (or libvirtd etc). This would likely be a big task though and certainly something outside of this spec.",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "85389eae_9975ecf4",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2020-12-10T02:03:34Z",
+      "side": 1,
+      "message": "I think it could also be helpful to provide `--skip-pre-playbooks` and `--skip-post-playbooks` as I suspect they\u0027ll be most common.\n\nAdditionally a dry-run or keeping --list-playbooks to print out what will happen with the filters would be helpful.",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9f560f44_536c7307",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 8
@@ -16,6 +84,40 @@
       "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfecafb4_859dae0d",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2020-12-10T02:03:34Z",
+      "side": 1,
+      "message": "(nit) how? As CLI params, a values.yaml etc?",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6fce8002_6ac3510f",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 7069
+      },
+      "writtenOn": "2020-12-10T02:03:34Z",
+      "side": 1,
+      "message": "(nit) might be worth mentioning that this isn\u0027t complete. For example, it\u0027s missing the --list-playbooks and filters etc. I suspect the interface will change as the implementation grows so I wouldn\u0027t be too concerned about getting it right in the spec.",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
