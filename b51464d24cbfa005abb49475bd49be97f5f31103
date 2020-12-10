@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e18232d1_906b1c2c",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1235,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-12-10T16:00:38Z",
+      "side": 1,
+      "message": "Adding a docstring to this new method would not really hurt. In fact you could also add return type hints unless this does not trigger a very long chain of changes.",
+      "range": {
+        "startLine": 1235,
+        "startChar": 4,
+        "endLine": 1235,
+        "endChar": 33
+      },
+      "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
