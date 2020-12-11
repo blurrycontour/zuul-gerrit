@@ -270,6 +270,15 @@
         - context: doc/source/examples
           repository: zuul/zuul-tutorial-logs
           dockerfile: logs-Dockerfile
+        - context: doc/source/examples
+          repository: zuul/gerrit
+          dockerfile: gerrit-Dockerfile
+        - context: doc/source/examples
+          repository: zuul/zookeeper
+          dockerfile: zookeeper-Dockerfile
+        - context: doc/source/examples
+          repository: zuul/mariadb
+          dockerfile: mariadb-Dockerfile
 
 - job:
     name: zuul-build-python-release
