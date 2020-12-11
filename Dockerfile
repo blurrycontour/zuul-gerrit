@@ -55,6 +55,12 @@ RUN /output/install-from-bindep zuul_base \
   && rm -rf /output
 RUN useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul
 
+# This enables git protocol v2 which is more efficient at negotiating
+# refs.  This can be removed after the images are built with git 2.26
+# where it becomes the default.
+RUN echo '[protocol]' >> /var/lib/zuul/.gitconfig
+RUN echo '    version = 2' >> /var/lib/zuul/.gitconfig
+
 VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
 
