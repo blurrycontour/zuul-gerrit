@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ed89d42f_8c7a23dd",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-11T14:45:05Z",
+      "side": 1,
+      "message": "Would https://dateutil.readthedocs.io/en/stable/parser.html be a good choice here?",
+      "revId": "cb47a5ccf00dacf42a8642da169fe9feab159b6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
