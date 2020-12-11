@@ -8,4 +8,6 @@
     status_code: 200
     body_format: json
     body:
-      message: "recheck"
+      comments:
+        "/PATCHSET_LEVEL":
+          - "message": "recheck"

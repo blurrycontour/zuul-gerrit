@@ -1,1 +1,3 @@
 FROM gerritcodereview/gerrit:3.3.0
+
+RUN curl -SL https://gerrit-ci.gerritforge.com/job/Gerrit-verifier-bazel/97340/artifact/gerrit/bazel-bin/release.war -o /var/gerrit/bin/gerrit.war
