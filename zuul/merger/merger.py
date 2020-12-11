@@ -228,6 +228,13 @@ class Repo(object):
             # reflog when gc kicks in.
             config_writer.set_value('gc', 'reflogExpire', 'now')
 
+            # Git versions between 2.18 and 2.26 have version 2
+            # protocol support but it's not enabled by default.
+            # Starting in 2.26, it is the default.  V2 is more
+            # efficient at negotiating refs and can reduce the time
+            # spent updating a repo by 50% on large repos.
+            config_writer.set_value('protocol', 'version', '2')
+
             config_writer.write()
         if rewrite_url:
             self._git_set_remote_url(repo, self.remote_url)
