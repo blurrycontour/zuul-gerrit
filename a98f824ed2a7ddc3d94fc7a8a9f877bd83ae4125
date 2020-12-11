@@ -22,6 +22,23 @@
       "revId": "a98f824ed2a7ddc3d94fc7a8a9f877bd83ae4125",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "553ae3f2_b4814076",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-11T18:11:38Z",
+      "side": 1,
+      "message": "Good point; the next PS is one layer, but we could squash all of these run commands together.",
+      "revId": "a98f824ed2a7ddc3d94fc7a8a9f877bd83ae4125",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
