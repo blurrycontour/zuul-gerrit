@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d36c936_d9817db1",
+        "filename": "Dockerfile",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-11T17:21:12Z",
+      "side": 1,
+      "message": "To save one layer, this could be replaced by:\n\n  echo -e \u0027[protocol]\\n    version \u003d 2\u0027 \u003e\u003e /var/lib/zuul/.gitconfig",
+      "range": {
+        "startLine": 61,
+        "startChar": 0,
+        "endLine": 62,
+        "endChar": 54
+      },
+      "revId": "a98f824ed2a7ddc3d94fc7a8a9f877bd83ae4125",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
