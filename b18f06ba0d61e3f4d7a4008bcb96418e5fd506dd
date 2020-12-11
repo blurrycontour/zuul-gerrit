@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2931aa6e_9c565407",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-12-11T19:21:52Z",
+      "side": 1,
+      "message": "this should go away",
+      "range": {
+        "startLine": 62,
+        "startChar": 5,
+        "endLine": 62,
+        "endChar": 9
+      },
+      "revId": "b18f06ba0d61e3f4d7a4008bcb96418e5fd506dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
