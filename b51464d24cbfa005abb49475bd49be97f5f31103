@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "3f1d41d2_fa1e8e64",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 8449
+      },
+      "writtenOn": "2020-12-11T08:10:48Z",
+      "side": 1,
+      "message": "thanks for working on that. fwiw we are hitting this issue with tripleo upgrade jobs @ https://bugs.launchpad.net/tripleo/+bug/1907657",
+      "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e18232d1_906b1c2c",
         "filename": "zuul/model.py",
         "patchSetId": 6
