@@ -16,7 +16,7 @@ services:
     entrypoint: |
       /bin/sh -c '\
         /entrypoint.sh init && \
-        git config -f /var/gerrit/etc/gerrit.config change.publishPatchSetLevelCommentAsLegacyChangeMessage true && \
+        git config -f /var/gerrit/etc/gerrit.config change.publishPatchSetLevelCommentAsLegacyChangeMessage false && \
         /var/gerrit/bin/gerrit.sh run'
   gerritconfig:
     image: zuul/zuul-executor
