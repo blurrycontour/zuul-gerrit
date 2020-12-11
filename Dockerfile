@@ -39,9 +39,11 @@ RUN assemble
 # installations do so we have to call zuul-manage-ansible here. Remove
 # /root/.local/share/virtualenv after because it adds wheels into /root
 # that we don't need after the install step so are a waste of space.
-RUN /output/install-from-bindep && zuul-manage-ansible && rm -rf /root/.local/share/virtualenv
-
-RUN mkdir /tmp/openshift-install \
+RUN /output/install-from-bindep \
+  && zuul-manage-ansible \
+  && rm -rf /root/.local/share/virtualenv \
+# Install openshift
+  && mkdir /tmp/openshift-install \
   && curl -L $OPENSHIFT_URL -o /tmp/openshift-install/openshift-client.tgz \
   && cd /tmp/openshift-install/ \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
@@ -52,13 +54,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
 RUN /output/install-from-bindep zuul_base \
-  && rm -rf /output
-RUN useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul
-
+  && rm -rf /output \
+  && useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul \
 # This enables git protocol v2 which is more efficient at negotiating
 # refs.  This can be removed after the images are built with git 2.26
 # where it becomes the default.
-RUN git config --system protocol.version 2
+  && RUN git config --system protocol.version 2
 
 VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
@@ -73,8 +74,7 @@ COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
 COPY tools/4D64390375060AA4.asc /etc/apt/trusted.gpg.d/kubic.asc
 RUN echo 'deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/Debian_10/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list \
   && apt-get update \
-  && apt-get install -y \
-      skopeo \
+  && apt-get install -y skopeo \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
