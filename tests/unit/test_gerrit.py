@@ -228,6 +228,27 @@ class TestGerritWeb(ZuulTestCase):
 
         self.assertEqual([], tested_change_ids)
 
+    def test_recheck(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(3, len(self.history))
+
+        self.fake_gerrit.addEvent(A.getChangeCommentEvent(1,
+                                  'recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(6, len(self.history))
+
+        self.fake_gerrit.addEvent(A.getChangeCommentEvent(1,
+                                  patchsetcomment='recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(9, len(self.history))
+
+        self.fake_gerrit.addEvent(A.getChangeCommentEvent(1,
+                                  patchsetcomment='do not recheck'))
+        self.waitUntilSettled()
+        self.assertEqual(9, len(self.history))
+
 
 class TestFileComments(AnsibleZuulTestCase):
     config_file = 'zuul-gerrit-web.conf'
