@@ -1,1 +1,6 @@
 FROM gerritcodereview/gerrit:3.3.0
+
+# Link from https://gerrit-review.googlesource.com/c/gerrit/+/291144
+# "Checks" tab, patchset 7, "Build/Tests", Details
+# Jenkins left menu "Status", release.war
+RUN curl -SL https://gerrit-ci.gerritforge.com/job/Gerrit-verifier-bazel/97390/artifact/gerrit/bazel-bin/release.war -o /var/gerrit/bin/gerrit.war

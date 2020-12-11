@@ -13,6 +13,11 @@ services:
       - "29418:29418"
     environment:
       - CANONICAL_WEB_URL=http://localhost:8080/
+    entrypoint: |
+      /bin/sh -c '\
+        /entrypoint.sh init && \
+        git config -f /var/gerrit/etc/gerrit.config change.publishPatchSetLevelCommentAsLegacyChangeMessage true && \
+        /var/gerrit/bin/gerrit.sh run'
   gerritconfig:
     image: zuul/zuul-executor
     environment:
