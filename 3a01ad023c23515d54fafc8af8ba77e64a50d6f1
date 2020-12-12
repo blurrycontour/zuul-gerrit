@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "577ce086_1b2f5fb8",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-12T14:36:50Z",
+      "side": 1,
+      "message": "I think you no longer need the {} wrapper here (at least rudimentary testing indicates it still generates an implicit testenv:py3-docker entry without using them).",
+      "revId": "3a01ad023c23515d54fafc8af8ba77e64a50d6f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7648d5db_0bc9c347",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-12T14:36:50Z",
+      "side": 1,
+      "message": "I agree it\u0027s worth indicating this takes a long time to run, though I do wonder if the estimated time indicated is going to be even remotely accurate given we have no idea what resources are available locally when running it. Could be half that, could be 10x. Maybe just putting \"long-running\" (add a \"very\" if you think it\u0027s warranted) in parentheses instead of an approximate time?",
+      "revId": "3a01ad023c23515d54fafc8af8ba77e64a50d6f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a5188935_e6fe416b",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-12T14:36:50Z",
+      "side": 1,
+      "message": "Very neat that you can distinguish descriptions for multiple implicit testenvs in the default here.",
+      "revId": "3a01ad023c23515d54fafc8af8ba77e64a50d6f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ed38d9b2_8b300002",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-12T14:36:50Z",
+      "side": 1,
+      "message": "Most of your descriptions don\u0027t end in a \".\" so maybe this one shouldn\u0027t either for the sake of consistency.",
+      "revId": "3a01ad023c23515d54fafc8af8ba77e64a50d6f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "27fce844_a88fc350",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-12T14:36:50Z",
+      "side": 1,
+      "message": "This is fairly long, wraps the `tox -av` output on my 80-column terminal. It could probably be shortened to something like \"Style checks and validators, run locally before pushing\" (I tested this alternative, it\u0027s short enough to avoid wrapping onto a second line for me).",
+      "revId": "3a01ad023c23515d54fafc8af8ba77e64a50d6f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "57780bbd_b97e6ecf",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-12T14:36:50Z",
+      "side": 1,
+      "message": "Same concern about the estimated time as in py3 above.",
+      "revId": "3a01ad023c23515d54fafc8af8ba77e64a50d6f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
