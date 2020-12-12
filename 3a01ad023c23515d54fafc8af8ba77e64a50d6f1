@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "f84cf338_96f5203e",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2020-12-12T14:51:47Z",
+      "side": 1,
+      "message": "Revisiting this, it was actually just missing a \",\" originally. I\u0027ve collapsed these correctly in my latest edit and updated the commit message to reflect that.",
+      "revId": "3a01ad023c23515d54fafc8af8ba77e64a50d6f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7648d5db_0bc9c347",
         "filename": "tox.ini",
         "patchSetId": 1
