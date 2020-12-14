@@ -1,0 +1,142 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cf84f7f9_0c5bb7ba",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-12-14T11:05:37Z",
+      "side": 1,
+      "message": "It looks like changed_files is not part of the API\nlooking at getPR() line 211,  you generated change.pr.get(\u0027files\u0027) using the local variable changed_files, if that was the idea then this is always false (equals)\n\nAPI: https://developer.atlassian.com/bitbucket/api/2/reference/resource/repositories/%7Bworkspace%7D/%7Brepo_slug%7D/diffstat/%7Bspec%7D\n\nI made a test with 50000 new files in a single commit with a pullrequest and got:\n{\n  \"pagelen\": 500,\n  \"next\": \"https://api.bitbucket.org/2.0/repositories/......\",\n  \"values\": []\n  \"page\": 1,\n  \"size\": 50000\n}\nIt would take size/pagelen requests to get all files.\n\nIMO,\nif \u0027next\u0027 is present in the answer, set files to None\nif \u0027next\u0027 is absent, set files to file list",
+      "range": {
+        "startLine": 389,
+        "startChar": 12,
+        "endLine": 389,
+        "endChar": 71
+      },
+      "revId": "95be299dafb61b04d4960039d525dff800e91d7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89d17ec7_f3c03a09",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-12-14T11:05:37Z",
+      "side": 1,
+      "message": "feels like those should be removed",
+      "range": {
+        "startLine": 395,
+        "startChar": 0,
+        "endLine": 396,
+        "endChar": 46
+      },
+      "revId": "95be299dafb61b04d4960039d525dff800e91d7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "533fe0e1_f6ea7cc3",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-12-14T11:05:37Z",
+      "side": 1,
+      "message": "might be nice to set event.newrev \u003d \u00270\u0027 * 40 also",
+      "range": {
+        "startLine": 578,
+        "startChar": 12,
+        "endLine": 578,
+        "endChar": 39
+      },
+      "revId": "95be299dafb61b04d4960039d525dff800e91d7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7decbfee_6f0550e2",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-12-14T11:05:37Z",
+      "side": 1,
+      "message": "if old is None: ?",
+      "range": {
+        "startLine": 583,
+        "startChar": 8,
+        "endLine": 583,
+        "endChar": 31
+      },
+      "revId": "95be299dafb61b04d4960039d525dff800e91d7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ac305013_081c84b4",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 585,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-12-14T11:05:37Z",
+      "side": 1,
+      "message": "might be nice to set event.oldrev \u003d \u00270\u0027 * 40 also",
+      "range": {
+        "startLine": 585,
+        "startChar": 12,
+        "endLine": 585,
+        "endChar": 39
+      },
+      "revId": "95be299dafb61b04d4960039d525dff800e91d7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23c83fb6_7eaebbd9",
+        "filename": "zuul/driver/bitbucketcloud/bitbucketcloudconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 591,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2020-12-14T11:05:37Z",
+      "side": 1,
+      "message": "if new is not None and old is not None: ?",
+      "range": {
+        "startLine": 591,
+        "startChar": 8,
+        "endLine": 591,
+        "endChar": 63
+      },
+      "revId": "95be299dafb61b04d4960039d525dff800e91d7f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
