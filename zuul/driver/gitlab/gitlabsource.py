@@ -47,11 +47,13 @@ class GitlabSource(BaseSource):
             return True
         return change.is_merged
 
-    def canMerge(self, change, allow_needs, event=None):
+    def canMerge(self, change, allow_needs, event=None, refresh=True):
         """Determine if change can merge."""
         if not change.number:
             return True
-        return self.connection.canMerge(change, allow_needs, event=event)
+        return self.connection.canMerge(
+            change, allow_needs, event=event, refresh=refresh
+        )
 
     def postConfig(self):
         """Called after configuration has been processed."""
