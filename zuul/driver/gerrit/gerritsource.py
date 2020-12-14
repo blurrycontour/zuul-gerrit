@@ -46,8 +46,10 @@ class GerritSource(BaseSource):
     def isMerged(self, change, head=None):
         return self.connection.isMerged(change, head)
 
-    def canMerge(self, change, allow_needs, event=None):
-        return self.connection.canMerge(change, allow_needs, event=event)
+    def canMerge(self, change, allow_needs, event=None, refresh=False):
+        return self.connection.canMerge(
+            change, allow_needs, event=event, refresh=refresh
+        )
 
     def postConfig(self):
         pass
