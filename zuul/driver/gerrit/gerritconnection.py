@@ -966,8 +966,12 @@ class GerritConnection(BaseConnection):
         sha = refs.get(ref, '')
         return sha
 
-    def canMerge(self, change, allow_needs, event=None):
+    def canMerge(self, change, allow_needs, event=None, refresh=False):
         log = get_annotated_logger(self.log, event)
+        if refresh:
+            change = self._getChange(
+                change.number, change.patchset, refresh=True, event=event
+            )
         if not change.number:
             log.debug("Change has no number; considering it merged")
             # Good question.  It's probably ref-updated, which, ah,

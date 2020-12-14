@@ -718,8 +718,18 @@ class PagureConnection(BaseConnection):
         flag = pagure.get_pr_flags(change.number, self.username, last=True)
         return True if flag.get('status', '') == 'success' else False
 
-    def canMerge(self, change, allow_needs, event=None):
+    def canMerge(self, change, allow_needs, event=None, refresh=False):
         log = get_annotated_logger(self.log, event)
+
+        if refresh:
+            change = self._getChange(
+                change.project,
+                change.number,
+                change.patchset,
+                refresh=True,
+                event=event,
+            )
+
         pagure = self.get_project_api_client(change.project.name)
         pr = pagure.get_pr(change.number)
 

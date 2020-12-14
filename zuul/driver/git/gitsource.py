@@ -32,7 +32,7 @@ class GitSource(BaseSource):
     def isMerged(self, change, head=None):
         raise NotImplementedError()
 
-    def canMerge(self, change, allow_needs, event=None):
+    def canMerge(self, change, allow_needs, event=None, refresh=False):
         raise NotImplementedError()
 
     def getChange(self, event, refresh=False):
