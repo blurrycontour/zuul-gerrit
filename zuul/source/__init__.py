@@ -41,8 +41,17 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         If head is provided the change is checked if it is at head."""
 
     @abc.abstractmethod
-    def canMerge(self, change, allow_needs, event=None):
-        """Determine if change can merge."""
+    def canMerge(self, change, allow_needs, event=None, allow_refresh=False):
+        """Determine if change can merge.
+
+        change: The change to check for mergeability
+        allow_needs: The statuses/votes that are allowed to be missing on a
+                     change, typically the votes the pipeline would set itself
+                     before attempting to merge
+        event: event information for log annotation
+        allow_refresh: Allow refreshing of cached volatile data that cannot be
+                       reliably kept up to date using events.
+        """
 
     def postConfig(self):
         """Called after configuration has been processed."""
