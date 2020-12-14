@@ -22,6 +22,30 @@
       "revId": "25611f1415d83f5baed918945ad66dc842f8ab73",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3e14a75b_52ab2f27",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 2555,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-14T15:25:18Z",
+      "side": 1,
+      "message": "oops i missed the nested loop below.",
+      "parentUuid": "acb34b43_1aaab7d8",
+      "range": {
+        "startLine": 2555,
+        "startChar": 20,
+        "endLine": 2555,
+        "endChar": 40
+      },
+      "revId": "25611f1415d83f5baed918945ad66dc842f8ab73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
