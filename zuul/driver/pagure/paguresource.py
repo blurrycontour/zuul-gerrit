@@ -48,11 +48,13 @@ class PagureSource(BaseSource):
             return True
         return change.is_merged
 
-    def canMerge(self, change, allow_needs, event=None):
+    def canMerge(self, change, allow_needs, event=None, allow_refresh=False):
         """Determine if change can merge."""
         if not change.number:
             # Not a pull request, considering merged.
             return True
+        # The pagure connection fetches canmerge on demand in any case so
+        # allow_refresh is not necessary
         return self.connection.canMerge(change, allow_needs, event=event)
 
     def postConfig(self):
