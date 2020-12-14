@@ -125,6 +125,24 @@
       "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9b3f5bdd_54162b26",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2551,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-12-14T12:38:56Z",
+      "side": 1,
+      "message": "Zeroing out the parent data is enough to fix. So I reverted this part.",
+      "parentUuid": "eab63583_114102ed",
+      "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
