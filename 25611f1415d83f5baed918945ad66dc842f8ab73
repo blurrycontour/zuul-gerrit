@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "acb34b43_1aaab7d8",
+        "filename": "zuul/model.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 2555,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-14T14:04:21Z",
+      "side": 1,
+      "message": "isn\u0027t this removing all returned variable from previous parents (not just the conflicting one)?",
+      "range": {
+        "startLine": 2555,
+        "startChar": 20,
+        "endLine": 2555,
+        "endChar": 40
+      },
+      "revId": "25611f1415d83f5baed918945ad66dc842f8ab73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
