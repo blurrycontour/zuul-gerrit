@@ -107,6 +107,24 @@
       "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eab63583_114102ed",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2551,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2020-12-14T12:10:05Z",
+      "side": 1,
+      "message": "I\u0027ll check of zeroing out the parent data is enough.",
+      "parentUuid": "b6c0a25c_d0d55fad",
+      "revId": "b51464d24cbfa005abb49475bd49be97f5f31103",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
