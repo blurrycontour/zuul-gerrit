@@ -570,8 +570,16 @@ class GitlabConnection(CachedBranchConnection):
 
         return change
 
-    def canMerge(self, change, allow_needs, event=None):
+    def canMerge(self, change, allow_needs, event=None, refresh=False):
         log = get_annotated_logger(self.log, event)
+        if refresh:
+            change = self._getChange(
+                change.project,
+                change.number,
+                change.patchset,
+                refresh=refresh,
+                event=event,
+            )
         can_merge = True if change.merge_status == "can_be_merged" else False
         log.info('Check MR %s#%s mergeability can_merge: %s',
                  change.project.name, change.number, can_merge)

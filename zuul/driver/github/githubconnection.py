@@ -1612,8 +1612,11 @@ class GithubConnection(CachedBranchConnection):
         log.debug('Got PR %s#%s', project_name, number)
         return (pr, probj)
 
-    def canMerge(self, change, allow_needs, event=None):
+    def canMerge(self, change, allow_needs, event=None, refresh=False):
         log = get_annotated_logger(self.log, event)
+
+        if refresh:
+            self._updateCanMergeInfo(change, event)
 
         # If the PR is a draft it cannot be merged.
         if change.draft:
