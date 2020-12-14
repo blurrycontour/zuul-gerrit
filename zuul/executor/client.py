@@ -160,6 +160,7 @@ class ExecutorClient(object):
                            buildset=item.current_build_set.uuid,
                            ref=item.change.ref,
                            pipeline=pipeline.name,
+                           post_review=pipeline.post_review,
                            job=job.name,
                            voting=job.voting,
                            project=project,

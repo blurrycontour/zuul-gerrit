@@ -305,6 +305,11 @@ of item.
 
       The name of the pipeline in which the job is being run.
 
+   .. var:: post_review
+      :type: bool
+
+      Whether the current job is running in a post-review pipeline or not.
+
    .. var:: job
 
       The name of the job being run.
