@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "543bf576_26438faa",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-14T23:03:20Z",
+      "side": 1,
+      "message": "That\u0027s correct, the zuul-runner shall re-use most of the zuul-executor code without interfering with the service",
+      "parentUuid": "2933e61c_1b2d4d02",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "40f53eae_f74eced7",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 8
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "e57a836f_da2ad8ab",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-14T23:03:20Z",
+      "side": 1,
+      "message": "Loading local zuul.d is indeed out of scope, the current implementation gets job details of an existing layout from the api. Though local ansible playbook modification are supported.",
+      "parentUuid": "40f53eae_f74eced7",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "04ebd5a0_8f46335d",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 8
@@ -47,6 +83,24 @@
       "writtenOn": "2020-12-10T02:03:34Z",
       "side": 1,
       "message": "Perfect for the scope of this work, but I also envisioned it\u0027d be awesome if a user could launch nodes in a cloud using images from nodepool or something just by supplying their own credentials (or libvirtd etc). This would likely be a big task though and certainly something outside of this spec.",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2377a81b_910aade5",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-14T23:03:20Z",
+      "side": 1,
+      "message": "I tried running nodepool driver locally with https://review.opendev.org/c/zuul/nodepool/+/639632 for zuul-runner, but that more works needs to be specified for zuul-runner integration.",
+      "parentUuid": "04ebd5a0_8f46335d",
       "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
@@ -104,6 +158,24 @@
     },
     {
       "key": {
+        "uuid": "4b1c72df_d13788ef",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-14T23:03:20Z",
+      "side": 1,
+      "message": "I guess through a configuration file.",
+      "parentUuid": "dfecafb4_859dae0d",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6fce8002_6ac3510f",
         "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
         "patchSetId": 8
@@ -115,6 +187,24 @@
       "writtenOn": "2020-12-10T02:03:34Z",
       "side": 1,
       "message": "(nit) might be worth mentioning that this isn\u0027t complete. For example, it\u0027s missing the --list-playbooks and filters etc. I suspect the interface will change as the implementation grows so I wouldn\u0027t be too concerned about getting it right in the spec.",
+      "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "427725a4_76e2b1b7",
+        "filename": "doc/source/reference/developer/specs/zuul-runner.rst",
+        "patchSetId": 8
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-14T23:03:20Z",
+      "side": 1,
+      "message": "At some point we can remove the spec and replace it with the actual documentation.",
+      "parentUuid": "6fce8002_6ac3510f",
       "revId": "8317025b850d7b54f79fed9839e9d0fcf8aaf5a6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
