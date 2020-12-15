@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ece8eee0_76ca8827",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 2036,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2020-12-15T14:08:11Z",
+      "side": 1,
+      "message": "here should be string type.",
+      "range": {
+        "startLine": 2033,
+        "startChar": 17,
+        "endLine": 2036,
+        "endChar": 46
+      },
+      "revId": "fb1aa8fc0d34939a8d94767c59388622b3892c7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
