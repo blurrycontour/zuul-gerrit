@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b5cca73a_f07f209c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2020-12-15T15:58:54Z",
+      "side": 1,
+      "message": "should this be log.exception?",
+      "range": {
+        "startLine": 908,
+        "startChar": 20,
+        "endLine": 908,
+        "endChar": 25
+      },
+      "revId": "fe807e8cbc240af3134c2fefa4742ace9533bf1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
