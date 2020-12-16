@@ -1833,9 +1833,6 @@ class TenantParser(object):
             for branch in branches:
                 branch_cache = abide.getUnparsedBranchCache(
                     project.canonical_name, branch)
-                if branch_cache.isValidFor(tpc):
-                    # We already have this branch cached.
-                    continue
                 if not tpc.load_classes:
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
@@ -1865,6 +1862,10 @@ class TenantParser(object):
                         )
                         branch_cache.put(source_context.path, incdata)
                     branch_cache.setValidFor(tpc)
+                    continue
+
+                if branch_cache.isValidFor(tpc):
+                    # We already have this branch cached.
                     continue
 
                 cache_ltime = self.zk_client.zxid
