@@ -213,7 +213,10 @@ class Scheduler(threading.Thread):
         )
         self.abide: Abide = Abide()
         self.unparsed_abide: UnparsedAbideConfig = UnparsedAbideConfig()
-        self.tenant_layout_state = LayoutStateStore(self.zk_client)
+        self.tenant_layout_state = LayoutStateStore(
+            self.zk_client, self._on_tenant_layout_change
+        )
+        self.local_layout_state: Dict[str, LayoutState] = {}
 
         time_dir = self._get_time_database_dir()
         self.time_database: TimeDataBase = TimeDataBase(time_dir)
@@ -260,6 +263,7 @@ class Scheduler(threading.Thread):
         self.rpc.start()
         self.rpc_slow.start()
         self.stats_thread.start()
+        self.tenant_layout_state.watch()
         self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
     def stop(self):
@@ -426,10 +430,61 @@ class Scheduler(threading.Thread):
         self.repl = None
 
     def prime(self, config):
-        self.log.debug("Priming scheduler config")
-        event = ReconfigureEvent()
-        self._doReconfigureEvent(event)
-        self.log.debug("Config priming complete")
+        self.layout_lock.acquire()
+        self.config = self._zuul_app.config
+        try:
+            self.log.info("Priming scheduler config")
+            start = time.monotonic()
+
+            # Reload the ansible manager in case the default ansible version
+            # changed.
+            default_ansible_version = get_default(
+                self.config, 'scheduler', 'default_ansible_version', None)
+            self.ansible_manager = AnsibleManager(
+                default_version=default_ansible_version)
+
+            # TODO: We currently assume that the tenant configuration is the
+            # same on all schedulers. In the future we might want to store the
+            # tenant config with the layout in Zookeeper.
+            loader = configloader.ConfigLoader(
+                self.connections, self, self.merger,
+                self._get_key_dir())
+            tenant_config, script = self.checkTenantSourceConf(self.config)
+            self.unparsed_abide = loader.readConfig(
+                tenant_config, from_script=script)
+
+            loader.loadAdminRules(self.abide, self.unparsed_abide)
+            for tenant_name in self.unparsed_abide.tenants:
+                layout_state = self.tenant_layout_state.get(tenant_name)
+                # In case we don't have a cached layout state we need to
+                # acquire the write lock since we load a new tenant.
+                if layout_state is None:
+                    tlock = tenant_write_lock(self.zk_client, tenant_name)
+                else:
+                    tlock = tenant_read_lock(self.zk_client, tenant_name)
+
+                with locked(tlock):
+                    loader.loadTenant(
+                        self.abide,
+                        tenant_name,
+                        self.ansible_manager,
+                        self.unparsed_abide,
+                        zuul_cache_ltime=-1,
+                    )
+                    tenant = self.abide.tenants[tenant_name]
+                    if layout_state is None:
+                        # Reconfigure only new tenants
+                        self._reconfigureTenant(tenant)
+                    else:
+                        self.local_layout_state[tenant_name] = layout_state
+                    self.connections.reconfigureDrivers(tenant)
+        finally:
+            self.layout_lock.release()
+
+        duration = round(time.monotonic() - start, 3)
+        self.log.info("Config priming complete (duration: %s seconds)",
+                      duration)
+
         self.last_reconfigured = int(time.time())
 
     def reconfigure(self, config, smart=False):
@@ -582,6 +637,53 @@ class Scheduler(threading.Thread):
                             "current mode is %o" % (key_dir, mode))
         return key_dir
 
+    def _on_tenant_layout_change(self, layout_state: LayoutState) -> None:
+        self.log.debug("Tenant layout changed: %s", layout_state)
+        tenant_name = layout_state.tenant_name
+        if (
+            self.tenant_layout_state[tenant_name]
+            == self.local_layout_state.get(tenant_name)
+        ):
+            self.log.debug(
+                "Local layout of tenant %s already up to date", tenant_name
+            )
+            return
+
+        self.config = self._zuul_app.config
+
+        # Reload the ansible manager in case the default ansible version
+        # changed.
+        default_ansible_version = get_default(
+            self.config, 'scheduler', 'default_ansible_version', None)
+        self.ansible_manager = AnsibleManager(
+            default_version=default_ansible_version)
+
+        loader = configloader.ConfigLoader(
+            self.connections, self, self.merger,
+            self._get_key_dir())
+        tenant_config, script = self.checkTenantSourceConf(self.config)
+        self.unparsed_abide = loader.readConfig(
+            tenant_config, from_script=script
+        )
+
+        tlock = tenant_read_lock(self.zk_client, tenant_name)
+        with locked(tlock):
+            self.log.debug(
+                "Updating local layout of tenant %s ", tenant_name
+            )
+            loader.loadTenant(
+                self.abide,
+                tenant_name,
+                self.ansible_manager,
+                self.unparsed_abide,
+                zuul_cache_ltime=-1,
+            )
+
+            tenant = self.abide.tenants.get(tenant_name)
+            if tenant is not None:
+                self.local_layout_state[tenant_name] = layout_state
+                self.connections.reconfigureDrivers(tenant)
+
     @classmethod
     def checkTenantSourceConf(cls, config: ConfigParser):
         tenant_config = None
@@ -621,6 +723,8 @@ class Scheduler(threading.Thread):
             self.ansible_manager = AnsibleManager(
                 default_version=default_ansible_version)
 
+            # TODO (swestphahl): Is this necessary for the full
+            # reconfiguration or just piggybacking houskeeping stuff?
             for connection in self.connections.connections.values():
                 self.log.debug("Clear cache for: %s" % connection)
                 connection.clearCache()
@@ -990,6 +1094,9 @@ class Scheduler(threading.Thread):
             hostname=self.hostname,
             last_reconfigured=int(time.time()),
         )
+        # We need to update the local layout state before the remote state,
+        # to avoid race conditions in the layout changed callback.
+        self.local_layout_state[tenant.name] = layout_state
         self.tenant_layout_state[tenant.name] = layout_state
 
         if self.statsd:
@@ -1164,6 +1271,16 @@ class Scheduler(threading.Thread):
                     # We (re-)lock the tenant for every pipeline so the
                     # scheduler has a chance to get the write lock if needed.
                     with locked(tlock, blocking=False):
+                        if (
+                            self.tenant_layout_state[tenant.name]
+                            > self.local_layout_state[tenant.name]
+                        ):
+                            self.log.debug(
+                                "Local layout of tenant %s not up to date",
+                                tenant.name
+                            )
+                            break
+
                         self.log.debug("Locking pipeline %s", pipeline.name)
                         try:
                             with locked(plock, blocking=False):
