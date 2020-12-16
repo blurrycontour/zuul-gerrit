@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0e24767_2707c5ae",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 2023,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-12-16T09:35:29Z",
+      "side": 1,
+      "message": "My impression is that while this may fix problem on one system it may break on another one.\n\nDo you have any references regarding the expected format used by created_at and updated_at?\n\nIf their format is not hardcoded to use specific format we should test with two variations in order to assure it works file.\n\nIf the original format was broken, it would worth including a commend with a link to the spec which documents accepted formats.",
+      "range": {
+        "startLine": 2023,
+        "startChar": 8,
+        "endLine": 2023,
+        "endChar": 28
+      },
+      "revId": "04da3fb5db8f250c49e2210ce3cbc7ce3eefa8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
