@@ -14,13 +14,19 @@
 
 import json
 from collections.abc import MutableMapping
-from functools import total_ordering
+from functools import partial, total_ordering
 from uuid import uuid4
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Callable, Dict, Iterator, List, Optional, Set
 
 from kazoo.exceptions import NoNodeError
+from kazoo.protocol.states import (
+    EventType,
+    KazooState,
+    WatchedEvent,
+    ZnodeStat,
+)
 
-from zuul.zk import ZooKeeperBase
+from zuul.zk import ZooKeeperBase, ZooKeeperClient
 
 
 @total_ordering
@@ -79,6 +85,63 @@ class LayoutState:
 class LayoutStateStore(ZooKeeperBase, MutableMapping):
 
     layout_root = "/zuul/layout"
+
+    # Make instance hashable in order to allow hashing of _on_state_change
+    # callback with Python <3.8
+    __hash__ = object.__hash__
+
+    def __init__(
+        self,
+        client: ZooKeeperClient,
+        callback: Callable[[LayoutState], Any],
+    ):
+        super().__init__(client)
+        self._watched_tenants: Set[str] = set()
+        self.callback = callback
+        self.kazoo_client.ensure_path(self.layout_root)
+        self.kazoo_client.add_listener(self._on_state_change)
+
+    def _on_state_change(self, state: KazooState) -> None:
+        if state == KazooState.LOST:
+            # Data watches are no longer valid and will be re-created by
+            # the child watch which survives session loss.
+            self._watched_tenants.clear()
+
+    def watch(self) -> None:
+        self.kazoo_client.ChildrenWatch(self.layout_root, self._layout_watch)
+
+    def _layout_watch(
+        self,
+        tenant_list: List[str],
+        event: Optional[WatchedEvent] = None,
+    ) -> None:
+        new_tenants = set(tenant_list) - self._watched_tenants
+        for tenant_name in new_tenants:
+            self.kazoo_client.DataWatch(
+                f"{self.layout_root}/{tenant_name}",
+                partial(self._tenant_data_watch, tenant_name),
+            )
+            self._watched_tenants.add(tenant_name)
+
+    def _tenant_data_watch(
+        self,
+        tenant_name: str,
+        data: bytes,
+        zstat: ZnodeStat,
+        event: WatchedEvent,
+    ) -> bool:
+        if event and event.type == EventType.DELETED:
+            self._watched_tenants.discard(tenant_name)
+            return False
+        if data:
+            state = LayoutState.from_dict(
+                {
+                    "ltime": zstat.last_modified_transaction_id,
+                    **json.loads(data),
+                }
+            )
+            self.callback(state)
+        return True
 
     def __getitem__(self, tenant_name: str) -> LayoutState:
         try:
