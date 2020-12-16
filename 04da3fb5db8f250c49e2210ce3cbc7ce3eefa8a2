@@ -46,6 +46,30 @@
       "revId": "04da3fb5db8f250c49e2210ce3cbc7ce3eefa8a2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1f5fcda2_28ed227f",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 2023,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2020-12-16T15:40:08Z",
+      "side": 1,
+      "message": "They use different formats in different messages. There can be formats listed in patchset1. dateutl.praser.prase can deal with them all. Here is the possible timestamp format in gitlab message: https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#webhooks",
+      "parentUuid": "17cb4059_cd9bdfcc",
+      "range": {
+        "startLine": 2023,
+        "startChar": 8,
+        "endLine": 2023,
+        "endChar": 28
+      },
+      "revId": "04da3fb5db8f250c49e2210ce3cbc7ce3eefa8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
