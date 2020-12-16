@@ -22,6 +22,30 @@
       "revId": "04da3fb5db8f250c49e2210ce3cbc7ce3eefa8a2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17cb4059_cd9bdfcc",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 2023,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2020-12-16T09:59:22Z",
+      "side": 1,
+      "message": "Yep I believe Lida tested with the formats given locally, but adding them to CI would be a good idea as well.",
+      "parentUuid": "d0e24767_2707c5ae",
+      "range": {
+        "startLine": 2023,
+        "startChar": 8,
+        "endLine": 2023,
+        "endChar": 28
+      },
+      "revId": "04da3fb5db8f250c49e2210ce3cbc7ce3eefa8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
