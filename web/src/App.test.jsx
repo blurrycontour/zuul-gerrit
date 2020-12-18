@@ -29,7 +29,7 @@ api.fetchInfo = jest.fn()
 api.fetchTenants = jest.fn()
 api.fetchStatus = jest.fn()
 api.fetchConfigErrors = jest.fn()
-api.fetchConfigErrors.mockImplementation(() => Promise.resolve({data: []}))
+api.fetchConfigErrors.mockImplementation(() => Promise.resolve({ data: [] }))
 
 const store = configureStore()
 
@@ -42,12 +42,14 @@ it('renders without crashing', () => {
 
 it('renders multi tenant', () => {
   api.fetchInfo.mockImplementation(
-    () => Promise.resolve({data: {
-      info: {capabilities: {}}
-    }})
+    () => Promise.resolve({
+      data: {
+        info: { capabilities: {} }
+      }
+    })
   )
   api.fetchTenants.mockImplementation(
-    () => Promise.resolve({data: [{name: 'openstack'}]})
+    () => Promise.resolve({ data: [{ name: 'openstack' }] })
   )
   const application = ReactTestUtils.renderIntoDocument(
     <Provider store={store}><Router><App /></Router></Provider>
@@ -72,12 +74,14 @@ it('renders multi tenant', () => {
 
 it('renders single tenant', () => {
   api.fetchInfo.mockImplementation(
-    () => Promise.resolve({data: {
-      info: {capabilities: {}, tenant: 'openstack'}
-    }})
+    () => Promise.resolve({
+      data: {
+        info: { capabilities: {}, tenant: 'openstack' }
+      }
+    })
   )
   api.fetchStatus.mockImplementation(
-    () => Promise.resolve({data: {pipelines: []}})
+    () => Promise.resolve({ data: { pipelines: [] } })
   )
   const application = ReactTestUtils.renderIntoDocument(
     <Provider store={store}><Router><App /></Router></Provider>
