@@ -69,6 +69,12 @@ span.zuul-job-result.label {
     vertical-align: top;
 }
 
+/* Restore the menuitem styling */
+.zuul-status-content .pf-c-content ul[role="menu"] {
+    padding-left: 0;
+    list-style: none;
+}
+
 /* Avoid duplicated lines/borders for the job items on the status page */
 .zuul-status-content .pf-c-content li+li {
     margin-top: 0;
