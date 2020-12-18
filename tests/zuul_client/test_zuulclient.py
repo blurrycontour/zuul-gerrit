@@ -419,6 +419,19 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(C.reported, 2)
 
 
+class TestZuulClientAdminCORSEnabled(TestZuulClientAdmin):
+    """Test the admin commands of zuul-client, CORS enabled"""
+    config_file = 'zuul-admin-web-CORS-multiple-origins.conf'
+
+
+class TestZuulClientAdminCORSEnabledWildCard(TestZuulClientAdmin):
+    """
+    Test the admin commands of zuul-client, CORS enabled with origin
+    wildcard
+    """
+    config_file = 'zuul-admin-web-CORS-wildcard.conf'
+
+
 class TestZuulClientQueryData(BaseTestWeb):
     """Test that zuul-client can fetch builds"""
     config_file = 'zuul-sql-driver-mysql.conf'
@@ -578,6 +591,11 @@ class TestZuulClientBuilds(TestZuulClientQueryData,
                         results)
 
 
+class TestZuulClientBuildsCORSEnabled(TestZuulClientBuilds):
+    """Test that zuul-client can fetch builds, CORS enabled"""
+    config_file = 'zuul-sql-driver-mysql-CORS-enabled.conf'
+
+
 class TestZuulClientBuildInfo(TestZuulClientQueryData,
                               AnsibleZuulTestCase):
     """Test that zuul-client can fetch a build's details"""
@@ -631,3 +649,8 @@ class TestZuulClientBuildInfo(TestZuulClientQueryData,
                 x['url'] == 'http://example.com/docs'
                 for x in artifacts),
             output)
+
+
+class TestZuulClientBuildInfoCORSEnabled(TestZuulClientBuildInfo):
+    """Test that zuul-client can fetch builds, CORS enabled"""
+    config_file = 'zuul-sql-driver-mysql-CORS-enabled.conf'
