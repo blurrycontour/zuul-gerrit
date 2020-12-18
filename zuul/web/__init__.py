@@ -682,6 +682,8 @@ class ZuulWebAPI(object):
             return {'description': e.error_description,
                     'error': e.error,
                     'realm': e.realm}
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
         return {'zuul': {'admin': admin_tenants}, }
 
     @cherrypy.expose
@@ -704,6 +706,8 @@ class ZuulWebAPI(object):
             return {'description': e.error_description,
                     'error': e.error,
                     'realm': e.realm}
+        resp = cherrypy.response
+        resp.headers['Access-Control-Allow-Origin'] = '*'
         return {'zuul': {'admin': tenant in admin_tenants,
                          'scope': [tenant, ]}, }
 
