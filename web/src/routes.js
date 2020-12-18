@@ -29,6 +29,7 @@ import ConfigErrorsPage from './pages/ConfigErrors'
 import TenantsPage from './pages/Tenants'
 import StreamPage from './pages/Stream'
 import OpenApiPage from './pages/OpenApi'
+import AuthCallbackPage from './pages/AuthCallback'
 
 // The Route object are created in the App component.
 // Object with a title are created in the menu.
@@ -89,27 +90,27 @@ const routes = () => [
   {
     to: '/build/:buildId',
     component: BuildPage,
-    props: {'activeTab': 'results'},
+    props: { 'activeTab': 'results' },
   },
   {
     to: '/build/:buildId/artifacts',
     component: BuildPage,
-    props: {'activeTab': 'artifacts'},
+    props: { 'activeTab': 'artifacts' },
   },
   {
     to: '/build/:buildId/logs',
     component: BuildPage,
-    props: {'activeTab': 'logs'},
+    props: { 'activeTab': 'logs' },
   },
   {
     to: '/build/:buildId/console',
     component: BuildPage,
-    props: {'activeTab': 'console'},
+    props: { 'activeTab': 'console' },
   },
   {
     to: '/build/:buildId/log/:file*',
     component: BuildPage,
-    props: {'activeTab': 'logs', 'logfile': true},
+    props: { 'activeTab': 'logs', 'logfile': true },
   },
   {
     to: '/buildset/:buildsetId',
@@ -134,6 +135,10 @@ const routes = () => [
     component: ComponentsPage,
     noTenantPrefix: true,
   },
+  {
+    to: '/auth_callback',
+    component: AuthCallbackPage,
+  }
 ]
 
 export { routes }
