@@ -6,5 +6,6 @@ Admin How-to Guides
 
    installation
    zuul-from-scratch
+   openid-connect-examples
    troubleshooting
    zookeeper
