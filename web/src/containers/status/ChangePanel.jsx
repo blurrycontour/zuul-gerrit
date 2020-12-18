@@ -24,19 +24,21 @@ class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    pipeline: PropTypes.string,
+    dispatch: PropTypes.func
   }
 
-  constructor () {
+  constructor() {
     super()
     this.state = {
-      expanded: false
+      expanded: false,
     }
     this.onClick = this.onClick.bind(this)
     this.clicked = false
   }
 
-  onClick (e) {
+  onClick(e) {
     // Skip middle mouse button
     if (e.button === 1) {
       return
@@ -49,7 +51,7 @@ class ChangePanel extends React.Component {
     this.setState({ expanded: !expanded })
   }
 
-  time (ms) {
+  time(ms) {
     return moment.duration(ms).format({
       template: 'h [hr] m [min]',
       largest: 2,
@@ -58,7 +60,7 @@ class ChangePanel extends React.Component {
     })
   }
 
-  enqueueTime (ms) {
+  enqueueTime(ms) {
     // Special format case for enqueue time to add style
     let hours = 60 * 60 * 1000
     let now = Date.now()
@@ -73,7 +75,7 @@ class ChangePanel extends React.Component {
     return <span className={status}>{text}</span>
   }
 
-  jobStrResult (job) {
+  jobStrResult(job) {
     let result = job.result ? job.result.toLowerCase() : null
     if (result === null) {
       if (job.url === null) {
@@ -91,7 +93,7 @@ class ChangePanel extends React.Component {
     return result
   }
 
-  renderChangeLink (change) {
+  renderChangeLink(change) {
     let changeId = change.id || 'NA'
     let changeTitle = changeId
     // Fall back to display the ref if there is no change id
@@ -119,7 +121,7 @@ class ChangePanel extends React.Component {
       </small>)
   }
 
-  renderProgressBar (change) {
+  renderProgressBar(change) {
     let jobPercent = (100 / change.jobs.length).toFixed(2)
     return (
       <div className='progress zuul-change-total-result'>
@@ -153,13 +155,13 @@ class ChangePanel extends React.Component {
           return <div className={'progress-bar' + className}
             key={idx}
             title={job.name}
-            style={{width: jobPercent + '%'}}/>
+            style={{ width: jobPercent + '%' }} />
         })}
       </div>
     )
   }
 
-  renderTimer (change) {
+  renderTimer(change) {
     let remainingTime
     if (change.remaining_time === null) {
       remainingTime = 'unknown'
@@ -179,9 +181,9 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderJobProgressBar (elapsedTime, remainingTime) {
+  renderJobProgressBar(elapsedTime, remainingTime) {
     let progressPercent = 100 * (elapsedTime / (elapsedTime +
-                                                remainingTime))
+      remainingTime))
     // Show animation in preparation phase
     let className
     let progressWidth = progressPercent
@@ -208,13 +210,13 @@ class ChangePanel extends React.Component {
           aria-valuenow={progressPercent}
           aria-valuemin={0}
           aria-valuemax={100}
-          style={{'width': progressWidth + '%'}}
+          style={{ 'width': progressWidth + '%' }}
         />
       </div>
     )
   }
 
-  renderJobStatusLabel (job, result) {
+  renderJobStatusLabel(job, result) {
     let className, title
     switch (result) {
       case 'success':
@@ -249,10 +251,10 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderJob (job) {
+  renderJob(job) {
     const { tenant } = this.props
     let job_name = job.name
-    let ordinal_rules = new Intl.PluralRules('en', {type: 'ordinal'})
+    let ordinal_rules = new Intl.PluralRules('en', { type: 'ordinal' })
     const suffixes = {
       one: 'st',
       two: 'nd',
@@ -260,7 +262,7 @@ class ChangePanel extends React.Component {
       other: 'th'
     }
     if (job.tries > 1) {
-        job_name = job_name + ' (' + job.tries + suffixes[ordinal_rules.select(job.tries)] + ' attempt)'
+      job_name = job_name + ' (' + job.tries + suffixes[ordinal_rules.select(job.tries)] + ' attempt)'
     }
     let name = ''
     if (job.result !== null) {
@@ -293,11 +295,11 @@ class ChangePanel extends React.Component {
         {resultBar}
         {job.voting === false ? (
           <small className='zuul-non-voting-desc'> (non-voting)</small>) : ''}
-        <div style={{clear: 'both'}} />
+        <div style={{ clear: 'both' }} />
       </span>)
   }
 
-  renderJobList (jobs) {
+  renderJobList(jobs) {
     return (
       <ul className='list-group zuul-patchset-body'>
         {jobs.map((job, idx) => (
@@ -308,7 +310,7 @@ class ChangePanel extends React.Component {
       </ul>)
   }
 
-  render () {
+  render() {
     const { expanded } = this.state
     const { change, globalExpanded } = this.props
     let expand = globalExpanded
@@ -349,4 +351,6 @@ class ChangePanel extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ChangePanel)
+export default connect(state => ({
+  tenant: state.tenant,
+}))(ChangePanel)
