@@ -14,6 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import configparser
 import os
 import urllib.parse
 import socket
@@ -144,7 +145,6 @@ class TestWeb(BaseTestWeb):
         self.assertIn('Content-Type', resp.headers)
         self.assertEqual(
             'application/json; charset=utf-8', resp.headers['Content-Type'])
-        self.assertIn('Access-Control-Allow-Origin', resp.headers)
         self.assertIn('Cache-Control', resp.headers)
         self.assertIn('Last-Modified', resp.headers)
         self.assertTrue(resp.headers['Last-Modified'].endswith(' GMT'))
@@ -2032,6 +2032,7 @@ class TestArtifacts(BaseTestWeb, AnsibleZuulTestCase):
 
 class TestTenantScopedWebApi(BaseTestWeb):
     config_file = 'zuul-admin-web.conf'
+    extra_headers = {}
 
     def test_admin_routes_no_token(self):
         resp = self.post_url(
@@ -2039,13 +2040,15 @@ class TestTenantScopedWebApi(BaseTestWeb):
             json={'job': 'project-test1',
                   'count': 1,
                   'reason': 'because',
-                  'node_hold_expiration': 36000})
+                  'node_hold_expiration': 36000},
+            headers=self.extra_headers or None)
         self.assertEqual(401, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
             json={'trigger': 'gerrit',
                   'change': '2,1',
-                  'pipeline': 'check'})
+                  'pipeline': 'check'},
+            headers=self.extra_headers or None)
         self.assertEqual(401, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
@@ -2053,7 +2056,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
                   'ref': 'abcd',
                   'newrev': 'aaaa',
                   'oldrev': 'bbbb',
-                  'pipeline': 'check'})
+                  'pipeline': 'check'},
+            headers=self.extra_headers or None)
         self.assertEqual(401, resp.status_code)
 
     def test_bad_key_JWT_token(self):
@@ -2066,9 +2070,11 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='OnlyZuulNoDana',
                            algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'job': 'project-test1',
                   'count': 1,
                   'reason': 'because',
@@ -2076,14 +2082,14 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(401, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'trigger': 'gerrit',
                   'change': '2,1',
                   'pipeline': 'check'})
         self.assertEqual(401, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'trigger': 'gerrit',
                   'ref': 'abcd',
                   'newrev': 'aaaa',
@@ -2128,9 +2134,11 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'exp': int(time.time()) - 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'job': 'project-test1',
                   'count': 1,
                   'reason': 'because',
@@ -2138,14 +2146,14 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(401, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'trigger': 'gerrit',
                   'change': '2,1',
                   'pipeline': 'check'})
         self.assertEqual(401, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'trigger': 'gerrit',
                   'ref': 'abcd',
                   'newrev': 'aaaa',
@@ -2163,9 +2171,11 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'job': 'project-test1',
                   'count': 1,
                   'reason': 'because',
@@ -2173,14 +2183,14 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(403, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'trigger': 'gerrit',
                   'change': '2,1',
                   'pipeline': 'check'})
         self.assertEqual(403, resp.status_code)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/enqueue",
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json={'trigger': 'gerrit',
                   'ref': 'abcd',
                   'newrev': 'aaaa',
@@ -2203,9 +2213,11 @@ class TestTenantScopedWebApi(BaseTestWeb):
                 'node_hold_expiration': None}
         good_token = jwt.encode(good_authz, key='NoDanaOnlyZuul',
                                 algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % good_token}
+        headers.update(self.extra_headers)
         req = self.post_url(
             'api/tenant/tenant-one/project/org/project/autohold',
-            headers={'Authorization': 'Bearer %s' % good_token},
+            headers=headers,
             json=args)
         self.assertEqual(200, req.status_code, req.text)
         resp = self.get_url(
@@ -2215,9 +2227,11 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         resp = self.delete_url(
             "api/tenant/tenant-one/autohold/%s" % request['id'],
-            headers={'Authorization': 'Bearer %s' % token})
+            headers=headers)
         self.assertEqual(403, resp.status_code)
 
     def test_autohold(self):
@@ -2237,10 +2251,16 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         req = self.post_url(
             'api/tenant/tenant-one/project/org/project/autohold',
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json=args)
+        # Expected failure if testing CORS with a bad origin
+        if self.extra_headers.get('Origin') == 'bad.zuul':
+            self.assertEqual(400, req.status_code, req.text)
+            return
         self.assertEqual(200, req.status_code, req.text)
         data = req.json()
         self.assertEqual(True, data)
@@ -2268,7 +2288,6 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.addAutohold('tenant-one', 'review.example.com/org/project',
                          'project-test2', '.*', 'reason text', 1, 600)
 
-        # Use autohold-list API to retrieve request ID
         resp = self.get_url(
             "api/tenant/tenant-one/autohold")
         self.assertEqual(200, resp.status_code, resp.text)
@@ -2298,9 +2317,15 @@ class TestTenantScopedWebApi(BaseTestWeb):
                      'exp': int(time.time()) + 3600}
         bad_token = jwt.encode(bad_authz, key='NoDanaOnlyZuul',
                                algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % bad_token}
+        headers.update(self.extra_headers)
         resp = self.delete_url(
             "api/tenant/tenant-one/autohold/%s" % request_id,
-            headers={'Authorization': 'Bearer %s' % bad_token})
+            headers=headers)
+        # Expected failure if testing CORS with a bad origin
+        if self.extra_headers.get('Origin') == 'bad.zuul':
+            self.assertEqual(400, resp.status_code, resp.text)
+            return
         # Throw a "Forbidden" error, because user is authenticated but not
         # authorized for tenant-one
         self.assertEqual(403, resp.status_code, resp.text)
@@ -2330,9 +2355,15 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  },
                  'exp': int(time.time()) + 3600}
         request_id, token = self._init_autohold_delete(authz)
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         resp = self.delete_url(
             "api/tenant/tenant-one/autohold/%s" % request_id,
-            headers={'Authorization': 'Bearer %s' % token})
+            headers=headers)
+        # Expected failure if testing CORS with a bad origin
+        if self.extra_headers.get('Origin') == 'bad.zuul':
+            self.assertEqual(400, resp.status_code, resp.text)
+            return
         self.assertEqual(204, resp.status_code, resp.text)
         # autohold-list should be empty now
         resp = self.get_url(
@@ -2362,9 +2393,15 @@ class TestTenantScopedWebApi(BaseTestWeb):
                   'pipeline': 'gate', }
         if use_trigger:
             change['trigger'] = 'gerrit'
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         req = self.post_url(path % enqueue_args,
-                            headers={'Authorization': 'Bearer %s' % token},
+                            headers=headers,
                             json=change)
+        # Expected failure if testing CORS with a bad origin
+        if self.extra_headers.get('Origin') == 'bad.zuul':
+            self.assertEqual(400, req.status_code, req.text)
+            return
         # The JSON returned is the same as the client's output
         self.assertEqual(200, req.status_code, req.text)
         data = req.json()
@@ -2407,9 +2444,14 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         req = self.post_url(path % enqueue_args,
-                            headers={'Authorization': 'Bearer %s' % token},
+                            headers=headers,
                             json=ref)
+        if self.extra_headers.get('Origin') == 'bad.zuul':
+            self.assertEqual(400, req.status_code, req.text)
+            return
         self.assertEqual(200, req.status_code, req.text)
         # The JSON returned is the same as the client's output
         data = req.json()
@@ -2451,14 +2493,19 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'exp': int(time.time()) + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         path = "api/tenant/%(tenant)s/project/%(project)s/dequeue"
         dequeue_args = {'tenant': 'tenant-one',
                         'project': 'org/project', }
         change = {'ref': 'refs/heads/stable',
                   'pipeline': 'periodic', }
         req = self.post_url(path % dequeue_args,
-                            headers={'Authorization': 'Bearer %s' % token},
+                            headers=headers,
                             json=change)
+        if self.extra_headers.get('Origin') == 'bad.zuul':
+            self.assertEqual(400, req.status_code, req.text)
+            return
         # The JSON returned is the same as the client's output
         self.assertEqual(200, req.status_code, req.text)
         data = req.json()
@@ -2479,6 +2526,11 @@ class TestTenantScopedWebApi(BaseTestWeb):
         properly"""
         # Note that %tenant, %project are not relevant here. The client is
         # just checking what the endpoint allows.
+        try:
+            cors_enabled = self.config.get('web', 'enable_cors')
+        except configparser.NoOptionError:
+            # option not set, defaults to False
+            cors_enabled = False
         endpoints = [
             {'action': 'promote',
              'path': 'api/tenant/my-tenant/promote',
@@ -2502,19 +2554,34 @@ class TestTenantScopedWebApi(BaseTestWeb):
              'path': 'api/tenant/my-tenant/authorizations',
              'allowed_methods': ['GET', ]},
         ]
+        headers = {'Access-Control-Request-Method': 'GET',
+                   'Access-Control-Request-Headers': 'Authorization',
+                   'Origin': 'test.zuul'}
+        headers.update(self.extra_headers)
         for endpoint in endpoints:
             preflight = self.options_url(
                 endpoint['path'],
-                headers={'Access-Control-Request-Method': 'GET',
-                         'Access-Control-Request-Headers': 'Authorization'})
+                headers=headers)
+            if self.extra_headers.get('Origin') == 'bad.zuul':
+                self.assertEqual(400, preflight.status_code, preflight.text)
+                continue
             self.assertEqual(
                 204,
                 preflight.status_code,
                 "%s failed: %s" % (endpoint['action'], preflight.text))
-            self.assertEqual(
-                '*',
-                preflight.headers.get('Access-Control-Allow-Origin'),
-                "%s failed: %s" % (endpoint['action'], preflight.headers))
+            if cors_enabled:
+                request_origin = self.extra_headers.get('Origin')
+                allowed_origin = preflight.headers.get(
+                    'Access-Control-Allow-Origin'
+                )
+                self.assertTrue(
+                    allowed_origin in ['*', request_origin],
+                    "%s failed: %s" % (endpoint['action'], preflight.headers))
+            else:
+                self.assertEqual(
+                    '*',
+                    preflight.headers.get('Access-Control-Allow-Origin'),
+                    "%s failed: %s" % (endpoint['action'], preflight.headers))
             self.assertEqual(
                 'Authorization, Content-Type',
                 preflight.headers.get('Access-Control-Allow-Headers'),
@@ -2569,10 +2636,15 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'iat': int(time.time())}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
                            algorithm='HS256')
+        headers = {'Authorization': 'Bearer %s' % token}
+        headers.update(self.extra_headers)
         req = self.post_url(
             'api/tenant/tenant-one/promote',
-            headers={'Authorization': 'Bearer %s' % token},
+            headers=headers,
             json=args)
+        if self.extra_headers.get('Origin') == 'bad.zuul':
+            self.assertEqual(400, req.status_code, req.text)
+            return
         self.assertEqual(200, req.status_code, req.text)
         data = req.json()
         self.assertEqual(True, data)
@@ -2818,6 +2890,44 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertTrue('zuul' in data)
         self.assertTrue(data['zuul']['admin'] is False, data)
         self.assertTrue(data['zuul']['scope'] == ['tenant-one'], data)
+
+
+class TestTenantScopedWebAPICORSEnabledMultiOrigins(TestTenantScopedWebApi):
+    config_file = 'zuul-admin-web-CORS-multiple-origins.conf'
+    extra_headers = {'Origin': 'foo.zuul'}
+
+
+class TestTenantScopedWebAPICORSEnabledDirectCalls(TestTenantScopedWebApi):
+    """Test that non-CORS calls work with CORS enabled."""
+    config_file = 'zuul-admin-web-CORS-multiple-origins.conf'
+
+    def test_OPTIONS(self):
+        self.skipTest('this tests a CORS-only call')
+
+
+class TestTenantScopedWebAPICORSEnabledBadOrigin(TestTenantScopedWebApi):
+    config_file = 'zuul-admin-web-CORS-multiple-origins.conf'
+    extra_headers = {'Origin': 'bad.zuul'}
+
+    def test_admin_routes_no_token(self):
+        self.skipTest('N/A')
+
+    def test_bad_key_JWT_token(self):
+        self.skipTest('N/A')
+
+    def test_expired_JWT_token(self):
+        self.skipTest('N/A')
+
+    def test_valid_JWT_bad_tenants(self):
+        self.skipTest('N/A')
+
+    def test_autohold_delete_wrong_tenant(self):
+        self.skipTest('N/A')
+
+
+class TestTenantScopedWebAPICORSEnabledWildcard(TestTenantScopedWebApi):
+    config_file = 'zuul-admin-web-CORS-wildcard.conf'
+    extra_headers = {'Origin': 'nodanaonly.zuul'}
 
 
 class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
