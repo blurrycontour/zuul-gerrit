@@ -14,6 +14,7 @@
 
 import { combineReducers } from 'redux'
 
+import auth from './auth'
 import configErrors from './configErrors'
 import change from './change'
 import errors from './errors'
@@ -32,8 +33,10 @@ import status from './status'
 import tenant from './tenant'
 import tenants from './tenants'
 import timezone from './timezone'
+import user from './user'
 
 const reducers = {
+  auth,
   build,
   change,
   configErrors,
@@ -52,6 +55,7 @@ const reducers = {
   tenants,
   timezone,
   preferences,
+  user,
 }
 
 export default combineReducers(reducers)
