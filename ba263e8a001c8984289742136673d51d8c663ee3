@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e0e65c53_d55810c0",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2020-12-18T13:31:21Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 1012,
+        "startChar": 6,
+        "endLine": 1012,
+        "endChar": 8
+      },
+      "revId": "ba263e8a001c8984289742136673d51d8c663ee3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
