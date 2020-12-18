@@ -1,4 +1,4 @@
-// Copyright 2018 Red Hat, Inc
+// Copyright 2020 Red Hat, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,30 +12,33 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import {
-  INFO_FETCH_REQUEST,
-  INFO_FETCH_SUCCESS,
-  INFO_FETCH_FAIL,
-} from '../actions/info'
+import initialState from './initialState'
 
-export default (state = {
-  isFetching: false,
-  tenant: null,
-  capabilities: null,
-}, action) => {
+import {
+  USERMANAGER_CREATE,
+  USERMANAGER_FAIL,
+  USERMANAGER_SUCCESS,
+} from '../actions/auth'
+
+export default (state = initialState.auth, action) => {
   switch (action.type) {
-    case INFO_FETCH_REQUEST:
-    case INFO_FETCH_FAIL:
+    case USERMANAGER_CREATE:
       return {
         isFetching: true,
-        tenant: null,
+        userManagerConfig: null,
+        capabilities: null,
       }
-    case INFO_FETCH_SUCCESS:
+    case USERMANAGER_SUCCESS:
       return {
         isFetching: false,
-        tenant: action.tenant,
-        capabilities: action.capabilities,
-        ready: true
+        userManagerConfig: action.userManagerConfig,
+        capabilities: action.capabilities
+      }
+    case USERMANAGER_FAIL:
+      return {
+        isFetching: false,
+        userManager: null,
+        capabilities: null,
       }
     default:
       return state
