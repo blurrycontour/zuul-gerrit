@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
 import ChangePanel from './ChangePanel'
@@ -27,7 +28,12 @@ class Change extends React.Component {
     change: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
-    tenant: PropTypes.object
+    pipeline: PropTypes.string,
+    tenant: PropTypes.object,
+  }
+
+  state = {
+      showDequeueModal: false,
   }
 
   renderStatusIcon (change) {
@@ -76,7 +82,7 @@ class Change extends React.Component {
   }
 
   render () {
-    const { change, queue, expanded } = this.props
+    const { change, queue, expanded, pipeline } = this.props
     let row = []
     let i
     for (i = 0; i < queue._tree_columns; i++) {
@@ -96,17 +102,22 @@ class Change extends React.Component {
       <td key={i + 1}
         className="zuul-change-cell"
         style={{width: changeWidth + 'px'}}>
-        <ChangePanel change={change} globalExpanded={expanded} />
+        <ChangePanel change={change} globalExpanded={expanded} pipeline={pipeline} />
       </td>
     )
+
     return (
+      <React.Fragment>
       <table className="zuul-change-box" style={{boxSizing: 'content-box'}}>
         <tbody>
           <tr>{row}</tr>
         </tbody>
       </table>
+      </React.Fragment>
     )
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(Change)
+export default connect(state => ({
+    tenant: state.tenant
+}))(Change)

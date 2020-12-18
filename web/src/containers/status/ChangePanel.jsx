@@ -19,21 +19,98 @@ import { Link } from 'react-router-dom'
 import * as moment from 'moment'
 import 'moment-duration-format'
 
+import { Button, Modal, ModalVariant } from '@patternfly/react-core'
+import { TrashIcon, BullhornIcon } from '@patternfly/react-icons'
+import { dequeue, dequeue_ref } from '../../api'
+import { addDequeueError } from '../../actions/adminActions'
+
+import { addError } from '../../actions/errors'
+
 
 class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    tenant: PropTypes.object
+    pipeline: PropTypes.string,
+    tenant: PropTypes.object,
+    user: PropTypes.object,
+    dispatch: PropTypes.func
   }
 
   constructor () {
     super()
     this.state = {
-      expanded: false
+      expanded: false,
+      showDequeueModal: false,
     }
     this.onClick = this.onClick.bind(this)
     this.clicked = false
+  }
+
+  renderDequeueButton () {
+      return (
+        <TrashIcon
+          title="Dequeue this change"
+          style={{cursor:'pointer'}}
+          color='#A30000'
+          onClick={(event) => {
+            event.preventDefault()
+            this.setState(() => ({showDequeueModal: true}))
+        }} />
+      )
+  }
+
+  dequeueConfirm = () => {
+    const { tenant, user, change, pipeline } = this.props
+    let projectName = change.project
+    let changeId = change.id || 'N/A'
+    let changeRef = change.ref
+    this.setState(() => ({showDequeueModal: false}))
+    // post-merge
+    if (/^[0-9a-f]{40}$/.test(changeId)) {
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline, changeRef, user.token)
+        .catch(error => {
+           this.props.dispatch(addDequeueError(error))
+        })
+    // pre-merge, ie we have a change id
+    } else if (changeId !== 'N/A') {
+      dequeue(tenant.apiPrefix, projectName, pipeline, changeId, user.token)
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
+    } else {
+        this.props.dispatch(addError({
+          url: null,
+          status: 'Invalid change ' + changeRef + ' on project ' + projectName,
+          text: ''
+        }))
+    }
+  }
+
+  dequeueCancel = () => {
+    this.setState(() => ({showDequeueModal: false}))
+  }
+
+  renderDequeueModal() {
+    const { showDequeueModal } = this.state
+    const { change } = this.props
+    let projectName = change.project
+    let changeId = change.id || change.ref
+    const title = 'You are about to dequeue a change'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        titleIconVariant={BullhornIcon}
+        isOpen={showDequeueModal}
+        title={title}
+        onClose={this.dequeueCancel}
+        actions={[
+          <Button key="deq_confirm" variant="primary" onClick={this.dequeueConfirm}>Confirm</Button>,
+          <Button key="deq_cancel" variant="link" onClick={this.dequeueCancel}>Cancel</Button>,
+        ]}>
+      <p>Please confirm that you want to cancel <strong>all ongoing builds</strong> on change <strong>{ changeId }</strong> for project <strong>{ projectName }</strong>.</p>
+    </Modal>
+    )
   }
 
   onClick (e) {
@@ -298,20 +375,30 @@ class ChangePanel extends React.Component {
 
   render () {
     const { expanded } = this.state
-    const { change, globalExpanded } = this.props
+    const { change, globalExpanded, user, tenant } = this.props
     let expand = globalExpanded
     if (this.clicked) {
       expand = expanded
     }
     const header = (
       <div className='panel panel-default zuul-change'>
+        { this.renderDequeueModal() }
         <div className='panel-heading zuul-patchset-header'
           onClick={this.onClick}>
           <div className='row'>
             <div className='col-xs-8'>
-              <span className='change_project'>{change.project}</span>
               <div className='row'>
-                <div className='col-xs-4'>
+                {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1) ?
+                 (<div className='col-xs-1 my-auto text-left'>
+                    {this.renderDequeueButton()}
+                  </div>) :
+                 ''}
+                <div className='col-xs-8'>
+                  <span className='change_project'>{change.project}</span>
+                </div>
+              </div>
+              <div className='row'>
+                <div className='col-xs-2'>
                   {this.renderChangeLink(change)}
                 </div>
                 <div className='col-xs-8'>
@@ -320,8 +407,8 @@ class ChangePanel extends React.Component {
               </div>
             </div>
             {change.live === true ? (
-              <div className='col-xs-4 text-right'>
-                {this.renderTimer(change)}
+                <div className='col-xs-4 text-right'>
+                  {this.renderTimer(change)}
               </div>
             ) : ''}
           </div>
@@ -337,4 +424,7 @@ class ChangePanel extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ChangePanel)
+export default connect(state => ({
+    tenant: state.tenant,
+    user: state.user,
+}))(ChangePanel)
