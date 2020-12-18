@@ -57,6 +57,7 @@ import {
   UsersIcon,
 } from '@patternfly/react-icons'
 
+import AuthContainer from './containers/auth/Auth'
 import ErrorBoundary from './containers/ErrorBoundary'
 import { Fetching } from './containers/Fetching'
 import SelectTz from './containers/timezone/SelectTz'
@@ -66,6 +67,7 @@ import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
+import { createUserManagerFromTenant } from './actions/auth'
 
 class App extends React.Component {
   static propTypes = {
@@ -78,6 +80,8 @@ class App extends React.Component {
     history: PropTypes.object,
     dispatch: PropTypes.func,
     isKebabDropdownOpen: PropTypes.bool,
+    user: PropTypes.object,
+    userManager: PropTypes.object,
   }
 
   state = {
@@ -176,6 +180,7 @@ class App extends React.Component {
         this.props.dispatch(tenantAction)
         if (tenantName) {
           this.props.dispatch(fetchConfigErrorsAction(tenantAction.tenant))
+          this.props.dispatch(createUserManagerFromTenant(tenantName))
         }
       }
     }
@@ -391,6 +396,8 @@ class App extends React.Component {
         }
         <SelectTz/>
         <ConfigModal/>
+
+    {tenant.name && (<AuthContainer />)}
       </PageHeaderTools>
     )
 
@@ -427,6 +434,8 @@ export default withRouter(connect(
     configErrors: state.configErrors,
     info: state.info,
     tenant: state.tenant,
-    timezone: state.timezone
+    timezone: state.timezone,
+    user: state.user,
+    userManager: state.auth.userManager
   })
 )(App))
