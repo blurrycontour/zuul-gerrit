@@ -32,7 +32,16 @@ export default function configureStore(initialState) {
         // TODO (felix): Re-enable the status.status path once we know how to
         // solve the weird state mutations that are done somewhere deep within
         // the logic of the status page (or its child components).
-        reduxImmutableStateInvariant({ ignore: ['status.status'] })
+        reduxImmutableStateInvariant({
+          ignore: [
+            'status.status',
+            // TODO (mhu): Figure out why this is needed. I suspect this is because
+            // the store is meant to be created with redux-oidc's userManager already
+            // instantiated at startup time (see https://github.com/maxmantz/redux-oidc-example/blob/master/src/store.js
+            // for example). We cannot do that since userManager's config must be
+            // fetched from zuul-web first.
+            'auth.userManager']
+        })
       )
     )
   )
