@@ -78,7 +78,6 @@ def handle_options(allowed_methods=None):
         request.handler = None
         # Set CORS response headers
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Access-Control-Allow-Headers'] =\
             ', '.join(['Authorization', 'Content-Type'])
         resp.headers['Access-Control-Allow-Methods'] =\
@@ -308,7 +307,6 @@ class ZuulWebAPI(object):
                                       'ref': body.get('ref', None)})
             result = not job.failure
             resp = cherrypy.response
-            resp.headers['Access-Control-Allow-Origin'] = '*'
             return result
         else:
             raise cherrypy.HTTPError(400,
@@ -352,7 +350,6 @@ class ZuulWebAPI(object):
                                   'change': change, })
         result = not job.failure
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     def _enqueue_ref(self, tenant, project, ref,
@@ -366,7 +363,6 @@ class ZuulWebAPI(object):
                                   'newrev': newrev, })
         result = not job.failure
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     @cherrypy.expose
@@ -402,7 +398,6 @@ class ZuulWebAPI(object):
                                  })
         result = not job.failure
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
     @cherrypy.expose
@@ -495,7 +490,6 @@ class ZuulWebAPI(object):
                              'nodes': request['nodes']
                             })
             resp = cherrypy.response
-            resp.headers['Access-Control-Allow-Origin'] = '*'
             return result
 
     @cherrypy.expose
@@ -524,7 +518,6 @@ class ZuulWebAPI(object):
                 raise cherrypy.HTTPError(
                     404, 'Hold request %s not found.' % request_id)
             resp = cherrypy.response
-            resp.headers['Access-Control-Allow-Origin'] = '*'
             return {
                 'id': request['id'],
                 'tenant': request['tenant'],
@@ -623,7 +616,6 @@ class ZuulWebAPI(object):
     def _handleInfo(self, info):
         ret = {'info': info.toDict()}
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         if self.static_cache_expiry:
             resp.headers['Cache-Control'] = "public, max-age=%d" % \
                 self.static_cache_expiry
@@ -708,7 +700,6 @@ class ZuulWebAPI(object):
         job = self.rpc.submitJob('zuul:tenant_list', {})
         ret = json.loads(job.data[0])
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -717,7 +708,6 @@ class ZuulWebAPI(object):
         job = self.rpc.submitJob('zuul:connection_list', {})
         ret = json.loads(job.data[0])
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     def _getStatus(self, tenant):
@@ -737,7 +727,6 @@ class ZuulWebAPI(object):
         last_modified = datetime.utcfromtimestamp(self.cache_time[tenant])
         last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
         resp.headers["Last-modified"] = last_modified_header
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return payload
 
     @cherrypy.expose
@@ -763,7 +752,6 @@ class ZuulWebAPI(object):
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -776,7 +764,6 @@ class ZuulWebAPI(object):
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -789,7 +776,6 @@ class ZuulWebAPI(object):
         if not ret:
             raise cherrypy.HTTPError(404, 'Job %s does not exist.' % job_name)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -801,7 +787,6 @@ class ZuulWebAPI(object):
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -817,7 +802,6 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(
                 404, 'Project %s does not exist.' % project)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -829,7 +813,6 @@ class ZuulWebAPI(object):
         if ret is None:
             raise cherrypy.HTTPError(404, 'Tenant %s does not exist.' % tenant)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -855,7 +838,6 @@ class ZuulWebAPI(object):
                 allowed_labels, disallowed_labels))
         ret = [{'name': label} for label in sorted(labels)]
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -870,7 +852,6 @@ class ZuulWebAPI(object):
                 node_data[key] = node.get(key)
             ret.append(node_data)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
     @cherrypy.expose
@@ -883,7 +864,6 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(
                 404, 'Project %s does not exist.' % project)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'text/plain'
         return job.data[0]
 
@@ -897,7 +877,6 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(
                 404, 'Project %s does not exist.' % project)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         resp.headers['Content-Type'] = 'text/plain'
         return job.data[0] + '\n'
 
@@ -994,7 +973,6 @@ class ZuulWebAPI(object):
             result=result, final=final, held=held, limit=limit, offset=skip)
 
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return [self.buildToDict(b, b.buildset) for b in builds]
 
     @cherrypy.expose
@@ -1008,7 +986,6 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(404, "Build not found")
         data = self.buildToDict(data[0], data[0].buildset)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return data
 
     def buildsetToDict(self, buildset, builds=[]):
@@ -1072,7 +1049,6 @@ class ZuulWebAPI(object):
             limit=limit, offset=skip)
 
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return [self.buildsetToDict(b) for b in buildsets]
 
     @cherrypy.expose
@@ -1086,7 +1062,6 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(404, "Buildset not found")
         data = self.buildsetToDict(data, data.builds)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return data
 
     @cherrypy.expose
@@ -1112,7 +1087,6 @@ class ZuulWebAPI(object):
         if not ret:
             raise cherrypy.HTTPError(404)
         resp = cherrypy.response
-        resp.headers['Access-Control-Allow-Origin'] = '*'
         return ret
 
 
@@ -1341,9 +1315,15 @@ class ZuulWeb(object):
 
         conf = {
             '/': {
-                'request.dispatch': route_map
+                'request.dispatch': route_map,
+                # required for CORS
+                'tools.response_headers.on': True,
+                'tools.response_headers.headers': [
+                  ('Access-Control-Allow-Origin', '*'),
+                ],
             }
         }
+
         cherrypy.config.update({
             'global': {
                 'environment': 'production',
