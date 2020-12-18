@@ -26,4 +26,10 @@ export default {
     isFetching: false,
     url: null,
   },
+  auth: {
+    isFetching: false,
+    userManagerConfig: null,
+    capabilities: null,
+  },
+  user: {}
 }
