@@ -1058,6 +1058,26 @@ sections of ``zuul.conf`` are used by the web server:
 
       If this is used the finger gateways should be configured accordingly.
 
+   .. attr:: enable_cors
+      :default: false
+
+      Whether or not CORS strict checking shall be enabled. If set to false, all values of
+      the "Origin" header will be allowed when zuul-web receives a CORS-enabled request 
+      (equivalent to setting "Access-Control-Allow-Origin" = \*).
+
+      If set to true, any CORS-enabled request whose origin is not set to an allowed value
+      (see below) will result in a HTTP error 400.
+
+      Note that CORS is usually only implemented by web browsers; this setting and the one
+      below can be safely ignored if no web UI is intended to be deployed with zuul-web. 
+
+   .. attr:: allowed_origins 
+      :default: localhost
+
+      A comma-separated list of origins to be allowed when enforcing CORS. Typically, these
+      should be the root URLs of the Zuul web UIs that are expected to communicate with
+      zuul-web.
+
 .. _web-server-tenant-scoped-api:
 
 Enabling tenant-scoped access to privileged actions
