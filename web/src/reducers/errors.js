@@ -25,6 +25,10 @@ export default (state = [], action) => {
   if (action.error && action.type.match(/.*_FETCH_FAIL$/)) {
     action = addApiError(action.error)
   }
+  // Intercept Admin API failures
+  if (action.error && action.type.match(/ADMIN_.*_FAIL$/)) {
+    action = addApiError(action.error)
+  }
   switch (action.type) {
     case ADD_ERROR:
       if (state.filter(error => (
