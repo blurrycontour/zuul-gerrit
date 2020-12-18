@@ -32,7 +32,11 @@ export default function configureStore(initialState) {
         // TODO (felix): Re-enable the status.status path once we know how to
         // solve the weird state mutations that are done somewhere deep within
         // the logic of the status page (or its child components).
-        reduxImmutableStateInvariant({ ignore: ['status.status'] })
+        reduxImmutableStateInvariant({
+          ignore: [
+            'status.status',
+          ]
+        })
       )
     )
   )
