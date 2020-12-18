@@ -1014,6 +1014,16 @@ sections of ``zuul.conf`` are used by the web server:
       The Cache-Control max-age response header value for static files served
       by the zuul-web. Set to 0 during development to disable Cache-Control.
 
+   .. attr:: enable_cors
+      :default: false
+
+      Whether or not CORS shall be enabled. If true, all origins will be allowed by default.
+
+   .. attr:: allowed_origin
+      :default: *
+
+      The origin to be allowed when enabling cors.
+
 .. _web-server-tenant-scoped-api:
 
 Enabling tenant-scoped access to privileged actions
