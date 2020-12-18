@@ -176,6 +176,35 @@ function fetchUserAuthorizations (apiPrefix, token) {
   return res
 }
 
+function dequeue (apiPrefix, projectName, pipeline, change, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.post(
+    apiPrefix + 'project/' + projectName + '/dequeue',
+    {
+      pipeline: pipeline,
+      change: change,
+    }
+  )
+  return res
+}
+function dequeue_ref (apiPrefix, projectName, pipeline, ref, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.post(
+    apiPrefix + 'project/' + projectName + '/dequeue',
+    {
+      pipeline: pipeline,
+      ref: ref,
+    }
+  )
+  return res
+}
+
 export {
   apiUrl,
   getHomepageUrl,
@@ -198,4 +227,6 @@ export {
   fetchInfo,
   fetchTenantInfo,
   fetchUserAuthorizations,
+  dequeue,
+  dequeue_ref,
 }

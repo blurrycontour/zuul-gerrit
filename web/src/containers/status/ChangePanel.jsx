@@ -19,24 +19,109 @@ import { Link } from 'react-router-dom'
 import * as moment from 'moment'
 import 'moment-duration-format'
 
+import {
+  ExpandableSection,
+  Button,
+  Modal,
+  ModalVariant
+} from '@patternfly/react-core'
+import { BanIcon, BullhornIcon } from '@patternfly/react-icons'
+import { dequeue, dequeue_ref } from '../../api'
+import { addDequeueError } from '../../actions/adminActions'
+
+import { addError } from '../../actions/errors'
+
 
 class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    tenant: PropTypes.object
+    pipeline: PropTypes.string,
+    tenant: PropTypes.object,
+    user: PropTypes.object,
+    dispatch: PropTypes.func
   }
 
-  constructor () {
+  constructor() {
     super()
     this.state = {
-      expanded: false
+      expanded: false,
+      showDequeueModal: false,
+      showAdminActions: false,
     }
     this.onClick = this.onClick.bind(this)
     this.clicked = false
   }
 
-  onClick (e) {
+  renderDequeueButton() {
+    return (
+      <BanIcon
+        title="Stop all jobs for this change"
+        style={{
+          cursor: 'pointer',
+          color: 'var(--pf-global--danger-color--100)'
+        }}
+        onClick={(event) => {
+          event.preventDefault()
+          this.setState(() => ({ showDequeueModal: true }))
+        }} />
+    )
+  }
+
+  dequeueConfirm = () => {
+    const { tenant, user, change, pipeline } = this.props
+    let projectName = change.project
+    let changeId = change.id || 'N/A'
+    let changeRef = change.ref
+    this.setState(() => ({ showDequeueModal: false }))
+    // post-merge
+    if (/^[0-9a-f]{40}$/.test(changeId)) {
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline, changeRef, user.token)
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
+      // pre-merge, ie we have a change id
+    } else if (changeId !== 'N/A') {
+      dequeue(tenant.apiPrefix, projectName, pipeline, changeId, user.token)
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
+    } else {
+      this.props.dispatch(addError({
+        url: null,
+        status: 'Invalid change ' + changeRef + ' on project ' + projectName,
+        text: ''
+      }))
+    }
+  }
+
+  dequeueCancel = () => {
+    this.setState(() => ({ showDequeueModal: false }))
+  }
+
+  renderDequeueModal() {
+    const { showDequeueModal } = this.state
+    const { change } = this.props
+    let projectName = change.project
+    let changeId = change.id || change.ref
+    const title = 'You are about to dequeue a change'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        titleIconVariant={BullhornIcon}
+        isOpen={showDequeueModal}
+        title={title}
+        onClose={this.dequeueCancel}
+        actions={[
+          <Button key="deq_confirm" variant="primary" onClick={this.dequeueConfirm}>Confirm</Button>,
+          <Button key="deq_cancel" variant="link" onClick={this.dequeueCancel}>Cancel</Button>,
+        ]}>
+        <p>Please confirm that you want to cancel <strong>all ongoing builds</strong> on change <strong>{changeId}</strong> for project <strong>{projectName}</strong>.</p>
+      </Modal>
+    )
+  }
+
+  onClick(e) {
     // Skip middle mouse button
     if (e.button === 1) {
       return
@@ -49,7 +134,7 @@ class ChangePanel extends React.Component {
     this.setState({ expanded: !expanded })
   }
 
-  time (ms) {
+  time(ms) {
     return moment.duration(ms).format({
       template: 'h [hr] m [min]',
       largest: 2,
@@ -58,7 +143,7 @@ class ChangePanel extends React.Component {
     })
   }
 
-  enqueueTime (ms) {
+  enqueueTime(ms) {
     // Special format case for enqueue time to add style
     let hours = 60 * 60 * 1000
     let now = Date.now()
@@ -73,7 +158,7 @@ class ChangePanel extends React.Component {
     return <span className={status}>{text}</span>
   }
 
-  jobStrResult (job) {
+  jobStrResult(job) {
     let result = job.result ? job.result.toLowerCase() : null
     if (result === null) {
       if (job.url === null) {
@@ -91,7 +176,7 @@ class ChangePanel extends React.Component {
     return result
   }
 
-  renderChangeLink (change) {
+  renderChangeLink(change) {
     let changeId = change.id || 'NA'
     let changeTitle = changeId
     // Fall back to display the ref if there is no change id
@@ -119,7 +204,7 @@ class ChangePanel extends React.Component {
       </small>)
   }
 
-  renderProgressBar (change) {
+  renderProgressBar(change) {
     let jobPercent = (100 / change.jobs.length).toFixed(2)
     return (
       <div className='progress zuul-change-total-result'>
@@ -151,7 +236,7 @@ class ChangePanel extends React.Component {
             return <div className={'progress-bar' + className}
               key={idx}
               title={job.name}
-              style={{width: jobPercent + '%'}}/>
+              style={{ width: jobPercent + '%' }} />
           } else {
             return ''
           }
@@ -160,7 +245,7 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderTimer (change) {
+  renderTimer(change) {
     let remainingTime
     if (change.remaining_time === null) {
       remainingTime = 'unknown'
@@ -180,9 +265,9 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderJobProgressBar (elapsedTime, remainingTime) {
+  renderJobProgressBar(elapsedTime, remainingTime) {
     let progressPercent = 100 * (elapsedTime / (elapsedTime +
-                                                remainingTime))
+      remainingTime))
     // Show animation in preparation phase
     let className
     let progressWidth = progressPercent
@@ -209,13 +294,13 @@ class ChangePanel extends React.Component {
           aria-valuenow={progressPercent}
           aria-valuemin={0}
           aria-valuemax={100}
-          style={{'width': progressWidth + '%'}}
+          style={{ 'width': progressWidth + '%' }}
         />
       </div>
     )
   }
 
-  renderJobStatusLabel (job, result) {
+  renderJobStatusLabel(job, result) {
     let className, title
     switch (result) {
       case 'success':
@@ -250,10 +335,10 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderJob (job) {
+  renderJob(job) {
     const { tenant } = this.props
     let job_name = job.name
-    let ordinal_rules = new Intl.PluralRules('en', {type: 'ordinal'})
+    let ordinal_rules = new Intl.PluralRules('en', { type: 'ordinal' })
     const suffixes = {
       one: 'st',
       two: 'nd',
@@ -261,7 +346,7 @@ class ChangePanel extends React.Component {
       other: 'th'
     }
     if (job.tries > 1) {
-        job_name = job_name + ' (' + job.tries + suffixes[ordinal_rules.select(job.tries)] + ' attempt)'
+      job_name = job_name + ' (' + job.tries + suffixes[ordinal_rules.select(job.tries)] + ' attempt)'
     }
     let name = ''
     if (job.result !== null) {
@@ -294,11 +379,11 @@ class ChangePanel extends React.Component {
         {resultBar}
         {job.voting === false ? (
           <small className='zuul-non-voting-desc'> (non-voting)</small>) : ''}
-        <div style={{clear: 'both'}} />
+        <div style={{ clear: 'both' }} />
       </span>)
   }
 
-  renderJobList (jobs) {
+  renderJobList(jobs) {
     return (
       <ul className='list-group zuul-patchset-body'>
         {jobs.map((job, idx) => (
@@ -309,15 +394,40 @@ class ChangePanel extends React.Component {
       </ul>)
   }
 
-  render () {
+  renderAdminCommands(user, tenant) {
+    const { showAdminActions } = this.state
+    if (user.isAdmin && user.scope.indexOf(tenant.name) !== -1) {
+      return (
+        <ExpandableSection
+          className="zuul-patchset-header"
+          title="Show the list of actions available to tenant admins"
+          toggleText={showAdminActions ? 'Hide' : 'Actions'}
+          onToggle={() => { this.setState({ showAdminActions: !showAdminActions }) }}>
+          <div className='row'>
+            <div className='col-xs-6 text-center'>
+              {this.renderDequeueButton()} Dequeue
+            </div>
+          </div>
+        </ExpandableSection>
+      )
+    } else {
+      return null
+    }
+  }
+
+  render() {
     const { expanded } = this.state
-    const { change, globalExpanded } = this.props
+    const { change, globalExpanded, user, tenant } = this.props
     let expand = globalExpanded
     if (this.clicked) {
       expand = expanded
     }
     const header = (
       <div className='panel panel-default zuul-change'>
+        {this.renderDequeueModal()}
+        <div>
+          {this.renderAdminCommands(user, tenant)}
+        </div>
         <div className='panel-heading zuul-patchset-header'
           onClick={this.onClick}>
           <div className='row'>
@@ -350,4 +460,7 @@ class ChangePanel extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(ChangePanel)
+export default connect(state => ({
+  tenant: state.tenant,
+  user: state.user,
+}))(ChangePanel)

@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
+
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
 import ChangePanel from './ChangePanel'
@@ -27,10 +28,15 @@ class Change extends React.Component {
     change: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
-    tenant: PropTypes.object
+    pipeline: PropTypes.string,
+    tenant: PropTypes.object,
   }
 
-  renderStatusIcon (change) {
+  state = {
+    showDequeueModal: false,
+  }
+
+  renderStatusIcon(change) {
     let iconGlyph = 'pficon pficon-ok'
     let iconTitle = 'Succeeding'
     if (change.active !== true) {
@@ -38,10 +44,10 @@ class Change extends React.Component {
       iconTitle = 'Waiting until closer to head of queue to' +
         ' start jobs'
     } else if (change.live !== true) {
-      iconGlyph =  'pficon pficon-info'
+      iconGlyph = 'pficon pficon-info'
       iconTitle = 'Dependent change required for testing'
     } else if (change.failing_reasons &&
-               change.failing_reasons.length > 0) {
+      change.failing_reasons.length > 0) {
       let reason = change.failing_reasons.join(', ')
       iconTitle = 'Failing because ' + reason
       if (reason.match(/merge conflict/)) {
@@ -66,17 +72,17 @@ class Change extends React.Component {
     }
   }
 
-  renderLineImg (change, i) {
+  renderLineImg(change, i) {
     let image = LineTImage
     if (change._tree_branches.indexOf(i) === change._tree_branches.length - 1) {
       // Angle line
       image = LineAngleImage
     }
-    return <img alt="Line" src={image} style={{verticalAlign: 'baseline'}} />
+    return <img alt="Line" src={image} style={{ verticalAlign: 'baseline' }} />
   }
 
-  render () {
-    const { change, queue, expanded } = this.props
+  render() {
+    const { change, queue, expanded, pipeline } = this.props
     let row = []
     let i
     for (i = 0; i < queue._tree_columns; i++) {
@@ -95,12 +101,13 @@ class Change extends React.Component {
     row.push(
       <td key={i + 1}
         className="zuul-change-cell"
-        style={{width: changeWidth + 'px'}}>
-        <ChangePanel change={change} globalExpanded={expanded} />
+        style={{ width: changeWidth + 'px' }}>
+        <ChangePanel change={change} globalExpanded={expanded} pipeline={pipeline} />
       </td>
     )
+
     return (
-      <table className="zuul-change-box" style={{boxSizing: 'content-box'}}>
+      <table className="zuul-change-box" style={{ boxSizing: 'content-box' }}>
         <tbody>
           <tr>{row}</tr>
         </tbody>
@@ -109,4 +116,6 @@ class Change extends React.Component {
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(Change)
+export default connect(state => ({
+  tenant: state.tenant
+}))(Change)
