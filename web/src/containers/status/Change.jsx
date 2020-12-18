@@ -16,10 +16,15 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { Button, ButtonVariant, Modal,ModalVariant } from '@patternfly/react-core'
+import { OffIcon, BullhornIcon } from '@patternfly/react-icons'
 
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
 import ChangePanel from './ChangePanel'
+import { dequeue, dequeue_ref } from '../../api'
+import { addDequeueError } from '../../actions/adminActions'
+import { addError } from '../../actions/errors'
 
 
 class Change extends React.Component {
@@ -27,7 +32,80 @@ class Change extends React.Component {
     change: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
-    tenant: PropTypes.object
+    pipeline: PropTypes.string,
+    tenant: PropTypes.object,
+    user: PropTypes.object,
+    dispatch: PropTypes.func,
+  }
+
+  state = {
+      showDequeueModal: false,
+  }
+
+  renderDequeueButton () {
+      return (
+        <Button
+          variant={ButtonVariant.plain}
+          onClick={(event) => {
+            event.preventDefault()
+            this.setState(() => ({showDequeueModal: true}))
+        }}>
+        <OffIcon title="Dequeue this change" />
+        </Button>
+      )
+  }
+
+  dequeueConfirm = () => {
+    const { tenant, user, change, pipeline } = this.props
+    let projectName = change.project
+    let changeId = change.id || 'N/A'
+    let changeRef = change.ref
+    this.setState(() => ({showDequeueModal: false}))
+    // post-merge
+    if (/^[0-9a-f]{40}$/.test(changeId)) {
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline, changeRef, user.token)
+        .catch(error => {
+           this.props.dispatch(addDequeueError(error))
+        })
+    // pre-merge, ie we have a change id
+    } else if (changeId !== 'N/A') {
+      dequeue(tenant.apiPrefix, projectName, pipeline, changeId, user.token)
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
+    } else {
+        this.props.dispatch(addError({
+          url: null,
+          status: 'Invalid change ' + changeRef + ' on project ' + projectName,
+          text: ''
+        }))
+    }
+  }
+
+  dequeueCancel = () => {
+    this.setState(() => ({showDequeueModal: false}))
+  }
+
+  renderDequeueModal() {
+    const { showDequeueModal } = this.state
+    const { change } = this.props
+    let projectName = change.project
+    let changeId = change.id || change.ref
+    const title = 'You are about to dequeue a change'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        titleIconVariant={BullhornIcon}
+        isOpen={showDequeueModal}
+        title={title}
+        onClose={this.dequeueCancel}
+        actions={[
+          <Button key="deq_confirm" variant="primary" onClick={this.dequeueConfirm}>Confirm</Button>,
+          <Button key="deq_cancel" variant="link" onClick={this.dequeueCancel}>Cancel</Button>,
+        ]}>
+      <p>Please confirm that you want to cancel <strong>all ongoing builds</strong> on change <strong>{ changeId }</strong> for project <strong>{ projectName }</strong>.</p>
+    </Modal>
+    )
   }
 
   renderStatusIcon (change) {
@@ -76,7 +154,7 @@ class Change extends React.Component {
   }
 
   render () {
-    const { change, queue, expanded } = this.props
+    const { change, queue, expanded, user, tenant } = this.props
     let row = []
     let i
     for (i = 0; i < queue._tree_columns; i++) {
@@ -99,14 +177,27 @@ class Change extends React.Component {
         <ChangePanel change={change} globalExpanded={expanded} />
       </td>
     )
+    if (user.isAdmin && user.scope.indexOf(tenant.name) !== -1) {
+      row.push(
+        <td key={i + 2} className={'zuul-change-row'}>
+          {this.renderDequeueButton()}
+        </td>
+      )
+    }
     return (
+      <React.Fragment>
       <table className="zuul-change-box" style={{boxSizing: 'content-box'}}>
         <tbody>
           <tr>{row}</tr>
         </tbody>
       </table>
+      { this.renderDequeueModal() }
+      </React.Fragment>
     )
   }
 }
 
-export default connect(state => ({tenant: state.tenant}))(Change)
+export default connect(state => ({
+    tenant: state.tenant,
+    user: state.user,
+}))(Change)
