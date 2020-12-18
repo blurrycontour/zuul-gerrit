@@ -67,6 +67,11 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
         params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
         params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
 
+        params['enable_cors'] = get_default(self.config, 'web', 'enable_cors',
+                                            False)
+        params['allowed_origin'] = get_default(self.config, 'web',
+                                               'allowed_origin', "*")
+
         params['command_socket'] = get_default(
             self.config, 'web', 'command_socket',
             '/var/lib/zuul/web.socket')
