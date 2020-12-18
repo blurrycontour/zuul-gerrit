@@ -57,6 +57,7 @@ import {
   UsersIcon,
 } from '@patternfly/react-icons'
 
+import AuthContainer from './containers/auth/Auth'
 import ErrorBoundary from './containers/ErrorBoundary'
 import { Fetching } from './containers/Fetching'
 import SelectTz from './containers/timezone/SelectTz'
@@ -66,6 +67,7 @@ import { clearError } from './actions/errors'
 import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
+import { createUserManagerFromTenant } from './actions/auth'
 
 class App extends React.Component {
   static propTypes = {
@@ -78,6 +80,7 @@ class App extends React.Component {
     history: PropTypes.object,
     dispatch: PropTypes.func,
     isKebabDropdownOpen: PropTypes.bool,
+    user: PropTypes.object,
   }
 
   state = {
@@ -105,7 +108,7 @@ class App extends React.Component {
       )
     } else {
       // Return an empty navigation bar in case we don't have an active tenant
-      return <Nav aria-label="Nav" variant="horizontal"/>
+      return <Nav aria-label="Nav" variant="horizontal" />
     }
   }
 
@@ -164,7 +167,7 @@ class App extends React.Component {
         whiteLabel = false
 
         const match = matchPath(
-          this.props.location.pathname, {path: '/t/:tenant'})
+          this.props.location.pathname, { path: '/t/:tenant' })
 
         if (match) {
           tenantName = match.params.tenant
@@ -176,6 +179,7 @@ class App extends React.Component {
         this.props.dispatch(tenantAction)
         if (tenantName) {
           this.props.dispatch(fetchConfigErrorsAction(tenantAction.tenant))
+          this.props.dispatch(createUserManagerFromTenant(tenantName))
         }
       }
     }
@@ -225,7 +229,7 @@ class App extends React.Component {
           <TimedToastNotification
             key={error.id}
             type='error'
-            onDismiss={() => {this.props.dispatch(clearError(error.id))}}
+            onDismiss={() => { this.props.dispatch(clearError(error.id)) }}
           >
             <span title={moment.utc(error.date).tz(this.props.timezone).format()}>
               <strong>{error.text}</strong> ({error.status})&nbsp;
@@ -257,14 +261,14 @@ class App extends React.Component {
           variant="danger"
           onClick={() => {
             history.push(this.props.tenant.linkPrefix + '/config-errors')
-            this.setState({showErrors: false})
+            this.setState({ showErrors: false })
           }}
         >
           <NotificationDrawerListItemHeader
             title={item.source_context.project + ' | ' + ctxPath}
             variant="danger" />
           <NotificationDrawerListItemBody>
-            <pre style={{whiteSpace: 'pre-wrap'}}>
+            <pre style={{ whiteSpace: 'pre-wrap' }}>
               {error}
             </pre>
           </NotificationDrawerListItemBody>
@@ -383,14 +387,16 @@ class App extends React.Component {
             aria-label="Notifications"
             onClick={(e) => {
               e.preventDefault()
-              this.setState({showErrors: !this.state.showErrors})
+              this.setState({ showErrors: !this.state.showErrors })
             }}
           >
             <BellIcon />
           </NotificationBadge>
         }
-        <SelectTz/>
-        <ConfigModal/>
+        <SelectTz />
+        <ConfigModal />
+
+        {tenant.name && (<AuthContainer />)}
       </PageHeaderTools>
     )
 
@@ -399,7 +405,7 @@ class App extends React.Component {
     const pageHeader = (
       <PageHeader
         logo={<Brand src={logo} alt='Zuul logo' className="zuul-brand" />}
-        logoProps={{to: logoUrl}}
+        logoProps={{ to: logoUrl }}
         logoComponent={Link}
         headerTools={pageHeaderTools}
         topNav={nav}
@@ -427,6 +433,7 @@ export default withRouter(connect(
     configErrors: state.configErrors,
     info: state.info,
     tenant: state.tenant,
-    timezone: state.timezone
+    timezone: state.timezone,
+    user: state.user
   })
 )(App))
