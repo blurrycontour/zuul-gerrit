@@ -64,7 +64,7 @@ import { Fetching } from './containers/Fetching'
 import SelectTz from './containers/timezone/SelectTz'
 import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
-import { clearError } from './actions/errors'
+import { clearNotification } from './actions/notifications'
 import { fetchConfigErrorsAction } from './actions/configErrors'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
@@ -72,7 +72,7 @@ import { createUserManagerFromTenant } from './actions/auth'
 
 class App extends React.Component {
   static propTypes = {
-    errors: PropTypes.array,
+    notifications: PropTypes.array,
     configErrors: PropTypes.array,
     info: PropTypes.object,
     tenant: PropTypes.object,
@@ -228,21 +228,34 @@ class App extends React.Component {
     })
   }
 
-  renderErrors = (errors) => {
+  renderNotifications = (notifications) => {
     return (
       <ToastNotificationList>
-        {errors.map(error => (
-          <TimedToastNotification
-            key={error.id}
-            type='error'
-            onDismiss={() => { this.props.dispatch(clearError(error.id)) }}
-          >
-            <span title={moment.utc(error.date).tz(this.props.timezone).format()}>
-              <strong>{error.text}</strong> ({error.status})&nbsp;
-              {error.url}
-            </span>
-          </TimedToastNotification>
-        ))}
+        {notifications.map(notification => {
+          let notificationBody
+          if (notification.type === 'error') {
+            notificationBody = (
+              <>
+                <strong>{notification.text}</strong> {notification.status} &nbsp;
+                {notification.url}
+              </>
+            )
+          } else {
+            notificationBody = (<span>{notification.text}</span>)
+          }
+          return (
+            <TimedToastNotification
+              key={notification.id}
+              type={notification.type}
+              onDismiss={() => { this.props.dispatch(clearNotification(notification.id)) }}
+            >
+              <span title={moment.utc(notification.date).tz(this.props.timezone).format()}>
+                {notificationBody}
+              </span>
+            </TimedToastNotification>
+          )
+        }
+        )}
       </ToastNotificationList>
     )
   }
@@ -311,7 +324,7 @@ class App extends React.Component {
 
   render() {
     const { isKebabDropdownOpen } = this.state
-    const { errors, configErrors, tenant } = this.props
+    const { notifications, configErrors, tenant } = this.props
 
     const nav = this.renderMenu()
 
@@ -433,7 +446,7 @@ class App extends React.Component {
 
     return (
       <React.Fragment>
-        {errors.length > 0 && this.renderErrors(errors)}
+        {notifications.length > 0 && this.renderNotifications(notifications)}
         {this.renderConfigErrors(configErrors)}
         <Page header={pageHeader}>
           <ErrorBoundary>
@@ -448,7 +461,7 @@ class App extends React.Component {
 // This connect the info state from the store to the info property of the App.
 export default withRouter(connect(
   state => ({
-    errors: state.errors,
+    notifications: state.notifications,
     configErrors: state.configErrors,
     info: state.info,
     tenant: state.tenant,
