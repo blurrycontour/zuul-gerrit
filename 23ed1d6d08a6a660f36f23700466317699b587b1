@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7777a1fc_edc24fbd",
+        "filename": "doc/source/reference/old-client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-21T22:03:22Z",
+      "side": 1,
+      "message": "Can we make this change without renaming the file (which also changes URLs)?",
+      "revId": "23ed1d6d08a6a660f36f23700466317699b587b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
