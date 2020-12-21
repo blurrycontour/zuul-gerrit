@@ -12,38 +12,39 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-export const ADD_ERROR = 'ADD_ERROR'
-export const CLEAR_ERROR = 'CLEAR_ERROR'
-export const CLEAR_ERRORS = 'CLEAR_ERRORS'
+export const ADD_NOTIFICATION = 'ADD_NOTIFICATION'
+export const CLEAR_NOTIFICATION = 'CLEAR_NOTIFICATION'
+export const CLEAR_NOTIFICATIONS = 'CLEAR_NOTIFICATIONS'
 
-let errorId = 0
+let notificationId = 0
 
-export const addError = error => ({
-  type: ADD_ERROR,
-  id: errorId++,
-  error
+export const addNotification = notification => ({
+  type: ADD_NOTIFICATION,
+  id: notificationId++,
+  notification
 })
 
 export const addApiError = error => {
   const d = {
-    url: (error && error.request && error.request.responseURL) || error.url
+    url: (error && error.request && error.request.responseURL) || error.url,
+    type: 'error',
   }
   if (error.response) {
     d.text = error.response.statusText
     d.status = error.response.status
   } else {
     d.status = 'Unable to fetch URL, check your network connectivity,'
-        + ' browser plugins, ad-blockers, or try to refresh this page'
+      + ' browser plugins, ad-blockers, or try to refresh this page'
     d.text = error.message
   }
-  return addError(d)
+  return addNotification(d)
 }
 
-export const clearError = id => ({
-  type: CLEAR_ERROR,
+export const clearNotification = id => ({
+  type: CLEAR_NOTIFICATION,
   id
 })
 
-export const clearErrors = () => ({
-  type: CLEAR_ERRORS
+export const clearNotifications = () => ({
+  type: CLEAR_NOTIFICATIONS
 })

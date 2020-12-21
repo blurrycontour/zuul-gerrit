@@ -14,7 +14,7 @@
 
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
   Button,
@@ -23,6 +23,8 @@ import {
   List,
   ListItem,
   Title,
+  Modal,
+  ModalVariant,
 } from '@patternfly/react-core'
 import {
   CodeIcon,
@@ -33,16 +35,20 @@ import {
   StreamIcon,
   OutlinedCalendarAltIcon,
   OutlinedClockIcon,
+  RedoAltIcon,
+  // BullhornIcon
 } from '@patternfly/react-icons'
 import * as moment from 'moment'
 import 'moment-duration-format'
 
 import { buildExternalLink } from '../../Misc'
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
+import { enqueue, enqueue_ref } from '../../api'
+import { addNotification, addApiError } from '../../actions/notifications'
 import { ChartModal } from '../charts/ChartModal'
 import BuildsetGanttChart from '../charts/GanttChart'
 
-function Buildset({ buildset, timezone, tenant }) {
+function Buildset({ buildset, timezone, tenant, user }) {
   const buildset_link = buildExternalLink(buildset)
   const [isGanttChartModalOpen, setIsGanttChartModalOpen] = useState(false)
 
@@ -127,13 +133,92 @@ function Buildset({ buildset, timezone, tenant }) {
     )
   }
 
+  const [showEnqueueModal, setShowEnqueueModal] = useState(false)
+  const dispatch = useDispatch()
+
+  function renderEnqueueButton() {
+    const value = (<span style={{
+      cursor: 'pointer',
+      color: 'var(--pf-global--primary-color--100)'
+    }}
+      title="Re-enqueue this change"
+      onClick={(event) => {
+        event.preventDefault()
+        setShowEnqueueModal(true)
+      }}
+    >
+      Re-enqueue buildset
+    </span>)
+    return (
+      <IconProperty
+        WrapElement={ListItem}
+        icon={<RedoAltIcon />}
+        value={value}
+      />
+    )
+  }
+
+  function enqueueConfirm() {
+    let changeId = buildset.change ? buildset.change + ',' + buildset.patchset : buildset.newrev
+    setShowEnqueueModal(false)
+    if (/^[0-9a-f]{40}$/.test(changeId)) {
+      const oldrev = '0000000000000000000000000000000000000000'
+      enqueue_ref(tenant.apiPrefix, buildset.project, buildset.pipeline, buildset.ref, oldrev, changeId, user.token)
+        .then(() => {
+          dispatch(addNotification(
+            {
+              text: 'Change queued successfully.',
+              type: 'success',
+              status: '',
+              url: '',
+            }))
+        })
+        .catch(error => {
+          dispatch(addApiError(error))
+        })
+    } else {
+      enqueue(tenant.apiPrefix, buildset.project, buildset.pipeline, changeId, user.token)
+        .then(() => {
+          dispatch(addNotification(
+            {
+              text: 'Change queued successfully.',
+              type: 'success',
+              status: '',
+              url: '',
+            }))
+        })
+        .catch(error => {
+          dispatch(addApiError(error))
+        })
+    }
+  }
+
+  function renderEnqueueModal() {
+    let changeId = buildset.change ? buildset.change + ',' + buildset.patchset : buildset.newrev
+    const title = 'You are about to re-enqueue a change'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        // titleIconVariant={BullhornIcon}
+        isOpen={showEnqueueModal}
+        title={title}
+        onClose={() => { setShowEnqueueModal(false) }}
+        actions={[
+          <Button key="deq_confirm" variant="primary" onClick={enqueueConfirm}>Confirm</Button>,
+          <Button key="deq_cancel" variant="link" onClick={() => { setShowEnqueueModal(false) }}>Cancel</Button>,
+        ]}>
+        <p>Please confirm that you want to re-enqueue <strong>all jobs</strong> for change <strong>{changeId}</strong> (project <strong>{buildset.project}</strong>) on pipeline <strong>{buildset.pipeline}</strong>.</p>
+      </Modal>
+    )
+  }
+
   return (
     <>
       <Title headingLevel="h2">
         <BuildResultWithIcon result={buildset.result} size="md">
           Buildset result
         </BuildResultWithIcon>
-        <BuildResultBadge result={buildset.result} />
+        <BuildResultBadge result={buildset.result} /> &nbsp;
       </Title>
       {/* We handle the spacing for the body and the flex items by ourselves
             so they go hand in hand. By default, the flex items' spacing only
@@ -219,6 +304,15 @@ function Buildset({ buildset, timezone, tenant }) {
             </List>
           </FlexItem>
         </Flex>
+        {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1) &&
+          <Flex flex={{ default: 'flex_1' }}>
+            <FlexItem>
+              <List style={{ listStyle: 'none' }}>
+                {renderEnqueueButton()}
+              </List>
+            </FlexItem>
+          </Flex>}
+
       </Flex>
       <ChartModal
         chart={<BuildsetGanttChart builds={buildset.builds} />}
@@ -228,6 +322,7 @@ function Buildset({ buildset, timezone, tenant }) {
           setIsGanttChartModalOpen(false)
         }}
       />
+      {renderEnqueueModal()}
     </>
   )
 }
@@ -236,9 +331,11 @@ Buildset.propTypes = {
   buildset: PropTypes.object,
   tenant: PropTypes.object,
   timezone: PropTypes.string,
+  user: PropTypes.object,
 }
 
 export default connect((state) => ({
   tenant: state.tenant,
   timezone: state.timezone,
+  user: state.user,
 }))(Buildset)
