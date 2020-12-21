@@ -17,7 +17,7 @@ import { combineReducers } from 'redux'
 import auth from './auth'
 import configErrors from './configErrors'
 import change from './change'
-import errors from './errors'
+import notifications from './notifications'
 import build from './build'
 import info from './info'
 import job from './job'
@@ -40,7 +40,7 @@ const reducers = {
   build,
   change,
   configErrors,
-  errors,
+  notifications,
   info,
   job,
   jobs,
