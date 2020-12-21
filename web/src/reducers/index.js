@@ -18,7 +18,7 @@ import auth from './auth'
 import configErrors from './configErrors'
 import change from './change'
 import component from './component'
-import errors from './errors'
+import notifications from './notifications'
 import build from './build'
 import info from './info'
 import job from './job'
@@ -42,7 +42,7 @@ const reducers = {
   change,
   component,
   configErrors,
-  errors,
+  notifications,
   info,
   job,
   jobs,

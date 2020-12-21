@@ -13,9 +13,14 @@
 // under the License.
 
 export const ADMIN_DEQUEUE_FAIL = 'ADMIN_DEQUEUE_FAIL'
-
+export const ADMIN_ENQUEUE_FAIL = 'ADMIN_ENQUEUE_FAIL'
 
 export const addDequeueError = error => ({
   type: ADMIN_DEQUEUE_FAIL,
-  error: error
+  notification: error
+})
+
+export const addEnqueueError = error => ({
+  type: ADMIN_ENQUEUE_FAIL,
+  notification: error
 })
