@@ -61,6 +61,7 @@ class BuildPage extends React.Component {
     isFetchingOutput: PropTypes.bool.isRequired,
     isFetchingLogfile: PropTypes.bool.isRequired,
     tenant: PropTypes.object.isRequired,
+    user: PropTypes.object,
     fetchBuildAllInfo: PropTypes.func.isRequired,
     activeTab: PropTypes.string.isRequired,
     location: PropTypes.object.isRequired,
@@ -143,6 +144,7 @@ class BuildPage extends React.Component {
       history,
       location,
       tenant,
+      user,
     } = this.props
     const hash = location.hash.substring(1).split('/')
     const severity = parseInt(parse(location.search).severity)
@@ -251,7 +253,7 @@ class BuildPage extends React.Component {
     return (
       <>
         <PageSection variant={PageSectionVariants.light}>
-          <Build build={build} active={activeTab} hash={hash} />
+          <Build build={build} active={activeTab} hash={hash} user={user}/>
         </PageSection>
         <PageSection variant={PageSectionVariants.light}>
           <Tabs
