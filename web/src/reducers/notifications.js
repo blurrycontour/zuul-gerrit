@@ -15,35 +15,37 @@
 import update from 'immutability-helper'
 
 import {
-  ADD_ERROR,
-  CLEAR_ERROR,
-  CLEAR_ERRORS,
+  ADD_NOTIFICATION,
+  CLEAR_NOTIFICATION,
+  CLEAR_NOTIFICATIONS,
   addApiError,
-} from '../actions/errors'
+} from '../actions/notifications'
 
 
 export default (state = [], action) => {
   // Intercept API failure
-  if (action.error && action.type.match(/.*_FETCH_FAIL$/)) {
-    action = addApiError(action.error)
+  if (action.notification && action.type.match(/.*_FETCH_FAIL$/)) {
+    action = addApiError(action.notification)
   }
   // Intercept Admin API failures
-  if (action.error && action.type.match(/ADMIN_.*_FAIL$/)) {
-    action = addApiError(action.error)
+  if (action.notification && action.type.match(/ADMIN_.*_FAIL$/)) {
+    action = addApiError(action.notification)
   }
   switch (action.type) {
-    case ADD_ERROR:
-      if (state.filter(error => (
-        error.url === action.error.url &&
-            error.status === action.error.status)).length > 0)
+    case ADD_NOTIFICATION:
+      if (state.filter(notification => (
+        notification.url === action.notification.url &&
+        notification.status === action.notification.status)).length > 0)
         return state
-      action.error.id = action.id
-      action.error.date = Date.now()
-      return update(state, {$push: [action.error]})
-    case CLEAR_ERROR:
-      return update(state, {$splice: [[state.indexOf(
-        state.filter(item => (item.id === action.id))[0]), 1]]})
-    case CLEAR_ERRORS:
+      action.notification.id = action.id
+      action.notification.date = Date.now()
+      return update(state, { $push: [action.notification] })
+    case CLEAR_NOTIFICATION:
+      return update(state, {
+        $splice: [[state.indexOf(
+          state.filter(item => (item.id === action.id))[0]), 1]]
+      })
+    case CLEAR_NOTIFICATIONS:
       return []
     default:
       return state
