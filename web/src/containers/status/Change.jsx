@@ -77,7 +77,7 @@ class Change extends React.Component {
         url: null,
         status: 'Invalid change ' + changeRef + ' on project ' + projectName,
         text: '',
-        type: 'error'
+        type: 'error',
       }))
     }
   }
