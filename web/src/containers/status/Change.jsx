@@ -31,7 +31,7 @@ import {
 import { dequeue, dequeue_ref } from '../../api'
 import { addDequeueError } from '../../actions/adminActions'
 
-import { addError } from '../../actions/errors'
+import { addNotification } from '../../actions/notifications'
 
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
@@ -73,10 +73,11 @@ class Change extends React.Component {
           this.props.dispatch(addDequeueError(error))
         })
     } else {
-      this.props.dispatch(addError({
+      this.props.dispatch(addNotification({
         url: null,
         status: 'Invalid change ' + changeRef + ' on project ' + projectName,
-        text: ''
+        text: '',
+        type: 'error'
       }))
     }
   }

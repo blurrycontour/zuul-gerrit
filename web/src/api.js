@@ -181,7 +181,7 @@ function fetchUserAuthorizations(apiPrefix, token) {
   return res
 }
 
-function dequeue (apiPrefix, projectName, pipeline, change, token) {
+function dequeue(apiPrefix, projectName, pipeline, change, token) {
   const instance = Axios.create({
     baseURL: apiUrl
   })
@@ -195,7 +195,7 @@ function dequeue (apiPrefix, projectName, pipeline, change, token) {
   )
   return res
 }
-function dequeue_ref (apiPrefix, projectName, pipeline, ref, token) {
+function dequeue_ref(apiPrefix, projectName, pipeline, ref, token) {
   const instance = Axios.create({
     baseURL: apiUrl
   })
@@ -205,6 +205,37 @@ function dequeue_ref (apiPrefix, projectName, pipeline, ref, token) {
     {
       pipeline: pipeline,
       ref: ref,
+    }
+  )
+  return res
+}
+
+function enqueue(apiPrefix, projectName, pipeline, change, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.post(
+    apiPrefix + 'project/' + projectName + '/enqueue',
+    {
+      pipeline: pipeline,
+      change: change,
+    }
+  )
+  return res
+}
+function enqueue_ref(apiPrefix, projectName, pipeline, ref, oldrev, newrev, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.post(
+    apiPrefix + 'project/' + projectName + '/enqueue',
+    {
+      pipeline: pipeline,
+      ref: ref,
+      oldrev: oldrev,
+      newrev: newrev,
     }
   )
   return res
@@ -235,4 +266,6 @@ export {
   fetchUserAuthorizations,
   dequeue,
   dequeue_ref,
+  enqueue,
+  enqueue_ref,
 }
