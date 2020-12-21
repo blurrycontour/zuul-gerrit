@@ -491,6 +491,8 @@ class ZuulWebAPI(object):
                         'count': jbody['count'],
                         'node_hold_expiration': jbody['node_hold_expiration']}
                 result = self.rpc.submitJob('zuul:autohold', data)
+                resp = cherrypy.response
+                resp.headers['Access-Control-Allow-Origin'] = '*'
                 return not result.failure
             else:
                 raise cherrypy.HTTPError(400,
