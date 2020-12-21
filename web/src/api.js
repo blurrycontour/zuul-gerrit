@@ -14,7 +14,7 @@
 
 import Axios from 'axios'
 
-function getHomepageUrl (url) {
+function getHomepageUrl(url) {
   //
   // Discover serving location from href.
   //
@@ -64,14 +64,14 @@ function getHomepageUrl (url) {
   if (baseUrl.includes('/t/')) {
     baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/t/') + 1)
   }
-  if (! baseUrl.endsWith('/')) {
+  if (!baseUrl.endsWith('/')) {
     baseUrl = baseUrl + '/'
   }
   // console.log('Homepage url is ', baseUrl)
   return baseUrl
 }
 
-function getZuulUrl () {
+function getZuulUrl() {
   // Return the zuul root api absolute url
   const ZUUL_API = process.env.REACT_APP_ZUUL_API
   let apiUrl
@@ -81,12 +81,12 @@ function getZuulUrl () {
     apiUrl = ZUUL_API
   } else {
     // Api url is relative to homepage path
-    apiUrl = getHomepageUrl () + 'api/'
+    apiUrl = getHomepageUrl() + 'api/'
   }
-  if (! apiUrl.endsWith('/')) {
+  if (!apiUrl.endsWith('/')) {
     apiUrl = apiUrl + '/'
   }
-  if (! apiUrl.endsWith('/api/')) {
+  if (!apiUrl.endsWith('/api/')) {
     apiUrl = apiUrl + 'api/'
   }
   // console.log('Api url is ', apiUrl)
@@ -95,7 +95,7 @@ function getZuulUrl () {
 const apiUrl = getZuulUrl()
 
 
-function getStreamUrl (apiPrefix) {
+function getStreamUrl(apiPrefix) {
   const streamUrl = (apiUrl + apiPrefix)
     .replace(/(http)(s)?:\/\//, 'ws$2://') + 'console-stream'
   // console.log('Stream url is ', streamUrl)
@@ -103,80 +103,80 @@ function getStreamUrl (apiPrefix) {
 }
 
 // Direct APIs
-function fetchInfo () {
+function fetchInfo() {
   return Axios.get(apiUrl + 'info')
 }
-function fetchTenantInfo (apiPrefix) {
+function fetchTenantInfo(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'info')
 }
-function fetchOpenApi () {
-  return Axios.get(getHomepageUrl () + 'openapi.yaml')
+function fetchOpenApi() {
+  return Axios.get(getHomepageUrl() + 'openapi.yaml')
 }
-function fetchTenants () {
+function fetchTenants() {
   return Axios.get(apiUrl + 'tenants')
 }
-function fetchConfigErrors (apiPrefix) {
+function fetchConfigErrors(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'config-errors')
 }
-function fetchStatus (apiPrefix) {
+function fetchStatus(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'status')
 }
-function fetchChangeStatus (apiPrefix, changeId) {
+function fetchChangeStatus(apiPrefix, changeId) {
   return Axios.get(apiUrl + apiPrefix + 'status/change/' + changeId)
 }
-function fetchBuild (apiPrefix, buildId) {
+function fetchBuild(apiPrefix, buildId) {
   return Axios.get(apiUrl + apiPrefix + 'build/' + buildId)
 }
-function fetchBuilds (apiPrefix, queryString) {
+function fetchBuilds(apiPrefix, queryString) {
   let path = 'builds'
   if (queryString) {
     path += '?' + queryString.slice(1)
   }
   return Axios.get(apiUrl + apiPrefix + path)
 }
-function fetchBuildset (apiPrefix, buildsetId) {
+function fetchBuildset(apiPrefix, buildsetId) {
   return Axios.get(apiUrl + apiPrefix + 'buildset/' + buildsetId)
 }
-function fetchBuildsets (apiPrefix, queryString) {
+function fetchBuildsets(apiPrefix, queryString) {
   let path = 'buildsets'
   if (queryString) {
     path += '?' + queryString.slice(1)
   }
   return Axios.get(apiUrl + apiPrefix + path)
 }
-function fetchProject (apiPrefix, projectName) {
+function fetchProject(apiPrefix, projectName) {
   return Axios.get(apiUrl + apiPrefix + 'project/' + projectName)
 }
-function fetchProjects (apiPrefix) {
+function fetchProjects(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'projects')
 }
-function fetchJob (apiPrefix, jobName) {
+function fetchJob(apiPrefix, jobName) {
   return Axios.get(apiUrl + apiPrefix + 'job/' + jobName)
 }
-function fetchJobs (apiPrefix) {
+function fetchJobs(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'jobs')
 }
-function fetchLabels (apiPrefix) {
+function fetchLabels(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'labels')
 }
-function fetchNodes (apiPrefix) {
+function fetchNodes(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
 
 // token-protected API
-function fetchUserAuthorizations (apiPrefix, token) {
+function fetchUserAuthorizations(apiPrefix, token) {
   // Axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
   const instance = Axios.create({
     baseURL: apiUrl
   })
   instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
   let res = instance.get(apiPrefix + 'authorizations')
-    .catch(err => {console.log('An error occurred', err)})
-    // Axios.defaults.headers.common['Authorization'] = ''
+    .catch(err => { console.log('An error occurred', err) })
+  // Axios.defaults.headers.common['Authorization'] = ''
   return res
 }
 
-function dequeue (apiPrefix, projectName, pipeline, change, token) {
+function dequeue(apiPrefix, projectName, pipeline, change, token) {
   const instance = Axios.create({
     baseURL: apiUrl
   })
@@ -190,7 +190,7 @@ function dequeue (apiPrefix, projectName, pipeline, change, token) {
   )
   return res
 }
-function dequeue_ref (apiPrefix, projectName, pipeline, ref, token) {
+function dequeue_ref(apiPrefix, projectName, pipeline, ref, token) {
   const instance = Axios.create({
     baseURL: apiUrl
   })
@@ -200,6 +200,37 @@ function dequeue_ref (apiPrefix, projectName, pipeline, ref, token) {
     {
       pipeline: pipeline,
       ref: ref,
+    }
+  )
+  return res
+}
+
+function enqueue(apiPrefix, projectName, pipeline, change, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.post(
+    apiPrefix + 'project/' + projectName + '/enqueue',
+    {
+      pipeline: pipeline,
+      change: change,
+    }
+  )
+  return res
+}
+function enqueue_ref(apiPrefix, projectName, pipeline, ref, oldrev, newrev, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.post(
+    apiPrefix + 'project/' + projectName + '/enqueue',
+    {
+      pipeline: pipeline,
+      ref: ref,
+      oldrev: oldrev,
+      newrev: newrev,
     }
   )
   return res
@@ -229,4 +260,6 @@ export {
   fetchUserAuthorizations,
   dequeue,
   dequeue_ref,
+  enqueue,
+  enqueue_ref,
 }
