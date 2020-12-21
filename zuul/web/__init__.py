@@ -570,6 +570,8 @@ class ZuulWebAPI(object):
             self._autohold(tenant_name, project_name, jbody['job'], ref_filter,
                            jbody['reason'], jbody['count'],
                            jbody['node_hold_expiration'])
+            resp = cherrypy.response
+            resp.headers['Access-Control-Allow-Origin'] = '*'
             return True
         else:
             raise cherrypy.HTTPError(405)
