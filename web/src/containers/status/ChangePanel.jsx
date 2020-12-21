@@ -25,11 +25,14 @@ import {
   Modal,
   ModalVariant
 } from '@patternfly/react-core'
-import { BanIcon, BullhornIcon } from '@patternfly/react-icons'
+import {
+  BanIcon,
+  // BullhornIcon 
+} from '@patternfly/react-icons'
 import { dequeue, dequeue_ref } from '../../api'
 import { addDequeueError } from '../../actions/adminActions'
 
-import { addError } from '../../actions/errors'
+import { addNotification } from '../../actions/notifications'
 
 
 class ChangePanel extends React.Component {
@@ -87,10 +90,11 @@ class ChangePanel extends React.Component {
           this.props.dispatch(addDequeueError(error))
         })
     } else {
-      this.props.dispatch(addError({
+      this.props.dispatch(addNotification({
         url: null,
         status: 'Invalid change ' + changeRef + ' on project ' + projectName,
-        text: ''
+        text: '',
+        type: 'error'
       }))
     }
   }
@@ -108,7 +112,7 @@ class ChangePanel extends React.Component {
     return (
       <Modal
         variant={ModalVariant.small}
-        titleIconVariant={BullhornIcon}
+        // titleIconVariant={BullhornIcon}
         isOpen={showDequeueModal}
         title={title}
         onClose={this.dequeueCancel}
