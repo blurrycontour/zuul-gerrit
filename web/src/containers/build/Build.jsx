@@ -16,7 +16,19 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Flex, FlexItem, List, ListItem, Title } from '@patternfly/react-core'
+import {
+    Flex,
+    FlexItem,
+    List,
+    ListItem,
+    Title,
+    Button,
+    ButtonVariant,
+    Modal,
+    ModalVariant,
+    Form,
+    FormGroup,
+    TextInput } from '@patternfly/react-core'
 import {
   BookIcon,
   BuildIcon,
@@ -29,216 +41,310 @@ import {
   OutlinedCalendarAltIcon,
   OutlinedClockIcon,
   StreamIcon,
+  LockIcon,
 } from '@patternfly/react-icons'
 import * as moment from 'moment'
 import 'moment-duration-format'
 
 import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalLink, ExternalLink } from '../../Misc'
+import { autohold } from '../../api'
+import { addAutoholdError } from '../../actions/adminActions'
 
-function Build({ build, tenant, timezone }) {
-  const build_link = buildExternalLink(build)
+class Build extends React.Component {
 
-  return (
-    <>
-      <Title
-        headingLevel="h2"
-        style={{
-          color: build.voting
-            ? 'inherit'
-            : 'var(--pf-global--disabled-color--100)',
-        }}
-      >
-        <BuildResultWithIcon
-          result={build.result}
-          colored={build.voting}
-          size="md"
+  static propTypes = {
+    build: PropTypes.object,
+    tenant: PropTypes.object,
+    hash: PropTypes.array,
+    timezone: PropTypes.string,
+    user: PropTypes.object,
+    dispatch: PropTypes.func,
+  }
+
+  state = {
+    showAutoholdModal: false,
+    ah_form_reason: this.props.user.user ? 'Requested from the web UI by ' + this.props.user.user.profile.preferred_username : '-',
+    ah_form_count: 1,
+    ah_form_node_hold_expiration: 86400,
+  }
+
+  handleFormInputReason = ah_form_reason => {
+    this.setState({ ah_form_reason })
+  }
+
+  handleFormInputCount = ah_form_count => {
+    this.setState({ ah_form_count })
+  }
+
+  handleFormInputNHE = ah_form_node_hold_expiration => {
+    this.setState({ ah_form_node_hold_expiration })
+  }
+
+  autoholdCancel = () => {
+    this.setState(() => ({showAutoholdModal: false}))
+  }
+
+  autoholdConfirm = () => {
+    const { build, tenant, user } = this.props
+    const { ah_form_reason, ah_form_count, ah_form_node_hold_expiration } = this.state
+    this.setState(() => ({showAutoholdModal: false}))
+    let change = build.change ? build.change : null
+    let ref = change ? null : build.ref
+    autohold(tenant.apiPrefix, build.project, build.job_name, change, ref, ah_form_reason, parseInt(ah_form_count), parseInt(ah_form_node_hold_expiration), user.token)
+      .then(() => {
+        alert('Autohold request set successfully.')
+      })
+      .catch(error => {
+        this.props.dispatch(addAutoholdError(error))
+      })
+  }
+
+  renderAutoholdButton () {
+    return (
+      <Button
+        variant={ButtonVariant.primary}
+        onClick={(event) => {
+          event.preventDefault()
+          this.setState(() => ({showAutoholdModal: true}))
+        }}>
+        <LockIcon title="Hold nodes on next build failure" /> Autohold
+      </Button>
+    )
+  }
+
+  renderAutoholdModal() {
+    const { showAutoholdModal, ah_form_reason, ah_form_count, ah_form_node_hold_expiration } = this.state
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        titleIconVariant={LockIcon}
+        isOpen={showAutoholdModal}
+        title='Create an Autohold Request'
+        onClose={this.autoholdCancel}
+        actions={[
+          <Button key="autohold_confirm" variant="primary" onClick={this.autoholdConfirm}>Create</Button>,
+          <Button key="deq_cancel" variant="link" onClick={this.autoholdCancel}>Cancel</Button>
+        ]}>
+        <Form isHorizontal>
+          <FormGroup label="Reason" isRequired fieldId="ah-form-reason" helperText="A descriptive reason for holding the next failing build">
+            <TextInput value={ ah_form_reason } isRequired type="text" id="ah-form-reason" name="ah_form_reason" onChange={this.handleFormInputReason} />
+          </FormGroup>
+          <FormGroup label="Count" isRequired fieldId="ah-form-count" helperText="How many times a failing build should be held">
+            <TextInput value={ ah_form_count } isRequired type="number" id="ah-form-count" name="ah_form_count" onChange={this.handleFormInputCount} />
+          </FormGroup>
+          <FormGroup label="Node Hold Expires in (s)" isRequired fieldId="ah-form-nhe" helperText="How long nodes should be kept in HELD state (seconds)">
+            <TextInput value={ ah_form_node_hold_expiration } isRequired type="number" id="ah-form-count" name="ah_form_node_hold_expiration" onChange={this.handleFormInputNHE} />
+          </FormGroup>
+        </Form>
+      </Modal>
+    )
+  }
+
+  render () {
+
+    const { build, tenant, timezone, user } = this.props
+    const build_link = buildExternalLink(build)
+
+    return (
+      <>
+        <Title
+          headingLevel="h2"
+          style={{
+            color: build.voting
+              ? 'inherit'
+              : 'var(--pf-global--disabled-color--100)',
+          }}
         >
-          {build.job_name} {!build.voting && ' (non-voting)'}
-        </BuildResultWithIcon>
-        <BuildResultBadge result={build.result} />
-      </Title>
-      {/* We handle the spacing for the body and the flex items by ourselves
-          so they go hand in hand. By default, the flex items' spacing only
-          affects left/right margin, but not top or bottom (which looks
-          awkward when the items are stacked at certain breakpoints) */}
-      <Flex className="zuul-build-attributes">
-        <Flex flex={{ lg: 'flex_1' }}>
-          <FlexItem>
-            <List style={{ listStyle: 'none' }}>
-              {build_link && (
+          <BuildResultWithIcon
+            result={build.result}
+            colored={build.voting}
+            size="md"
+          >
+            {build.job_name} {!build.voting && ' (non-voting)'}
+          </BuildResultWithIcon>
+          <BuildResultBadge result={build.result} /> &nbsp;
+          {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1) &&
+            this.renderAutoholdButton()}
+        </Title>
+        {/* We handle the spacing for the body and the flex items by ourselves
+            so they go hand in hand. By default, the flex items' spacing only
+            affects left/right margin, but not top or bottom (which looks
+            awkward when the items are stacked at certain breakpoints) */}
+        <Flex className="zuul-build-attributes">
+          <Flex flex={{ lg: 'flex_1' }}>
+            <FlexItem>
+              <List style={{ listStyle: 'none' }}>
+                {build_link && (
+                  <IconProperty
+                    WrapElement={ListItem}
+                    icon={<CodeIcon />}
+                    value={build_link}
+                  />
+                )}
+                {/* TODO (felix): Link to project page in Zuul */}
                 <IconProperty
                   WrapElement={ListItem}
-                  icon={<CodeIcon />}
-                  value={build_link}
-                />
-              )}
-              {/* TODO (felix): Link to project page in Zuul */}
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<CubeIcon />}
-                value={
-                  <>
-                    <strong>Project </strong> {build.project}
-                  </>
-                }
-              />
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<CodeBranchIcon />}
-                value={
-                  build.branch ? (
-                    <>
-                      <strong>Branch </strong> {build.branch}
-                    </>
-                  ) : (
-                    <>
-                      <strong>Ref </strong> {build.ref}
-                    </>
-                  )
-                }
-              />
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<StreamIcon />}
-                value={
-                  <>
-                    <strong>Pipeline </strong> {build.pipeline}
-                  </>
-                }
-              />
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<FingerprintIcon />}
-                value={
-                  <span>
-                    <strong>UUID </strong> {build.uuid} <br />
-                    <strong>Event ID </strong> {build.event_id} <br />
-                  </span>
-                }
-              />
-            </List>
-          </FlexItem>
-        </Flex>
-        <Flex flex={{ lg: 'flex_1' }}>
-          <FlexItem>
-            <List style={{ listStyle: 'none' }}>
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<OutlinedCalendarAltIcon />}
-                value={
-                  <span>
-                    <strong>Started at </strong>
-                    {moment
-                      .utc(build.start_time)
-                      .tz(timezone)
-                      .format('YYYY-MM-DD HH:mm:ss')}
-                    <br />
-                    <strong>Completed at </strong>
-                    {moment
-                      .utc(build.end_time)
-                      .tz(timezone)
-                      .format('YYYY-MM-DD HH:mm:ss')}
-                  </span>
-                }
-              />
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<OutlinedClockIcon />}
-                value={
-                  <>
-                    <strong>Took </strong>
-                    {moment
-                      .duration(build.duration, 'seconds')
-                      .format('h [hr] m [min] s [sec]')}
-                  </>
-                }
-              />
-            </List>
-          </FlexItem>
-        </Flex>
-        <Flex flex={{ lg: 'flex_1' }}>
-          <FlexItem>
-            <List style={{ listStyle: 'none' }}>
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<BookIcon />}
-                value={
-                  <Link to={tenant.linkPrefix + '/job/' + build.job_name}>
-                    View job documentation
-                  </Link>
-                }
-              />
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<HistoryIcon />}
-                value={
-                  <Link
-                    to={
-                      tenant.linkPrefix +
-                      '/builds?job_name=' +
-                      build.job_name +
-                      '&project=' +
-                      build.project
-                    }
-                    title="See previous runs of this job inside current project."
-                  >
-                    View build history
-                  </Link>
-                }
-              />
-              {/* In some cases not all build data is available on initial
-                      page load (e.g. when we come from another page like the
-                      buildset result page). Thus, we have to check for the
-                      buildset here. */}
-              {build.buildset && (
-                <IconProperty
-                  WrapElement={ListItem}
-                  icon={<BuildIcon />}
+                  icon={<CubeIcon />}
                   value={
-                    <Link
-                      to={
-                        tenant.linkPrefix + '/buildset/' + build.buildset.uuid
-                      }
-                    >
-                      View buildset result
+                    <>
+                      <strong>Project </strong> {build.project}
+                    </>
+                  }
+                />
+                <IconProperty
+                  WrapElement={ListItem}
+                  icon={<CodeBranchIcon />}
+                  value={
+                    build.branch ? (
+                      <>
+                        <strong>Branch </strong> {build.branch}
+                      </>
+                    ) : (
+                      <>
+                        <strong>Ref </strong> {build.ref}
+                      </>
+                    )
+                  }
+                />
+                <IconProperty
+                  WrapElement={ListItem}
+                  icon={<StreamIcon />}
+                  value={
+                    <>
+                      <strong>Pipeline </strong> {build.pipeline}
+                    </>
+                  }
+                />
+                <IconProperty
+                  WrapElement={ListItem}
+                  icon={<FingerprintIcon />}
+                  value={
+                    <span>
+                      <strong>UUID </strong> {build.uuid} <br />
+                      <strong>Event ID </strong> {build.event_id} <br />
+                    </span>
+                  }
+                />
+              </List>
+            </FlexItem>
+          </Flex>
+          <Flex flex={{ lg: 'flex_1' }}>
+            <FlexItem>
+              <List style={{ listStyle: 'none' }}>
+                <IconProperty
+                  WrapElement={ListItem}
+                  icon={<OutlinedCalendarAltIcon />}
+                  value={
+                    <span>
+                      <strong>Started at </strong>
+                      {moment
+                        .utc(build.start_time)
+                        .tz(timezone)
+                        .format('YYYY-MM-DD HH:mm:ss')}
+                      <br />
+                      <strong>Completed at </strong>
+                      {moment
+                        .utc(build.end_time)
+                        .tz(timezone)
+                        .format('YYYY-MM-DD HH:mm:ss')}
+                    </span>
+                  }
+                />
+                <IconProperty
+                  WrapElement={ListItem}
+                  icon={<OutlinedClockIcon />}
+                  value={
+                    <>
+                      <strong>Took </strong>
+                      {moment
+                        .duration(build.duration, 'seconds')
+                        .format('h [hr] m [min] s [sec]')}
+                    </>
+                  }
+                />
+              </List>
+            </FlexItem>
+          </Flex>
+          <Flex flex={{ lg: 'flex_1' }}>
+            <FlexItem>
+              <List style={{ listStyle: 'none' }}>
+                <IconProperty
+                  WrapElement={ListItem}
+                  icon={<BookIcon />}
+                  value={
+                    <Link to={tenant.linkPrefix + '/job/' + build.job_name}>
+                      View job documentation
                     </Link>
                   }
                 />
-              )}
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<FileCodeIcon />}
-                value={
-                  build.log_url ? (
-                    <ExternalLink target={build.log_url}>View log</ExternalLink>
-                  ) : (
-                    <span
-                      style={{
-                        color: 'var(--pf-global--disabled-color--100)',
-                      }}
+                <IconProperty
+                  WrapElement={ListItem}
+                  icon={<HistoryIcon />}
+                  value={
+                    <Link
+                      to={
+                        tenant.linkPrefix +
+                        '/builds?job_name=' +
+                        build.job_name +
+                        '&project=' +
+                        build.project
+                      }
+                      title="See previous runs of this job inside current project."
                     >
-                      No log available
-                    </span>
-                  )
-                }
-              />
-            </List>
-          </FlexItem>
+                      View build history
+                    </Link>
+                  }
+                />
+                {/* In some cases not all build data is available on initial
+                        page load (e.g. when we come from another page like the
+                        buildset result page). Thus, we have to check for the
+                        buildset here. */}
+                {build.buildset && (
+                  <IconProperty
+                    WrapElement={ListItem}
+                    icon={<BuildIcon />}
+                    value={
+                      <Link
+                        to={
+                          tenant.linkPrefix + '/buildset/' + build.buildset.uuid
+                        }
+                      >
+                        View buildset result
+                      </Link>
+                    }
+                  />
+                )}
+                <IconProperty
+                  WrapElement={ListItem}
+                  icon={<FileCodeIcon />}
+                  value={
+                    build.log_url ? (
+                      <ExternalLink target={build.log_url}>View log</ExternalLink>
+                    ) : (
+                      <span
+                        style={{
+                          color: 'var(--pf-global--disabled-color--100)',
+                        }}
+                      >
+                        No log available
+                      </span>
+                    )
+                  }
+                />
+              </List>
+            </FlexItem>
+          </Flex>
         </Flex>
-      </Flex>
-    </>
-  )
-}
+        { this.renderAutoholdModal() }
+      </>
+    )
+  }
 
-Build.propTypes = {
-  build: PropTypes.object,
-  tenant: PropTypes.object,
-  hash: PropTypes.array,
-  timezone: PropTypes.string,
 }
 
 export default connect((state) => ({
   tenant: state.tenant,
   timezone: state.timezone,
+  user: state.user,
 }))(Build)
