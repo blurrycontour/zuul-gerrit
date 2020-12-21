@@ -15,15 +15,33 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Table } from 'patternfly-react'
+
+import {
+  ClusterIcon,
+  InfrastructureIcon,
+  KeyIcon,
+  NetworkIcon,
+  OutlinedCalendarAltIcon,
+  OutlinedCommentsIcon,
+  RunningIcon,
+  TagIcon
+} from '@patternfly/react-icons'
+
 import * as moment from 'moment'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchNodesIfNeeded } from '../actions/nodes'
-import { Fetchable } from '../containers/Fetching'
-
+import {PageSection, PageSectionVariants} from "@patternfly/react-core";
+import SortTable from "../containers/SortTable";
 
 class NodesPage extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      fetching: false,
+    }
+  }
+
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -34,81 +52,97 @@ class NodesPage extends React.Component {
     this.props.dispatch(fetchNodesIfNeeded(this.props.tenant, force))
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Nodes'
     if (this.props.tenant.name) {
       this.updateData()
     }
   }
 
-  componentDidUpdate (prevProps) {
+  componentDidUpdate(prevProps) {
     if (this.props.tenant.name !== prevProps.tenant.name) {
       this.updateData()
     }
   }
 
-  render () {
-    const { remoteData } = this.props
-    const nodes = remoteData.nodes
+  render() {
+    const nodes = this.props.remoteData.nodes
+    const building = nodes.filter(n => n.state === "building").length
+    const ready = nodes.filter(n => n.state === "ready").length
+    const inUse = nodes.filter(n => n.state === "in-use").length
+    const deleting = nodes.filter(n => n.state === "deleting").length
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = value => <Table.Cell>{value}</Table.Cell>
-    const cellLabelsFormat = value => <Table.Cell>{value.join(',')}</Table.Cell>
-    const cellPreFormat = value => (
-      <Table.Cell style={{fontFamily: 'Menlo,Monaco,Consolas,monospace'}}>
-        {value}
-      </Table.Cell>)
-    const cellAgeFormat = value => (
-      <Table.Cell style={{fontFamily: 'Menlo,Monaco,Consolas,monospace'}}>
-        {moment.unix(value).fromNow()}
-      </Table.Cell>)
-
-    const columns = []
-    const myColumns = [
-      'id', 'labels', 'connection', 'server', 'provider', 'state',
-      'age', 'comment'
-    ]
-    myColumns.forEach(column => {
-      let formatter = cellFormat
-      let prop = column
-      if (column === 'labels') {
-        prop = 'type'
-        formatter = cellLabelsFormat
-      } else if (column === 'connection') {
-        prop = 'connection_type'
-      } else if (column === 'server') {
-        prop = 'external_id'
-        formatter = cellPreFormat
-      } else if (column === 'age') {
-        prop = 'state_time'
-        formatter = cellAgeFormat
-      }
-      columns.push({
-        header: {label: column, formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
-    })
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <PageSection style={{paddingRight: '5px'}}>
-          <Fetchable
-            isFetching={remoteData.isFetching}
-            fetchCallback={this.updateData}
-          />
-        </PageSection>
-        <Table.PfProvider
-          striped
-          bordered
-          hover
-          columns={columns}
-        >
-          <Table.Header/>
-          <Table.Body
-            rows={nodes}
-            rowKey="id"
-          />
-        </Table.PfProvider>
+        <div style={{marginBottom: 10}}>
+          <div>
+            <b>Summary
+              : </b>{nodes.length} total, {building} building, {ready} ready, {inUse} in-use, {deleting} deleting
+          </div>
+        </div>
+        <SortTable
+          defaultSort={"asc"}
+          defaultSortIndex={1}
+          config={[
+            {
+              name: "Id",
+              sortable: false,
+              icon: <KeyIcon/>,
+              field: "id",
+              formatters: []
+            },
+            {
+              name: "Label",
+              sortable: true,
+              icon: <TagIcon/>,
+              field: "type",
+              formatters: []
+            },
+            {
+              name: "Connection",
+              sortable: false,
+              icon: <NetworkIcon/>,
+              field: "connection_type",
+              formatters: []
+            },
+            {
+              name: "Server",
+              sortable: true,
+              icon: <ClusterIcon/>,
+              field: "external_id",
+              formatters: []
+            },
+            {
+              name: "Provider",
+              sortable: true,
+              icon: <InfrastructureIcon/>,
+              field: "provider",
+              formatters: []
+            },
+            {
+              name: "State",
+              sortable: true,
+              icon: <RunningIcon/>,
+              field: "state",
+              formatters: []
+            },
+            {
+              name: "Age",
+              sortable: true,
+              icon: <OutlinedCalendarAltIcon/>,
+              field: "state_time",
+              formatters: [date => (moment.unix(date).fromNow())]
+            },
+            {
+              name: "Comment",
+              sortable: false,
+              icon: <OutlinedCommentsIcon/>,
+              field: "comment",
+              formatters: []
+            }
+          ]}
+          data={nodes}
+          name={"Nodes Table"}/>
       </PageSection>
     )
   }
