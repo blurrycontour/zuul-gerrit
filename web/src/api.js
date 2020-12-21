@@ -235,6 +235,26 @@ function enqueue_ref(apiPrefix, projectName, pipeline, ref, oldrev, newrev, toke
   )
   return res
 }
+function autohold (apiPrefix, projectName, job, change, ref,
+                   reason, count, node_hold_expiration, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.post(
+    apiPrefix + 'project/' + projectName + '/autohold',
+    {
+      change: change,
+      job: job,
+      ref: ref,
+      reason: reason,
+      count: count,
+      node_hold_expiration: node_hold_expiration,
+    }
+  )
+  return res
+}
+
 
 export {
   apiUrl,
@@ -258,6 +278,7 @@ export {
   fetchInfo,
   fetchTenantInfo,
   fetchUserAuthorizations,
+  autohold,
   dequeue,
   dequeue_ref,
   enqueue,
