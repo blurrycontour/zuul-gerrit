@@ -16,6 +16,24 @@
       "revId": "23ed1d6d08a6a660f36f23700466317699b587b1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "464d564a_b723d6bf",
+        "filename": "doc/source/reference/old-client.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-12-22T13:49:56Z",
+      "side": 1,
+      "message": "Rename was on purpose in order to enforce the deprecations. Otherwise we risk on still getting this as the top answer.\n\nStill, if people want to keep it I can rename it to keep the old name.",
+      "parentUuid": "7777a1fc_edc24fbd",
+      "revId": "23ed1d6d08a6a660f36f23700466317699b587b1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
