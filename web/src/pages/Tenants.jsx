@@ -35,7 +35,7 @@ import {
 import { Fetching } from '../containers/Fetching'
 import { fetchTenantsIfNeeded } from '../actions/tenants'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
-import { IconProperty } from '../containers/build/Misc'
+import { IconProperty } from '../Misc'
 
 class TenantsPage extends React.Component {
   static propTypes = {
@@ -47,15 +47,15 @@ class TenantsPage extends React.Component {
     this.props.dispatch(fetchTenantsIfNeeded(force))
   }
 
-  componentDidMount () {
+  componentDidMount() {
     document.title = 'Zuul Tenants'
     this.updateData()
   }
 
   // TODO: fix Refreshable class to work with tenant less page.
-  componentDidUpdate () { }
+  componentDidUpdate() { }
 
-  render () {
+  render() {
     const { remoteData } = this.props
     if (remoteData.isFetching) {
       return <Fetching />
@@ -64,46 +64,48 @@ class TenantsPage extends React.Component {
     const tenants = remoteData.tenants.map((tenant) => {
       return {
         cells: [
-          {title: (<b>{tenant.name}</b>)},
-          {title: (<Link to={'/t/' + tenant.name + '/status'}>Status</Link>)},
-          {title: (<Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>)},
-          {title: (<Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>)},
-          {title: (<Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>)},
-          {title: (<Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>)},
+          { title: (<b>{tenant.name}</b>) },
+          { title: (<Link to={'/t/' + tenant.name + '/status'}>Status</Link>) },
+          { title: (<Link to={'/t/' + tenant.name + '/projects'}>Projects</Link>) },
+          { title: (<Link to={'/t/' + tenant.name + '/jobs'}>Jobs</Link>) },
+          { title: (<Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>) },
+          { title: (<Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>) },
           tenant.projects,
           tenant.queue
-        ]}})
+        ]
+      }
+    })
     const columns = [
       {
-        title: <IconProperty icon={<HomeIcon />} value="Name"/>,
+        title: <IconProperty icon={<HomeIcon />} value="Name" />,
         dataLabel: 'Name',
       },
       {
-        title: <IconProperty icon={<DesktopIcon />} value="Status"/>,
+        title: <IconProperty icon={<DesktopIcon />} value="Status" />,
         dataLabel: 'Status',
       },
       {
-        title: <IconProperty icon={<CubeIcon />} value="Projects"/>,
+        title: <IconProperty icon={<CubeIcon />} value="Projects" />,
         dataLabel: 'Projects',
       },
       {
-        title: <IconProperty icon={<BuildIcon />} value="Jobs"/>,
+        title: <IconProperty icon={<BuildIcon />} value="Jobs" />,
         dataLabel: 'Jobs',
       },
       {
-        title: <IconProperty icon={<FolderIcon />} value="Builds"/>,
+        title: <IconProperty icon={<FolderIcon />} value="Builds" />,
         dataLabel: 'Builds',
       },
       {
-        title: <IconProperty icon={<RepositoryIcon />} value="Buildsets"/>,
+        title: <IconProperty icon={<RepositoryIcon />} value="Buildsets" />,
         dataLabel: 'Buildsets',
       },
       {
-        title: <IconProperty icon={<CubesIcon />} value="Project count"/>,
+        title: <IconProperty icon={<CubesIcon />} value="Project count" />,
         dataLabel: 'Project count',
       },
       {
-        title: <IconProperty icon={<TrendUpIcon />} value="Queue"/>,
+        title: <IconProperty icon={<TrendUpIcon />} value="Queue" />,
         dataLabel: 'Queue',
       }
     ]
@@ -125,4 +127,4 @@ class TenantsPage extends React.Component {
   }
 }
 
-export default connect(state => ({remoteData: state.tenants}))(TenantsPage)
+export default connect(state => ({ remoteData: state.tenants }))(TenantsPage)

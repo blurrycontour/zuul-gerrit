@@ -39,8 +39,8 @@ import {
   TableVariant,
 } from '@patternfly/react-table'
 
-import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
-import { buildExternalTableLink } from '../../Misc'
+import { BuildResult, BuildResultWithIcon } from './Misc'
+import { buildExternalTableLink, IconProperty } from '../../Misc'
 
 function BuildsetTable({
   buildsets,
@@ -101,13 +101,13 @@ function BuildsetTable({
           title: changeOrRefLink && changeOrRefLink,
         },
         {
-            title: (
-              <BuildResult
-                result={buildset.result}
-                link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
-              >
-              </BuildResult>
-            ),
+          title: (
+            <BuildResult
+              result={buildset.result}
+              link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
+            >
+            </BuildResult>
+          ),
         },
       ],
     }
@@ -168,7 +168,7 @@ function BuildsetTable({
         cells={columns}
         rows={rows}
         actions={actions}
-        className="zuul-build-table"
+        className="zuul-table"
       >
         <TableHeader />
         <TableBody />
