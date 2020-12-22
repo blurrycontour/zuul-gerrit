@@ -24,7 +24,8 @@ import {
   ModalVariant,
   Form,
   FormGroup,
-  TextInput } from '@patternfly/react-core'
+  TextInput
+} from '@patternfly/react-core'
 import {
   BookIcon,
   BuildIcon,
@@ -42,8 +43,8 @@ import {
 import * as moment from 'moment'
 import 'moment-duration-format'
 
-import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
-import { buildExternalLink, ExternalLink } from '../../Misc'
+import { BuildResultBadge, BuildResultWithIcon } from './Misc'
+import { buildExternalLink, ExternalLink, IconProperty } from '../../Misc'
 
 import { autohold } from '../../api'
 
@@ -56,7 +57,7 @@ function Build({ build, tenant, timezone, user }) {
 
   const build_link = buildExternalLink(build)
 
-  function handleConfirm () {
+  function handleConfirm() {
     let change = build.change ? build.change : null
     let ref = change ? null : build.ref
     autohold(tenant.apiPrefix, build.project, build.job_name, change, ref, ahFormReason, parseInt(ahFormCount), parseInt(ahFormNodeHoldExpiration), user.token)
@@ -68,7 +69,7 @@ function Build({ build, tenant, timezone, user }) {
       })
   }
 
-  function renderAutoholdButton () {
+  function renderAutoholdButton() {
     return (
       <Button
         variant={ButtonVariant.primary}
@@ -88,56 +89,56 @@ function Build({ build, tenant, timezone, user }) {
         titleIconVariant={LockIcon}
         isOpen={showAutoholdModal}
         title='Create an Autohold Request'
-        onClose={() => {setShowAutoholdModal(false)}}
+        onClose={() => { setShowAutoholdModal(false) }}
         actions={[
           <Button
-              key="autohold_confirm"
-              variant="primary"
-              onClick={() => handleConfirm()}>Create</Button>,
+            key="autohold_confirm"
+            variant="primary"
+            onClick={() => handleConfirm()}>Create</Button>,
           <Button
-              key="autohold_cancel"
-              variant="link"
-              onClick={() => {setShowAutoholdModal(false)}}>Cancel</Button>
+            key="autohold_cancel"
+            variant="link"
+            onClick={() => { setShowAutoholdModal(false) }}>Cancel</Button>
         ]}>
         <Form isHorizontal>
           <FormGroup
-              label="Reason"
-              isRequired
-              fieldId="ah-form-reason"
-              helperText="A descriptive reason for holding the next failing build">
+            label="Reason"
+            isRequired
+            fieldId="ah-form-reason"
+            helperText="A descriptive reason for holding the next failing build">
             <TextInput
-                value={ ahFormReason }
-                isRequired
-                type="text"
-                id="ah-form-reason"
-                name="ahFormReason"
-                onChange={(value) => {setAhFormReason(value)}} />
+              value={ahFormReason}
+              isRequired
+              type="text"
+              id="ah-form-reason"
+              name="ahFormReason"
+              onChange={(value) => { setAhFormReason(value) }} />
           </FormGroup>
           <FormGroup
-              label="Count"
-              isRequired
-              fieldId="ah-form-count"
-              helperText="How many times a failing build should be held">
+            label="Count"
+            isRequired
+            fieldId="ah-form-count"
+            helperText="How many times a failing build should be held">
             <TextInput
-                value={ ahFormCount }
-                isRequired
-                type="number"
-                id="ah-form-count"
-                name="ahFormCount"
-                onChange={(value) => {setAhFormCount(value)}}  />
+              value={ahFormCount}
+              isRequired
+              type="number"
+              id="ah-form-count"
+              name="ahFormCount"
+              onChange={(value) => { setAhFormCount(value) }} />
           </FormGroup>
           <FormGroup
-              label="Node Hold Expires in (s)"
-              isRequired
-              fieldId="ah-form-nhe"
-              helperText="How long nodes should be kept in HELD state (seconds)">
+            label="Node Hold Expires in (s)"
+            isRequired
+            fieldId="ah-form-nhe"
+            helperText="How long nodes should be kept in HELD state (seconds)">
             <TextInput
-                value={ ahFormNodeHoldExpiration }
-                isRequired
-                type="number"
-                id="ah-form-count"
-                name="ahFormNodeHoldExpiration"
-                onChange={(value) => {setAhFormNodeHoldExpiration(value)}} />
+              value={ahFormNodeHoldExpiration}
+              isRequired
+              type="number"
+              id="ah-form-count"
+              name="ahFormNodeHoldExpiration"
+              onChange={(value) => { setAhFormNodeHoldExpiration(value) }} />
           </FormGroup>
         </Form>
       </Modal>
@@ -334,7 +335,7 @@ function Build({ build, tenant, timezone, user }) {
           </FlexItem>
         </Flex>
       </Flex>
-      { renderAutoholdModal() }
+      { renderAutoholdModal()}
     </>
   )
 }
