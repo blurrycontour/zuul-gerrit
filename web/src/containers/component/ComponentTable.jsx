@@ -32,7 +32,7 @@ import {
   StopCircleIcon,
 } from '@patternfly/react-icons'
 
-import { IconProperty } from '../build/Misc'
+import { IconProperty } from '../../Misc'
 
 const STATE_ICON_CONFIGS = {
   RUNNING: {

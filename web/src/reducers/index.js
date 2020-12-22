@@ -15,6 +15,7 @@
 import { combineReducers } from 'redux'
 
 import auth from './auth'
+import autoholds from './autoholds'
 import configErrors from './configErrors'
 import change from './change'
 import component from './component'
@@ -38,6 +39,7 @@ import user from './user'
 
 const reducers = {
   auth,
+  autoholds,
   build,
   change,
   component,
