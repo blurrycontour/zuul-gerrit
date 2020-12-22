@@ -40,7 +40,8 @@ import {
   TableVariant,
 } from '@patternfly/react-table'
 
-import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
+import { BuildResult, BuildResultWithIcon } from './Misc'
+import { IconProperty } from '../Misc'
 import { buildExternalTableLink } from '../../Misc'
 
 function BuildsetTable(props) {

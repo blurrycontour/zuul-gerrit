@@ -46,7 +46,8 @@ import {
 import * as moment from 'moment'
 import 'moment-duration-format'
 
-import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
+import { BuildResultBadge, BuildResultWithIcon } from './Misc'
+import { IconProperty } from '../Misc'
 import { buildExternalLink, ExternalLink } from '../../Misc'
 import { autohold } from '../../api'
 import { addAutoholdError } from '../../actions/adminActions'
