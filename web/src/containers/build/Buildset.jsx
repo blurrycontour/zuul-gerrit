@@ -36,8 +36,8 @@ import {
   // BullhornIcon
 } from '@patternfly/react-icons'
 
-import { buildExternalLink } from '../../Misc'
-import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
+import { buildExternalLink, IconProperty } from '../../Misc'
+import { BuildResultBadge, BuildResultWithIcon } from './Misc'
 import { enqueue, enqueue_ref } from '../../api'
 import { addNotification, addApiError } from '../../actions/notifications'
 

@@ -43,8 +43,8 @@ import {
 import 'moment-duration-format'
 import * as moment from 'moment'
 
-import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
-import { buildExternalTableLink } from '../../Misc'
+import { BuildResult, BuildResultWithIcon } from './Misc'
+import { buildExternalTableLink, IconProperty } from '../../Misc'
 
 function BuildTable({
   builds,
@@ -139,13 +139,13 @@ function BuildTable({
             .format('YYYY-MM-DD HH:mm:ss'),
         },
         {
-            title: (
-              <BuildResult
-                result={build.result}
-                link={`${tenant.linkPrefix}/build/${build.uuid}`}
-                colored={build.voting}
-              />
-            ),
+          title: (
+            <BuildResult
+              result={build.result}
+              link={`${tenant.linkPrefix}/build/${build.uuid}`}
+              colored={build.voting}
+            />
+          ),
         },
       ],
     }
@@ -206,7 +206,7 @@ function BuildTable({
         cells={columns}
         rows={rows}
         actions={actions}
-        className="zuul-build-table"
+        className="zuul-table"
       >
         <TableHeader />
         <TableBody />
