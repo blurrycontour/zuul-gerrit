@@ -1962,7 +1962,7 @@ class TestScheduler(ZuulTestCase):
         # Validate node has recorded the failed job
         if change != "":
             ref = "refs/changes/%s/%s/.*" % (
-                str(change_obj.number)[-1:], str(change_obj.number)
+                str(change_obj.number).zfill(2)[-2:], str(change_obj.number)
             )
 
         self.assertEqual(
