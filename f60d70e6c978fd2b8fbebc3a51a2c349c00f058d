@@ -16,6 +16,23 @@
       "revId": "f60d70e6c978fd2b8fbebc3a51a2c349c00f058d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a2882b87_b2383f2c",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-22T16:22:11Z",
+      "side": 1,
+      "message": "Yes it is; we only didn\u0027t notice this because autohold is the only code path that calls this.",
+      "revId": "f60d70e6c978fd2b8fbebc3a51a2c349c00f058d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
