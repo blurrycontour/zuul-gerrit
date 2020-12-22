@@ -20,6 +20,8 @@ import JobPage from './pages/Job'
 import JobsPage from './pages/Jobs'
 import LabelsPage from './pages/Labels'
 import NodesPage from './pages/Nodes'
+import AutoholdsPage from './pages/Autoholds'
+import AutoholdPage from './pages/Autohold'
 import BuildPage from './pages/Build'
 import BuildsPage from './pages/Builds'
 import BuildsetPage from './pages/Buildset'
@@ -59,6 +61,11 @@ const routes = () => [
     title: 'Nodes',
     to: '/nodes',
     component: NodesPage
+  },
+  {
+    title: 'Autoholds',
+    to: '/autoholds',
+    component: AutoholdsPage
   },
   {
     title: 'Builds',
@@ -114,6 +121,10 @@ const routes = () => [
   {
     to: '/buildset/:buildsetId',
     component: BuildsetPage
+  },
+  {
+    to: '/autohold/:requestId',
+    component: AutoholdPage
   },
   {
     to: '/config-errors',
