@@ -63,7 +63,7 @@ function buildExternalLink(buildish) {
     return (
       <ExternalLink target={buildish.ref_url}>
         <strong>Revision </strong>
-        {buildish.newrev.slice(0,7)}
+        {buildish.newrev.slice(0, 7)}
       </ExternalLink>
     )
   }
@@ -84,7 +84,7 @@ function buildExternalTableLink(buildish) {
   } else if (buildish.ref_url && buildish.newrev) {
     return (
       <ExternalLink target={buildish.ref_url}>
-        {buildish.newrev.slice(0,7)}
+        {buildish.newrev.slice(0, 7)}
       </ExternalLink>
     )
   }
@@ -92,9 +92,32 @@ function buildExternalTableLink(buildish) {
   return null
 }
 
+function IconProperty(props) {
+  const { icon, value, WrapElement = 'span' } = props
+  return (
+    <WrapElement style={{ marginLeft: '25px' }}>
+      <span
+        style={{
+          marginRight: 'var(--pf-global--spacer--sm)',
+          marginLeft: '-25px',
+        }}
+      >
+        {icon}
+      </span>
+      <span>{value}</span>
+    </WrapElement>
+  )
+}
+
+IconProperty.propTypes = {
+  icon: PropTypes.node,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+  WrapElement: PropTypes.func,
+}
+
 // https://github.com/kitze/conditional-wrap
 // appears to be the first implementation of this pattern
 const ConditionalWrapper = ({ condition, wrapper, children }) =>
   condition ? wrapper(children) : children
 
-export { removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper }
+export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper }
