@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "fecc7b82_ffbeaa1a",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2020-12-22T16:25:35Z",
+      "side": 1,
+      "message": "This should be \u003e\u003d 2.",
+      "revId": "f60d70e6c978fd2b8fbebc3a51a2c349c00f058d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5dbc2191_2829fc59",
         "filename": "zuul/driver/gerrit/gerritsource.py",
         "patchSetId": 1
