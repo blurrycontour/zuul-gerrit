@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f28cdcc_f17a77c8",
+        "filename": "doc/source/reference/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2020-12-22T15:40:03Z",
+      "side": 1,
+      "message": "Since this is a spec and not really a part of the documentation, and it is meant to be a snapshot of what was intended (and agreed upon) as a development effort by the community, should it be edited?",
+      "range": {
+        "startLine": 422,
+        "startChar": 0,
+        "endLine": 423,
+        "endChar": 39
+      },
+      "revId": "60d0c05728f276c03515b8cce6bd67cf33436dd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
