@@ -57,12 +57,12 @@ a.refresh {
 }
 
 /* Keep the normal font-size for compact tables */
-.zuul-build-table td {
+.zuul-table td {
     font-size: var(--pf-global--FontSize--md);
 }
 
 /* Use the same hover effect on table rows like for the selectable data list */
-.zuul-build-table tbody tr:hover {
+.zuul-table tbody tr:hover {
     box-shadow: var(--pf-global--BoxShadow--sm-top),
       var(--pf-global--BoxShadow--sm-bottom);
 }
@@ -72,7 +72,7 @@ a.refresh {
        show the column names. Thus, we fall back to the border to show the hover
        effect. The drawback with that is, that we can't show a nice transition.
        */
-    .zuul-build-table tbody tr:hover {
+    .zuul-table tbody tr:hover {
         border-left-color: var(--pf-global--active-color--100);
         border-left-width: var(--pf-global--BorderWidth--lg);
         border-left-style: solid;
@@ -85,7 +85,7 @@ a.refresh {
     /* For the larger screens (normal table layout) we can use the before
        element on the first table cell to show the same hover effect like for
        the data list */
-    .zuul-build-table tbody tr td:first-child::before {
+    .zuul-table tbody tr td:first-child::before {
         position: absolute;
         top: 0;
         bottom: 0;
@@ -96,14 +96,14 @@ a.refresh {
         transition: var(--pf-global--Transition);
     }
 
-    .zuul-build-table tbody tr:hover td:first-child::before {
+    .zuul-table tbody tr:hover td:first-child::before {
         background-color: var(--pf-global--active-color--100);
     }
 
     /* Hide the action column with the build link on larger screen. This is only
        needed for the mobile version as we can't use the "magnifying-glass icon
        on hover" effect there. */
-    .zuul-build-table .pf-c-table__action {
+    .zuul-table .pf-c-table__action {
         display: none;
     }
 }
