@@ -37,7 +37,8 @@ import {
 } from '@patternfly/react-icons'
 
 import { buildExternalLink } from '../../Misc'
-import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
+import { BuildResultBadge, BuildResultWithIcon } from './Misc'
+import { IconProperty } from '../Misc'
 import { enqueue, enqueue_ref } from '../../api'
 
 function Buildset({ buildset, tenant, user }) {
