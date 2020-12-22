@@ -43,8 +43,8 @@ import {
 import * as moment from 'moment'
 import 'moment-duration-format'
 
-import { BuildResultBadge, BuildResultWithIcon, IconProperty } from './Misc'
-import { buildExternalLink, ExternalLink } from '../../Misc'
+import { BuildResultBadge, BuildResultWithIcon } from './Misc'
+import { buildExternalLink, ExternalLink, IconProperty } from '../../Misc'
 
 import { autohold } from '../../api'
 import { addNotification, addApiError } from '../../actions/notifications'
@@ -119,7 +119,7 @@ function Build({ build, tenant, timezone, user }) {
             variant="primary"
             onClick={() => {
               handleConfirm()
-              setShowAutoholdModal()
+              setShowAutoholdModal(false)
             }}>Create</Button>,
           <Button
             key="autohold_cancel"
