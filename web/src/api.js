@@ -47,6 +47,7 @@ function getHomepageUrl(url) {
 
   // Remove known sub-path
   const subDir = [
+    '/autohold/',
     '/build/',
     '/buildset/',
     '/job/',
@@ -167,6 +168,12 @@ function fetchLabels(apiPrefix) {
 function fetchNodes(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
+function fetchAutoholds(apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'autohold')
+}
+function fetchAutohold(apiPrefix, requestId) {
+  return Axios.get(apiUrl + apiPrefix + 'autohold/' + requestId)
+}
 
 // token-protected API
 function fetchUserAuthorizations(apiPrefix, token) {
@@ -240,8 +247,8 @@ function enqueue_ref(apiPrefix, projectName, pipeline, ref, oldrev, newrev, toke
   )
   return res
 }
-function autohold (apiPrefix, projectName, job, change, ref,
-                   reason, count, node_hold_expiration, token) {
+function autohold(apiPrefix, projectName, job, change, ref,
+  reason, count, node_hold_expiration, token) {
   const instance = Axios.create({
     baseURL: apiUrl
   })
@@ -256,6 +263,17 @@ function autohold (apiPrefix, projectName, job, change, ref,
       count: count,
       node_hold_expiration: node_hold_expiration,
     }
+  )
+  return res
+}
+
+function autohold_delete(apiPrefix, requestId, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.delete(
+    apiPrefix + '/autohold/' + requestId
   )
   return res
 }
@@ -284,7 +302,10 @@ export {
   fetchComponents,
   fetchTenantInfo,
   fetchUserAuthorizations,
+  fetchAutoholds,
+  fetchAutohold,
   autohold,
+  autohold_delete,
   dequeue,
   dequeue_ref,
   enqueue,
