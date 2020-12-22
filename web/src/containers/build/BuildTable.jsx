@@ -43,7 +43,8 @@ import {
 import 'moment-duration-format'
 import * as moment from 'moment'
 
-import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
+import { BuildResult, BuildResultWithIcon } from './Misc'
+import { IconProperty } from '../Misc'
 import { buildExternalTableLink } from '../../Misc'
 
 function BuildTable({
