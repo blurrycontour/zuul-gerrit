@@ -162,6 +162,12 @@ function fetchLabels (apiPrefix) {
 function fetchNodes (apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
+function fetchAutoholds (apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'autohold')
+}
+function fetchAutohold (apiPrefix, requestId) {
+  return Axios.get(apiUrl + apiPrefix + 'autohold/' + requestId)
+}
 
 // token-protected API
 function fetchUserAuthorizations (apiPrefix, token) {
@@ -280,6 +286,8 @@ export {
   fetchInfo,
   fetchTenantInfo,
   fetchUserAuthorizations,
+  fetchAutoholds,
+  fetchAutohold,
   autohold,
   dequeue,
   dequeue_ref,
