@@ -177,27 +177,6 @@ BuildResultWithIcon.propTypes = {
   children: PropTypes.node,
 }
 
-function IconProperty(props) {
-  const { icon, value, WrapElement = 'span' } = props
-  return (
-    <WrapElement style={{ marginLeft: '25px' }}>
-      <span
-        style={{
-          marginRight: 'var(--pf-global--spacer--sm)',
-          marginLeft: '-25px',
-        }}
-      >
-        {icon}
-      </span>
-      <span>{value}</span>
-    </WrapElement>
-  )
-}
 
-IconProperty.propTypes = {
-  icon: PropTypes.node,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-  WrapElement: PropTypes.func,
-}
 
-export { BuildResult, BuildResultBadge, BuildResultWithIcon, IconProperty }
+export { BuildResult, BuildResultBadge, BuildResultWithIcon }
