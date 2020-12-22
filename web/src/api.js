@@ -162,6 +162,12 @@ function fetchLabels(apiPrefix) {
 function fetchNodes(apiPrefix) {
   return Axios.get(apiUrl + apiPrefix + 'nodes')
 }
+function fetchAutoholds (apiPrefix) {
+  return Axios.get(apiUrl + apiPrefix + 'autohold')
+}
+function fetchAutohold (apiPrefix, requestId) {
+  return Axios.get(apiUrl + apiPrefix + 'autohold/' + requestId)
+}
 
 // token-protected API
 function fetchUserAuthorizations(apiPrefix, token) {
@@ -255,6 +261,17 @@ function autohold (apiPrefix, projectName, job, change, ref,
   return res
 }
 
+function autohold_delete (apiPrefix, requestId, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.delete(
+    apiPrefix + '/autohold/' + requestId
+  )
+  return res
+}
+
 
 export {
   apiUrl,
@@ -278,7 +295,10 @@ export {
   fetchInfo,
   fetchTenantInfo,
   fetchUserAuthorizations,
+  fetchAutoholds,
+  fetchAutohold,
   autohold,
+  autohold_delete,
   dequeue,
   dequeue_ref,
   enqueue,
