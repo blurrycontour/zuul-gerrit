@@ -22,6 +22,30 @@
       "revId": "60d0c05728f276c03515b8cce6bd67cf33436dd9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "64340795_affc0af9",
+        "filename": "doc/source/reference/developer/specs/tenant-scoped-admin-web-API.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 423,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-12-22T15:45:38Z",
+      "side": 1,
+      "message": "I am not sure how it should be modified but others are welcomed to edit this CR.",
+      "parentUuid": "7f28cdcc_f17a77c8",
+      "range": {
+        "startLine": 422,
+        "startChar": 0,
+        "endLine": 423,
+        "endChar": 39
+      },
+      "revId": "60d0c05728f276c03515b8cce6bd67cf33436dd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
