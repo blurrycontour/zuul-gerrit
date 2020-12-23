@@ -31,10 +31,10 @@ with open(os.path.join(FIXTURE_DIR,
 algo = jwt.algorithms.RSAAlgorithm(jwt.algorithms.RSAAlgorithm.SHA256)
 with open(os.path.join(FIXTURE_DIR,
                        'auth/oidc-key'), 'r') as k:
-    OIDC_PRIVATE_KEY = algo.prepare_key(k.read().encode('utf-8'))
+    OIDC_PRIVATE_KEY = algo.prepare_key(k.read())
 with open(os.path.join(FIXTURE_DIR,
                        'auth/oidc-key.pub'), 'r') as k:
-    pub_key = algo.prepare_key(k.read().encode('utf-8'))
+    pub_key = algo.prepare_key(k.read())
     pub_jwk = algo.to_jwk(pub_key)
     key = {
         "kid": "OwO",
