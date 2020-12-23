@@ -1351,7 +1351,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='OnlyZuulNoDana',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
             headers={'Authorization': 'Bearer %s' % token},
@@ -1386,7 +1386,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  },
                  'exp': time.time() - 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
             headers={'Authorization': 'Bearer %s' % token},
@@ -1421,7 +1421,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
             headers={'Authorization': 'Bearer %s' % token},
@@ -1461,7 +1461,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                 'ref': None,
                 'node_hold_expiration': None}
         good_token = jwt.encode(good_authz, key='NoDanaOnlyZuul',
-                                algorithm='HS256').decode('utf-8')
+                                algorithm='HS256')
         req = self.post_url(
             'api/tenant/tenant-one/project/org/project/autohold',
             headers={'Authorization': 'Bearer %s' % good_token},
@@ -1495,7 +1495,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         req = self.post_url(
             'api/tenant/tenant-one/project/org/project/autohold',
             headers={'Authorization': 'Bearer %s' % token},
@@ -1521,7 +1521,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
 
     def _init_autohold_delete(self, authz):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
 
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
@@ -1559,7 +1559,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                      },
                      'exp': time.time() + 3600}
         bad_token = jwt.encode(bad_authz, key='NoDanaOnlyZuul',
-                               algorithm='HS256').decode('utf-8')
+                               algorithm='HS256')
         resp = self.delete_url(
             "api/tenant/tenant-one/autohold/%s" % request_id,
             headers={'Authorization': 'Bearer %s' % bad_token})
@@ -1603,7 +1603,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
         enqueue_args = {'tenant': 'tenant-one',
                         'project': 'org/project', }
@@ -1655,7 +1655,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         req = self.post_url(path % enqueue_args,
                             headers={'Authorization': 'Bearer %s' % token},
                             json=ref)
@@ -1696,7 +1696,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         path = "api/tenant/%(tenant)s/project/%(project)s/dequeue"
         dequeue_args = {'tenant': 'tenant-one',
                         'project': 'org/project', }
@@ -1818,7 +1818,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  'exp': time.time() + 3600,
                  'iat': time.time()}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         req = self.post_url(
             'api/tenant/tenant-one/promote',
             headers={'Authorization': 'Bearer %s' % token},
@@ -1892,7 +1892,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         req = self.post_url(
             'api/tenant/tenant-one/project/org/project/autohold',
             headers={'Authorization': 'Bearer %s' % token},
@@ -1915,7 +1915,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                             'project': project, }
 
             token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                               algorithm='HS256').decode('utf-8')
+                               algorithm='HS256')
             req = self.post_url(path % enqueue_args,
                                 headers={'Authorization': 'Bearer %s' % token},
                                 json=change)
@@ -1959,7 +1959,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'groups': ['ghostbusters', 'secretary'],
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
         enqueue_args = {'tenant': 'tenant-one',
                         'project': 'org/project2', }
@@ -1985,7 +1985,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                      'car': 'ecto-1'},
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
         enqueue_args = {'tenant': 'tenant-one',
                         'project': 'org/project', }
@@ -2007,7 +2007,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
                  'zuul': {'admin': admin_tenants},
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         # TODO(mhu) deprecated, remove after next release
         req = self.get_url('/api/user/authorizations',
                            headers={'Authorization': 'Bearer %s' % token})
@@ -2049,7 +2049,7 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
             authz = test_user['authz']
             authz['exp'] = time.time() + 3600
             token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                               algorithm='HS256').decode('utf-8')
+                               algorithm='HS256')
             # TODO(mhu) deprecated, remove after next release
             req = self.get_url('/api/user/authorizations',
                                headers={'Authorization': 'Bearer %s' % token})
@@ -2116,7 +2116,7 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
             headers={'Authorization': 'Bearer %s' % token},
@@ -2152,7 +2152,7 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
                  'exp': time.time() + 7200,
                  'iat': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
             headers={'Authorization': 'Bearer %s' % token},
@@ -2188,7 +2188,7 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
                  'exp': time.time() + 3600,
                  'iat': time.time()}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         time.sleep(10)
         resp = self.post_url(
             "api/tenant/tenant-one/project/org/project/autohold",
@@ -2232,7 +2232,7 @@ class TestTenantScopedWebApiTokenWithExpiry(BaseTestWeb):
                  'exp': time.time() + 3600,
                  'iat': time.time()}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         req = self.post_url(
             'api/tenant/tenant-one/project/org/project/autohold',
             headers={'Authorization': 'Bearer %s' % token},
@@ -2336,7 +2336,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
@@ -2375,7 +2375,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
@@ -2404,7 +2404,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
@@ -2440,7 +2440,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
@@ -2491,7 +2491,7 @@ class TestCLIViaWebApi(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
