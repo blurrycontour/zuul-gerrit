@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30fe869a_3c5d7ae7",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2020-12-23T10:17:51Z",
+      "side": 1,
+      "message": "Pinning should not happen without at least a commit-link mentioning what required it,\nas seen on line 36-37.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 12
+      },
+      "revId": "f78e848f635c1666c5f3a0a893bf3b6bb6bc1318",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
