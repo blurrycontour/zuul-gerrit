@@ -169,7 +169,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             ['zuul-client',
              '--zuul-url', self.base_url, '--auth-token', token, '-v',
@@ -209,7 +209,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             ['zuul-client',
              '--zuul-url', self.base_url, '--auth-token', token, '-v',
@@ -245,7 +245,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             ['zuul-client',
              '--zuul-url', self.base_url, '--auth-token', token, '-v',
@@ -287,7 +287,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             ['zuul-client',
              '--zuul-url', self.base_url, '--auth-token', token, '-v',
@@ -338,7 +338,7 @@ class TestZuulClientAdmin(BaseTestWeb):
                  },
                  'exp': time.time() + 3600}
         token = jwt.encode(authz, key='NoDanaOnlyZuul',
-                           algorithm='HS256').decode('utf-8')
+                           algorithm='HS256')
         p = subprocess.Popen(
             ['zuul-client',
              '--zuul-url', self.base_url, '--auth-token', token, '-v',
