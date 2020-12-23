@@ -24,7 +24,8 @@ alembic
 cryptography>=1.6
 cachecontrol
 cachetools
-pyjwt
+# PyJWT 2.0.0 has API breaking changes
+pyjwt<2.0.0
 iso8601
 psutil
 fb-re2>=1.0.6
