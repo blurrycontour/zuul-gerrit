@@ -15,7 +15,20 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Table } from 'patternfly-react'
+
+import {
+  Spinner,
+} from '@patternfly/react-core'
+
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableVariant,
+  sortable,
+  SortByDirection,
+} from '@patternfly/react-table'
+
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchLabelsIfNeeded } from '../actions/labels'
@@ -48,25 +61,15 @@ class LabelsPage extends React.Component {
 
   render () {
     const { remoteData } = this.props
-    const labels = remoteData.labels[this.props.tenant.name]
+    const labels = remoteData.labels[this.props.tenant.name] || []
 
     if (!labels) {
       return <Fetching />
     }
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = value => <Table.Cell>{value}</Table.Cell>
-    const columns = []
-    const myColumns = ['name']
-    myColumns.forEach(column => {
-      let formatter = cellFormat
-      let prop = column
-      columns.push({
-        header: {label: column, formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
-    })
+    const columns = [{title: 'Name'}]
+    const rows = labels.map(l => [l.name])
+
     return (
       <PageSection variant={PageSectionVariants.light}>
         <PageSection style={{paddingRight: '5px'}}>
@@ -75,18 +78,15 @@ class LabelsPage extends React.Component {
             fetchCallback={this.updateData}
           />
         </PageSection>
-        <Table.PfProvider
-          striped
-          bordered
-          hover
-          columns={columns}
+        <Table
+          aria-label="Labels Table"
+          variant={TableVariant.compact}
+          cells={columns}
+          rows={rows}
         >
-          <Table.Header/>
-          <Table.Body
-            rows={labels}
-            rowKey="name"
-          />
-        </Table.PfProvider>
+          <TableHeader />
+          <TableBody />
+        </Table>
       </PageSection>
     )
   }
