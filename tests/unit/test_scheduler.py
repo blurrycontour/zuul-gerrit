@@ -1962,7 +1962,7 @@ class TestScheduler(ZuulTestCase):
         # Validate node has recorded the failed job
         if change != "":
             ref = "refs/changes/%s/%s/.*" % (
-                str(change_obj.number)[-1:], str(change_obj.number)
+                str(change_obj.number).zfill(2)[-2:], str(change_obj.number)
             )
 
         self.assertEqual(
@@ -2037,7 +2037,8 @@ class TestScheduler(ZuulTestCase):
 
         _fail_job_and_verify_autohold_request(A, ref)
 
-        ref = "refs/changes/%s/%s/.*" % (str(change)[-1:], str(change))
+        ref = "refs/changes/%s/%s/.*" % (str(change).zfill(2)[-2:],
+                                         str(change))
         _fail_job_and_verify_autohold_request(A, ref)
         _fail_job_and_verify_autohold_request(A, ".*")
 
@@ -6930,8 +6931,8 @@ class TestSchedulerMerges(ZuulTestCase):
             'initial commit',
             'add content from fixture',
             # the intermediate commits order is nondeterministic
-            "Merge commit 'refs/changes/1/2/1' of %s into HEAD" % us_path,
-            "Merge commit 'refs/changes/1/3/1' of %s into HEAD" % us_path,
+            "Merge commit 'refs/changes/02/2/1' of %s into HEAD" % us_path,
+            "Merge commit 'refs/changes/03/3/1' of %s into HEAD" % us_path,
         ]
         result = self._test_project_merge_mode(mode)
         self.assertEqual(result[:2], expected_messages[:2])
