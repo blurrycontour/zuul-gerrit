@@ -11,6 +11,13 @@ Glossary
       A job which cannot be run directly, and is only intended to
       serve as a parent on top of which other jobs are constructed.
 
+   ansible
+
+      An open-source software provisioning, configuration management,
+      and application-deployment tool. It runs on many Unix-like
+      systems,and can configure both Unix-like systems as well as
+      Microsoft Windows.
+
    artifact
 
       A file or set of files created by a build and archived for
@@ -33,6 +40,11 @@ Glossary
       streams and results in the status API and Web dashboard.  The
       context for a build comes not only from its job definition,
       but also from the pipeline into which it is scheduled.
+
+   build server
+
+      A centralized, stable and reliable environment for building
+      distributed development projects.
 
    buildset
 
@@ -88,6 +100,17 @@ Glossary
       credentials and location information for a specific source of
       events, whether that's a code review platform, a generic Git
       hosting site or an emitting protocol such as SMTP or SQL.
+
+   continuous deployment
+
+      A software release process that uses automated testing to
+      validate if changes to a codebase are correct and stable for
+      immediate autonomous deployment to a production environment.
+
+   continuous integration
+
+      A development practice where developers integrate code into
+      a shared repository frequently, preferably several times a day.
 
    cross-project dependency
 
@@ -172,6 +195,11 @@ Glossary
       executed, for strong isolation from the executor's
       environment.  In Ansible inventory terms, this is a remote
       host.
+
+   nodepool
+
+      Node pools are a set of nodes, with a common configuration
+      and specification, under the control of the cluster master.
 
    nodeset
 
@@ -385,3 +413,9 @@ Glossary
       restricted, and jobs defined in these projects run in a
       restricted execution environment since they may be operating on
       changes which have not yet undergone review.
+
+   zuul
+
+      Zuul is an open source ci/cd platform specializing in gating
+      changes across multiple Systems and applications before landing
+      on a single patch.
