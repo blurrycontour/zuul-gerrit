@@ -1249,6 +1249,10 @@ class TestScheduler(ZuulTestCase):
         a = source.getChange(event, refresh=True)
         self.assertTrue(source.canMerge(a, mgr.getSubmitAllowNeeds()))
 
+        A.setWorkInProgress(True)
+        a = source.getChange(event, refresh=True)
+        self.assertFalse(source.canMerge(a, mgr.getSubmitAllowNeeds()))
+
     def test_project_merge_conflict(self):
         "Test that gate merge conflicts are handled properly"
 

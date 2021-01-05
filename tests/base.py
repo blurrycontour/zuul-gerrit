@@ -1,5 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2016 Red Hat, Inc.
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -638,6 +639,14 @@ class FakeGerritChange(object):
         self.data['submitRecords'] = self.getSubmitRecords()
         return json.loads(json.dumps(event))
 
+    def setWorkInProgress(self, wip):
+        # Gerrit only includes 'wip' in the data returned via ssh if
+        # the value is true.
+        if wip:
+            self.data['wip'] = True
+        elif 'wip' in self.data:
+            del self.data['wip']
+
     def getSubmitRecords(self):
         status = {}
         for cat in self.categories:
@@ -770,7 +779,8 @@ class FakeGerritChange(object):
             "labels": labels,
             "current_revision": self.patchsets[-1]['revision'],
             "revisions": revisions,
-            "requirements": []
+            "requirements": [],
+            "work_in_progresss": self.data.get('wip', False)
         }
         return json.loads(json.dumps(data))
 
