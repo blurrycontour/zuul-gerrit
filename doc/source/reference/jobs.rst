@@ -855,7 +855,7 @@ Skipping dependent jobs
 
 .. note::
 
-   In the follow section the use of 'child jobs' refers to dependent jobs
+   In the following section the use of 'child jobs' refers to dependent jobs
    configured by `job.dependencies` and should not be confused with jobs
    that inherit from a parent job.
 
