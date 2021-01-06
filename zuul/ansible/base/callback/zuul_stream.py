@@ -95,6 +95,7 @@ class CallbackModule(default.CallbackModule):
 
         super(CallbackModule, self).__init__()
         self._task = None
+        self._task_skipped = False
         self._daemon_running = False
         self._play = None
         self._streamers = []
@@ -133,6 +134,8 @@ class CallbackModule(default.CallbackModule):
         self._log("[%s] Starting to log %s for task %s"
                   % (host, log_id, task_name), job=False, executor=True)
         while True:
+            if self._task_skipped:
+                return
             try:
                 s = socket.create_connection((ip, port), 5)
                 # Disable the socket timeout after we have successfully
@@ -161,6 +164,8 @@ class CallbackModule(default.CallbackModule):
             buff = s.recv(4096)
             buffering = True
             while buffering:
+                if self._task_skipped:
+                    return
                 if b'\n' in buff:
                     (line, buff) = buff.split(b'\n', 1)
                     # We can potentially get binary data here. In order to
@@ -206,6 +211,7 @@ class CallbackModule(default.CallbackModule):
         else:
             self._log("%s | %s " % (host, line))
             return False
+
 
     def _log_module_failure(self, result, result_dict):
         if 'module_stdout' in result_dict and result_dict['module_stdout']:
@@ -296,9 +302,10 @@ class CallbackModule(default.CallbackModule):
     def v2_playbook_on_handler_task_start(self, task):
         self.v2_playbook_on_task_start(task, False)
 
-    def _stop_streamers(self):
+    def _stop_streamers(self, task_skipped=False):
         self._streamers_stop_ts = time.monotonic()
         self._streamers_stop = True
+        self._task_skipped = task_skipped
         while True:
             if not self._streamers:
                 break
@@ -308,6 +315,7 @@ class CallbackModule(default.CallbackModule):
                 msg = "[Zuul] Log Stream did not terminate"
                 self._log(msg, job=True, executor=True)
         self._streamers_stop = False
+        self._task_skipped = False
 
     def _process_result_for_localhost(self, result, is_task=True):
         result_dict = dict(result._result)
@@ -373,6 +381,8 @@ class CallbackModule(default.CallbackModule):
             self._log_message(result, "Ignoring Errors", status="ERROR")
 
     def v2_runner_on_skipped(self, result):
+        self._stop_streamers(True)
+
         if result._task.loop:
             self._items_done = False
             self._deferred_result = dict(result._result)
