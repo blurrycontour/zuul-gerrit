@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f489a39b_f3f63bfd",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 32943
+      },
+      "writtenOn": "2021-01-07T17:46:58Z",
+      "side": 1,
+      "message": "Space character after the comma perhaps?",
+      "range": {
+        "startLine": 18,
+        "startChar": 13,
+        "endLine": 18,
+        "endChar": 17
+      },
+      "revId": "978e180a0dbf0123ca3fd0a404c1602e2c52ce73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "346b604b_12bbc8e7",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 32943
+      },
+      "writtenOn": "2021-01-07T17:46:58Z",
+      "side": 1,
+      "message": "Nitpick: \"systems\" was not capitalized in the \"ansible\" entry above, should it be here?",
+      "range": {
+        "startLine": 420,
+        "startChar": 30,
+        "endLine": 420,
+        "endChar": 31
+      },
+      "revId": "978e180a0dbf0123ca3fd0a404c1602e2c52ce73",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
