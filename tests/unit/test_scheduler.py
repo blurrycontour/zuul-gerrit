@@ -3315,7 +3315,9 @@ class TestScheduler(ZuulTestCase):
         )
         self.waitUntilSettled()
 
-        command_socket = self.config.get('scheduler', 'command_socket')
+        command_socket = self.scheds.first.config.get(
+            'scheduler', 'command_socket'
+        )
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
             s.connect(command_socket)
             s.sendall('full-reconfigure\n'.encode('utf8'))
