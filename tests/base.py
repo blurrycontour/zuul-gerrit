@@ -4090,7 +4090,8 @@ class SchedulerTestApp:
     def smartReconfigure(self, command_socket=False):
         try:
             if command_socket:
-                command_socket = self.config.get('scheduler', 'command_socket')
+                command_socket = self.sched.config.get(
+                    'scheduler', 'command_socket')
                 with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
                     s.connect(command_socket)
                     s.sendall('smart-reconfigure\n'.encode('utf8'))
@@ -4109,7 +4110,22 @@ class SchedulerTestManager:
                upstream_root, rpcclient, poller_events,
                git_url_with_auth, source_only, fake_sql, add_cleanup,
                validate_tenants):
-        app = SchedulerTestApp(log, config, changes,
+        # Since the config contains a regex we cannot use copy.deepcopy()
+        # as this will raise an exception with Python <3.7
+        config_data = StringIO()
+        config.write(config_data)
+        config_data.seek(0)
+        scheduler_config = ConfigParser()
+        scheduler_config.read_file(config_data)
+
+        # Ensure a unique command socket per scheduler instance
+        command_socket = os.path.join(
+            os.path.dirname(config.get("scheduler", "command_socket")),
+            f"scheduler-{len(self.instances)}.socket"
+        )
+        scheduler_config.set("scheduler", "command_socket", command_socket)
+
+        app = SchedulerTestApp(log, scheduler_config, changes,
                                additional_event_queues, upstream_root,
                                rpcclient, poller_events,
                                git_url_with_auth, source_only,
@@ -5445,6 +5461,8 @@ class ZuulTestCase(BaseTestCase):
             self.tenant_config_file = new_tenant_config.name
             with open(source_path, mode='rb') as source_tenant_config:
                 new_tenant_config.write(source_tenant_config.read())
+        for app in self.scheds.instances:
+            app.config['scheduler']['tenant_config'] = self.tenant_config_file
         self.config['scheduler']['tenant_config'] = self.tenant_config_file
         self.setupAllProjectKeys(self.config)
         self.log.debug(
