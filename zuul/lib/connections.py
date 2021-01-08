@@ -16,19 +16,17 @@ import logging
 import re
 from collections import OrderedDict
 from urllib.parse import urlparse
+import platform
 
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.git
-import zuul.driver.github
 import zuul.driver.smtp
 import zuul.driver.timer
 import zuul.driver.sql
 import zuul.driver.bubblewrap
 import zuul.driver.nullwrap
 import zuul.driver.mqtt
-import zuul.driver.pagure
-import zuul.driver.gitlab
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 
@@ -49,15 +47,19 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.zuul.ZuulDriver())
         self.registerDriver(zuul.driver.gerrit.GerritDriver())
         self.registerDriver(zuul.driver.git.GitDriver())
-        self.registerDriver(zuul.driver.github.GithubDriver())
         self.registerDriver(zuul.driver.smtp.SMTPDriver())
         self.registerDriver(zuul.driver.timer.TimerDriver())
         self.registerDriver(zuul.driver.sql.SQLDriver())
         self.registerDriver(zuul.driver.bubblewrap.BubblewrapDriver())
         self.registerDriver(zuul.driver.nullwrap.NullwrapDriver())
         self.registerDriver(zuul.driver.mqtt.MQTTDriver())
-        self.registerDriver(zuul.driver.pagure.PagureDriver())
-        self.registerDriver(zuul.driver.gitlab.GitlabDriver())
+        if platform.system() == "Linux":
+            import zuul.driver.github
+            import zuul.driver.pagure
+            import zuul.driver.gitlab
+            self.registerDriver(zuul.driver.github.GithubDriver())
+            self.registerDriver(zuul.driver.pagure.PagureDriver())
+            self.registerDriver(zuul.driver.gitlab.GitlabDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:

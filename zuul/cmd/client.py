@@ -26,7 +26,6 @@ import textwrap
 import requests
 import urllib.parse
 
-import zuul.rpcclient
 import zuul.cmd
 from zuul.lib.config import get_default
 
@@ -416,6 +415,8 @@ class Client(zuul.cmd.ZuulApp):
             ssl_key = get_default(self.config, 'gearman', 'ssl_key')
             ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
             ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
+
+            import zuul.rpcclient
             client = zuul.rpcclient.RPCClient(
                 server, port, ssl_key,
                 ssl_cert, ssl_ca,
