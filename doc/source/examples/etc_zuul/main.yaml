@@ -1,5 +1,16 @@
+- admin-rule:
+    name: tenant-group
+    conditions:
+      - groups: "{tenant.name}-admin"
+- admin-rule:
+    name: admin-user
+    conditions:
+      - preferred_username: admin
 - tenant:
     name: example-tenant
+    admin-rules:
+      - tenant-group
+      - admin-user
     source:
       gerrit:
         config-projects:
