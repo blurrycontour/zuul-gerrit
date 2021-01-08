@@ -1,15 +1,35 @@
 # Version 2 is the latest that is supported by docker-compose in
 # Ubuntu Xenial.
-version: '2'
+version: '2.3'
 
 services:
+  keycloak:
+    image: jboss/keycloak
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=kcadmin
+      - DB_VENDOR=h2
+      - KEYCLOAK_IMPORT=/var/keycloak_import/zuul-demo-data.json
+      - JAVA_OPTS_APPEND="-Djboss.socket.binding.port-offset=2"
+    ports:
+      - "8082:8082"
+    volumes:
+      - "./keycloak/:/var/keycloak_import/:z"
+    entrypoint: |
+      /bin/sh -c '\
+      /opt/jboss/tools/docker-entrypoint.sh -b 0.0.0.0'
+    command: []
   gerrit:
-    image: docker.io/gerritcodereview/gerrit
+    build:
+      dockerfile: gerrit-oauth-Dockerfile
+      context: ./
     ports:
       - "8080:8080"
       - "29418:29418"
     environment:
       - CANONICAL_WEB_URL=http://localhost:8080/
+    depends_on:
+      - keycloak
   gerritconfig:
     image: docker.io/zuul/zuul-executor
     environment:
@@ -19,6 +39,7 @@ services:
     depends_on:
       - gerrit
     volumes:
+      - "./etc_gerrit/:/gerrit_bootstrap/:z"
       - "sshkey:/var/ssh:z"
       - "nodessh:/var/node:z"
       - "./playbooks/:/var/playbooks/:z"
@@ -60,7 +81,12 @@ services:
              zuul-scheduler -f'
     # FIXME: The scheduler has no ansible anymore so use the executor image.
     #        This needs to be changes such that ansible is not required for startup.
-    image: docker.io/zuul/zuul-scheduler
+    # Uncomment and remove build below once 736968 is merged
+    # image: docker.io/zuul/zuul-scheduler
+    build:
+      context: ../../..
+      dockerfile: Dockerfile
+      target: zuul-scheduler
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
@@ -76,7 +102,12 @@ services:
       - mysql
     ports:
       - "9000:9000"
-    image: docker.io/zuul/zuul-web
+    # Uncomment and remove build below once 736968 is merged
+    # image: docker.io/zuul/zuul-web
+    build:
+      context: ../../..
+      dockerfile: Dockerfile
+      target: zuul-web
     environment:
       ZUUL_MYSQL_PASSWORD: secret
     volumes:
@@ -92,7 +123,12 @@ services:
       - ZUUL_MYSQL_PASSWORD=secret
     depends_on:
       - scheduler
-    image: docker.io/zuul/zuul-executor
+    # Uncomment and remove build below once 736968 is merged
+    # image: docker.io/zuul/zuul-executor
+    build:
+      context: ../../..
+      dockerfile: Dockerfile
+      target: zuul-executor
     volumes:
       - "./etc_zuul/:/etc/zuul/:z"
       - "./playbooks/:/var/playbooks/:z"
