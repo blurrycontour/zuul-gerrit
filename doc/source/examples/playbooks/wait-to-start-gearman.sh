@@ -5,7 +5,7 @@
 
 wait_for_gearman() {
     echo `date -Iseconds` "Wait for gearman to start"
-    for i in $(seq 1 120); do
+    for i in $(seq 1 180); do
         cat < /dev/null > /dev/tcp/scheduler/4730 && return
         sleep 1
     done
