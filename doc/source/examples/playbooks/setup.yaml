@@ -26,15 +26,9 @@
       command: cp /var/ssh/nodepool.pub /var/node/authorized_keys
       args:
         creates: /var/node/authorized_keys
-    # The Gerrit container puts up a helpful info page the first time
-    # you hit the web server; get past that.
-    - name: Get Gerrit first login screen
-      uri:
-        url: http://gerrit:8080/a/accounts/self/sshkeys
-        method: GET
-        user: admin
-        password: secret
-      ignore_errors: true
+
+    - name: configure gerrit admin http password
+      command: ssh -p 29418 -i /gerrit_bootstrap/gerrit_admin_key -l admin -o StrictHostKeyChecking=no gerrit gerrit set-account --http-password secret admin
     - name: Add admin SSH key to Gerrit
       uri:
         url: http://gerrit:8080/a/accounts/self/sshkeys
@@ -45,6 +39,8 @@
         status_code: 201
         headers:
           Content-Type: text/plain
+    - name: Remove bootstrap key
+      command: ssh -p 29418 -i /gerrit_bootstrap/gerrit_admin_key -l admin -o StrictHostKeyChecking=no gerrit gerrit set-account --delete-ssh-key trent@reznor admin
 
     - name: Create temp dir for Gerrit config update
       shell: mktemp -d
