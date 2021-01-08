@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "348b1c14_12906d75",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-01-08T16:22:33Z",
+      "side": 1,
+      "message": "This dep was added explicitly to add the pin. Zuul does not have a direct dependency on it. Can we just remove the dependency here entirely and let it get pulled in by other deps if the still need it?",
+      "revId": "18114249be49412d7677e7e758ae64ea6d5e720c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
