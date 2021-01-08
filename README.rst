@@ -61,10 +61,12 @@ License, version 2.0.  Some parts of Zuul are licensed under the
 General Public License, version 3.0.  Please see the license headers
 at the tops of individual source files.
 
-Python Version Support
-----------------------
+Supported Platforms
+-------------------
 
-Zuul requires Python 3. It does not support Python 2.
+Zuul requires **Python 3 on Linux**. It does not support Python 2 or non-Linux
+platforms. Due to the lack of time, patches related to unsupported platforms
+are likely to be discarded.
 
 Since Zuul uses Ansible to drive CI jobs, Zuul can run tests anywhere
 Ansible can, including Python 2 environments.
