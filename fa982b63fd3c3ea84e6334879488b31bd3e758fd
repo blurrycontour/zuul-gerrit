@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31e3f35a_2d5c3ece",
+        "filename": "README.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-08T18:00:54Z",
+      "side": 1,
+      "message": "I suggest omitting the last line.  We have, in fact, accepted patches to support non-Linux platforms, but reverted them when they didn\u0027t work.  I think we would accept them again if they had a committed champion.",
+      "revId": "fa982b63fd3c3ea84e6334879488b31bd3e758fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
