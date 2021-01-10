@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d6a874a_0bf32649",
+        "filename": "playbooks/tutorial/quick-start.yaml",
+        "patchSetId": 37
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-10T18:02:38Z",
+      "side": 1,
+      "message": "Nit: you can (and we always do in Zuul) omit the initial \"---\" in yaml files unless they are multi-document (and they never are).\n\nI wouldn\u0027t -1 for this, but I have a comment below that\u0027s worthy of a -1, so it\u0027d be great to go ahead and remove all these to be consistent.",
+      "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "780ad841_63bdd079",
+        "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
+        "patchSetId": 37
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-10T18:02:38Z",
+      "side": 1,
+      "message": "-1: This warrants a comment; you include an explanation in the commit message, but since there\u0027s a \"git review -s\" right below this, we\u0027re going to wonder in the future why we\u0027re downloading the commit hook here.  I really did need the commit message to understand what was going on, which is a good indication we need that information in the code too.  Something like:\n\n# Git-review doesn\u0027t support supplying a known_hosts file to scp, so we\n# fetch the commit hook ahead of time to avoid that.",
+      "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5db5d7ea_370004f1",
+        "filename": "playbooks/tutorial/roles/setup-tutorial/tasks/main.yaml",
+        "patchSetId": 37
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-10T18:02:38Z",
+      "side": 1,
+      "message": "The original idea of the localtest playbook was to use the user\u0027s normal ssh key and ssh-agent to ease testing.  It seems like you\u0027re saying you think it\u0027s more valuable to harmonize the local and zuul test paths, even if it makes things a little more difficult for us when we run this test locally?  I don\u0027t disagree, I just want to make sure I understand your reasoning.\n\nIt looks like all paths now kill the extra ssh-agent process, so this should be fine.",
+      "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5b086152_bea6fe51",
+        "filename": "playbooks/tutorial/roles/setup-tutorial/tasks/main.yaml",
+        "patchSetId": 37
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-10T18:02:38Z",
+      "side": 1,
+      "message": "Why don\u0027t you use the init-repository role here?",
+      "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
