@@ -26,7 +26,7 @@ services:
       - "../../../tools/:/var/zuul-tools/:z"
     # NOTE(pabelanger): Be sure to update this line each time we change the
     # default version of ansible for Zuul.
-    command: "/usr/local/lib/zuul/ansible/2.8/bin/ansible-playbook /var/playbooks/setup.yaml"
+    command: "/usr/local/lib/zuul/ansible/2.9/bin/ansible-playbook /var/playbooks/setup.yaml"
   zk:
     image: zookeeper
     hostname: examples_zk_1.examples_default
