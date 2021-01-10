@@ -1,0 +1,12 @@
+- block:
+    - name: Install git-review
+      command: python3 -m pip install git-review
+      become: true
+  when: not local
+
+- name: Setup Tutorial Execution
+  include_role:
+    name: setup-tutorial
+
+- name: Run quick-start tutorial
+  include_tasks: quick-start.yaml
