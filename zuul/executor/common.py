@@ -15,6 +15,7 @@
 
 import base64
 import collections
+import copy
 import datetime
 import git
 import json
@@ -32,7 +33,6 @@ import time
 from urllib.parse import urlsplit
 
 import zuul.ansible.logconfig
-from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.yamlutil import yaml
 from zuul.lib import filecomments
@@ -693,6 +693,46 @@ class AnsibleJob(object):
         RESULT_DISK_FULL: 'RESULT_DISK_FULL',
     }
 
+    def __init__(self, arguments, job_unique,
+                 getMerger,
+                 process_worker,
+                 merge_root,
+                 connections,
+                 ansible_manager,
+                 execution_wrapper,
+                 verbose=False,
+                 setup_timeout=60,
+                 default_username="zuul",
+                 executor_hostname="localhost",
+                 executor_extra_paths={},
+                 statsd=None,
+                 log_console_port=DEFAULT_STREAM_PORT):
+        logger = logging.getLogger("zuul.AnsibleJob")
+        self.arguments = arguments
+        self.process_worker = process_worker
+        self.zuul_event_id = self.arguments.get('zuul_event_id')
+        self.log = get_annotated_logger(
+            logger, self.zuul_event_id, build=job_unique)
+        self.connections = connections
+        self.ansible_version = self.arguments.get('ansible_version')
+        self.ansible_manager = ansible_manager
+        self.merge_root = merge_root
+        self.getMerger = getMerger
+        if verbose:
+            self.verbosity = '-vvv'
+        else:
+            self.verbosity = '-v'
+        self.setup_timeout = setup_timeout
+        self.default_username = default_username
+        self.executor_hostname = executor_hostname
+        self.statsd = statsd
+        self.log_console_port = log_console_port
+        self.arguments = arguments
+        self.jobdir = None
+        self.project_info = {}
+        self.execution_wrapper = execution_wrapper
+        self.executor_extra_paths = executor_extra_paths
+
     def getResultData(self):
         data = {}
         try:
@@ -777,7 +817,7 @@ class AnsibleJob(object):
         try:
             ret = merger.mergeChanges(
                 items, repo_state=repo_state,
-                process_worker=self.executor_server.process_worker)
+                process_worker=self.process_worker)
         except ValueError:
             # Return ABORTED so that we'll try again. At this point all of
             # the refs we're trying to merge should be valid refs. If we
@@ -788,15 +828,15 @@ class AnsibleJob(object):
             return None
         if not ret:  # merge conflict
             result = dict(result='MERGER_FAILURE')
-            if self.executor_server.statsd:
+            if self.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
-                self.executor_server.statsd.incr(base_key + ".FAILURE")
+                self.statsd.incr(base_key + ".FAILURE")
             self.job.sendWorkComplete(json.dumps(result))
             return None
 
-        if self.executor_server.statsd:
+        if self.statsd:
             base_key = "zuul.executor.{hostname}.merger"
-            self.executor_server.statsd.incr(base_key + ".SUCCESS")
+            self.statsd.incr(base_key + ".SUCCESS")
         recent = ret[3]
         orig_commit = ret[4]
         for key, commit in recent.items():
@@ -879,9 +919,9 @@ class AnsibleJob(object):
 
         pre_failed = False
         success = False
-        if self.executor_server.statsd:
+        if self.statsd:
             key = "zuul.executor.{hostname}.starting_builds"
-            self.executor_server.statsd.timing(
+            self.statsd.timing(
                 key, (time.monotonic() - self.time_starting_build) * 1000)
 
         self.started = True
@@ -1039,7 +1079,7 @@ class AnsibleJob(object):
                 check_varnames(host_vars)
                 host_vars.update(dict(
                     ansible_host=ip,
-                    ansible_user=self.executor_server.default_username,
+                    ansible_user=self.default_username,
                     ansible_port=port,
                     nodepool=dict(
                         label=node.get('label'),
@@ -1204,7 +1244,7 @@ class AnsibleJob(object):
         self.log.debug("Prepare playbook repo for %s: %s@%s" %
                        (playbook['trusted'] and 'trusted' or 'untrusted',
                         playbook['project'], playbook['branch']))
-        source = self.executor_server.connections.getSource(
+        source = self.connections.getSource(
             playbook['connection'])
         project = source.getProject(playbook['project'])
         branch = playbook['branch']
@@ -1249,10 +1289,7 @@ class AnsibleJob(object):
                                                  branch)
             self.log.debug("Cloning %s@%s into new trusted space %s",
                            project, branch, root)
-            merger = self.executor_server._getMerger(
-                root,
-                self.executor_server.merge_root,
-                self.log)
+            merger = self.getMerger(root, self.merge_root, self.log)
             merger.checkoutBranch(project.connection_name, project.name,
                                   branch)
         else:
@@ -1279,17 +1316,14 @@ class AnsibleJob(object):
                     p['name'] == project.name):
                     # We already have this repo prepared
                     self.log.debug("Found workdir repo for untrusted project")
-                    merger = self.executor_server._getMerger(
+                    merger = self.getMerger(
                         root,
                         self.jobdir.src_root,
                         self.log)
                     break
 
             if merger is None:
-                merger = self.executor_server._getMerger(
-                    root,
-                    self.executor_server.merge_root,
-                    self.log)
+                merger = self.getMerger(root, self.merge_root, self.log)
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
                            project, branch, root)
@@ -1333,8 +1367,7 @@ class AnsibleJob(object):
     def prepareZuulRole(self, jobdir_playbook, role, args, root):
         self.log.debug("Prepare zuul role for %s" % (role,))
         # Check out the role repo if needed
-        source = self.executor_server.connections.getSource(
-            role['connection'])
+        source = self.connections.getSource(role['connection'])
         project = source.getProject(role['project'])
         name = role['target_name']
         path = None
@@ -1464,7 +1497,7 @@ class AnsibleJob(object):
         check_varnames(all_vars)
         all_vars['zuul'] = args['zuul'].copy()
         all_vars['zuul']['executor'] = dict(
-            hostname=self.executor_server.hostname,
+            hostname=self.executor_hostname,
             src_root=self.jobdir.src_root,
             log_root=self.jobdir.log_root,
             work_root=self.jobdir.work_root,
@@ -1677,9 +1710,8 @@ class AnsibleJob(object):
             env_copy['ARA_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
-        if self.executor_server.log_console_port != DEFAULT_STREAM_PORT:
-            env_copy['ZUUL_CONSOLE_PORT'] = str(
-                self.executor_server.log_console_port)
+        if self.log_console_port != DEFAULT_STREAM_PORT:
+            env_copy['ZUUL_CONSOLE_PORT'] = str(self.log_console_port)
         env_copy['TMP'] = self.jobdir.local_tmp
         pythonpath = env_copy.get('PYTHONPATH')
         if pythonpath:
@@ -1687,26 +1719,21 @@ class AnsibleJob(object):
         else:
             pythonpath = []
 
-        ansible_dir = self.executor_server.ansible_manager.getAnsibleDir(
+        ansible_dir = self.ansible_manager.getAnsibleDir(
             ansible_version)
         pythonpath = [ansible_dir] + pythonpath
         env_copy['PYTHONPATH'] = os.path.pathsep.join(pythonpath)
 
         if playbook.trusted:
-            opt_prefix = 'trusted'
+            paths = self.executor_extra_paths.get('trusted', {})
         else:
-            opt_prefix = 'untrusted'
-        ro_paths = get_default(self.executor_server.config, 'executor',
-                               '%s_ro_paths' % opt_prefix)
-        rw_paths = get_default(self.executor_server.config, 'executor',
-                               '%s_rw_paths' % opt_prefix)
-        ro_paths = ro_paths.split(":") if ro_paths else []
-        rw_paths = rw_paths.split(":") if rw_paths else []
+            paths = self.executor_extra_paths.get('untrusted', {})
+        ro_paths = copy.copy(paths.get('ro', []))
+        rw_paths = copy.copy(paths.get('rw', []))
 
         ro_paths.append(ansible_dir)
         ro_paths.append(
-            self.executor_server.ansible_manager.getAnsibleInstallDir(
-                ansible_version))
+            self.ansible_manager.getAnsibleInstallDir(ansible_version))
         ro_paths.append(self.jobdir.ansible_root)
         ro_paths.append(self.jobdir.trusted_root)
         ro_paths.append(self.jobdir.untrusted_root)
@@ -1722,9 +1749,9 @@ class AnsibleJob(object):
             secrets[playbook.secrets] = playbook.secrets_content
 
         if wrapped:
-            wrapper = self.executor_server.execution_wrapper
+            wrapper = self.execution_wrapper
         else:
-            wrapper = self.executor_server.connections.drivers['nullwrap']
+            wrapper = self.connections.drivers['nullwrap']
 
         context = wrapper.getExecutionContext(ro_paths, rw_paths, secrets)
 
@@ -1894,43 +1921,162 @@ class AnsibleJob(object):
         return (self.RESULT_NORMAL, ret)
 
     def runAnsibleSetup(self, playbook, ansible_version):
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
-        # TODO: select correct ansible version from job
-        ansible = self.executor_server.ansible_manager.getAnsibleCommand(
-            ansible_version,
-            command='ansible')
-        cmd = [ansible, '*', verbose, '-m', 'setup',
+        ansible = self.ansible_manager.getAnsibleCommand(
+            ansible_version, command='ansible')
+        cmd = [ansible, '*', self.verbosity, '-m', 'setup',
                '-i', self.jobdir.setup_inventory,
                '-a', 'gather_subset=!all']
         if self.executor_variables_file is not None:
             cmd.extend(['-e@%s' % self.executor_variables_file])
 
         result, code = self.runAnsible(
-            cmd=cmd, timeout=self.executor_server.setup_timeout,
+            cmd=cmd, timeout=self.setup_timeout,
             playbook=playbook, ansible_version=ansible_version, wrapped=False)
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
-        if self.executor_server.statsd:
+        if self.statsd:
             base_key = "zuul.executor.{hostname}.phase.setup"
-            self.executor_server.statsd.incr(base_key + ".%s" %
-                                             self.RESULT_MAP[result])
+            self.statsd.incr(base_key + ".%s" % self.RESULT_MAP[result])
         return result, code
+
+    def prepareRepositories(self, update_manager):
+        args = self.arguments
+        tasks = []
+        projects = set()
+        repo_state = args['repo_state']
+
+        # Make sure all projects used by the job are updated...
+        for project in args['projects']:
+            self.log.debug("Updating project %s" % (project,))
+            tasks.append(update_manager(
+                project['connection'], project['name'],
+                repo_state=repo_state,
+                zuul_event_id=self.zuul_event_id,
+                build=self.job.unique))
+            projects.add((project['connection'], project['name']))
+
+        # ...as well as all playbook and role projects.
+        repos = []
+        playbooks = (args['pre_playbooks'] + args['playbooks'] +
+                     args['post_playbooks'] + args['cleanup_playbooks'])
+        for playbook in playbooks:
+            repos.append(playbook)
+            repos += playbook['roles']
+
+        for repo in repos:
+            key = (repo['connection'], repo['project'])
+            if key not in projects:
+                self.log.debug("Updating playbook or role %s" % (
+                               repo['project'],))
+                tasks.append(update_manager(
+                    *key, repo_state=repo_state,
+                    zuul_event_id=self.zuul_event_id,
+                    build=self.job.unique))
+                projects.add(key)
+
+        for task in tasks:
+            task.wait()
+
+            if not task.success:
+                raise ExecutorError(
+                    'Failed to update project %s' % task.canonical_name)
+
+            self.project_info[task.canonical_name] = {
+                'refs': task.refs,
+                'branches': task.branches,
+            }
+
+        # Early abort if abort requested
+        if self.aborted:
+            self._send_aborted()
+            return False, None
+
+        self.log.debug("Git updates complete")
+        merger = self.getMerger(
+            self.jobdir.src_root,
+            self.merge_root,
+            self.log)
+        repos = {}
+        for project in args['projects']:
+            self.log.debug("Cloning %s/%s" % (project['connection'],
+                                              project['name'],))
+            repo = merger.getRepo(project['connection'],
+                                  project['name'])
+            repos[project['canonical_name']] = repo
+
+        # The commit ID of the original item (before merging).  Used
+        # later for line mapping.
+        item_commit = None
+
+        merge_items = [i for i in args['items'] if i.get('number')]
+        if merge_items:
+            item_commit = self.doMergeChanges(
+                merger, merge_items, repo_state)
+            if item_commit is None:
+                # There was a merge conflict and we have already sent
+                # a work complete result, don't run any jobs
+                return False, merger
+
+        # Early abort if abort requested
+        if self.aborted:
+            self._send_aborted()
+            return False, merger
+
+        state_items = [i for i in args['items'] if not i.get('number')]
+        if state_items:
+            merger.setRepoState(
+                state_items, repo_state,
+                process_worker=self.process_worker)
+
+        # Early abort if abort requested
+        if self.aborted:
+            self._send_aborted()
+            return False, merger
+
+        for project in args['projects']:
+            repo = repos[project['canonical_name']]
+            # If this project is the Zuul project and this is a ref
+            # rather than a change, checkout the ref.
+            if (project['canonical_name'] ==
+                args['zuul']['project']['canonical_name'] and
+                (not args['zuul'].get('branch')) and
+                args['zuul'].get('ref')):
+                ref = args['zuul']['ref']
+            else:
+                ref = None
+            selected_ref, selected_desc = self.resolveBranch(
+                project['canonical_name'],
+                ref,
+                args['branch'],
+                args['override_branch'],
+                args['override_checkout'],
+                project['override_branch'],
+                project['override_checkout'],
+                project['default_branch'])
+            self.log.info("Checking out %s %s %s",
+                          project['canonical_name'], selected_desc,
+                          selected_ref)
+            repo.checkout(selected_ref)
+
+            # Update the inventory variables to indicate the ref we
+            # checked out
+            p = args['zuul']['projects'][project['canonical_name']]
+            p['checkout'] = selected_ref
+
+        # Set the URL of the origin remote for each repo to a bogus
+        # value. Keeping the remote allows tools to use it to determine
+        # which commits are part of the current change.
+        for repo in repos.values():
+            repo.setRemoteUrl('file:///dev/null')
+
+        return item_commit, merger
 
     def runAnsibleCleanup(self, playbook):
         # TODO(jeblair): This requires a bugfix in Ansible 2.4
         # Once this is used, increase the controlpersist timeout.
         return (self.RESULT_NORMAL, 0)
 
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
-        cmd = ['ansible', '*', verbose, '-m', 'meta',
+        cmd = ['ansible', '*', self.verbosity, '-m', 'meta',
                '-a', 'reset_connection']
 
         result, code = self.runAnsible(
@@ -1938,10 +2084,9 @@ class AnsibleJob(object):
             wrapped=False)
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
-        if self.executor_server.statsd:
+        if self.statsd:
             base_key = "zuul.executor.{hostname}.phase.cleanup"
-            self.executor_server.statsd.incr(base_key + ".%s" %
-                                             self.RESULT_MAP[result])
+            self.statsd.incr(base_key + ".%s" % self.RESULT_MAP[result])
         return result, code
 
     def emitPlaybookBanner(self, playbook, step, phase, result=None):
@@ -1977,13 +2122,8 @@ class AnsibleJob(object):
 
     def runAnsiblePlaybook(self, playbook, timeout, ansible_version,
                            success=None, phase=None, index=None):
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
-        cmd = [self.executor_server.ansible_manager.getAnsibleCommand(
-            ansible_version), verbose, playbook.path]
+        cmd = [self.ansible_manager.getAnsibleCommand(
+            ansible_version), self.verbosity, playbook.path]
         if playbook.secrets_content:
             cmd.extend(['-e', '@' + playbook.secrets])
 
@@ -2017,9 +2157,9 @@ class AnsibleJob(object):
                                        cleanup=phase == 'cleanup')
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
-        if self.executor_server.statsd:
+        if self.statsd:
             base_key = "zuul.executor.{hostname}.phase.{phase}"
-            self.executor_server.statsd.incr(
+            self.statsd.incr(
                 base_key + ".{result}",
                 result=self.RESULT_MAP[result],
                 phase=phase or 'unknown')
