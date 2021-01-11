@@ -627,13 +627,14 @@ class GerritConnection(BaseConnection):
         elif r.status_code != 200:
             raise Exception("Received response %s" % (r.status_code,))
         ret = None
-        if r.text and len(r.text) > 4:
+        text = r.text
+        if text and len(text) > 4:
             try:
-                ret = json.loads(r.text[4:])
+                ret = json.loads(text[4:])
             except Exception:
                 self.log.exception(
                     "Unable to parse result %s from post to %s" %
-                    (r.text, url))
+                    (text, url))
                 raise
         return ret
 
@@ -653,13 +654,14 @@ class GerritConnection(BaseConnection):
         elif r.status_code != 200:
             raise Exception("Received response %s" % (r.status_code,))
         ret = None
-        if r.text and len(r.text) > 4:
+        text = r.text
+        if text and len(text) > 4:
             try:
-                ret = json.loads(r.text[4:])
+                ret = json.loads(text[4:])
             except Exception:
                 self.log.exception(
                     "Unable to parse result %s from post to %s" %
-                    (r.text, url))
+                    (text, url))
                 raise
         return ret
 
@@ -1290,12 +1292,13 @@ class GerritConnection(BaseConnection):
                 verify=self.verify_ssl,
                 auth=self.auth, timeout=TIMEOUT,
                 headers={'User-Agent': self.user_agent})
-            self.iolog.debug('Received: %s %s' % (r.status_code, r.text,))
+            text = r.text
+            self.iolog.debug('Received: %s %s' % (r.status_code, text,))
             if r.status_code == 409:
                 raise HTTPConflictException()
             elif r.status_code != 200:
                 raise Exception("Received response %s" % (r.status_code,))
-            out = r.text[r.text.find('\n') + 5:]
+            out = text[text.find('\n') + 5:]
         else:
             cmd = "git-upload-pack %s" % project.name
             out, err = self._ssh(cmd, "0000")
