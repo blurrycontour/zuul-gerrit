@@ -32,6 +32,7 @@ class GerritChange(Change):
     def __init__(self, project):
         super(GerritChange, self).__init__(project)
         self.status = None
+        self.wip = None
         self.approvals = []
 
     def update(self, data, connection):
@@ -79,6 +80,7 @@ class GerritChange(Change):
         self.approvals = data['currentPatchSet'].get('approvals', [])
         self.open = data['open']
         self.status = data['status']
+        self.wip = data.get('wip', False)
         self.owner = data['owner'].get('username')
         self.message = data['commitMessage']
 
@@ -149,6 +151,7 @@ class GerritChange(Change):
             self.missing_labels.add(label_name)
         self.open = data['status'] == 'NEW'
         self.status = data['status']
+        self.wip = data.get('work_in_progress', False)
         self.owner = data['owner'].get('username')
         self.message = current_revision['commit']['message']
 
