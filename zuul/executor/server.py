@@ -173,16 +173,35 @@ class AnsibleJobGearman(AnsibleJob):
     """
 
     def __init__(self, executor_server, job):
-        logger = logging.getLogger("zuul.AnsibleJob")
-        self.arguments = json.loads(job.arguments)
-        self.zuul_event_id = self.arguments.get('zuul_event_id')
+        extra_paths = {}
+        for context in ("trusted", "untrusted"):
+            extra_paths[context] = {}
+            for type_path in ("ro", "rw"):
+                conf = get_default(
+                    executor_server.config,
+                    'executor',
+                    '%s_%s_paths' % (context, type_path))
+                extra_paths[
+                    context][type_path] = conf.split(":") if conf else []
+        super().__init__(
+            json.loads(job.arguments), str(job.unique),
+            getMerger=executor_server._getMerger,
+            process_worker=executor_server.process_worker,
+            merge_root=executor_server.merge_root,
+            connections=executor_server.connections,
+            ansible_manager=executor_server.ansible_manager,
+            execution_wrapper=executor_server.execution_wrapper,
+            verbose=executor_server.verbose,
+            setup_timeout=executor_server.setup_timeout,
+            executor_hostname=executor_server.hostname,
+            default_username=executor_server.default_username,
+            statsd=executor_server.statsd,
+            executor_extra_paths=extra_paths,
+            log_console_port=executor_server.log_console_port)
+
         # Record ansible version being used for the cleanup phase
-        self.ansible_version = self.arguments.get('ansible_version')
-        self.log = get_annotated_logger(
-            logger, self.zuul_event_id, build=job.unique)
         self.executor_server = executor_server
         self.job = job
-        self.jobdir = None
         self.proc = None
         self.proc_lock = threading.Lock()
         self.running = False
@@ -194,7 +213,6 @@ class AnsibleJobGearman(AnsibleJob):
         self.cleanup_started = False
         self._resume_event = threading.Event()
         self.thread = None
-        self.project_info = {}
         self.private_key_file = get_default(self.executor_server.config,
                                             'executor', 'private_key_file',
                                             '~/.ssh/id_rsa')
@@ -367,133 +385,14 @@ class AnsibleJobGearman(AnsibleJob):
                 args['zuul']['ref'],
                 args['zuul']['change_url']))
         self.log.debug("Job root: %s" % (self.jobdir.root,))
-        tasks = []
-        projects = set()
-        repo_state = args['repo_state']
 
-        # Make sure all projects used by the job are updated...
-        for project in args['projects']:
-            self.log.debug("Updating project %s" % (project,))
-            tasks.append(self.executor_server.update(
-                project['connection'], project['name'],
-                repo_state=repo_state,
-                zuul_event_id=self.zuul_event_id,
-                build=self.job.unique))
-            projects.add((project['connection'], project['name']))
+        item_commit, merger = self.prepareRepositories(
+            self.executor_server.update)
 
-        # ...as well as all playbook and role projects.
-        repos = []
-        playbooks = (args['pre_playbooks'] + args['playbooks'] +
-                     args['post_playbooks'] + args['cleanup_playbooks'])
-        for playbook in playbooks:
-            repos.append(playbook)
-            repos += playbook['roles']
-
-        for repo in repos:
-            key = (repo['connection'], repo['project'])
-            if key not in projects:
-                self.log.debug("Updating playbook or role %s" % (
-                               repo['project'],))
-                tasks.append(self.executor_server.update(
-                    *key, repo_state=repo_state,
-                    zuul_event_id=self.zuul_event_id,
-                    build=self.job.unique))
-                projects.add(key)
-
-        for task in tasks:
-            task.wait()
-
-            if not task.success:
-                raise ExecutorError(
-                    'Failed to update project %s' % task.canonical_name)
-
-            self.project_info[task.canonical_name] = {
-                'refs': task.refs,
-                'branches': task.branches,
-            }
-
-        # Early abort if abort requested
-        if self.aborted:
-            self._send_aborted()
+        if item_commit is False:
+            # There was a merge conflict and we have already sent
+            # a work complete result, don't run any jobs
             return
-
-        self.log.debug("Git updates complete")
-        merger = self.executor_server._getMerger(
-            self.jobdir.src_root,
-            self.executor_server.merge_root,
-            self.log)
-        repos = {}
-        for project in args['projects']:
-            self.log.debug("Cloning %s/%s" % (project['connection'],
-                                              project['name'],))
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
-            repos[project['canonical_name']] = repo
-
-        # The commit ID of the original item (before merging).  Used
-        # later for line mapping.
-        item_commit = None
-
-        merge_items = [i for i in args['items'] if i.get('number')]
-        if merge_items:
-            item_commit = self.doMergeChanges(
-                merger, merge_items, repo_state)
-            if item_commit is None:
-                # There was a merge conflict and we have already sent
-                # a work complete result, don't run any jobs
-                return
-
-        # Early abort if abort requested
-        if self.aborted:
-            self._send_aborted()
-            return
-
-        state_items = [i for i in args['items'] if not i.get('number')]
-        if state_items:
-            merger.setRepoState(
-                state_items, repo_state,
-                process_worker=self.executor_server.process_worker)
-
-        # Early abort if abort requested
-        if self.aborted:
-            self._send_aborted()
-            return
-
-        for project in args['projects']:
-            repo = repos[project['canonical_name']]
-            # If this project is the Zuul project and this is a ref
-            # rather than a change, checkout the ref.
-            if (project['canonical_name'] ==
-                args['zuul']['project']['canonical_name'] and
-                (not args['zuul'].get('branch')) and
-                args['zuul'].get('ref')):
-                ref = args['zuul']['ref']
-            else:
-                ref = None
-            selected_ref, selected_desc = self.resolveBranch(
-                project['canonical_name'],
-                ref,
-                args['branch'],
-                args['override_branch'],
-                args['override_checkout'],
-                project['override_branch'],
-                project['override_checkout'],
-                project['default_branch'])
-            self.log.info("Checking out %s %s %s",
-                          project['canonical_name'], selected_desc,
-                          selected_ref)
-            repo.checkout(selected_ref)
-
-            # Update the inventory variables to indicate the ref we
-            # checked out
-            p = args['zuul']['projects'][project['canonical_name']]
-            p['checkout'] = selected_ref
-
-        # Set the URL of the origin remote for each repo to a bogus
-        # value. Keeping the remote allows tools to use it to determine
-        # which commits are part of the current change.
-        for repo in repos.values():
-            repo.setRemoteUrl('file:///dev/null')
 
         # Early abort if abort requested
         if self.aborted:
