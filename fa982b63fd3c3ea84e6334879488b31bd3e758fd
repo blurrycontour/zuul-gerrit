@@ -16,6 +16,23 @@
       "revId": "fa982b63fd3c3ea84e6334879488b31bd3e758fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d32b430a_c587669d",
+        "filename": "tox.ini",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-01-11T11:56:53Z",
+      "side": 1,
+      "message": "This breaks running any tox environment on non linux platforms. However e.g. linters are working fine on mac development environments. Actually even tests and docs work fine with some preparation (replacing gear with gear\u003d\u003d0.15.0 after env creation).\n\nThus I\u0027d veto against forcefully breaking every tox environment on non linux platforms. I\u0027d be ok with just printing a warning without breaking the test.",
+      "revId": "fa982b63fd3c3ea84e6334879488b31bd3e758fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
