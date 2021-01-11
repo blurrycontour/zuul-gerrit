@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "474aacd6_4d0b2d1e",
+        "filename": "playbooks/tutorial/quick-start.yaml",
+        "patchSetId": 37
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2021-01-11T22:54:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d6a874a_0bf32649",
+      "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "780ad841_63bdd079",
         "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
         "patchSetId": 37
@@ -30,6 +48,24 @@
       "writtenOn": "2021-01-10T18:02:38Z",
       "side": 1,
       "message": "-1: This warrants a comment; you include an explanation in the commit message, but since there\u0027s a \"git review -s\" right below this, we\u0027re going to wonder in the future why we\u0027re downloading the commit hook here.  I really did need the commit message to understand what was going on, which is a good indication we need that information in the code too.  Something like:\n\n# Git-review doesn\u0027t support supplying a known_hosts file to scp, so we\n# fetch the commit hook ahead of time to avoid that.",
+      "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd878755_6fbbc394",
+        "filename": "playbooks/tutorial/roles/init-repository/tasks/main.yaml",
+        "patchSetId": 37
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2021-01-11T22:54:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "780ad841_63bdd079",
       "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "82d99f8b_3f6762ad",
+        "filename": "playbooks/tutorial/roles/setup-tutorial/tasks/main.yaml",
+        "patchSetId": 37
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2021-01-11T22:54:14Z",
+      "side": 1,
+      "message": "I have restored user\u0027s normal ssh key as default, and generated one if id_rsa.pub is not found",
+      "parentUuid": "5db5d7ea_370004f1",
+      "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5b086152_bea6fe51",
         "filename": "playbooks/tutorial/roles/setup-tutorial/tasks/main.yaml",
         "patchSetId": 37
@@ -64,6 +118,24 @@
       "writtenOn": "2021-01-10T18:02:38Z",
       "side": 1,
       "message": "Why don\u0027t you use the init-repository role here?",
+      "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b57ef8b_788514c3",
+        "filename": "playbooks/tutorial/roles/setup-tutorial/tasks/main.yaml",
+        "patchSetId": 37
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2021-01-11T22:54:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b086152_bea6fe51",
       "revId": "cb38e7d365fd7564d5e4df0d626902551063946b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
