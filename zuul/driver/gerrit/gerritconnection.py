@@ -627,13 +627,14 @@ class GerritConnection(BaseConnection):
         elif r.status_code != 200:
             raise Exception("Received response %s" % (r.status_code,))
         ret = None
-        if r.text and len(r.text) > 4:
+        text = r.text
+        if text and len(text) > 4:
             try:
-                ret = json.loads(r.text[4:])
+                ret = json.loads(text[4:])
             except Exception:
                 self.log.exception(
                     "Unable to parse result %s from post to %s" %
-                    (r.text, url))
+                    (text, url))
                 raise
         return ret
 
@@ -653,13 +654,14 @@ class GerritConnection(BaseConnection):
         elif r.status_code != 200:
             raise Exception("Received response %s" % (r.status_code,))
         ret = None
-        if r.text and len(r.text) > 4:
+        text = r.text
+        if text and len(text) > 4:
             try:
-                ret = json.loads(r.text[4:])
+                ret = json.loads(text[4:])
             except Exception:
                 self.log.exception(
                     "Unable to parse result %s from post to %s" %
-                    (r.text, url))
+                    (text, url))
                 raise
         return ret
 
