@@ -315,8 +315,13 @@ class ExecutorClient(object):
             ))
         params['zuul_event_id'] = item.event.zuul_event_id\
             if item.event else None
-        build = Build(job, uuid, zuul_event_id=item.event
-                      .zuul_event_id if item.event else None)
+
+        build = Build(
+            job,
+            item.current_build_set,
+            uuid,
+            zuul_event_id=item.event.zuul_event_id if item.event else None
+        )
         build.parameters = params
         build.nodeset = nodeset
 
@@ -331,8 +336,6 @@ class ExecutorClient(object):
 
         # Update zuul attempts after addBuild above to ensure build_set
         # is up to date.
-        if not build.build_set:
-            raise Exception("Build set undefined for %s" % build)
         attempts = build.build_set.getTries(job.name)
         zuul_params['attempts'] = attempts
 
