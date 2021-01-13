@@ -1946,14 +1946,14 @@ class Build(object):
     Job (related builds are grouped together in a BuildSet).
     """
 
-    def __init__(self, job, uuid, zuul_event_id=None):
+    def __init__(self, job, build_set, uuid, zuul_event_id=None):
         self.job = job
+        self.build_set = build_set
         self.uuid = uuid
         self.url = None
         self.result = None
         self.result_data = {}
         self.error_detail = None
-        self.build_set = None
         self.execute_time = time.time()
         self.start_time = None
         self.end_time = None
@@ -2140,7 +2140,6 @@ class BuildSet(object):
         self.builds[build.job.name] = build
         if build.job.name not in self.tries:
             self.tries[build.job.name] = 1
-        build.build_set = self
 
     def addRetryBuild(self, build):
         self.retry_builds.setdefault(build.job.name, []).append(build)
@@ -2645,7 +2644,7 @@ class QueueItem(object):
             job.updateArtifactData(data)
         except RequirementsError as e:
             self.warning(str(e))
-            fakebuild = Build(job, None)
+            fakebuild = Build(job, self.current_build_set, None)
             fakebuild.result = 'FAILURE'
             self.addBuild(fakebuild)
             self.setResult(fakebuild)
@@ -2856,12 +2855,12 @@ class QueueItem(object):
         for job in skipped:
             child_build = self.current_build_set.getBuild(job.name)
             if not child_build:
-                fakebuild = Build(job, None)
+                fakebuild = Build(job, self.current_build_set, None)
                 fakebuild.result = 'SKIPPED'
                 self.addBuild(fakebuild)
 
     def setNodeRequestFailure(self, job):
-        fakebuild = Build(job, None)
+        fakebuild = Build(job, self.current_build_set, None)
         fakebuild.start_time = time.time()
         fakebuild.end_time = time.time()
         self.addBuild(fakebuild)
@@ -2890,7 +2889,7 @@ class QueueItem(object):
 
     def _setAllJobsSkipped(self):
         for job in self.getJobs():
-            fakebuild = Build(job, None)
+            fakebuild = Build(job, self.current_build_set, None)
             fakebuild.result = 'SKIPPED'
             self.addBuild(fakebuild)
 

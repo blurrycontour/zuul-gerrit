@@ -1723,7 +1723,7 @@ class Scheduler(threading.Thread):
                 if final:
                     # If final is set make sure that the job is not resurrected
                     # later by re-requesting nodes.
-                    fakebuild = Build(job, None)
+                    fakebuild = Build(job, item.current_build_set, None)
                     fakebuild.result = 'CANCELED'
                     buildset.addBuild(fakebuild)
         finally:
