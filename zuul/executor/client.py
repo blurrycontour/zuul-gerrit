@@ -306,8 +306,18 @@ class ExecutorClient(object):
                 src_dir=os.path.join('src', p.canonical_name),
                 required=(p in required_projects),
             ))
-        params['zuul_event_id'] = item.event.zuul_event_id
-        build = Build(job, uuid, zuul_event_id=item.event.zuul_event_id)
+
+        if item.event:
+            params['zuul_event_id'] = item.event.zuul_event_id
+        else:
+            params['zuul_event_id'] = None
+
+        build = Build(
+            job,
+            item.current_build_set,
+            uuid,
+            zuul_event_id=params["zuul_event_id"],
+        )
         build.parameters = params
         build.nodeset = nodeset
 
