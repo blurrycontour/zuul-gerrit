@@ -1070,14 +1070,12 @@ class PipelineManager(metaclass=ABCMeta):
 
         return True
 
-    def onFilesChangesCompleted(self, event):
-        build_set = event.build_set
+    def onFilesChangesCompleted(self, build_set, files):
         item = build_set.item
-        item.change.files = event.files
+        item.change.files = files
         build_set.files_state = build_set.COMPLETE
 
-    def onMergeCompleted(self, event):
-        build_set = event.build_set
+    def onMergeCompleted(self, build_set, event):
         item = build_set.item
         item.change.containing_branches = event.item_in_branches
         build_set.merge_state = build_set.COMPLETE
@@ -1096,12 +1094,13 @@ class PipelineManager(metaclass=ABCMeta):
             self.log.info("Unable to merge change %s" % item.change)
             item.setUnableToMerge()
 
-    def onNodesProvisioned(self, event):
+    def onNodesProvisioned(self, build_set, request):
         # TODOv3(jeblair): handle provisioning failure here
-        request = event.request
         log = get_annotated_logger(self.log, request.event_id)
 
-        build_set = request.build_set
+        # TODO (felix): Check if this is already handled in the build
+        # TODO (felix): Store a reference to the node request in the build in
+        # ZooKeeper.
         build_set.jobNodeRequestComplete(request.job.name,
                                          request.nodeset)
         if request.failed or not request.fulfilled:
