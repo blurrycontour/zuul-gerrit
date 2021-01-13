@@ -26,13 +26,10 @@ import time
 import traceback
 import urllib
 from configparser import ConfigParser
-from queue import Queue
 from threading import Thread
 from typing import Optional, Dict, TYPE_CHECKING, Callable, Any
 
 from statsd import StatsClient
-
-from zuul.lib.named_queue import NamedQueue
 
 from zuul import configloader
 from zuul import exceptions
@@ -53,6 +50,7 @@ from zuul.model import (
     BuildCompletedEvent,
     BuildPausedEvent,
     BuildStartedEvent,
+    BuildStatusEvent,
     Change,
     DequeueEvent,
     EnqueueEvent,
@@ -63,6 +61,7 @@ from zuul.model import (
     NodesProvisionedEvent,
     PromoteEvent,
     ReconfigureEvent,
+    ResultEvent,
     SmartReconfigureEvent,
     Tenant,
     TenantReconfigureEvent,
@@ -82,10 +81,14 @@ from zuul.zk.event_queues import (
     GlobalTriggerEventQueue,
     PipelineEventWatcher,
     PipelineManagementEventQueue,
+    PipelineResultEventQueue,
     PipelineTriggerEventQueue,
+    TENANT_ROOT,
 )
+from zuul.zk.builds import BuildQueue, BuildResult, BuildState
 from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
+
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
 
@@ -116,6 +119,7 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
     _merger_client_class = MergeClient
+    _zk_builds_class = BuildQueue
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
@@ -156,14 +160,17 @@ class Scheduler(threading.Thread):
         self.triggers: Dict[str, BaseTrigger] = dict()
         self.config: ConfigParser = config
         self.zk_client: ZooKeeperClient = zk_client
-        self.zk_component: ZooKeeperComponent =\
-            ZooKeeperComponentRegistry(zk_client)\
-            .register('schedulers', self.hostname)
+        self.build_queue: BuildQueue = self._zk_builds_class(zk_client)
+        self.zk_component_registry: ZooKeeperComponentRegistry = (
+            ZooKeeperComponentRegistry(zk_client)
+        )
+        self.zk_component: ZooKeeperComponent = (
+            self.zk_component_registry.register('schedulers', self.hostname)
+        )
         self.zk_connection_event: ZooKeeperConnectionEvent =\
             ZooKeeperConnectionEvent(zk_client)
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
 
-        self.result_event_queue: Queue = NamedQueue('ResultEventQueue')
         self.global_watcher = GlobalEventWatcher(
             self.zk_client, self.wake_event.set
         )
@@ -183,6 +190,9 @@ class Scheduler(threading.Thread):
             PipelineTriggerEventQueue.create_registry(
                 self.zk_client, self.connections
             )
+        )
+        self.pipeline_result_events = PipelineResultEventQueue.create_registry(
+            self.zk_client
         )
         self.abide: Abide = Abide()
         self.unparsed_abide: UnparsedAbideConfig = UnparsedAbideConfig()
@@ -250,6 +260,7 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
+        self.zk_client.disconnect()
 
     def runCommand(self):
         while self._command_running:
@@ -275,20 +286,10 @@ class Scheduler(threading.Thread):
             return
         functions = getGearmanFunctions(self.rpc.gearworker.gearman)
         functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
-        executors_accepting = 0
-        executors_online = 0
-        execute_queue = 0
-        execute_running = 0
         mergers_online = 0
         merge_queue = 0
         merge_running = 0
         for (name, (queued, running, registered)) in functions.items():
-            if name.startswith('executor:execute'):
-                executors_accepting = registered
-                execute_queue = queued - running
-                execute_running = running
-            if name.startswith('executor:stop'):
-                executors_online += registered
             if name == 'merger:merge':
                 mergers_online = registered
             if name.startswith('merger:'):
@@ -297,6 +298,23 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.mergers.online', mergers_online)
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
+
+        executors_accepting = 0
+        executors_online = 0
+        for executor in self.zk_component_registry.all('executors'):
+            executors_online += 1
+            if executor.get('accepting_work', False):
+                executors_accepting += 1
+        execute_queue = len(
+            list(self.build_queue.in_state(BuildState.REQUESTED))
+        )
+        execute_running = len(
+            list(
+                self.build_queue.in_state(
+                    BuildState.RUNNING, BuildState.PAUSED
+                )
+            )
+        )
         self.statsd.gauge('zuul.executors.online', executors_online)
         self.statsd.gauge('zuul.executors.accepting', executors_accepting)
         self.statsd.gauge('zuul.executors.jobs_running', execute_running)
@@ -305,8 +323,9 @@ class Scheduler(threading.Thread):
         # TODO: Report event queues per tenant
         self.statsd.gauge('zuul.scheduler.eventqueues.trigger',
                           len(self.trigger_events))
-        self.statsd.gauge('zuul.scheduler.eventqueues.result',
-                          self.result_event_queue.qsize())
+        # TODO (felix): No global result event queue
+        # self.statsd.gauge('zuul.scheduler.eventqueues.result',
+        #                  len(self.result_events))
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           len(self.management_events))
 
@@ -316,88 +335,50 @@ class Scheduler(threading.Thread):
     def addManagementEvent(self, event: ManagementEvent):
         self.management_events.put(event, needs_result=False)
 
-    def addResultEvent(self, event):
-        self.result_event_queue.put(event)
-        self.wake_event.set()
-
-    def onBuildStarted(self, build):
-        build.start_time = time.time()
-        event = BuildStartedEvent(build)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
-
-    def onBuildPaused(self, build, result_data):
-        build.result_data = result_data
-        event = BuildPausedEvent(build)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
-
-    def onBuildCompleted(self, build, result, result_data, warnings):
-        build.end_time = time.time()
-        build.result_data = result_data
-        build.build_set.warning_messages.extend(warnings)
-        # Note, as soon as the result is set, other threads may act
-        # upon this, even though the event hasn't been fully
-        # processed. This could result in race conditions when e.g. skipping
-        # child jobs via zuul_return. Therefore we must delay setting the
-        # result to the main event loop.
-        try:
-            if self.statsd and build.pipeline:
-                tenant = build.pipeline.tenant
-                jobname = build.job.name.replace('.', '_').replace('/', '_')
-                hostname = (build.build_set.item.change.project.
-                            canonical_hostname.replace('.', '_'))
-                projectname = (build.build_set.item.change.project.name.
-                               replace('.', '_').replace('/', '_'))
-                branchname = (getattr(build.build_set.item.change,
-                                      'branch', '').
-                              replace('.', '_').replace('/', '_'))
-                basekey = 'zuul.tenant.%s' % tenant.name
-                pipekey = '%s.pipeline.%s' % (basekey, build.pipeline.name)
-                # zuul.tenant.<tenant>.pipeline.<pipeline>.all_jobs
-                key = '%s.all_jobs' % pipekey
-                self.statsd.incr(key)
-                jobkey = '%s.project.%s.%s.%s.job.%s' % (
-                    pipekey, hostname, projectname, branchname, jobname)
-                # zuul.tenant.<tenant>.pipeline.<pipeline>.project.
-                #   <host>.<project>.<branch>.job.<job>.<result>
-                key = '%s.%s' % (
-                    jobkey,
-                    'RETRY' if result is None else result
-                )
-                if result in ['SUCCESS', 'FAILURE'] and build.start_time:
-                    dt = int((build.end_time - build.start_time) * 1000)
-                    self.statsd.timing(key, dt)
-                self.statsd.incr(key)
-                # zuul.tenant.<tenant>.pipeline.<pipeline>.project.
-                #  <host>.<project>.<branch>.job.<job>.wait_time
-                if build.start_time:
-                    key = '%s.wait_time' % jobkey
-                    dt = int((build.start_time - build.execute_time) * 1000)
-                    self.statsd.timing(key, dt)
-        except Exception:
-            self.log.exception("Exception reporting runtime stats")
-        event = BuildCompletedEvent(build, result)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
-
     def onMergeCompleted(self, build_set, merged, updated,
                          commit, files, repo_state, item_in_branches):
-        event = MergeCompletedEvent(build_set, merged, updated,
-                                    commit, files, repo_state,
-                                    item_in_branches)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
+        tenant_name = build_set.item.pipeline.tenant.name
+        pipeline_name = build_set.item.pipeline.name
+        event = MergeCompletedEvent(
+            build_set.uuid,
+            build_set.item.pipeline.name,
+            build_set.item.queue.name,
+            tenant_name,
+            merged,
+            updated,
+            commit,
+            files,
+            repo_state,
+            item_in_branches,
+        )
+        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def onFilesChangesCompleted(self, build_set, files):
-        event = FilesChangesCompletedEvent(build_set, files)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
+        tenant_name = build_set.item.pipeline.tenant.name
+        pipeline_name = build_set.item.pipeline.name
+        event = FilesChangesCompletedEvent(
+            build_set.uuid,
+            build_set.item.pipeline.name,
+            build_set.item.queue.name,
+            tenant_name,
+            files,
+        )
+        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
-    def onNodesProvisioned(self, req):
-        event = NodesProvisionedEvent(req)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
+    def onNodesProvisioned(self, request):
+        tenant_name = request.build_set.item.pipeline.tenant.name
+        pipeline_name = request.build_set.item.pipeline.name
+        event = NodesProvisionedEvent(
+            request.uid,
+            request.id,
+            request.build_set.uuid,
+            request.job.name,
+            request.build_set.item.pipeline.name,
+            request.build_set.item.queue.name,
+            tenant_name,
+            request.event_id,
+        )
+        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def reconfigureTenant(self, tenant, project, event):
         self.log.debug("Submitting tenant reconfiguration event for "
@@ -637,6 +618,12 @@ class Scheduler(threading.Thread):
                 self.unparsed_abide, self.ansible_manager)
             for tenant in abide.tenants.values():
                 self._reconfigureTenant(tenant)
+            # Clean up tenants which were removed by the reconfiguration event
+            old_tenants = set(self.abide.tenants.keys())
+            new_tenants = set(abide.tenants.keys())
+            remove_tenants = old_tenants - new_tenants
+            for tenant in remove_tenants:
+                self._cleanupTenant(self.abide.tenants[tenant])
             self.abide = abide
         finally:
             self.layout_lock.release()
@@ -694,6 +681,10 @@ class Scheduler(threading.Thread):
                 tenant = abide.tenants.get(tenant_name)
                 if tenant is not None:
                     self._reconfigureTenant(tenant)
+                else:
+                    # Clean up the old tenant before it's removed from the
+                    # current abide in the next step.
+                    self._cleanupTenant(self.abide.tenants[tenant_name])
                 self.abide = abide
         duration = round(time.monotonic() - start, 3)
         self.log.info("Smart reconfiguration of tenants %s complete "
@@ -766,6 +757,14 @@ class Scheduler(threading.Thread):
         return None
 
     def _reenqueueTenant(self, old_tenant, tenant):
+        # Clean up old pipelines before trying to enqueue anything in the new
+        # ones.
+        old_pipelines = set(old_tenant.layout.pipelines.keys())
+        new_pipelines = set(tenant.layout.pipelines.keys())
+        remove_pipelines = old_pipelines - new_pipelines
+        for pipeline_name in remove_pipelines:
+            self._cleanupPipeline(old_tenant.layout.pipelines[pipeline_name])
+
         for name, new_pipeline in tenant.layout.pipelines.items():
             old_pipeline = old_tenant.layout.pipelines.get(name)
             if not old_pipeline:
@@ -862,6 +861,51 @@ class Scheduler(threading.Thread):
                     "Canceling node request %s during reconfiguration",
                     request)
                 self.cancelJob(build_set, request.job)
+
+    def _cleanupBuild(self, build):
+        # We directly delete the builds in ZooKeeper rather than putting a
+        # CANCELED event in the result queue since the result queue won't be
+        # processed anymore once the tenant is removed.
+        del self.executor.builds[build.uuid]
+        build_item = self.build_queue.get(build.zookeeper_node)
+        if build_item:
+            self.build_queue.remove(build_item)
+        try:
+            self.nodepool.returnNodeSet(
+                build.nodeset,
+                build=build,
+                zuul_event_id=build.zuul_event_id
+            )
+        except Exception:
+            self.log.exception(
+                "Unable to return nodeset %s" % build.nodeset
+            )
+
+    def _cleanupPipeline(self, pipeline):
+        self.log.debug("Cleaning up pipeline %s", pipeline.name)
+        for item in pipeline.getAllItems():
+            if not item.current_build_set:
+                continue
+            for build in item.current_build_set.builds.values():
+                self._cleanupBuild(build)
+
+    def _cleanupTenant(self, tenant):
+        self.log.debug("Cleaning up tenant %s", tenant.name)
+        # Find all running builds for this tenant
+        builds_to_delete = [
+            build for build in self.executor.builds.values()
+            if build.build_set.item.pipeline.tenant == tenant
+        ]
+
+        # Delete all builds in the local executor client and in ZooKeeper
+        for build in builds_to_delete:
+            self._cleanupBuild(build)
+
+        # Delete the tenant root path for this tenant in ZooKeeper to remove
+        # all tenant specific event queues
+        self.zk_client.client.delete(
+            f"{TENANT_ROOT}/{tenant.name}", recursive=True
+        )
 
     def _reconfigureTenant(self, tenant):
         # This is called from _doReconfigureEvent while holding the
@@ -1022,10 +1066,9 @@ class Scheduler(threading.Thread):
                 if not self._stopped:
                     self.process_management_queue()
 
-                # Give result events priority -- they let us stop builds,
-                # whereas trigger events cause us to execute builds.
-                while (not self.result_event_queue.empty() and
-                       not self._stopped):
+                if not self._stopped:
+                    # Give result events priority -- they let us stop builds,
+                    # whereas trigger events cause us to execute builds.
                     self.process_result_queue()
 
                 if not self._stopped:
@@ -1277,65 +1320,152 @@ class Scheduler(threading.Thread):
             )
 
     def process_result_queue(self):
-        self.log.debug("Fetching result event")
-        event = self.result_event_queue.get()
-        self.log.debug("Processing result event %s" % event)
-        try:
-            if isinstance(event, BuildStartedEvent):
-                self._doBuildStartedEvent(event)
-            elif isinstance(event, BuildPausedEvent):
-                self._doBuildPausedEvent(event)
-            elif isinstance(event, BuildCompletedEvent):
-                self._doBuildCompletedEvent(event)
-            elif isinstance(event, MergeCompletedEvent):
-                self._doMergeCompletedEvent(event)
-            elif isinstance(event, FilesChangesCompletedEvent):
-                self._doFilesChangesCompletedEvent(event)
-            elif isinstance(event, NodesProvisionedEvent):
-                self._doNodesProvisionedEvent(event)
-            else:
-                self.log.error("Unable to handle event %s" % event)
-        finally:
-            self.result_event_queue.task_done()
+        for tenant in self.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                for event in self.pipeline_result_events[tenant.name][
+                    pipeline.name
+                ]:
+                    if self._stopped:
+                        return
+                    self.log.debug("Processing result event %s", event)
+                    try:
+                        self._process_result_event(event)
+                    finally:
+                        self.pipeline_result_events[tenant.name][
+                            pipeline.name
+                        ].ack(event)
+
+    def _process_result_event(self, event: ResultEvent):
+        if isinstance(event, BuildStartedEvent):
+            self._doBuildStartedEvent(event)
+        elif isinstance(event, BuildStatusEvent):
+            self._doBuildStatusEvent(event)
+        elif isinstance(event, BuildPausedEvent):
+            self._doBuildPausedEvent(event)
+        elif isinstance(event, BuildCompletedEvent):
+            self._doBuildCompletedEvent(event)
+        elif isinstance(event, MergeCompletedEvent):
+            self._doMergeCompletedEvent(event)
+        elif isinstance(event, FilesChangesCompletedEvent):
+            self._doFilesChangesCompletedEvent(event)
+        elif isinstance(event, NodesProvisionedEvent):
+            self._doNodesProvisionedEvent(event)
+        else:
+            self.log.error("Unable to handle event %s" % event)
+
+    def _get_build_from_event(self, event):
+        build_item_path = event.build_item_path
+
+        if build_item_path.startswith("noop"):
+            *_, uuid = build_item_path.partition("-")
+            build = self.executor.builds.get(uuid)
+            if build:
+                return build, None
+
+        build_item = self.build_queue.get(build_item_path)
+        if not build_item:
+            self.log.error(
+                "Unable to find build %s in ZooKeeper", build_item_path
+            )
+            return None, None
+        build = self.executor.builds.get(build_item.uuid)
+        if not build:
+            self.log.error("Unable to find build %s", build_item.uuid)
+            return None, None
+
+        return build, build_item
+
+    def _is_current_build(self, build, cancel=False):
+        log = get_annotated_logger(
+            self.log, event=build.zuul_event_id, build=build.uuid
+        )
+
+        if build.build_set is not build.build_set.item.current_build_set:
+            log.debug("Build %s is not in the current build set", build)
+            # Try to cancel the build if requested (BuildPausedEvent)
+            if cancel:
+                try:
+                    self.executor.cancel(build)
+                except Exception:
+                    log.exception(
+                        "Exception while canceling paused build %s", build
+                    )
+            return False
+
+        if not build.build_set.item.pipeline:
+            log.warning("Build %s is not associated with a pipeline", build)
+            # Try to cancel the build if requested (BuildPausedEvent)
+            if cancel:
+                try:
+                    self.executor.cancel(build)
+                except Exception:
+                    log.exception(
+                        "Exception while canceling paused build %s", build
+                    )
+            return False
+
+        return True
+
+    def _doBuildStatusEvent(self, event):
+        build, build_item = self._get_build_from_event(event)
+        if not build:
+            return
+
+        if not self._is_current_build(build):
+            return
+
+        log = get_annotated_logger(
+            self.log, event=build.zuul_event_id, build=build.uuid
+        )
+
+        # Allow build URL to be updated
+        log.debug(
+            "Build %s url update: %s -> %s",
+            build,
+            build.url,
+            build_item.data.get("url"),
+        )
+        build.url = build_item.data.get("url", build.url)
+
+        # Update information about worker
+        build.worker.updateFromData(build_item.data)
 
     def _doBuildStartedEvent(self, event):
-        build = event.build
-        log = get_annotated_logger(self.log, build.zuul_event_id)
-        if build.build_set is not build.build_set.item.current_build_set:
-            log.warning("Build %s is not in the current build set", build)
+        build, _ = self._get_build_from_event(event)
+        if not build:
             return
-        pipeline = build.build_set.item.pipeline
-        if not pipeline:
-            log.warning("Build %s is not associated with a pipeline", build)
+
+        if not self._is_current_build(build):
             return
+
+        build.start_time = time.time()
+
+        log = get_annotated_logger(
+            self.log, event=build.zuul_event_id, build=build.uuid
+        )
+
         try:
             build.estimated_time = float(self.time_database.getEstimatedTime(
                 build))
         except Exception:
             log.exception("Exception estimating build time:")
-        pipeline.manager.onBuildStarted(event.build)
+
+        pipeline = build.build_set.item.pipeline
+        pipeline.manager.onBuildStarted(build)
 
     def _doBuildPausedEvent(self, event):
-        build = event.build
-        log = get_annotated_logger(self.log, build.zuul_event_id)
-        if build.build_set is not build.build_set.item.current_build_set:
-            log.warning("Build %s is not in the current build set", build)
-            try:
-                self.executor.cancel(build)
-            except Exception:
-                log.exception(
-                    "Exception while canceling paused build %s", build)
+        build, build_item = self._get_build_from_event(event)
+        if not build:
             return
+
+        if not self._is_current_build(build, cancel=True):
+            return
+
+        build.paused = True
+        build.result_data = build_item.result_data.get("data", {})
+
         pipeline = build.build_set.item.pipeline
-        if not pipeline:
-            log.warning("Build %s is not associated with a pipeline", build)
-            try:
-                self.executor.cancel(build)
-            except Exception:
-                log.exception(
-                    "Exception while canceling paused build %s", build)
-            return
-        pipeline.manager.onBuildPaused(event.build)
+        pipeline.manager.onBuildPaused(build)
 
     def _handleExpiredHoldRequest(self, request: HoldRequest) -> bool:
         '''
@@ -1463,84 +1593,277 @@ class Scheduler(threading.Thread):
             return True
         return False
 
+    def _reportBuildStats(self, build):
+        # Note, as soon as the result is set, other threads may act
+        # upon this, even though the event hasn't been fully
+        # processed. This could result in race conditions when e.g. skipping
+        # child jobs via zuul_return. Therefore we must delay setting the
+        # result to the main event loop.
+        try:
+            if self.statsd and build.pipeline:
+                tenant = build.pipeline.tenant
+                jobname = build.job.name.replace('.', '_').replace('/', '_')
+                hostname = (build.build_set.item.change.project.
+                            canonical_hostname.replace('.', '_'))
+                projectname = (build.build_set.item.change.project.name.
+                               replace('.', '_').replace('/', '_'))
+                branchname = (getattr(build.build_set.item.change,
+                                      'branch', '').
+                              replace('.', '_').replace('/', '_'))
+                basekey = 'zuul.tenant.%s' % tenant.name
+                pipekey = '%s.pipeline.%s' % (basekey, build.pipeline.name)
+                # zuul.tenant.<tenant>.pipeline.<pipeline>.all_jobs
+                key = '%s.all_jobs' % pipekey
+                self.statsd.incr(key)
+                jobkey = '%s.project.%s.%s.%s.job.%s' % (
+                    pipekey, hostname, projectname, branchname, jobname)
+                # zuul.tenant.<tenant>.pipeline.<pipeline>.project.
+                #   <host>.<project>.<branch>.job.<job>.<result>
+                key = '%s.%s' % (
+                    jobkey,
+                    'RETRY' if build.result is None else build.result
+                )
+                if build.result in ['SUCCESS', 'FAILURE'] and build.start_time:
+                    dt = int((build.end_time - build.start_time) * 1000)
+                    self.statsd.timing(key, dt)
+                self.statsd.incr(key)
+                # zuul.tenant.<tenant>.pipeline.<pipeline>.project.
+                #  <host>.<project>.<branch>.job.<job>.wait_time
+                if build.start_time:
+                    key = '%s.wait_time' % jobkey
+                    dt = int((build.start_time - build.execute_time) * 1000)
+                    self.statsd.timing(key, dt)
+        except Exception:
+            self.log.exception("Exception reporting runtime stats")
+
     def _doBuildCompletedEvent(self, event):
-        build = event.build
-        build.result = event.result
-        zuul_event_id = build.zuul_event_id
-        log = get_annotated_logger(self.log, zuul_event_id)
+        build, build_item = self._get_build_from_event(event)
+        if not build:
+            return
+
+        log = get_annotated_logger(
+            self.log, event=build.zuul_event_id, build=build.uuid
+        )
+
+        # If we got a build, but no build_item this is an indicator for a noop
+        # build result. In that case, we can skip most of this method and just
+        # set the end_time and notify the pipeline manager if the build is
+        # still valid (part of the BuildItem's current build set).
+        if build_item:
+            warnings = build_item.result_data.get("warnings", [])
+            result = build_item.result
+
+            log.info(
+                "Build complete, result %s, warnings %s", result, warnings
+            )
+
+            if result is None:
+                if (
+                    build.build_set.getTries(build.job.name) >=
+                    build.job.attempts
+                ):
+                    result = BuildResult.RETRY_LIMIT
+                else:
+                    build.retry = True
+            if result == BuildResult.ABORTED:
+                # Always retry if the executor just went away
+                build.retry = True
+            if result == BuildResult.MERGER_FAILURE:
+                # The build result MERGER_FAILURE is a bit misleading here
+                # because when we got here we know that there are no merge
+                # conflicts. Instead this is most likely caused by some
+                # infrastructure failure. This can be anything like connection
+                # issue, drive corruption, full disk, corrupted git cache, etc.
+                # This may or may not be a recoverable failure so we should
+                # retry here respecting the max retries. But to be able to
+                # distinguish from RETRY_LIMIT which normally indicates pre
+                # playbook failures we keep the build result after the max
+                # attempts.
+                if (
+                    build.build_set.getTries(build.job.name) <
+                    build.job.attempts
+                ):
+                    build.retry = True
+
+            if build.retry:
+                result = BuildResult.RETRY
+
+            # If the build was canceled, we did actively cancel the job so
+            # don't overwrite the result and don't retry.
+            if build.canceled:
+                result = BuildResult[build.result]
+                build.retry = False
+
+            # Update the build and buildset with the values from the build item
+            # NOTE (felix): Convert the result enum to a string for backward
+            # compatibility.
+            build.result = result.name
+            build.node_labels = build_item.result_data.get("node_labels", [])
+            build.node_name = build_item.result_data.get("node_name")
+            build.result_data = build_item.result_data.get("data", {})
+            build.build_set.warning_messages.extend(warnings)
+            build.error_detail = build_item.result_data.get("error_detail")
+
+        build.end_time = time.time()
+        self._reportBuildStats(build)
 
         # Regardless of any other conditions which might cause us not
         # to pass this on to the pipeline manager, make sure we return
         # the nodes to nodepool.
         try:
-            event.build.held = self._processAutohold(build)
+            build.held = self._processAutohold(build)
             self.log.debug(
-                'build "%s" held status set to %s' % (event.build,
-                                                      event.build.held))
+                'build "%s" held status set to %s' % (build, build.held)
+            )
         except Exception:
             log.exception("Unable to process autohold for %s" % build)
         try:
             self.nodepool.returnNodeSet(build.nodeset, build=build,
-                                        zuul_event_id=zuul_event_id)
+                                        zuul_event_id=build.zuul_event_id)
         except Exception:
             log.exception("Unable to return nodeset %s" % build.nodeset)
 
-        if build.build_set is not build.build_set.item.current_build_set:
-            log.debug("Build %s is not in the current build set", build)
-            return
-        pipeline = build.build_set.item.pipeline
-        if not pipeline:
-            log.warning("Build %s is not associated with a pipeline", build)
-            return
-        if build.end_time and build.start_time and build.result:
-            duration = build.end_time - build.start_time
+        # Remove the build from Zookeeper and the local executor client.
+        del self.executor.builds[build.uuid]
+        if build_item:
+            log.debug("Removing: %s", build)
             try:
-                self.time_database.update(build, duration, build.result)
+                self.build_queue.remove(build_item)
+                log.debug("Removed: %s", build)
             except Exception:
-                log.exception("Exception recording build time:")
-        pipeline.manager.onBuildCompleted(event.build)
+                log.exception("Failed to remove: %s", build)
+
+        # Only calculate the end time and notify the pipelie manager if the
+        # build is still valid.
+        if self._is_current_build(build):
+            if build.end_time and build.start_time and build.result:
+                duration = build.end_time - build.start_time
+                try:
+                    self.time_database.update(build, duration, build.result)
+                except Exception:
+                    log.exception("Exception recording build time:")
+
+            pipeline = build.build_set.item.pipeline
+            pipeline.manager.onBuildCompleted(build)
 
     def _doMergeCompletedEvent(self, event):
-        build_set = event.build_set
-        if build_set is not build_set.item.current_build_set:
-            self.log.warning("Build set %s is not current" % (build_set,))
-            return
-        pipeline = build_set.item.pipeline
-        if not pipeline:
-            self.log.warning("Build set %s is not associated with a pipeline" %
-                             (build_set,))
-            return
-        pipeline.manager.onMergeCompleted(event)
+        tenant = self.abide.tenants.get(event.tenant_name)
+        pipeline = tenant.layout.pipelines.get(event.pipeline_name)
 
-    def _doFilesChangesCompletedEvent(self, event):
-        build_set = event.build_set
-        if build_set is not build_set.item.current_build_set:
+        if not pipeline:
+            self.log.warning(
+                "Build set %s is not associated with a pipeline",
+                event.build_set_uuid
+            )
+            return
+
+        build_set = None
+        queues = [
+            q for q in pipeline.queues if q.name == event.queue_name
+        ]
+        for queue in queues:
+            # Look up the build set from the queue
+            for item in queue.queue:
+                # If the provided buildset UUID doesn't match the current one,
+                # we assume that it's not current anymore.
+                if item.current_build_set.uuid == event.build_set_uuid:
+                    build_set = item.current_build_set
+                    break
+
+        if not build_set:
             self.log.warning("Build set %s is not current", build_set)
             return
-        pipeline = build_set.item.pipeline
+
+        pipeline.manager.onMergeCompleted(build_set, event)
+
+    def _doFilesChangesCompletedEvent(self, event):
+        tenant = self.abide.tenants.get(event.tenant_name)
+        pipeline = tenant.layout.pipelines.get(event.pipeline_name)
+
         if not pipeline:
-            self.log.warning("Build set %s is not associated with a pipeline",
-                             build_set)
+            self.log.warning(
+                "Build set %s is not associated with a pipeline",
+                event.build_set_uuid,
+            )
             return
-        pipeline.manager.onFilesChangesCompleted(event)
+
+        build_set = None
+        queues = [
+            q for q in pipeline.queues if q.name == event.queue_name
+        ]
+        for queue in queues:
+            # Look up the build set from the queue
+            for item in queue.queue:
+                # If the provided buildset UUID doesn't match the current one,
+                # we assume that it's not current anymore.
+                if item.current_build_set.uuid == event.build_set_uuid:
+                    build_set = item.current_build_set
+                    break
+
+        if not build_set:
+            self.log.warning("Build set %s is not current", build_set)
+            return
+
+        pipeline.manager.onFilesChangesCompleted(build_set, event.files)
 
     def _doNodesProvisionedEvent(self, event):
-        request = event.request
         request_id = event.request_id
-        build_set = request.build_set
-        log = get_annotated_logger(self.log, request.event_id)
+        job_name = event.job_name
+
+        log = get_annotated_logger(self.log, event.zuul_event_id)
+
+        tenant = self.abide.tenants.get(event.tenant_name)
+        pipeline = tenant.layout.pipelines.get(event.pipeline_name)
+
+        build_set = None
+        queues = [
+            q for q in pipeline.queues if q.name == event.queue_name
+        ]
+        for queue in queues:
+            # Look up the build set from the queue
+            for item in queue.queue:
+                # If the provided buildset UUID doesn't match the current one,
+                # we assume that it's not current anymore.
+                if item.current_build_set.uuid == event.build_set_uuid:
+                    build_set = item.current_build_set
+                    break
+
+        for queue in queues:
+            for item in queue.queue:
+                if item.current_build_set.uuid == event.build_set_uuid:
+                    build_set = item.current_build_set
+                    break
+
+        if not build_set:
+            log.warning(
+                "Build set is not current for node request %s",
+                request_id,
+            )
+            # TODO (felix): In the current state we are unable to look up the
+            # node request from an old build set as we only have access to the
+            # current build set via the queue item.
+            # Once we have a nodepool API which provides a node request by id,
+            # we could solve this issue.
+            """
+            if request.fulfilled:
+                self.nodepool.returnNodeSet(request.nodeset,
+                                            zuul_event_id=request.event_id)
+            """
+            return
+
+        # TODO (felix): As a temporary solution, we look up the request from
+        # the buildset since it's not stored in ZooKeeper with all relevant
+        # information. For a more profound solution, we should implement a
+        # nodepool API that returns the NodeRequest with all relevant
+        # information (nodeset, nodes) for a given request_id.
+        request = build_set.node_requests.get(job_name)
+        if not request:
+            return
 
         ready = self.nodepool.acceptNodes(request, request_id)
         if not ready:
             return
 
-        if build_set is not build_set.item.current_build_set:
-            log.warning("Build set %s is not current "
-                        "for node request %s", build_set, request)
-            if request.fulfilled:
-                self.nodepool.returnNodeSet(request.nodeset,
-                                            zuul_event_id=request.event_id)
-            return
         if request.job.name not in [x.name for x in build_set.item.getJobs()]:
             log.warning("Item %s does not contain job %s "
                         "for node request %s",
@@ -1550,7 +1873,6 @@ class Scheduler(threading.Thread):
                 self.nodepool.returnNodeSet(request.nodeset,
                                             zuul_event_id=request.event_id)
             return
-        pipeline = build_set.item.pipeline
         if not pipeline:
             log.warning("Build set %s is not associated with a pipeline "
                         "for node request %s", build_set, request)
@@ -1558,7 +1880,7 @@ class Scheduler(threading.Thread):
                 self.nodepool.returnNodeSet(request.nodeset,
                                             zuul_event_id=request.event_id)
             return
-        pipeline.manager.onNodesProvisioned(event)
+        pipeline.manager.onNodesProvisioned(build_set, request)
 
     def formatStatusJSON(self, tenant_name):
         # TODOv3(jeblair): use tenants
@@ -1569,9 +1891,11 @@ class Scheduler(threading.Thread):
 
         data['trigger_event_queue'] = {}
         data['trigger_event_queue']['length'] = len(self.trigger_events)
-        data['result_event_queue'] = {}
-        data['result_event_queue']['length'] = \
-            self.result_event_queue.qsize()
+        # TODO (felix): No global result event queue
+        # data['result_event_queue'] = {}
+        # data['result_event_queue']['length'] = len(
+        #    self.result_events[tenant_name]
+        # )
         data['management_event_queue'] = {}
         data['management_event_queue']['length'] = len(self.management_events)
 
