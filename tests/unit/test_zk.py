@@ -19,11 +19,12 @@ from tests.zk import TestZooKeeperConnection
 from zuul import model
 import zuul.zk.exceptions
 
-from tests.base import BaseTestCase, ChrootedKazooFixture
+from tests.base import BaseTestCase, ChrootedKazooFixture, iterate_timeout
+from zuul.zk.builds import BuildQueue, BuildState
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 
-class TestZK(BaseTestCase):
+class ZooKeeperBaseTestCase(BaseTestCase):
 
     def setUp(self):
         super().setUp()
@@ -39,6 +40,9 @@ class TestZK(BaseTestCase):
             .connect()
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
+
+
+class TestZK(ZooKeeperBaseTestCase):
 
     def _createRequest(self):
         req = model.HoldRequest()
@@ -83,3 +87,67 @@ class TestZK(BaseTestCase):
         # Test deleting the request
         self.zk_nodepool.deleteHoldRequest(req1)
         self.assertEqual([], self.zk_nodepool.getHoldRequests())
+
+
+class TestBuilds(ZooKeeperBaseTestCase):
+
+    def test_lost_builds(self):
+        build_queue = BuildQueue(self.zk_client)
+
+        build_queue.submit("A", "tenant", "pipeline", {}, "zone")
+        path_b = build_queue.submit("B", "tenant", "pipeline", {}, "zone")
+        path_c = build_queue.submit("C", "tenant", "pipeline", {}, "zone")
+        path_d = build_queue.submit("D", "tenant", "pipeline", {}, "zone")
+
+        b = build_queue.get(path_b)
+        c = build_queue.get(path_c)
+        d = build_queue.get(path_d)
+
+        b.state = BuildState.RUNNING
+        build_queue.update(b)
+
+        c.state = BuildState.RUNNING
+        build_queue.update(c)
+        build_queue.lock(c)
+
+        d.state = BuildState.COMPLETED
+        build_queue.update(d)
+
+        # The lost_builds method should only return builds which are running
+        # but not locked by any executor (which is build b in our case).
+        lost_builds = list(build_queue.lost_builds())
+
+        self.assertEqual(1, len(lost_builds))
+        self.assertEqual(b.path, lost_builds[0].path)
+
+    def test_tree_cache(self):
+        zoned_cached_build_queue = BuildQueue(
+            self.zk_client, zone_filter=["test-zone-1"], use_cache=True
+        )
+        unzoned_cached_build_queue = BuildQueue(self.zk_client, use_cache=True)
+        uncached_build_queue = BuildQueue(self.zk_client)
+
+        self.zk_client.client.ensure_path(f"{BuildQueue.ROOT}/test-zone-1")
+        self.zk_client.client.ensure_path(f"{BuildQueue.ROOT}/test-zone-2")
+
+        for _ in iterate_timeout(10, "zoned cache updated"):
+            if len(zoned_cached_build_queue._zone_tree_caches.values()) == 1:
+                break
+
+        for _ in iterate_timeout(10, "unzoned cache updated"):
+            if len(unzoned_cached_build_queue._zone_tree_caches.values()) == 2:
+                break
+
+        self.assertEqual(
+            set(["test-zone-1"]),
+            set(zoned_cached_build_queue._zone_tree_caches.keys()),
+        )
+
+        self.assertEqual(
+            set(["test-zone-1", "test-zone-2"]),
+            set(unzoned_cached_build_queue._zone_tree_caches.keys()),
+        )
+
+        self.assertEqual(
+            0, len(uncached_build_queue._zone_tree_caches.values())
+        )
