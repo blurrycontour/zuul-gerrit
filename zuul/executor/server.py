@@ -38,9 +38,10 @@ import re
 import git
 from urllib.parse import urlsplit
 
+from kazoo.exceptions import KazooException
+
 from zuul.executor.sensors import SensorInterface
 from zuul.lib.ansible import AnsibleManager
-from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.yamlutil import yaml
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
@@ -59,7 +60,18 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
+from zuul.model import (
+    BuildCompletedEvent,
+    BuildPausedEvent,
+    BuildStartedEvent,
+    BuildStatusEvent,
+)
 from zuul.zk import ZooKeeperClient
+from zuul.zk.builds import (
+    BuildEvent, BuildItem, BuildQueue, BuildResult, BuildState
+)
+from zuul.zk.event_queues import PipelineResultEventQueue
+from zuul.zk.exceptions import BuildNotFound
 from zuul.zk.components import ZooKeeperComponentState
 
 BUFFER_LINES_FOR_SYNTAX = 200
@@ -817,17 +829,19 @@ class AnsibleJob(object):
         RESULT_DISK_FULL: 'RESULT_DISK_FULL',
     }
 
-    def __init__(self, executor_server: 'ExecutorServer', job):
+    def __init__(
+        self, executor_server: 'ExecutorServer', build: BuildItem
+    ):
         logger = logging.getLogger("zuul.AnsibleJob")
-        self.arguments: Dict[str, Any] = json.loads(job.arguments)
-        self.zuul_event_id: Optional[str] = self.arguments.get('zuul_event_id')
+        self.arguments = build.params
+        self.zuul_event_id = build.params['zuul_event_id']
         # Record ansible version being used for the cleanup phase
         self.ansible_version: Optional[str] = self.arguments\
             .get('ansible_version')
         self.log = get_annotated_logger(
-            logger, self.zuul_event_id, build=job.unique)
+            logger, self.zuul_event_id, build=build.uuid)
         self.executor_server: ExecutorServer = executor_server
-        self.job = job
+        self.build = build
         self.jobdir: Optional[str] = None
         self.proc = None
         self.proc_lock: threading.Lock = threading.Lock()
@@ -858,8 +872,10 @@ class AnsibleJob(object):
             self.executor_server.config,
             'executor',
             'winrm_read_timeout_sec')
-        self.ssh_agent = SshAgent(zuul_event_id=self.zuul_event_id,
-                                  build=self.job.unique)
+        self.ssh_agent = SshAgent(
+            zuul_event_id=self.zuul_event_id,
+            build=self.build.uuid
+        )
         self.port_forwards: List[KubeFwd] = []
         self.executor_variables_file = None
 
@@ -886,8 +902,10 @@ class AnsibleJob(object):
 
     def run(self):
         self.running = True
-        self.thread = threading.Thread(target=self.execute,
-                                       name='build-%s' % self.job.unique)
+        self.thread = threading.Thread(
+            target=self.execute,
+            name=f"build-{self.build.uuid}",
+        )
         self.thread.start()
 
     def stop(self, reason=None):
@@ -912,7 +930,7 @@ class AnsibleJob(object):
         self.paused = True
 
         data = {'paused': self.paused, 'data': self.getResultData()}
-        self.job.sendWorkData(json.dumps(data))
+        self.executor_server.pauseBuild(self.build, data)
         self._resume_event.wait()
 
     def resume(self):
@@ -930,6 +948,7 @@ class AnsibleJob(object):
                 "{now} |\n".format(now=datetime.datetime.now()))
 
         self.paused = False
+        self.executor_server.resumeBuild(self.build)
         self._resume_event.set()
 
     def wait(self):
@@ -941,7 +960,7 @@ class AnsibleJob(object):
             self.time_starting_build = time.monotonic()
 
             # report that job has been taken
-            self.job.sendWorkData(json.dumps(self._base_job_data()))
+            self.executor_server.startBuild(self.build, self._base_job_data())
 
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
@@ -949,7 +968,7 @@ class AnsibleJob(object):
                 self.ssh_agent.addData(key['name'], key['key'])
             self.jobdir = JobDir(self.executor_server.jobdir_root,
                                  self.executor_server.keep_jobdir,
-                                 str(self.job.unique))
+                                 str(self.build.uuid))
             self._execute()
         except BrokenProcessPool:
             # The process pool got broken, re-initialize it and send
@@ -958,13 +977,16 @@ class AnsibleJob(object):
             self.executor_server.resetProcessPool()
             self._send_aborted()
         except ExecutorError as e:
-            result_data = json.dumps(dict(result='ERROR',
-                                          error_detail=e.args[0]))
-            self.log.debug("Sending result: %s" % (result_data,))
-            self.job.sendWorkComplete(result_data)
+            result = BuildResult.ERROR
+            data = {"error_detail": e.args[0]}
+            self.log.debug("Sending result %s with data %s", result, data)
+            self.executor_server.completeBuild(self.build, result, data)
         except Exception:
             self.log.exception("Exception while executing job")
-            self.job.sendWorkException(traceback.format_exc())
+            data = {"exception": traceback.format_exc()}
+            self.executor_server.completeBuild(
+                self.build, BuildResult.ERROR, data
+            )
         finally:
             self.running = False
             if self.jobdir:
@@ -983,7 +1005,7 @@ class AnsibleJob(object):
                 except Exception:
                     self.log.exception("Error stopping port forward:")
             try:
-                self.executor_server.finishJob(self.job.unique)
+                self.executor_server.finishJob(self.build.uuid)
             except Exception:
                 self.log.exception("Error finalizing job thread:")
             self.log.info("Job execution took: %.3f seconds" % (
@@ -1002,8 +1024,7 @@ class AnsibleJob(object):
         }
 
     def _send_aborted(self):
-        result = dict(result='ABORTED')
-        self.job.sendWorkComplete(json.dumps(result))
+        self.executor_server.completeBuild(self.build, BuildResult.ABORTED)
 
     def _execute(self):
         args = self.arguments
@@ -1024,7 +1045,7 @@ class AnsibleJob(object):
                 project['connection'], project['name'],
                 repo_state=repo_state,
                 zuul_event_id=self.zuul_event_id,
-                build=self.job.unique))
+                build=self.build.uuid))
             projects.add((project['connection'], project['name']))
 
         # ...as well as all playbook and role projects.
@@ -1043,7 +1064,7 @@ class AnsibleJob(object):
                 tasks.append(self.executor_server.update(
                     *key, repo_state=repo_state,
                     zuul_event_id=self.zuul_event_id,
-                    build=self.job.unique))
+                    build=self.build.uuid))
                 projects.add(key)
 
         for task in tasks:
@@ -1162,17 +1183,18 @@ class AnsibleJob(object):
             data['url'] = "finger://{hostname}:{port}/{uuid}".format(
                 hostname=self.executor_server.hostname,
                 port=self.executor_server.log_streaming_port,
-                uuid=self.job.unique)
+                uuid=self.build.uuid
+            )
         else:
             data['url'] = 'finger://{hostname}/{uuid}'.format(
                 hostname=self.executor_server.hostname,
-                uuid=self.job.unique)
+                uuid=self.build.uuid
+            )
 
-        self.job.sendWorkData(json.dumps(data))
-        self.job.sendWorkStatus(0, 100)
+        self.executor_server.updateBuildStatus(self.build, data, 0, 100)
 
         result = self.runPlaybooks(args)
-        success = result == 'SUCCESS'
+        success = result == BuildResult.SUCCESS
 
         self.runCleanupPlaybooks(success)
 
@@ -1181,15 +1203,13 @@ class AnsibleJob(object):
             self.jobdir.setup_playbook)
 
         if self.aborted_reason == self.RESULT_DISK_FULL:
-            result = 'DISK_FULL'
+            result = BuildResult.DISK_FULL
         data = self.getResultData()
         warnings = []
         self.mapLines(merger, args, data, item_commit, warnings)
-        result_data = json.dumps(dict(result=result,
-                                      warnings=warnings,
-                                      data=data))
-        self.log.debug("Sending result: %s" % (result_data,))
-        self.job.sendWorkComplete(result_data)
+        result_data = dict(warnings=warnings, data=data)
+        self.log.debug("Sending result %s with data %s", result, result_data)
+        self.executor_server.completeBuild(self.build, result, result_data)
 
     def getResultData(self):
         data = {}
@@ -1281,15 +1301,15 @@ class AnsibleJob(object):
             # the refs we're trying to merge should be valid refs. If we
             # can't fetch them, it should resolve itself.
             self.log.exception("Could not fetch refs to merge from remote")
-            result = dict(result='ABORTED')
-            self.job.sendWorkComplete(json.dumps(result))
+            self.executor_server.completeBuild(self.build, BuildResult.ABORTED)
             return None
         if not ret:  # merge conflict
-            result = dict(result='MERGER_FAILURE')
             if self.executor_server.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
                 self.executor_server.statsd.incr(base_key + ".FAILURE")
-            self.job.sendWorkComplete(json.dumps(result))
+            self.executor_server.completeBuild(
+                self.build, BuildResult.MERGER_FAILURE
+            )
             return None
 
         if self.executor_server.statsd:
@@ -1416,19 +1436,19 @@ class AnsibleJob(object):
                     playbook, ansible_timeout, self.ansible_version,
                     phase='run', index=index)
                 if job_status == self.RESULT_ABORTED:
-                    return 'ABORTED'
+                    return BuildResult.ABORTED
                 elif job_status == self.RESULT_TIMED_OUT:
                     # Set the pre-failure flag so this doesn't get
                     # overridden by a post-failure.
                     pre_failed = True
-                    result = 'TIMED_OUT'
+                    result = BuildResult.TIMED_OUT
                     break
                 elif job_status == self.RESULT_NORMAL:
                     success = (job_code == 0)
                     if success:
-                        result = 'SUCCESS'
+                        result = BuildResult.SUCCESS
                     else:
-                        result = 'FAILURE'
+                        result = BuildResult.FAILURE
                         break
                 else:
                     # The result of the job is indeterminate.  Zuul will
@@ -1441,7 +1461,7 @@ class AnsibleJob(object):
         if success and pause:
             self.pause()
         if self.aborted:
-            return 'ABORTED'
+            return BuildResult.ABORTED
 
         post_timeout = args['post_timeout']
         unreachable = False
@@ -1455,7 +1475,7 @@ class AnsibleJob(object):
                 playbook, post_timeout, self.ansible_version, success,
                 phase='post', index=index)
             if post_status == self.RESULT_ABORTED:
-                return 'ABORTED'
+                return BuildResult.ABORTED
             if post_status == self.RESULT_UNREACHABLE:
                 # In case we encounter unreachable nodes we need to return None
                 # so the job can be retried. However in the case of post
@@ -1467,7 +1487,7 @@ class AnsibleJob(object):
                 # If we encountered a pre-failure, that takes
                 # precedence over the post result.
                 if not pre_failed:
-                    result = 'POST_FAILURE'
+                    result = BuildResult.POST_FAILURE
                 if (index + 1) == len(self.jobdir.post_playbooks):
                     self._logFinalPlaybookError()
 
@@ -1991,7 +2011,7 @@ class AnsibleJob(object):
                     all_vars['zuul']['resources'][
                         node['name'][0]]['pod'] = data['pod']
                     fwd = KubeFwd(zuul_event_id=self.zuul_event_id,
-                                  build=self.job.unique,
+                                  build=self.build.uuid,
                                   kubeconfig=self.jobdir.kubeconfig,
                                   context=data['context_name'],
                                   namespace=data['namespace'],
@@ -2261,7 +2281,9 @@ class AnsibleJob(object):
         try:
             ansible_log = get_annotated_logger(
                 logging.getLogger("zuul.AnsibleJob.output"),
-                self.zuul_event_id, build=self.job.unique)
+                self.zuul_event_id,
+                build=self.build.uuid,
+            )
 
             # Use manual idx instead of enumerate so that RESULT lines
             # don't count towards BUFFER_LINES_FOR_SYNTAX
@@ -2535,28 +2557,14 @@ class ExecutorMergeWorker(gear.TextWorker):
         super(ExecutorMergeWorker, self).handleNoop(packet)
 
 
-class ExecutorExecuteWorker(gear.TextWorker):
-    def __init__(self, executor_server, *args, **kw):
-        self.zuul_executor_server = executor_server
-        super(ExecutorExecuteWorker, self).__init__(*args, **kw)
-
-    def handleNoop(self, packet):
-        # Delay our response to running a new job based on the number
-        # of jobs we're currently running, in an attempt to spread
-        # load evenly among executors.
-        workers = len(self.zuul_executor_server.job_workers)
-        delay = (workers ** 2) / 1000.0
-        time.sleep(delay)
-        return super(ExecutorExecuteWorker, self).handleNoop(packet)
-
-
 class ExecutorServer(BaseMergeServer):
     log = logging.getLogger("zuul.ExecutorServer")
     _ansible_manager_class = AnsibleManager
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
+    _zk_builds_class = BuildQueue
 
-    def __init__(self, config, zk_client: ZooKeeperClient, connections=None,
+    def __init__(self, config, zk_client: ZooKeeperClient, connections,
                  jobdir_root=None, keep_jobdir=False,
                  log_streaming_port=DEFAULT_FINGER_PORT,
                  log_console_port=DEFAULT_STREAM_PORT):
@@ -2564,12 +2572,12 @@ class ExecutorServer(BaseMergeServer):
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
+        self._running: bool = False
+        self._command_running: bool = False
         # TODOv3(mordred): make the executor name more unique --
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
                                     socket.getfqdn())
-        self.zk_component = self.zk_component_registry.register(
-            'executors', self.hostname)
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
@@ -2616,7 +2624,6 @@ class ExecutorServer(BaseMergeServer):
         # If the execution driver ever becomes configurable again,
         # this is where it would happen.
         execution_wrapper_name = 'bubblewrap'
-        self.accepting_work: bool = False
         self.execution_wrapper = connections.drivers[execution_wrapper_name]
 
         self.update_queue = DeduplicateQueue()
@@ -2696,30 +2703,41 @@ class ExecutorServer(BaseMergeServer):
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
 
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
+        self.build_queue: BuildQueue = self._zk_builds_class(
+            zk_client,
+            [self.zone or BuildQueue.DEFAULT_ZONE],
+            self._tree_cache_listener,
+            use_cache=True,
+        )
+        self.result_events = PipelineResultEventQueue.create_registry(
+            zk_client
+        )
+        self.zk_component = self.zk_component_registry.register(
+            "executors", self.hostname
+        )
 
-        self.executor_jobs = {
-            "executor:resume:%s" % self.hostname: self.resumeJob,
-            "executor:stop:%s" % self.hostname: self.stopJob,
-            function_name: self.executeJob,
-        }
-
-        self.executor_gearworker = ZuulGearWorker(
-            'Zuul Executor Server',
-            'zuul.ExecutorServer.ExecuteWorker',
-            'executor',
-            self.config,
-            self.executor_jobs,
-            worker_class=ExecutorExecuteWorker,
-            worker_args=[self])
+        self._build_job_worker = threading.Thread(
+            target=self._buildJobWorkerLoop,
+            name="ExecutorServerBuildWorkerThread"
+        )
+        self._build_cleanup_worker = threading.Thread(
+            target=self._buildCleanupLoop,
+            name="ExecutorServerBuildCleanupThread"
+        )
 
         # Used to offload expensive operations to different processes
         self.process_worker = None
 
     def _repoLock(self, connection_name, project_name):
         return self.repo_locks.getRepoLock(connection_name, project_name)
+
+    @property
+    def accepting_work(self):
+        return self.zk_component.get("accepting_work", False)
+
+    @accepting_work.setter
+    def accepting_work(self, work):
+        self.zk_component.set("accepting_work", work)
 
     def start(self):
         # Start merger worker only if we process merge jobs
@@ -2738,7 +2756,8 @@ class ExecutorServer(BaseMergeServer):
             self.log.warning('Multiprocessing context has already been set')
         self.process_worker = ProcessPoolExecutor()
 
-        self.executor_gearworker.start()
+        self._build_job_worker.start()
+        self._build_cleanup_worker.start()
 
         self.log.debug("Starting command processor")
         self.command_socket.start()
@@ -2763,25 +2782,6 @@ class ExecutorServer(BaseMergeServer):
         self.disk_accountant.start()
         self.zk_component.set('state', ZooKeeperComponentState.RUNNING)
 
-    def register_work(self):
-        if self._running:
-            self.accepting_work = True
-            function_name = 'executor:execute'
-            if self.zone:
-                function_name += ':%s' % self.zone
-            self.executor_gearworker.gearman.registerFunction(function_name)
-            # TODO(jeblair): Update geard to send a noop after
-            # registering for a job which is in the queue, then remove
-            # this API violation.
-            self.executor_gearworker.gearman._sendGrabJobUniq()
-
-    def unregister_work(self):
-        self.accepting_work = False
-        function_name = 'executor:execute'
-        if self.zone:
-            function_name += ':%s' % self.zone
-        self.executor_gearworker.gearman.unRegisterFunction(function_name)
-
     def stop(self):
         self.log.debug("Stopping")
         self.zk_component.set('state', ZooKeeperComponentState.STOPPED)
@@ -2794,7 +2794,6 @@ class ExecutorServer(BaseMergeServer):
         # Stop accepting new jobs
         if self.merger_gearworker is not None:
             self.merger_gearworker.gearman.setFunctions([])
-        self.executor_gearworker.gearman.setFunctions([])
         # Tell the executor worker to abort any jobs it just accepted,
         # and grab the list of currently running job workers.
         with self.run_lock:
@@ -2827,7 +2826,8 @@ class ExecutorServer(BaseMergeServer):
         # gearman workers.
         if self.process_merge_jobs:
             super().stop()
-        self.executor_gearworker.stop()
+        self._build_job_worker.join()
+        self._build_cleanup_worker.join()
 
         if self.process_worker is not None:
             self.process_worker.shutdown()
@@ -2847,7 +2847,10 @@ class ExecutorServer(BaseMergeServer):
             update_thread.join()
         if self.process_merge_jobs:
             super().join()
-        self.executor_gearworker.join()
+        # else:
+        #     self.zookeeper.disconnect()
+        self._build_job_worker.join()
+        self._build_cleanup_worker.join()
         self.command_thread.join()
 
     def pause(self):
@@ -2856,6 +2859,7 @@ class ExecutorServer(BaseMergeServer):
         self.pause_sensor.pause = True
         if self.process_merge_jobs:
             super().pause()
+        self.manageLoad()
 
     def unpause(self):
         self.log.debug('Resuming')
@@ -2998,20 +3002,99 @@ class ExecutorServer(BaseMergeServer):
             log.error(msg)
             raise Exception(msg)
 
-    def executeJob(self, job):
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
+    def _tree_cache_listener(
+        self, build: BuildItem, build_event: BuildEvent
+    ) -> None:
+        # TODO (felix): Would it harm to simply keep the cancel/resume node? If
+        # not we could avoid this ZK update. The cancel request can anyway
+        # only be fulfilled by the executor that executes the job. So, if
+        # that executor died, no other can pick up the request.
+        if build_event == BuildEvent.CANCELED:
+            self.build_queue.fulfil_cancel(build)
+            self.stopJob(build)
+        elif build_event == BuildEvent.RESUMED:
+            self.build_queue.fulfil_resume(build)
+            self.resumeJob(build)
+        elif build_event == build_event.DELETED:
+            self.stopJob(build)
+
+    def _buildJobWorkerLoop(self):
+        while self._running:
+            if not self.zk_client.connected:
+                self.log.warning("Zookeeper disconnected")
+                # TODO (felix): Same like below. Let the gouvernours,
+                # tree_cache_listener set the wake event (maybe also the
+                # onConnect callback when the executor is reconnected to ZK?).
+                time.sleep(1.0)
+                continue
+
+            if self.accepting_work:
+                for build in self.build_queue.next():
+                    # Check the sensors again as they might have changed in the
+                    # meantime. E.g. the last build started within the next()
+                    # generator could have fulfilled the StartingBuildSensor.
+                    if not self.accepting_work:
+                        break
+                    if not self.build_queue.lock(build):
+                        continue
+
+                    build.state = BuildState.RUNNING
+                    # Directly update the build in ZooKeeper, so we don't
+                    # loop over and try to lock it again and again.
+                    self.build_queue.update(build)
+                    log = get_annotated_logger(
+                        self.log, event=None, build=build.uuid
+                    )
+                    try:
+                        log.debug("Next executed job: %s", build.path)
+                        self.executeJob(build)
+                    except Exception:
+                        log.exception("Exception while running job")
+                        self.completeBuild(
+                            build,
+                            BuildResult.ERROR,
+                            {"exception": traceback.format_exc()},
+                        )
+            # TODO (felix): Instead of sleep use a thread.wake_event which is
+            # set by the tree_cache_listener for new builds or in the sensors/
+            # gouvenors when executor is accepting work.
+            time.sleep(1.0)
+
+    def _buildCleanupLoop(self):
+        self.zk_client.election(BuildQueue.CLEANUP_ELECTION_ROOT,
+                                func=self._buildCleanup,
+                                repeat=lambda: self._running)
+
+    def _buildCleanup(self):
+        if self._running:
+            time.sleep(10.0)
+            # TODO (felix): Can we avoid these connected checks? AFAIK they are
+            # used in multiple places.
+            if self.zk_client.connected:
+                for build in self.build_queue.lost_builds():
+                    # TODO (felix): Why do we get a BadVersionError here?
+                    self.completeBuild(build, BuildResult.CANCELED)
+        return not self._running
+
+    def executeJob(self, build: BuildItem):
+        zuul_event_id = build.params['zuul_event_id']
         log = get_annotated_logger(self.log, zuul_event_id)
-        log.debug("Got %s job: %s", job.name, job.unique)
+        log.debug("Got %s job: %s", build.uuid, build)
         if self.statsd:
             base_key = 'zuul.executor.{hostname}'
             self.statsd.incr(base_key + '.builds')
-        self.job_workers[job.unique] = self._job_class(self, job)
+        self.job_workers[build.uuid] = self._job_class(self, build)
+        self.log.debug(
+            "Starting Job: %s, queue(%d): %s",
+            build.uuid,
+            len(self.job_workers),
+            self.job_workers
+        )
         # Run manageLoad before starting the thread mostly for the
         # benefit of the unit tests to make the calculation of the
         # number of starting jobs more deterministic.
         self.manageLoad()
-        self.job_workers[job.unique].run()
+        self.job_workers[build.uuid].run()
 
     def run_governor(self):
         while not self.governor_stop_event.wait(10):
@@ -3033,9 +3116,13 @@ class ExecutorServer(BaseMergeServer):
             for sensor in self.sensors:
                 ok, message = sensor.isOk()
                 if not ok:
-                    self.log.info(
-                        "Unregistering due to {}".format(message))
-                    self.unregister_work()
+                    self.log.info("Unregistering due to {}".format(message))
+                    try:
+                        self.accepting_work = False
+                    except KazooException:
+                        # Cannot be marked as not accepting work, local cache
+                        # will still reflect the change
+                        self.log.exception("Could not unregister executor!")
                     break
         else:
             reregister = True
@@ -3049,7 +3136,13 @@ class ExecutorServer(BaseMergeServer):
             if reregister:
                 self.log.info("Re-registering as job is within its limits "
                               "{}".format(", ".join(limits)))
-                self.register_work()
+                if self._running:
+                    try:
+                        self.accepting_work = True
+                    except KazooException:
+                        # Cannot be marked as accepting work, local cache
+                        # will still reflect the change
+                        self.log.exception("Could not re-register executor!")
         if self.statsd:
             base_key = 'zuul.executor.{hostname}'
             for sensor in self.sensors:
@@ -3057,32 +3150,30 @@ class ExecutorServer(BaseMergeServer):
 
     def finishJob(self, unique: str) -> None:
         del(self.job_workers[unique])
+        self.log.debug(
+            "Finishing Job: %s, queue(%d): %s",
+            unique,
+            len(self.job_workers),
+            self.job_workers
+        )
 
     def stopJobDiskFull(self, jobdir: str) -> None:
         unique = os.path.basename(jobdir)
         self.stopJobByUnique(unique, reason=AnsibleJob.RESULT_DISK_FULL)
 
-    def resumeJob(self, job):
-        try:
-            args = json.loads(job.arguments)
-            zuul_event_id = args.get('zuul_event_id')
-            log = get_annotated_logger(self.log, zuul_event_id)
-            log.debug("Resume job with arguments: %s", args)
-            unique = args['uuid']
-            self.resumeJobByUnique(unique, zuul_event_id=zuul_event_id)
-        finally:
-            job.sendWorkComplete()
+    def resumeJob(self, build: BuildItem) -> None:
+        zuul_event_id = build.params['zuul_event_id']
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("Resume job with arguments: %s", build.params)
+        unique = build.uuid
+        self.resumeJobByUnique(unique, zuul_event_id=zuul_event_id)
 
-    def stopJob(self, job):
-        try:
-            args = json.loads(job.arguments)
-            zuul_event_id = args.get('zuul_event_id')
-            log = get_annotated_logger(self.log, zuul_event_id)
-            log.debug("Stop job with arguments: %s", args)
-            unique = args['uuid']
-            self.stopJobByUnique(unique, zuul_event_id=zuul_event_id)
-        finally:
-            job.sendWorkComplete()
+    def stopJob(self, build: BuildItem):
+        zuul_event_id = build.params['zuul_event_id']
+        log = get_annotated_logger(self.log, zuul_event_id)
+        log.debug("Stop job with arguments: %s", build.params)
+        unique = build.uuid
+        self.stopJobByUnique(unique, zuul_event_id=zuul_event_id)
 
     def resumeJobByUnique(self, unique, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
@@ -3105,3 +3196,91 @@ class ExecutorServer(BaseMergeServer):
             job_worker.stop(reason)
         except Exception:
             log.exception("Exception sending stop command to worker:")
+
+    def updateBuildStatus(
+        self,
+        build: BuildItem,
+        data: Dict[str, Any],
+        current: int,
+        total: int,
+    ):
+        build.progress = {"progress": current, "total": total}
+        build.data = {**build.data, **data}
+        self.build_queue.update(build)
+
+        tenant_name = build.tenant_name
+        pipeline_name = build.pipeline_name
+
+        event = BuildStatusEvent(build.path)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def startBuild(self, build: BuildItem, data: Dict[str, Any]):
+        log = get_annotated_logger(self.log, event=None, build=build.uuid)
+        build.data = {**build.data, **data}
+        self.build_queue.update(build)
+        try:
+            self.build_queue.update(build)
+        except BuildNotFound as e:
+            log.warning("Could not start build: %s", str(e))
+            return
+
+        tenant_name = build.tenant_name
+        pipeline_name = build.pipeline_name
+
+        event = BuildStartedEvent(build.path)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def pauseBuild(self, build: BuildItem, result_data: Dict[str, Any]):
+        log = get_annotated_logger(self.log, event=None, build=build.uuid)
+        # Update the build state in ZooKeeper and set the paused data
+        build.result_data = result_data
+        build.state = BuildState.PAUSED
+        try:
+            self.build_queue.update(build)
+        except BuildNotFound as e:
+            log.warning("Could not pause build: %s", str(e))
+            return
+
+        tenant_name = build.tenant_name
+        pipeline_name = build.pipeline_name
+
+        event = BuildPausedEvent(build.path)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def resumeBuild(self, build: BuildItem):
+        log = get_annotated_logger(self.log, event=None, build=build.uuid)
+        build.state = BuildState.RUNNING
+        try:
+            self.build_queue.update(build)
+        except BuildNotFound as e:
+            log.warning("Could not resume build: %s", str(e))
+            return
+
+    def completeBuild(
+        self,
+        build: BuildItem,
+        result: BuildResult,
+        result_data: Optional[Dict[str, Any]] = None,
+    ):
+        log = get_annotated_logger(self.log, event=None, build=build.uuid)
+        # Update the build state, result and set optional result data in
+        # ZooKeeper (data, warnings, exception).
+        if result_data is None:
+            result_data = {}
+        build.result_data = result_data
+        build.state = BuildState.COMPLETED
+        build.result = result
+        try:
+            self.build_queue.update(build)
+        except BuildNotFound as e:
+            log.warning("Could not complete build: %s", str(e))
+            return
+
+        self.build_queue.unlock(build)
+
+        tenant_name = build.tenant_name
+        pipeline_name = build.pipeline_name
+
+        # Notify the scheduler about the completed build
+        event = BuildCompletedEvent(build.path)
+        self.result_events[tenant_name][pipeline_name].put(event)
