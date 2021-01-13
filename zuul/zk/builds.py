@@ -53,6 +53,7 @@ class BuildResult(Enum):
     MERGER_FAILURE = 7
     POST_FAILURE = 8
     TIMED_OUT = 9
+    DISK_FULL = 10
 
 
 @total_ordering
@@ -535,8 +536,6 @@ class BuildQueue(ZooKeeperBase):
         # usage.
         build_event = None
         if event.event_type in (TreeEvent.NODE_ADDED, TreeEvent.NODE_UPDATED):
-            if event.event_data.data:
-                self.log.debug("FE: data %s", event.event_data.data)
             if event.event_data.data and not action:
                 # Action nodes such as resume and cancel don't provide any
                 # data.
