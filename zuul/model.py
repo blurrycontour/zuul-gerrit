@@ -1897,15 +1897,20 @@ class Build(object):
     Job (related builds are grouped together in a BuildSet).
     """
 
-    def __init__(self, job: Job, uuid: Optional[str],
-                 zuul_event_id: Optional[str]=None):
+    def __init__(
+        self,
+        job: Job,
+        build_set: "BuildSet",
+        uuid: Optional[str],
+        zuul_event_id: Optional[str] = None
+    ):
         self.job: Job = job
         self.uuid: Optional[str] = uuid
         self.url: Optional[str] = None
         self.result: Optional[str] = None
         self.result_data: Dict[str, Any] = {}
         self.error_detail: Optional[str] = None
-        self.build_set: Optional[BuildSet] = None
+        self.build_set: BuildSet = build_set
         self.execute_time: float = time.time()
         self.start_time: Optional[float] = None
         self.end_time: Optional[float] = None
@@ -2088,7 +2093,6 @@ class BuildSet(object):
         self.builds[build.job.name] = build
         if build.job.name not in self.tries:
             self.tries[build.job.name] = 1
-        build.build_set = self
 
     def addRetryBuild(self, build):
         self.retry_builds.setdefault(build.job.name, []).append(build)
@@ -2545,7 +2549,7 @@ class QueueItem(object):
             job.updateArtifactData(data)
         except RequirementsError as e:
             self.warning(str(e))
-            fakebuild = Build(job, None)
+            fakebuild = Build(job, self.current_build_set, None)
             fakebuild.result = 'FAILURE'
             self.addBuild(fakebuild)
             self.setResult(fakebuild)
@@ -2734,12 +2738,12 @@ class QueueItem(object):
         for job in skipped:
             child_build = self.current_build_set.getBuild(job.name)
             if not child_build:
-                fakebuild = Build(job, None)
+                fakebuild = Build(job, self.current_build_set, None)
                 fakebuild.result = 'SKIPPED'
                 self.addBuild(fakebuild)
 
     def setNodeRequestFailure(self, job):
-        fakebuild = Build(job, None)
+        fakebuild = Build(job, self.current_build_set, None)
         fakebuild.start_time = time.time()
         fakebuild.end_time = time.time()
         self.addBuild(fakebuild)
@@ -2764,7 +2768,7 @@ class QueueItem(object):
 
     def _setAllJobsSkipped(self):
         for job in self.getJobs():
-            fakebuild = Build(job, None)
+            fakebuild = Build(job, self.current_build_set, None)
             fakebuild.result = 'SKIPPED'
             self.addBuild(fakebuild)
 
