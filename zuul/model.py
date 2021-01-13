@@ -1925,10 +1925,12 @@ class Build(object):
         self.node_name: Optional[str] = None
         self.nodeset: Optional[NodeSet] = None
         self.zuul_event_id: Optional[str] = zuul_event_id
+        self.zookeeper_node: Optional[str] = None
 
     def __repr__(self):
-        return ('<Build %s of %s voting:%s on %s>' %
-                (self.uuid, self.job.name, self.job.voting, self.worker))
+        return ('<Build %s of %s voting:%s, url: %s on %s>' %
+                (self.uuid, self.job.name, self.job.voting, self.url,
+                 self.worker))
 
     @property
     def failed(self):
@@ -3537,76 +3539,45 @@ class ResultEvent(AbstractEvent):
         pass
 
 
-class BuildStartedEvent(ResultEvent):
-    """A build has started.
+class BuildResultEvent(ResultEvent):
+    """Base class for build related result events."""
 
-    :arg Build build: The build which has started.
-    """
-
-    def __init__(self, build):
-        self.build = build
+    def __init__(self, build_item_path):
+        self.build_item_path = build_item_path
 
     def toDict(self) -> Dict[str, Any]:
         return {
-            "build": self.build,
+            "build_item_path": self.build_item_path,
         }
 
     @classmethod
-    def fromDict(
-        cls: Type["BuildStartedEvent"], data: Dict[str, Any]
-    ) -> "BuildStartedEvent":
+    def fromDict(cls, data: Dict[str, Any]):
         return cls(
-            data.get("build"),
+            data.get("build_item_path"),
         )
 
-
-class BuildPausedEvent(ResultEvent):
-    """A build has been paused.
-
-    :arg Build build: The build which has been paused.
-    """
-
-    def __init__(self, build):
-        self.build = build
-
-    def toDict(self) -> Dict[str, Any]:
-        return {
-            "build": self.build,
-        }
-
-    @classmethod
-    def fromDict(
-        cls: Type["BuildPausedEvent"], data: Dict[str, Any]
-    ) -> "BuildPausedEvent":
-        return cls(
-            data.get("build"),
-        )
+    def __repr__(self):
+        return "<{} {}>".format(self.__class__.__name__, self.build_item_path)
 
 
-class BuildCompletedEvent(ResultEvent):
-    """A build has completed
+class BuildStartedEvent(BuildResultEvent):
+    """A build has started."""
+    pass
 
-    :arg Build build: The build which has completed.
-    """
 
-    def __init__(self, build, result):
-        self.build = build
-        self.result = result
+class BuildPausedEvent(BuildResultEvent):
+    """A build has been paused."""
+    pass
 
-    def toDict(self) -> Dict[str, Any]:
-        return {
-            "build": self.build,
-            "result": self.result,
-        }
 
-    @classmethod
-    def fromDict(
-        cls: Type["BuildCompletedEvent"], data: Dict[str, Any]
-    ) -> "BuildCompletedEvent":
-        return cls(
-            data.get("build"),
-            data.get("result"),
-        )
+class BuildStatusEvent(BuildResultEvent):
+    """A build status has been updated."""
+    pass
+
+
+class BuildCompletedEvent(BuildResultEvent):
+    """A build has completed."""
+    pass
 
 
 class MergeCompletedEvent(ResultEvent):
@@ -3621,19 +3592,36 @@ class MergeCompletedEvent(ResultEvent):
         commit in the merge list appears (changes without refs).
     """
 
-    def __init__(self, build_set, merged, updated, commit,
-                 files, repo_state, item_in_branches):
-        self.build_set = build_set
+    def __init__(
+        self,
+        build_set_uuid,
+        pipeline_name,
+        queue_name,
+        tenant_name,
+        merged,
+        updated,
+        commit,
+        files,
+        repo_state,
+        item_in_branches
+    ):
+        self.build_set_uuid = build_set_uuid
+        self.pipeline_name = pipeline_name
+        self.queue_name = queue_name
+        self.tenant_name = tenant_name
         self.merged = merged
         self.updated = updated
         self.commit = commit
-        self.files = files
-        self.repo_state = repo_state
-        self.item_in_branches = item_in_branches
+        self.files = files or []
+        self.repo_state = repo_state or {}
+        self.item_in_branches = item_in_branches or []
 
     def toDict(self) -> Dict[str, Any]:
         return {
-            "build_set": self.build_set,
+            "build_set_uuid": self.build_set_uuid,
+            "pipeline_name": self.pipeline_name,
+            "queue_name": self.queue_name,
+            "tenant_name": self.tenant_name,
             "merged": self.merged,
             "updated": self.updated,
             "commit": self.commit,
@@ -3647,7 +3635,10 @@ class MergeCompletedEvent(ResultEvent):
         cls: Type["MergeCompletedEvent"], data: Dict[str, Any]
     ) -> "MergeCompletedEvent":
         return cls(
-            data.get("build_set"),
+            data.get("build_set_uuid"),
+            data.get("pipeline_name"),
+            data.get("queue_name"),
+            data.get("tenant_name"),
             data.get("merged"),
             data.get("updated"),
             data.get("commit"),
@@ -3664,13 +3655,26 @@ class FilesChangesCompletedEvent(ResultEvent):
     :arg list files: List of files changed.
     """
 
-    def __init__(self, build_set, files):
-        self.build_set = build_set
-        self.files = files
+    def __init__(
+        self,
+        build_set_uuid,
+        pipeline_name,
+        queue_name,
+        tenant_name,
+        files,
+    ):
+        self.build_set_uuid = build_set_uuid
+        self.pipeline_name = pipeline_name
+        self.queue_name = queue_name
+        self.tenant_name = tenant_name
+        self.files = files or []
 
     def toDict(self) -> Dict[str, Any]:
         return {
-            "build_set": self.build_set,
+            "build_set_uuid": self.build_set_uuid,
+            "pipeline_name": self.pipeline_name,
+            "queue_name": self.queue_name,
+            "tenant_name": self.tenant_name,
             "files": list(self.files),
         }
 
@@ -3679,7 +3683,10 @@ class FilesChangesCompletedEvent(ResultEvent):
         cls: Type["FilesChangesCompletedEvent"], data: Dict[str, Any]
     ) -> "FilesChangesCompletedEvent":
         return cls(
-            data.get("build_set"),
+            data.get("build_set_uuid"),
+            data.get("pipeline_name"),
+            data.get("queue_name"),
+            data.get("tenant_name"),
             list(data.get("files", [])),
         )
 
@@ -3691,13 +3698,36 @@ class NodesProvisionedEvent(ResultEvent):
     :arg list of Node objects nodes: The provisioned nodes
     """
 
-    def __init__(self, request):
-        self.request = request
-        self.request_id = request.id
+    def __init__(
+        self,
+        request_uid,
+        request_id,
+        build_set_uuid,
+        job_name,
+        pipeline_name,
+        queue_name,
+        tenant_name,
+        zuul_event_id
+    ):
+        self.request_uid = request_uid
+        self.request_id = request_id
+        self.build_set_uuid = build_set_uuid
+        self.job_name = job_name
+        self.pipeline_name = pipeline_name
+        self.queue_name = queue_name
+        self.tenant_name = tenant_name
+        self.zuul_event_id = zuul_event_id
 
     def toDict(self) -> Dict[str, Any]:
         return {
-            "request": self.request,
+            "request_uid": self.request_uid,
+            "request_id": self.request_id,
+            "build_set_uuid": self.build_set_uuid,
+            "job_name": self.job_name,
+            "pipeline_name": self.pipeline_name,
+            "queue_name": self.queue_name,
+            "tenant_name": self.tenant_name,
+            "zuul_event_id": self.zuul_event_id,
         }
 
     @classmethod
@@ -3705,7 +3735,14 @@ class NodesProvisionedEvent(ResultEvent):
         cls: Type["NodesProvisionedEvent"], data: Dict[str, Any]
     ) -> "NodesProvisionedEvent":
         return cls(
-            data.get("request"),
+            data.get("request_uid"),
+            data.get("request_id"),
+            data.get("build_set_uuid"),
+            data.get("job_name"),
+            data.get("pipeline_name"),
+            data.get("queue_name"),
+            data.get("tenant_name"),
+            data.get("zuul_event_id"),
         )
 
 
