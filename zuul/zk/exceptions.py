@@ -9,10 +9,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-from kazoo.exceptions import KazooException
 
 
-class ZuulZooKeeperException(KazooException):
+class ZuulZooKeeperException(Exception):
     """Base exception class for all custom ZK exceptions"""
     pass
 
@@ -25,3 +24,7 @@ class NoClientException(ZuulZooKeeperException):
 
     def __init__(self):
         super().__init__("No zookeeper client!")
+
+
+class BuildNotFound(ZuulZooKeeperException):
+    pass
