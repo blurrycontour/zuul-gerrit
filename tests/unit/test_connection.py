@@ -13,10 +13,11 @@
 # under the License.
 
 import textwrap
+import time
 
 import sqlalchemy as sa
 
-from tests.base import ZuulTestCase, ZuulDBTestCase
+from tests.base import ZuulTestCase, ZuulDBTestCase, AnsibleZuulTestCase
 
 
 def _get_reporter_from_connection_name(reporters, connection_name):
@@ -652,3 +653,79 @@ class TestMQTTConnectionBuildPage(ZuulTestCase):
                 build_id
             ),
         )
+
+
+class TestElasticsearchConnection(AnsibleZuulTestCase):
+    config_file = 'zuul-elastic-driver.conf'
+    tenant_config_file = 'config/elasticsearch-driver/main.yaml'
+
+    def _getSecrets(self, job, pbtype):
+        secrets = []
+        build = self.getJobFromHistory(job)
+        for pb in build.parameters[pbtype]:
+            secrets.append(pb['secrets'])
+        return secrets
+
+    def test_elastic_reporter(self):
+        "Test the Elasticsearch reporter"
+        # Add a success result
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        indexed_docs = self.scheds.first.connections.connections[
+            'elasticsearch'].source_it
+        index = self.scheds.first.connections.connections[
+            'elasticsearch'].index
+
+        self.assertEqual(len(indexed_docs), 2)
+        self.assertEqual(index, ('zuul-index.tenant-one-%s' %
+                                 time.strftime("%Y.%m.%d")))
+        buildset_doc = [doc for doc in indexed_docs if
+                        doc['build_type'] == 'buildset'][0]
+        self.assertEqual(buildset_doc['tenant'], 'tenant-one')
+        self.assertEqual(buildset_doc['pipeline'], 'check')
+        self.assertEqual(buildset_doc['result'], 'SUCCESS')
+        build_doc = [doc for doc in indexed_docs if
+                     doc['build_type'] == 'build'][0]
+        self.assertEqual(build_doc['buildset_uuid'], buildset_doc['uuid'])
+        self.assertEqual(build_doc['result'], 'SUCCESS')
+        self.assertEqual(build_doc['job_name'], 'test')
+        self.assertEqual(build_doc['tenant'], 'tenant-one')
+        self.assertEqual(build_doc['pipeline'], 'check')
+
+        self.assertIn('job_vars', build_doc)
+        self.assertDictEqual(
+            build_doc['job_vars'], {'bar': 'foo', 'bar2': 'foo2'})
+
+        self.assertIn('job_returned_vars', build_doc)
+        self.assertDictEqual(
+            build_doc['job_returned_vars'], {'foo': 'bar'})
+
+        self.assertEqual(self.history[0].uuid, build_doc['uuid'])
+
+    def test_elasticsearch_secret_leak(self):
+        expected_secret = [{
+            'test_secret': {
+                'username': 'test-username',
+                'password': 'test-password'
+            }
+        }]
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        indexed_docs = self.scheds.first.connections.connections[
+            'elasticsearch'].source_it
+
+        build_doc = [doc for doc in indexed_docs if
+                     doc['build_type'] == 'build'][0]
+
+        # Ensure that job include secret
+        self.assertEqual(
+            self._getSecrets('test', 'playbooks'),
+            expected_secret)
+
+        # Check if there is a secret leak
+        self.assertFalse('test_secret' in build_doc['job_vars'])
