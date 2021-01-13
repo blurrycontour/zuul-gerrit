@@ -93,7 +93,7 @@ class ZooKeeperClient(object):
     def connect(self, hosts: str, read_only: bool = False,
                 timeout: float = 10.0, tls_cert: Optional[str] = None,
                 tls_key: Optional[str] = None,
-                tls_ca: Optional[str] = None):
+                tls_ca: Optional[str] = None) -> None:
         """
         Establish a connection with ZooKeeper cluster.
 
@@ -282,10 +282,10 @@ class ZooKeeperBase(metaclass=ABCMeta):
             raise NoClientException()
         return self.client.client
 
-    def _onConnect(self):
+    def _onConnect(self) -> None:
         pass
 
-    def _onDisconnect(self):
+    def _onDisconnect(self) -> None:
         pass
 
 
