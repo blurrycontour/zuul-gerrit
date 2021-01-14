@@ -617,8 +617,15 @@ def main():
     args = args or argv
 
     if chdir:
-        chdir = os.path.abspath(chdir)
-        os.chdir(chdir)
+        try:
+            chdir = os.path.abspath(chdir)
+            os.chdir(chdir)
+        except Exception as e:
+            rc=256
+            with Console(zuul_log_id) as console:
+                console.addLine("cannot change directory to \'%s\'\n" % chdir)
+                console.addLine("[Zuul] Task exit code: %s\n" % rc)
+            raise e
 
     if creates:
         # do not run the command if the line contains creates=filename
