@@ -15,6 +15,7 @@
 import yaml
 import logging
 
+from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch.client import IndicesClient
 from elasticsearch.helpers import bulk
@@ -32,6 +33,7 @@ class ElasticsearchConnection(BaseConnection):
         "build_type": {"type": "keyword"},
         "result": {"type": "keyword"},
         "duration": {"type": "integer"},
+        "@timestamp": {"type": "date"},
         # BuildSet type specific attributes
         "zuul_ref": {"type": "keyword"},
         "pipeline": {"type": "keyword"},
@@ -108,6 +110,8 @@ class ElasticsearchConnection(BaseConnection):
     def gen(self, it, index):
         for source in it:
             d = {}
+            source['@timestamp'] = datetime.fromtimestamp(
+                int(source['start_time'])).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
             d['_index'] = index
             d['_type'] = 'zuul'
             d['_op_type'] = 'index'

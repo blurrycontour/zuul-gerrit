@@ -14,6 +14,7 @@
 
 import textwrap
 import time
+import types
 
 import sqlalchemy as sa
 
@@ -703,6 +704,13 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
             build_doc['job_returned_vars'], {'foo': 'bar'})
 
         self.assertEqual(self.history[0].uuid, build_doc['uuid'])
+        self.assertIn('duration', build_doc)
+        self.assertTrue(type(build_doc['duration']) is int)
+
+        doc_gen = self.scheds.first.connections.connections[
+            'elasticsearch'].gen(indexed_docs, index)
+        self.assertIsInstance(doc_gen, types.GeneratorType)
+        self.assertTrue('@timestamp' in list(doc_gen)[0]['_source'])
 
     def test_elasticsearch_secret_leak(self):
         expected_secret = [{
