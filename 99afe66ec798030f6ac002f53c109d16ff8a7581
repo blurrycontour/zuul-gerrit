@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cdbc1a0e_8237ca82",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-14T19:34:58Z",
+      "side": 1,
+      "message": "We should probably do this for jobs_base too, and do both as the first part of this function, so that the following line works.",
+      "revId": "99afe66ec798030f6ac002f53c109d16ff8a7581",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
