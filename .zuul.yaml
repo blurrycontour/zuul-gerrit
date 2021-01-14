@@ -78,6 +78,8 @@
         ZUUL_SSH_KEY: /home/zuul/.ssh/id_rsa
         ZUUL_REMOTE_IPV4: "{{ nodepool.interface_ip }}"
         ZUUL_REMOTE_KEEP: "true"
+        OS_STDOUT_CAPTURE: 0
+        OS_LOG_CAPTURE: 0
 
 - job:
     name: zuul-tox-zuul-client

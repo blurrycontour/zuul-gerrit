@@ -133,6 +133,8 @@ class CallbackModule(default.CallbackModule):
         self._log("[%s] Starting to log %s for task %s"
                   % (host, log_id, task_name), job=False, executor=True)
         logger_retries = 0
+        self._log("zuul_stream _read_log create_connection ip:{} port:{}"
+                  .format(ip, port))
         while True:
             try:
                 s = socket.create_connection((ip, port), 5)

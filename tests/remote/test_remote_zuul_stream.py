@@ -99,11 +99,14 @@ class FunctionalZuulStreamMixIn:
 
     def test_command(self):
         job = self._run_job('command')
+        print("ZUULDEBUG self.log_console_port:{}"
+              .format(self.log_console_port))
         with self.jobLog(job):
             build = self.history[-1]
             self.assertEqual(build.result, 'SUCCESS')
 
             text = self._get_job_output(build)
+            print("ZUULDEBUG text >>{}<<".format(text))
             self.assertLogLine(
                 r'RUN START: \[untrusted : review.example.com/org/project/'
                 r'playbooks/command.yaml@master\]', text)
