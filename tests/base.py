@@ -1959,7 +1959,7 @@ class FakeGitlabMergeRequest(object):
         self.description = description
         self.upstream_root = upstream_root
         self.number_of_commits = 0
-        self.created_at = datetime.datetime.now()
+        self.created_at = datetime.datetime.now(datetime.timezone.utc)
         self.updated_at = self.created_at
         self.merged_at = None
         self.sha = None
@@ -2056,7 +2056,7 @@ class FakeGitlabMergeRequest(object):
             'object_attributes': {
                 'title': self.subject,
                 'created_at': self.created_at.strftime(
-                    '%Y-%m-%d %H:%M:%S UTC'),
+                    '%Y-%m-%d %H:%M:%S.%f%z'),
                 'updated_at': self.updated_at.strftime(
                     '%Y-%m-%d %H:%M:%S UTC'),
                 'iid': self.number,
