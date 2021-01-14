@@ -203,7 +203,7 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine('PLAY RECAP', text)
             self.assertLogLine(
                 r'controller \| ok: \d+ changed: \d+ unreachable: 0 failed: 0 '
-                'skipped: 0 rescued: 1 ignored: 0', text)
+                'skipped: 1 rescued: 1 ignored: 0', text)
             self.assertLogLine(
                 r'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
                 r'org/project/playbooks/command.yaml@master]', text)
@@ -211,6 +211,14 @@ class FunctionalZuulStreamMixIn:
                                             text)
             self.assertLess((time2 - time1) / timedelta(milliseconds=1),
                             9000)
+
+            time1, _ = self._getLogTime(
+                r'TASK \[include-a-role : Skipped Command\]', text)
+            time2, _ = self._getLogTime(
+                r'TASK \[include-a-role : '
+                r'Second task after skipped command\]', text)
+            self.assertLess((time2 - time1) / timedelta(milliseconds=1),
+                            5000)
 
             # This is from the debug: msg='{{ ansible_version }}'
             # testing raw variable output.  To make it version
