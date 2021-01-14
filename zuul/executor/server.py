@@ -130,7 +130,8 @@ class DiskAccountant(object):
         self.jobs_base = jobs_base
         self.limit = limit
         self.func = func
-        self.cache_dir = cache_dir
+        # Remove any trailing slash to ensure dirname equality tests work
+        self.cache_dir = cache_dir.rstrip('/')
         self.usage_func = usage_func
         self.stop_event = threading.Event()
 
