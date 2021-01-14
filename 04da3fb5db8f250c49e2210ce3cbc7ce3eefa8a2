@@ -70,6 +70,30 @@
       "revId": "04da3fb5db8f250c49e2210ce3cbc7ce3eefa8a2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b276e294_a5aa9e5b",
+        "filename": "tests/base.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 2023,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2021-01-14T13:59:16Z",
+      "side": 1,
+      "message": "We have tested based on images loading this change. It works properly with gitlab webhook timstamp. Zuul scheduler can create event and find jobs for gitlab repo. Recheck comments on the gitlab repo can trigger the scheduler properly.",
+      "parentUuid": "1f5fcda2_28ed227f",
+      "range": {
+        "startLine": 2023,
+        "startChar": 8,
+        "endLine": 2023,
+        "endChar": 28
+      },
+      "revId": "04da3fb5db8f250c49e2210ce3cbc7ce3eefa8a2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
