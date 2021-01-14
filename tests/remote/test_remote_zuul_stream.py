@@ -166,7 +166,21 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine(r'compute1 \| failed_in_loop2', text)
             self.assertLogLine(r'compute1 \| ok: Item: failed_in_loop2 '
                                r'Result: 1', text)
+            time1, _ = self._getLogTime(r'TASK \[Remote shell task with '
+                                        r'python exception\]', text)
+            self.assertLogLine(r'compute1 \| cannot change directory to '
+                               r'\'/remote-shelltask/somewhere/'
+                               r'that/does/not/exist\'', text)
             self.assertLogLine(r'compute1 \| .*No such file or directory: .*'
+                               r'\'/remote-shelltask/somewhere/'
+                               r'that/does/not/exist\'', text)
+            time2, _ = self._getLogTime(
+                r'compute1 \| .*No such file or directory: .*'
+                r'\'/remote-shelltask/somewhere/'
+                r'that/does/not/exist\'', text)
+            self.assertLess((time2 - time1) / timedelta(milliseconds=1),
+                            5000)
+            self.assertLogLine(r'controller \| cannot change directory to '
                                r'\'/remote-shelltask/somewhere/'
                                r'that/does/not/exist\'', text)
             self.assertLogLine(r'controller \| .*No such file or directory: .*'
