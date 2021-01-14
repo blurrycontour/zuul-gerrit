@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a8828b83_548c41e4",
+        "filename": "requirements.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-01-14T11:05:04Z",
+      "side": 1,
+      "message": "pyjwt claims to follow semantic versioning [1] so I guess we could use pyjwt\u003e\u003d2.0.0,\u003c3.0 instead so we\u0027re not stuck on one specific version and miss potential future security fixes.\n\n[1] https://github.com/jpadilla/pyjwt/blob/482364776109cb597af7f679161dcf9c3ef5d0ea/CHANGELOG.md",
+      "revId": "a937cdcc8bdfd6da5c2beb0af5f4337166a4a9fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
