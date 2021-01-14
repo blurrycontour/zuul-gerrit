@@ -120,6 +120,9 @@ class DiskAccountant(object):
         :param callable usage_func: Optional function to call with usage
                                     for every dir _NOT_ over limit
         '''
+        # Remove any trailing slash to ensure dirname equality tests work
+        cache_dir = cache_dir.rstrip('/')
+        jobs_base = jobs_base.rstrip('/')
         # Don't cross the streams
         if cache_dir == jobs_base:
             raise Exception("Cache dir and jobs dir cannot be the same")
