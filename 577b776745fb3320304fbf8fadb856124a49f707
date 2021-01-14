@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "51612463_44620e91",
+        "filename": "tests/base.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2045,
+      "author": {
+        "id": 31995
+      },
+      "writtenOn": "2021-01-14T14:17:27Z",
+      "side": 1,
+      "message": "two types of timestamp to check if timestamp praser works properly",
+      "range": {
+        "startLine": 2042,
+        "startChar": 16,
+        "endLine": 2045,
+        "endChar": 42
+      },
+      "revId": "577b776745fb3320304fbf8fadb856124a49f707",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
