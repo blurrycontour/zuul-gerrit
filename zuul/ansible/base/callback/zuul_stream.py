@@ -97,12 +97,13 @@ class CallbackModule(default.CallbackModule):
         self._task = None
         self._daemon_running = False
         self._play = None
-        self._streamers = []
+        self._streamers = {}
         self._streamers_stop = False
         self.configure_logger()
         self._items_done = False
         self._deferred_result = None
         self._playbook_name = None
+        self._streamers_lock = threading.Lock()
 
     def configure_logger(self):
         # ansible appends timestamp, user and pid to the log lines emitted
@@ -147,7 +148,7 @@ class CallbackModule(default.CallbackModule):
                     "Please check connectivity to [%s:%s]"
                     % (ip, port), executor=True)
                 self._log_streamline(
-                    "localhost",
+                    "localhost", log_id,
                     "Timeout exception waiting for the logger. "
                     "Please check connectivity to [%s:%s]"
                     % (ip, port))
@@ -172,7 +173,7 @@ class CallbackModule(default.CallbackModule):
                     # code points to escape sequences which exactly represent
                     # the correct data without throwing a decoding exception.
                     done = self._log_streamline(
-                        host, line.decode("utf-8", "backslashreplace"))
+                        host, log_id, line.decode("utf-8", "backslashreplace"))
                     if done:
                         return
                 else:
@@ -183,23 +184,27 @@ class CallbackModule(default.CallbackModule):
                         buff += more
             if buff:
                 self._log_streamline(
-                    host, buff.decode("utf-8", "backslashreplace"))
+                    host, log_id, buff.decode("utf-8", "backslashreplace"))
 
-    def _log_streamline(self, host, line):
+    def _log_streamline(self, host, log_id, line):
         if "[Zuul] Task exit code" in line:
             return True
-        elif self._streamers_stop and "[Zuul] Log not found" in line:
-            # When we got here it indicates that the task is already finished
-            # but the logfile didn't appear yet on the remote node. This can
-            # happen rarely on a contended remote node. In this case give
-            # the streamer some additional time to pick up the log. Otherwise
-            # we would discard the log.
-            if time.monotonic() < (self._streamers_stop_ts + 10):
-                # don't output this line
-                return False
-            return True
         elif "[Zuul] Log not found" in line:
-            # don't output this line
+            if self._streamers_stop:
+                # When we got here it indicates that the task is already
+                # finished but the logfile didn't appear yet on the remote node
+                # This can happen rarely on a contended remote node. In this
+                # case give the streamer some additional time to pick up the
+                # log. Otherwise we would discard the log.
+                if time.monotonic() > (self._streamers_stop_ts + 10):
+                    return True
+
+            # if the task was skipped, there won't be any output
+            with self._streamers_lock:
+                if log_id in self._streamers and self._streamers[log_id][
+                        'skip']:
+                    return True
+
             return False
         elif " | " in line:
             ts, ln = line.split(' | ', 1)
@@ -289,23 +294,34 @@ class CallbackModule(default.CallbackModule):
 
                 log_id = "%s-%s" % (
                     task._uuid, paths._sanitize_filename(inventory_hostname))
+                with self._streamers_lock:
+                    if log_id not in self._streamers:
+                        self._streamers[log_id] = {'skip': False,
+                                                   'streamers': []}
                 streamer = threading.Thread(
                     target=self._read_log, args=(
                         host, ip, port, log_id, task_name, hosts))
                 streamer.daemon = True
                 streamer.start()
-                self._streamers.append(streamer)
+                self._streamers_stop = False
+                with self._streamers_lock:
+                    self._streamers[log_id]['streamers'].append(streamer)
 
     def v2_playbook_on_handler_task_start(self, task):
         self.v2_playbook_on_task_start(task, False)
 
-    def _stop_streamers(self):
+    def _stop_streamers(self, log_id):
         self._streamers_stop_ts = time.monotonic()
         self._streamers_stop = True
+        with self._streamers_lock:
+            if log_id not in self._streamers:
+                return
         while True:
-            if not self._streamers:
-                break
-            streamer = self._streamers.pop()
+            with self._streamers_lock:
+                if not self._streamers[log_id]['streamers']:
+                    self._streamers[log_id]['skip'] = False
+                    break
+                streamer = self._streamers[log_id]['streamers'].pop()
             streamer.join(30)
             if streamer.is_alive():
                 msg = "[Zuul] Log Stream did not terminate"
@@ -317,6 +333,10 @@ class CallbackModule(default.CallbackModule):
         localhost_names = ('localhost', '127.0.0.1', '::1')
         is_localhost = False
         task_host = result._host.get_name()
+        log_id = "%s-%s" % (
+            result._task._uuid, paths._sanitize_filename(
+                self._get_host(result)))
+
         delegated_vars = result_dict.get('_ansible_delegated_vars', None)
         if delegated_vars:
             delegated_host = delegated_vars['ansible_host']
@@ -337,7 +357,7 @@ class CallbackModule(default.CallbackModule):
                 is_localhost = True
 
         if not is_localhost and is_task:
-            self._stop_streamers()
+            self._stop_streamers(log_id)
         if result._task.action in ('command', 'shell',
                                    'win_command', 'win_shell'):
             stdout_lines = zuul_filter_result(result_dict)
@@ -384,6 +404,14 @@ class CallbackModule(default.CallbackModule):
             if reason:
                 # No reason means it's an item, which we'll log differently
                 self._log_message(result, status='skipping', msg=reason)
+
+            log_id = "%s-%s" % (
+                result._task._uuid,
+                paths._sanitize_filename(self._get_host(result)))
+            with self._streamers_lock:
+                if log_id in self._streamers:
+                    self._streamers[log_id]['skip'] = True
+            self._process_result_for_localhost(result)
 
     def v2_runner_item_on_skipped(self, result):
         reason = result._result.get('skip_reason')
@@ -508,14 +536,23 @@ class CallbackModule(default.CallbackModule):
                 hostname = self._get_hostname(result)
                 self._log("%s | %s " % (hostname, line))
 
-            if isinstance(result_dict['item'], str):
-                self._log_message(
-                    result,
-                    "Item: {item} Runtime: {delta}".format(**result_dict))
+            # in case of an async loop, the ansible job is not finished
+            # and no delta key is present in the result
+            if 'delta' in result_dict:
+                if isinstance(result_dict['item'], str):
+                    self._log_message(
+                        result,
+                        "Item: {item} Runtime: {delta}".format(
+                            **result_dict))
+                else:
+                    self._log_message(
+                        result,
+                        "Item: Runtime: {delta}".format(
+                            **result_dict))
             else:
                 self._log_message(
                     result,
-                    "Item: Runtime: {delta}".format(
+                    "Item: ansible_job_id:{ansible_job_id}".format(
                         **result_dict))
 
         if self._deferred_result:
@@ -683,5 +720,8 @@ class CallbackModule(default.CallbackModule):
                 delegated_host=delegated_vars['ansible_host'])
         else:
             return result._host.get_name()
+
+    def _get_host(self, result):
+        return result._host.get_name()
 
     v2_runner_on_unreachable = v2_runner_on_failed
