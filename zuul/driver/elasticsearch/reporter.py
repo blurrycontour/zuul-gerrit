@@ -86,7 +86,7 @@ class ElasticsearchReporter(BaseReporter):
                 "result": result,
                 "start_time": str(start_time),
                 "end_time": str(end_time),
-                "duration": str(end_time - start_time),
+                "duration": end_time - start_time,
                 "voting": build.job.voting,
                 "log_url": url,
             }

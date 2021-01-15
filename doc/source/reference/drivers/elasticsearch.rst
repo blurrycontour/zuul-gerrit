@@ -88,9 +88,9 @@ Example of driver configuration:
 
 .. code-block:: text
 
-[connection elasticsearch]
-driver=elasticsearch
-uri=https://managesf.sftests.com:9200
+    [connection elasticsearch]
+    driver=elasticsearch
+    uri=https://managesf.sftests.com:9200
 
 
 Additional parameters to authenticate to the Elasticsearch server you
