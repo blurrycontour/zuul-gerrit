@@ -387,6 +387,8 @@ class GitlabConnection(BaseConnection):
             'canonical_hostname', self.server)
         self.webhook_token = self.connection_config.get(
             'webhook_token', '')
+        self.api_token_name = self.connection_config.get(
+            'api_token_name', '')
         self.api_token = self.connection_config.get(
             'api_token', '')
         self.gl_client = GitlabAPIClient(self.baseurl, self.api_token)
@@ -459,7 +461,15 @@ class GitlabConnection(BaseConnection):
         return '%s/%s/merge_requests/%s' % (self.baseurl, project, number)
 
     def getGitUrl(self, project):
-        return '%s/%s.git' % (self.cloneurl, project.name)
+        cloneurl = '%s/%s.git' % (self.cloneurl, project.name)
+        if self.cloneurl.startswith('http') and self.api_token_name != '':
+            cloneurl = '%s://%s:%s@%s/%s.git' % (
+                self.cloneurl.split('://')[0],
+                self.api_token_name,
+                self.api_token,
+                self.cloneurl.split('://')[1],
+                project.name)
+        return cloneurl
 
     def getChange(self, event, refresh=False):
         project = self.source.getProject(event.project_name)
