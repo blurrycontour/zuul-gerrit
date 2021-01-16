@@ -1,6 +1,9 @@
+- hosts: node
+  roles:
+    - role: ensure-python
+
 - hosts: controller
   roles:
-
     - role: ensure-pip
 
     - role: bindep
