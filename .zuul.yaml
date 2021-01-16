@@ -26,6 +26,8 @@
       - zuul/ansible/.*
       - zuul/lib/ansible*
       - playbooks/zuul-stream/.*
+    vars:
+      python_version: 3.6
 
 - job:
     name: zuul-stream-functional-2.8

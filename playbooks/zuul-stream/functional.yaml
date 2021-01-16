@@ -2,7 +2,7 @@
   tasks:
     - name: Set python path fact
       set_fact:
-        python_path: "/usr/local/lib/python3.6/dist-packages"
+        python_path: "/usr/local/lib/python{{ python_version }}/dist-packages"
 
     - name: Run ansible that should succeed
       command: >
