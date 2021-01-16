@@ -1,5 +1,10 @@
+- hosts: node
+  roles:
+    - role: ensure-python
+
 - hosts: controller
   roles:
+    - role: ensure-python
 
     - role: ensure-pip
 
