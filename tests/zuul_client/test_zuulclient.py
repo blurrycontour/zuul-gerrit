@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import configparser
+import io
 import time
 import jwt
 import os
@@ -19,11 +21,13 @@ import subprocess
 import tempfile
 import textwrap
 
+from zuul.lib import encryption
 import zuul.web
 import zuul.rpcclient
 
 from tests.base import iterate_timeout
 from tests.unit.test_web import BaseTestWeb
+from tests.base import FIXTURE_DIR
 
 
 class TestSmokeZuulClient(BaseTestWeb):
@@ -33,6 +37,167 @@ class TestSmokeZuulClient(BaseTestWeb):
             ['zuul-client', '--version'],
             stderr=subprocess.STDOUT)
         self.assertTrue(b'Zuul-client version:' in test_version)
+
+
+class TestZuulClientAuthToken(BaseTestWeb):
+    """Test the auth token creation workflow"""
+    config_file = 'zuul-admin-web.conf'
+
+    def test_no_authenticator(self):
+        """Test that token generation is not possible without authenticator"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '-c', os.path.join(FIXTURE_DIR, self.config_file),
+             'create-auth-token',
+             '--auth-config', 'not_zuul_operator',
+             '--user', 'marshmallow_man',
+             '--tenant', 'tenant_one', ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.assertEqual(p.returncode, 1, 'The command must exit 1')
+
+    def test_unsupported_driver(self):
+        """Test that token generation is not possible with wrong driver"""
+        old_conf = io.StringIO()
+        self.config.write(old_conf)
+        self.config.add_section('auth someauth')
+        self.config.set('auth someauth', 'driver', 'OpenIDConnect')
+        with open(os.path.join(self.test_root, 'OIDC.conf'), 'w') as f:
+            self.config.write(f)
+        p = subprocess.Popen(
+            ['zuul-client',
+             '-c', os.path.join(self.test_root, 'OIDC.conf'),
+             'create-auth-token',
+             '--auth-config', 'someauth',
+             '--user', 'marshmallow_man',
+             '--tenant', 'tenant_one', ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        old_conf.seek(0)
+        self.config = configparser.ConfigParser()
+        self.config.read_file(old_conf)
+        self.assertEqual(p.returncode, 1, 'The command must exit 1')
+
+    def _test_api_with_token(self, bearer_token, tenant):
+        req = self.get_url('/api/tenant/%s/authorizations' % tenant,
+                           headers={'Authorization': bearer_token})
+        data = req.json()
+        self.assertTrue('zuul' in data, data)
+        self.assertTrue('admin' in data['zuul'], data)
+        self.assertTrue(data['zuul']['admin'], data)
+        self.assertTrue(tenant in data['zuul']['scope'], data)
+
+    def test_token_generation_HS256(self):
+        """Test token generation and use with HS256"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '-c', os.path.join(FIXTURE_DIR, self.config_file),
+             'create-auth-token',
+             '--auth-conf', 'zuul_operator',
+             '--user', 'marshmallow_man',
+             '--tenant', 'tenant_one', ],
+            stdout=subprocess.PIPE)
+        now = time.time()
+        out, _ = p.communicate()
+        self.assertEqual(p.returncode, 0, 'The command must exit 0')
+        self.assertTrue(out.startswith(b"Bearer "), out)
+        # there is a trailing carriage return in the output
+        token = jwt.decode(out[len("Bearer "):-1],
+                           key=self.config.get(
+                               'auth zuul_operator',
+                               'secret'),
+                           algorithms=[self.config.get(
+                               'auth zuul_operator',
+                               'driver')],
+                           audience=self.config.get(
+                               'auth zuul_operator',
+                               'client_id'),)
+        self.assertEqual('marshmallow_man', token.get('sub'))
+        self.assertEqual('zuul_operator', token.get('iss'))
+        self.assertEqual('zuul.example.com', token.get('aud'))
+        admin_tenants = token.get('zuul', {}).get('admin', [])
+        self.assertTrue('tenant_one' in admin_tenants, admin_tenants)
+        # allow one minute for the process to run
+        self.assertTrue(580 <= int(token['exp']) - now < 660,
+                        (token['exp'], now))
+        bearer_token = out.decode().strip()
+        self._test_api_with_token(bearer_token, 'tenant_one')
+
+    def test_token_generation_RS256(self):
+        """Test token generation and use with RS256"""
+        private, public = encryption.generate_rsa_keypair()
+        public_pem = encryption.serialize_rsa_public_key(public)
+        public_file = tempfile.NamedTemporaryFile(delete=False)
+        public_file.write(public_pem)
+        public_file.close()
+        private_pem = encryption.serialize_rsa_private_key(private)
+        private_file = tempfile.NamedTemporaryFile(delete=False)
+        private_file.write(private_pem)
+        private_file.close()
+
+        old_conf = io.StringIO()
+        self.config.write(old_conf)
+        self.config.add_section('auth other_operator')
+        self.config.set(
+            'auth other_operator', 'driver', 'RS256')
+        self.config.set(
+            'auth other_operator', 'allow_authz_override', 'true')
+        self.config.set(
+            'auth other_operator', 'realm', 'zuul.example2.com')
+        self.config.set(
+            'auth other_operator', 'client_id', 'zuul.example2.com')
+        self.config.set(
+            'auth other_operator', 'issuer_id', 'other_operator')
+        self.config.set(
+            'auth other_operator', 'public_key', public_file.name)
+        self.config.set(
+            'auth other_operator', 'private_key', private_file.name)
+        temp_conf = tempfile.NamedTemporaryFile(delete=False)
+        temp_conf.close()
+        with open(temp_conf.name, 'w') as f:
+            self.config.write(f)
+
+        # reload the config to update authenticators
+        self.web.authenticators.configure(self.config)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '-c', temp_conf.name,
+             'create-auth-token',
+             '--auth-conf', 'other_operator',
+             '--user', 'marshmallow_man',
+             '--tenant', 'tenant_one', ],
+            stdout=subprocess.PIPE)
+        now = time.time()
+        out, _ = p.communicate()
+        self.assertEqual(p.returncode, 0, 'The command must exit 0')
+        self.assertTrue(out.startswith(b"Bearer "), out)
+        # there is a trailing carriage return in the output
+        token = jwt.decode(out[len("Bearer "):-1],
+                           key=public_pem,
+                           algorithms=[self.config.get(
+                               'auth other_operator',
+                               'driver')],
+                           audience=self.config.get(
+                               'auth other_operator',
+                               'client_id'),)
+        self.assertEqual('marshmallow_man', token.get('sub'))
+        self.assertEqual('other_operator', token.get('iss'))
+        self.assertEqual('zuul.example2.com', token.get('aud'))
+        admin_tenants = token.get('zuul', {}).get('admin', [])
+        self.assertTrue('tenant_one' in admin_tenants, admin_tenants)
+        # allow one minute for the process to run
+        self.assertTrue(580 <= int(token['exp']) - now < 660,
+                        (token['exp'], now))
+        bearer_token = out.decode().strip()
+        self._test_api_with_token(bearer_token, 'tenant_one')
+        # clean up
+        os.unlink(private_file.name)
+        os.unlink(public_file.name)
+        old_conf.seek(0)
+        self.config = configparser.ConfigParser()
+        self.config.read_file(old_conf)
+        os.unlink(temp_conf.name)
 
 
 class TestZuulClientEncrypt(BaseTestWeb):
