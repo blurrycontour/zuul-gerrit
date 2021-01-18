@@ -696,7 +696,7 @@ class ZuulWebAPI(object):
         rawToken = cherrypy.request.headers['Authorization'][len('Bearer '):]
         claims = self.zuulweb.authenticators.authenticate(rawToken)
         if 'zuul' in claims and 'admin' in claims.get('zuul', {}):
-            return {'zuul': {'admin': claims['zuul']['admin']}, }
+            return claims['zuul']['admin']
         job = self.rpc.submitJob('zuul:get_admin_tenants',
                                  {'claims': claims})
         admin_tenants = json.loads(job.data[0])
