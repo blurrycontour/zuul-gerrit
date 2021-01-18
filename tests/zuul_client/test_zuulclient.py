@@ -102,14 +102,13 @@ class TestZuulClientAuthToken(BaseTestWeb):
         self.assertEqual(p.returncode, 0, 'The command must exit 0')
         self.assertTrue(out.startswith(b"Bearer "), out)
         # there is a trailing carriage return in the output
-        # TODO this will fail if pyjwt > 2.0.0
         token = jwt.decode(out[len("Bearer "):-1],
                            key=self.config.get(
                                'auth zuul_operator',
                                'secret'),
-                           algorithm=self.config.get(
+                           algorithms=[self.config.get(
                                'auth zuul_operator',
-                               'driver'),
+                               'driver')],
                            audience=self.config.get(
                                'auth zuul_operator',
                                'client_id'),)
@@ -121,7 +120,66 @@ class TestZuulClientAuthToken(BaseTestWeb):
         # allow one minute for the process to run
         self.assertTrue(580 <= int(token['exp']) - now < 660,
                         (token['exp'], now))
-        self._test_api_with_token(out)
+        self._test_api_with_token(out, 'tenant_one')
+
+    def test_token_generation_RS256(self):
+        """Test token generation and use with RS256"""
+        private, public = encryption.generate_rsa_keypair()
+        public_pem = encryption.serialize_rsa_public_key(public)
+        public_file = tempfile.NamedTemporaryFile(delete=False)
+        public_file.write(public_pem)
+        public_file.close()
+        private_pem = encryption.serialize_rsa_private_key(private)
+        private_file = tempfile.NamedTemporaryFile(delete=False)
+        private_file.write(private_pem)
+        private_file.close()
+
+        old_conf = io.StringIO()
+        self.config.write(old_conf)
+        self.config.set(
+            'auth zuul_operator_2', 'public_key', public_file.name)
+        self.config.set(
+            'auth zuul_operator_2', 'private_key', private_file.name)
+        temp_conf = tempfile.NamedTemporaryFile(delete=False)
+        self.config.write(temp_conf)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '-c', temp_conf.name,
+             'create-auth-token',
+             '--auth-conf', 'zuul_operator_2',
+             '--user', 'marshmallow_man',
+             '--tenant', 'tenant_one', ],
+            stdout=subprocess.PIPE)
+        now = time.time()
+        out, _ = p.communicate()
+        self.assertEqual(p.returncode, 0, 'The command must exit 0')
+        self.assertTrue(out.startswith(b"Bearer "), out)
+        # there is a trailing carriage return in the output
+        token = jwt.decode(out[len("Bearer "):-1],
+                           key=public_pem,
+                           algorithms=[self.config.get(
+                               'auth zuul_operator_2',
+                               'driver')],
+                           audience=self.config.get(
+                               'auth zuul_operator',
+                               'client_id'),)
+        self.assertEqual('marshmallow_man', token.get('sub'))
+        self.assertEqual('zuul_operator', token.get('iss'))
+        self.assertEqual('zuul.example.com', token.get('aud'))
+        admin_tenants = token.get('zuul', {}).get('admin', [])
+        self.assertTrue('tenant_one' in admin_tenants, admin_tenants)
+        # allow one minute for the process to run
+        self.assertTrue(580 <= int(token['exp']) - now < 660,
+                        (token['exp'], now))
+        self._test_api_with_token(out, 'tenant_one')
+        # clean up
+        os.unlink(private_file.name)
+        os.unlink(public_file.name)
+        old_conf.seek(0)
+        self.config = configparser.ConfigParser()
+        self.config.read_file(old_conf)
+        os.unlink(temp_conf.name)
 
 
 class TestZuulClientEncrypt(BaseTestWeb):
