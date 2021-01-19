@@ -15,7 +15,7 @@
 
 import time
 
-from tests.zk import TestZooKeeperConnection
+from tests.zk import TestZooKeeperClient
 from zuul import model
 import zuul.nodepool
 
@@ -38,8 +38,8 @@ class TestNodepool(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk_client = TestZooKeeperConnection(hosts=self.zk_config)\
-            .connect()
+        self.zk_client = TestZooKeeperClient(hosts=self.zk_config)
+        self.zk_client.connect()
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
         self.hostname = 'nodepool-test-hostname'
@@ -107,8 +107,8 @@ class TestNodepool(BaseTestCase):
         job.nodeset = nodeset
         self.fake_nodepool.pause()
         request = self.nodepool.requestNodes(None, job, 0)
-        self.zk_client.client.stop()
-        self.zk_client.client.start()
+        self.zk_client.kazoo_client.stop()
+        self.zk_client.kazoo_client.start()
         self.fake_nodepool.unpause()
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
