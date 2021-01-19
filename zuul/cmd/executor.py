@@ -25,7 +25,7 @@ import zuul.zk
 from zuul.executor.server import ExecutorServer
 
 from zuul.lib.config import get_default
-from zuul.zk import ZooKeeperConnection
+from zuul.zk import ZooKeeperClient
 
 
 class Executor(zuul.cmd.ZuulDaemonApp):
@@ -108,7 +108,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
 
         self.start_log_streamer()
 
-        zk_client = ZooKeeperConnection.fromConfig(self.config).connect()
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
         self.executor = ExecutorServer(
             self.config,
             zk_client,

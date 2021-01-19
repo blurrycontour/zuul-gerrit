@@ -27,7 +27,7 @@ import zuul.scheduler
 
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd_config
-from zuul.zk import ZooKeeperConnection
+from zuul.zk import ZooKeeperClient
 
 
 class Scheduler(zuul.cmd.ZuulDaemonApp):
@@ -138,7 +138,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         self.setup_logging('scheduler', 'log_config')
 
-        zk_client = ZooKeeperConnection.fromConfig(self.config).connect()
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
         self.configure_connections()
         self.sched = zuul.scheduler.Scheduler(self.config, self.connections,
                                               zk_client, app=self)

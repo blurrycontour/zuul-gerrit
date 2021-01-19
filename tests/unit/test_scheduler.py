@@ -2608,7 +2608,9 @@ class TestScheduler(ZuulTestCase):
         builds = list(self.build_queue.all())
         # Use a DataWatch to avoid a race condition between creating and
         # immediately deleting the cancel node in ZooKeeper.
-        self.zk_client.client.DataWatch(f"{builds[0].path}/cancel", data_watch)
+        self.zk_client.kazoo_client.DataWatch(
+            f"{builds[0].path}/cancel", data_watch
+        )
 
         # Abandon change to cancel build
         self.fake_gerrit.addEvent(A.getChangeAbandonedEvent())
@@ -5810,8 +5812,12 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        self.scheds.execute(lambda app: app.sched.zk_client.client.stop())
-        self.scheds.execute(lambda app: app.sched.zk_client.client.start())
+        self.scheds.execute(
+            lambda app: app.sched.zk_client.kazoo_client.stop()
+        )
+        self.scheds.execute(
+            lambda app: app.sched.zk_client.kazoo_client.start()
+        )
         self.fake_nodepool.unpause()
         self.waitUntilSettled()
 
@@ -5846,8 +5852,12 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # The request is fulfilled, but the scheduler hasn't processed
         # it yet.  Reconnect ZK.
-        self.scheds.execute(lambda app: app.sched.zk_client.client.stop())
-        self.scheds.execute(lambda app: app.sched.zk_client.client.start())
+        self.scheds.execute(
+            lambda app: app.sched.zk_client.kazoo_client.stop()
+        )
+        self.scheds.execute(
+            lambda app: app.sched.zk_client.kazoo_client.start()
+        )
 
         # Allow the scheduler to continue and process the (now
         # out-of-date) notification that nodes are ready.

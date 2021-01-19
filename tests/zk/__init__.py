@@ -15,14 +15,14 @@ import traceback
 import uuid
 from typing import Dict
 
-from zuul.zk import ZooKeeperClient, ZooKeeperConnection
+from zuul.zk import ZooKeeperClient
 
 
 class TestZooKeeperClient(ZooKeeperClient):
     connections: Dict[str, str] = {}
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self._connection_id: str = ''
 
     def connect(self, *args, **kwargs) -> None:
@@ -40,7 +40,3 @@ class TestZooKeeperClient(ZooKeeperClient):
                 self.log.debug("ZK Disconnecting (%s)", self._connection_id)
                 self._connection_id = ''
         super().disconnect()
-
-
-class TestZooKeeperConnection(ZooKeeperConnection):
-    _zk_client_class = TestZooKeeperClient

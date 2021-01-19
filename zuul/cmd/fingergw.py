@@ -21,7 +21,7 @@ import zuul.lib.fingergw
 import zuul.zk
 from zuul.lib.config import get_default
 from zuul.lib.fingergw import FingerGateway
-from zuul.zk import ZooKeeperConnection
+from zuul.zk import ZooKeeperClient
 
 
 class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
@@ -74,7 +74,7 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
         ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
 
-        with ZooKeeperConnection.fromConfig(self.config) as zk_client:
+        with ZooKeeperClient.fromConfig(self.config) as zk_client:
             self.gateway = zuul.lib.fingergw.FingerGateway(
                 (gear_server, gear_port, ssl_key, ssl_cert, ssl_ca),
                 zk_client,
