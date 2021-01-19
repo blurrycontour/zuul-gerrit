@@ -66,7 +66,7 @@ from git.util import IterableList
 import yaml
 import paramiko
 
-from tests.zk import TestZooKeeperClient, TestZooKeeperConnection
+from tests.zk import TestZooKeeperClient
 from tests.zk.builds import TestBuildQueue
 
 from psutil import Popen
@@ -90,7 +90,7 @@ from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.named_queue import NamedQueue
 from zuul.model import Change
 from zuul.rpcclient import RPCClient
-from zuul.zk import ZooKeeperConnection
+from zuul.zk import ZooKeeperClient
 from zuul.zk.builds import BuildItem, BuildResult, BuildState
 
 import tests.fakegithub
@@ -3676,10 +3676,6 @@ class WebProxyFixture(fixtures.Fixture):
         self.thread.join()
 
 
-class TestZuulWeb(ZuulWeb):
-    _zk_connection_class = TestZooKeeperConnection
-
-
 class ZuulWebFixture(fixtures.Fixture):
     def __init__(self, gearman_server_port,
                  changes: Dict[str, Dict[str, Change]], config: ConfigParser,
@@ -3710,7 +3706,7 @@ class ZuulWebFixture(fixtures.Fixture):
 
     def _setUp(self):
         # Start the web server
-        self.web = TestZuulWeb(
+        self.web = ZuulWeb(
             listen_address='::', listen_port=0,
             gear_server='127.0.0.1', gear_port=self.gearman_server_port,
             info=self.info,
@@ -3959,7 +3955,8 @@ class SchedulerTestApp:
         self.zk_config = zk_config
         self.changes = changes
 
-        zk_client = TestZooKeeperConnection(hosts=self.zk_config).connect()
+        zk_client = TestZooKeeperClient(hosts=self.zk_config)
+        zk_client.connect()
 
         # Register connections from the config using fakes
         self.connections = TestConnectionRegistry(
@@ -4149,7 +4146,8 @@ class ZuulTestCase(BaseTestCase):
             zk_chroot_fixture.zookeeper_port,
             zk_chroot_fixture.zookeeper_chroot
         )
-        self.zk_client = ZooKeeperConnection(hosts=self.zk_config).connect()
+        self.zk_client = ZooKeeperClient(hosts=self.zk_config)
+        self.zk_client.connect()
         self.build_queue = TestBuildQueue(self.zk_client)
 
         if not KEEP_TEMPDIRS:
@@ -4550,9 +4548,14 @@ class ZuulTestCase(BaseTestCase):
     def assertEmptyBuildQueueHistory(self):
         nodes = []
         # TODO (felix): Use the build_queue API rather than ZK directly?
-        for zone in self.zk_client.client.get_children(self.build_queue.ROOT):
-            nodes.extend(self.zk_client.client.get_children(
-                "%s/%s" % (self.build_queue.ROOT, zone)))
+        for zone in self.zk_client.kazoo_client.get_children(
+            self.build_queue.ROOT
+        ):
+            nodes.extend(
+                self.zk_client.kazoo_client.get_children(
+                    "%s/%s" % (self.build_queue.ROOT, zone)
+                )
+            )
         try:
             self.log.debug(
                 "Waiting for %s Builds in Zookeeper to be cleaned up", nodes
@@ -4561,10 +4564,10 @@ class ZuulTestCase(BaseTestCase):
                 120, "Builds in Zookeeper to be cleaned up", sleep=1.0
             ):
                 nodes = []
-                for zone in self.zk_client.client.get_children(
+                for zone in self.zk_client.kazoo_client.get_children(
                     self.build_queue.ROOT
                 ):
-                    nodes.extend(self.zk_client.client.get_children(
+                    nodes.extend(self.zk_client.kazoo_client.get_children(
                         "%s/%s" % (self.build_queue.ROOT, zone)
                     ))
                 if len(nodes) == 0:
