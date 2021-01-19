@@ -163,6 +163,7 @@ class GerritTriggerEvent(TriggerEvent):
         self.approvals = []
         self.uuid = None
         self.scheme = None
+        self.patchsetcomments = None
 
     def __repr__(self):
         ret = '<GerritTriggerEvent %s %s' % (self.type,
@@ -384,6 +385,11 @@ class GerritEventFilter(EventFilter, GerritApprovalFilter):
             if (event.comment is not None and
                 comment_re.search(event.comment)):
                 matches_comment_re = True
+            if event.patchsetcomments is not None:
+                for comment in event.patchsetcomments:
+                    if (comment is not None and
+                        comment_re.search(comment)):
+                        matches_comment_re = True
         if self.comments and not matches_comment_re:
             return False
 

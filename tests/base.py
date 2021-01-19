@@ -557,7 +557,23 @@ class FakeGerritChange(object):
                  "reason": ""}
         return event
 
-    def getChangeCommentEvent(self, patchset):
+    def getChangeCommentEvent(self, patchset, comment=None,
+                              patchsetcomment=None):
+        if comment is None and patchsetcomment is None:
+            comment = "Patch Set %d:\n\nThis is a comment" % patchset
+        elif comment:
+            comment = "Patch Set %d:\n\n%s" % (patchset, comment)
+        else:  # patchsetcomment is not None
+            comment = "Patch Set %d:\n\n(1 comment)" % patchset
+
+        commentevent = {"comment": comment}
+        if patchsetcomment:
+            commentevent.update(
+                {'patchSetComments':
+                    {"/PATCHSET_LEVEL": [{"message": patchsetcomment}]}
+                }
+            )
+
         event = {"type": "comment-added",
                  "change": {"project": self.project,
                             "branch": self.branch,
@@ -570,8 +586,8 @@ class FakeGerritChange(object):
                  "author": {"name": "User Name"},
                  "approvals": [{"type": "Code-Review",
                                 "description": "Code-Review",
-                                "value": "0"}],
-                 "comment": "This is a comment"}
+                                "value": "0"}]}
+        event.update(commentevent)
         return event
 
     def getChangeMergedEvent(self):

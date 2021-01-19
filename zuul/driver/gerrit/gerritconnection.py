@@ -186,6 +186,13 @@ class GerritEventConnector(threading.Thread):
                 event.ref = patchset.get('ref')
             event.approvals = data.get('approvals', [])
             event.comment = data.get('comment')
+            patchsetcomments = data.get('patchSetComments', {}).get(
+                "/PATCHSET_LEVEL")
+            if patchsetcomments:
+                event.patchsetcomments = []
+                for patchsetcomment in patchsetcomments:
+                    event.patchsetcomments.append(
+                        patchsetcomment.get('message'))
         refupdate = data.get('refUpdate')
         if refupdate:
             event.project_name = refupdate.get('project')
