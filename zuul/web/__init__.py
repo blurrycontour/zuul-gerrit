@@ -36,7 +36,7 @@ from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.lib.repl import REPLServer
 import zuul.model
 from zuul.rpcclient import RPCClient
-from zuul.zk import ZooKeeperConnection, ZooKeeperClient
+from zuul.zk import ZooKeeperClient
 from zuul.zk.components import (
     ZooKeeperComponent, ZooKeeperComponentRegistry, ZooKeeperComponentState
 )
@@ -1212,7 +1212,6 @@ class StreamManager(object):
 
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web.ZuulWeb")
-    _zk_connection_class = ZooKeeperConnection
 
     def __init__(self, listen_address: str, listen_port: int,
                  gear_server: str, gear_port: int,
@@ -1239,10 +1238,15 @@ class ZuulWeb(object):
         self.rpc: RPCClient = RPCClient(gear_server, gear_port,
                                         ssl_key, ssl_cert, ssl_ca,
                                         client_id='Zuul Web Server')
-        self.zk_client: ZooKeeperClient = self._zk_connection_class(
-            hosts=zk_hosts, read_only=True, timeout=zk_timeout,
-            tls_cert=zk_tls_cert, tls_key=zk_tls_key, tls_ca=zk_tls_ca
-        ).connect()
+        self.zk_client: ZooKeeperClient = ZooKeeperClient(
+            hosts=zk_hosts,
+            read_only=True,
+            timeout=zk_timeout,
+            tls_cert=zk_tls_cert,
+            tls_key=zk_tls_key,
+            tls_ca=zk_tls_ca,
+        )
+        self.zk_client.connect()
         self.zk_connection_event = ZooKeeperConnectionEvent(self.zk_client)
         self.zk_component: ZooKeeperComponent = (
             ZooKeeperComponentRegistry(self.zk_client).register(
