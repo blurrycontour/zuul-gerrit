@@ -18,7 +18,7 @@ from unittest import skip
 
 import zuul.zk
 import zuul.nodepool
-from tests.zk import TestZooKeeperConnection
+from tests.zk import TestZooKeeperClient
 from zuul import model
 
 from tests.base import BaseTestCase
@@ -32,8 +32,8 @@ class TestNodepoolIntegration(BaseTestCase):
         super(TestNodepoolIntegration, self).setUp()
 
         self.statsd = None
-        self.zk_client = TestZooKeeperConnection(hosts='localhost:2181')\
-            .connect()
+        self.zk_client = TestZooKeeperClient(hosts='localhost:2181')
+        self.zk_client.connect()
         self.addCleanup(self.zk_client.disconnect)
         self.hostname = socket.gethostname()
 
@@ -105,8 +105,8 @@ class TestNodepoolIntegration(BaseTestCase):
         job.nodeset = nodeset
         self.fake_nodepool.paused = True
         request = self.nodepool.requestNodes(None, job, 0)
-        self.zk_client.client.stop()
-        self.zk_client.client.start()
+        self.zk_client.kazoo_client.stop()
+        self.zk_client.kazoo_client.start()
         self.fake_nodepool.paused = False
         self.waitForRequests()
         self.assertEqual(len(self.provisioned_requests), 1)
