@@ -32,7 +32,7 @@ from tests.base import iterate_timeout, ZuulWebFixture
 
 from ws4py.client import WebSocketBaseClient
 
-from zuul.zk import ZooKeeperConnection
+from zuul.zk import ZooKeeperClient
 
 
 class WSClient(WebSocketBaseClient):
@@ -547,7 +547,8 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
             if build_obj.worker.hostname and build_obj.worker.log_port:
                 break
 
-        zk_client = ZooKeeperConnection(self.zk_config).connect()
+        zk_client = ZooKeeperClient(self.zk_config)
+        zk_client.connect()
         self.addCleanup(zk_client.disconnect)
 
         # Start the finger gateway daemon

@@ -903,7 +903,7 @@ class Scheduler(threading.Thread):
 
         # Delete the tenant root path for this tenant in ZooKeeper to remove
         # all tenant specific event queues
-        self.zk_client.client.delete(
+        self.zk_client.kazoo_client.delete(
             f"{TENANT_ROOT}/{tenant.name}", recursive=True
         )
 
