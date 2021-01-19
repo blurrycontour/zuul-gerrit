@@ -22,7 +22,7 @@ import zuul.cmd
 import zuul.merger.server
 import zuul.zk
 from zuul.merger.server import MergeServer
-from zuul.zk import ZooKeeperConnection
+from zuul.zk import ZooKeeperClient
 
 
 class Merger(zuul.cmd.ZuulDaemonApp):
@@ -60,7 +60,8 @@ class Merger(zuul.cmd.ZuulDaemonApp):
 
         self.setup_logging('merger', 'log_config')
 
-        zk_client = ZooKeeperConnection.fromConfig(self.config).connect()
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
         self.merger = zuul.merger.server.MergeServer(self.config, zk_client,
                                                      self.connections)
         self.merger.start()
