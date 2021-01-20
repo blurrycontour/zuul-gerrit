@@ -282,14 +282,21 @@ class RPCListener(RPCListenerBase):
         job.sendWorkComplete()
 
     def handle_get_running_jobs(self, job):
-        # args = json.loads(job.arguments)
-        # TODO: use args to filter by pipeline etc
+        args = json.loads(job.arguments)
         running_items = []
-        for tenant in self.sched.abide.tenants.values():
-            for pipeline_name, pipeline in tenant.layout.pipelines.items():
-                for queue in pipeline.queues:
-                    for item in queue.queue:
-                        running_items.append(item.formatJSON())
+
+        for tenant_name, tenant in self.sched.abide.tenants.items():
+            if args['tenant'] is not None and\
+               tenant_name == args['tenant']:
+                pipelines = tenant.layout.pipelines.items()
+                for pipeline_name, pipeline in pipelines:
+                    if args['pipeline'] is not None and\
+                       pipeline_name == args['pipeline']:
+                        for queue in pipeline.queues:
+                            if args['queue'] is not None and\
+                               queue.name == args['queue']:
+                                for item in queue.queue:
+                                    running_items.append(item.formatJSON())
 
         job.sendWorkComplete(json.dumps(running_items))
 
