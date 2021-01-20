@@ -16,6 +16,24 @@
       "revId": "ad3a14413155cfdc317c6f0da93c503feeedb045",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4288ad86_cf2260b4",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-01-20T17:06:00Z",
+      "side": 1,
+      "message": "And perhaps be more specific, e.g. `Formatting tenant %s status took %.3f seconds for %d bytes`",
+      "parentUuid": "e5f30c1c_9ef1a001",
+      "revId": "ad3a14413155cfdc317c6f0da93c503feeedb045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
