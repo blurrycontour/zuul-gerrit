@@ -726,6 +726,8 @@ class ZuulWebAPI(object):
                (time.time() - self.cache_time[tenant]) > self.cache_expiry:
                 job = self.rpc.submitJob('zuul:status_get',
                                          {'tenant': tenant})
+                self.log.debug('Requested status_get for tenant %s with '
+                               'payload size %s', tenant, len(job.data[0]))
                 self.cache[tenant] = json.loads(job.data[0])
                 self.cache_time[tenant] = time.time()
         payload = self.cache[tenant]
