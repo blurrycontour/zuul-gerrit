@@ -125,8 +125,10 @@ class RPCClient(object):
                 }
         return not self.submitJob('zuul:promote', data).failure
 
-    def get_running_jobs(self):
-        data = {}
+    def get_running_jobs(self, tenant=None, pipeline=None, queue=None):
+        data = {'tenant': tenant,
+                'pipeline': pipeline,
+                'queue': queue}
         job = self.submitJob('zuul:get_running_jobs', data)
         if job.failure:
             return False
