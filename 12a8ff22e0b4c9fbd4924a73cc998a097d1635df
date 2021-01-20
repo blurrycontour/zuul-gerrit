@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "194c6592_378859e4",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-01-20T15:06:20Z",
+      "side": 1,
+      "message": "Would it be easier to follow using the `filter` function? For example:\n\n  def keep(attr):\n      return lambda item: args[attr] is None or args[attr] \u003d\u003d item[attr] \n\n  for _, tenant in filter(keep(\"tenant\"), self.sched.abide.tenants.items()):",
+      "range": {
+        "startLine": 288,
+        "startChar": 0,
+        "endLine": 288,
+        "endChar": 68
+      },
+      "revId": "12a8ff22e0b4c9fbd4924a73cc998a097d1635df",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
