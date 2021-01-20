@@ -22,6 +22,30 @@
       "revId": "12a8ff22e0b4c9fbd4924a73cc998a097d1635df",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "414efde5_57905247",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-01-20T15:50:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "194c6592_378859e4",
+      "range": {
+        "startLine": 288,
+        "startChar": 0,
+        "endLine": 288,
+        "endChar": 68
+      },
+      "revId": "12a8ff22e0b4c9fbd4924a73cc998a097d1635df",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
