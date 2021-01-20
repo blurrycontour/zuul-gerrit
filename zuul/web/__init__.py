@@ -231,7 +231,7 @@ class ZuulWebAPI(object):
         self.zuulweb = zuulweb
         self.cache = {}
         self.cache_time = {}
-        self.cache_expiry = 1
+        self.cache_expiry = 15
         self.static_cache_expiry = zuulweb.static_cache_expiry
         self.status_lock = threading.Lock()
 
