@@ -906,6 +906,71 @@ class TestWeb(BaseTestWeb):
                   'pipeline': 'check'})
         self.assertEqual(404, resp.status_code)
 
+    def tests_running_jobs(self):
+        """test the jobs/running endpoint"""
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Wait for gearman server to send the initial workData back to zuul
+        start = time.time()
+        while True:
+            if time.time() - start > 10:
+                raise Exception("Timeout waiting for gearman server to report "
+                                + "back to the client")
+            build = list(self.scheds.first.sched.executor.builds.values())[0]
+            if build.worker.name == self.executor_server.hostname:
+                break
+            else:
+                time.sleep(0)
+
+        resp = self.get_url("api/tenant/tenant-one/jobs/running")
+        self.assertEqual(200, resp.status_code)
+        running_items = resp.json()
+
+        self.assertEqual(1, len(running_items))
+        running_item = running_items[0]
+        self.assertEqual([], running_item['failing_reasons'])
+        self.assertEqual([], running_item['items_behind'])
+        self.assertEqual('https://review.example.com/1', running_item['url'])
+        self.assertIsNone(running_item['item_ahead'])
+        self.assertEqual('org/project', running_item['project'])
+        self.assertIsNone(running_item['remaining_time'])
+        self.assertEqual(True, running_item['active'])
+        self.assertEqual('1,1', running_item['id'])
+
+        self.assertEqual(3, len(running_item['jobs']))
+        for job in running_item['jobs']:
+            if job['name'] == 'project-merge':
+                self.assertEqual('project-merge', job['name'])
+                self.assertEqual('gate', job['pipeline'])
+                self.assertEqual(False, job['retry'])
+                self.assertEqual(
+                    'stream/{uuid}?logfile=console.log'
+                    .format(uuid=job['uuid']), job['url'])
+                self.assertEqual(
+                    'finger://{hostname}/{uuid}'.format(
+                        hostname=self.executor_server.hostname,
+                        uuid=job['uuid']),
+                    job['finger_url'])
+                self.assertEqual(2, len(job['worker']))
+                self.assertEqual(False, job['canceled'])
+                self.assertEqual(True, job['voting'])
+                self.assertIsNone(job['result'])
+                self.assertEqual('gate', job['pipeline'])
+                break
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        resp = self.get_url("api/tenant/tenant-one/jobs/running")
+        self.assertEqual(200, resp.status_code)
+        running_items = resp.json()
+        self.assertEqual(0, len(running_items))
+
     def test_jobs_list(self):
         jobs = self.get_url("api/tenant/tenant-one/jobs").json()
         self.assertEqual(len(jobs), 10)
