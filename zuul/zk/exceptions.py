@@ -28,3 +28,11 @@ class NoClientException(ZuulZooKeeperException):
 
 class BuildNotFound(ZuulZooKeeperException):
     pass
+
+
+class MergeJobNotFound(ZuulZooKeeperException):
+    pass
+
+
+class FutureTimeoutException(ZuulZooKeeperException):
+    pass
