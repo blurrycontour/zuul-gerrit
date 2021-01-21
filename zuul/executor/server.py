@@ -70,7 +70,6 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.builds import (
     BuildEvent, BuildItem, BuildQueue, BuildResult, BuildState
 )
-from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.exceptions import BuildNotFound
 from zuul.zk.components import ZooKeeperComponentState
 
@@ -2709,9 +2708,6 @@ class ExecutorServer(BaseMergeServer):
             self._tree_cache_listener,
             use_cache=True,
         )
-        self.result_events = PipelineResultEventQueue.create_registry(
-            zk_client
-        )
         self.zk_component = self.zk_component_registry.register(
             "executors", self.hostname
         )
@@ -3047,6 +3043,9 @@ class ExecutorServer(BaseMergeServer):
                     )
                     try:
                         log.debug("Next executed job: %s", build.path)
+                        # TODO (felix): Rename this to builds to make the
+                        # difference between merger=job and executor=build more
+                        # clear.
                         self.executeJob(build)
                     except Exception:
                         log.exception("Exception while running job")

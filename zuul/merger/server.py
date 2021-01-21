@@ -17,6 +17,7 @@ import logging
 import os
 import socket
 import threading
+import time
 from abc import ABCMeta
 from configparser import ConfigParser
 
@@ -29,8 +30,11 @@ from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
 from zuul.merger.merger import nullcontext
-from zuul.zk.components import ZooKeeperComponentRegistry, \
-    ZooKeeperComponentState
+from zuul.zk.components import (
+    ZooKeeperComponentRegistry, ZooKeeperComponentState
+)
+from zuul.zk.event_queues import PipelineResultEventQueue
+from zuul.zk.merges import MergeJobQueue, MergeJobState
 
 COMMANDS = ['stop', 'pause', 'unpause']
 
@@ -81,6 +85,19 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.zk_component_registry: ZooKeeperComponentRegistry =\
             ZooKeeperComponentRegistry(zk_client)
 
+        self.merge_job_queue = MergeJobQueue(zk_client)
+
+        self._merge_job_worker = threading.Thread(
+            target=self._mergeJobWorkerLoop,
+            name="MergerServerJobWorkerThread",
+        )
+
+        self.result_events = PipelineResultEventQueue.create_registry(
+            zk_client
+        )
+
+        self._running: bool = False
+
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
         # well as to support the merger:cat functon to supply
@@ -105,6 +122,26 @@ class BaseMergeServer(metaclass=ABCMeta):
             self.config,
             self.merger_jobs)
 
+    def _mergeJobWorkerLoop(self):
+        while self._running:
+            for job in self.merge_job_queue.next():
+                if not self.merge_job_queue.lock(job):
+                    continue
+
+                # TODO (felix): What about the executor server implementation
+                # when it's currently not accepting work? How do we reflect
+                # this for the merger jobs?
+                job.state = MergeJobState.RUNNING
+                # Directly update the job in ZooKeeper, so we dont loop over
+                # and try to lock it again and again.
+                self.merge_job_queue.update(job)
+                self.log.debug("Next executed merge job: %s", job)
+                # TODO (felix): Implement the job execution
+            # TODO (felix): Use a wake_event instead of sleep. Who can set the
+            # wake event when new jobs are in the queue? Use a data watch to
+            # set the wake event.
+            time.sleep(1.0)
+
     def _getMerger(self, root, cache_root, logger=None):
         return merger.Merger(
             root, self.connections, self.zk_client, self.merge_email,
@@ -122,6 +159,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def start(self):
         self.log.debug('Starting merger worker')
+        self._running = True
         self.log.debug('Cleaning any stale git index.lock files')
         for (dirpath, dirnames, filenames) in os.walk(self.merge_root):
             if '.git' in dirnames:
@@ -141,17 +179,24 @@ class BaseMergeServer(metaclass=ABCMeta):
                             'Unable to remove stale git lock: '
                             '%s this may result in failed merges' % fp)
         self.merger_gearworker.start()
+        self._merge_job_worker.start()
 
     def stop(self):
         self.log.debug('Stopping merger worker')
+        self._running = False
         self.merger_gearworker.stop()
+        self._merge_job_worker.join()
 
     def join(self):
         self.merger_gearworker.join()
+        self._merge_job_worker.join()
 
     def pause(self):
         self.log.debug('Pausing merger worker')
         self.merger_gearworker.unregister()
+        # TODO (felix): How to pause/unpause the self._merge_job_worker? The
+        # executor server does that via its sensors + manageLoad(), but I want
+        # to avoid implementing all this in here.
 
     def unpause(self):
         self.log.debug('Resuming merger worker')

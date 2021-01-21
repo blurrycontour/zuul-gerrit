@@ -22,6 +22,7 @@ import gear
 import zuul.model
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.zk.merges import MergeJobQueue
 
 
 def getJobData(job):
@@ -91,6 +92,8 @@ class MergeClient(object):
         self.log.debug("Waiting for gearman")
         self.gearman.waitForServer()
         self.jobs = set()
+
+        self.merge_job_queue = MergeJobQueue(self.sched.zk_client)
 
     def stop(self):
         self.gearman.shutdown()
