@@ -211,7 +211,7 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
         event_path = "{}/{}-".format(self.event_root, self.event_prefix.value)
         return self.kazoo_client.create(
             event_path,
-            json.dumps(data).encode("utf-8"),
+            self._dict_to_bytes(data),
             sequence=True,
             makepath=True,
         )
@@ -234,7 +234,7 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
             # TODO: implement sharding of large events
             data, zstat = self.kazoo_client.get(path)
             try:
-                event = json.loads(data)
+                event = self._bytes_to_dict(data)
             except json.JSONDecodeError:
                 self.log.exception("Malformed event data in %s", path)
                 self._remove(path)
@@ -275,7 +275,7 @@ class ManagementEventResultFuture(ZooKeeperBase):
                 return False
             try:
                 data, _ = self.kazoo_client.get(self._result_path)
-                result = json.loads(data.decode("utf-8"))
+                result = self._bytes_to_dict(data)
             except json.JSONDecodeError:
                 self.log.exception(
                     "Malformed result data in %s", self._result_path
@@ -359,7 +359,7 @@ class ManagementEventQueue(ZooKeeperEventQueue[model.ManagementEvent]):
         result_data = {"traceback": event.traceback}
         self.kazoo_client.create(
             event.result_ref,
-            json.dumps(result_data).encode("utf-8"),
+            self._dict_to_bytes(result_data),
             ephemeral=True,
             makepath=True,
         )
