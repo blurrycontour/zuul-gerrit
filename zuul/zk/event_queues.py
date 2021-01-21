@@ -41,6 +41,7 @@ from zuul import model
 from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import ZooKeeperClient, ZooKeeperBase
+from zuul.zk.exceptions import FutureTimeoutException
 
 
 RESULT_EVENT_TYPE_MAP: Dict[str, Type[model.ResultEvent]] = {
@@ -246,15 +247,16 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
             self.kazoo_client.delete(path, recursive=True)
 
 
-class ManagementEventResultFuture(ZooKeeperBase):
+class EventResultFuture(ZooKeeperBase):
 
-    log = logging.getLogger("zuul.zk.event_queues.MangementEventResultFuture")
+    log = logging.getLogger("zuul.zk.event_queues.EventResultFuture")
 
     def __init__(self, client: ZooKeeperClient, result_path: str):
         super().__init__(client)
         self._result_path = result_path
         self._wait_event = threading.Event()
         self.kazoo_client.DataWatch(self._result_path, self._result_callback)
+        self.data: Dict[str, Any] = {}
 
     def _result_callback(
         self,
@@ -269,26 +271,62 @@ class ManagementEventResultFuture(ZooKeeperBase):
         # Stop the watch if we got a result
         return False
 
-    def wait(self, timeout: Optional[float] = None) -> bool:
+    def wait(self, timeout: Optional[float] = None) -> None:
         try:
             if not self._wait_event.wait(timeout):
-                return False
+                raise FutureTimeoutException()
             try:
                 data, _ = self.kazoo_client.get(self._result_path)
-                result = self._bytes_to_dict(data)
+                self.data = self._bytes_to_dict(data)
             except json.JSONDecodeError:
                 self.log.exception(
                     "Malformed result data in %s", self._result_path
                 )
                 raise
-            tb = result.get("traceback")
-            if tb is not None:
-                # TODO: raise some kind of ManagementEventException here
-                raise RuntimeError(tb)
         finally:
             with suppress(NoNodeError):
                 self.kazoo_client.delete(self._result_path)
-        return True
+
+
+class MergerEventResultFuture(EventResultFuture):
+
+    log = logging.getLogger("zuul.zk.event_queues.ManagementEventResultFuture")
+
+    def __init__(self, client: ZooKeeperClient, result_path: str):
+        super().__init__(client, result_path)
+
+        self.merged = None
+        self.updated = None
+        self.commit = None
+        self.files = None
+        self.repo_state = None
+        self.item_in_branches = None
+
+    def wait(self, timeout: Optional[float] = None) -> None:
+        super().wait(timeout)
+        if self.data is not None:
+            self.merged = self.data.get("merged", False)
+            self.updated = self.data.get("updated", False)
+            self.commit = self.data.get("commit")
+            self.files = self.data.get("files", {})
+            self.repo_state = self.data.get("repo_state", {})
+            self.item_in_branches = self.data.get("item_in_branches", [])
+
+
+class ManagementEventResultFuture(EventResultFuture):
+
+    log = logging.getLogger("zuul.zk.event_queues.ManagementEventResultFuture")
+
+    def __init__(self, client: ZooKeeperClient, result_path: str):
+        super().__init__(client, result_path)
+
+    def wait(self, timeout: Optional[float] = None) -> None:
+        super().wait(timeout)
+        if self.data is not None:
+            tb = self.data.get("traceback")
+            if tb is not None:
+                # TODO: raise some kind of ManagementEventException here
+                raise RuntimeError(tb)
 
 
 class ManagementEventQueue(ZooKeeperEventQueue[model.ManagementEvent]):
