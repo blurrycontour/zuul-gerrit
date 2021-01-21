@@ -984,6 +984,32 @@ class SourceContext(ConfigObject):
         )
 
 
+class ZuulMark(object):
+    # The yaml mark class differs between the C and python versions.
+    # The C version does not provide a snippet, and also appears to
+    # lose data under some circumstances.
+    def __init__(self, start_mark, end_mark, stream):
+        self.name = start_mark.name
+        self.index = start_mark.index
+        self.line = start_mark.line
+        self.end_line = end_mark.line
+        self.end_index = end_mark.index
+        self.column = start_mark.column
+        self.end_column = end_mark.column
+        self.snippet = stream[start_mark.index:end_mark.index]
+
+    def __str__(self):
+        return '  in "{name}", line {line}, column {column}'.format(
+            name=self.name,
+            line=self.line + 1,
+            column=self.column + 1,
+        )
+
+    def __eq__(self, other):
+        return (self.line == other.line and
+                self.snippet == other.snippet)
+
+
 class PlaybookContext(ConfigObject):
     """A reference to a playbook in the context of a project.
 
