@@ -9,6 +9,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+import json
 import logging
 import re
 import threading
@@ -26,6 +28,7 @@ from kazoo.protocol.states import KazooState
 from kazoo.recipe.lock import Lock
 
 from zuul.lib.config import get_default
+from zuul.lib.jsonutil import json_dumps
 from zuul.zk.exceptions import NoClientException
 
 
@@ -326,3 +329,12 @@ class ZooKeeperBase(metaclass=ABCMeta):
 
     def _onDisconnect(self) -> None:
         pass
+
+    @staticmethod
+    def _bytes_to_dict(data: bytes) -> Dict[str, Any]:
+        return json.loads(data.decode("utf-8"))
+
+    @staticmethod
+    def _dict_to_bytes(data: Dict[str, Any]) -> bytes:
+        # The custom json_dumps() will also serialize MappingProxyType objects
+        return json_dumps(data).encode("utf-8")
