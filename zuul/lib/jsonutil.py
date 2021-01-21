@@ -13,8 +13,7 @@
 import json
 import types
 
-import zuul.configloader
-import zuul.model
+from zuul.model import SourceContext, ZuulMark
 
 
 class ZuulJSONEncoder(json.JSONEncoder):
@@ -26,8 +25,8 @@ class ZuulJSONEncoder(json.JSONEncoder):
             d.pop('_start_mark', None)
             return d
         elif (
-                isinstance(o, zuul.model.SourceContext) or
-                isinstance(o, zuul.configloader.ZuulMark)):
+                isinstance(o, SourceContext) or
+                isinstance(o, ZuulMark)):
             return {}
         return json.JSONEncoder.default(self, o)
 
