@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 from enum import Enum
 from functools import total_ordering
@@ -23,7 +22,6 @@ from kazoo.protocol.states import ZnodeStat
 from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
-from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
 from zuul.zk import ZooKeeperBase, ZooKeeperClient
 from zuul.zk.exceptions import BuildNotFound
@@ -595,15 +593,6 @@ class BuildQueue(ZooKeeperBase):
             path = path[len(self.ROOT) + 1:]
 
         return path.split("/")
-
-    @staticmethod
-    def _bytes_to_dict(data: bytes) -> Dict[str, Any]:
-        return json.loads(data.decode("utf-8"))
-
-    @staticmethod
-    def _dict_to_bytes(data: Dict[str, Any]) -> bytes:
-        # The custom json_dumps() will also serialize MappingProxyType objects
-        return json_dumps(data).encode("utf-8")
 
     # TODO (felix): Remove
     @staticmethod
