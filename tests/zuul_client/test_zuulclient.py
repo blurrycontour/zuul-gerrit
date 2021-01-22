@@ -27,6 +27,15 @@ from tests.base import ZuulDBTestCase, AnsibleZuulTestCase
 from tests.unit.test_web import BaseTestWeb
 
 
+def split_pretty_table(output):
+    lines = output.decode().split('\n')
+    headers = [x.strip() for x in lines[1].split('|') if x != '']
+    # Trim headers and last line of the table
+    return [dict(zip(headers,
+                     [x.strip() for x in l.split('|') if x != '']))
+            for l in lines[3:-2]]
+
+
 class TestSmokeZuulClient(BaseTestWeb):
     def test_is_installed(self):
         """Test that the CLI is installed"""
@@ -394,19 +403,72 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
 
+    def test_show_running_jobs(self):
+        """Test the 'show running-jobs' command"""
+        # Taken from test_scheduler's test_client_get_running_jobs
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Wait for gearman server to send the initial workData back to zuul
+        start = time.time()
+        while True:
+            if time.time() - start > 10:
+                raise Exception("Timeout waiting for gearman server to report "
+                                + "back to the client")
+            build = list(self.scheds.first.sched.executor.builds.values())[0]
+            if build.worker.name == self.executor_server.hostname:
+                break
+            else:
+                time.sleep(0)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'show', 'running-jobs', '--tenant', 'tenant-one'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+
+        results = split_pretty_table(output[0])
+        self.assertEqual(3, len(results), results)
+        for job in results:
+            if job['name'] == 'project-merge':
+                self.assertEqual('project-merge', job['Name'], job)
+                self.assertEqual('gate', job['Pipeline'], job)
+                self.assertEqual('No', job['Retry'], job)
+                self.assertEqual(
+                    'stream/{uuid}?logfile=console.log'
+                    .format(uuid=job['UUID']), job['URL'], job)
+                self.assertEqual('?', job['Worker Hostname'], job)
+                self.assertEqual('No', job['Canceled'])
+                self.assertEqual('Yes', job['Voting'])
+                self.assertIn(job['Result'],
+                              ['IN PROGRESS', 'QUEUED', 'WAITING'],
+                              job)
+                break
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'show', 'running-jobs', '--tenant', 'tenant-one'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+
+        results = split_pretty_table(output)
+        self.assertEqual(0, len(results), results)
+
 
 class TestZuulClientQueryData(ZuulDBTestCase,
                               BaseTestWeb):
     config_file = 'zuul-sql-driver.conf'
     tenant_config_file = 'config/sql-driver/main.yaml'
-
-    def _split_pretty_table(self, output):
-        lines = output.decode().split('\n')
-        headers = [x.strip() for x in lines[1].split('|') if x != '']
-        # Trim headers and last line of the table
-        return [dict(zip(headers,
-                         [x.strip() for x in l.split('|') if x != '']))
-                for l in lines[3:-2]]
 
     def _split_line_output(self, output):
         lines = output.decode().split('\n')
@@ -467,7 +529,7 @@ class TestZuulClientBuilds(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(17, len(results), results)
 
         # 5 jobs in check, 3 jobs in gate
@@ -478,7 +540,7 @@ class TestZuulClientBuilds(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(8, len(results), results)
         self.assertTrue(all(x['Project'] == 'org/project' for x in results),
                         results)
@@ -491,7 +553,7 @@ class TestZuulClientBuilds(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(5, len(results), results)
         self.assertTrue(all(x['Job'] == 'project-test1' for x in results),
                         results)
@@ -504,7 +566,7 @@ class TestZuulClientBuilds(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(9, len(results), results)
         self.assertTrue(all(x['Change or Ref'].startswith('2,')
                             for x in results),
@@ -519,7 +581,7 @@ class TestZuulClientBuilds(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(0, len(results), results)
 
         for result in ['SUCCESS', 'FAILURE']:
@@ -534,7 +596,7 @@ class TestZuulClientBuilds(TestZuulClientQueryData,
                 job_count += 1
             output, err = p.communicate()
             self.assertEqual(p.returncode, 0, output)
-            results = self._split_pretty_table(output)
+            results = split_pretty_table(output)
             self.assertEqual(job_count, len(results), results)
             if len(results) > 0:
                 self.assertTrue(all(x['Result'] == result for x in results),
@@ -548,7 +610,7 @@ class TestZuulClientBuilds(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(6, len(results), results)
         self.assertTrue(all(x['Pipeline'] == 'gate' for x in results),
                         results)
@@ -585,7 +647,7 @@ class TestZuulClientBuildInfo(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         uuid = results[0]['ID']
         p = subprocess.Popen(
             ['zuul-client',
@@ -596,7 +658,7 @@ class TestZuulClientBuildInfo(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        artifacts = self._split_pretty_table(output)
+        artifacts = split_pretty_table(output)
         self.assertTrue(
             any(x['name'] == 'tarball' and
                 x['url'] == 'http://example.com/tarball'
@@ -623,7 +685,7 @@ class TestZuulClientBuildsets(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(5, len(results), results)
 
         # 1 buildset in check, 1 buildset in gate
@@ -635,7 +697,7 @@ class TestZuulClientBuildsets(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(2, len(results), results)
         self.assertTrue(all(x['Project'] == 'org/project' for x in results),
                         results)
@@ -648,7 +710,7 @@ class TestZuulClientBuildsets(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(3, len(results), results)
         self.assertTrue(all(x['Change or Ref'].startswith('2,')
                             for x in results),
@@ -663,7 +725,7 @@ class TestZuulClientBuildsets(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(0, len(results), results)
 
         # 2 buildsets in gate
@@ -674,7 +736,7 @@ class TestZuulClientBuildsets(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         self.assertEqual(2, len(results), results)
         self.assertTrue(all(x['Pipeline'] == 'gate' for x in results),
                         results)
@@ -686,7 +748,7 @@ class TestZuulClientBuildsets(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        results = self._split_pretty_table(output)
+        results = split_pretty_table(output)
         # TODO the failed job on patch B doesn't always trigger.
         failures_count = self.countJobResults(self.history, 'FAILURE')
         failures_count += self.countJobResults(self.history, 'SKIPPED')
@@ -755,7 +817,7 @@ class TestZuulClientBuildsetInfo(TestZuulClientQueryData,
             stdout=subprocess.PIPE)
         output, err = p.communicate()
         self.assertEqual(p.returncode, 0, output)
-        builds = self._split_pretty_table(output)
+        builds = split_pretty_table(output)
         self.assertTrue(all(x['Project'] == info['Project'] for x in builds),
                         output)
         self.assertTrue(all(x['Pipeline'] == info['Pipeline'] for x in builds),
