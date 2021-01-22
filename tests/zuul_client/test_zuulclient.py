@@ -26,6 +26,15 @@ from tests.base import iterate_timeout
 from tests.unit.test_web import BaseTestWeb
 
 
+def split_pretty_table(output):
+    lines = output.decode().split('\n')
+    headers = [x.strip() for x in lines[1].split('|') if x != '']
+    # Trim headers and last line of the table
+    return [dict(zip(headers,
+                     [x.strip() for x in l.split('|') if x != '']))
+            for l in lines[3:-2]]
+
+
 class TestSmokeZuulClient(BaseTestWeb):
     def test_is_installed(self):
         """Test that the CLI is installed"""
@@ -392,3 +401,64 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(C.reported, 2)
+
+    def test_show_running_jobs(self):
+        """Test the 'show running-jobs' command"""
+        # Taken from test_scheduler's test_client_get_running_jobs
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        # Wait for gearman server to send the initial workData back to zuul
+        start = time.time()
+        while True:
+            if time.time() - start > 10:
+                raise Exception("Timeout waiting for gearman server to report "
+                                + "back to the client")
+            build = list(self.scheds.first.sched.executor.builds.values())[0]
+            if build.worker.name == self.executor_server.hostname:
+                break
+            else:
+                time.sleep(0)
+
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'show', 'running-jobs', '--tenant', 'tenant-one'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+
+        results = split_pretty_table(output)
+        self.assertEqual(3, len(results), results)
+        for job in results:
+            if job['name'] == 'project-merge':
+                self.assertEqual('project-merge', job['Name'], job)
+                self.assertEqual('gate', job['Pipeline'], job)
+                self.assertEqual('No', job['Retry'], job)
+                self.assertEqual(
+                    'stream/{uuid}?logfile=console.log'
+                    .format(uuid=job['UUID']), job['URL'], job)
+                self.assertEqual('?', job['Worker Hostname'], job)
+                self.assertEqual('No', job['Canceled'])
+                self.assertEqual('Yes', job['Voting'])
+                self.assertIn(job['Result'],
+                              ['IN PROGRESS', 'QUEUED', 'WAITING'],
+                              job)
+                break
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'show', 'running-jobs', '--tenant', 'tenant-one'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output)
+
+        results = split_pretty_table(output)
+        self.assertEqual(0, len(results), results)
