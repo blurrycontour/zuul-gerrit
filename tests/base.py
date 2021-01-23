@@ -411,7 +411,9 @@ class FakeGerritChange(object):
         if parent is None:
             parent = 'refs/tags/init'
         ref = GerritChangeReference.create(
-            repo, '1/%s/%s' % (self.number, self.latest_patchset),
+            repo, '%s/%s/%s' % (str(self.number).zfill(2)[-2:],
+                                self.number,
+                                self.latest_patchset),
             parent)
         repo.head.reference = ref
         zuul.merger.merger.reset_repo_to_head(repo)
@@ -466,8 +468,9 @@ class FakeGerritChange(object):
              'createdOn': time.time(),
              'files': ps_files,
              'number': str(self.latest_patchset),
-             'ref': 'refs/changes/1/%s/%s' % (self.number,
-                                              self.latest_patchset),
+             'ref': 'refs/changes/%s/%s/%s' % (str(self.number).zfill(2)[-2:],
+                                               self.number,
+                                               self.latest_patchset),
              'revision': c.hexsha,
              'uploader': {'email': 'user@example.com',
                           'name': 'User name',

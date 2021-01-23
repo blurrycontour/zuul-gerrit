@@ -385,7 +385,7 @@ class TestExecutorRepos(ZuulTestCase):
         # one to make sure that our post job runs with the one that we
         # intended rather than simply the current repo state.
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B',
-                                           parent='refs/changes/1/1/1')
+                                           parent='refs/changes/01/1/1')
         B.setMerged()
         B_commit = str(upstream[p1].commit('master'))
         self.log.debug("B commit: %s" % B_commit)

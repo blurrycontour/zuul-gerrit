@@ -469,7 +469,7 @@ class TestMergerRepo(ZuulTestCase):
         '''Tests that git gc doesn't prune FETCH_HEAD'''
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         repo = git.Repo(parent_path)
-        change_ref = 'refs/changes/1/1'
+        change_ref = 'refs/changes/01/1'
 
         self.log.info('Creating a commit on %s', change_ref)
         repo.head.reference = repo.head.commit

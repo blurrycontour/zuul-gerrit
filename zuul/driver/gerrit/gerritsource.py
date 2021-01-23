@@ -149,7 +149,7 @@ class GerritSource(BaseSource):
         return [f]
 
     def getRefForChange(self, change):
-        partial = change[-2:]
+        partial = str(change).zfill(2)[-2:]
         return "refs/changes/%s/%s/.*" % (partial, change)
 
 

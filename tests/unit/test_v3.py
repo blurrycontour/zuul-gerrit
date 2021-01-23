@@ -2242,7 +2242,7 @@ class TestInRepoConfig(ZuulTestCase):
                      'playbooks/project-test1.yaml': in_repo_playbook}
         C = self.fake_gerrit.addFakeChange('org/project1', 'master', 'C',
                                            files=file_dict,
-                                           parent='refs/changes/1/1/1')
+                                           parent='refs/changes/01/1/1')
         C.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
             C.subject, B.data['id'])
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
