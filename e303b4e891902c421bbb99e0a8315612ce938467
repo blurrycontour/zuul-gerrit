@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "621c4724_2a01fc67",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-01-25T17:50:55Z",
+      "side": 1,
+      "message": "I don\u0027t think this is a term we ever use? We usually refer to \"build nodes\" (i.e. the existing \"node\" entry later in this glossary). If you\u0027re looking for a way to incorporate the words \"build server\" into the page, maybe add it to the node entry like, \"This is what a typical Zuul deployment would use for builds, in place of a classic build server.\"",
+      "revId": "e303b4e891902c421bbb99e0a8315612ce938467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0de11661_20052288",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-01-25T17:50:55Z",
+      "side": 1,
+      "message": "Seems like this definition may have come from something unrelated (I hesitate to say \"plagiarized,\" but it does appear to be copied verbatim from Kubernetes API documentation, please don\u0027t *ever* copy random text from elsewhere on the Web without at least providing some attribution, you could get us in lots of trouble).\n\nNodepool is the Zuul subsystem responsible for lifecycle management of build nodes and similar ephemeral resources. It acts on node requests made by the Zuul scheduler, and takes care of booting nodes as needed to fulfil these requests, deleting them again if necessary once Zuul releases its lock to indicate they\u0027re no longer in use.",
+      "revId": "e303b4e891902c421bbb99e0a8315612ce938467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb5bf1dc_12abb52d",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 419,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-01-25T17:50:55Z",
+      "side": 1,
+      "message": "CI/CD is usually capitalized.",
+      "revId": "e303b4e891902c421bbb99e0a8315612ce938467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "29ceb1fd_5b002686",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-01-25T17:50:55Z",
+      "side": 1,
+      "message": "\"Landing\" is somewhat jargony, but you \"land a patch\" you don\u0027t \"land on a patch,\" but really it may just be better to say \"before merging a single patch.\"",
+      "revId": "e303b4e891902c421bbb99e0a8315612ce938467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
