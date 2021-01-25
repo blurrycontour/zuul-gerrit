@@ -19,6 +19,41 @@
     },
     {
       "key": {
+        "uuid": "146b58d2_7347cd9e",
+        "filename": "contrib/swift-proxy/setup.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-01-25T17:31:54Z",
+      "side": 1,
+      "message": "This file is copied from zuul so I think that\u0027s ok.",
+      "parentUuid": "20ec01c3_512a0e4c",
+      "revId": "7e4be18d500140ccfae62fecb4182a1b0df702fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "01fbae2a_5fb203f0",
+        "filename": "contrib/swift-proxy/setup.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-01-25T17:31:54Z",
+      "side": 1,
+      "message": "The version should be removed.",
+      "revId": "7e4be18d500140ccfae62fecb4182a1b0df702fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2c554efb_c2ad0576",
         "filename": "contrib/swift-proxy/swift_proxy/__init__.py",
         "patchSetId": 2
