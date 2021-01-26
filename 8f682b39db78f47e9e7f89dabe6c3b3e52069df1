@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bafb0c8b_7aa2b4a0",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2021-01-26T16:30:50Z",
+      "side": 1,
+      "message": "I was not used at all to Gitlab when I tried to use it with Zuul. I was completely overwhelmed by deploys keys, deploy token, personal access token, instance level, group level, project level, ... It took me some time to find how to allow Zuul to clone repositories for multiple projects with a single connection, using the cloneurl format you said.\n\nBut having to set server AND cloneurl with the same information felt wierd (duplicating information). So modifying cloneurl to include credentials if api_token_name is defined seemed reasonable to me.\n\nAs you said, at minimum a new paragraph for cloneurl to either:\n-explain that name/token will be included if defined (+ add more check in code to include credentials if \"a:b@\" cannot already be found in parameter)\n-OR to explain multiple cases with/without credentials\n\nIMO \"something\" should be the API token name as I describe in the other comment.",
+      "parentUuid": "a03fe73f_4d0f10bb",
+      "revId": "8f682b39db78f47e9e7f89dabe6c3b3e52069df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "953a49f8_e37ec780",
         "filename": "zuul/driver/gitlab/gitlabconnection.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2021-01-26T12:15:12Z",
       "side": 1,
       "message": "Why do we need this new attribute ? It seems the user could use the cloneurl to specify the auth.",
+      "revId": "8f682b39db78f47e9e7f89dabe6c3b3e52069df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8bd66ad4_ca5ad4af",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2021-01-26T16:30:50Z",
+      "side": 1,
+      "message": "Explained by \"To clone internal or private projects, authentication is required. It\ncan be achieved using the Access Token. Currently, any names can be used\nbut [1] shows that it\u0027s likely going to be restricted to username and\ntoken-name. As token-name is directly related to an Access Token, use\nthis value.\"\nand comment in \"def getGitUrl(\"",
+      "parentUuid": "953a49f8_e37ec780",
       "revId": "8f682b39db78f47e9e7f89dabe6c3b3e52069df1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
