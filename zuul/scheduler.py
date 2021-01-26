@@ -1074,10 +1074,6 @@ class Scheduler(threading.Thread):
         # This is called from _doReconfigureEvent while holding the
         # layout lock
         if old_tenant:
-            # Copy over semaphore handler so we don't loose the currently
-            # held semaphores.
-            tenant.semaphore_handler = old_tenant.semaphore_handler
-
             self._reenqueueTenant(old_tenant, tenant)
 
         # TODOv3(jeblair): update for tenants
