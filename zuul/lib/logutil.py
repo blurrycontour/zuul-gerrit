@@ -52,3 +52,21 @@ class EventIdLogAdapter(logging.LoggerAdapter):
         new_msg.append(msg)
         msg = ' '.join(new_msg)
         return msg, kwargs
+
+
+class MultiLineFormatter(logging.Formatter):
+    def format(self, record):
+        rec = super().format(record)
+        ret = []
+        # Save the existing message and re-use this record object to
+        # format each line.
+        saved_msg = record.message
+        for i, line in enumerate(rec.split('\n')):
+            if i:
+                record.message = '  '+line
+                ret.append(self.formatMessage(record))
+            else:
+                ret.append(line)
+        # Restore the message
+        record.message = saved_msg
+        return '\n'.join(ret)
