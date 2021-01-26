@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from zuul.zk.merges import MergeJobType
+
 from tests.base import (
     iterate_timeout,
     ZuulTestCase,
@@ -59,13 +61,16 @@ class TestScaleOutScheduler(ZuulTestCase):
                 break
 
         for app in self.scheds.instances:
+            cat_jobs = [
+                job
+                for job in app.sched.merger.merge_job_queue.history.values()
+                if job.job_type == MergeJobType.CAT
+            ]
             if app is self.scheds.first:
-                self.assertIsNotNone(
-                    app.sched.merger.history.get("merger:cat")
-                )
+                self.assertTrue(cat_jobs)
             else:
                 # Make sure the other schedulers did not issue any cat jobs
-                self.assertIsNone(app.sched.merger.history.get("merger:cat"))
+                self.assertFalse(cat_jobs)
 
     def test_reconfigure(self):
         # Create a second scheduler instance

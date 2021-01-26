@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import os
 import socket
@@ -20,6 +19,8 @@ import threading
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
+from zuul.lib.logutil import get_annotated_logger
+from zuul.model import FilesChangesCompletedEvent, MergeCompletedEvent
 
 from zuul.zk import ZooKeeperClient
 
@@ -34,7 +35,7 @@ from zuul.zk.components import (
     ZooKeeperComponentRegistry, ZooKeeperComponentState
 )
 from zuul.zk.event_queues import PipelineResultEventQueue
-from zuul.zk.merges import MergeJobQueue, MergeJobState
+from zuul.zk.merges import MergeJobQueue, MergeJobState, MergeJobType
 
 COMMANDS = ['stop', 'pause', 'unpause']
 
@@ -96,7 +97,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             zk_client
         )
 
-        self._running: bool = False
+        self._merger_running: bool = False
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -123,7 +124,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             self.merger_jobs)
 
     def _mergeJobWorkerLoop(self):
-        while self._running:
+        while self._merger_running:
             for job in self.merge_job_queue.next():
                 if not self.merge_job_queue.lock(job):
                     continue
@@ -136,11 +137,83 @@ class BaseMergeServer(metaclass=ABCMeta):
                 # and try to lock it again and again.
                 self.merge_job_queue.update(job)
                 self.log.debug("Next executed merge job: %s", job)
-                # TODO (felix): Implement the job execution
+                self.executeMergeJob(job)
             # TODO (felix): Use a wake_event instead of sleep. Who can set the
             # wake event when new jobs are in the queue? Use a data watch to
             # set the wake event.
             time.sleep(1.0)
+
+    def executeMergeJob(self, job):
+        result = None
+        if job.job_type == MergeJobType.MERGE:
+            result = self.merge(job)
+        elif job.job_type == MergeJobType.CAT:
+            result = self.cat(job)
+        elif job.job_type == MergeJobType.REF_STATE:
+            result = self.refstate(job)
+        elif job.job_type == MergeJobType.FILES_CHANGES:
+            result = self.fileschanges(job)
+
+        if not result:
+            return
+
+        self.completeMergeJob(job, result)
+
+    def completeMergeJob(self, job, result):
+        log = get_annotated_logger(self.log, job.payload.get("zuul_event_id"))
+
+        merged = result.get("merged", False)
+        updated = result.get("updated", False)
+        commit = result.get("commit")
+        item_in_branches = result.get("item_in_branches", [])
+        files = result.get("files", {})
+
+        log.info(
+            "Merge %s complete, merged: %s, updated: %s, "
+            "commit: %s, branches: %s",
+            job,
+            merged,
+            updated,
+            commit,
+            item_in_branches,
+        )
+
+        if job.result_path:
+            self.merge_job_queue.report_result(job, result)
+
+        if job.build_set_uuid:
+            # Only forward events if the job has a build_set
+            if job.job_type == MergeJobType.FILES_CHANGES:
+                event = FilesChangesCompletedEvent(
+                    job.build_set_uuid,
+                    job.pipeline_name,
+                    job.queue_name,
+                    job.tenant_name,
+                    files,
+                )
+            else:
+                event = MergeCompletedEvent(
+                    job.build_set_uuid,
+                    job.pipeline_name,
+                    job.queue_name,
+                    job.tenant_name,
+                    merged,
+                    updated,
+                    commit,
+                    files,
+                    result.get("repo_state", {}),
+                    item_in_branches,
+                )
+            self.result_events[job.tenant_name][job.pipeline_name].put(event)
+
+        # Mark the merge job as complete and delete it. Although the
+        # state update is mainly for consistency reasons, it might come
+        # in handy in case the deletion fails. Thus, we know that the
+        # job was already executed and we have a result in the result
+        # queue.
+        job.state = MergeJobState.COMPLETED
+        self.merge_job_queue.update(job)
+        self.merge_job_queue.remove(job)
 
     def _getMerger(self, root, cache_root, logger=None):
         return merger.Merger(
@@ -159,7 +232,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def start(self):
         self.log.debug('Starting merger worker')
-        self._running = True
+        self._merger_running = True
         self.log.debug('Cleaning any stale git index.lock files')
         for (dirpath, dirnames, filenames) in os.walk(self.merge_root):
             if '.git' in dirnames:
@@ -183,7 +256,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def stop(self):
         self.log.debug('Stopping merger worker')
-        self._running = False
+        self._merger_running = False
         self.merger_gearworker.stop()
         self._merge_job_worker.join()
 
@@ -194,48 +267,52 @@ class BaseMergeServer(metaclass=ABCMeta):
     def pause(self):
         self.log.debug('Pausing merger worker')
         self.merger_gearworker.unregister()
-        # TODO (felix): How to pause/unpause the self._merge_job_worker? The
-        # executor server does that via its sensors + manageLoad(), but I want
-        # to avoid implementing all this in here.
+        # TODO (felix): How to pause/unpause the self._merge_job_worker?
 
     def unpause(self):
         self.log.debug('Resuming merger worker')
         self.merger_gearworker.register()
+        # TODO (felix): How to pause/unpause the self._merge_job_worker?
 
     def cat(self, job):
-        self.log.debug("Got cat job: %s" % job.unique)
-        args = json.loads(job.arguments)
+        self.log.debug("Got cat job: %s", job.uuid)
+        payload = job.payload
 
-        connection_name = args['connection']
-        project_name = args['project']
+        connection_name = payload["connection"]
+        project_name = payload["project"]
         self._update(connection_name, project_name)
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
         try:
             self._update(connection_name, project_name)
             with lock:
-                files = self.merger.getFiles(connection_name, project_name,
-                                             args['branch'], args['files'],
-                                             args.get('dirs'))
+                files = self.merger.getFiles(
+                    connection_name,
+                    project_name,
+                    payload["branch"],
+                    payload["files"],
+                    payload.get("dirs"),
+                )
         except Exception:
             result = dict(update=False)
         else:
             result = dict(updated=True, files=files)
-
-        job.sendWorkComplete(json.dumps(result))
+        return result
 
     def merge(self, job):
-        self.log.debug("Got merge job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
+        self.log.debug("Got merge job: %s", job.uuid)
+        payload = job.payload
+        zuul_event_id = payload.get("zuul_event_id")
 
         ret = self.merger.mergeChanges(
-            args['items'], args.get('files'),
-            args.get('dirs', []),
-            args.get('repo_state'),
-            branches=args.get('branches'),
+            payload["items"],
+            payload.get("files"),
+            payload.get("dirs", []),
+            payload.get("repo_state"),
+            branches=payload.get("branches"),
             repo_locks=self.repo_locks,
-            zuul_event_id=zuul_event_id)
+            zuul_event_id=zuul_event_id
+        )
 
         result = dict(merged=(ret is not None))
         if ret is None:
@@ -244,29 +321,31 @@ class BaseMergeServer(metaclass=ABCMeta):
             (result['commit'], result['files'], result['repo_state'],
              recent, orig_commit) = ret
         result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        return result
 
     def refstate(self, job):
-        self.log.debug("Got refstate job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
-        success, repo_state, item_in_branches = \
-            self.merger.getRepoState(
-                args['items'], branches=args.get('branches'),
-                repo_locks=self.repo_locks)
+        self.log.debug("Got refstate job: %s", job.uuid)
+        payload = job.payload
+        zuul_event_id = payload.get("zuul_event_id")
+
+        success, repo_state, item_in_branches = self.merger.getRepoState(
+            payload["items"],
+            branches=payload.get("branches"),
+            repo_locks=self.repo_locks,
+        )
         result = dict(updated=success,
                       repo_state=repo_state,
                       item_in_branches=item_in_branches)
         result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        return result
 
     def fileschanges(self, job):
-        self.log.debug("Got fileschanges job: %s" % job.unique)
-        args = json.loads(job.arguments)
-        zuul_event_id = args.get('zuul_event_id')
+        self.log.debug("Got fileschanges job: %s", job.uuid)
+        payload = job.payload
+        zuul_event_id = payload.get("zuul_event_id")
 
-        connection_name = args['connection']
-        project_name = args['project']
+        connection_name = payload["connection"]
+        project_name = payload["project"]
         self._update(connection_name, project_name,
                      zuul_event_id=zuul_event_id)
 
@@ -276,16 +355,19 @@ class BaseMergeServer(metaclass=ABCMeta):
                          zuul_event_id=zuul_event_id)
             with lock:
                 files = self.merger.getFilesChanges(
-                    connection_name, project_name,
-                    args['branch'], args['tosha'],
-                    zuul_event_id=zuul_event_id)
+                    connection_name,
+                    project_name,
+                    payload["branch"],
+                    payload["tosha"],
+                    zuul_event_id=zuul_event_id,
+                )
         except Exception:
             result = dict(update=False)
         else:
             result = dict(updated=True, files=files)
 
-        result['zuul_event_id'] = zuul_event_id
-        job.sendWorkComplete(json.dumps(result))
+        result["zuul_event_id"] = zuul_event_id
+        return result
 
 
 class MergeServer(BaseMergeServer):
