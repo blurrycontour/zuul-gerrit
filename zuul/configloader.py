@@ -37,6 +37,7 @@ from zuul.lib.keystorage import KeyStorage
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.zk import ZooKeeperClient
+from zuul.zk.semaphore import SemaphoreHandler
 
 
 # Several forms accept either a single item or a list, this makes
@@ -1615,6 +1616,9 @@ class TenantParser(object):
 
         tenant.layout = self._parseLayout(
             tenant, parsed_config, loading_errors)
+        tenant.semaphore_handler = SemaphoreHandler(
+            self.scheduler.zk_client, tenant.name, tenant.layout
+        )
 
         return tenant
 
