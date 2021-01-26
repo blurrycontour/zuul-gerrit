@@ -3837,7 +3837,7 @@ def cpu_times(self):
 
 class TestScheduler(zuul.scheduler.Scheduler):
     _merger_client_class = RecordingMergeClient
-    _zk_builds_class = TestBuildQueue
+    _build_queue_class = TestBuildQueue
 
 
 class BaseTestCase(testtools.TestCase):
