@@ -12,7 +12,7 @@
 # implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from collections import defaultdict
 
 import cherrypy
 import socket
@@ -233,7 +233,7 @@ class ZuulWebAPI(object):
         self.cache_time = {}
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
-        self.status_lock = threading.Lock()
+        self.status_lock = defaultdict(threading.Lock)
 
     def _basic_auth_header_check(self):
         """make sure protected endpoints have a Authorization header with the
@@ -721,13 +721,21 @@ class ZuulWebAPI(object):
         return ret
 
     def _getStatus(self, tenant):
-        with self.status_lock:
-            if tenant not in self.cache or \
-               (time.time() - self.cache_time[tenant]) > self.cache_expiry:
-                job = self.rpc.submitJob('zuul:status_get',
-                                         {'tenant': tenant})
-                self.cache[tenant] = json.loads(job.data[0])
-                self.cache_time[tenant] = time.time()
+        if tenant not in self.cache or \
+           (time.time() - self.cache_time[tenant]) > self.cache_expiry:
+            if self.status_lock[tenant].acquire(blocking=False):
+                try:
+                    job = self.rpc.submitJob('zuul:status_get',
+                                             {'tenant': tenant})
+                    self.cache[tenant] = json.loads(job.data[0])
+                    self.cache_time[tenant] = time.time()
+                finally:
+                    self.status_lock[tenant].release()
+            else:
+                # We didn't get the lock so an update is in progress. Thus we
+                # just need to wait for the lock and immediately release it.
+                with self.status_lock[tenant]:
+                    pass
         payload = self.cache[tenant]
         if payload.get('code') == 404:
             raise cherrypy.HTTPError(404, payload['message'])
