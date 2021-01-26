@@ -131,7 +131,7 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
     _merger_client_class = MergeClient
-    _zk_builds_class = BuildQueue
+    _build_queue_class = BuildQueue
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
@@ -172,7 +172,7 @@ class Scheduler(threading.Thread):
         self.triggers: Dict[str, BaseTrigger] = dict()
         self.config: ConfigParser = config
         self.zk_client: ZooKeeperClient = zk_client
-        self.build_queue: BuildQueue = self._zk_builds_class(zk_client)
+        self.build_queue: BuildQueue = self._build_queue_class(zk_client)
         self.zk_component_registry: ZooKeeperComponentRegistry = (
             ZooKeeperComponentRegistry(zk_client)
         )

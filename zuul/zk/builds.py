@@ -213,6 +213,12 @@ class BuildQueue(ZooKeeperBase):
             # the cache is enabled.
             self.register_all_zones()
 
+    @property
+    def initial_state(self) -> BuildState:
+        # This is used to override the initial BuildState in the TestBuildQueue
+        # for tests which have a hold_jobs_in_queue enabled.
+        return BuildState.REQUESTED
+
     def _onConnect(self) -> None:
         # Will be called by ZooKeeperBase when the connection is established
         if not self.use_cache:
@@ -295,11 +301,6 @@ class BuildQueue(ZooKeeperBase):
     def next(self) -> Generator[BuildItem, None, None]:
         yield from self.in_state(BuildState.REQUESTED)
 
-    def _create_new_state(self) -> BuildState:
-        # This is used to override the initial BuildState in the TestBuildQueue
-        # for tests which have a hold_jobs_in_queue enabled.
-        return BuildState.REQUESTED
-
     def submit(
         self,
         uuid: str,
@@ -315,7 +316,7 @@ class BuildQueue(ZooKeeperBase):
 
         build = BuildItem(
             uuid,
-            self._create_new_state(),
+            self.initial_state,
             precedence,
             params,
             zone,
