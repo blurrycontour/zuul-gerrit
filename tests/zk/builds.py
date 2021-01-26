@@ -33,16 +33,17 @@ class TestBuildQueue(BuildQueue):
         super().__init__(client, zone_filter, tree_callback, use_cache)
         self.hold_in_queue: bool = False
 
+    @property
+    def initial_state(self) -> BuildState:
+        if self.hold_in_queue:
+            return BuildState.HOLD
+        return BuildState.REQUESTED
+
     def requested(self):
         return self.in_state(BuildState.REQUESTED, BuildState.HOLD)
 
     def all(self):
         return self.in_state()
-
-    def _create_new_state(self) -> BuildState:
-        if self.hold_in_queue:
-            return BuildState.HOLD
-        return BuildState.REQUESTED
 
     def release(self, what: Union[None, str, BuildItem] = None):
         """

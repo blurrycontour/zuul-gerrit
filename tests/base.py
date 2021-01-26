@@ -70,7 +70,7 @@ from tests.zk import TestZooKeeperClient
 from tests.zk.builds import TestBuildQueue
 from tests.zk.merges import TestMergeJobQueue
 from zuul.driver.sql.sqlconnection import DatabaseSession
-from zuul.model import BuildSet, Change, PRECEDENCE_NORMAL, WebInfo
+from zuul.model import Change, WebInfo
 from zuul.rpcclient import RPCClient
 from zuul.driver.zuul import ZuulDriver
 from zuul.driver.git import GitDriver
@@ -3878,7 +3878,7 @@ def cpu_times(self):
 
 class TestScheduler(zuul.scheduler.Scheduler):
     _merger_client_class = RecordingMergeClient
-    _zk_builds_class = TestBuildQueue
+    _build_queue_class = TestBuildQueue
 
 
 class BaseTestCase(testtools.TestCase):

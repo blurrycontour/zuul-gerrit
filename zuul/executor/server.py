@@ -2545,7 +2545,7 @@ class ExecutorServer(BaseMergeServer):
     _ansible_manager_class = AnsibleManager
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
-    _zk_builds_class = BuildQueue
+    _build_queue_class = BuildQueue
 
     def __init__(
         self,
@@ -2689,7 +2689,7 @@ class ExecutorServer(BaseMergeServer):
                 self.ansible_manager.install()
         self.ansible_manager.copyAnsibleFiles()
 
-        self.build_queue: BuildQueue = self._zk_builds_class(
+        self.build_queue: BuildQueue = self._build_queue_class(
             zk_client,
             [self.zone or BuildQueue.DEFAULT_ZONE],
             self._tree_cache_listener,
