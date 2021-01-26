@@ -307,7 +307,7 @@ class ZuulWebAPI(object):
         self.cache_time = {}
         self.cache_expiry = 1
         self.static_cache_expiry = zuulweb.static_cache_expiry
-        self.status_lock = threading.Lock()
+        self.status_lock = defaultdict(threading.Lock)
 
     def _basic_auth_header_check(self):
         """make sure protected endpoints have a Authorization header with the
@@ -928,12 +928,19 @@ class ZuulWebAPI(object):
 
     def _getStatus(self, tenant_name):
         tenant = self._getTenantOrRaise(tenant_name)
-        with self.status_lock:
-            if tenant not in self.cache or \
-               (time.time() - self.cache_time[tenant]) > self.cache_expiry:
-                self.cache[tenant_name] = self.formatStatus(tenant)
-                self.cache_time[tenant_name] = time.time()
-
+        if tenant_name not in self.cache or \
+           (time.time() - self.cache_time[tenant_name]) > self.cache_expiry:
+            if self.status_lock[tenant_name].acquire(blocking=False):
+                try:
+                    self.cache[tenant_name] = self.formatStatus(tenant)
+                    self.cache_time[tenant_name] = time.time()
+                finally:
+                    self.status_lock[tenant_name].release()
+            else:
+                # We didn't get the lock so an update is in progress. Thus we
+                # just need to wait for the lock and immediately release it.
+                with self.status_lock[tenant_name]:
+                    pass
         payload = self.cache[tenant_name]
         resp = cherrypy.response
         resp.headers["Cache-Control"] = f"public, max-age={self.cache_expiry}"
