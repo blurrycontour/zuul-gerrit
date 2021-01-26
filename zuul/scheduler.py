@@ -359,36 +359,6 @@ class Scheduler(threading.Thread):
     def addManagementEvent(self, event: ManagementEvent):
         self.management_events.put(event, needs_result=False)
 
-    def onMergeCompleted(self, build_set, merged, updated,
-                         commit, files, repo_state, item_in_branches):
-        tenant_name = build_set.item.pipeline.tenant.name
-        pipeline_name = build_set.item.pipeline.name
-        event = MergeCompletedEvent(
-            build_set.uuid,
-            build_set.item.pipeline.name,
-            build_set.item.queue.name,
-            tenant_name,
-            merged,
-            updated,
-            commit,
-            files,
-            repo_state,
-            item_in_branches,
-        )
-        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
-
-    def onFilesChangesCompleted(self, build_set, files):
-        tenant_name = build_set.item.pipeline.tenant.name
-        pipeline_name = build_set.item.pipeline.name
-        event = FilesChangesCompletedEvent(
-            build_set.uuid,
-            build_set.item.pipeline.name,
-            build_set.item.queue.name,
-            tenant_name,
-            files,
-        )
-        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
-
     def onNodesProvisioned(self, request):
         tenant_name = request.build_set.item.pipeline.tenant.name
         pipeline_name = request.build_set.item.pipeline.name

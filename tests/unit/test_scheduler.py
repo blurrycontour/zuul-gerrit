@@ -45,6 +45,7 @@ from tests.base import (
     iterate_timeout,
 )
 from zuul.zk.layout import LayoutState
+from zuul.zk.merges import MergeJobState, MergeJobType
 
 EMPTY_LAYOUT_STATE = LayoutState("", "unknown", 0)
 
@@ -3931,13 +3932,9 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.builds), 2)
 
         merge_count_project1 = 0
-        for job in self.gearman_server.jobs_history:
-            if job.name == b'merger:refstate':
-                args = job.arguments
-                if isinstance(args, bytes):
-                    args = args.decode('utf-8')
-                args = json.loads(args)
-                if args["items"][0]["project"] == "org/project1":
+        for job in self.merge_job_history.values():
+            if job.job_type == MergeJobType.REF_STATE:
+                if job.payload["items"][0]["project"] == "org/project1":
                     merge_count_project1 += 1
         self.assertEquals(merge_count_project1, 0,
                           "project1 shouldn't have any refstate call")
@@ -6167,18 +6164,18 @@ For CI problems and help debugging, contact ci@example.org"""
     def test_pending_merge_in_reconfig(self):
         # Test that if we are waiting for an outstanding merge on
         # reconfiguration that we continue to do so.
-        self.gearman_server.hold_merge_jobs_in_queue = True
+        self.hold_merge_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         A.setMerged()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
-        gearJob = next(iter(self.scheds.first.sched.merger.jobs))
-        self.assertEqual(gearJob.complete, False)
+        jobs = list(self.merge_job_queue.all())
+        self.assertEqual(len(jobs), 1)
+        self.assertEqual(jobs[0].state, MergeJobState.HOLD)
 
         # Reconfigure while we still have an outstanding merge job
-        self.gearman_server.hold_merge_jobs_in_queue = False
+        self.hold_merge_jobs_in_queue = False
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         (trusted, project1) = tenant.getProject('org/project1')
         self.scheds.first.sched.reconfigureTenant(
@@ -6188,16 +6185,17 @@ For CI problems and help debugging, contact ci@example.org"""
 
         # Verify the merge job is still running and that the item is
         # in the pipeline
-        self.assertEqual(gearJob.complete, False)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 1)
+        jobs = list(self.merge_job_queue.all())
+        self.assertEqual(jobs[0].state, MergeJobState.HOLD)
+        self.assertEqual(len(jobs), 1)
 
         pipeline = tenant.layout.pipelines['post']
         self.assertEqual(len(pipeline.getAllItems()), 1)
-        self.gearman_server.release()
+        self.merge_job_queue.release()
         self.waitUntilSettled()
 
-        self.assertEqual(gearJob.complete, True)
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 0)
+        jobs = list(self.merge_job_queue.all())
+        self.assertEqual(len(jobs), 0)
 
     @simple_layout('layouts/parent-matchers.yaml')
     def test_parent_matchers(self):
