@@ -66,6 +66,7 @@ import paramiko
 
 from tests.zk import TestZooKeeperClient
 from tests.zk.builds import TestBuildQueue
+from tests.zk.merges import TestMergeJobQueue
 
 from psutil import Popen
 from zuul.driver.zuul import ZuulDriver
@@ -86,10 +87,11 @@ from zuul.executor.server import JobDir
 from zuul.lib.config import get_default
 from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.named_queue import NamedQueue
-from zuul.model import Change
+from zuul.model import BuildSet, Change, PRECEDENCE_NORMAL, WebInfo
 from zuul.rpcclient import RPCClient
 from zuul.zk import ZooKeeperClient
 from zuul.zk.builds import BuildItem, BuildResult, BuildState
+from zuul.zk.merges import MergeJobState, MergeJobType
 
 import tests.fakegithub
 import zuul.driver.gerrit.gerritsource as gerritsource
@@ -110,7 +112,6 @@ import zuul.lib.auth
 import zuul.merger.client
 import zuul.merger.merger
 import zuul.merger.server
-import zuul.model
 import zuul.nodepool
 import zuul.rpcclient
 import zuul.configloader
@@ -3028,16 +3029,26 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
 
 class RecordingMergeClient(zuul.merger.client.MergeClient):
 
+    _merge_job_queue_class = TestMergeJobQueue
+
     def __init__(self, config, sched):
         super().__init__(config, sched)
         self.history = {}
 
-    def submitJob(self, name, data, build_set,
-                  precedence=zuul.model.PRECEDENCE_NORMAL, event=None):
-        self.history.setdefault(name, [])
-        self.history[name].append((data, build_set))
+    def submitJob(
+        self,
+        job_type: MergeJobType,
+        data: Dict[str, Any],
+        build_set: BuildSet,
+        precedence: int = PRECEDENCE_NORMAL,
+        needs_result: bool = False,
+        event=None,
+    ):
+        self.history.setdefault(job_type, [])
+        self.history[job_type].append((data, build_set))
         return super().submitJob(
-            name, data, build_set, precedence, event=event)
+            job_type, data, build_set, precedence, needs_result, event=event
+        )
 
 
 class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
@@ -3053,7 +3064,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     """
 
     _job_class = RecordingAnsibleJob
-    _zk_builds_class = TestBuildQueue
+    _build_queue_class = TestBuildQueue
 
     def __init__(self, *args, **kw):
         self._run_ansible: bool = kw.pop('_run_ansible', False)
@@ -3640,7 +3651,7 @@ class ZuulWebFixture(fixtures.Fixture):
                  rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
                  add_cleanup: Callable[[Callable[[], None]], None],
                  test_root: str, zk_hosts: str,
-                 info: Optional[zuul.model.WebInfo] = None):
+                 info: Optional[WebInfo] = None):
         super(ZuulWebFixture, self).__init__()
         self.gearman_server_port = gearman_server_port
         self.connections = TestConnectionRegistry(
@@ -3655,7 +3666,7 @@ class ZuulWebFixture(fixtures.Fixture):
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(config)
         if info is None:
-            self.info = zuul.model.WebInfo.fromConfig(config)
+            self.info = WebInfo.fromConfig(config)
         else:
             self.info = info
         self.zk_hosts = zk_hosts
@@ -4123,6 +4134,7 @@ class ZuulTestCase(BaseTestCase):
         self.zk_client = ZooKeeperClient(hosts=self.zk_config)
         self.zk_client.connect()
         self.build_queue = TestBuildQueue(self.zk_client)
+        self.merge_job_queue = TestMergeJobQueue(self.zk_client)
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4727,12 +4739,36 @@ class ZuulTestCase(BaseTestCase):
         return self.build_queue.hold_in_queue
 
     @hold_jobs_in_queue.setter
-    def hold_jobs_in_queue(self, hold_jobs_in_queue: bool):
+    def hold_jobs_in_queue(self, hold_in_queue: bool):
         """Helper method to set hold_in_queue on all involved BuildQueues"""
 
-        self.build_queue.hold_in_queue = hold_jobs_in_queue
+        self.build_queue.hold_in_queue = hold_in_queue
         for app in self.scheds:
-            app.sched.build_queue.hold_in_queue = hold_jobs_in_queue
+            app.sched.build_queue.hold_in_queue = hold_in_queue
+
+    @property
+    def hold_merge_jobs_in_queue(self):
+        return self.merge_job_queue.hold_in_queue
+
+    @hold_merge_jobs_in_queue.setter
+    def hold_merge_jobs_in_queue(self, hold_in_queue: bool):
+        """Helper method to set hold_in_queue on all involved MergeJobQueues"""
+
+        self.merge_job_queue.hold_in_queue = hold_in_queue
+        for app in self.scheds:
+            app.sched.merger.merge_job_queue.hold_in_queue = hold_in_queue
+
+    @property
+    def merge_job_history(self):
+        history = {}
+        for app in self.scheds:
+            history.update(app.sched.merger.merge_job_queue.history)
+        return history
+
+    @merge_job_history.deleter
+    def merge_job_history(self):
+        for app in self.scheds:
+            app.sched.merger.merge_job_queue.history.clear()
 
     def getParameter(self, job, name):
         if isinstance(job, FakeBuild):
@@ -4830,10 +4866,16 @@ class ZuulTestCase(BaseTestCase):
     def __areAllMergeJobsWaiting(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
             merge_client = app.sched.merger
+            queued_merge_jobs = list(merge_client.merge_job_queue.in_state())
+            # Always ignore merge jobs which are on hold.
+            for job in queued_merge_jobs:
+                if job.state != MergeJobState.HOLD:
+                    return False
             for client_job in list(merge_client.jobs):
                 if not client_job.handle:
                     self.log.debug("%s has no handle" % client_job)
                     return False
+                # TODO (felix): Remove the gearman_server.jobs
                 server_job = self.gearman_server.jobs.get(client_job.handle)
                 if not server_job:
                     self.log.debug("%s is not known to the gearman server" %
