@@ -52,3 +52,10 @@ class EventIdLogAdapter(logging.LoggerAdapter):
         new_msg.append(msg)
         msg = ' '.join(new_msg)
         return msg, kwargs
+
+
+class SingleLineFormatter(logging.Formatter):
+    def format(self, record):
+        rec = super().format(record)
+        rec = ' | '.join([line.strip() for line in rec.split('\n')])
+        return rec
