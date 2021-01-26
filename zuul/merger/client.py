@@ -14,15 +14,14 @@
 
 import json
 import logging
-import threading
+from typing import Any, Dict, Optional
 from uuid import uuid4
 
 import gear
 
-import zuul.model
 from zuul.lib.config import get_default
-from zuul.lib.logutil import get_annotated_logger
-from zuul.zk.merges import MergeJobQueue
+from zuul.model import BuildSet, PRECEDENCE_HIGH, PRECEDENCE_NORMAL
+from zuul.zk.merges import MergeJob, MergeJobQueue, MergeJobType
 
 
 def getJobData(job):
@@ -59,20 +58,10 @@ class MergeGearmanClient(gear.Client):
         self.__merge_client.onBuildCompleted(job)
 
 
-class MergeJob(gear.TextJob):
-    def __init__(self, *args, **kw):
-        super(MergeJob, self).__init__(*args, **kw)
-        self.__event = threading.Event()
-
-    def setComplete(self):
-        self.__event.set()
-
-    def wait(self, timeout=300):
-        return self.__event.wait(timeout)
-
-
 class MergeClient(object):
     log = logging.getLogger("zuul.MergeClient")
+
+    _merge_job_queue_class = MergeJobQueue
 
     def __init__(self, config, sched):
         self.config = config
@@ -93,7 +82,9 @@ class MergeClient(object):
         self.gearman.waitForServer()
         self.jobs = set()
 
-        self.merge_job_queue = MergeJobQueue(self.sched.zk_client)
+        self.merge_job_queue = self._merge_job_queue_class(
+            self.sched.zk_client
+        )
 
     def stop(self):
         self.gearman.shutdown()
@@ -103,105 +94,106 @@ class MergeClient(object):
             return True
         return False
 
-    def submitJob(self, name, data, build_set,
-                  precedence=zuul.model.PRECEDENCE_NORMAL, event=None):
-        log = get_annotated_logger(self.log, event)
-        uuid = str(uuid4().hex)
-        job = MergeJob(name,
-                       json.dumps(data),
-                       unique=uuid)
-        job.build_set = build_set
-        log.debug("Submitting job %s with data %s", job, data)
-        self.jobs.add(job)
-        self.gearman.submitJob(job, precedence=precedence,
-                               timeout=300)
-        return job
-
-    def mergeChanges(self, items, build_set, files=None, dirs=None,
-                     repo_state=None, precedence=zuul.model.PRECEDENCE_NORMAL,
-                     branches=None, event=None):
+    def submitJob(
+        self,
+        job_type: MergeJobType,
+        data: Dict[str, Any],
+        build_set: Optional[BuildSet],
+        precedence: int = PRECEDENCE_NORMAL,
+        needs_result: bool = False,
+        event=None,
+    ):
+        # Extend the job data with the event id if provided
         if event is not None:
             zuul_event_id = event.zuul_event_id
         else:
             zuul_event_id = None
+        data["zuul_event_id"] = zuul_event_id
+
+        # In case no build_set is provided, we don't have the necessary values
+        # in the MergeJob to provide a result event. However, this shouldn't be
+        # much of a problem, as in those cases, the return value of this
+        # function will be used to provide the result.
+        build_set_uuid = None
+        tenant_name = None
+        pipeline_name = None
+        queue_name = None
+
+        if build_set is not None:
+            build_set_uuid = build_set.uuid
+            tenant_name = build_set.item.pipeline.tenant.name
+            pipeline_name = build_set.item.pipeline.name
+            queue_name = build_set.item.queue.name
+
+        uuid = str(uuid4().hex)
+
+        job = MergeJob(
+            uuid,
+            self.merge_job_queue.initial_state,
+            job_type,
+            data,
+            precedence,
+            build_set_uuid,
+            tenant_name,
+            pipeline_name,
+            queue_name,
+        )
+
+        return self.merge_job_queue.submit(job, needs_result, event)
+
+    def mergeChanges(self, items, build_set, files=None, dirs=None,
+                     repo_state=None, precedence=PRECEDENCE_NORMAL,
+                     branches=None, event=None):
         data = dict(items=items,
                     files=files,
                     dirs=dirs,
                     repo_state=repo_state,
-                    branches=branches,
-                    zuul_event_id=zuul_event_id)
-        self.submitJob('merger:merge', data, build_set, precedence,
-                       event=event)
+                    branches=branches)
+
+        self.submitJob(
+            MergeJobType.MERGE, data, build_set, precedence, event=event
+        )
 
     def getRepoState(self, items, build_set,
-                     precedence=zuul.model.PRECEDENCE_NORMAL,
+                     precedence=PRECEDENCE_NORMAL,
                      branches=None, event=None):
-        if event is not None:
-            zuul_event_id = event.zuul_event_id
-        else:
-            zuul_event_id = None
 
-        data = dict(items=items, branches=branches,
-                    zuul_event_id=zuul_event_id)
-        self.submitJob('merger:refstate', data, build_set, precedence,
-                       event=event)
+        data = dict(items=items, branches=branches)
+        self.submitJob(
+            MergeJobType.REF_STATE, data, build_set, precedence, event=event
+        )
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[],
-                 precedence=zuul.model.PRECEDENCE_HIGH, event=None):
-        if event is not None:
-            zuul_event_id = event.zuul_event_id
-        else:
-            zuul_event_id = None
-
+                 precedence=PRECEDENCE_HIGH, event=None):
         data = dict(connection=connection_name,
                     project=project_name,
                     branch=branch,
                     files=files,
-                    dirs=dirs,
-                    zuul_event_id=zuul_event_id)
-        job = self.submitJob('merger:cat', data, None, precedence, event=event)
+                    dirs=dirs)
+        job = self.submitJob(
+            MergeJobType.CAT,
+            data,
+            None,
+            precedence,
+            needs_result=True,
+            event=event,
+        )
         return job
 
     def getFilesChanges(self, connection_name, project_name, branch,
-                        tosha=None, precedence=zuul.model.PRECEDENCE_HIGH,
+                        tosha=None, precedence=PRECEDENCE_HIGH,
                         build_set=None, event=None):
-        if event is not None:
-            zuul_event_id = event.zuul_event_id
-        else:
-            zuul_event_id = None
 
         data = dict(connection=connection_name,
                     project=project_name,
                     branch=branch,
-                    tosha=tosha,
-                    zuul_event_id=zuul_event_id)
-        job = self.submitJob('merger:fileschanges', data, build_set,
-                             precedence, event=event)
+                    tosha=tosha)
+        job = self.submitJob(
+            MergeJobType.FILES_CHANGES,
+            data,
+            build_set,
+            precedence,
+            needs_result=True,
+            event=event,
+        )
         return job
-
-    def onBuildCompleted(self, job):
-        data = getJobData(job)
-        zuul_event_id = data.get('zuul_event_id')
-        log = get_annotated_logger(self.log, zuul_event_id)
-
-        merged = data.get('merged', False)
-        job.updated = data.get('updated', False)
-        commit = data.get('commit')
-        files = data.get('files', {})
-        repo_state = data.get('repo_state', {})
-        item_in_branches = data.get('item_in_branches', [])
-        job.files = files
-        log.info("Merge %s complete, merged: %s, updated: %s, "
-                 "commit: %s, branches: %s", job, merged, job.updated, commit,
-                 item_in_branches)
-        job.setComplete()
-        if job.build_set:
-            if job.name == 'merger:fileschanges':
-                self.sched.onFilesChangesCompleted(job.build_set, files)
-            else:
-                self.sched.onMergeCompleted(job.build_set,
-                                            merged, job.updated, commit, files,
-                                            repo_state, item_in_branches)
-        # The test suite expects the job to be removed from the
-        # internal account after the wake flag is set.
-        self.jobs.remove(job)
