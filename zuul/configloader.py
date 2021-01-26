@@ -1839,12 +1839,13 @@ class TenantParser(object):
                 branch_cache.setValidFor(tpc)
 
         for job in jobs:
-            self.log.debug("Waiting for cat job %s" % (job,))
+            self.log.debug("Waiting for cat job %s", job)
             job.wait(self.merger.git_timeout)
             if not job.updated:
-                raise Exception("Cat job %s failed" % (job,))
-            self.log.debug("Cat job %s got files %s" %
-                           (job, job.files.keys()))
+                raise Exception(f"Cat job {job} failed")
+            self.log.debug(
+                "Cat job %s got files %s", job, job.files.keys()
+            )
             loaded = False
             files = sorted(job.files.keys())
             tpc = tenant.project_configs[
@@ -1866,16 +1867,17 @@ class TenantParser(object):
                         conf_root not in tpc.extra_config_dirs):
                         if (loaded and loaded != conf_root):
                             self.log.warning(
-                                "Multiple configuration files in %s" %
-                                (job.source_context,))
+                                "Multiple configuration files in %s",
+                                job.source_context,
+                            )
                             continue
                         loaded = conf_root
                     # Create a new source_context so we have unique filenames.
                     source_context = job.source_context.copy()
                     source_context.path = fn
                     self.log.info(
-                        "Loading configuration from %s" %
-                        (source_context,))
+                        "Loading configuration from %s", source_context
+                    )
                     incdata = self.loadProjectYAML(
                         job.files[fn], source_context, loading_errors)
                     branch_cache = abide.getUnparsedBranchCache(
