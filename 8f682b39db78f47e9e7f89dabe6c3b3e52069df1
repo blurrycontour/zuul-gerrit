@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a03fe73f_4d0f10bb",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2021-01-26T12:15:12Z",
+      "side": 1,
+      "message": "I\u0027ve tested with a cloneurl set in the zuul.conf of form https://something:\u003capi_token\u003e@gitlab.com and it worked as expected. So I\u0027m not sure why we need this new setting.\n\nIf we go for the cloneurl solution maybe a new paragraph in this doc about how to deal with private repositories will be welcome.",
+      "revId": "8f682b39db78f47e9e7f89dabe6c3b3e52069df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "953a49f8_e37ec780",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2021-01-26T12:15:12Z",
+      "side": 1,
+      "message": "Why do we need this new attribute ? It seems the user could use the cloneurl to specify the auth.",
+      "revId": "8f682b39db78f47e9e7f89dabe6c3b3e52069df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
