@@ -19,7 +19,9 @@ import json
 import logging
 import os
 from logging import LoggerAdapter
-from typing import Any, Tuple, Dict, List, Optional, Type, TypeVar
+from typing import (
+    Any, Dict, List, Optional, Tuple, Type, TYPE_CHECKING, TypeVar
+)
 
 import re2
 import struct
@@ -41,6 +43,9 @@ from zuul.lib.artifacts import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
 from zuul.trigger import BaseTrigger
+
+if TYPE_CHECKING:
+    from zuul.zk.semaphore import SemaphoreHandler
 
 MERGER_MERGE = 1          # "git merge"
 MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
@@ -4815,113 +4820,6 @@ class Semaphore(ConfigObject):
                 self.max == other.max)
 
 
-class SemaphoreHandler(object):
-    log = logging.getLogger("zuul.SemaphoreHandler")
-
-    def __init__(self):
-        self.semaphores = {}
-
-    def acquire(self, item, job, request_resources):
-        """
-        Aquires a semaphore for an item job combination. This gets called twice
-        during the lifecycle of a job. The first call is before requesting
-        build resources. The second call is before running the job. In which
-        call we really acquire the semaphore is defined by the job.
-
-        :param item: The item
-        :param job: The job
-        :param request_resources: True if we want to acquire for the request
-                                  resources phase, False if we want to acquire
-                                  for the run phase.
-        """
-        if not job.semaphore:
-            return True
-
-        log = get_annotated_logger(self.log, item.event)
-        if job.semaphore.resources_first and request_resources:
-            # We're currently in the resource request phase and want to get the
-            # resources before locking. So we don't need to do anything here.
-            return True
-        else:
-            # As a safety net we want to acuire the semaphore at least in the
-            # run phase so don't filter this here as re-acuiring the semaphore
-            # is not a problem here if it has been already acquired before in
-            # the resources phase.
-            pass
-
-        semaphore_key = job.semaphore.name
-
-        m = self.semaphores.get(semaphore_key)
-        if not m:
-            # The semaphore is not held, acquire it
-            self._acquire(semaphore_key, item, job.name, log)
-            return True
-        if (item, job.name) in m:
-            # This item already holds the semaphore
-            return True
-
-        # semaphore is there, check max
-        if len(m) < self._max_count(item, job.semaphore.name):
-            self._acquire(semaphore_key, item, job.name, log)
-            return True
-
-        return False
-
-    def release(self, item, job):
-        if not job.semaphore:
-            return
-
-        log = get_annotated_logger(self.log, item.event)
-        semaphore_key = job.semaphore.name
-
-        m = self.semaphores.get(semaphore_key)
-        if not m:
-            # The semaphore is not held, nothing to do
-            log.error("Semaphore can not be released for %s "
-                      "because the semaphore is not held", item)
-            return
-        if (item, job.name) in m:
-            # This item is a holder of the semaphore
-            self._release(semaphore_key, item, job.name, log)
-            return
-        log.error("Semaphore can not be released for %s "
-                  "which does not hold it", item)
-
-    def _acquire(self, semaphore_key, item, job_name, log):
-        log.debug("Semaphore acquire {semaphore}: job {job}, item {item}"
-                  .format(semaphore=semaphore_key,
-                          job=job_name,
-                          item=item))
-        if semaphore_key not in self.semaphores:
-            self.semaphores[semaphore_key] = []
-        self.semaphores[semaphore_key].append((item, job_name))
-
-    def _release(self, semaphore_key, item, job_name, log):
-        log.debug("Semaphore release {semaphore}: job {job}, item {item}"
-                  .format(semaphore=semaphore_key,
-                          job=job_name,
-                          item=item))
-        sem_item = (item, job_name)
-        if sem_item in self.semaphores[semaphore_key]:
-            self.semaphores[semaphore_key].remove(sem_item)
-
-        # cleanup if there is no user of the semaphore anymore
-        if len(self.semaphores[semaphore_key]) == 0:
-            del self.semaphores[semaphore_key]
-
-    @staticmethod
-    def _max_count(item, semaphore_name):
-        if not item.layout:
-            # This should not occur as the layout of the item must already be
-            # built when acquiring or releasing a semaphore for a job.
-            raise Exception("Item {} has no layout".format(item))
-
-        # find the right semaphore
-        default_semaphore = Semaphore(semaphore_name, 1)
-        semaphores = item.layout.semaphores
-        return semaphores.get(semaphore_name, default_semaphore).max
-
-
 class Tenant(object):
     def __init__(self, name):
         self.name = name
@@ -4944,7 +4842,7 @@ class Tenant(object):
         self.untrusted_projects: List[Project] = []
         # The parsed config from those projects.
         self.untrusted_projects_config = None
-        self.semaphore_handler: SemaphoreHandler = SemaphoreHandler()
+        self.semaphore_handler: "SemaphoreHandler" = None
         # Metadata about projects for this tenant
         # canonical project name -> TenantProjectConfig
         self.project_configs = {}
