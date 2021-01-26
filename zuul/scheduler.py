@@ -897,10 +897,6 @@ class Scheduler(threading.Thread):
         old_tenant = self.abide.tenants.get(tenant.name)
 
         if old_tenant:
-            # Copy over semaphore handler so we don't loose the currently
-            # held semaphores.
-            tenant.semaphore_handler = old_tenant.semaphore_handler
-
             self._reenqueueTenant(old_tenant, tenant)
 
         # TODOv3(jeblair): update for tenants
