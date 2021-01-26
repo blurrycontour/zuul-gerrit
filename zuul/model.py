@@ -2190,6 +2190,7 @@ class QueueItem(object):
                  event: Optional['TriggerEvent']):
         log = logging.getLogger("zuul.QueueItem")
         self.log: LoggerAdapter = get_annotated_logger(log, event)
+        self.uuid: str = uuid4().hex
         self.pipeline: Pipeline = queue.pipeline
         self.queue: ChangeQueue = queue
         self.change: Change = change  # a ref
@@ -2226,8 +2227,8 @@ class QueueItem(object):
             pipeline = self.pipeline.name
         else:
             pipeline = None
-        return '<QueueItem 0x%x for %s in %s>' % (
-            id(self), self.change, pipeline)
+        return '<QueueItem %s for %s in %s>' % (
+            self.uuid, self.change, pipeline)
 
     def resetAllBuilds(self):
         self.current_build_set = BuildSet(self)
