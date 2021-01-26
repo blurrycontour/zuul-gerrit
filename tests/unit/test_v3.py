@@ -25,6 +25,7 @@ import paramiko
 
 import zuul.configloader
 from zuul.lib import encryption
+from zuul.zk.merges import MergeJobType
 from tests.base import (
     AnsibleZuulTestCase,
     ZuulTestCase,
@@ -2553,7 +2554,8 @@ class TestNonLiveMerges(ZuulTestCase):
         # We expect one merge call per live change, plus one call for
         # each non-live change with a config update (which is all of them).
         self.assertEqual(
-            len(self.scheds.first.sched.merger.history['merger:merge']), 6)
+            len(self.scheds.first.sched.merger.history[MergeJobType.MERGE]), 6
+        )
 
     def test_non_live_merges(self):
         """
@@ -2577,7 +2579,8 @@ class TestNonLiveMerges(ZuulTestCase):
 
         # We expect one merge call per live change.
         self.assertEqual(
-            len(self.scheds.first.sched.merger.history['merger:merge']), 3)
+            len(self.scheds.first.sched.merger.history[MergeJobType.MERGE]), 3
+        )
 
 
 class TestJobContamination(AnsibleZuulTestCase):
@@ -3503,7 +3506,7 @@ class TestBrokenMultiTenantConfig(ZuulTestCase):
         # the tenant loads with an error, but proceeds.
 
         # Don't run any merge jobs, so we can run them out of order.
-        self.gearman_server.hold_merge_jobs_in_queue = True
+        self.hold_merge_jobs_in_queue = True
 
         # Create a first change which modifies the config (and
         # therefore will require a merge job).
@@ -3523,13 +3526,11 @@ class TestBrokenMultiTenantConfig(ZuulTestCase):
         self.waitUntilSettled()
 
         # There should be a merge job for each change.
-        self.assertEqual(len(self.scheds.first.sched.merger.jobs), 2)
+        self.assertEqual(len(list(self.merge_job_queue.all())), 2)
 
-        jobs = [job for job in self.gearman_server.getQueue()
-                if job.name.startswith(b'merger:')]
+        jobs = list(self.merge_job_queue.queued())
         # Release the second merge job.
-        jobs[-1].waiting = False
-        self.gearman_server.wakeConnections()
+        self.merge_job_queue.release(jobs[-1])
         self.waitUntilSettled()
 
         # At this point we should still be waiting on the first
@@ -3537,8 +3538,8 @@ class TestBrokenMultiTenantConfig(ZuulTestCase):
         self.assertHistory([])
 
         # Proceed.
-        self.gearman_server.hold_merge_jobs_in_queue = False
-        self.gearman_server.release()
+        self.hold_merge_jobs_in_queue = False
+        self.merge_job_queue.release()
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='base', result='SUCCESS', changes='1,1 2,1'),
