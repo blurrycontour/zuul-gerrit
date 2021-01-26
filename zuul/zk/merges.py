@@ -28,8 +28,9 @@ from zuul.zk.exceptions import MergeJobNotFound
 
 class MergeJobState(Enum):
     REQUESTED = 0
-    RUNNING = 1
-    COMPLETED = 2
+    HOLD = 1
+    RUNNING = 2
+    COMPLETED = 3
 
 
 class MergeJobType(Enum):
@@ -162,6 +163,12 @@ class MergeJobQueue(ZooKeeperBase):
 
     def next(self) -> Generator[MergeJob, None, None]:
         yield from self.in_state(MergeJobState.REQUESTED)
+
+    @property
+    def initial_state(self) -> MergeJobState:
+        # This is used to override the initial MergeJobState in the
+        # TestMergeJobQueue in case hold_jobs_in_queue is enabled.
+        return MergeJobState.REQUESTED
 
     def submit(
         self, job: MergeJob, needs_result: bool = False, event=None
