@@ -87,6 +87,23 @@
       "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0544a116_5f3cd69b",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-27T21:40:11Z",
+      "side": 1,
+      "message": "That makes it seem more like an oversight in the docs to me.  My guess is the intent is to use \u0027class\u0027 if it subclasses the built-in formatter class (as we do) and \u0027()\u0027 if the formatter takes entirely different args.",
+      "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
