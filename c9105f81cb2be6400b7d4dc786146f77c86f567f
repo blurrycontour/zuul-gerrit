@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b8dfc001_d29eedcd",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-01-27T02:01:51Z",
+      "side": 1,
+      "message": "I may be missing something, but I can not see anywhere that \"formatters\" supports a \"class\" field?\n\nhttps://docs.python.org/3/library/logging.config.html#logging-config-dictschema\n\n The dictionary passed to dictConfig() must contain the following keys:\n ...\n formatters - the corresponding value will be a dict in which each key is a formatter id and each value is a dict describing how to configure the corresponding Formatter instance.\n\n The configuring dict is searched for keys format and datefmt (with defaults of None) and these are used to construct a Formatter instance.\n\nI\u0027m not really convinced this works ... and I\u0027m not sure what logs to look at to confirm that?  I don\u0027t think any of the successful tox runs actually keep the zuul logs to inspect?",
+      "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
