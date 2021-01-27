@@ -52,6 +52,23 @@
       "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9bcf25f4_7af323b2",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-27T14:43:58Z",
+      "side": 1,
+      "message": "It works.  I tested this before submitting it.  If you want, we could create a unit test for it.\n\nThis is why class works: https://github.com/python/cpython/blob/master/Lib/logging/config.py#L670\n\nIt mirrors the stanza below in handlers.  But I agree, it\u0027s undocumented.  It\u0027s hard to say whether that\u0027s an oversign or intentional.  We may be able to use this approach instead which is fully documented but more verbose: https://docs.python.org/3/library/logging.config.html#user-defined-objects",
+      "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
