@@ -84,11 +84,22 @@ _DEFAULT_SERVER_LOGGING_CONFIG = {
             'level': 'INFO',
             'formatter': 'simple',
         },
+        'console_debug': {
+            # Used for printing to stdout
+            'class': 'logging.StreamHandler',
+            'stream': 'ext://sys.stdout',
+            'level': 'DEBUG',
+            'formatter': 'simple',
+        },
     },
     'loggers': {
         'zuul': {
             'handlers': ['console'],
             'level': 'INFO',
+        },
+        'zuul.GerritReporter': {
+            'handlers': ['console_debug'],
+            'level': 'DEBUG',
         },
         'zuul.GerritConnection.io': {
             'handlers': ['console'],
