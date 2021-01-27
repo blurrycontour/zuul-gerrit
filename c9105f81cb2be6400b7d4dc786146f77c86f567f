@@ -16,6 +16,24 @@
       "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "766ecadb_a56a7f27",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2021-01-27T07:53:21Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this affect the quickstart logs? I\u0027m pretty sure this or something similar works however since we\u0027ve done this to get json logs in the past.",
+      "parentUuid": "b8dfc001_d29eedcd",
+      "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
