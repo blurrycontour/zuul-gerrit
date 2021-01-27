@@ -34,6 +34,24 @@
       "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "69974cb2_4335df99",
+        "filename": "zuul/ansible/logconfig.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-01-27T08:13:04Z",
+      "side": 1,
+      "message": "Good point; that does have the most complete set of logs of the jobs probably.  I went through\n\nhttps://storage.bhs.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_b74/772602/1/check/zuul-quick-start/b748a57/container_logs/\n\nand didn\u0027t see any instances of this, however.\n\nalthough the launcher log does have some examples of exceptions that would also be nice to have covered too 😊\n\nhttps://storage.bhs.cloud.ovh.net/v1/AUTH_dcaab5e32b234d56b626f72581e3644c/zuul_opendev_logs_b74/772602/1/check/zuul-quick-start/b748a57/container_logs/launcher.log",
+      "parentUuid": "766ecadb_a56a7f27",
+      "revId": "c9105f81cb2be6400b7d4dc786146f77c86f567f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
