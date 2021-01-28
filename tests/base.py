@@ -3176,7 +3176,6 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         super(RecordingExecutorServer, self).stop()
 
 
-# TODO (felix): Remove?
 class FakeGearmanServer(gear.Server):
     """A Gearman server for use in tests.
 
@@ -4607,7 +4606,6 @@ class ZuulTestCase(BaseTestCase):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.scheds.execute(lambda app: app.sched.executor.stop())
-        self.scheds.execute(lambda app: app.sched.merger.stop())
         if self.merge_server:
             self.merge_server.stop()
             self.merge_server.join()
@@ -4865,30 +4863,13 @@ class ZuulTestCase(BaseTestCase):
 
     def __areAllMergeJobsWaiting(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
-            merge_client = app.sched.merger
-            queued_merge_jobs = list(merge_client.merge_job_queue.in_state())
+            queued_merge_jobs = list(
+                app.sched.merger.merge_job_queue.in_state()
+            )
             # Always ignore merge jobs which are on hold.
             for job in queued_merge_jobs:
                 if job.state != MergeJobState.HOLD:
                     return False
-            for client_job in list(merge_client.jobs):
-                if not client_job.handle:
-                    self.log.debug("%s has no handle" % client_job)
-                    return False
-                # TODO (felix): Remove the gearman_server.jobs
-                server_job = self.gearman_server.jobs.get(client_job.handle)
-                if not server_job:
-                    self.log.debug("%s is not known to the gearman server" %
-                                   client_job)
-                    return False
-                if not hasattr(server_job, 'waiting'):
-                    self.log.debug("%s is being enqueued" % server_job)
-                    return False
-                if server_job.waiting:
-                    self.log.debug("%s is waiting" % server_job)
-                    continue
-                self.log.debug("%s is not waiting" % server_job)
-                return False
         return True
 
     def __eventQueuesEmpty(self) -> Generator[bool, None, None]:
@@ -5038,9 +5019,6 @@ class ZuulTestCase(BaseTestCase):
         logger("All builds waiting: %s" % areAllBuildsWaiting)
         logger("All requests completed: %s" % areAllNodeRequestsComplete)
         logger("All event queues empty: %s" % allEventQueuesEmpty)
-        for app in self.scheds.filter(matcher):
-            logger("[Sched: %s] Merge client jobs: %s" %
-                   (app.sched, app.sched.merger.jobs))
 
     def waitForPoll(self, poller, timeout=30):
         self.log.debug("Wait for poll on %s", poller)

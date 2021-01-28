@@ -28,7 +28,6 @@ from zuul.lib.connections import ConnectionRegistry
 
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
-from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
 from zuul.merger.merger import nullcontext
 from zuul.zk.components import (
@@ -109,19 +108,6 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         # Repo locking is needed on the executor
         self.repo_locks = self._repo_locks_class()
-
-        self.merger_jobs = {
-            'merger:merge': self.merge,
-            'merger:cat': self.cat,
-            'merger:refstate': self.refstate,
-            'merger:fileschanges': self.fileschanges,
-        }
-        self.merger_gearworker = ZuulGearWorker(
-            'Zuul Merger',
-            'zuul.BaseMergeServer',
-            'merger-gearman-worker',
-            self.config,
-            self.merger_jobs)
 
     def _mergeJobWorkerLoop(self):
         while self._merger_running:
@@ -251,27 +237,22 @@ class BaseMergeServer(metaclass=ABCMeta):
                         self.log.exception(
                             'Unable to remove stale git lock: '
                             '%s this may result in failed merges' % fp)
-        self.merger_gearworker.start()
         self._merge_job_worker.start()
 
     def stop(self):
         self.log.debug('Stopping merger worker')
         self._merger_running = False
-        self.merger_gearworker.stop()
         self._merge_job_worker.join()
 
     def join(self):
-        self.merger_gearworker.join()
         self._merge_job_worker.join()
 
     def pause(self):
         self.log.debug('Pausing merger worker')
-        self.merger_gearworker.unregister()
         # TODO (felix): How to pause/unpause the self._merge_job_worker?
 
     def unpause(self):
         self.log.debug('Resuming merger worker')
-        self.merger_gearworker.register()
         # TODO (felix): How to pause/unpause the self._merge_job_worker?
 
     def cat(self, job):
