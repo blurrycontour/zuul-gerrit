@@ -18,6 +18,7 @@ from uuid import uuid4
 
 from zuul.lib.config import get_default
 from zuul.model import BuildSet, PRECEDENCE_HIGH, PRECEDENCE_NORMAL
+from zuul.zk import ZooKeeperClient
 from zuul.zk.merges import MergeJob, MergeJobQueue, MergeJobType
 
 
@@ -26,15 +27,12 @@ class MergeClient(object):
 
     _merge_job_queue_class = MergeJobQueue
 
-    def __init__(self, config, sched):
+    def __init__(self, config, zk_client: ZooKeeperClient):
         self.config = config
-        self.sched = sched
         self.git_timeout = get_default(
             self.config, 'merger', 'git_timeout', 300
         )
-        self.merge_job_queue = self._merge_job_queue_class(
-            self.sched.zk_client
-        )
+        self.merge_job_queue = self._merge_job_queue_class(zk_client)
 
     def submitJob(
         self,
