@@ -3087,8 +3087,8 @@ class RecordingMergeClient(zuul.merger.client.MergeClient):
 
     _merge_job_queue_class = TestMergeJobQueue
 
-    def __init__(self, config, sched):
-        super().__init__(config, sched)
+    def __init__(self, config, zk_client: ZooKeeperClient):
+        super().__init__(config, zk_client)
         self.history = {}
 
     def submitJob(
