@@ -240,7 +240,8 @@ class Scheduler(threading.Thread):
 
         if not testonly:
             self.executor = self._executor_client_class(self.config, self)
-            self.merger = self._merger_client_class(self.config, self)
+            self.merger = self._merger_client_class(
+                self.config, self.zk_client)
             self.nodepool = nodepool.Nodepool(
                 self.zk_client, self.hostname, self.statsd, self)
 

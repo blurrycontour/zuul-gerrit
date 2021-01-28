@@ -29,12 +29,11 @@ class MergeClient(object):
 
     _merger_api_class = MergerApi
 
-    def __init__(self, config, sched):
+    def __init__(self, config, zk_client):
         self.config = config
-        self.sched = sched
         self.git_timeout = get_default(
             self.config, 'merger', 'git_timeout', 300)
-        self.merger_api = self._merger_api_class(self.sched.zk_client)
+        self.merger_api = self._merger_api_class(zk_client)
 
     def submitJob(
         self,
