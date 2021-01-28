@@ -1316,6 +1316,19 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 msg = msg[1:-1]
             l = [queryMethod(change) for change in self.changes.values()
                  if msg in change.data['commitMessage']]
+        elif query.startswith("status:"):
+            cut_off_time = 0
+            parts = query.split(" ")
+            for part in parts:
+                if part.startswith("-age"):
+                    _, _, age = part.partition(":")
+                    cut_off_time = (
+                        datetime.datetime.now().timestamp() - float(age[:-1])
+                    )
+            l = [
+                queryMethod(change) for change in self.changes.values()
+                if change.data["lastUpdated"] >= cut_off_time
+            ]
         else:
             # Query all open changes
             l = [queryMethod(change) for change in self.changes.values()]
