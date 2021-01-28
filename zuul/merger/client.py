@@ -12,50 +12,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 from typing import Any, Dict, Optional
 from uuid import uuid4
 
-import gear
-
 from zuul.lib.config import get_default
 from zuul.model import BuildSet, PRECEDENCE_HIGH, PRECEDENCE_NORMAL
 from zuul.zk.merges import MergeJob, MergeJobQueue, MergeJobType
-
-
-def getJobData(job):
-    if not len(job.data):
-        return {}
-    d = job.data[-1]
-    if not d:
-        return {}
-    return json.loads(d)
-
-
-class MergeGearmanClient(gear.Client):
-    def __init__(self, merge_client):
-        super(MergeGearmanClient, self).__init__('Zuul Merge Client')
-        self.__merge_client = merge_client
-
-    def handleWorkComplete(self, packet):
-        job = super(MergeGearmanClient, self).handleWorkComplete(packet)
-        self.__merge_client.onBuildCompleted(job)
-        return job
-
-    def handleWorkFail(self, packet):
-        job = super(MergeGearmanClient, self).handleWorkFail(packet)
-        self.__merge_client.onBuildCompleted(job)
-        return job
-
-    def handleWorkException(self, packet):
-        job = super(MergeGearmanClient, self).handleWorkException(packet)
-        self.__merge_client.onBuildCompleted(job)
-        return job
-
-    def handleDisconnect(self, job):
-        job = super(MergeGearmanClient, self).handleDisconnect(job)
-        self.__merge_client.onBuildCompleted(job)
 
 
 class MergeClient(object):
@@ -66,33 +29,12 @@ class MergeClient(object):
     def __init__(self, config, sched):
         self.config = config
         self.sched = sched
-        server = self.config.get('gearman', 'server')
-        port = get_default(self.config, 'gearman', 'port', 4730)
-        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-        self.log.debug("Connecting to gearman at %s:%s" % (server, port))
-        self.gearman = MergeGearmanClient(self)
-        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
-                               keepalive=True, tcp_keepidle=60,
-                               tcp_keepintvl=30, tcp_keepcnt=5)
         self.git_timeout = get_default(
-            self.config, 'merger', 'git_timeout', 300)
-        self.log.debug("Waiting for gearman")
-        self.gearman.waitForServer()
-        self.jobs = set()
-
+            self.config, 'merger', 'git_timeout', 300
+        )
         self.merge_job_queue = self._merge_job_queue_class(
             self.sched.zk_client
         )
-
-    def stop(self):
-        self.gearman.shutdown()
-
-    def areMergesOutstanding(self):
-        if self.jobs:
-            return True
-        return False
 
     def submitJob(
         self,
