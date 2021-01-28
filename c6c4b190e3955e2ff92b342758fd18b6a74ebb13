@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4cd9da9f_5fe9f872",
+        "filename": "tests/zuul_client/test_zuulclient.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-01-28T21:22:29Z",
+      "side": 1,
+      "message": "Is there a reason why this is capped at 80 column and less than 4k bytes?\nWould it be more useful to test a larger payload like `\u0027a\u0027 * 10_000` ?",
+      "range": {
+        "startLine": 43,
+        "startChar": 27,
+        "endLine": 43,
+        "endChar": 51
+      },
+      "revId": "c6c4b190e3955e2ff92b342758fd18b6a74ebb13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
