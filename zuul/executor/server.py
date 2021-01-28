@@ -2699,9 +2699,6 @@ class ExecutorServer(BaseMergeServer):
                 self.ansible_manager.install()
         self.ansible_manager.copyAnsibleFiles()
 
-        self.process_merge_jobs = get_default(self.config, 'executor',
-                                              'merge_jobs', True)
-
         self.build_queue: BuildQueue = self._zk_builds_class(
             zk_client,
             [self.zone or BuildQueue.DEFAULT_ZONE],
@@ -2721,6 +2718,10 @@ class ExecutorServer(BaseMergeServer):
             name="ExecutorServerBuildCleanupThread"
         )
 
+        self.process_merge_jobs = get_default(
+            self.config, "executor", "merge_jobs", True
+        )
+
         # Used to offload expensive operations to different processes
         self.process_worker = None
 
@@ -2734,6 +2735,14 @@ class ExecutorServer(BaseMergeServer):
     @accepting_work.setter
     def accepting_work(self, work):
         self.zk_component.set("accepting_work", work)
+
+    @property
+    def process_merge_jobs(self):
+        return self.zk_component.get("process_merge_jobs", False)
+
+    @process_merge_jobs.setter
+    def process_merge_jobs(self, process_merge_jobs):
+        self.zk_component.set("process_merge_jobs", process_merge_jobs)
 
     def start(self):
         # Start merger worker only if we process merge jobs
