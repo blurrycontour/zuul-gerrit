@@ -247,7 +247,9 @@ class Scheduler(threading.Thread):
             default_version=default_ansible_version)
 
         self.executor: ExecutorClient = ExecutorClient(self.config, self)
-        self.merger: MergeClient = self._merger_client_class(self.config, self)
+        self.merger: MergeClient = self._merger_client_class(
+            self.config, zk_client
+        )
         self.nodepool: Nodepool = Nodepool(self)
         self.connections.registerScheduler(self)
 
