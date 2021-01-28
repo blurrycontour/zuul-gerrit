@@ -39,7 +39,6 @@ from zuul.executor.client import ExecutorClient
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
-from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
@@ -99,6 +98,7 @@ from zuul.zk.locks import (
     tenant_read_lock,
     tenant_write_lock,
 )
+from zuul.zk.merges import MergeJobState
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 if TYPE_CHECKING:
@@ -305,20 +305,16 @@ class Scheduler(threading.Thread):
     def _runStats(self):
         if not self.statsd:
             return
-        functions = getGearmanFunctions(self.rpc.gearworker.gearman)
-        functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
+
         mergers_online = 0
-        merge_queue = 0
-        merge_running = 0
-        for (name, (queued, running, registered)) in functions.items():
-            if name == 'merger:merge':
-                mergers_online = registered
-            if name.startswith('merger:'):
-                merge_queue += queued - running
-                merge_running += running
-        self.statsd.gauge('zuul.mergers.online', mergers_online)
-        self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
-        self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
+        for merger in self.zk_component_registry.all("mergers"):
+            mergers_online += 1
+        merge_queue = len(
+            list(self.merger.merge_job_queue.in_state(MergeJobState.REQUESTED))
+        )
+        merge_running = len(
+            list(self.merger.merge_job_queue.in_state(MergeJobState.RUNNING))
+        )
 
         executors_accepting = 0
         executors_online = 0
@@ -326,6 +322,10 @@ class Scheduler(threading.Thread):
             executors_online += 1
             if executor.get('accepting_work', False):
                 executors_accepting += 1
+            # In case the executor also provides merger capabilities, count it
+            # as merger.
+            if executor.get("process_merge_jobs", False):
+                mergers_online += 1
         execute_queue = len(
             list(self.build_queue.in_state(BuildState.REQUESTED))
         )
@@ -336,6 +336,11 @@ class Scheduler(threading.Thread):
                 )
             )
         )
+
+        self.statsd.gauge('zuul.mergers.online', mergers_online)
+        self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
+        self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
+
         self.statsd.gauge('zuul.executors.online', executors_online)
         self.statsd.gauge('zuul.executors.accepting', executors_accepting)
         self.statsd.gauge('zuul.executors.jobs_running', execute_running)
