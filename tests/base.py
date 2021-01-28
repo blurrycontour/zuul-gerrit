@@ -92,7 +92,7 @@ from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.named_queue import NamedQueue
 from zuul.zk import ZooKeeperClient
 from zuul.zk.builds import BuildItem, BuildResult, BuildState
-from zuul.zk.merges import MergeJobState, MergeJobType
+from zuul.zk.merges import MergeJobState
 from psutil import Popen
 
 import tests.fakegithub
@@ -3126,26 +3126,9 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
 
 class RecordingMergeClient(zuul.merger.client.MergeClient):
 
+    # TODO (felix): Can we provide this class somewhere else, so we can remove
+    # the RecordingMergeClient completely?
     _merge_job_queue_class = TestMergeJobQueue
-
-    def __init__(self, config, zk_client: ZooKeeperClient):
-        super().__init__(config, zk_client)
-        self.history = {}
-
-    def submitJob(
-        self,
-        job_type: MergeJobType,
-        data: Dict[str, Any],
-        build_set: BuildSet,
-        precedence: int = PRECEDENCE_NORMAL,
-        needs_result: bool = False,
-        event=None,
-    ):
-        self.history.setdefault(job_type, [])
-        self.history[job_type].append((data, build_set))
-        return super().submitJob(
-            job_type, data, build_set, precedence, needs_result, event=event
-        )
 
 
 class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
