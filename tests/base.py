@@ -3201,27 +3201,8 @@ class TestingMergerApi(HoldableMergerApi):
         return self.inState()
 
 
-class RecordingMergeClient(zuul.merger.client.MergeClient):
-
+class HoldableMergeClient(zuul.merger.client.MergeClient):
     _merger_api_class = HoldableMergerApi
-
-    def __init__(self, config, zk_client: ZooKeeperClient):
-        super().__init__(config, zk_client)
-        self.history = {}
-
-    def submitJob(
-        self,
-        job_type,
-        data,
-        build_set,
-        precedence=PRECEDENCE_NORMAL,
-        needs_result=False,
-        event=None,
-    ):
-        self.history.setdefault(job_type, [])
-        self.history[job_type].append((data, build_set))
-        return super().submitJob(
-            job_type, data, build_set, precedence, needs_result, event=event)
 
 
 class HoldableExecutorApi(ExecutorApi):
@@ -3443,7 +3424,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
 
 class TestScheduler(zuul.scheduler.Scheduler):
-    _merger_client_class = RecordingMergeClient
+    _merger_client_class = HoldableMergeClient
     _executor_client_class = HoldableExecutorClient
 
 
