@@ -40,7 +40,8 @@ for a file named ``zuul.yaml`` or a directory named ``zuul.d``, and if
 they are not found, ``.zuul.yaml`` or ``.zuul.d`` (with a leading
 dot). In the case of an :term:`untrusted-project`, the configuration
 from every branch is included, however, in the case of a
-:term:`config-project`, only the ``master`` branch is examined.
+:term:`config-project`, only the branch defined in the tenant configuration
+:attr:`tenant.config-projects` ``load-branch` is examined.
 
 When a change is proposed to one of these files in an
 untrusted-project, the configuration proposed in the change is merged
