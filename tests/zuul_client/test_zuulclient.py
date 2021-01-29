@@ -40,6 +40,7 @@ class TestZuulClientEncrypt(BaseTestWeb):
     tenant_config_file = 'config/secrets/main.yaml'
     config_file = 'zuul-admin-web.conf'
     secret = {'password': 'zuul-client'}
+    large_secret = {'key': (('a' * 79 + '\n') * 50)[:-1]}
 
     def setUp(self):
         super(TestZuulClientEncrypt, self).setUp()
@@ -51,6 +52,21 @@ class TestZuulClientEncrypt(BaseTestWeb):
         for pb in build.parameters[pbtype]:
             secrets.append(pb['secrets'])
         return secrets
+
+    def test_encrypt_large_secret(self):
+        """Test that we can use zuul-client to encrypt a large secret"""
+        p = subprocess.Popen(
+            ['zuul-client',
+             '--zuul-url', self.base_url,
+             'encrypt', '--tenant', 'tenant-one', '--project', 'org/project2',
+             '--secret-name', 'my_secret', '--field-name', 'key'],
+            stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+        p.stdin.write(
+            str.encode(self.large_secret['key'])
+        )
+        output, error = p.communicate()
+        p.stdin.close()
+        self._test_encrypt(self.large_secret, output, error)
 
     def test_encrypt(self):
         """Test that we can use zuul-client to generate a project secret"""
@@ -65,7 +81,7 @@ class TestZuulClientEncrypt(BaseTestWeb):
         )
         output, error = p.communicate()
         p.stdin.close()
-        self._test_encrypt(output, error)
+        self._test_encrypt(self.secret, output, error)
 
     def test_encrypt_outfile(self):
         """Test that we can use zuul-client to generate a project secret to a
@@ -84,7 +100,7 @@ class TestZuulClientEncrypt(BaseTestWeb):
         _, error = p.communicate()
         p.stdin.close()
         output = outfile.read()
-        self._test_encrypt(output, error)
+        self._test_encrypt(self.secret, output, error)
 
     def test_encrypt_infile(self):
         """Test that we can use zuul-client to generate a project secret from
@@ -103,9 +119,9 @@ class TestZuulClientEncrypt(BaseTestWeb):
             stdout=subprocess.PIPE)
         output, error = p.communicate()
         os.unlink(infile.name)
-        self._test_encrypt(output, error)
+        self._test_encrypt(self.secret, output, error)
 
-    def _test_encrypt(self, output, error):
+    def _test_encrypt(self, _secret, output, error):
         self.assertEqual(None, error, error)
         self.assertTrue(b'- secret:' in output, output.decode())
         new_repo_conf = output.decode()
@@ -151,7 +167,7 @@ class TestZuulClientEncrypt(BaseTestWeb):
         secrets = self._getSecrets('project2-secret', 'playbooks')
         self.assertEqual(
             secrets,
-            [{'my_secret': self.secret}],
+            [{'my_secret': _secret}],
             secrets)
 
 
