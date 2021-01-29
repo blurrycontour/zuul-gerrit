@@ -196,4 +196,9 @@ def main():
 
 
 if __name__ == '__main__':
+    print(
+        "This script is deprecated. Use `zuul-client encrypt` instead. "
+        "Please refer to https://zuul-ci.org/docs/zuul-client/ "
+        "for more details on how to use zuul-client."
+    )
     main()
