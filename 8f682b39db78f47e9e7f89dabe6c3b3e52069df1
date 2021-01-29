@@ -37,6 +37,57 @@
     },
     {
       "key": {
+        "uuid": "77a24795_8293fbbc",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-29T22:07:06Z",
+      "side": 1,
+      "message": "I\u0027m normally pretty reluctant to add unecessary options, but the way Guillaume describes it, this seems more user friendly.  I like the idea of having clear instructions that say \"set these 4 values (api token name, api token, webhook token, server) and the rest can be ignored except in advanced cases.",
+      "revId": "8f682b39db78f47e9e7f89dabe6c3b3e52069df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "294e7b94_4c5b7654",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-29T22:07:06Z",
+      "side": 1,
+      "message": "spelling: authentication",
+      "revId": "8f682b39db78f47e9e7f89dabe6c3b3e52069df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f5e0b28b_b9d5d98a",
+        "filename": "doc/source/reference/drivers/gitlab.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-01-29T22:07:06Z",
+      "side": 1,
+      "message": "Should we say \"Omit\" instead of \"Leave blank\" to be clear?",
+      "revId": "8f682b39db78f47e9e7f89dabe6c3b3e52069df1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "953a49f8_e37ec780",
         "filename": "zuul/driver/gitlab/gitlabconnection.py",
         "patchSetId": 3
