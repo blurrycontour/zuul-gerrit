@@ -1,4 +1,5 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -1230,6 +1231,7 @@ class Job(ConfigObject):
             protected_origin=None,
             secrets=(),  # secrets aren't inheritable
             queued=False,
+            waiting_status=None,  # Text description of why its waiting
         )
 
         self.attributes = {}
@@ -2658,25 +2660,49 @@ class QueueItem(object):
             if job not in jobs_not_requested:
                 continue
             if not self.jobRequirementsReady(job):
+                job.waiting_status = 'requirements: {}'.format(
+                    ', '.join(job.requires))
                 continue
-            all_parent_jobs_successful = True
-            for parent_job in self.job_graph.getParentJobsRecursively(
-                    job.name):
-                if parent_job.name in unexecuted_job_names \
-                        or parent_job.name in failed_job_names:
-                    all_parent_jobs_successful = False
+
+            # Some set operations to figure out what jobs we really need:
+            all_dep_jobs_successful = True
+            # Every parent job (dependency), whether soft or hard:
+            all_dep_job_names = set(
+                [x.name for x in
+                 self.job_graph.getParentJobsRecursively(job.name)])
+            # Only the hard deps:
+            hard_dep_job_names = set(
+                [x.name for x in self.job_graph.getParentJobsRecursively(
+                    job.name, skip_soft=True)])
+            # Any dep that hasn't finished (or started) running
+            unexecuted_dep_job_names = unexecuted_job_names & all_dep_job_names
+            # Any dep that has finished and failed
+            failed_dep_job_names = failed_job_names & all_dep_job_names
+            ignored_hard_dep_job_names = hard_dep_job_names & ignored_job_names
+            # We can't proceed if there are any:
+            # * Deps that haven't finished running
+            #     (this includes soft deps that haven't skipped)
+            # * Deps that have failed
+            # * Hard deps that were skipped
+            required_dep_job_names = (
+                unexecuted_dep_job_names |
+                failed_dep_job_names |
+                ignored_hard_dep_job_names)
+            if required_dep_job_names:
+                    job.waiting_status = 'dependencies: {}'.format(
+                        ', '.join(required_dep_job_names))
+                    all_dep_jobs_successful = False
                     break
-            for parent_job in self.job_graph.getParentJobsRecursively(
-                    job.name, skip_soft=True):
-                if parent_job.name in ignored_job_names:
-                    all_parent_jobs_successful = False
-                    break
-            if all_parent_jobs_successful:
+
+            if all_dep_jobs_successful:
                 if semaphore_handler.acquire(self, job, True):
                     # If this job needs a semaphore, either acquire it or
                     # make sure that we have it before requesting the nodes.
                     toreq.append(job)
                     job.queued = True
+                else:
+                    job.waiting_status = 'semaphore: {}'.format(
+                        job.semaphore.name)
         return toreq
 
     def setResult(self, build):
@@ -2941,6 +2967,10 @@ class QueueItem(object):
             if remaining and remaining > max_remaining:
                 max_remaining = remaining
 
+            waiting_status = None
+            if not (job.queued or result):
+                waiting_status = job.waiting_status
+
             ret['jobs'].append({
                 'name': job.name,
                 'dependencies': [x.name for x in job.dependencies],
@@ -2965,6 +2995,7 @@ class QueueItem(object):
                 'node_labels': build.node_labels if build else [],
                 'node_name': build.node_name if build else None,
                 'worker': worker,
+                'waiting_status': waiting_status,
             })
 
         if self.haveAllJobsStarted():

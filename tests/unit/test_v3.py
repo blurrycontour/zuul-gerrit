@@ -1,4 +1,5 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -6210,6 +6211,20 @@ class TestProvidesRequires(ZuulDBTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 1)
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        status = tenant.layout.pipelines["gate"].formatStatusJSON()
+
+        # First change
+        jobs = status["change_queues"][0]["heads"][0][0]["jobs"]
+        self.assertIsNone(jobs[0]["waiting_status"])
+        self.assertEqual(jobs[1]["waiting_status"],
+                         'dependencies: image-builder')
+
+        # Second change
+        jobs = status["change_queues"][0]["heads"][0][1]["jobs"]
+        self.assertEqual(jobs[0]["waiting_status"],
+                         'requirements: images')
 
         # Release image-build, it should cause both instances of
         # image-user to run.
