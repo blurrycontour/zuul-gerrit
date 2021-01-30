@@ -7109,6 +7109,13 @@ class TestSemaphore(ZuulTestCase):
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
+        status = tenant.layout.pipelines["check"].formatStatusJSON()
+        jobs = status["change_queues"][0]["heads"][0][0]["jobs"]
+        self.assertIsNone(jobs[0]["waiting_status"])
+        self.assertIsNone(jobs[1]["waiting_status"])
+        self.assertEqual(jobs[2]["waiting_status"],
+                         'semaphore: test-semaphore')
+
         # By default we first lock the semaphore and then get the nodes
         # so at this point the semaphore needs to be aquired.
         self.assertTrue('test-semaphore' in
