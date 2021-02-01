@@ -12,15 +12,19 @@
 
 import logging
 import time
-
 from collections import defaultdict
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional, TYPE_CHECKING
 
 from zuul import model
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import NodeRequest, NodeSet, HoldRequest, Build, BuildSet,\
     Node, Job, TriggerEvent
+from zuul.zk import ZooKeeperClient
 from zuul.zk.exceptions import LockException
+from zuul.zk.nodepool import ZooKeeperNodepool
+
+if TYPE_CHECKING:
+    from zuul.scheduler import Scheduler
 
 
 def add_resources(target: Dict[str, int], source: Dict[str, int]) -> None:
@@ -36,11 +40,20 @@ def subtract_resources(target: Dict[str, int], source: Dict[str, int]) -> None:
 class Nodepool(object):
     log = logging.getLogger('zuul.nodepool')
 
-    def __init__(self, scheduler):
-        self.requests = {}
+    def __init__(
+        self,
+        zk_client: ZooKeeperClient,
+        hostname: str,
+        scheduler: Optional["Scheduler"] = None,
+    ):
+        self.hostname = hostname
         self.sched = scheduler
-        self.current_resources_by_tenant = {}
-        self.current_resources_by_project = {}
+
+        self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
+
+        self.requests: Dict[str, NodeRequest] = {}
+        self.current_resources_by_tenant: Dict[str, Dict[str, int]] = {}
+        self.current_resources_by_project: Dict[str, Dict[str, int]] = {}
 
     def emitStats(self, request: NodeRequest) -> None:
         # Implements the following :
@@ -51,7 +64,7 @@ class Nodepool(object):
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<label>
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<size>
         #  gauge   zuul.nodepool.current_requests
-        if not self.sched.statsd:
+        if not self.sched or not self.sched.statsd:
             return
         statsd = self.sched.statsd
         pipe = statsd.pipeline()
@@ -79,7 +92,7 @@ class Nodepool(object):
         pipe.send()
 
     def emitStatsResources(self) -> None:
-        if not self.sched.statsd:
+        if not self.sched or not self.sched.statsd:
             return
         statsd = self.sched.statsd
 
@@ -96,7 +109,7 @@ class Nodepool(object):
 
     def emitStatsResourceCounters(self, tenant, project, resources, duration)\
             -> None:
-        if not self.sched.statsd:
+        if not self.sched or not self.sched.statsd:
             return
         statsd = self.sched.statsd
 
@@ -116,20 +129,26 @@ class Nodepool(object):
         # Create a copy of the nodeset to represent the actual nodes
         # returned by nodepool.
         nodeset = job.nodeset.copy()
-        req = NodeRequest(self.sched.hostname, build_set, job,
-                          nodeset, relative_priority, event=event)
+        req = NodeRequest(
+            self.hostname,
+            build_set,
+            job,
+            nodeset,
+            relative_priority,
+            event=event
+        )
         self.requests[req.uid] = req
 
         if nodeset.nodes:
-            self.sched.zk_nodepool.submitNodeRequest(req,
-                                                     self._updateNodeRequest)
+            self.zk_nodepool.submitNodeRequest(req, self._updateNodeRequest)
             # Logged after submission so that we have the request id
             log.info("Submitted node request %s", req)
             self.emitStats(req)
         else:
             log.info("Fulfilling empty node request %s", req)
             req.state = model.STATE_FULFILLED
-            self.sched.onNodesProvisioned(req)
+            if self.sched is not None:
+                self.sched.onNodesProvisioned(req)
             del self.requests[req.uid]
         return req
 
@@ -139,7 +158,7 @@ class Nodepool(object):
         if request.uid in self.requests:
             request.canceled = True
             try:
-                self.sched.zk_nodepool.deleteNodeRequest(request)
+                self.zk_nodepool.deleteNodeRequest(request)
             except Exception:
                 log.exception("Error deleting node request:")
 
@@ -156,7 +175,7 @@ class Nodepool(object):
         if relative_priority is None:
             return
         try:
-            self.sched.zk_nodepool.lockNodeRequest(request, blocking=False)
+            self.zk_nodepool.lockNodeRequest(request, blocking=False)
         except LockException:
             # It may be locked by nodepool, which is fine.
             log.debug("Unable to revise locked node request %s", request)
@@ -164,7 +183,7 @@ class Nodepool(object):
         try:
             old_priority = request.relative_priority
             request.relative_priority = relative_priority
-            self.sched.zk_nodepool.storeNodeRequest(request)
+            self.zk_nodepool.storeNodeRequest(request)
             log.debug("Revised relative priority of "
                       "node request %s from %s to %s",
                       request, old_priority, relative_priority)
@@ -172,7 +191,7 @@ class Nodepool(object):
             log.exception("Unable to update node request %s", request)
         finally:
             try:
-                self.sched.zk_nodepool.unlockNodeRequest(request)
+                self.zk_nodepool.unlockNodeRequest(request)
             except Exception:
                 log.exception("Unable to unlock node request %s", request)
 
@@ -199,7 +218,7 @@ class Nodepool(object):
             node.comment = request.reason
             if request.node_expiration:
                 node.hold_expiration = request.node_expiration
-            self.sched.zk_nodepool.storeNode(node)
+            self.zk_nodepool.storeNode(node)
 
         request.nodes.append(dict(
             build=build.uuid,
@@ -214,10 +233,10 @@ class Nodepool(object):
 
         # Give ourselves a few seconds to try to obtain the lock rather than
         # immediately give up.
-        self.sched.zk_nodepool.lockHoldRequest(request, timeout=5)
+        self.zk_nodepool.lockHoldRequest(request, timeout=5)
 
         try:
-            self.sched.zk_nodepool.storeHoldRequest(request)
+            self.zk_nodepool.storeHoldRequest(request)
         except Exception:
             # If we fail to update the request count, we won't consider it
             # a real autohold error by passing the exception up. It will
@@ -228,7 +247,7 @@ class Nodepool(object):
         finally:
             # Although any exceptions thrown here are handled higher up in
             # _doBuildCompletedEvent, we always want to try to unlock it.
-            self.sched.zk_nodepool.unlockHoldRequest(request)
+            self.zk_nodepool.unlockHoldRequest(request)
 
     def useNodeSet(self, nodeset: NodeSet, build_set: BuildSet = None,
                    event=None) -> None:
@@ -238,7 +257,7 @@ class Nodepool(object):
             if node.lock is None:
                 raise Exception("Node %s is not locked" % (node,))
             node.state = model.STATE_IN_USE
-            self.sched.zk_nodepool.storeNode(node)
+            self.zk_nodepool.storeNode(node)
             if node.resources:
                 add_resources(resources, node.resources)
         if build_set and resources:
@@ -286,7 +305,7 @@ class Nodepool(object):
                         if node.resources:
                             add_resources(resources, node.resources)
                         node.state = model.STATE_USED
-                        self.sched.zk_nodepool.storeNode(node)
+                        self.zk_nodepool.storeNode(node)
                 except Exception:
                     log.exception("Exception storing node %s "
                                   "while unlocking:", node)
@@ -314,7 +333,7 @@ class Nodepool(object):
     def _unlockNodes(self, nodes: List[Node]) -> None:
         for node in nodes:
             try:
-                self.sched.zk_nodepool.unlockNode(node)
+                self.zk_nodepool.unlockNode(node)
             except Exception:
                 self.log.exception("Error unlocking node:")
 
@@ -332,7 +351,7 @@ class Nodepool(object):
                     raise Exception("Node %s allocated to %s, not %s" %
                                     (node.id, node.allocated_to, request_id))
                 self.log.debug("Locking node %s" % (node,))
-                self.sched.zk_nodepool.lockNode(node, timeout=30)
+                self.zk_nodepool.lockNode(node, timeout=30)
                 locked_nodes.append(node)
         except Exception:
             self.log.exception("Error locking nodes:")
@@ -358,15 +377,17 @@ class Nodepool(object):
         if deleted:
             log.debug("Resubmitting lost node request %s", request)
             request.id = None
-            self.sched.zk_nodepool.submitNodeRequest(request,
-                                                     self._updateNodeRequest)
+            self.zk_nodepool.submitNodeRequest(
+                request, self._updateNodeRequest
+            )
             # Stop watching this request node
             return False
         elif request.state in (model.STATE_FULFILLED, model.STATE_FAILED):
             log.info("Node request %s %s", request, request.state)
 
             # Give our results to the scheduler.
-            self.sched.onNodesProvisioned(request)
+            if self.sched is not None:
+                self.sched.onNodesProvisioned(request)
             del self.requests[request.uid]
 
             self.emitStats(request)
@@ -408,14 +429,15 @@ class Nodepool(object):
         # processing it. Nodepool will automatically reallocate the assigned
         # nodes in that situation.
         try:
-            if not self.sched.zk_nodepool.nodeRequestExists(request):
+            if not self.zk_nodepool.nodeRequestExists(request):
                 log.info("Request %s no longer exists, resubmitting",
                          request.id)
                 request.id = None
                 request.state = model.STATE_REQUESTED
                 self.requests[request.uid] = request
-                self.sched.zk_nodepool.submitNodeRequest(
-                    request, self._updateNodeRequest)
+                self.zk_nodepool.submitNodeRequest(
+                    request, self._updateNodeRequest
+                )
                 return False
         except Exception:
             # If we cannot retrieve the node request from ZK we probably lost
@@ -443,7 +465,7 @@ class Nodepool(object):
         # succeeded, delete the request.
         log.debug("Deleting node request %s", request)
         try:
-            self.sched.zk_nodepool.deleteNodeRequest(request)
+            self.zk_nodepool.deleteNodeRequest(request)
         except Exception:
             log.exception("Error deleting node request:")
             request.failed = True
