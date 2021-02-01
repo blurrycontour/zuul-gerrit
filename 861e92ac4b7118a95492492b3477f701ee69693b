@@ -16,6 +16,24 @@
       "revId": "861e92ac4b7118a95492492b3477f701ee69693b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e1d83759_1c282393",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-02-01T13:03:18Z",
+      "side": 1,
+      "message": "i\u0027m not sure about the reason, i can try to implement this component 👍",
+      "parentUuid": "6f270dbb_35dc4ee0",
+      "revId": "861e92ac4b7118a95492492b3477f701ee69693b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
