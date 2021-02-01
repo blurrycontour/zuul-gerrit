@@ -2306,6 +2306,8 @@ class GithubWebController(BaseWebController):
         json_body = json.loads(body.decode('utf-8'))
 
         data = {'headers': headers, 'body': json_body}
+        # TODO (felix): Create WebhookEvent class which inherits from
+        # AbstractEvent class. WebhookEvent gets the additional payload.
         self.zuul_web.zk_connection_event.push(
             self.connection.connection_name, data)
         return data
