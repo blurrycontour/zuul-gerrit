@@ -517,6 +517,26 @@ class TestWeb(BaseTestWeb):
         self.assertGreater(len(data), 0)
         self.assertEqual("test-provider", data[0]["provider"])
         self.assertEqual("label1", data[0]["type"])
+        # test some filtering
+        data = self.get_url('api/tenant/tenant-one/nodes?type=label1').json()
+        self.assertGreater(len(data), 0)
+        self.assertTrue(all(node["type"] == "label1" for node in data),
+                        data)
+        data = self.get_url(
+            'api/tenant/tenant-one/nodes?provider=test-provider').json()
+        self.assertGreater(len(data), 0)
+        self.assertTrue(all(node["provider"] == "test-provider"
+                            for node in data),
+                        data)
+        unlikely_state_time = 100 * 24 * 3600
+        data = self.get_url(
+            'api/tenant/tenant-one/nodes?'
+            'in_state_less_than=%s' % unlikely_state_time).json()
+        self.assertGreater(len(data), 0)
+        data = self.get_url(
+            'api/tenant/tenant-one/nodes?'
+            'in_state_more_than=%s' % unlikely_state_time).json()
+        self.assertEqual(len(data), 0)
 
     def test_web_labels_list(self):
         # can we fetch the labels list
