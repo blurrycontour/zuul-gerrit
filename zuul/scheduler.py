@@ -253,7 +253,7 @@ class Scheduler(threading.Thread):
         self.merger: MergeClient = self._merger_client_class(
             self.config, zk_client
         )
-        self.nodepool: Nodepool = Nodepool(self)
+        self.nodepool: Nodepool = Nodepool(zk_client, self.hostname, self)
         self.connections.registerScheduler(self)
 
     def start(self):

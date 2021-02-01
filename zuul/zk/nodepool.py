@@ -353,7 +353,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
                 "Exception in hold request cache update for event: %s", event)
 
     def submitNodeRequest(self, node_request: NodeRequest,
-                          watcher: Callable[[NodeRequest, bool], None])\
+                          watcher: Callable[[NodeRequest, bool], bool])\
             -> None:
         """
         Submit a request for nodes to Nodepool.
