@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a12a1360_b2d7ccc8",
+        "filename": "web/src/pages/Nodes.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-02-01T11:21:42Z",
+      "side": 1,
+      "message": "Connection Type\n\nI am not sure this info is really valuable in the nodes list page; furthermore the display of the column\u0027s header is truncated. Maybe we could remove it and keep it for a single node page.",
+      "range": {
+        "startLine": 65,
+        "startChar": 61,
+        "endLine": 65,
+        "endChar": 71
+      },
+      "revId": "f925089ba9b5624098f1756581280d72ebcadf54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e35e9366_736663d2",
+        "filename": "web/src/pages/Nodes.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-02-01T11:21:42Z",
+      "side": 1,
+      "message": "Provider Server ID?",
+      "range": {
+        "startLine": 68,
+        "startChar": 61,
+        "endLine": 68,
+        "endChar": 67
+      },
+      "revId": "f925089ba9b5624098f1756581280d72ebcadf54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3555f995_5efb6147",
+        "filename": "web/src/pages/Nodes.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-02-01T11:21:42Z",
+      "side": 1,
+      "message": "Makes more sense to have this info before the provider server id, we should move this column to the left",
+      "range": {
+        "startLine": 72,
+        "startChar": 1,
+        "endLine": 72,
+        "endChar": 81
+      },
+      "revId": "f925089ba9b5624098f1756581280d72ebcadf54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cb727e20_13be33fe",
+        "filename": "web/src/pages/Nodes.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-02-01T11:21:42Z",
+      "side": 1,
+      "message": "\"Last Status Change\" makes more sense, since all values are in the form \"XXX ago\"",
+      "range": {
+        "startLine": 80,
+        "startChar": 73,
+        "endLine": 80,
+        "endChar": 76
+      },
+      "revId": "f925089ba9b5624098f1756581280d72ebcadf54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
