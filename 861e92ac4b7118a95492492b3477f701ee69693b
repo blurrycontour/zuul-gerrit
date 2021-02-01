@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6f270dbb_35dc4ee0",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-02-01T10:33:49Z",
+      "side": 1,
+      "message": "Why not use a FormSelect instead: https://www.patternfly.org/v4/components/form-select/",
+      "revId": "861e92ac4b7118a95492492b3477f701ee69693b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
