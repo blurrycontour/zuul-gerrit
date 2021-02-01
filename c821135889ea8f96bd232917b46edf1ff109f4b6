@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "31adfc63_a61fef31",
+        "filename": "doc/source/reference/drivers/sql.rst",
+        "patchSetId": 36
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-01T23:23:43Z",
+      "side": 1,
+      "message": "Duplicate word is duplicated.  :)",
+      "revId": "c821135889ea8f96bd232917b46edf1ff109f4b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "54d2b610_8cf8fcd7",
+        "filename": "tests/fixtures/config/sql-driver/git/common-config/zuul.yaml",
+        "patchSetId": 36
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-01T23:23:43Z",
+      "side": 1,
+      "message": "My understanding is we\u0027ll keep this here for the next step (4.1.0: warn on sql reporters in pipelines).  Then sometime after that and before 5.0, we can remove this entirely.",
+      "revId": "c821135889ea8f96bd232917b46edf1ff109f4b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "adc70ee1_94132716",
+        "filename": "tests/fixtures/config/sql-driver/git/common-config/zuul.yaml",
+        "patchSetId": 36
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-01T23:23:43Z",
+      "side": 1,
+      "message": "We should remove this empty section (it produces a config error).",
+      "revId": "c821135889ea8f96bd232917b46edf1ff109f4b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d437dc35_68716f00",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 36
+      },
+      "lineNbr": 708,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-01T23:23:43Z",
+      "side": 1,
+      "message": "This is necessary so that /api/tenant/foo/builds can still return 404 as it currently does.\n\nHowever, I think we should keep the cache time very low.  We\u0027re already effectively doing an RPC call on each hit to /builds; any caching is an optimization.  However, a long cache will mean that adding a tenant won\u0027t be reflected in the web ui, and the first thing I would do as a user after adding a tenant is to check the web ui.  Let\u0027s set this to 60 seconds for now.  Once we start using ZK, we shouldn\u0027t need this anymore.\n\nThere were some unit test failures related to caching (because they wanted to look up the number of items in the queue for a tenant, and were getting old cached values).  I cleared the cache in the unit tests to handle that.",
+      "revId": "c821135889ea8f96bd232917b46edf1ff109f4b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
