@@ -29,6 +29,7 @@ import {
   OutlinedCalendarAltIcon,
   OutlinedClockIcon,
   StreamIcon,
+  ExclamationIcon,
 } from '@patternfly/react-icons'
 import * as moment from 'moment'
 import 'moment-duration-format'
@@ -227,6 +228,18 @@ function Build({ build, tenant, timezone }) {
           </FlexItem>
         </Flex>
       </Flex>
+
+      {build.error_detail &&
+       <IconProperty
+         icon={<ExclamationIcon />}
+         value={
+           <>
+             <strong>Error </strong> {build.error_detail} <br />
+           </>
+         }
+       />
+      }
+
     </>
   )
 }
