@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1183c781_b87469ed",
+        "filename": "requirements.txt",
+        "patchSetId": 9
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-02T15:48:45Z",
+      "side": 1,
+      "message": "Could these be only installed as an extra requirements?",
+      "revId": "23745b08aae64d970f52dd25ec9f5c8cf113d0e1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
