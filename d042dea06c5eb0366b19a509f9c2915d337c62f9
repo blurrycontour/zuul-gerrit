@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b8c4408_6a1ec699",
+        "filename": "web/package.json",
+        "patchSetId": 19
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-02-02T14:53:25Z",
+      "side": 1,
+      "message": "Do we need this beta? I\u0027m worried a bit that this component might be abandoned. Last commit is from more than one year ago [1] and the last release is this beta. Are there alternatives we could use?\n\n[1] https://github.com/maxmantz/redux-oidc",
+      "revId": "d042dea06c5eb0366b19a509f9c2915d337c62f9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
