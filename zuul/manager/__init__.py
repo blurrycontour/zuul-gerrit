@@ -640,10 +640,6 @@ class PipelineManager(metaclass=ABCMeta):
         for job in jobs:
             log.debug("Found job %s for change %s", job, item.change)
             try:
-                nodeset = item.current_build_set.getJobNodeSet(job.name)
-                self.sched.nodepool.useNodeSet(
-                    nodeset, build_set=item.current_build_set,
-                    event=item.event)
                 self.sched.executor.execute(
                     job, item, self.pipeline,
                     build_set.dependent_changes,
@@ -1257,6 +1253,10 @@ class PipelineManager(metaclass=ABCMeta):
         if item.live and not dequeued and self.sched.use_relative_priority:
             priority = item.getNodePriority()
             for node_request in item.current_build_set.node_requests.values():
+                if node_request.fulfilled:
+                    # If the node request is already fulfilled, there is no
+                    # need to update the relative priority.
+                    continue
                 if node_request.relative_priority != priority:
                     self.sched.nodepool.reviseRequest(
                         node_request, priority)

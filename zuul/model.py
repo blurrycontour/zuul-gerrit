@@ -609,6 +609,7 @@ class Node(ConfigObject):
         self.username = None
         self.hold_expiration = None
         self.resources = None
+        self.allocated_to = None
 
     @property
     def state(self):
@@ -881,6 +882,35 @@ class NodeRequest(object):
         self._state = data['state']
         self.state_time = data['state_time']
         self.relative_priority = data.get('relative_priority', 0)
+
+    @classmethod
+    def fromDict(cls, data):
+        request = cls(
+            requestor=data["requestor"],
+            # TODO (felix): Check if the build_set and job parameters are still
+            # required on the NodeRequest. In the current implementation they
+            # aren't available when the node request is deserialized on the
+            # executor because those values couldn't be serialized to ZK in the
+            # first place. So there might be a good chance that they aren't
+            # needed on the scheduler as well.
+            build_set=None,
+            job=None,
+            nodeset=None,
+            relative_priority=data.get("relative_priority", 0),
+        )
+
+        request.created_time = data["created_time"]
+        request.provider = data["provider"]
+
+        # Set _state directly to bypass the setter and avoid overwriting the
+        # state_time.
+        request._state = data["state"]
+        request.state_time = data["state_time"]
+        request.event_id = data["event_id"]
+
+        request._zk_data = data
+
+        return request
 
 
 class Secret(ConfigObject):
@@ -2044,7 +2074,6 @@ class Build(object):
         self.worker = Worker()
         self.node_labels = []
         self.node_name = None
-        self.nodeset = None
         self.zuul_event_id = zuul_event_id
 
     def __repr__(self):
@@ -2265,7 +2294,6 @@ class BuildSet(object):
         if job_name in self.nodesets:
             raise Exception("Prior node request for %s" % (job_name))
         self.nodesets[job_name] = nodeset
-        del self.node_requests[job_name]
 
     def getTries(self, job_name):
         return self.tries.get(job_name, 0)
