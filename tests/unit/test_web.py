@@ -346,6 +346,7 @@ class TestWeb(BaseTestWeb):
                 'nodeset': {
                     'groups': [],
                     'name': '',
+                    'node_request_id': None,
                     'nodes': [{'comment': None,
                                'hold_job': None,
                                'id': None,
@@ -392,6 +393,7 @@ class TestWeb(BaseTestWeb):
                 'nodeset': {
                     'groups': [],
                     'name': '',
+                    'node_request_id': None,
                     'nodes': [{'comment': None,
                                'hold_job': None,
                                'id': None,
