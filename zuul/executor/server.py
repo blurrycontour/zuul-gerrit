@@ -58,9 +58,14 @@ from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
 from zuul.model import (
-    BuildCompletedEvent, BuildPausedEvent, BuildStartedEvent, BuildStatusEvent
+    BuildCompletedEvent,
+    BuildPausedEvent,
+    BuildStartedEvent,
+    BuildStatusEvent,
+    NodeSet,
+    SCHEME_GOLANG,
 )
-import zuul.model
+from zuul.nodepool import Nodepool
 from zuul.zk.event_queues import PipelineResultEventQueue
 
 BUFFER_LINES_FOR_SYNTAX = 200
@@ -826,8 +831,7 @@ class AnsibleJob(object):
         self.ansible_version = self.arguments.get('ansible_version')
         # TODO(corvus): Remove default setting after 4.3.0; this is to handle
         # scheduler/executor version skew.
-        self.scheme = self.arguments.get('workspace_scheme',
-                                         zuul.model.SCHEME_GOLANG)
+        self.scheme = self.arguments.get('workspace_scheme', SCHEME_GOLANG)
         self.log = get_annotated_logger(
             logger, self.zuul_event_id, build=job.unique)
         self.executor_server = executor_server
@@ -1790,7 +1794,7 @@ class AnsibleJob(object):
                 root,
                 self.executor_server.merge_root,
                 logger=self.log,
-                scheme=zuul.model.SCHEME_GOLANG)
+                scheme=SCHEME_GOLANG)
             merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch,
@@ -1830,7 +1834,7 @@ class AnsibleJob(object):
                         root,
                         self.jobdir.src_root,
                         logger=self.log,
-                        scheme=zuul.model.SCHEME_GOLANG,
+                        scheme=SCHEME_GOLANG,
                         cache_scheme=self.scheme)
                     break
 
@@ -1840,7 +1844,7 @@ class AnsibleJob(object):
                     root,
                     self.executor_server.merge_root,
                     logger=self.log,
-                    scheme=zuul.model.SCHEME_GOLANG)
+                    scheme=SCHEME_GOLANG)
 
                 # If we don't have this repo yet prepared we need to restore
                 # the repo state. Otherwise we have speculative merges in the
@@ -2621,6 +2625,9 @@ class ExecutorServer(BaseMergeServer):
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
 
+    # Number of seconds past node expiration a hold request will remain
+    EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
+
     def __init__(
         self,
         config,
@@ -2768,6 +2775,7 @@ class ExecutorServer(BaseMergeServer):
 
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
+        self.nodepool = Nodepool(self.zk_client, self.hostname, self.statsd)
 
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client
@@ -3092,17 +3100,45 @@ class ExecutorServer(BaseMergeServer):
     def executeJob(self, job):
         args = json.loads(job.arguments)
         zuul_event_id = args.get('zuul_event_id')
-        log = get_annotated_logger(self.log, zuul_event_id)
+        log = get_annotated_logger(self.log, zuul_event_id, build=job.unique)
         log.debug("Got %s job: %s", job.name, job.unique)
         if self.statsd:
             base_key = 'zuul.executor.{hostname}'
             self.statsd.incr(base_key + '.builds')
+
+        if not self.lockNodes(job):
+            return
+
+        job.start_time = time.monotonic()
+
         self.job_workers[job.unique] = self._job_class(self, job)
         # Run manageLoad before starting the thread mostly for the
         # benefit of the unit tests to make the calculation of the
         # number of starting jobs more deterministic.
         self.manageLoad()
         self.job_workers[job.unique].run()
+
+    def lockNodes(self, job):
+        args = json.loads(job.arguments)
+        zuul_event_id = args.get('zuul_event_id')
+        log = get_annotated_logger(self.log, zuul_event_id, build=job.unique)
+        try:
+            log.debug("Locking nodeset")
+            nodeset = NodeSet.fromDict(args["nodeset"])
+            # We have to store the nodeset object somewhere to keep the lock
+            # intact. For now, the gearman job should be sufficient. Once the
+            # builds are in ZooKeeper we can store the NodeSet directly on the
+            # build.
+            job.nodeset = nodeset
+            self.nodepool.lockNodeSet(nodeset)
+            self.nodepool.useNodeSet(nodeset, job)
+            return True
+        except Exception:
+            result_data = dict(
+                result="NODE_FAILURE", exception=traceback.format_exc()
+            )
+            self.completeBuild(job, result_data)
+            return False
 
     def run_governor(self):
         while not self.governor_stop_event.wait(10):
@@ -3197,6 +3233,139 @@ class ExecutorServer(BaseMergeServer):
         except Exception:
             log.exception("Exception sending stop command to worker:")
 
+    def _handleExpiredHoldRequest(self, request):
+        '''
+        Check if a hold request is expired and delete it if it is.
+
+        The 'expiration' attribute will be set to the clock time when the
+        hold request was used for the last time. If this is NOT set, then
+        the request is still active.
+
+        If a node expiration time is set on the request, and the request is
+        expired, *and* we've waited for a defined period past the node
+        expiration (EXPIRED_HOLD_REQUEST_TTL), then we will delete the hold
+        request.
+
+        :param: request Hold request
+        :returns: True if it is expired, False otherwise.
+        '''
+        if not request.expired:
+            return False
+
+        if not request.node_expiration:
+            # Request has been used up but there is no node expiration, so
+            # we don't auto-delete it.
+            return True
+
+        elapsed = time.time() - request.expired
+        if elapsed < self.EXPIRED_HOLD_REQUEST_TTL + request.node_expiration:
+            # Haven't reached our defined expiration lifetime, so don't
+            # auto-delete it yet.
+            return True
+
+        try:
+            self.nodepool.zk_nodepool.lockHoldRequest(request)
+            self.log.info("Removing expired hold request %s", request)
+            self.nodepool.zk_nodepool.deleteHoldRequest(request)
+        except Exception:
+            self.log.exception(
+                "Failed to delete expired hold request %s", request
+            )
+        finally:
+            try:
+                self.nodepool.zk_nodepool.unlockHoldRequest(request)
+            except Exception:
+                pass
+
+        return True
+
+    def _getAutoholdRequest(self, job):
+        args = json.loads(job.arguments)
+        autohold_key_base = (
+            args["zuul"]["tenant"],
+            args["zuul"]["project"]["canonical_name"],
+            args["zuul"]["job"],
+        )
+
+        class Scope(object):
+            """Enum defining a precedence/priority of autohold requests.
+
+            Autohold requests for specific refs should be fulfilled first,
+            before those for changes, and generic jobs.
+
+            Matching algorithm goes over all existing autohold requests, and
+            returns one with the highest number (in case of duplicated
+            requests the last one wins).
+            """
+            NONE = 0
+            JOB = 1
+            CHANGE = 2
+            REF = 3
+
+        # Do a partial match of the autohold key against all autohold
+        # requests, ignoring the last element of the key (ref filter),
+        # and finally do a regex match between ref filter from
+        # the autohold request and the build's change ref to check
+        # if it matches. Lastly, make sure that we match the most
+        # specific autohold request by comparing "scopes"
+        # of requests - the most specific is selected.
+        autohold = None
+        scope = Scope.NONE
+        self.log.debug("Checking build autohold key %s", autohold_key_base)
+        for request_id in self.nodepool.zk_nodepool.getHoldRequests():
+            request = self.nodepool.zk_nodepool.getHoldRequest(request_id)
+            if not request:
+                continue
+
+            if self._handleExpiredHoldRequest(request):
+                continue
+
+            ref_filter = request.ref_filter
+
+            if request.current_count >= request.max_count:
+                # This request has been used the max number of times
+                continue
+            elif not (
+                request.tenant == autohold_key_base[0]
+                and request.project == autohold_key_base[1]
+                and request.job == autohold_key_base[2]
+            ):
+                continue
+            elif not re.match(ref_filter, args["zuul"]["ref"]):
+                continue
+
+            if ref_filter == ".*":
+                candidate_scope = Scope.JOB
+            elif ref_filter.endswith(".*"):
+                candidate_scope = Scope.CHANGE
+            else:
+                candidate_scope = Scope.REF
+
+            self.log.debug(
+                "Build autohold key %s matched scope %s",
+                autohold_key_base,
+                candidate_scope,
+            )
+            if candidate_scope > scope:
+                scope = candidate_scope
+                autohold = request
+
+        return autohold
+
+    def _processAutohold(self, job, result):
+        # We explicitly only want to hold nodes for jobs if they have
+        # failed / retry_limit / post_failure and have an autohold request.
+        hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
+        if result not in hold_list:
+            return False
+
+        request = self._getAutoholdRequest(job)
+        if request is not None:
+            self.log.debug("Got autohold %s", request)
+            self.nodepool.holdNodeSet(job.nodeset, request, job)
+            return True
+        return False
+
     def startBuild(self, job: gear.TextJob, data: Dict) -> None:
         # Mark the gearman job as started, as we are still using it for the
         # actual job execution. The data, however, will be passed to the
@@ -3207,6 +3376,10 @@ class ExecutorServer(BaseMergeServer):
         # the start_time directly on the build. But for now we have to use the
         # data dict for that.
         data["start_time"] = time.time()
+
+        # NOTE (felix): We store the start_time on the gearman job to calculate
+        # the in-use time of locked nodes when the nodeset is returned.
+        job.start_time = data["start_time"]
 
         params = json.loads(job.arguments)
         tenant_name = params["zuul"]["tenant"]
@@ -3250,7 +3423,44 @@ class ExecutorServer(BaseMergeServer):
         # result dict for that.
         result["end_time"] = time.time()
 
+        # NOTE (felix): We store the end_time on the gearman job to calculate
+        # the in-use time of locked nodes when the nodeset is returned.
+        job.end_time = result["end_time"]
+
         params = json.loads(job.arguments)
+        # If the result is None, check if the build has reached its max
+        # attempts and if so set the result to RETRY_LIMIT.
+        # NOTE (felix): This must be done in order to correctly process the
+        # autohold in the next step. Since we only want to hold the node if the
+        # build has reached a final result.
+        if result.get("result") is None:
+            attempts = params["zuul"]["attempts"]
+            max_attempts = params["zuul"]["max_attempts"]
+            if attempts >= max_attempts:
+                result["result"] = "RETRY_LIMIT"
+
+        zuul_event_id = params["zuul_event_id"]
+        log = get_annotated_logger(self.log, zuul_event_id, build=job.unique)
+
+        # Provide the hold information back to the scheduler via the build
+        # result.
+        try:
+            held = self._processAutohold(job, result.get("result"))
+            result["held"] = held
+            log.debug('held status set to %s', held)
+        except Exception:
+            log.exception("Unable to process autohold for %s", job)
+
+        # Regardless of any other conditions which might cause us not to pass
+        # the build result on to the scheduler/pipeline manager, make sure we
+        # return the nodes to nodepool.
+        try:
+            self.nodepool.returnNodeSet(
+                job.nodeset, job, zuul_event_id=zuul_event_id
+            )
+        except Exception:
+            log.exception("Unable to return nodeset %s", job.nodeset)
+
         tenant_name = params["zuul"]["tenant"]
         pipeline_name = params["zuul"]["pipeline"]
 

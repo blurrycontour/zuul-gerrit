@@ -6950,7 +6950,7 @@ class TestJobPausePriority(AnsibleZuulTestCase):
 
         for x in iterate_timeout(60, 'paused job'):
             reqs = self.fake_nodepool.getNodeRequests()
-            if reqs:
+            if len(reqs) == 1:
                 break
 
         self.assertEqual(len(reqs), 1)

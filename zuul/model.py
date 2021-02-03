@@ -608,6 +608,7 @@ class Node(ConfigObject):
         self.username = None
         self.hold_expiration = None
         self.resources = None
+        self.allocated_to = None
 
     @property
     def state(self):
@@ -716,6 +717,7 @@ class NodeSet(ConfigObject):
         self.name = name or ''
         self.nodes = OrderedDict()
         self.groups = OrderedDict()
+        self.node_request_id = None
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -727,9 +729,11 @@ class NodeSet(ConfigObject):
                 self.nodes == other.nodes)
 
     def toDict(self):
-        d = {}
-        d['name'] = self.name
-        d['nodes'] = []
+        d = {
+            "node_request_id": self.node_request_id,
+            "name": self.name,
+            "nodes": [],
+        }
         for node in self.nodes.values():
             d['nodes'].append(node.toDict(internal_attributes=True))
         d['groups'] = []
@@ -740,6 +744,7 @@ class NodeSet(ConfigObject):
     @classmethod
     def fromDict(cls, data):
         nodeset = cls(data["name"])
+        nodeset.node_request_id = data["node_request_id"]
         for node in data["nodes"]:
             nodeset.addNode(Node.fromDict(node))
         for group in data["groups"]:
@@ -748,9 +753,10 @@ class NodeSet(ConfigObject):
 
     def copy(self):
         n = NodeSet(self.name)
-        for name, node in self.nodes.items():
+        n.node_request_id = self.node_request_id
+        for _, node in self.nodes.items():
             n.addNode(Node(node.name, node.label))
-        for name, group in self.groups.items():
+        for _, group in self.groups.items():
             n.addGroup(Group(group.name, group.nodes[:]))
         return n
 
@@ -1997,7 +2003,6 @@ class Build(object):
         self.worker = Worker()
         self.node_labels = []
         self.node_name = None
-        self.nodeset = None
         self.zuul_event_id = zuul_event_id
 
     def __repr__(self):
@@ -2889,14 +2894,6 @@ class QueueItem(object):
                 fakebuild = Build(job, self.current_build_set, None)
                 fakebuild.result = 'SKIPPED'
                 self.addBuild(fakebuild)
-
-    def setNodeRequestFailure(self, job):
-        fakebuild = Build(job, self.current_build_set, None)
-        fakebuild.start_time = time.time()
-        fakebuild.end_time = time.time()
-        self.addBuild(fakebuild)
-        fakebuild.result = 'NODE_FAILURE'
-        self.setResult(fakebuild)
 
     def setDequeuedNeedingChange(self):
         self.dequeued_needing_change = True
