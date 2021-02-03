@@ -363,21 +363,6 @@ class Scheduler(threading.Thread):
     def addManagementEvent(self, event: ManagementEvent):
         self.management_events.put(event, needs_result=False)
 
-    def onNodesProvisioned(self, request):
-        tenant_name = request.build_set.item.pipeline.tenant.name
-        pipeline_name = request.build_set.item.pipeline.name
-        event = NodesProvisionedEvent(
-            request.uid,
-            request.id,
-            request.build_set.uuid,
-            request.job.name,
-            request.build_set.item.pipeline.name,
-            request.build_set.item.queue.name,
-            tenant_name,
-            request.event_id,
-        )
-        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
-
     def reconfigureTenant(self, tenant, project, event):
         self.log.debug("Submitting tenant reconfiguration event for "
                        "%s due to event %s in project %s",

@@ -44,7 +44,6 @@ class TestNodepool(BaseTestCase):
         self.addCleanup(self.zk_client.disconnect)
         self.hostname = 'nodepool-test-hostname'
 
-        self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
         self.nodepool = zuul.nodepool.Nodepool(
@@ -62,11 +61,6 @@ class TestNodepool(BaseTestCase):
         while self.nodepool.requests:
             time.sleep(0.1)
 
-    def onNodesProvisioned(self, request):
-        # This is a scheduler method that the nodepool class calls
-        # back when a request is provisioned.
-        self.provisioned_requests.append(request)
-
     def test_node_request(self):
         # Test a simple node request
 
@@ -77,7 +71,11 @@ class TestNodepool(BaseTestCase):
         job.nodeset = nodeset
         request = self.nodepool.requestNodes(None, job, 0)
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
         # Accept the nodes
@@ -113,7 +111,11 @@ class TestNodepool(BaseTestCase):
         self.zk_client.kazoo_client.start()
         self.fake_nodepool.unpause()
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
     def test_node_request_canceled(self):
@@ -129,7 +131,11 @@ class TestNodepool(BaseTestCase):
         self.nodepool.cancelRequest(request)
 
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 0)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 0)
 
     def test_accept_nodes_resubmitted(self):
         # Test that a resubmitted request would not lock nodes
@@ -141,7 +147,11 @@ class TestNodepool(BaseTestCase):
         job.nodeset = nodeset
         request = self.nodepool.requestNodes(None, job, 0)
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
         # Accept the nodes, passing a different ID
@@ -162,7 +172,11 @@ class TestNodepool(BaseTestCase):
         job.nodeset = nodeset
         request = self.nodepool.requestNodes(None, job, 0)
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 1)
         self.assertEqual(request.state, 'fulfilled')
 
         self.zk_nodepool.deleteNodeRequest(request)
@@ -188,7 +202,11 @@ class TestNodepool(BaseTestCase):
         request2 = self.nodepool.requestNodes(None, job, 0)
         self.fake_nodepool.unpause()
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 2)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 2)
         self.assertEqual(request1.state, 'fulfilled')
         self.assertEqual(request2.state, 'fulfilled')
         self.assertTrue(request2.state_time < request1.state_time)
