@@ -17,9 +17,19 @@ from typing import Dict, List, Optional, TYPE_CHECKING
 
 from zuul import model
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import NodeRequest, NodeSet, HoldRequest, Build, BuildSet,\
-    Node, Job, TriggerEvent
+from zuul.model import (
+    Build,
+    BuildSet,
+    HoldRequest,
+    Job,
+    Node,
+    NodeRequest,
+    NodeSet,
+    NodesProvisionedEvent,
+    TriggerEvent,
+)
 from zuul.zk import ZooKeeperClient
+from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepool
 
@@ -50,6 +60,9 @@ class Nodepool(object):
         self.sched = scheduler
 
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
+        self.result_events = PipelineResultEventQueue.create_registry(
+            zk_client
+        )
 
         self.requests: Dict[str, NodeRequest] = {}
         self.current_resources_by_tenant: Dict[str, Dict[str, int]] = {}
@@ -123,8 +136,13 @@ class Nodepool(object):
             statsd.incr(key, value * duration,
                         project=project, resource=resource)
 
-    def requestNodes(self, build_set, job: Job, relative_priority: int,
-                     event: Optional[TriggerEvent] = None) -> NodeRequest:
+    def requestNodes(
+        self,
+        build_set: Optional[BuildSet],
+        job: Job,
+        relative_priority: int,
+        event: Optional[TriggerEvent] = None,
+    ) -> NodeRequest:
         log = get_annotated_logger(self.log, event)
         # Create a copy of the nodeset to represent the actual nodes
         # returned by nodepool.
@@ -147,10 +165,27 @@ class Nodepool(object):
         else:
             log.info("Fulfilling empty node request %s", req)
             req.state = model.STATE_FULFILLED
-            if self.sched is not None:
-                self.sched.onNodesProvisioned(req)
-            del self.requests[req.uid]
+            self.fulfillRequest(req)
         return req
+
+    def fulfillRequest(self, request: NodeRequest) -> None:
+        if request.build_set is not None:
+            # We can only provide a result event for a noderequest with
+            # build_set.
+            tenant_name = request.build_set.item.pipeline.tenant.name
+            pipeline_name = request.build_set.item.pipeline.name
+            event = NodesProvisionedEvent(
+                request.uid,
+                request.id,
+                request.build_set.uuid,
+                request.job.name,
+                request.build_set.item.pipeline.name,
+                request.build_set.item.queue.name,
+                tenant_name,
+                request.event_id,
+            )
+            self.result_events[tenant_name][pipeline_name].put(event)
+        del self.requests[request.uid]
 
     def cancelRequest(self, request: NodeRequest) -> None:
         log = get_annotated_logger(self.log, request.event_id)
@@ -386,9 +421,7 @@ class Nodepool(object):
             log.info("Node request %s %s", request, request.state)
 
             # Give our results to the scheduler.
-            if self.sched is not None:
-                self.sched.onNodesProvisioned(request)
-            del self.requests[request.uid]
+            self.fulfillRequest(request)
 
             self.emitStats(request)
 
