@@ -21,7 +21,7 @@ from kazoo.recipe.cache import TreeEvent
 from kazoo.recipe.lock import Lock
 
 import zuul.model
-from zuul.model import HoldRequest
+from zuul.model import HoldRequest, NodeRequest
 from zuul.zk import ZooKeeperClient, ZooKeeperBase
 from zuul.zk.exceptions import LockException
 
@@ -400,6 +400,28 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
         self.kazoo_client.DataWatch(path, callback)
 
+    def getNodeRequest(self, node_request_id):
+        """
+        Retrieve a NodeRequest from a given path in ZooKeeper
+        """
+
+        path = f"{self.REQUEST_ROOT}/{node_request_id}"
+        try:
+            data, stat = self.kazoo_client.get(path)
+        except NoNodeError:
+            return None
+
+        if not data:
+            return None
+
+        obj = NodeRequest.fromDict(json.loads(data.decode("utf-8")))
+        # Using updateNodeRequest() here will ensure that also the nodes are
+        # updated.
+        self.updateNodeRequest(obj, data)
+        obj.id = node_request_id
+        obj.stat = stat
+        return obj
+
     def deleteNodeRequest(self, node_request):
         """
         Delete a request for nodes.
@@ -515,7 +537,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
         """
 
         if node.lock is None:
-            raise LockException("Node %s does not hold a lock" % (node,))
+            raise LockException(f"Node {node} does not hold a lock")
         node.lock.release()
         node.lock = None
 
