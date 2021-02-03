@@ -22,6 +22,23 @@
       "revId": "677b17d9fddc837f6238fc3c0ce6b89cee3ed5d4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "37ed7ce2_87dbde9b",
+        "filename": "web/src/pages/Build.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-03T18:51:02Z",
+      "side": 1,
+      "message": "Right now, I don\u0027t think so because I think it\u0027s only set if we weren\u0027t able to start the job.  But that\u0027s something to keep in mind in the future if we change how error_detail is used.",
+      "revId": "677b17d9fddc837f6238fc3c0ce6b89cee3ed5d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
