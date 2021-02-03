@@ -635,10 +635,6 @@ class PipelineManager(metaclass=ABCMeta):
         for job in jobs:
             log.debug("Found job %s for change %s", job, item.change)
             try:
-                nodeset = item.current_build_set.getJobNodeSet(job.name)
-                self.sched.nodepool.useNodeSet(
-                    nodeset, build_set=item.current_build_set,
-                    event=item.event)
                 self.sched.executor.execute(
                     job, item, self.pipeline,
                     build_set.dependent_changes,
@@ -1242,6 +1238,11 @@ class PipelineManager(metaclass=ABCMeta):
             priority = item.getNodePriority()
             for node_request in item.current_build_set.node_requests.values():
                 if node_request.relative_priority != priority:
+                    # TODO (felix): What's the purpose of the reviseRequest()?
+                    # This sometimes fails with a NoNodeError, because the
+                    # NodeRequest doesn't exist anymore. See tests:
+                    # tests.unit.test_scheduler.TestScheduler.test_queue_rate_limiting_reconfigure
+                    # tests.unit.test_scheduler.TestScheduler.test_failed_change_at_head_with_queue
                     self.sched.nodepool.reviseRequest(
                         node_request, priority)
         return (changed, nnfi)

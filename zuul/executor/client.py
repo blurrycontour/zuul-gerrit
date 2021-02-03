@@ -172,7 +172,6 @@ class ExecutorClient(object):
             zuul_event_id=item.event.zuul_event_id,
         )
         build.parameters = params
-        build.nodeset = nodeset
 
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
@@ -198,6 +197,13 @@ class ExecutorClient(object):
         # is up to date.
         attempts = build.build_set.getTries(job.name)
         params["zuul"]['attempts'] = attempts
+        params['max_attempts'] = job.attempts
+
+        # Store the NodeRequest ID in the job arguments, so we can look it up
+        # on the executor side to lock the nodes.
+        node_request = build.build_set.getJobNodeRequest(job.name)
+        if node_request:
+            params["noderequest_id"] = node_request.id
 
         functions = getGearmanFunctions(self.gearman)
         function_name = 'executor:execute'
@@ -333,6 +339,20 @@ class ExecutorClient(object):
             result = {"result": "CANCELED", "end_time": time.time()}
             event = BuildCompletedEvent(build.uuid, result)
             self.result_events[tenant_name][pipeline_name].put(event)
+
+            # As the job didn't show up on any executor yet, we have to make
+            # sure that the node request is deleted. Usually this would be done
+            # by the executor when it accepts the nodes before starting the
+            # build.
+            request = build.build_set.getJobNodeRequest(build.job.name)
+            if request:
+                log.debug("Deleting node request %s", request)
+                try:
+                    self.sched.nodepool.zk_nodepool.deleteNodeRequest(request)
+                except Exception:
+                    log.exception("Error deleting node request:")
+                    request.failed = True
+
             return True
         return False
 
