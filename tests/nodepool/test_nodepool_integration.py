@@ -37,7 +37,6 @@ class TestNodepoolIntegration(BaseTestCase):
         self.addCleanup(self.zk_client.disconnect)
         self.hostname = socket.gethostname()
 
-        self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
         self.nodepool = zuul.nodepool.Nodepool(
@@ -49,11 +48,6 @@ class TestNodepoolIntegration(BaseTestCase):
         while self.nodepool.requests:
             time.sleep(0.1)
 
-    def onNodesProvisioned(self, request):
-        # This is a scheduler method that the nodepool class calls
-        # back when a request is provisioned.
-        self.provisioned_requests.append(request)
-
     def test_node_request(self):
         # Test a simple node request
 
@@ -63,7 +57,11 @@ class TestNodepoolIntegration(BaseTestCase):
         job.nodeset = nodeset
         request = self.nodepool.requestNodes(None, job, 0)
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 1)
         self.assertEqual(request.state, model.STATE_FULFILLED)
 
         # Accept the nodes
@@ -93,7 +91,11 @@ class TestNodepoolIntegration(BaseTestCase):
         job.nodeset = nodeset
         request = self.nodepool.requestNodes(None, job, 0)
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 1)
         self.assertEqual(request.state, model.STATE_FAILED)
 
     @skip("Disabled until nodepool is ready")
@@ -111,7 +113,11 @@ class TestNodepoolIntegration(BaseTestCase):
         self.zk_client.kazoo_client.start()
         self.fake_nodepool.paused = False
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 1)
+
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 1)
         self.assertEqual(request.state, model.STATE_FULFILLED)
 
     @skip("Disabled until nodepool is ready")
@@ -128,4 +134,7 @@ class TestNodepoolIntegration(BaseTestCase):
         self.nodepool.cancelRequest(request)
 
         self.waitForRequests()
-        self.assertEqual(len(self.provisioned_requests), 0)
+        provisioned_requests = self.zk_nodepool.kazoo_client.get_children(
+            self.zk_nodepool.REQUEST_ROOT
+        )
+        self.assertEqual(len(provisioned_requests), 0)

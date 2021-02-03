@@ -744,11 +744,17 @@ class NodeSet(ConfigObject):
 class NodeRequest(object):
     """A request for a set of nodes."""
 
-    def __init__(self, requestor: str, build_set: 'BuildSet', job: 'Job',
-                 nodeset: NodeSet, relative_priority: int,
-                 event: Optional['TriggerEvent'] = None):
+    def __init__(
+        self,
+        requestor: str,
+        build_set: Optional['BuildSet'],
+        job: 'Job',
+        nodeset: NodeSet,
+        relative_priority: int,
+        event: Optional['TriggerEvent'] = None
+    ):
         self.requestor: str = requestor
-        self.build_set: BuildSet = build_set
+        self.build_set: Optional[BuildSet] = build_set
         self.job: Job = job
         self.lock: Optional[Lock] = None
         self.nodeset: NodeSet = nodeset
