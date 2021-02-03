@@ -436,8 +436,16 @@ class TestAnsibleJob(ZuulTestCase):
     def setUp(self):
         super(TestAnsibleJob, self).setUp()
         ansible_version = AnsibleManager().default_version
-        args = '{"ansible_version": "%s"}' % ansible_version
-        job = gear.TextJob('executor:execute', args, unique='test')
+        args = {
+            "ansible_version": ansible_version,
+            "nodeset": {
+                "name": "dummy-node",
+                "node_request_id": 0,
+                "nodes": [],
+                "groups": [],
+            },
+        }
+        job = gear.TextJob('executor:execute', json.dumps(args), unique='test')
         self.test_job = zuul.executor.server.AnsibleJob(self.executor_server,
                                                         job)
 
