@@ -635,10 +635,6 @@ class PipelineManager(metaclass=ABCMeta):
         for job in jobs:
             log.debug("Found job %s for change %s", job, item.change)
             try:
-                nodeset = item.current_build_set.getJobNodeSet(job.name)
-                self.sched.nodepool.useNodeSet(
-                    nodeset, build_set=item.current_build_set,
-                    event=item.event)
                 self.sched.executor.execute(
                     job, item, self.pipeline,
                     build_set.dependent_changes,
@@ -1417,7 +1413,6 @@ class PipelineManager(metaclass=ABCMeta):
         if request.failed or not request.fulfilled:
             log.info("Node request %s: failure for %s",
                      request, request.job.name)
-            build_set.item.setNodeRequestFailure(request.job)
             self._resumeBuilds(request.build_set)
             tenant = build_set.item.pipeline.tenant
             tenant.semaphore_handler.release(build_set.item, request.job)

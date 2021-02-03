@@ -18,7 +18,6 @@
 import json
 import logging
 import os
-import re
 import socket
 import sys
 import threading
@@ -111,9 +110,6 @@ class Scheduler(threading.Thread):
     _stats_interval = 30
     _cleanup_interval = 60 * 60
     _merger_client_class = MergeClient
-
-    # Number of seconds past node expiration a hold request will remain
-    EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
 
     def __init__(self, config, connections, app, testonly=False):
         threading.Thread.__init__(self)
@@ -1596,131 +1592,6 @@ class Scheduler(threading.Thread):
             return
         pipeline.manager.onBuildPaused(build)
 
-    def _handleExpiredHoldRequest(self, request):
-        '''
-        Check if a hold request is expired and delete it if it is.
-
-        The 'expiration' attribute will be set to the clock time when the
-        hold request was used for the last time. If this is NOT set, then
-        the request is still active.
-
-        If a node expiration time is set on the request, and the request is
-        expired, *and* we've waited for a defined period past the node
-        expiration (EXPIRED_HOLD_REQUEST_TTL), then we will delete the hold
-        request.
-
-        :returns: True if it is expired, False otherwise.
-        '''
-        if not request.expired:
-            return False
-
-        if not request.node_expiration:
-            # Request has been used up but there is no node expiration, so
-            # we don't auto-delete it.
-            return True
-
-        elapsed = time.time() - request.expired
-        if elapsed < self.EXPIRED_HOLD_REQUEST_TTL + request.node_expiration:
-            # Haven't reached our defined expiration lifetime, so don't
-            # auto-delete it yet.
-            return True
-
-        try:
-            self.zk_nodepool.lockHoldRequest(request)
-            self.log.info("Removing expired hold request %s", request)
-            self.zk_nodepool.deleteHoldRequest(request)
-        except Exception:
-            self.log.exception(
-                "Failed to delete expired hold request %s", request)
-        finally:
-            try:
-                self.zk_nodepool.unlockHoldRequest(request)
-            except Exception:
-                pass
-
-        return True
-
-    def _getAutoholdRequest(self, build):
-        change = build.build_set.item.change
-
-        autohold_key_base = (build.pipeline.tenant.name,
-                             change.project.canonical_name,
-                             build.job.name)
-
-        class Scope(object):
-            """Enum defining a precedence/priority of autohold requests.
-
-            Autohold requests for specific refs should be fulfilled first,
-            before those for changes, and generic jobs.
-
-            Matching algorithm goes over all existing autohold requests, and
-            returns one with the highest number (in case of duplicated
-            requests the last one wins).
-            """
-            NONE = 0
-            JOB = 1
-            CHANGE = 2
-            REF = 3
-
-        # Do a partial match of the autohold key against all autohold
-        # requests, ignoring the last element of the key (ref filter),
-        # and finally do a regex match between ref filter from
-        # the autohold request and the build's change ref to check
-        # if it matches. Lastly, make sure that we match the most
-        # specific autohold request by comparing "scopes"
-        # of requests - the most specific is selected.
-        autohold = None
-        scope = Scope.NONE
-        self.log.debug("Checking build autohold key %s", autohold_key_base)
-        for request_id in self.zk_nodepool.getHoldRequests():
-            request = self.zk_nodepool.getHoldRequest(request_id)
-            if not request:
-                continue
-
-            if self._handleExpiredHoldRequest(request):
-                continue
-
-            ref_filter = request.ref_filter
-
-            if request.current_count >= request.max_count:
-                # This request has been used the max number of times
-                continue
-            elif not (request.tenant == autohold_key_base[0] and
-                      request.project == autohold_key_base[1] and
-                      request.job == autohold_key_base[2]):
-                continue
-            elif not re.match(ref_filter, change.ref):
-                continue
-
-            if ref_filter == ".*":
-                candidate_scope = Scope.JOB
-            elif ref_filter.endswith(".*"):
-                candidate_scope = Scope.CHANGE
-            else:
-                candidate_scope = Scope.REF
-
-            self.log.debug("Build autohold key %s matched scope %s",
-                           autohold_key_base, candidate_scope)
-            if candidate_scope > scope:
-                scope = candidate_scope
-                autohold = request
-
-        return autohold
-
-    def _processAutohold(self, build):
-        # We explicitly only want to hold nodes for jobs if they have
-        # failed / retry_limit / post_failure and have an autohold request.
-        hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
-        if build.result not in hold_list:
-            return False
-
-        request = self._getAutoholdRequest(build)
-        if request is not None:
-            self.log.debug("Got autohold %s", request)
-            self.nodepool.holdNodeSet(build.nodeset, request, build)
-            return True
-        return False
-
     def _doBuildCompletedEvent(self, event):
         # Get the local build object from the executor client
         build = self.executor.builds.get(event.build)
@@ -1739,13 +1610,8 @@ class Scheduler(threading.Thread):
         build.error_detail = event_result.get("error_detail")
 
         if result is None:
-            if (
-                build.build_set.getTries(build.job.name) >= build.job.attempts
-            ):
-                result = "RETRY_LIMIT"
-            else:
-                build.retry = True
-        if result in ("DISCONNECT", "ABORTED"):
+            build.retry = True
+        if result == "ABORTED":
             # Always retry if the executor just went away
             build.retry = True
         if result == "MERGER_FAILURE":
@@ -1766,7 +1632,6 @@ class Scheduler(threading.Thread):
 
         result_data = event_result.get("data", {})
         warnings = event_result.get("warnings", [])
-
         log.info("Build complete, result %s, warnings %s", result, warnings)
 
         if build.retry:
@@ -1781,25 +1646,15 @@ class Scheduler(threading.Thread):
         build.end_time = event_result["end_time"]
         build.result_data = result_data
         build.build_set.warning_messages.extend(warnings)
+        build.held = event_result.get("held")
 
         build.result = result
         self._reportBuildStats(build)
 
-        # Regardless of any other conditions which might cause us not
-        # to pass this on to the pipeline manager, make sure we return
-        # the nodes to nodepool.
-        try:
-            build.held = self._processAutohold(build)
-            self.log.debug(
-                'build "%s" held status set to %s', build, build.held
-            )
-        except Exception:
-            log.exception("Unable to process autohold for %s", build)
-        try:
-            self.nodepool.returnNodeSet(build.nodeset, build=build,
-                                        zuul_event_id=build.zuul_event_id)
-        except Exception:
-            log.exception("Unable to return nodeset %s" % build.nodeset)
+        # The build is completed and the nodes were already returned by the
+        # executor. For consistency, also remove the node request from the
+        # build set.
+        build.build_set.removeJobNodeRequest(build.job.name)
 
         # The test suite expects the build to be removed from the
         # internal dict after it's added to the report queue.
@@ -1847,13 +1702,8 @@ class Scheduler(threading.Thread):
 
     def _doNodesProvisionedEvent(self, event):
         request = event.request
-        request_id = event.request_id
         build_set = request.build_set
         log = get_annotated_logger(self.log, request.event_id)
-
-        ready = self.nodepool.acceptNodes(request, request_id)
-        if not ready:
-            return
 
         if build_set is not build_set.item.current_build_set:
             log.warning("Build set %s is not current "
@@ -1993,7 +1843,7 @@ class Scheduler(threading.Thread):
                     nodeset = buildset.getJobNodeSet(job_name)
                     if nodeset:
                         self.nodepool.returnNodeSet(
-                            nodeset, build=build, zuul_event_id=item.event)
+                            nodeset, zuul_event_id=item.event)
 
                 # In the unlikely case that a build is removed and
                 # later added back, make sure we clear out the nodeset
