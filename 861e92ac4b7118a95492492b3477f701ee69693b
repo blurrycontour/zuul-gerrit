@@ -34,6 +34,24 @@
       "revId": "861e92ac4b7118a95492492b3477f701ee69693b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c06d60a0_0611fa0d",
+        "filename": "web/src/containers/config/Config.jsx",
+        "patchSetId": 26
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 29946
+      },
+      "writtenOn": "2021-02-03T18:49:15Z",
+      "side": 1,
+      "message": "timezone from moment are lot of region, for this reason i use select component with variant typehead instead of FormSelect\n\nAlso i add a maxHeight to force scrolling bar (https://imgur.com/a/2QBkpJH)",
+      "parentUuid": "e1d83759_1c282393",
+      "revId": "861e92ac4b7118a95492492b3477f701ee69693b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
