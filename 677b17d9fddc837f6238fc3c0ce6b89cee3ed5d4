@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "12780f26_b0e0c7f7",
+        "filename": "web/src/pages/Build.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-03T01:24:44Z",
+      "side": 1,
+      "message": "Could error_detail be set along with hosts?",
+      "range": {
+        "startLine": 165,
+        "startChar": 10,
+        "endLine": 165,
+        "endChar": 28
+      },
+      "revId": "677b17d9fddc837f6238fc3c0ce6b89cee3ed5d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
