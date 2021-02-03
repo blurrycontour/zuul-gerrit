@@ -172,7 +172,6 @@ class ExecutorClient(object):
             zuul_event_id=item.event.zuul_event_id,
         )
         build.parameters = params
-        build.nodeset = nodeset
 
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
@@ -198,6 +197,15 @@ class ExecutorClient(object):
         # is up to date.
         attempts = build.build_set.getTries(job.name)
         params["zuul"]['attempts'] = attempts
+        params['max_attempts'] = job.attempts
+
+        # Store the nodeset in the job arguments, so we can lock it on the
+        # executor side.
+        # TODO (felix): The nodeset shouldn't be ne necessary anymore as we are
+        # now updating the nodes directly on the noderequest in the executor.
+        params["nodeset"] = nodeset.toDict()
+        params["noderequest_id"] = build.build_set.getJobNodeRequest(
+            job.name).id
 
         functions = getGearmanFunctions(self.gearman)
         function_name = 'executor:execute'

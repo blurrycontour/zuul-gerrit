@@ -133,6 +133,10 @@ class Nodepool(object):
                 # the executor side.
                 self.sched.onNodesProvisioned(req)
             del self.requests[req.uid]
+
+        # Store the node_request id on the nodeset for later evaluation
+        nodeset.node_request_id = req.id
+
         return req
 
     def cancelRequest(self, request):
@@ -178,7 +182,7 @@ class Nodepool(object):
             except Exception:
                 log.exception("Unable to unlock node request %s", request)
 
-    def holdNodeSet(self, nodeset, request, build):
+    def holdNodeSet(self, nodeset, request, ansible_job):
         '''
         Perform a hold on the given set of nodes.
 
@@ -202,7 +206,7 @@ class Nodepool(object):
             self.zk_nodepool.storeNode(node)
 
         request.nodes.append(dict(
-            build=build.uuid,
+            build=ansible_job.job.unique,
             nodes=[node.id for node in nodes],
         ))
         request.current_count += 1
@@ -230,21 +234,22 @@ class Nodepool(object):
             # _doBuildCompletedEvent, we always want to try to unlock it.
             self.zk_nodepool.unlockHoldRequest(request)
 
-    def useNodeSet(self, nodeset, build_set=None, event=None):
-        self.log.info("Setting nodeset %s in use" % (nodeset,))
+    def useNodeSet(self, nodeset, ansible_job=None, event=None):
+        self.log.info("Setting nodeset %s in use", nodeset)
         resources = defaultdict(int)
         for node in nodeset.getNodes():
             if node.lock is None:
-                raise Exception("Node %s is not locked" % (node,))
+                raise Exception("Node %s is not locked", node)
             node.state = model.STATE_IN_USE
             self.zk_nodepool.storeNode(node)
             if node.resources:
                 add_resources(resources, node.resources)
-        if build_set and resources:
+        if ansible_job and resources:
+            args = ansible_job.arguments
             # we have a buildset and thus also tenant and project so we
             # can emit project specific resource usage stats
-            tenant_name = build_set.item.pipeline.tenant.name
-            project_name = build_set.item.change.project.canonical_name
+            tenant_name = args["zuul"]["tenant"]
+            project_name = args["zuul"]["project"]["canonical_name"]
 
             self.current_resources_by_tenant.setdefault(
                 tenant_name, defaultdict(int))
@@ -257,24 +262,11 @@ class Nodepool(object):
                           resources)
             self.emitStatsResources()
 
-    def returnNodeSet(self, nodeset, build=None, zuul_event_id=None):
+    def returnNodeSet(self, nodeset, ansible_job=None, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         log.info("Returning nodeset %s", nodeset)
         resources = defaultdict(int)
-        duration = None
-        project = None
-        tenant = None
-        if build:
-            project = build.build_set.item.change.project
-            tenant = build.build_set.item.pipeline.tenant.name
-        if (build and build.start_time and build.end_time and
-            build.build_set and build.build_set.item and
-            build.build_set.item.change and
-            build.build_set.item.change.project):
-            duration = build.end_time - build.start_time
-            log.info("Nodeset %s with %s nodes was in use "
-                     "for %s seconds for build %s for project %s",
-                     nodeset, len(nodeset.nodes), duration, build, project)
+
         for node in nodeset.getNodes():
             if node.lock is None:
                 log.error("Node %s is not locked", node)
@@ -290,21 +282,33 @@ class Nodepool(object):
                                   "while unlocking:", node)
         self._unlockNodes(nodeset.getNodes())
 
+        if not ansible_job:
+            return
+
+        args = ansible_job.arguments
+        project = args["zuul"]["project"]["canonical_name"]
+        tenant = args["zuul"]["tenant"]
+        duration = 0
+        if ansible_job.end_time and ansible_job.time_starting_build:
+            duration = ansible_job.end_time - ansible_job.time_starting_build
+        log.info("Nodeset %s with %s nodes was in use "
+                 "for %s seconds for build %s for project %s",
+                 nodeset, len(nodeset.nodes), duration, ansible_job, project)
+
         # When returning a nodeset we need to update the gauges if we have a
         # build. Further we calculate resource*duration and increment their
         # tenant or project specific counters. With that we have both the
         # current value and also counters to be able to perform accounting.
-        if tenant and project and resources:
-            project_name = project.canonical_name
+        if resources:
             subtract_resources(
                 self.current_resources_by_tenant[tenant], resources)
             subtract_resources(
-                self.current_resources_by_project[project_name], resources)
+                self.current_resources_by_project[project], resources)
             self.emitStatsResources()
 
             if duration:
                 self.emitStatsResourceCounters(
-                    tenant, project_name, resources, duration)
+                    tenant, project, resources, duration)
 
     def unlockNodeSet(self, nodeset):
         self._unlockNodes(nodeset.getNodes())
@@ -317,15 +321,12 @@ class Nodepool(object):
                 self.log.exception("Error unlocking node:")
 
     def lockNodeSet(self, nodeset, request_id):
-        self._lockNodes(nodeset.getNodes(), request_id)
-
-    def _lockNodes(self, nodes, request_id):
         # Try to lock all of the supplied nodes.  If any lock fails,
         # try to unlock any which have already been locked before
         # re-raising the error.
         locked_nodes = []
         try:
-            for node in nodes:
+            for node in nodeset.getNodes():
                 if node.allocated_to != request_id:
                     raise Exception("Node %s allocated to %s, not %s" %
                                     (node.id, node.allocated_to, request_id))
@@ -342,6 +343,9 @@ class Nodepool(object):
         # Return False to indicate that we should stop watching the
         # node.
         log.debug("Updating node request %s", request)
+
+        # Update the node_request id on the nodeset
+        request.nodeset.node_request_id = request.id
 
         if request.uid not in self.requests:
             log.debug("Request %s is unknown", request.uid)
@@ -377,7 +381,7 @@ class Nodepool(object):
 
         return True
 
-    def acceptNodes(self, request, request_id):
+    def acceptNodes(self, request):
         log = get_annotated_logger(self.log, request.event_id)
 
         # Called by the scheduler when it wants to accept and lock
@@ -387,11 +391,19 @@ class Nodepool(object):
 
         log.info("Accepting node request %s", request)
 
+        # TODO (felix): I think this shouldn't be a problem anymore as the
+        # node request is now directly retrieved from ZooKeeper before
+        # accepting the nodes on the executor.
+        """
         if request_id != request.id:
             log.info("Skipping node accept for %s (resubmitted as %s)",
                      request_id, request.id)
             return False
+        """
 
+        # TODO (felix): The canceled might also not be necessary anymore as the
+        # executor won't be able to retrieve the NodeRequest from ZooKeeper if
+        # it was deleted.
         if request.canceled:
             log.info("Ignoring canceled node request %s", request)
             # The request was already deleted when it was canceled
@@ -424,13 +436,13 @@ class Nodepool(object):
             # request probably doesn't make sense at this point in time as it
             # is likely to directly fail again. So just log the problem
             # with zookeeper and fail here.
-            log.exception("Error getting node request %s:", request_id)
+            log.exception("Error getting node request %s:", request)
             request.failed = True
             return True
 
         locked = False
         if request.fulfilled:
-            # If the request suceeded, try to lock the nodes.
+            # If the request succeeded, try to lock the nodes.
             try:
                 self.lockNodeSet(request.nodeset, request.id)
                 locked = True
@@ -451,4 +463,6 @@ class Nodepool(object):
             # them.
             if locked:
                 self.unlockNodeSet(request.nodeset)
-        return True
+
+        if request.failed:
+            raise Exception("Accepting nodes failed")

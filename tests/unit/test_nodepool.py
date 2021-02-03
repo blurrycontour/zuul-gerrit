@@ -80,8 +80,13 @@ class TestNodepool(BaseTestCase):
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
-            self.assertIsNotNone(node.lock)
             self.assertEqual(node.state, 'ready')
+
+        # Lock the nodes
+        self.nodepool.lockNodeSet(nodeset)
+
+        for node in nodeset.getNodes():
+            self.assertIsNotNone(node.lock)
 
         # Mark the nodes in use
         self.nodepool.useNodeSet(nodeset)

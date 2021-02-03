@@ -30,7 +30,6 @@ from kazoo.exceptions import NoNodeError
 import git
 import testtools
 from testtools.matchers import AfterPreprocessing, MatchesRegex
-from zuul.scheduler import Scheduler
 import fixtures
 
 import zuul.change_matcher
@@ -45,7 +44,8 @@ from tests.base import (
     repack_repo,
     simple_layout,
     iterate_timeout,
-    RecordingExecutorServer, TestConnectionRegistry,
+    RecordingExecutorServer,
+    TestConnectionRegistry,
 )
 
 
@@ -2292,10 +2292,10 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/autohold.yaml')
     def test_autohold_request_expiration(self):
-        orig_exp = Scheduler.EXPIRED_HOLD_REQUEST_TTL
+        orig_exp = RecordingExecutorServer.EXPIRED_HOLD_REQUEST_TTL
 
         def reset_exp():
-            self.scheds.first.sched.EXPIRED_HOLD_REQUEST_TTL = orig_exp
+            self.executor_server.EXPIRED_HOLD_REQUEST_TTL = orig_exp
 
         self.addCleanup(reset_exp)
 
@@ -2326,7 +2326,7 @@ class TestScheduler(ZuulTestCase):
         # Temporarily shorten hold time so that the hold request can be
         # auto-deleted (which is done on another test failure). And wait
         # long enough for nodes to expire and request to delete.
-        self.scheds.first.sched.EXPIRED_HOLD_REQUEST_TTL = 1
+        self.executor_server.EXPIRED_HOLD_REQUEST_TTL = 1
         time.sleep(3)
 
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
