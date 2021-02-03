@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "5c842174_bdb52dac",
+        "filename": "requirements.txt",
+        "patchSetId": 39
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-02-03T20:28:52Z",
+      "side": 1,
+      "message": "whoops, that should not have landed here. I\u0027ve accidentally committed this.\n\nBackground: 0.15.0 is the only version so far that works on mac so I override that version on my development machine before creating the tox environment. However that version is intentionally excluded since it had a  performance regression on linux.",
+      "parentUuid": "d957a722_71a60700",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 3
+      },
+      "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "878caf4a_6b10a2ad",
         "filename": "zuul/cmd/__init__.py",
         "patchSetId": 39
