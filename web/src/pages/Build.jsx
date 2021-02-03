@@ -35,6 +35,7 @@ import {
   FileCodeIcon,
   TerminalIcon,
   PollIcon,
+  ExclamationIcon,
 } from '@patternfly/react-icons'
 
 import { fetchBuildAllInfo } from '../actions/build'
@@ -161,6 +162,13 @@ class BuildPage extends React.Component {
         <Fetching />
       ) : build.hosts ? (
         <BuildOutput output={build.hosts} />
+      ) : build.error_detail ? (
+        <>
+        <EmptyState variant={EmptyStateVariant.small}>
+          <EmptyStateIcon icon={ExclamationIcon} />
+        </EmptyState>
+          <p><b>Error:</b> {build.error_detail}</p>
+        </>
       ) : (
         <EmptyState variant={EmptyStateVariant.small}>
           <EmptyStateIcon icon={PollIcon} />
