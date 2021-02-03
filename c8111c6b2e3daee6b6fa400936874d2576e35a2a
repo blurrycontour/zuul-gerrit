@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7abd7f8f_723650cc",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1174,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-02-03T10:20:36Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem to be used anywhere?",
+      "range": {
+        "startLine": 1174,
+        "startChar": 8,
+        "endLine": 1174,
+        "endChar": 38
+      },
+      "revId": "c8111c6b2e3daee6b6fa400936874d2576e35a2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93f50d0b_551b3438",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1303,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-02-03T10:20:36Z",
+      "side": 1,
+      "message": "I think we want to be able to define a white list of allowed origins that match tenant deployments (for example zuul.opendev.org and zuul.openstack.org) instead of either one allowed origin or \u0027*\u0027.\nThis doc explains how white lists should be handled: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#access-control-allow-origin\nNote that we\u0027d also want to enforce CORS without the wildcard especially for requests with credentials.\nA quick look at cherrypy\u0027s doc didn\u0027t show anything about support for origin white lists out of the box; you might have to write a function that checks the \u0027Origin\u0027 header of the request against the white list, and returns it as the Access-Control-Allow-Origin response header if it is in the white list.",
+      "range": {
+        "startLine": 1303,
+        "startChar": 0,
+        "endLine": 1303,
+        "endChar": 67
+      },
+      "revId": "c8111c6b2e3daee6b6fa400936874d2576e35a2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
