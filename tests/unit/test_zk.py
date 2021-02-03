@@ -20,7 +20,7 @@ import testtools
 from tests.base import BaseTestCase, ChrootedKazooFixture, iterate_timeout
 from tests.zk import TestZooKeeperClient
 
-from zuul import model
+from zuul.model import HoldRequest, NodeSet
 from zuul.zk.builds import BuildQueue, BuildState
 from zuul.zk.config_cache import (
     create_unparsed_files_cache, UnparsedFilesCache
@@ -52,7 +52,7 @@ class ZooKeeperBaseTestCase(BaseTestCase):
 class TestZK(ZooKeeperBaseTestCase):
 
     def _createRequest(self):
-        req = model.HoldRequest()
+        req = HoldRequest()
         req.count = 1
         req.reason = 'some reason'
         req.expiration = 1
@@ -100,10 +100,46 @@ class TestBuilds(ZooKeeperBaseTestCase):
     def test_lost_builds(self):
         build_queue = BuildQueue(self.zk_client)
 
-        build_queue.submit("A", "tenant", "pipeline", {}, "zone")
-        path_b = build_queue.submit("B", "tenant", "pipeline", {}, "zone")
-        path_c = build_queue.submit("C", "tenant", "pipeline", {}, "zone")
-        path_d = build_queue.submit("D", "tenant", "pipeline", {}, "zone")
+        build_queue.submit(
+            "A",
+            "tenant",
+            "pipeline",
+            "project",
+            "job",
+            {},
+            "zone",
+            NodeSet("test"),
+        )
+        path_b = build_queue.submit(
+            "B",
+            "tenant",
+            "pipeline",
+            "project",
+            "job",
+            {},
+            "zone",
+            NodeSet("test"),
+        )
+        path_c = build_queue.submit(
+            "C",
+            "tenant",
+            "pipeline",
+            "project",
+            "job",
+            {},
+            "zone",
+            NodeSet("test"),
+        )
+        path_d = build_queue.submit(
+            "D",
+            "tenant",
+            "pipeline",
+            "project",
+            "job",
+            {},
+            "zone",
+            NodeSet("test"),
+        )
 
         b = build_queue.get(path_b)
         c = build_queue.get(path_c)

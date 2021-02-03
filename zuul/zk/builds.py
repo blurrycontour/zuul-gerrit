@@ -23,6 +23,7 @@ from kazoo.recipe.cache import TreeCache, TreeEvent
 from kazoo.recipe.lock import Lock
 
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import NodeSet
 from zuul.zk import ZooKeeperBase, ZooKeeperClient
 from zuul.zk.exceptions import BuildNotFound
 
@@ -50,8 +51,9 @@ class BuildResult(Enum):
     ERROR = 6
     MERGER_FAILURE = 7
     POST_FAILURE = 8
-    TIMED_OUT = 9
-    DISK_FULL = 10
+    NODE_FAILURE = 9
+    TIMED_OUT = 10
+    DISK_FULL = 11
 
 
 @total_ordering
@@ -65,6 +67,9 @@ class BuildItem:
         zone: str,
         tenant_name: str,
         pipeline_name: str,
+        project_name: str,
+        job_name: str,
+        nodeset: NodeSet,
     ):
         self.uuid = uuid
         self.state = state
@@ -73,6 +78,9 @@ class BuildItem:
         self.zone = zone
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
+        self.project_name = project_name
+        self.job_name = job_name
+        self.nodeset = nodeset
 
         self.result: Optional[BuildResult] = None
         # TODO (felix): Is the progress/status used anywhere? So far I couldn't
@@ -82,6 +90,7 @@ class BuildItem:
         self.result_data: Dict[str, Any] = {}
         self.start_time: Optional[float] = None
         self.end_time: Optional[float] = None
+        self.held: bool = False
 
         # ZK related data
         self.path: Optional[str] = None
@@ -97,12 +106,16 @@ class BuildItem:
             "zone": self.zone,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
+            "project_name": self.project_name,
+            "job_name": self.job_name,
+            "nodeset": self.nodeset.toDict(),
             "result": self.result.name if self.result else None,
             "progress": self.progress,
             "data": self.data,
             "result_data": self.result_data,
             "start_time": self.start_time,
             "end_time": self.end_time,
+            "held": self.held,
         }
 
     def update_from_dict(self, data: Dict[str, Any]) -> None:
@@ -113,6 +126,9 @@ class BuildItem:
         self.zone = data["zone"]
         self.tenant_name = data["tenant_name"]
         self.pipeline_name = data["pipeline_name"]
+        self.project_name = data["project_name"]
+        self.job_name = data["job_name"]
+        self.nodeset = NodeSet.fromDict(data["nodeset"])
         result = data["result"]
         if result:
             self.result = BuildResult[result]
@@ -121,6 +137,7 @@ class BuildItem:
         self.result_data = data["result_data"]
         self.start_time = data["start_time"]
         self.end_time = data["end_time"]
+        self.held = data["held"]
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "BuildItem":
@@ -132,6 +149,9 @@ class BuildItem:
             data["zone"],
             data["tenant_name"],
             data["pipeline_name"],
+            data["project_name"],
+            data["job_name"],
+            NodeSet.fromDict(data["nodeset"]),
         )
 
         result = data["result"]
@@ -142,6 +162,7 @@ class BuildItem:
         build.result_data = data["result_data"]
         build.start_time = data["start_time"]
         build.end_time = data["end_time"]
+        build.held = data["held"]
 
         return build
 
@@ -167,10 +188,10 @@ class BuildItem:
         return same_prec and same_ctime
 
     def __repr__(self) -> str:
-        d = self.to_dict()
-        d["path"] = self.path
-        d["zstat"] = self._zstat
-        return f"<BuildItem {d}>"
+        return (
+            f"<BuildItem {self.uuid} of {self.job_name}, "
+            f"state={self.state.name}, nodeset={self.nodeset}>"
+        )
 
 
 class BuildEvent(Enum):
@@ -314,8 +335,11 @@ class BuildQueue(ZooKeeperBase):
         uuid: str,
         tenant_name: str,
         pipeline_name: str,
+        project_name: str,
+        job_name: str,
         params: Dict[str, Any],
         zone: str,
+        nodeset: NodeSet,
         precedence: int = 200,
     ) -> str:
         log = get_annotated_logger(self.log, event=None, build=uuid)
@@ -330,6 +354,9 @@ class BuildQueue(ZooKeeperBase):
             zone,
             tenant_name,
             pipeline_name,
+            project_name,
+            job_name,
+            nodeset,
         )
         log.debug("Submitting build to ZooKeeper %s", uuid)
 
@@ -372,28 +399,6 @@ class BuildQueue(ZooKeeperBase):
 
         build = BuildItem.from_dict(content)
         build.path = path
-        build._zstat = zstat
-
-        return build
-
-    def refresh(self, build: BuildItem) -> BuildItem:
-        data = None
-        zstat = None
-        try:
-            data, zstat = self.kazoo_client.get(build.path)
-        except NoNodeError:
-            # TODO (felix): If something goes wrong here, should we better just
-            # raise the error, so the caller can handle it?
-            self.log.error(
-                "Could not refresh non-existing build %s", build.path
-            )
-
-        if data:
-            d = self._bytes_to_dict(data)
-        else:
-            d = {}
-
-        build.update_from_dict(d)
         build._zstat = zstat
 
         return build
@@ -461,8 +466,6 @@ class BuildQueue(ZooKeeperBase):
 
         build.lock = lock
 
-        # Do an in-place update of the build so we have the latest data.
-        self.refresh(build)
         return True
 
     def is_locked(self, build: BuildItem) -> bool:
