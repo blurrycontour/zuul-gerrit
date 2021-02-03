@@ -80,6 +80,8 @@ class BuildItem:
         self.progress: Dict[str, int] = {}
         self.data: Dict[str, Any] = {}
         self.result_data: Dict[str, Any] = {}
+        self.start_time: Optional[float] = None
+        self.end_time: Optional[float] = None
 
         # ZK related data
         self.path: Optional[str] = None
@@ -99,6 +101,8 @@ class BuildItem:
             "progress": self.progress,
             "data": self.data,
             "result_data": self.result_data,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
         }
 
     def update_from_dict(self, data: Dict[str, Any]) -> None:
@@ -115,6 +119,8 @@ class BuildItem:
         self.progress = data["progress"]
         self.data = data["data"]
         self.result_data = data["result_data"]
+        self.start_time = data["start_time"]
+        self.end_time = data["end_time"]
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "BuildItem":
@@ -134,6 +140,8 @@ class BuildItem:
         build.progress = data["progress"]
         build.data = data["data"]
         build.result_data = data["result_data"]
+        build.start_time = data["start_time"]
+        build.end_time = data["end_time"]
 
         return build
 
