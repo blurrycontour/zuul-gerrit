@@ -3251,6 +3251,15 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         job.arguments = json.dumps(args)
         super(RecordingExecutorServer, self).executeJob(job)
 
+    def lockNodes(self, job, event):
+        locked = super().lockNodes(job, event)
+        if not locked:
+            # If the nodes could not be locked, directly remove the build
+            # from the list of running builds as it will never be executed.
+            build = self.job_builds.get(job.unique)
+            self.running_builds.remove(build)
+        return locked
+
     def stopJob(self, job):
         self.log.debug("handle stop")
         parameters = json.loads(job.arguments)
