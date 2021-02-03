@@ -348,6 +348,7 @@ class TestWeb(BaseTestWeb):
                     'name': '',
                     'nodes': [{'comment': None,
                                'hold_job': None,
+                               'id': None,
                                'label': 'label1',
                                'name': 'controller',
                                'aliases': [],
@@ -394,6 +395,7 @@ class TestWeb(BaseTestWeb):
                     'name': '',
                     'nodes': [{'comment': None,
                                'hold_job': None,
+                               'id': None,
                                'label': 'label2',
                                'name': 'controller',
                                'aliases': [],
@@ -1017,6 +1019,7 @@ class TestWeb(BaseTestWeb):
             'nodes': [{
                 'comment': None,
                 'hold_job': None,
+                'id': None,
                 'label': 'label1',
                 'name': ['controller'],
                 'state': 'unknown'
