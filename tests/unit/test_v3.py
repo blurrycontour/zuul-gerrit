@@ -6763,10 +6763,10 @@ class TestJobPausePriority(AnsibleZuulTestCase):
 
         for x in iterate_timeout(60, 'paused job'):
             reqs = self.fake_nodepool.getNodeRequests()
-            if reqs:
+            if len(reqs) == 2:
                 break
 
-        self.assertEqual(len(reqs), 1)
+        self.assertEqual(len(reqs), 2)
         self.assertEqual(reqs[0]['_oid'], '099-0000000001')
         self.assertEqual(reqs[0]['provider'], 'test-provider')
 

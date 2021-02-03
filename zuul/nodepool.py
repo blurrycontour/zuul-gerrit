@@ -20,7 +20,6 @@ from statsd import StatsClient
 from zuul import model
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import (
-    Build,
     BuildSet,
     HoldRequest,
     Job,
@@ -31,6 +30,7 @@ from zuul.model import (
     TriggerEvent,
 )
 from zuul.zk import ZooKeeperClient
+from zuul.zk.builds import BuildItem
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepool
@@ -166,6 +166,10 @@ class Nodepool(object):
             log.info("Fulfilling empty node request %s", req)
             req.state = model.STATE_FULFILLED
             self.fulfillRequest(req)
+
+        # Store the node_request id on the nodeset for later evaluation
+        nodeset.node_request_id = req.id
+
         return req
 
     def fulfillRequest(self, request: NodeRequest) -> None:
@@ -190,12 +194,11 @@ class Nodepool(object):
     def cancelRequest(self, request: NodeRequest) -> None:
         log = get_annotated_logger(self.log, request.event_id)
         log.info("Canceling node request %s", request)
-        if request.uid in self.requests:
-            request.canceled = True
-            try:
-                self.zk_nodepool.deleteNodeRequest(request)
-            except Exception:
-                log.exception("Error deleting node request:")
+        request.canceled = True
+        try:
+            self.zk_nodepool.deleteNodeRequest(request)
+        except Exception:
+            log.exception("Error deleting node request:")
 
     def reviseRequest(self, request: NodeRequest,
                       relative_priority: int = None) -> None:
@@ -230,8 +233,9 @@ class Nodepool(object):
             except Exception:
                 log.exception("Unable to unlock node request %s", request)
 
-    def holdNodeSet(self, nodeset: NodeSet, request: HoldRequest,
-                    build: Build) -> None:
+    def holdNodeSet(
+        self, nodeset: NodeSet, request: HoldRequest, build: BuildItem
+    ) -> None:
         '''
         Perform a hold on the given set of nodes.
 
@@ -284,8 +288,9 @@ class Nodepool(object):
             # _doBuildCompletedEvent, we always want to try to unlock it.
             self.zk_nodepool.unlockHoldRequest(request)
 
-    def useNodeSet(self, nodeset: NodeSet, build_set: BuildSet = None,
-                   event=None) -> None:
+    def useNodeSet(
+        self, nodeset: NodeSet, build: Optional[BuildItem] = None
+    ) -> None:
         self.log.info("Setting nodeset %s in use" % (nodeset,))
         resources: Dict[str, int] = defaultdict(int)
         for node in nodeset.getNodes():
@@ -295,11 +300,11 @@ class Nodepool(object):
             self.zk_nodepool.storeNode(node)
             if node.resources:
                 add_resources(resources, node.resources)
-        if build_set and resources:
+        if build and resources:
             # we have a buildset and thus also tenant and project so we
             # can emit project specific resource usage stats
-            tenant_name = build_set.item.layout.tenant.name
-            project_name = build_set.item.change.project.canonical_name
+            tenant_name = build.tenant_name
+            project_name = build.project_name
 
             self.current_resources_by_tenant.setdefault(
                 tenant_name, defaultdict(int))
@@ -312,25 +317,16 @@ class Nodepool(object):
                           resources)
             self.emitStatsResources()
 
-    def returnNodeSet(self, nodeset: NodeSet, build: Optional[Build] = None,
-                      zuul_event_id: Optional[str] = None) -> None:
+    def returnNodeSet(
+        self,
+        nodeset: NodeSet,
+        build: Optional[BuildItem] = None,
+        zuul_event_id: Optional[str] = None,
+    ) -> None:
         log = get_annotated_logger(self.log, zuul_event_id)
         log.info("Returning nodeset %s", nodeset)
         resources: Dict[str, int] = defaultdict(int)
-        duration = None
-        project = None
-        tenant = None
-        if build and build.build_set:
-            project = build.build_set.item.change.project
-            tenant = build.build_set.item.pipeline.tenant.name
-        if (build and build.start_time and build.end_time and
-            build.build_set and build.build_set.item and
-            build.build_set.item.change and
-            build.build_set.item.change.project):
-            duration = build.end_time - build.start_time
-            log.info("Nodeset %s with %s nodes was in use "
-                     "for %s seconds for build %s for project %s",
-                     nodeset, len(nodeset.nodes), duration, build, project)
+
         for node in nodeset.getNodes():
             if node.lock is None:
                 log.error("Node %s is not locked", node)
@@ -346,24 +342,40 @@ class Nodepool(object):
                                   "while unlocking:", node)
         self._unlockNodes(nodeset.getNodes())
 
+        if not build:
+            return
+
+        project = build.project_name
+        tenant = build.tenant_name
+        duration = None
+        if build.start_time and build.end_time:
+            duration = build.end_time - build.start_time
+            log.info(
+                "Nodeset %s with %s nodes was in use "
+                "for %s seconds for build %s for project %s",
+                nodeset,
+                len(nodeset.nodes),
+                duration,
+                build,
+                project,
+            )
         # When returning a nodeset we need to update the gauges if we have a
         # build. Further we calculate resource*duration and increment their
         # tenant or project specific counters. With that we have both the
         # current value and also counters to be able to perform accounting.
-        if tenant and project and resources:
-            project_name = project.canonical_name
+
+        if resources:
             subtract_resources(
-                self.current_resources_by_tenant[tenant], resources)
+                self.current_resources_by_tenant[tenant], resources
+            )
             subtract_resources(
-                self.current_resources_by_project[project_name], resources)
+                self.current_resources_by_project[project], resources
+            )
             self.emitStatsResources()
 
             if duration:
                 self.emitStatsResourceCounters(
-                    tenant, project_name, resources, duration)
-
-    def unlockNodeSet(self, nodeset: NodeSet) -> None:
-        self._unlockNodes(nodeset.getNodes())
+                    tenant, project, resources, duration)
 
     def _unlockNodes(self, nodes: List[Node]) -> None:
         for node in nodes:
@@ -372,16 +384,14 @@ class Nodepool(object):
             except Exception:
                 self.log.exception("Error unlocking node:")
 
-    def lockNodeSet(self, nodeset: NodeSet, request_id: str) -> None:
-        self._lockNodes(nodeset.getNodes(), request_id)
-
-    def _lockNodes(self, nodes: List[Node], request_id: str) -> None:
-        # Try to lock all of the supplied nodes.  If any lock fails,
+    def lockNodeSet(self, nodeset: NodeSet) -> None:
+        # Try to lock all of the supplied nodes. If any lock fails,
         # try to unlock any which have already been locked before
         # re-raising the error.
         locked_nodes = []
+        request_id = nodeset.node_request_id
         try:
-            for node in nodes:
+            for node in nodeset.getNodes():
                 if node.allocated_to != request_id:
                     raise Exception("Node %s allocated to %s, not %s" %
                                     (node.id, node.allocated_to, request_id))
@@ -398,6 +408,9 @@ class Nodepool(object):
         # Return False to indicate that we should stop watching the
         # node.
         log.debug("Updating node request %s", request)
+
+        # Update the node_request id on the nodeset
+        request.nodeset.node_request_id = request.id
 
         if request.uid not in self.requests:
             log.debug("Request %s is unknown", request.uid)
@@ -482,29 +495,11 @@ class Nodepool(object):
             request.failed = True
             return True
 
-        locked = False
-        if request.fulfilled:
-            # If the request suceeded, try to lock the nodes.
-            try:
-                if not request.id:
-                    raise Exception("Request without ID")
-                self.lockNodeSet(request.nodeset, request.id)
-                locked = True
-            except Exception:
-                log.exception("Error locking nodes:")
-                request.failed = True
+        # TODO (felix): If the node locking fails on the executor, do
+        # we need to reflect this on the request as well? Previously, the
+        # following was done here in case locking the request failed:
+        #
+        # log.exception("Error locking nodes:")
+        # request.failed = True
 
-        # Regardless of whether locking (or even the request)
-        # succeeded, delete the request.
-        log.debug("Deleting node request %s", request)
-        try:
-            self.zk_nodepool.deleteNodeRequest(request)
-        except Exception:
-            log.exception("Error deleting node request:")
-            request.failed = True
-            # If deleting the request failed, and we did lock the
-            # nodes, unlock the nodes since we're not going to use
-            # them.
-            if locked:
-                self.unlockNodeSet(request.nodeset)
         return True

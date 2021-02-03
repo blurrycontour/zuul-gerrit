@@ -443,6 +443,9 @@ class TestAnsibleJob(ZuulTestCase):
             zone=None,
             tenant_name=None,
             pipeline_name=None,
+            project_name=None,
+            job_name=None,
+            nodeset=None,
         )
 
         build.path = "/test/path"

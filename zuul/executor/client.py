@@ -259,6 +259,7 @@ class ExecutorClient(object):
         # is up to date.
         attempts = build.build_set.getTries(job.name)
         zuul_params['attempts'] = attempts
+        zuul_params['max_attempts'] = job.attempts
 
         # Because all nodes belong to the same provider, region and
         # availability zone we can get executor_zone from only the first
@@ -271,8 +272,11 @@ class ExecutorClient(object):
             uuid=uuid,
             tenant_name=build.build_set.item.pipeline.tenant.name,
             pipeline_name=build.build_set.item.pipeline.name,
+            project_name=build.build_set.item.change.project.canonical_name,
+            job_name=build.job.name,
             params=params,
             zone=executor_zone,
+            nodeset=nodeset,
             precedence=PRIORITY_MAP[pipeline.precedence]
         )
 
