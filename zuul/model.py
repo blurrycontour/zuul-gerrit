@@ -609,6 +609,7 @@ class Node(ConfigObject):
         self.username = None
         self.hold_expiration = None
         self.resources = None
+        self.allocated_to = None
 
     @property
     def state(self):
@@ -731,6 +732,7 @@ class NodeSet(ConfigObject):
         d = {}
         d['name'] = self.name
         d['nodes'] = []
+
         for node in self.nodes.values():
             d['nodes'].append(node.toDict(internal_attributes=True))
         d['groups'] = []
@@ -863,6 +865,10 @@ class NodeRequest(object):
     def toDict(self):
         # Start with any previously read data
         d = self._zk_data.copy()
+        # This is just the nodeset structure without data, but we need it to
+        # update the nodes on the executor side when the node request is
+        # fulfilled.
+        d["nodeset"] = self.nodeset.toDict()
         nodes = [n.label for n in self.nodeset.getNodes()]
         # These are immutable once set
         d.setdefault('node_types', nodes)
@@ -881,6 +887,32 @@ class NodeRequest(object):
         self._state = data['state']
         self.state_time = data['state_time']
         self.relative_priority = data.get('relative_priority', 0)
+
+    @classmethod
+    def fromDict(cls, data):
+        request = cls(
+            requestor=data["requestor"],
+            # TODO (felix): How to get the build_set and the job? They
+            # shouldn't be relevant for the current implementation, but we
+            # should know that they are missing.
+            build_set=None,
+            job=None,
+            nodeset=NodeSet.fromDict(data["nodeset"]),
+            relative_priority=data.get("relative_priority", 0),
+        )
+
+        request.created_time = data["created_time"]
+        request.provider = data["provider"]
+
+        # Set _state directly to bypass the setter and avoid overwriting the
+        # state_time.
+        request._state = data["state"]
+        request.state_time = data["state_time"]
+        request.event_id = data["event_id"]
+
+        request._zk_data = data
+
+        return request
 
 
 class Secret(ConfigObject):
@@ -2044,7 +2076,6 @@ class Build(object):
         self.worker = Worker()
         self.node_labels = []
         self.node_name = None
-        self.nodeset = None
         self.zuul_event_id = zuul_event_id
 
     def __repr__(self):
@@ -2265,7 +2296,7 @@ class BuildSet(object):
         if job_name in self.nodesets:
             raise Exception("Prior node request for %s" % (job_name))
         self.nodesets[job_name] = nodeset
-        del self.node_requests[job_name]
+        #del self.node_requests[job_name]
 
     def getTries(self, job_name):
         return self.tries.get(job_name, 0)
