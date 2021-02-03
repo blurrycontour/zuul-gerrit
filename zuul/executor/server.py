@@ -62,6 +62,7 @@ from zuul.model import (
     BuildCompletedEvent, BuildPausedEvent, BuildStartedEvent, BuildStatusEvent
 )
 import zuul.model
+from zuul.nodepool import Nodepool
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.components import ExecutorComponent
 
@@ -79,6 +80,10 @@ BLACKLISTED_VARS = dict(
     ansible_scp_extra_args='-o PermitLocalCommand=no',
     ansible_ssh_extra_args='-o PermitLocalCommand=no',
 )
+
+
+class NodeLockingError(Exception):
+    pass
 
 
 class StopException(Exception):
@@ -834,6 +839,15 @@ class AnsibleJob(object):
             logger, self.zuul_event_id, build=job.unique)
         self.executor_server = executor_server
         self.job = job
+        self.node_request = None
+        # Look up the NodeRequest with the provided ID from ZooKeeper. If no
+        # ID is provided, this most probably means that the NodeRequest wasn't
+        # submitted to ZooKeeper.
+        if self.arguments.get("noderequest_id"):
+            zk_nodepool = self.executor_server.nodepool.zk_nodepool
+            self.node_request = zk_nodepool.getNodeRequest(
+                self.arguments["noderequest_id"]
+            )
         self.jobdir = None
         self.proc = None
         self.proc_lock = threading.Lock()
@@ -961,7 +975,16 @@ class AnsibleJob(object):
             self.jobdir = JobDir(self.executor_server.jobdir_root,
                                  self.executor_server.keep_jobdir,
                                  str(self.job.unique))
+            self.lockNodes()
             self._execute()
+        except NodeLockingError:
+            self.log.exception(
+                "Error locking nodeset %s", self.node_request.nodeset
+            )
+            result_data = dict(
+                result="NODE_FAILURE", exception=traceback.format_exc()
+            )
+            self.executor_server.completeBuild(self.job, result_data)
         except BrokenProcessPool:
             # The process pool got broken, re-initialize it and send
             # ABORTED so we re-try the job.
@@ -993,12 +1016,43 @@ class AnsibleJob(object):
                     fwd.stop()
                 except Exception:
                     self.log.exception("Error stopping port forward:")
+
+            # Make sure we return the nodes to nodepool in any case.
+            self.unlockNodes()
             try:
                 self.executor_server.finishJob(self.job.unique)
             except Exception:
                 self.log.exception("Error finalizing job thread:")
-            self.log.info("Job execution took: %.3f seconds" % (
-                time.monotonic() - self.time_starting_build))
+            self.log.info("Job execution took: %.3f seconds",
+                          self.end_time - self.time_starting_build)
+
+    def lockNodes(self):
+        # If the node_request is not set, this probably means that the
+        # NodeRequest didn't contain any nodes and thus was never submitted
+        # to ZooKeeper. In that case we don't have anything to lock before
+        # executing the build.
+        if self.node_request:
+            self.log.debug("Locking nodeset")
+            try:
+                self.executor_server.nodepool.acceptNodes(self.node_request)
+                self.executor_server.nodepool.useNodeSet(
+                    self.node_request.nodeset, self
+                )
+            except Exception:
+                raise NodeLockingError
+
+    def unlockNodes(self):
+        if self.node_request:
+            try:
+                self.executor_server.nodepool.returnNodeSet(
+                    self.node_request.nodeset,
+                    self,
+                    zuul_event_id=self.zuul_event_id,
+                )
+            except Exception:
+                self.log.exception(
+                    "Unable to return nodeset %s", self.node_request.nodeset
+                )
 
     def _base_job_data(self):
         return {
@@ -2672,6 +2726,9 @@ class ExecutorServer(BaseMergeServer):
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
 
+    # Number of seconds past node expiration a hold request will remain
+    EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
+
     def __init__(
         self,
         config,
@@ -2829,6 +2886,8 @@ class ExecutorServer(BaseMergeServer):
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
         self.component_info.process_merge_jobs = self.process_merge_jobs
+
+        self.nodepool = Nodepool(self.zk_client, self.hostname, self.statsd)
 
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client
@@ -3270,6 +3329,141 @@ class ExecutorServer(BaseMergeServer):
         except Exception:
             log.exception("Exception sending stop command to worker:")
 
+    def _handleExpiredHoldRequest(self, request):
+        '''
+        Check if a hold request is expired and delete it if it is.
+
+        The 'expiration' attribute will be set to the clock time when the
+        hold request was used for the last time. If this is NOT set, then
+        the request is still active.
+
+        If a node expiration time is set on the request, and the request is
+        expired, *and* we've waited for a defined period past the node
+        expiration (EXPIRED_HOLD_REQUEST_TTL), then we will delete the hold
+        request.
+
+        :param: request Hold request
+        :returns: True if it is expired, False otherwise.
+        '''
+        if not request.expired:
+            return False
+
+        if not request.node_expiration:
+            # Request has been used up but there is no node expiration, so
+            # we don't auto-delete it.
+            return True
+
+        elapsed = time.time() - request.expired
+        if elapsed < self.EXPIRED_HOLD_REQUEST_TTL + request.node_expiration:
+            # Haven't reached our defined expiration lifetime, so don't
+            # auto-delete it yet.
+            return True
+
+        try:
+            self.nodepool.zk_nodepool.lockHoldRequest(request)
+            self.log.info("Removing expired hold request %s", request)
+            self.nodepool.zk_nodepool.deleteHoldRequest(request)
+        except Exception:
+            self.log.exception(
+                "Failed to delete expired hold request %s", request
+            )
+        finally:
+            try:
+                self.nodepool.zk_nodepool.unlockHoldRequest(request)
+            except Exception:
+                pass
+
+        return True
+
+    def _getAutoholdRequest(self, ansible_job):
+        args = ansible_job.arguments
+        autohold_key_base = (
+            args["zuul"]["tenant"],
+            args["zuul"]["project"]["canonical_name"],
+            args["zuul"]["job"],
+        )
+
+        class Scope(object):
+            """Enum defining a precedence/priority of autohold requests.
+
+            Autohold requests for specific refs should be fulfilled first,
+            before those for changes, and generic jobs.
+
+            Matching algorithm goes over all existing autohold requests, and
+            returns one with the highest number (in case of duplicated
+            requests the last one wins).
+            """
+            NONE = 0
+            JOB = 1
+            CHANGE = 2
+            REF = 3
+
+        # Do a partial match of the autohold key against all autohold
+        # requests, ignoring the last element of the key (ref filter),
+        # and finally do a regex match between ref filter from
+        # the autohold request and the build's change ref to check
+        # if it matches. Lastly, make sure that we match the most
+        # specific autohold request by comparing "scopes"
+        # of requests - the most specific is selected.
+        autohold = None
+        scope = Scope.NONE
+        self.log.debug("Checking build autohold key %s", autohold_key_base)
+        for request_id in self.nodepool.zk_nodepool.getHoldRequests():
+            request = self.nodepool.zk_nodepool.getHoldRequest(request_id)
+            if not request:
+                continue
+
+            if self._handleExpiredHoldRequest(request):
+                continue
+
+            ref_filter = request.ref_filter
+
+            if request.current_count >= request.max_count:
+                # This request has been used the max number of times
+                continue
+            elif not (
+                request.tenant == autohold_key_base[0]
+                and request.project == autohold_key_base[1]
+                and request.job == autohold_key_base[2]
+            ):
+                continue
+            elif not re.match(ref_filter, args["zuul"]["ref"]):
+                continue
+
+            if ref_filter == ".*":
+                candidate_scope = Scope.JOB
+            elif ref_filter.endswith(".*"):
+                candidate_scope = Scope.CHANGE
+            else:
+                candidate_scope = Scope.REF
+
+            self.log.debug(
+                "Build autohold key %s matched scope %s",
+                autohold_key_base,
+                candidate_scope,
+            )
+            if candidate_scope > scope:
+                scope = candidate_scope
+                autohold = request
+
+        return autohold
+
+    def _processAutohold(self, ansible_job, result):
+        # We explicitly only want to hold nodes for jobs if they have
+        # failed / retry_limit / post_failure and have an autohold request.
+        hold_list = ["FAILURE", "RETRY_LIMIT", "POST_FAILURE", "TIMED_OUT"]
+        if result not in hold_list:
+            return False
+
+        request = self._getAutoholdRequest(ansible_job)
+        if request is not None:
+            self.log.debug("Got autohold %s", request)
+            self.nodepool.holdNodeSet(
+                ansible_job.node_request.nodeset, request, ansible_job
+            )
+            return True
+        return False
+
     def startBuild(self, job: gear.TextJob, data: Dict) -> None:
         # Mark the gearman job as started, as we are still using it for the
         # actual job execution. The data, however, will be passed to the
@@ -3323,7 +3517,35 @@ class ExecutorServer(BaseMergeServer):
         # result dict for that.
         result["end_time"] = time.time()
 
+        # NOTE (felix): We store the end_time on the ansible job to calculate
+        # the in-use duration of locked nodes when the nodeset is returned.
+        ansible_job = self.job_workers[job.unique]
+        ansible_job.end_time = time.monotonic()
+
         params = json.loads(job.arguments)
+        # If the result is None, check if the build has reached its max
+        # attempts and if so set the result to RETRY_LIMIT.
+        # NOTE (felix): This must be done in order to correctly process the
+        # autohold in the next step. Since we only want to hold the node if the
+        # build has reached a final result.
+        if result.get("result") is None:
+            attempts = params["zuul"]["attempts"]
+            max_attempts = params["max_attempts"]
+            if attempts >= max_attempts:
+                result["result"] = "RETRY_LIMIT"
+
+        zuul_event_id = params["zuul_event_id"]
+        log = get_annotated_logger(self.log, zuul_event_id, build=job.unique)
+
+        # Provide the hold information back to the scheduler via the build
+        # result.
+        try:
+            held = self._processAutohold(ansible_job, result.get("result"))
+            result["held"] = held
+            log.info("Held status set to %s", held)
+        except Exception:
+            log.exception("Unable to process autohold for %s", ansible_job)
+
         tenant_name = params["zuul"]["tenant"]
         pipeline_name = params["zuul"]["pipeline"]
 

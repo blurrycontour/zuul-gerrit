@@ -76,7 +76,7 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(request.state, 'fulfilled')
 
         # Accept the nodes
-        self.nodepool.acceptNodes(request, request.id)
+        self.nodepool.acceptNodes(request)
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
@@ -140,6 +140,7 @@ class TestNodepool(BaseTestCase):
         self.assertEqual(request.state, 'fulfilled')
 
         # Accept the nodes, passing a different ID
+        # TODO (felix): What about this test?
         self.nodepool.acceptNodes(request, "invalid")
         nodeset = request.nodeset
 
@@ -163,7 +164,7 @@ class TestNodepool(BaseTestCase):
         self.zk_nodepool.deleteNodeRequest(request)
 
         # Accept the nodes
-        self.nodepool.acceptNodes(request, request.id)
+        self.nodepool.acceptNodes(request)
         nodeset = request.nodeset
 
         for node in nodeset.getNodes():
