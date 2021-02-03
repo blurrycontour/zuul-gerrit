@@ -1611,14 +1611,18 @@ class Scheduler(threading.Thread):
         build.worker.updateFromData(build_item.data)
 
     def _doBuildStartedEvent(self, event):
-        build, _ = self._get_build_from_event(event)
+        build, build_item = self._get_build_from_event(event)
         if not build:
             return
 
         if not self._is_current_build(build):
             return
 
-        build.start_time = time.time()
+        if build_item:
+            build.start_time = build_item.start_time
+        else:
+            # This is an indicator for a noop build
+            build.start_time = time.time()
 
         log = get_annotated_logger(
             self.log, event=build.zuul_event_id, build=build.uuid
@@ -1883,8 +1887,9 @@ class Scheduler(threading.Thread):
             build.result_data = build_item.result_data.get("data", {})
             build.build_set.warning_messages.extend(warnings)
             build.error_detail = build_item.result_data.get("error_detail")
-
-        build.end_time = time.time()
+            build.end_time = build_item.end_time
+        else:
+            build.end_time = time.time()
         self._reportBuildStats(build)
 
         # Regardless of any other conditions which might cause us not

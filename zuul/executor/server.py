@@ -3212,7 +3212,7 @@ class ExecutorServer(BaseMergeServer):
     def startBuild(self, build: BuildItem, data: Dict[str, Any]):
         log = get_annotated_logger(self.log, event=None, build=build.uuid)
         build.data = {**build.data, **data}
-        self.build_queue.update(build)
+        build.start_time = time.time()
         try:
             self.build_queue.update(build)
         except BuildNotFound as e:
@@ -3265,6 +3265,7 @@ class ExecutorServer(BaseMergeServer):
         build.result_data = result_data
         build.state = BuildState.COMPLETED
         build.result = result
+        build.end_time = time.time()
         try:
             self.build_queue.update(build)
         except BuildNotFound as e:
