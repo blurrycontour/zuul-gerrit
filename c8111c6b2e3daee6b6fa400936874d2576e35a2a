@@ -45,6 +45,30 @@
       "revId": "c8111c6b2e3daee6b6fa400936874d2576e35a2a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "26a7f006_b38da92b",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1303,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-02-03T10:24:51Z",
+      "side": 1,
+      "message": "\u003e A quick look at cherrypy\u0027s doc didn\u0027t show anything about support for origin white lists out of the box; you might have to write a function that checks the \u0027Origin\u0027 header of the request against the white list, and returns it as the Access-Control-Allow-Origin response header if it is in the white list.\n\nYou could actually expand the handle_options decorator to become a more generic CORS handler, like in https://groups.google.com/g/cherrypy-users/c/VKv_KkLJi14?pli\u003d1",
+      "parentUuid": "93f50d0b_551b3438",
+      "range": {
+        "startLine": 1303,
+        "startChar": 0,
+        "endLine": 1303,
+        "endChar": 67
+      },
+      "revId": "c8111c6b2e3daee6b6fa400936874d2576e35a2a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
