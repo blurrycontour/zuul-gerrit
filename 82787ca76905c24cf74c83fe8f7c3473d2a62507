@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "46703452_66b466c2",
+        "filename": "doc/source/reference/drivers/sql.rst",
+        "patchSetId": 39
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-03T19:46:49Z",
+      "side": 1,
+      "message": "Is this correct? Should it be `otherwise the first connection will be selected` ?",
+      "range": {
+        "startLine": 65,
+        "startChar": 20,
+        "endLine": 65,
+        "endChar": 1
+      },
+      "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d957a722_71a60700",
+        "filename": "requirements.txt",
+        "patchSetId": 39
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-03T19:46:49Z",
+      "side": 1,
+      "message": "is this related to the change?",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 3
+      },
+      "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "878caf4a_6b10a2ad",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-03T19:46:49Z",
+      "side": 1,
+      "message": "nit: could this empty line be removed?",
+      "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
