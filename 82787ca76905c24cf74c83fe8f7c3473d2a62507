@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "5995ec57_5825d937",
+        "filename": "doc/source/reference/drivers/sql.rst",
+        "patchSetId": 39
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-03T21:29:15Z",
+      "side": 1,
+      "message": "I think this is incorrect.  Reading back over the comments, I think we did not fully transition from the \"default\" flag idea to the \"first connection\" idea.  I don\u0027t see any code that actually acts on this flag right now.\n\nI think the way to resolve this is to remove this flag and any lingering references to \"default\".",
+      "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d957a722_71a60700",
         "filename": "requirements.txt",
         "patchSetId": 39
@@ -72,6 +89,23 @@
     },
     {
       "key": {
+        "uuid": "e8c2623f_8cae13a8",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 1175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-03T21:29:15Z",
+      "side": 1,
+      "message": "I\u0027m not sure we need this comment; it seems to suggest future work but this is the case now.",
+      "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "878caf4a_6b10a2ad",
         "filename": "zuul/cmd/__init__.py",
         "patchSetId": 39
@@ -86,6 +120,23 @@
       "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6f02cbeb_3cc70168",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 39
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-03T21:29:15Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
