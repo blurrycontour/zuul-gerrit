@@ -401,6 +401,14 @@ class ZooKeeperNodepool(ZooKeeperBase):
         except NoNodeError:
             pass
 
+    def deleteNodeRequestById(self, node_request_id: str) -> None:
+        path = f"{self.REQUEST_ROOT}/{node_request_id}"
+        try:
+            self.kazoo_client.delete(path)
+        except NoNodeError:
+            # Don't care if it's already gone
+            pass
+
     def nodeRequestExists(self, node_request: NodeRequest) -> bool:
         """
         See if a NodeRequest exists in ZooKeeper.
@@ -501,15 +509,16 @@ class ZooKeeperNodepool(ZooKeeperBase):
         """
         Unlock a node.
 
-        The node must already have been locked.
-
         :param Node node: The node which should be unlocked.
         """
 
         if node.lock is None:
-            raise LockException("Node %s does not hold a lock" % (node,))
-        node.lock.release()
-        node.lock = None
+            # This could happen if acquiring the lock failed and shouldn't be
+            # treated as an error.
+            self.log.warning("Node %s does not hold a lock", node)
+        else:
+            node.lock.release()
+            node.lock = None
 
     def lockNodeRequest(self, request: NodeRequest, blocking: bool = True,
                         timeout: Optional[float] = None) -> None:
