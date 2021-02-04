@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "51652f95_6bc420fd",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-04T09:23:48Z",
+      "side": 1,
+      "message": "I didn\u0027t take a deeper look into this change, but this class here catched my eye 😄\n\nI really would like to keep this a functional component and not introduce new class-based components to the Zuul UI. AFAIK they will become deprecated in react sooner or later. In the last two years the react developers added a lot new functionality to functional components and there isn\u0027t much left which requires a class based component.\n\nThe most up-to-date components in that regard are the src/containers/logfile/LogFile and /src/containers/FilterToolbar.\n\nIt would be awesome if you could have a look at those components and try to update this component accordingly. What you basically can do is to use the useState() hook to implement the state handling rather than define a state dictionary and use setState(\u003ckey\u003e, \u003cvalue\u003e) to update the values. There is a good introduction to those in the React documentation https://reactjs.org/docs/hooks-intro.html.",
+      "revId": "3f59c033c4be5880147167bed4a447866e3b0939",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
