@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "98f3d8eb_b2f0e25e",
+        "filename": "web/src/containers/autohold/AutoholdTable.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-04T08:58:22Z",
+      "side": 1,
+      "message": "I think if we don\u0027t use any formatting here, the tags are not needed. Instead you could simply write:\n\n{\n  title: autohold.project\n},\n{\n  title: autohold.job\n},\n...",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db310fa8_468cbe99",
+        "filename": "web/src/containers/autohold/AutoholdTable.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-04T08:58:22Z",
+      "side": 1,
+      "message": "You could use \"zuul-build-table\" as class name instead which will ensure that the table is styled similar to the builds/buildset table (This mainly includes the font size and the effect when hovering over different rows). Maybe we should change this classname to something more generic like \"zuul-table\" as this is not specific to builds anymore😉",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e76da98_84179198",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-04T08:58:22Z",
+      "side": 1,
+      "message": "Maybe we could move the IconProperty directly to the \u0027../../Misc\u0027 file to reduce the number of different Misc files. I just came up with that file because I didn\u0027t find a better name, but I think we shouldn\u0027t create too many of those files on different levels.",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6407276d_00f511c4",
+        "filename": "web/src/reducers/autoholds.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-04T08:58:22Z",
+      "side": 1,
+      "message": "I would prefer the solution without the immutability-helper since I find this much more readable. An example for that can be found in src/reducers/build.js. I also have the plan to remove this additional dependency completely, but I didn\u0027t find the time to do so yet. Most of the functions we use from that package can also be done quite easily with plain javascript.\n\nBasically, we just have to change the update() call and use the spread operator (...) instead to copy the old state and extend/overwrite certain values:\n\nreturn {\n  ...state,\n  isFetching: false,\n}\n\nor \n\nreturn {\n  ...state,\n  autoholds: action.autoholds,\n  isFetching: false,\n}",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
