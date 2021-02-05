@@ -73,6 +73,12 @@ class BuildsetsPage extends React.Component {
         placeholder: 'Filter by Buildset UUID...',
         type: 'search',
       },
+      {
+        key: 'ref',
+        title: 'Ref',
+        placeholder: 'Filter by Ref...',
+        type: 'search',
+      },
     ]
 
     this.state = {

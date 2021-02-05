@@ -81,6 +81,12 @@ class BuildsPage extends React.Component {
         placeholder: 'Filter by Build UUID...',
         type: 'search',
       },
+      {
+        key: 'ref',
+        title: 'Ref',
+        placeholder: 'Filter by Ref...',
+        type: 'search',
+      },
     ]
 
     this.state = {
