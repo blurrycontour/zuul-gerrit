@@ -8070,6 +8070,55 @@ class TestSchedulerFailFast(ZuulTestCase):
             dict(name='project-test6', result='ABORTED', changes='1,1'),
         ], ordered=False)
 
+    def test_fail_fast_gate(self):
+        """
+        Tests that a pipeline that is flagged with fail-fast
+        aborts jobs early.
+        """
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.executor_server.failJob('project-test1', B)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 4)
+        # Release project-test1 which will fail
+        self.builds[2].release()
+        self.waitUntilSettled()
+
+        # We should only have the builds from change A now
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test2')
+
+        # But both changes should still be in the pipeline
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        items = tenant.layout.pipelines['gate'].getAllItems()
+        self.assertEqual(len(items), 2)
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(B.reported, 1)
+
+        # Release change A
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 2)
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='FAILURE', changes='1,1 2,1'),
+            dict(name='project-test2', result='ABORTED', changes='1,1 2,1'),
+        ], ordered=False)
+
     def test_fail_fast_nonvoting(self):
         """
         Tests that a pipeline that is flagged with fail-fast
