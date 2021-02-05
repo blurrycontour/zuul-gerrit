@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9816dd95_8e04b255",
+        "filename": ".zuul.yaml",
+        "patchSetId": 59
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-05T17:56:18Z",
+      "side": 1,
+      "message": "-1: We\u0027re not doing anything in this change that makes tests longer, right?  All we\u0027re doing is masking a later expansion of test time?\n\nIt seems like it might be more appropriate to raise the time limit on the change where we made the tests run a lot longer, then we can have a conversation about whether that\u0027s appropriate and how we want to deal with it.",
+      "revId": "b0739b528a1057e698adbd190886a9bd70812e83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0740aa3d_3f365bf4",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 59
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-05T17:56:18Z",
+      "side": 1,
+      "message": "nit: Might be worth noting this is a base client for classes that implement application logic on ZK.",
+      "revId": "b0739b528a1057e698adbd190886a9bd70812e83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "68357f52_81273abd",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 59
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-05T17:56:18Z",
+      "side": 1,
+      "message": "nit: Probably didn\u0027t need to change all of the quotes in this change.  It\u0027s got enough going on already.  :)",
+      "revId": "b0739b528a1057e698adbd190886a9bd70812e83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
