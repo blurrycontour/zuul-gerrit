@@ -42,6 +42,23 @@
     },
     {
       "key": {
+        "uuid": "d3af71c7_56aef1c8",
+        "filename": "doc/source/reference/drivers/sql.rst",
+        "patchSetId": 39
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-05T17:14:11Z",
+      "side": 1,
+      "message": "I think this is incorrect.  Reading back over the comments, I think we did not fully transition from the \"default\" flag idea to the \"first connection\" idea.  I don\u0027t see any code that actually acts on this flag right now.\n\nI think the way to resolve this is to remove this flag and any lingering references to \"default\".",
+      "revId": "82787ca76905c24cf74c83fe8f7c3473d2a62507",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d957a722_71a60700",
         "filename": "requirements.txt",
         "patchSetId": 39
