@@ -151,6 +151,7 @@ class BuildsPage extends React.Component {
   }
 
   render() {
+    const { history } = this.props
     const { builds, fetching, filters } = this.state
     return (
       <PageSection variant={PageSectionVariants.light}>
@@ -163,6 +164,7 @@ class BuildsPage extends React.Component {
           builds={builds}
           fetching={fetching}
           onClearFilters={this.handleClearFilters}
+          history={history}
         />
       </PageSection>
     )

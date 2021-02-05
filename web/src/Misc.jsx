@@ -92,4 +92,9 @@ function buildExternalTableLink(buildish) {
   return null
 }
 
-export { removeHash, ExternalLink, buildExternalLink, buildExternalTableLink }
+// https://github.com/kitze/conditional-wrap
+// appears to be the first implementation of this pattern
+const ConditionalWrapper = ({ condition, wrapper, children }) =>
+  condition ? wrapper(children) : children
+
+export { removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper }

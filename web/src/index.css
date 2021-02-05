@@ -51,10 +51,6 @@ a.refresh {
     font-weight: bold;
 }
 
-.zuul-build-list:hover a {
-    text-decoration: none;
-}
-
 /* Keep the normal font-size for compact tables */
 .zuul-build-table td {
     font-size: var(--pf-global--FontSize--md);
@@ -98,20 +94,13 @@ a.refresh {
     .zuul-build-table tbody tr:hover td:first-child::before {
         background-color: var(--pf-global--active-color--100);
     }
-}
 
-/* Make a link stretch the whole parent element (in this case the whole table
-   cell) */
-.zuul-stretched-link::after {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 0;
-    pointer-events: auto;
-    content: "";
-    background-color: rgba(0,0,0,0);
+    /* Hide the action column with the build link on larger screen. This is only
+       needed for the mobile version as we can't use the "magnifying-glass icon
+       on hover" effect there. */
+    .zuul-build-table .pf-c-table__action {
+        display: none;
+    }
 }
 
 /*

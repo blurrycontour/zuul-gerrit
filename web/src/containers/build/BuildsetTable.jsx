@@ -15,7 +15,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
 import {
   Button,
   EmptyState,
@@ -43,8 +42,13 @@ import {
 import { BuildResult, BuildResultWithIcon, IconProperty } from './Misc'
 import { buildExternalTableLink } from '../../Misc'
 
-function BuildsetTable(props) {
-  const { buildsets, fetching, onClearFilters, tenant } = props
+function BuildsetTable({
+  buildsets,
+  fetching,
+  onClearFilters,
+  tenant,
+  history,
+}) {
   const columns = [
     {
       title: <IconProperty icon={<CubeIcon />} value="Project" />,
@@ -69,68 +73,41 @@ function BuildsetTable(props) {
   ]
 
   function createBuildsetRow(buildset) {
-    // This link will be defined on each cell of the current row as this is the
-    // only way to define a valid HTML link on a table row. Although we could
-    // simply define an onClick handler on the whole row and programatically
-    // switch to the buildresult page, this wouldn't provide the same
-    // look-and-feel as a plain HTML link.
-    const buildsetResultLink = (
-      <Link
-        to={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
-        className="zuul-stretched-link"
-      />
-    )
-    const buildset_link = buildExternalTableLink(buildset)
+    const changeOrRefLink = buildExternalTableLink(buildset)
 
     return {
+      // Pass the buildset's uuid as row id, so we can use it later on in the
+      // action handler to build the link to the build result page for each row.
+      id: buildset.uuid,
       cells: [
         {
           // To allow passing anything else than simple string values to a table
           // cell, we must use the title attribute.
           title: (
-            <>
-              {buildsetResultLink}
-              <BuildResultWithIcon result={buildset.result}>
-                {buildset.project}
-              </BuildResultWithIcon>
-            </>
+            <BuildResultWithIcon
+              result={buildset.result}
+              link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}>
+              {buildset.project}
+            </BuildResultWithIcon>
           ),
         },
         {
-          title: (
-            <>
-              {buildsetResultLink}
-              <span>{buildset.branch ? buildset.branch : buildset.ref}</span>
-            </>
-          ),
+          title: buildset.branch ? buildset.branch : buildset.ref,
         },
         {
-          title: (
-            <>
-              {buildsetResultLink}
-              <span>{buildset.pipeline}</span>
-            </>
-          ),
+          title: buildset.pipeline,
         },
         {
-          title: (
-            <>
-              {buildsetResultLink}
-              {buildset_link && (
-                <span style={{ zIndex: 1, position: 'relative' }}>
-                  {buildset_link}
-                </span>
-              )}
-            </>
-          ),
+          title: changeOrRefLink && changeOrRefLink,
         },
         {
-          title: (
-            <>
-              {buildsetResultLink}
-              <BuildResult result={buildset.result} />
-            </>
-          ),
+            title: (
+              <BuildResult
+                result={buildset.result}
+                link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}
+              >
+              </BuildResult>
+            ),
         },
       ],
     }
@@ -156,6 +133,9 @@ function BuildsetTable(props) {
   }
 
   let rows = []
+  // For the fetching row we don't need any actions, so we keep them empty by
+  // default.
+  let actions = []
   if (fetching) {
     rows = createFetchingRow()
     // The dataLabel property is used to show the column header in a list-like
@@ -166,6 +146,18 @@ function BuildsetTable(props) {
     columns[0].dataLabel = ''
   } else {
     rows = buildsets.map((buildset) => createBuildsetRow(buildset))
+    // This list of actions will be applied to each row in the table. For
+    // row-specific actions we must evaluate the individual row data provided to
+    // the onClick handler.
+    actions = [
+      {
+        title: 'Show buildset result',
+        onClick: (event, rowId, rowData) =>
+          // The row's id contains the buildset's uuid, so we can use it to
+          // build the correct link.
+          history.push(`${tenant.linkPrefix}/buildset/${rowData.id}`),
+      },
+    ]
   }
 
   return (
@@ -175,6 +167,7 @@ function BuildsetTable(props) {
         variant={TableVariant.compact}
         cells={columns}
         rows={rows}
+        actions={actions}
         className="zuul-build-table"
       >
         <TableHeader />
@@ -207,6 +200,7 @@ BuildsetTable.propTypes = {
   fetching: PropTypes.bool.isRequired,
   onClearFilters: PropTypes.func.isRequired,
   tenant: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
 }
 
 export default connect((state) => ({ tenant: state.tenant }))(BuildsetTable)
