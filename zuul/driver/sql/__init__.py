@@ -22,27 +22,8 @@ class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
     name = 'sql'
 
     def __init__(self):
-        self.tenant_connections = {}
         cpb.capabilities_registry.register_capabilities(
             'job_history', True)
-
-    def reconfigure(self, tenant):
-        # NOTE(corvus): This stores the connection of the first
-        # reporter seen for each tenant; we should figure out how to
-        # support multiple connections for a tenant (how do we deal
-        # with pagination of queries across multiple connections), or
-        # otherwise, require there only be one connection in a tenant.
-        if tenant.name in self.tenant_connections:
-            del self.tenant_connections[tenant.name]
-        for pipeline in tenant.layout.pipelines.values():
-            reporters = (pipeline.start_actions + pipeline.success_actions
-                         + pipeline.failure_actions
-                         + pipeline.merge_failure_actions)
-            for reporter in reporters:
-                if not isinstance(reporter, sqlreporter.SQLReporter):
-                    continue
-                self.tenant_connections[tenant.name] = reporter.connection
-                return
 
     def registerScheduler(self, scheduler):
         self.sched = scheduler

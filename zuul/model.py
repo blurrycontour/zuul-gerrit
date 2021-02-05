@@ -2423,8 +2423,7 @@ class QueueItem(object):
         self.log.debug("Checking DB for requirements")
         requirements_tuple = tuple(sorted(requirements))
         if requirements_tuple not in self._cached_sql_results:
-            sql_driver = self.pipeline.manager.sched.connections.drivers['sql']
-            conn = sql_driver.tenant_connections.get(self.pipeline.tenant.name)
+            conn = self.pipeline.manager.sched.connections.getSqlConnection()
             if conn:
                 builds = conn.getBuilds(
                     tenant=self.pipeline.tenant.name,

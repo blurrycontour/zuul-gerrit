@@ -68,6 +68,7 @@ from git.util import IterableList
 import yaml
 import paramiko
 
+from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul.model import Change
 from zuul.rpcclient import RPCClient
 
@@ -76,7 +77,7 @@ from zuul.driver.git import GitDriver
 from zuul.driver.smtp import SMTPDriver
 from zuul.driver.github import GithubDriver
 from zuul.driver.timer import TimerDriver
-from zuul.driver.sql import SQLDriver
+from zuul.driver.sql import SQLDriver, sqlconnection
 from zuul.driver.bubblewrap import BubblewrapDriver
 from zuul.driver.nullwrap import NullwrapDriver
 from zuul.driver.mqtt import MQTTDriver
@@ -317,12 +318,19 @@ class GitlabDriverMock(GitlabDriver):
         return connection
 
 
+class SQLDriverMock(SQLDriver):
+
+    def getConnection(self, name, config):
+        return FakeSqlConnection(self, name, config)
+
+
 class TestConnectionRegistry(ConnectionRegistry):
     def __init__(self, changes: Dict[str, Dict[str, Change]],
                  config: ConfigParser, additional_event_queues,
                  upstream_root: str, rpcclient: RPCClient, poller_events,
                  git_url_with_auth: bool,
-                 add_cleanup: Callable[[Callable[[], None]], None]):
+                 add_cleanup: Callable[[Callable[[], None]], None],
+                 fake_sql: bool):
         self.connections = OrderedDict()
         self.drivers = {}
 
@@ -336,7 +344,10 @@ class TestConnectionRegistry(ConnectionRegistry):
             rpcclient, git_url_with_auth))
         self.registerDriver(SMTPDriver())
         self.registerDriver(TimerDriver())
-        self.registerDriver(SQLDriver())
+        if fake_sql:
+            self.registerDriver(SQLDriverMock())
+        else:
+            self.registerDriver(SQLDriver())
         self.registerDriver(BubblewrapDriver())
         self.registerDriver(NullwrapDriver())
         self.registerDriver(MQTTDriver())
@@ -2961,6 +2972,37 @@ class FakeBuild(object):
         return repos
 
 
+class FakeZuulDatabaseSession(DatabaseSession):
+
+    def __exit__(self, etype, value, tb):
+        pass
+
+
+def FakeOrmSessionFactory():
+    class FakeBackendSession:
+        def add(self, *args, **kwargs):
+            pass
+
+    return FakeBackendSession()
+
+
+class FakeSqlConnection(sqlconnection.SQLConnection):
+
+    def __init__(self, driver, connection_name, connection_config):
+        connection_config['dburi'] = 'postgresql://example.com'
+        super().__init__(driver, connection_name, connection_config)
+        self.session = FakeOrmSessionFactory
+
+    def onLoad(self):
+        pass
+
+    def onStop(self):
+        pass
+
+    def getSession(self):
+        return FakeZuulDatabaseSession(self)
+
+
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     result = None
 
@@ -3659,12 +3701,12 @@ class ZuulWebFixture(fixtures.Fixture):
                  additional_event_queues, upstream_root: str,
                  rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
                  add_cleanup: Callable[[Callable[[], None]], None],
-                 test_root, info=None, zk_hosts=None):
+                 test_root, info=None, zk_hosts=None, fake_sql=True):
         super(ZuulWebFixture, self).__init__()
         self.gearman_server_port = gearman_server_port
         self.connections = TestConnectionRegistry(
             changes, config, additional_event_queues, upstream_root, rpcclient,
-            poller_events, git_url_with_auth, add_cleanup)
+            poller_events, git_url_with_auth, add_cleanup, fake_sql)
         self.connections.configure(
             config,
             include_drivers=[zuul.driver.sql.SQLDriver,
@@ -3919,6 +3961,7 @@ class SchedulerTestApp:
                  additional_event_queues, upstream_root: str,
                  rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
                  source_only: bool,
+                 fake_sql: bool,
                  add_cleanup: Callable[[Callable[[], None]], None]):
 
         self.log = log
@@ -3940,7 +3983,7 @@ class SchedulerTestApp:
         self.connections = TestConnectionRegistry(
             self.changes, self.config, additional_event_queues,
             upstream_root, rpcclient, poller_events,
-            git_url_with_auth, add_cleanup)
+            git_url_with_auth, add_cleanup, fake_sql)
         self.connections.configure(self.config, source_only=source_only)
 
         self.sched.registerConnections(self.connections)
@@ -3989,12 +4032,13 @@ class SchedulerTestManager:
                changes: Dict[str, Dict[str, Change]], additional_event_queues,
                upstream_root: str, rpcclient: RPCClient, poller_events,
                git_url_with_auth: bool, source_only: bool,
+               fake_sql: bool,
                add_cleanup: Callable[[Callable[[], None]], None])\
             -> SchedulerTestApp:
         app = SchedulerTestApp(log, config, zk_config, changes,
                                additional_event_queues, upstream_root,
                                rpcclient, poller_events, git_url_with_auth,
-                               source_only, add_cleanup)
+                               source_only, fake_sql, add_cleanup)
         self.instances.append(app)
         return app
 
@@ -4102,6 +4146,7 @@ class ZuulTestCase(BaseTestCase):
     git_url_with_auth: bool = False
     log_console_port: int = 19885
     source_only: bool = False
+    fake_sql: bool = True
 
     def __getattr__(self, name):
         """Allows to access fake connections the old way, e.g., using
@@ -4233,7 +4278,7 @@ class ZuulTestCase(BaseTestCase):
         executor_connections = TestConnectionRegistry(
             self.changes, self.config, self.additional_event_queues,
             self.upstream_root, self.rpcclient, self.poller_events,
-            self.git_url_with_auth, self.addCleanup)
+            self.git_url_with_auth, self.addCleanup, True)
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
@@ -4252,7 +4297,7 @@ class ZuulTestCase(BaseTestCase):
             self.log, self.config, self.zk_config, self.changes,
             self.additional_event_queues, self.upstream_root, self.rpcclient,
             self.poller_events, self.git_url_with_auth, self.source_only,
-            self.addCleanup)
+            self.fake_sql, self.addCleanup)
 
         if hasattr(self, 'fake_github'):
             self.additional_event_queues.append(
@@ -4343,6 +4388,7 @@ class ZuulTestCase(BaseTestCase):
         # Make test_root persist after ansible run for .flag test
         config.set('executor', 'trusted_rw_paths', self.test_root)
         self.setupAllProjectKeys(config)
+
         return config
 
     def setupSimpleLayout(self, config: ConfigParser):
@@ -5345,7 +5391,21 @@ class SSLZuulTestCase(ZuulTestCase):
 
 
 class ZuulDBTestCase(ZuulTestCase):
+    fake_sql = False
+
     def setup_config(self, config_file: str):
+        def _setup_fixture(config, section_name):
+            if (config.get(section_name, 'dburi') ==
+                    '$MYSQL_FIXTURE_DBURI$'):
+                f = MySQLSchemaFixture()
+                self.useFixture(f)
+                config.set(section_name, 'dburi', f.dburi)
+            elif (config.get(section_name, 'dburi') ==
+                  '$POSTGRESQL_FIXTURE_DBURI$'):
+                f = PostgresqlSchemaFixture()
+                self.useFixture(f)
+                config.set(section_name, 'dburi', f.dburi)
+
         config = super(ZuulDBTestCase, self).setup_config(config_file)
         for section_name in config.sections():
             con_match = re.match(r'^connection ([\'\"]?)(.*)(\1)$',
@@ -5354,16 +5414,11 @@ class ZuulDBTestCase(ZuulTestCase):
                 continue
 
             if config.get(section_name, 'driver') == 'sql':
-                if (config.get(section_name, 'dburi') ==
-                    '$MYSQL_FIXTURE_DBURI$'):
-                    f = MySQLSchemaFixture()
-                    self.useFixture(f)
-                    config.set(section_name, 'dburi', f.dburi)
-                elif (config.get(section_name, 'dburi') ==
-                      '$POSTGRESQL_FIXTURE_DBURI$'):
-                    f = PostgresqlSchemaFixture()
-                    self.useFixture(f)
-                    config.set(section_name, 'dburi', f.dburi)
+                _setup_fixture(config, section_name)
+
+        if 'database' in config.sections():
+            _setup_fixture(config, 'database')
+
         return config
 
 
