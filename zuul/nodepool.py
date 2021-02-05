@@ -13,7 +13,9 @@
 import logging
 import time
 from collections import defaultdict
-from typing import Dict, List, Optional, TYPE_CHECKING
+from typing import Dict, List, Optional
+
+from statsd import StatsClient
 
 from zuul import model
 from zuul.lib.logutil import get_annotated_logger
@@ -33,9 +35,6 @@ from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepool
 
-if TYPE_CHECKING:
-    from zuul.scheduler import Scheduler
-
 
 def add_resources(target: Dict[str, int], source: Dict[str, int]) -> None:
     for key, value in source.items():
@@ -54,10 +53,10 @@ class Nodepool(object):
         self,
         zk_client: ZooKeeperClient,
         hostname: str,
-        scheduler: Optional["Scheduler"] = None,
+        statsd: Optional[StatsClient],
     ):
         self.hostname = hostname
-        self.sched = scheduler
+        self.statsd = statsd
 
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
         self.result_events = PipelineResultEventQueue.create_registry(
@@ -77,10 +76,9 @@ class Nodepool(object):
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<label>
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<size>
         #  gauge   zuul.nodepool.current_requests
-        if not self.sched or not self.sched.statsd:
+        if not self.statsd:
             return
-        statsd = self.sched.statsd
-        pipe = statsd.pipeline()
+        pipe = self.statsd.pipeline()
         state = request.state
         dt = None
 
@@ -105,36 +103,38 @@ class Nodepool(object):
         pipe.send()
 
     def emitStatsResources(self) -> None:
-        if not self.sched or not self.sched.statsd:
+        if not self.statsd:
             return
-        statsd = self.sched.statsd
 
         for tenant, resources in self.current_resources_by_tenant.items():
             for resource, value in resources.items():
                 key = 'zuul.nodepool.resources.tenant.' \
                       '{tenant}.{resource}'
-                statsd.gauge(key, value, tenant=tenant, resource=resource)
+                self.statsd.gauge(key, value, tenant=tenant, resource=resource)
         for project, resources in self.current_resources_by_project.items():
             for resource, value in resources.items():
                 key = 'zuul.nodepool.resources.project.' \
                       '{project}.{resource}'
-                statsd.gauge(key, value, project=project, resource=resource)
+                self.statsd.gauge(
+                    key, value, project=project, resource=resource
+                )
 
     def emitStatsResourceCounters(self, tenant, project, resources, duration)\
             -> None:
-        if not self.sched or not self.sched.statsd:
+        if not self.statsd:
             return
-        statsd = self.sched.statsd
 
         for resource, value in resources.items():
             key = 'zuul.nodepool.resources.tenant.{tenant}.{resource}'
-            statsd.incr(key, value * duration,
-                        tenant=tenant, resource=resource)
+            self.statsd.incr(
+                key, value * duration, tenant=tenant, resource=resource
+            )
         for resource, value in resources.items():
             key = 'zuul.nodepool.resources.project.' \
                   '{project}.{resource}'
-            statsd.incr(key, value * duration,
-                        project=project, resource=resource)
+            self.statsd.incr(
+                key, value * duration, project=project, resource=resource
+            )
 
     def requestNodes(
         self,
