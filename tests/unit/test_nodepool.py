@@ -47,7 +47,7 @@ class TestNodepool(BaseTestCase):
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
         self.nodepool = zuul.nodepool.Nodepool(
-            self.zk_client, self.hostname, self
+            self.zk_client, self.hostname, self.statsd
         )
 
         self.fake_nodepool = FakeNodepool(
