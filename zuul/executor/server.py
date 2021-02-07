@@ -1,4 +1,5 @@
 # Copyright 2014 OpenStack Foundation
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -421,6 +422,17 @@ class JobDirPlaybook(object):
         return root
 
 
+class JobDirCredential(object):
+    def __init__(self, root):
+        self.root = root
+        self.files = {}
+
+    def addFile(self, fn, content):
+        if fn in self.files:
+            raise Exception("Duplicate credential file")
+        self.files[fn] = content
+
+
 class JobDir(object):
     def __init__(self, root, keep, build_uuid):
         '''
@@ -437,6 +449,7 @@ class JobDir(object):
         #     inventory.yaml
         #     extra_vars.yaml
         #     vars_blacklist.yaml
+        #     winrm_cert.pem
         #   .ansible (mounted in bwrap read-write)
         #     fact-cache/localhost
         #     cp
@@ -489,6 +502,10 @@ class JobDir(object):
             self.ansible_root, 'vars_blacklist.yaml')
         with open(self.ansible_vars_blacklist, 'w') as blacklist:
             blacklist.write(json.dumps(BLACKLISTED_VARS))
+        self.credentials_root = os.path.join(self.ansible_root, 'credentials')
+        os.makedirs(self.credentials_root)
+        # Node index -> JobDirCredential
+        self.credentials = {}
         self.trusted_root = os.path.join(self.root, 'trusted')
         os.makedirs(self.trusted_root)
         self.untrusted_root = os.path.join(self.root, 'untrusted')
@@ -645,6 +662,13 @@ class JobDir(object):
         playbook = JobDirPlaybook(root)
         self.playbooks.append(playbook)
         return playbook
+
+    def addCredential(self, node_index: int) -> JobDirCredential:
+        # Credentials are keyed by node index
+        root = os.path.join(self.credentials_root, str(node_index))
+        jobdir_cred = JobDirCredential(root)
+        self.credentials[node_index] = jobdir_cred
+        return jobdir_cred
 
     def cleanup(self):
         if not self.keep:
@@ -938,6 +962,10 @@ class AnsibleJob(object):
 
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
+            for node in self.arguments['nodes']:
+                cred = node.get('credential')
+                if cred and cred.get('type') == 'ssh':
+                    self.ssh_agent.addData('nodepool', cred['key'])
             for key in self.arguments.get('ssh_keys', []):
                 self.ssh_agent.addData(key['name'], key['key'])
             self.jobdir = JobDir(self.executor_server.jobdir_root,
@@ -1141,6 +1169,9 @@ class AnsibleJob(object):
 
         # This prepares each playbook and the roles needed for each.
         self.preparePlaybooks(args)
+
+        # Write out non-ssh connection credentials (winrm)
+        self.prepareCredentials(args)
 
         self.prepareAnsibleFiles(args)
         self.writeLoggingConfig()
@@ -1514,7 +1545,7 @@ class AnsibleJob(object):
 
     def getHostList(self, args):
         hosts = []
-        for node in args['nodes']:
+        for node_index, node in enumerate(args['nodes']):
             # NOTE(mordred): This assumes that the nodepool launcher
             # and the zuul executor both have similar network
             # characteristics, as the launcher will do a test for ipv6
@@ -1568,10 +1599,12 @@ class AnsibleJob(object):
                     host_vars['ansible_connection'] = connection_type
                     if connection_type == "winrm":
                         host_vars['ansible_winrm_transport'] = 'certificate'
-                        host_vars['ansible_winrm_cert_pem'] = \
-                            self.winrm_pem_file
-                        host_vars['ansible_winrm_cert_key_pem'] = \
-                            self.winrm_key_file
+                        host_vars['ansible_winrm_cert_pem'] = os.path.join(
+                            self.jobdir.credentials[node_index].root,
+                            'cert.pem')
+                        host_vars['ansible_winrm_cert_key_pem'] = os.path.join(
+                            self.jobdir.credentials[node_index].root,
+                            'cert.key')
                         # NOTE(tobiash): This is necessary when using default
                         # winrm self-signed certificates. This is probably what
                         # most installations want so hard code this here for
@@ -1946,6 +1979,34 @@ class AnsibleJob(object):
         with open(kube_cfg_path, "w") as of:
             of.write(yaml.safe_dump(kube_cfg, default_flow_style=False))
 
+    def prepareCredentials(self, args):
+        """Prepare credential files supplied with Nodepool
+
+        SSH credentials are more secure and are piped directly into
+        the agent so they never have to appear inside bubblewrap.
+        Certificates need to be written to a read-only mount in
+        bubblewrap.
+
+        If nodepool supplied credentials, use them, otherwise use
+        the credential files supplied to the executor.
+
+        """
+        for node_i, node in enumerate(args['nodes']):
+            connection_type = node.get('connection_type')
+            if connection_type == 'winrm':
+                cred = node.get('credential')
+                if cred and cred.get('type') == 'certificate':
+                    cert = cred['cert']
+                    key = cred['key']
+                else:
+                    with open(self.winrm_pem_file, 'r') as f:
+                        cert = f.read()
+                    with open(self.winrm_key_file, 'r') as f:
+                        key = f.read()
+                jobdir_cred = self.jobdir.addCredential(node_i)
+                jobdir_cred.addFile('cert.pem', cred['cert'])
+                jobdir_cred.addFile('cert.key', cred['key'])
+
     def prepareAnsibleFiles(self, args):
         all_vars = args['vars'].copy()
         check_varnames(all_vars)
@@ -2207,6 +2268,9 @@ class AnsibleJob(object):
         secrets = {}
         if playbook.secrets_content:
             secrets[playbook.secrets] = playbook.secrets_content
+        for cred in self.jobdir.credentials.values():
+            for fn, content in cred.files.items():
+                secrets[os.path.join(cred.root, fn)] = content
 
         if wrapped:
             wrapper = self.executor_server.execution_wrapper
