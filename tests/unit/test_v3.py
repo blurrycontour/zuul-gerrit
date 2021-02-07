@@ -5994,6 +5994,19 @@ class TestContainerJobs(AnsibleZuulTestCase):
         ], ordered=False)
 
 
+class TestNodepoolCredential(AnsibleZuulTestCase):
+    tenant_config_file = "config/nodepool-credential/main.yaml"
+
+    def test_nodepool_cred(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='nodepool-cred', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+
 class TestProvidesRequiresPause(AnsibleZuulTestCase):
     tenant_config_file = "config/provides-requires-pause/main.yaml"
 

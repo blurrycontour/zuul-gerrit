@@ -1,0 +1,9 @@
+- hosts: localhost
+  vars:
+    expected_key: "256 SHA256:3hYc6PixrYgYjQNKX+Z51TMRMPO348U1U7ULvGb5wQ4 corvus@fuligin (ED25519)"
+  tasks:
+    - command: "ssh-add -l"
+      register: output
+    - assert:
+        that:
+          - expected_key in output.stdout
