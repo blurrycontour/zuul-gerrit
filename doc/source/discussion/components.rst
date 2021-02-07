@@ -626,7 +626,8 @@ The following sections of ``zuul.conf`` are used by the executor:
    .. attr:: private_key_file
       :default: ~/.ssh/id_rsa
 
-      SSH private key file to be used when logging into worker nodes.
+      SSH private key file to be used when logging into worker nodes,
+      if none is supplied by Nodepool.
 
       .. note:: If you use an RSA key, ensure it is encoded in the PEM
                 format (use the ``-t rsa -m PEM`` arguments to
@@ -642,13 +643,13 @@ The following sections of ``zuul.conf`` are used by the executor:
       :default: ~/.winrm/winrm_client_cert.key
 
       The private key file of the client certificate to use for winrm
-      connections to Windows nodes.
+      connections to Windows nodes, if none is supplied by Nodepool.
 
    .. attr:: winrm_cert_pem_file
       :default: ~/.winrm/winrm_client_cert.pem
 
       The certificate file of the client certificate to use for winrm
-      connections to Windows nodes.
+      connections to Windows nodes, if none is supplied by Nodepool.
 
       .. note:: Currently certificate verification is disabled when
                 connecting to Windows nodes via winrm.
