@@ -662,19 +662,107 @@ class Repo(object):
                             'utf-8')
         return ret
 
-    def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
+    def getFilesChanges(self, refBase, refTo=None, oldrev=None,
+                        newrev=None, zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
-        self.fetch(branch, zuul_event_id=zuul_event_id)
-        head = repo.commit(
-            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
         files = set()
+        commitBase = None
+        commitTo = None
 
-        if tosha:
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(cmt.stats.files.keys())
+        log.debug('Get Files Changes %s '
+                  'refBase:%s refTo:%s oldrev:%s newrev:%s '
+                  % (self.local_path, refBase, refTo, oldrev, newrev))
+
+        if refBase and refBase != (40 * '0'):
+            commitBase = repo.commit(refBase)
+        if refTo and refTo != (40 * '0'):
+            self.fetch(refTo, zuul_event_id=zuul_event_id)
+            commitTo = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+
+        # if commitBase and commitTo points to the same commit, mostly in case
+        # of a ref-updated event, we use oldrev and newrev information to
+        # decide what to do:
+        if commitBase == commitTo:
+            # values exist and are different from null
+            # git diff between the 2 rev
+            if (newrev and newrev != (40 * '0') and
+                    oldrev and oldrev != (40 * '0')):
+                if oldrev == newrev:
+                    # refs are equals, revisions are equals, get tree files
+                    # by setting commitBase to None
+                    commitBase = None
+                else:
+                    commitBase = repo.commit(oldrev)
+                commitTo = repo.commit(newrev)
+
+            # newrev exists and oldrev is null, all files from newrev
+            elif (newrev and newrev != (40 * '0') and
+                    oldrev == (40 * '0')):
+                commitBase = None
+                commitTo = repo.commit(newrev)
+
+            # same thing but with oldrev, unlikely to happen
+            elif (oldrev and oldrev != (40 * '0') and
+                    newrev == (40 * '0')):
+                commitBase = repo.commit(oldrev)
+                commitTo = None
+
+            # if newrev and oldrev are both null/0000, all files from commitTo
+            # reference
+            else:
+                if commitTo is not None:
+                    commitBase = None
+                # if commitTo is None, commitBase is None, oldrev and newrev
+                # are also None/null, this will trigger an Exception in next
+                # part of the function
+
+        # define function for ancestor type diff
+        def gitDiffAncestor(commitA, commitB):
+            ancestorDiffFiles = set()
+            for x in commitA.diff(commitB):
+                if x.a_blob is not None:
+                    ancestorDiffFiles.add(x.a_blob.path)
+                if x.b_blob is not None:
+                    ancestorDiffFiles.add(x.b_blob.path)
+            return ancestorDiffFiles
+
+        if (commitBase and commitTo and commitBase.hexsha != (40 * '0')
+                and commitTo.hexsha != (40 * '0') and
+                commitBase != commitTo):
+            if (repo.is_ancestor(commitBase, commitTo) or
+                    repo.is_ancestor(commitTo, commitBase)):
+                # if one ref is an ancestor of the other:
+                # git diff refA..refB
+                files = gitDiffAncestor(commitBase, commitTo)
+            else:
+                filesDiffList = []
+                # if refs aren't ancestors, use git diff with every merge-base
+                # for a single merge-base, it's equal to: git diff refA...refB
+                # for multiple merge-base, the intersection of all git diff
+                # gives the list of modifications that are introducted by
+                # commitTo
+                for mergeBase in repo.merge_base(commitBase, commitTo,
+                                                 all=True):
+                    filesDiffList.append(gitDiffAncestor(mergeBase,
+                                                         commitTo))
+                files = set.intersection(*filesDiffList)
+        elif commitBase and commitBase.hexsha != (40 * '0'):
+            # if one ref is None/null, list tree files
+            for item in commitBase.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
+        elif commitTo and commitTo.hexsha != (40 * '0'):
+            # if one ref is None/null, list tree files
+            for item in commitTo.tree.traverse():
+                if item.type == 'blob':
+                    files.add(item.path)
         else:
-            files.update(head.stats.files.keys())
+            raise Exception(
+                'Unable to get Change files %s '
+                'refBase:%s refTo:%s oldrev:%s newrev:%s '
+                % (self.local_path, refBase, refTo, oldrev, newrev))
         return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
@@ -1089,7 +1177,9 @@ class Merger(object):
         return repo.getFiles(files, dirs, branch=branch)
 
     def getFilesChanges(self, connection_name, project_name, branch,
-                        tosha=None, zuul_event_id=None):
+                        tosha=None, oldrev=None, newrev=None,
+                        zuul_event_id=None):
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
-        return repo.getFilesChanges(branch, tosha, zuul_event_id=zuul_event_id)
+        return repo.getFilesChanges(branch, tosha, oldrev, newrev,
+                                    zuul_event_id=zuul_event_id)
