@@ -80,7 +80,8 @@ class GerritChange(Change):
             # instruct Zuul to ask the mergers to get the full file
             # list.
             self.files = None
-        self.files = files
+        else:
+            self.files = files
         self.id = data['id']
         self.is_merged = data.get('status', '') == 'MERGED'
         self.approvals = data['currentPatchSet'].get('approvals', [])
@@ -121,10 +122,12 @@ class GerritChange(Change):
         if str(current_revision['_number']) == self.patchset:
             self.ref = current_revision['ref']
             self.commit = data['current_revision']
+            if len(current_revision['commit']['parents']) > 1:
+                files = None
             self.is_current_patchset = True
         else:
             self.is_current_patchset = False
-        self.files = files or []
+        self.files = files
 
         self.is_merged = data['status'] == 'MERGED'
         self.approvals = []
