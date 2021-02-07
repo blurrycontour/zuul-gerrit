@@ -3055,7 +3055,7 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
             self.recordResult(self.result)
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
-                   wrapped=True, cleanup=False):
+                   cleanup=False):
         build = self.executor_server.job_builds[self.job.unique]
 
         if self.executor_server._run_ansible:
@@ -3065,7 +3065,7 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                 build.run()
 
             result = super(RecordingAnsibleJob, self).runAnsible(
-                cmd, timeout, playbook, ansible_version, wrapped, cleanup)
+                cmd, timeout, playbook, ansible_version, cleanup)
         else:
             if playbook.path:
                 result = build.run()
@@ -3484,6 +3484,18 @@ class FakeNodepool(object):
             data['connection_type'] = 'winrm'
         if 'network' in node_type:
             data['connection_type'] = 'network_cli'
+        if 'credential' in node_type:
+            data['credential'] = {
+                'type': 'ssh',
+                'key': """-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+QyNTUxOQAAACCnZfSJO3p8lOIfdDXbPkymLYNv2NheWVCtLdbBlXy0MQAAAJgELACvBCwA
+rwAAAAtzc2gtZWQyNTUxOQAAACCnZfSJO3p8lOIfdDXbPkymLYNv2NheWVCtLdbBlXy0MQ
+AAAEAZmWnlja0ThYBEMghBsLG1AdSrhQopjLXC7g1UMa6ZSadl9Ik7enyU4h90Nds+TKYt
+g2/Y2F5ZUK0t1sGVfLQxAAAADmNvcnZ1c0BmdWxpZ2luAQIDBAUGBw==
+-----END OPENSSH PRIVATE KEY-----
+                """
+            }
         if 'kubernetes-namespace' in node_type or 'fedora-pod' in node_type:
             data['connection_type'] = 'namespace'
             data['connection_port'] = {
@@ -4227,6 +4239,10 @@ class ZuulTestCase(BaseTestCase):
         self.config.set('executor', 'git_dir', self.executor_src_root)
         self.config.set('executor', 'private_key_file', self.private_key_file)
         self.config.set('executor', 'state_dir', self.executor_state_root)
+        self.config.set('executor', 'winrm_cert_pem_file',
+                        os.path.join(FIXTURE_DIR, 'test_winrm_cert'))
+        self.config.set('executor', 'winrm_cert_key_file',
+                        os.path.join(FIXTURE_DIR, 'test_winrm_key'))
         self.config.set(
             'executor', 'command_socket',
             os.path.join(self.test_root, 'executor.socket'))
