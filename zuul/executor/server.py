@@ -938,6 +938,10 @@ class AnsibleJob(object):
 
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
+            for node in self.arguments['nodes']:
+                cred = node.get('credential')
+                if cred and cred.get('type') == 'ssh':
+                    self.ssh_agent.addData('nodepool', cred['key'])
             for key in self.arguments.get('ssh_keys', []):
                 self.ssh_agent.addData(key['name'], key['key'])
             self.jobdir = JobDir(self.executor_server.jobdir_root,
