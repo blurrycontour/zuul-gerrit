@@ -758,7 +758,8 @@ class PipelineManager(metaclass=ABCMeta):
 
         self.sched.merger.getFilesChanges(
             item.change.project.connection_name, item.change.project.name,
-            item.change.ref, item.change.branch, build_set=build_set,
+            item.change.branch, item.change.ref, item.change.oldrev,
+            item.change.newrev, build_set=build_set,
             event=item.event)
         return False
 
