@@ -132,13 +132,13 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         self.setup_logging('scheduler', 'log_config')
 
-        self.sched = zuul.scheduler.Scheduler(self.config)
+        self.configure_connections(require_sql=True)
+        self.sched = zuul.scheduler.Scheduler(self.config, self.connections)
 
         executor_client = ExecutorClient(self.config, self.sched)
         self.sched.setZuulApp(self)
         merger = MergeClient(self.config, self.sched)
         nodepool = Nodepool(self.sched)
-        self.configure_connections(require_sql=True)
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
@@ -146,7 +146,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.log.info('Starting scheduler')
         try:
             self.sched.start()
-            self.sched.registerConnections(self.connections)
             self.sched.reconfigure(self.config)
             self.sched.wakeUp()
         except Exception:
