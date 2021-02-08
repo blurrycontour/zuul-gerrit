@@ -15,11 +15,11 @@
 
 import testtools
 
+from tests.zk import TestZooKeeperConnection
 from zuul import model
 import zuul.zk.exceptions
 
 from tests.base import BaseTestCase, ChrootedKazooFixture
-from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 
@@ -35,10 +35,10 @@ class TestZK(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk_client = ZooKeeperClient()
+        self.zk_client = TestZooKeeperConnection(hosts=self.zk_config)\
+            .connect()
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
-        self.zk_client.connect(self.zk_config)
 
     def _createRequest(self):
         req = model.HoldRequest()

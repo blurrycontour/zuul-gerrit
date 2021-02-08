@@ -20,12 +20,13 @@ import signal
 
 import zuul.cmd
 import zuul.executor.client
-from zuul.lib.config import get_default
-from zuul.lib.statsd import get_statsd_config
 import zuul.merger.client
 import zuul.nodepool
 import zuul.scheduler
-from zuul.zk import ZooKeeperClient
+
+from zuul.lib.config import get_default
+from zuul.lib.statsd import get_statsd_config
+from zuul.zk import ZooKeeperConnection
 
 
 class Scheduler(zuul.cmd.ZuulDaemonApp):
@@ -143,21 +144,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
 
-        zk_client = ZooKeeperClient()
-        zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts', None)
-        if not zookeeper_hosts:
-            raise Exception("The zookeeper hosts config value is required")
-        zookeeper_tls_key = get_default(self.config, 'zookeeper', 'tls_key')
-        zookeeper_tls_cert = get_default(self.config, 'zookeeper', 'tls_cert')
-        zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
-        zookeeper_timeout = float(get_default(self.config, 'zookeeper',
-                                              'session_timeout', 10.0))
-        zk_client.connect(
-            zookeeper_hosts,
-            timeout=zookeeper_timeout,
-            tls_cert=zookeeper_tls_cert,
-            tls_key=zookeeper_tls_key,
-            tls_ca=zookeeper_tls_ca)
+        zk_client = ZooKeeperConnection.fromConfig(self.config).connect()
 
         self.configure_connections(require_sql=True)
         self.sched.setExecutor(gearman)
