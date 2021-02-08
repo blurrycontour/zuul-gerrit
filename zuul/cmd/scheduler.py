@@ -138,12 +138,11 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('scheduler', 'log_config')
         self.log = logging.getLogger("zuul.Scheduler")
 
-        self.sched = zuul.scheduler.Scheduler(self.config)
+        self.configure_connections(require_sql=True)
+        self.sched = zuul.scheduler.Scheduler(self.config, self.connections)
 
         self.sched.setZuulApp(self)
         merger = MergeClient(self.config, self.sched)
-        self.configure_connections(require_sql=True)
-
         self.sched.setMerger(merger)
 
         if self.args.validate_tenants is None:
@@ -158,7 +157,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.log.info('Starting scheduler')
         try:
             self.sched.start()
-            self.sched.registerConnections(self.connections)
             self.sched.reconfigure(self.config,
                                    validate_tenants=self.args.validate_tenants)
             self.sched.wakeUp()
