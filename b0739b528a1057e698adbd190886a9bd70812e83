@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "99ca6b00_ccc92e0c",
+        "filename": ".zuul.yaml",
+        "patchSetId": 59
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2021-02-08T13:45:27Z",
+      "side": 1,
+      "message": "Zookeeper may introduce some lags to the system, therefore the tox-py3x jobs timeouts are increased from 80 to 120 mins.\n\nWhile it is true that reasons for longer tests are happening later on, this was increased here due to, splitting and reordering changes time to time. This change was to be always the first change in the pipeline before other ZK changes and therefore I put it here. But yes there is nothing in this change needing this increase.",
+      "parentUuid": "9816dd95_8e04b255",
+      "revId": "b0739b528a1057e698adbd190886a9bd70812e83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0740aa3d_3f365bf4",
         "filename": "zuul/zk/__init__.py",
         "patchSetId": 59
