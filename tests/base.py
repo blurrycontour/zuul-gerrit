@@ -3976,7 +3976,9 @@ class SchedulerTestApp:
         self.zk_config = zk_config
         self.changes = changes
 
-        self.sched = zuul.scheduler.Scheduler(self.config)
+        zk_client = TestZooKeeperConnection(hosts=self.zk_config).connect()
+
+        self.sched = zuul.scheduler.Scheduler(self.config, zk_client)
         self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
@@ -3999,12 +4001,10 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk_client = TestZooKeeperConnection(hosts=self.zk_config).connect()
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
         self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zk_client)
 
         self.sched.start()
         executor_client.gearman.waitForServer()

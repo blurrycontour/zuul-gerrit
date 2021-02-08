@@ -724,20 +724,17 @@ class Client(zuul.cmd.ZuulApp):
         }
 
     def validate(self):
-        from zuul import scheduler
-        from zuul import configloader
-        sched = scheduler.Scheduler(self.config, testonly=True)
+        from zuul.configloader import TenantParser, ConfigLoader
+        from zuul.scheduler import Scheduler
         self.configure_connections(source_only=True)
-        sched.registerConnections(self.connections, load=False)
-        loader = configloader.ConfigLoader(
-            sched.connections, sched, None, None)
-        tenant_config, script = sched._checkTenantSourceConf(self.config)
-        unparsed_abide = loader.readConfig(tenant_config, from_script=script)
+        tenant_config, script = Scheduler.checkTenantSourceConf(self.config)
+        unparsed_abide = ConfigLoader.readConfig(tenant_config,
+                                                 from_script=script)
+        err_code = 0
         try:
             for conf_tenant in unparsed_abide.tenants:
-                loader.tenant_parser.getSchema()(conf_tenant)
+                TenantParser.getSchema(self.connections)(conf_tenant)
             print("Tenants config validated with success")
-            err_code = 0
         except Exception as e:
             print("Error when validating tenants config")
             print(e)
