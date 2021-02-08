@@ -3978,7 +3978,15 @@ class SchedulerTestApp:
 
         zk_client = TestZooKeeperConnection(hosts=self.zk_config).connect()
 
-        self.sched = zuul.scheduler.Scheduler(self.config, zk_client)
+        # Register connections from the config using fakes
+        self.connections = TestConnectionRegistry(
+            self.changes, self.config, additional_event_queues,
+            upstream_root, rpcclient, poller_events,
+            git_url_with_auth, add_cleanup, fake_sql)
+        self.connections.configure(self.config, source_only=source_only)
+
+        self.sched = zuul.scheduler.Scheduler(self.config, self.connections,
+                                              zk_client)
         self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
@@ -3987,15 +3995,6 @@ class SchedulerTestApp:
             self.sched.trigger_event_queue,
             self.sched.management_event_queue
         ]
-
-        # Register connections from the config using fakes
-        self.connections = TestConnectionRegistry(
-            self.changes, self.config, additional_event_queues,
-            upstream_root, rpcclient, poller_events,
-            git_url_with_auth, add_cleanup, fake_sql)
-        self.connections.configure(self.config, source_only=source_only)
-
-        self.sched.registerConnections(self.connections)
 
         executor_client = zuul.executor.client.ExecutorClient(
             self.config, self.sched)
