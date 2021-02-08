@@ -933,10 +933,12 @@ class JobParser(object):
         branches = None
         if 'branches' in conf:
             branches = as_list(conf['branches'])
+            implied = False
         elif not project_pipeline:
+            implied = True
             branches = self.pcontext.getImpliedBranches(job.source_context)
         if branches:
-            job.setBranchMatcher(branches)
+            job.setBranchMatcher(branches, implied)
         if 'files' in conf:
             job.setFileMatcher(as_list(conf['files']))
         if 'irrelevant-files' in conf:
