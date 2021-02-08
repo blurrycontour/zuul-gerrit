@@ -3359,7 +3359,7 @@ class TestScheduler(ZuulTestCase):
         # event queue after waitUntilSettled.
         start = time.time()
         while True:
-            if time.time() - start > 15:
+            if time.time() - start > 30:
                 raise Exception("Timeout waiting for full reconfiguration")
             new = self.scheds.first.sched.tenant_last_reconfigured\
                 .get('tenant-one', 0)

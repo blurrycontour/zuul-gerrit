@@ -1565,24 +1565,20 @@ class TenantParser(object):
         'untrusted-projects': to_list(project_or_group),
     })
 
-    def validateTenantSources(self):
-        def v(value, path=[]):
+    @classmethod
+    def getSchema(cls, connections: 'connections.ConnectionRegistry'):
+        def validateTenantSources(value, path=None):
             if isinstance(value, dict):
                 for k, val in value.items():
-                    self.connections.getSource(k)
-                    self.validateTenantSource(val, path + [k])
+                    connections.getSource(k)
+                    cls.tenant_source(val)
             else:
                 raise vs.Invalid("Invalid tenant source", path)
-        return v
 
-    def validateTenantSource(self, value, path=[]):
-        self.tenant_source(value)
-
-    def getSchema(self):
         tenant = {vs.Required('name'): str,
                   'max-nodes-per-job': int,
                   'max-job-timeout': int,
-                  'source': self.validateTenantSources(),
+                  'source': validateTenantSources,
                   'exclude-unprotected-branches': bool,
                   'allowed-triggers': to_list(str),
                   'allowed-reporters': to_list(str),
@@ -1598,7 +1594,7 @@ class TenantParser(object):
         return vs.Schema(tenant)
 
     def fromYaml(self, abide, conf, ansible_manager) -> model.Tenant:
-        self.getSchema()(conf)
+        self.getSchema(self.connections)(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
                                 tenant, ansible_manager)
@@ -2285,28 +2281,25 @@ class ConfigLoader(object):
                                           merger, self.keystorage)
         self.admin_rule_parser = AuthorizationRuleParser()
 
-    def expandConfigPath(self, config_path):
+    @classmethod
+    def readConfig(cls, config_path: str, from_script: bool = False):
         if config_path:
             config_path = os.path.expanduser(config_path)
         if not os.path.exists(config_path):
             raise Exception("Unable to read tenant config file at %s" %
                             config_path)
-        return config_path
-
-    def readConfig(self, config_path, from_script=False):
-        config_path = self.expandConfigPath(config_path)
         if not from_script:
             with open(config_path) as config_file:
-                self.log.info("Loading configuration from %s" % (config_path,))
+                cls.log.info("Loading configuration from %s" % (config_path,))
                 data = yaml.safe_load(config_file)
         else:
             if not os.access(config_path, os.X_OK):
-                self.log.error(
+                cls.log.error(
                     "Unable to read tenant configuration from a non "
                     "executable script (%s)" % config_path)
                 data = []
             else:
-                self.log.info(
+                cls.log.info(
                     "Loading configuration from script %s" % config_path)
                 ret = subprocess.run(
                     [config_path], stdout=subprocess.PIPE,
@@ -2315,7 +2308,7 @@ class ConfigLoader(object):
                     ret.check_returncode()
                     data = yaml.safe_load(ret.stdout)
                 except subprocess.CalledProcessError as error:
-                    self.log.error(
+                    cls.log.error(
                         "Tenant config script exec failed: %s (%s)" % (
                             str(error), str(ret.stderr)))
                     data = []
