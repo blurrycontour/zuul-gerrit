@@ -1350,10 +1350,6 @@ class PipelineManager(metaclass=ABCMeta):
                 log.debug("%s window size increased to %s",
                           change_queue, change_queue.window)
 
-                # TODO (felix): Can be removed when the connection registry is
-                # mandatory.
-                if not self.sched.connections:
-                    return
                 zuul_driver = self.sched.connections.drivers['zuul']
                 tenant = self.pipeline.tenant
                 zuul_driver.onChangeMerged(tenant, item.change, source)
