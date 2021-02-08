@@ -722,6 +722,36 @@ class TestBranchVariants(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
+    def test_similar_branches(self):
+        # Test that implied branch matchers match the full branch name
+        self.executor_server.hold_jobs_in_build = True
+        # This creates a new branch with a copy of the config in master
+        self.create_branch('puppet-integration', 'develop')
+        self.create_branch('puppet-integration', 'dev')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'puppet-integration', 'develop'))
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'puppet-integration', 'dev'))
+        self.waitUntilSettled()
+
+        A = self.fake_gerrit.addFakeChange('puppet-integration', 'develop', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        ipath = self.builds[0].parameters['zuul']['_inheritance_path']
+        for source in ipath:
+            # We shouldn't have anything in our inheritance path from
+            # the "dev" branch, only "develop" (and "master" for the
+            # base job).
+            self.assertNotIn("@dev#", source)
+            if 'base' not in source:
+                self.assertIn("@develop#", source)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
     def test_branch_variants_reconfigure(self):
         # Test branch variants of jobs with inheritance
         self.executor_server.hold_jobs_in_build = True
