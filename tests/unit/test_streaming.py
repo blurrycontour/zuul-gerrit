@@ -254,7 +254,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
-                           self.test_root))
+                           self.test_root, self.zk_config))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
@@ -333,7 +333,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
-                           self.test_root))
+                           self.test_root, self.zk_config))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
@@ -409,7 +409,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
-                           self.test_root))
+                           self.test_root, self.zk_config))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
