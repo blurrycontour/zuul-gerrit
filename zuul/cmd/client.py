@@ -726,9 +726,8 @@ class Client(zuul.cmd.ZuulApp):
     def validate(self):
         from zuul import scheduler
         from zuul import configloader
-        sched = scheduler.Scheduler(self.config, testonly=True)
         self.configure_connections(source_only=True)
-        sched.registerConnections(self.connections, load=False)
+        sched = scheduler.Scheduler(self.config, self.connections)
         loader = configloader.ConfigLoader(
             sched.connections, sched, None, None)
         tenant_config, script = sched._checkTenantSourceConf(self.config)
