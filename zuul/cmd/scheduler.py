@@ -19,12 +19,12 @@ import sys
 import signal
 
 import zuul.cmd
-import zuul.executor.client
+import zuul.scheduler
+from zuul.executor.client import ExecutorClient
 from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd_config
-import zuul.merger.client
-import zuul.nodepool
-import zuul.scheduler
+from zuul.merger.client import MergeClient
+from zuul.nodepool import Nodepool
 from zuul.zk import ZooKeeperClient
 
 
@@ -139,28 +139,25 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('scheduler', 'log_config')
         self.log = logging.getLogger("zuul.Scheduler")
 
-        self.sched = zuul.scheduler.Scheduler(self.config)
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+
+        self.sched = zuul.scheduler.Scheduler(self.config, zk_client)
 
         self.sched.setZuulApp(self)
-        merger = zuul.merger.client.MergeClient(self.config, self.sched)
-
+        merger = MergeClient(self.config, self.sched)
         self.configure_connections(require_sql=True)
+
         self.sched.setMerger(merger)
 
-        zk_client = None
         if self.args.validate_tenants is None:
 
             # Only needed in full mode
-            gearman = zuul.executor.client.ExecutorClient(self.config,
-                                                          self.sched)
-            nodepool = zuul.nodepool.Nodepool(self.sched)
+            executor_client = ExecutorClient(self.config, self.sched)
+            nodepool = Nodepool(self.sched)
 
-            zk_client = ZooKeeperClient.fromConfig(self.config)
-            zk_client.connect()
-
-            self.sched.setExecutor(gearman)
+            self.sched.setExecutor(executor_client)
             self.sched.setNodepool(nodepool)
-            self.sched.setZooKeeper(zk_client)
 
         self.log.info('Starting scheduler')
         try:

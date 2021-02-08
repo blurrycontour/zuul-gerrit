@@ -290,7 +290,7 @@ class Scheduler(threading.Thread):
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
 
-    def __init__(self, config, testonly=False):
+    def __init__(self, config, zk_client, testonly=False):
         threading.Thread.__init__(self)
         self.daemon = True
         self.hostname = socket.getfqdn()
@@ -325,6 +325,9 @@ class Scheduler(threading.Thread):
         # self.triggers['connection_name'] = triggerObject
         self.triggers = dict()
         self.config = config
+
+        self.zk_client = zk_client
+        self.zk_nodepool = ZooKeeperNodepool(zk_client)
 
         self.trigger_event_queue = queue.Queue()
         self.result_event_queue = queue.Queue()
@@ -420,10 +423,6 @@ class Scheduler(threading.Thread):
 
     def setNodepool(self, nodepool):
         self.nodepool = nodepool
-
-    def setZooKeeper(self, zk_client):
-        self.zk_client = zk_client
-        self.zk_nodepool = ZooKeeperNodepool(zk_client)
 
     def runStats(self):
         while not self.stats_stop.wait(self._stats_interval):
@@ -822,20 +821,21 @@ class Scheduler(threading.Thread):
             self._save_queue()
             os._exit(0)
 
-    def _checkTenantSourceConf(self, config):
+    @classmethod
+    def checkTenantSourceConf(cls, config):
         tenant_config = None
         script = False
-        if self.config.has_option(
+        if config.has_option(
             'scheduler', 'tenant_config'):
-            tenant_config = self.config.get(
+            tenant_config = config.get(
                 'scheduler', 'tenant_config')
-        if self.config.has_option(
+        if config.has_option(
             'scheduler', 'tenant_config_script'):
             if tenant_config:
                 raise Exception(
                     "tenant_config and tenant_config_script options "
                     "are exclusive.")
-            tenant_config = self.config.get(
+            tenant_config = config.get(
                 'scheduler', 'tenant_config_script')
             script = True
         if not tenant_config:
@@ -867,7 +867,7 @@ class Scheduler(threading.Thread):
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
                 self._get_key_dir())
-            tenant_config, script = self._checkTenantSourceConf(self.config)
+            tenant_config, script = self.checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
             abide = loader.loadConfig(
@@ -912,7 +912,7 @@ class Scheduler(threading.Thread):
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger,
                 self._get_key_dir())
-            tenant_config, script = self._checkTenantSourceConf(self.config)
+            tenant_config, script = self.checkTenantSourceConf(self.config)
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
