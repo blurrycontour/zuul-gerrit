@@ -140,7 +140,9 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('scheduler', 'log_config')
 
         zk_client = ZooKeeperConnection.fromConfig(self.config).connect()
-        self.sched = zuul.scheduler.Scheduler(self.config, zk_client)
+        self.configure_connections(require_sql=True)
+        self.sched = zuul.scheduler.Scheduler(self.config, self.connections,
+                                              zk_client)
 
         executor_client = zuul.executor.client.ExecutorClient(
             self.config, self.sched)
@@ -148,7 +150,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
 
-        self.configure_connections(require_sql=True)
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merger)
         self.sched.setNodepool(nodepool)
@@ -156,7 +157,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.log.info('Starting scheduler')
         try:
             self.sched.start()
-            self.sched.registerConnections(self.connections)
             self.sched.reconfigure(self.config)
             self.sched.wakeUp()
         except Exception:
