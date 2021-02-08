@@ -69,13 +69,11 @@ class ConnectionRegistry(object):
             raise Exception("Driver %s already registered" % driver.name)
         self.drivers[driver.name] = driver
 
-    def registerScheduler(self, sched, load=True):
-        for driver_name, driver in self.drivers.items():
+    def registerScheduler(self, sched):
+        for _, driver in self.drivers.items():
             driver.registerScheduler(sched)
-        for connection_name, connection in self.connections.items():
+        for _, connection in self.connections.items():
             connection.registerScheduler(sched)
-            if load:
-                connection.onLoad()
 
     def reconfigureDrivers(self, tenant):
         for driver in self.drivers.values():

@@ -293,7 +293,7 @@ class Scheduler(threading.Thread):
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
 
-    def __init__(self, config, testonly=False):
+    def __init__(self, config, connections):
         threading.Thread.__init__(self)
         self.daemon = True
         self.hostname = socket.getfqdn()
@@ -312,7 +312,7 @@ class Scheduler(threading.Thread):
         self._zuul_app = None
         self.executor = None
         self.merger = None
-        self.connections = None
+        self.connections = connections
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
         self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
@@ -339,9 +339,8 @@ class Scheduler(threading.Thread):
         self.abide = model.Abide()
         self.unparsed_abide = model.UnparsedAbideConfig()
 
-        if not testonly:
-            time_dir = self._get_time_database_dir()
-            self.time_database = model.TimeDataBase(time_dir)
+        time_dir = self._get_time_database_dir()
+        self.time_database = model.TimeDataBase(time_dir)
 
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
@@ -368,6 +367,8 @@ class Scheduler(threading.Thread):
             self.config, 'scheduler', 'default_ansible_version', None)
         self.ansible_manager = AnsibleManager(
             default_version=default_ansible_version)
+
+        self.connections.registerScheduler(self)
 
     def start(self):
         super(Scheduler, self).start()
@@ -407,12 +408,6 @@ class Scheduler(threading.Thread):
                     self.command_map[command]()
             except Exception:
                 self.log.exception("Exception while processing command")
-
-    def registerConnections(self, connections, load=True):
-        # load: whether or not to trigger the onLoad for the connection. This
-        # is useful for not doing a full load during layout validation.
-        self.connections = connections
-        self.connections.registerScheduler(self, load)
 
     def stopConnections(self):
         self.connections.stop()
