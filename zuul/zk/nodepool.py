@@ -40,7 +40,7 @@ class ZooKeeperNodepool(ZooKeeperBase):
 
     def __init__(self, client: ZooKeeperClient, enable_cache: bool = True):
         super().__init__(client)
-        self.enable_cache = enable_cache  # type: bool
+        self.enable_cache = enable_cache
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
         # which contains raw znode data (among other details), and one for

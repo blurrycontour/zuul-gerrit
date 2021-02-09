@@ -451,7 +451,7 @@ class GitlabConnection(CachedBranchConnection):
     def getWebController(self, zuul_web):
         return GitlabWebController(zuul_web, self)
 
-    def getProject(self, name):
+    def getProject(self, name: str) -> Project:
         return self.projects.get(name)
 
     def addProject(self, project):

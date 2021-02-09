@@ -12,19 +12,31 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.driver import Driver, ConnectionInterface, ReporterInterface
-from zuul.driver.mqtt import mqttconnection
-from zuul.driver.mqtt import mqttreporter
+from typing import Dict, TYPE_CHECKING
+
+from zuul.driver import ConnectionInterface, Driver, ReporterInterface
+from zuul.driver.mqtt import mqttconnection, mqttreporter
+
+if TYPE_CHECKING:
+    import voluptuous as vs
+
+    from zuul.connection import BaseConnection
+    from zuul.model import Pipeline
 
 
 class MQTTDriver(Driver, ConnectionInterface, ReporterInterface):
     name = 'mqtt'
 
-    def getConnection(self, name, config):
+    def getConnection(self, name: str, config: Dict) -> "BaseConnection":
         return mqttconnection.MQTTConnection(self, name, config)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(
+        self,
+        connection: "BaseConnection",
+        pipeline: "Pipeline",
+        config: Dict = None,
+    ) -> mqttreporter.MQTTReporter:
         return mqttreporter.MQTTReporter(self, connection, config)
 
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> "vs.Schema":
         return mqttreporter.getSchema()

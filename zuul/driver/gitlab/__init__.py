@@ -12,35 +12,54 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.driver import Driver, ConnectionInterface, TriggerInterface
-from zuul.driver import SourceInterface, ReporterInterface
-from zuul.driver.gitlab import gitlabconnection
-from zuul.driver.gitlab import gitlabsource
-from zuul.driver.gitlab import gitlabreporter
-from zuul.driver.gitlab import gitlabtrigger
+from typing import Dict, TYPE_CHECKING
+
+from zuul.connection import BaseConnection
+from zuul.driver import (
+    ConnectionInterface,
+    Driver,
+    ReporterInterface,
+    SourceInterface,
+    TriggerInterface,
+)
+from zuul.driver.gitlab import (
+    gitlabconnection, gitlabreporter, gitlabsource, gitlabtrigger
+)
+
+if TYPE_CHECKING:
+    import voluptuous as vs
+
+    from zuul.model import Pipeline
+    from zuul.source import BaseSource
 
 
 class GitlabDriver(Driver, ConnectionInterface, TriggerInterface,
                    SourceInterface, ReporterInterface):
     name = 'gitlab'
 
-    def getConnection(self, name, config):
+    def getConnection(self, name: str, config: Dict) -> BaseConnection:
         return gitlabconnection.GitlabConnection(self, name, config)
 
     def getTrigger(self, connection, config=None):
         return gitlabtrigger.GitlabTrigger(self, connection, config)
 
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> "BaseSource":
         return gitlabsource.GitlabSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(
+        self,
+        connection: BaseConnection,
+        pipeline: "Pipeline",
+        config: Dict = None,
+    ) -> gitlabreporter.GitlabReporter:
         return gitlabreporter.GitlabReporter(
-            self, connection, pipeline, config)
+            self, connection, pipeline, config
+        )
 
     def getTriggerSchema(self):
         return gitlabtrigger.getSchema()
 
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> "vs.Schema":
         return gitlabreporter.getSchema()
 
     def getRequireSchema(self):

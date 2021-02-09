@@ -71,7 +71,6 @@ import paramiko
 from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul.model import Change
 from zuul.rpcclient import RPCClient
-
 from zuul.driver.zuul import ZuulDriver
 from zuul.driver.git import GitDriver
 from zuul.driver.smtp import SMTPDriver
@@ -86,6 +85,7 @@ from zuul.driver.gitlab import GitlabDriver
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.driver.elasticsearch import ElasticsearchDriver
+from zuul.executor.server import JobDir
 from zuul.lib.connections import ConnectionRegistry
 from psutil import Popen
 
@@ -2815,25 +2815,25 @@ class FakeStatsd(threading.Thread):
 class FakeBuild(object):
     log = logging.getLogger("zuul.test")
 
-    def __init__(self, executor_server, job):
+    def __init__(self, executor_server: "RecordingExecutorServer", job):
         self.daemon = True
         self.executor_server = executor_server
         self.job = job
-        self.jobdir = None
-        self.uuid = job.unique
+        self.jobdir: JobDir = None
+        self.uuid: str = job.unique
         self.parameters = json.loads(job.arguments)
         # TODOv3(jeblair): self.node is really "the label of the node
         # assigned".  We should rename it (self.node_label?) if we
         # keep using it like this, or we may end up exposing more of
         # the complexity around multi-node jobs here
         # (self.nodes[0].label?)
-        self.node = None
+        self.node: str = None
         if len(self.parameters.get('nodes')) == 1:
             self.node = self.parameters['nodes'][0]['label']
-        self.unique = self.parameters['zuul']['build']
-        self.pipeline = self.parameters['zuul']['pipeline']
-        self.project = self.parameters['zuul']['project']['name']
-        self.name = self.parameters['job']
+        self.unique: str = self.parameters['zuul']['build']
+        self.pipeline: str = self.parameters['zuul']['pipeline']
+        self.project: str = self.parameters['zuul']['project']['name']
+        self.name: str = self.parameters['job']
         self.wait_condition = threading.Condition()
         self.waiting = False
         self.paused = False
@@ -4070,7 +4070,7 @@ class SchedulerTestManager:
         return self.instances[0]
 
     def filter(self, matcher=None) -> Iterable[SchedulerTestApp]:
-        fcn = None  # type: Optional[Callable[[int, SchedulerTestApp], bool]]
+        fcn = None
         if type(matcher) == list:
             def fcn(_: int, app: SchedulerTestApp) -> bool:
                 return app in matcher
