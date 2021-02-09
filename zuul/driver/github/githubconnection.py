@@ -1516,7 +1516,7 @@ class GithubConnection(CachedBranchConnection):
             url += '/commit/%s' % sha
         return url
 
-    def getProject(self, name):
+    def getProject(self, name: str) -> Project:
         return self.projects.get(name)
 
     def addProject(self, project):

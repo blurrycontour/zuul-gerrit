@@ -27,8 +27,6 @@ import threading
 import re
 import struct
 
-from typing import Dict, List  # noqa
-
 from zuul.driver import (Driver, WrapperInterface)
 from zuul.execution_context import BaseExecutionContext
 

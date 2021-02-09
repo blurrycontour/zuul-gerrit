@@ -20,16 +20,23 @@ import os
 import shutil
 import subprocess
 import sys
-import zuul.ansible
-
+from configparser import ConfigParser
 from pkg_resources import resource_string
+from typing import Dict, Optional
+
+import zuul.ansible
 from zuul.lib.config import get_default
 
 
 class ManagedAnsible:
     log = logging.getLogger('zuul.managed_ansible')
 
-    def __init__(self, config, version, runtime_install_root=None):
+    def __init__(
+        self,
+        config: ConfigParser,
+        version: str,
+        runtime_install_root: Optional[str] = None,
+    ):
         self.version = version
 
         requirements = get_default(config, version, 'requirements')
@@ -148,8 +155,8 @@ class AnsibleManager:
 
     def __init__(self, zuul_ansible_dir=None, default_version=None,
                  runtime_install_root=None):
-        self._supported_versions = {}
-        self.default_version = None
+        self._supported_versions: Dict[str, ManagedAnsible] = {}
+        self.default_version: Optional[str] = None
         self.zuul_ansible_dir = zuul_ansible_dir
         self.runtime_install_root = runtime_install_root
 
@@ -257,8 +264,8 @@ class AnsibleManager:
                 result = False
         return result
 
-    def _getAnsible(self, version):
-        if not version:
+    def _getAnsible(self, version: str) -> ManagedAnsible:
+        if not version and self.default_version:
             version = self.default_version
 
         ansible = self._supported_versions.get(version)
@@ -283,7 +290,9 @@ class AnsibleManager:
                 'Ansible version %s ARA not installed' % version)
         return result
 
-    def getAnsibleCommand(self, version, command='ansible-playbook'):
+    def getAnsibleCommand(
+        self, version: str, command: str = 'ansible-playbook'
+    ) -> str:
         ansible = self._getAnsible(version)
         venv_path = ansible.venv_path
         if not venv_path:

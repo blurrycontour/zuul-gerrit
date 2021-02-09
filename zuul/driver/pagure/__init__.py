@@ -12,32 +12,53 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.driver import Driver, ConnectionInterface, TriggerInterface
-from zuul.driver import SourceInterface, ReporterInterface
-from zuul.driver.pagure import pagureconnection
-from zuul.driver.pagure import paguresource
-from zuul.driver.pagure import pagurereporter
-from zuul.driver.pagure import paguretrigger
+from typing import Any, Dict, Optional
+
+import voluptuous as vs
+
+from zuul.connection import BaseConnection
+from zuul.driver import (
+    ConnectionInterface,
+    Driver,
+    ReporterInterface,
+    SourceInterface,
+    TriggerInterface,
+)
+from zuul.driver.pagure import (
+    pagureconnection, pagurereporter, paguresource, paguretrigger
+)
+from zuul.model import Pipeline
+from zuul.source import BaseSource
 
 
 class PagureDriver(Driver, ConnectionInterface, TriggerInterface,
                    SourceInterface, ReporterInterface):
     name = 'pagure'
 
-    def getConnection(self, name, config):
+    def getConnection(
+        self,
+        name: str,
+        config: Dict[str, Any],
+    ) -> BaseConnection:
         return pagureconnection.PagureConnection(self, name, config)
 
     def getTrigger(self, connection, config=None):
         return paguretrigger.PagureTrigger(self, connection, config)
 
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> BaseSource:
         return paguresource.PagureSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(
+        self,
+        connection: BaseConnection,
+        pipeline: Pipeline,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> pagurereporter.PagureReporter:
         return pagurereporter.PagureReporter(
-            self, connection, pipeline, config)
+            self, connection, pipeline, config
+        )
 
-    def getTriggerSchema(self):
+    def getTriggerSchema(self) -> vs.Schema:
         return paguretrigger.getSchema()
 
     def getReporterSchema(self):

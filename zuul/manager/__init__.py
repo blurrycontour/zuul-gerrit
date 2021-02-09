@@ -13,11 +13,15 @@ import logging
 import textwrap
 import urllib
 from abc import ABCMeta, abstractmethod
+from typing import List, Tuple, TYPE_CHECKING
 
 from zuul import exceptions
-from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
+from zuul.model import Change, EventFilter, Job, Pipeline, QueueItem, RefFilter
+
+if TYPE_CHECKING:
+    from zuul import scheduler
 
 
 class DynamicChangeQueueContextManager(object):
@@ -46,14 +50,16 @@ class StaticChangeQueueContextManager(object):
 class PipelineManager(metaclass=ABCMeta):
     """Abstract Base Class for enqueing and processing Changes in a Pipeline"""
 
-    def __init__(self, sched, pipeline):
+    changes_merge = False  # Default behavior
+
+    def __init__(self, sched: "scheduler.Scheduler", pipeline: Pipeline):
         self.log = logging.getLogger("zuul.Pipeline.%s.%s" %
                                      (pipeline.tenant.name,
                                       pipeline.name,))
         self.sched = sched
         self.pipeline = pipeline
-        self.event_filters = []
-        self.ref_filters = []
+        self.event_filters: List[EventFilter] = []
+        self.ref_filters: List[RefFilter] = []
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -175,7 +181,7 @@ class PipelineManager(metaclass=ABCMeta):
                 self.log.error("Reporting item start %s received: %s" %
                                (item, ret))
 
-    def reportDequeue(self, item):
+    def reportDequeue(self, item: QueueItem) -> None:
         if not self.pipeline._disabled:
             self.log.info(
                 "Reporting dequeue, action %s item%s",
@@ -188,7 +194,7 @@ class PipelineManager(metaclass=ABCMeta):
                     "Reporting item dequeue %s received: %s", item, ret
                 )
 
-    def sendReport(self, action_reporters, item, message=None):
+    def sendReport(self, action_reporters, item: QueueItem, message=None):
         """Sends the built message off to configured reporters.
 
         Takes the action_reporters, item, message and extra options and
@@ -358,7 +364,7 @@ class PipelineManager(metaclass=ABCMeta):
                 log.debug("Dependency cycle detected for "
                           "change %s in project %s" % (
                               change, change.project))
-                item = model.QueueItem(self, change, event)
+                item = QueueItem(self, change, event)
                 item.warning("Dependency cycle detected")
                 actions = self.pipeline.failure_actions
                 item.setReportedResult('FAILURE')
@@ -395,7 +401,7 @@ class PipelineManager(metaclass=ABCMeta):
             self.dequeueSupercededItems(item)
             return True
 
-    def dequeueItem(self, item):
+    def dequeueItem(self, item: QueueItem) -> None:
         log = get_annotated_logger(self.log, item.event)
         log.debug("Removing change %s from queue", item.change)
         item.queue.dequeueItem(item)
@@ -480,7 +486,7 @@ class PipelineManager(metaclass=ABCMeta):
             build_set.setJobNodeRequest(job.name, req)
         return True
 
-    def _executeJobs(self, item, jobs):
+    def _executeJobs(self, item: QueueItem, jobs: List[Job]):
         log = get_annotated_logger(self.log, item.event)
         log.debug("Executing jobs for change %s", item.change)
         build_set = item.current_build_set
@@ -491,6 +497,9 @@ class PipelineManager(metaclass=ABCMeta):
                 self.sched.nodepool.useNodeSet(
                     nodeset, build_set=item.current_build_set,
                     event=item.event)
+                # TODO (felix): Can be removed when the executor is mandatory.
+                if not self.sched.executor:
+                    raise Exception("Scheduler has no executor client!")
                 self.sched.executor.execute(
                     job, item, self.pipeline,
                     build_set.dependent_changes,
@@ -507,18 +516,18 @@ class PipelineManager(metaclass=ABCMeta):
                 except Exception:
                     log.exception("Exception while releasing semaphore")
 
-    def executeJobs(self, item):
+    def executeJobs(self, item: QueueItem):
         # TODO(jeblair): This should return a value indicating a job
         # was executed.  Appears to be a longstanding bug.
         if not item.layout:
             return False
 
-        jobs = item.findJobsToRun(
+        jobs: List[Job] = item.findJobsToRun(
             item.pipeline.tenant.semaphore_handler)
         if jobs:
             self._executeJobs(item, jobs)
 
-    def cancelJobs(self, item, prime=True):
+    def cancelJobs(self, item: QueueItem, prime: bool = True) -> bool:
         log = get_annotated_logger(self.log, item.event)
         log.debug("Cancel jobs for change %s", item.change)
         canceled = False
@@ -736,7 +745,7 @@ class PipelineManager(metaclass=ABCMeta):
         else:
             branches = None
 
-        if isinstance(item.change, model.Change):
+        if isinstance(item.change, Change):
             self.sched.merger.mergeChanges(build_set.merger_items,
                                            item.current_build_set, files, dirs,
                                            precedence=self.pipeline.precedence,
@@ -845,7 +854,15 @@ class PipelineManager(metaclass=ABCMeta):
                 return False
         return True
 
-    def _processOneItem(self, item, nnfi):
+    def _processOneItem(
+        self, item: QueueItem, nnfi: QueueItem
+    ) -> Tuple[bool, QueueItem]:
+        """
+        Process one item
+        :param item: Queue item
+        :param nnfi: Nearest non-failing item
+        :return: Tuple: whether changed and nearest non-failing item
+        """
         log = item.annotateLogger(self.log)
         changed = False
         ready = False
@@ -900,6 +917,7 @@ class PipelineManager(metaclass=ABCMeta):
                 # Starting jobs reporting should only be done once if there are
                 # jobs to run for this item.
                 if ready and len(self.pipeline.start_actions) > 0 \
+                        and item.job_graph \
                         and len(item.job_graph.jobs) > 0 \
                         and not item.reported_start \
                         and not item.quiet:
@@ -954,8 +972,8 @@ class PipelineManager(metaclass=ABCMeta):
             queue_changed = False
             nnfi = None  # Nearest non-failing item
             for item in queue.queue[:]:
-                item_changed, nnfi = self._processOneItem(
-                    item, nnfi)
+                # NNFI: Nearest non-failing item
+                item_changed, nnfi = self._processOneItem(item, nnfi)
                 if item_changed:
                     queue_changed = True
                 self.reportStats(item)
@@ -1111,7 +1129,7 @@ class PipelineManager(metaclass=ABCMeta):
                  "with nodes %s",
                  request, request.job, build_set.item, request.nodeset)
 
-    def reportItem(self, item):
+    def reportItem(self, item: QueueItem) -> None:
         log = get_annotated_logger(self.log, item.event)
         if not item.reported:
             # _reportItem() returns True if it failed to report.
@@ -1146,26 +1164,33 @@ class PipelineManager(metaclass=ABCMeta):
                 log.debug("%s window size increased to %s",
                           change_queue, change_queue.window)
 
+                # TODO (felix): Can be removed when the connection registry is
+                # mandatory.
+                if not self.sched.connections:
+                    return
                 zuul_driver = self.sched.connections.drivers['zuul']
                 tenant = self.pipeline.tenant
                 zuul_driver.onChangeMerged(tenant, item.change, source)
 
-    def _reportItem(self, item):
+    def _reportItem(self, item: QueueItem):
         log = get_annotated_logger(self.log, item.event)
         log.debug("Reporting change %s", item.change)
         ret = True  # Means error as returned by trigger.report
 
-        # In the case of failure, we may not hove completed an initial
-        # merge which would get the layout for this item, so in order
-        # to determine whether this item's project is in this
-        # pipeline, use the dynamic layout if available, otherwise,
-        # fall back to the current static layout as a best
-        # approximation.
-        layout = (item.layout or self.pipeline.tenant.layout)
-
         project_in_pipeline = True
         ppc = None
         try:
+            # In the case of failure, we may not hove completed an initial
+            # merge which would get the layout for this item, so in order
+            # to determine whether this item's project is in this
+            # pipeline, use the dynamic layout if available, otherwise,
+            # fall back to the current static layout as a best
+            # approximation.
+            layout = (item.layout or self.pipeline.tenant.layout)
+            if not layout:
+                raise Exception(
+                    f"Tenant {self.pipeline.tenant} has no layout"
+                )
             ppc = layout.getProjectPipelineConfig(item)
         except Exception:
             log.exception("Invalid config for change %s", item.change)
