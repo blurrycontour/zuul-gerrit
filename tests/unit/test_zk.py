@@ -15,7 +15,7 @@
 
 import testtools
 
-from tests.zk import TestZooKeeperConnection
+from tests.zk import TestZooKeeperClient
 from zuul import model
 import zuul.zk.exceptions
 
@@ -35,8 +35,8 @@ class TestZK(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk_client = TestZooKeeperConnection(hosts=self.zk_config)\
-            .connect()
+        self.zk_client = TestZooKeeperClient(hosts=self.zk_config)
+        self.zk_client.connect()
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
 

@@ -68,7 +68,7 @@ from git.util import IterableList
 import yaml
 import paramiko
 
-from tests.zk import TestZooKeeperClient, TestZooKeeperConnection
+from tests.zk import TestZooKeeperClient
 from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul.model import Change
 from zuul.rpcclient import RPCClient
@@ -88,6 +88,7 @@ from zuul.driver.gerrit import GerritDriver
 from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.lib.connections import ConnectionRegistry
+from zuul.zk import ZooKeeperClient
 from psutil import Popen
 
 import tests.fakegithub
@@ -3696,10 +3697,6 @@ class WebProxyFixture(fixtures.Fixture):
         self.thread.join()
 
 
-class TestZuulWeb(ZuulWeb):
-    _zk_connection_class = TestZooKeeperConnection
-
-
 class ZuulWebFixture(fixtures.Fixture):
     def __init__(self, gearman_server_port,
                  changes: Dict[str, Dict[str, Change]], config: ConfigParser,
@@ -3730,7 +3727,7 @@ class ZuulWebFixture(fixtures.Fixture):
 
     def _setUp(self):
         # Start the web server
-        self.web = TestZuulWeb(
+        self.web = ZuulWeb(
             listen_address='::', listen_port=0,
             gear_server='127.0.0.1', gear_port=self.gearman_server_port,
             info=self.info,
@@ -3998,7 +3995,8 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk_client = TestZooKeeperConnection(hosts=self.zk_config).connect()
+        zk_client = TestZooKeeperClient(hosts=self.zk_config)
+        zk_client.connect()
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
@@ -4179,7 +4177,10 @@ class ZuulTestCase(BaseTestCase):
         self.fake_nodepool = FakeNodepool(
             self.zk_chroot_fixture.zookeeper_host,
             self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            self.zk_chroot_fixture.zookeeper_chroot
+        )
+        self.zk_client = ZooKeeperClient(hosts=self.zk_config)
+        self.zk_client.connect()
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
