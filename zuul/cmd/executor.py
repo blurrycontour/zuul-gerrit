@@ -17,6 +17,7 @@ import logging
 import os
 import sys
 import signal
+from typing import Optional
 
 import zuul.cmd
 from zuul.executor.server import COMMANDS, DEFAULT_FINGER_PORT, ExecutorServer
@@ -27,6 +28,11 @@ from zuul.zk import ZooKeeperClient
 class Executor(zuul.cmd.ZuulDaemonApp):
     app_name = 'executor'
     app_description = 'A standalone Zuul executor.'
+
+    def __init__(self):
+        super().__init__()
+        self.executor_server: Optional[ExecutorServer] = None
+        self.log_streamer_pid: Optional[int] = None
 
     def createParser(self):
         parser = super(Executor, self).createParser()
@@ -44,7 +50,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        self.executor.stop()
+        if self.executor_server:
+            self.executor_server.stop()
 
     def start_log_streamer(self):
         pipe_read, pipe_write = os.pipe()
