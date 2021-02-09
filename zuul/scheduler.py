@@ -33,6 +33,8 @@ from typing import Optional, Dict, TYPE_CHECKING, Callable, Any
 from statsd import StatsClient
 
 
+from zuul.lib.named_queue import NamedQueue
+
 from zuul import configloader
 from zuul import exceptions
 from zuul import version as zuul_version
@@ -76,6 +78,7 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.components import (
     ZooKeeperComponentRegistry, ZooKeeperComponentState
 )
+from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.event_queues import (
     GlobalEventWatcher,
     GlobalManagementEventQueue,
@@ -160,10 +163,11 @@ class Scheduler(threading.Thread):
                 "schedulers", self.hostname
             )
         )
+        self.zk_connection_event = ZooKeeperConnectionEvent(zk_client)
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
 
-        self.trigger_event_queue: Queue = Queue()
-        self.result_event_queue: Queue = Queue()
+        self.trigger_event_queue: Queue = NamedQueue('TriggerEventQueue')
+        self.result_event_queue: Queue = NamedQueue('ResultEventQueue')
         self.global_watcher = GlobalEventWatcher(
             self.zk_client, self.wake_event.set
         )

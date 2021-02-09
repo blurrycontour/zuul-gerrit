@@ -32,15 +32,15 @@ import threading
 from zuul import exceptions
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.commandsocket import CommandSocket
-from zuul.rpcclient import RPCClient
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.lib.repl import REPLServer
 import zuul.model
-import zuul.rpcclient
+from zuul.rpcclient import RPCClient
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import (
     ZooKeeperComponent, ZooKeeperComponentRegistry, ZooKeeperComponentState
 )
+from zuul.zk.connection_event import ZooKeeperConnectionEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
 if TYPE_CHECKING:
     from zuul.lib.connections import ConnectionRegistry
@@ -1251,6 +1251,7 @@ class ZuulWeb(object):
                 'webs', self.hostname
             )
         )
+        self.zk_connection_event = ZooKeeperConnectionEvent(self.zk_client)
 
         self.connections: ConnectionRegistry = connections
         self.authenticators: AuthenticatorRegistry = authenticators
