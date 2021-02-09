@@ -321,8 +321,8 @@ class ZooKeeperBase(metaclass=ABCMeta):
     def kazoo_client(self) -> KazooClient:
         return self.client.kazoo_client
 
-    def _onConnect(self):
+    def _onConnect(self) -> None:
         pass
 
-    def _onDisconnect(self):
+    def _onDisconnect(self) -> None:
         pass

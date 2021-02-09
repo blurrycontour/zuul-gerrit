@@ -307,6 +307,12 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         logfile = open(ansible_log, 'r')
         self.addCleanup(logfile.close)
 
+        # Wait for the build info to propagate to the scheduler
+        for _ in iterate_timeout(30, "wait for worker hostname/log_port"):
+            build_obj = self.scheds.first.sched.executor.builds[build.uuid]
+            if build_obj.worker.hostname and build_obj.worker.log_port:
+                break
+
         # Start a thread with the websocket client
         client1 = self.runWSClient(web.port, build.uuid)
         client1.event.wait()
@@ -378,6 +384,12 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                 break
         logfile = open(ansible_log, 'r')
         self.addCleanup(logfile.close)
+
+        # Wait for the build info to propagate to the scheduler
+        for _ in iterate_timeout(30, "wait for worker hostname/log_port"):
+            build_obj = self.scheds.first.sched.executor.builds[build.uuid]
+            if build_obj.worker.hostname and build_obj.worker.log_port:
+                break
 
         # Start a thread with the websocket client
         client1 = self.runWSClient(web.port, build.uuid)
@@ -451,6 +463,12 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
             if os.path.exists(ansible_log):
                 break
 
+        # Wait for the build info to propagate to the scheduler
+        for _ in iterate_timeout(30, "wait for worker hostname/log_port"):
+            build_obj = self.scheds.first.sched.executor.builds[build.uuid]
+            if build_obj.worker.hostname and build_obj.worker.log_port:
+                break
+
         # Start a thread with the websocket client
         client1 = self.runWSClient(web.port, build.uuid)
         client1.event.wait()
@@ -521,6 +539,12 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                 break
         logfile = open(ansible_log, 'r')
         self.addCleanup(logfile.close)
+
+        # Wait for the build info to propagate to the scheduler
+        for _ in iterate_timeout(30, "wait for worker hostname/log_port"):
+            build_obj = self.scheds.first.sched.executor.builds[build.uuid]
+            if build_obj.worker.hostname and build_obj.worker.log_port:
+                break
 
         zk_client = ZooKeeperClient(self.zk_config)
         zk_client.connect()
