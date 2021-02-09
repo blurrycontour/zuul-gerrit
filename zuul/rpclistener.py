@@ -17,21 +17,24 @@ import json
 import logging
 import time
 from abc import ABCMeta
-from typing import List
+from typing import List, Optional, TYPE_CHECKING
 
-from zuul import model
 from zuul.connection import BaseConnection
 from zuul.lib import encryption
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.jsonutil import ZuulJSONEncoder
+from zuul.model import Branch, Build, ChangeQueue, QueueItem, TriggerEvent
+
+if TYPE_CHECKING:
+    from zuul import scheduler
 
 
 class RPCListenerBase(metaclass=ABCMeta):
     log = logging.getLogger("zuul.RPCListenerBase")
     thread_name = 'zuul-rpc-gearman-worker'
-    functions = []  # type: List[str]
+    functions: List[str] = []
 
-    def __init__(self, config, sched):
+    def __init__(self, config, sched: "scheduler.Scheduler"):
         self.config = config
         self.sched = sched
 
@@ -86,7 +89,7 @@ class RPCListenerSlow(RPCListenerBase):
 
     def _common_enqueue(self, job):
         args = json.loads(job.arguments)
-        event = model.TriggerEvent()
+        event = TriggerEvent()
         event.timestamp = time.time()
         errors = ''
         tenant = None
@@ -298,9 +301,11 @@ class RPCListener(RPCListenerBase):
         #       log files, so this is forwards compatible with a future
         #       where there are more logs to potentially request than
         #       "console.log"
-        def find_build(uuid):
+        def find_build(uuid: str) -> Optional[Build]:
             for tenant in self.sched.abide.tenants.values():
-                for pipeline_name, pipeline in tenant.layout.pipelines.items():
+                if not tenant.layout:
+                    continue
+                for _, pipeline in tenant.layout.pipelines.items():
                     for queue in pipeline.queues:
                         for item in queue.queue:
                             for bld in item.current_build_set.getBuilds():
@@ -492,10 +497,10 @@ class RPCListener(RPCListenerBase):
             gear_job.sendWorkComplete(json.dumps(None))
             return
 
-        change = model.Branch(project)
+        change = Branch(project)
         change.branch = args.get("branch", "master")
-        queue = model.ChangeQueue(pipeline)
-        item = model.QueueItem(queue, change, None)
+        queue = ChangeQueue(pipeline)
+        item = QueueItem(queue, change, None)
         item.layout = tenant.layout
         item.freezeJobGraph(skip_file_matcher=True)
 

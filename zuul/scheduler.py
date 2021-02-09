@@ -27,22 +27,38 @@ import threading
 import time
 import traceback
 import urllib
+from typing import Optional, TYPE_CHECKING
 
-from zuul import configloader
-from zuul import model
-from zuul import exceptions
+from zuul import (
+    configloader, exceptions, rpclistener
+)
 from zuul import version as zuul_version
-from zuul import rpclistener
+from zuul.executor.client import ExecutorClient
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.queue import MergedQueue
 from zuul.lib.statsd import get_statsd
-import zuul.lib.queue
-import zuul.lib.repl
-from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
+from zuul.lib.repl import REPLServer
+from zuul.merger.client import MergeClient
+from zuul.model import (
+    Abide,
+    Build,
+    Change,
+    HoldRequest,
+    Tenant,
+    TimeDataBase,
+    TriggerEvent,
+    UnparsedAbideConfig,
+)
+from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
+
+if TYPE_CHECKING:
+    from zuul.lib import connections
+
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
 
@@ -306,9 +322,9 @@ class Scheduler(threading.Thread):
         self._hibernate = False
         self._stopped = False
         self._zuul_app = None
-        self.executor = None
-        self.merger = None
-        self.connections = None
+        self.executor: Optional[ExecutorClient] = None
+        self.merger: Optional[MergeClient] = None
+        self.connections: Optional[connections.ConnectionRegistry] = None
         self.statsd = get_statsd(config)
         self.rpc = rpclistener.RPCListener(config, self)
         self.rpc_slow = rpclistener.RPCListenerSlow(config, self)
@@ -324,16 +340,18 @@ class Scheduler(threading.Thread):
         # self.triggers['connection_name'] = triggerObject
         self.triggers = dict()
         self.config = config
+        self.zk_client: Optional[ZooKeeperClient] = None
+        self.zk_nodepool: Optional[ZooKeeperNodepool] = None
 
         self.trigger_event_queue = queue.Queue()
         self.result_event_queue = queue.Queue()
-        self.management_event_queue = zuul.lib.queue.MergedQueue()
-        self.abide = model.Abide()
-        self.unparsed_abide = model.UnparsedAbideConfig()
+        self.management_event_queue = MergedQueue()
+        self.abide = Abide()
+        self.unparsed_abide = UnparsedAbideConfig()
 
         if not testonly:
             time_dir = self._get_time_database_dir()
-            self.time_database = model.TimeDataBase(time_dir)
+            self.time_database = TimeDataBase(time_dir)
 
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
@@ -399,7 +417,9 @@ class Scheduler(threading.Thread):
             except Exception:
                 self.log.exception("Exception while processing command")
 
-    def registerConnections(self, connections, load=True):
+    def registerConnections(
+        self, connections: "connections.ConnectionRegistry", load: bool = True
+    ):
         # load: whether or not to trigger the onLoad for the connection. This
         # is useful for not doing a full load during layout validation.
         self.connections = connections
@@ -411,10 +431,10 @@ class Scheduler(threading.Thread):
     def setZuulApp(self, app):
         self._zuul_app = app
 
-    def setExecutor(self, executor):
+    def setExecutor(self, executor: ExecutorClient):
         self.executor = executor
 
-    def setMerger(self, merger):
+    def setMerger(self, merger: MergeClient):
         self.merger = merger
 
     def setNodepool(self, nodepool):
@@ -595,7 +615,7 @@ class Scheduler(threading.Thread):
     def start_repl(self):
         if self.repl:
             return
-        self.repl = zuul.lib.repl.REPLServer(self)
+        self.repl = REPLServer(self)
         self.repl.start()
 
     def stop_repl(self):
@@ -1197,7 +1217,7 @@ class Scheduler(threading.Thread):
             for item in shared_queue.queue:
                 if item.change.project != change.project:
                     continue
-                if (isinstance(item.change, model.Change) and
+                if (isinstance(item.change, Change) and
                         item.change.number == change.number and
                         item.change.patchset == change.patchset) or\
                    (item.change.ref == change.ref):

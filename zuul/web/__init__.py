@@ -20,7 +20,7 @@ from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import codecs
 import copy
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from datetime import datetime
 import json
 import logging
@@ -38,6 +38,9 @@ import zuul.rpcclient
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.lib.auth import AuthenticatorRegistry
+
+if TYPE_CHECKING:
+    from zuul.lib import connections
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -1205,11 +1208,10 @@ class StreamManager(object):
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web.ZuulWeb")
 
-    # There is an import loop with ConnectionRegistry
     def __init__(self,
                  listen_address: str, listen_port: int,
                  gear_server: str, gear_port: int,
-                 connections,  # ConnectionRegistry,
+                 connections: "connections.ConnectionRegistry",
                  authenticators: AuthenticatorRegistry,
                  zk_hosts: str, zk_timeout: float = 10.0,
                  zk_tls_cert: Optional[str] = None,

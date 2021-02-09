@@ -94,6 +94,11 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# Ensure that the sphinx-autodoc-typehints extensions loads conditional
+# TYPE_CHECKING imports like:
+# if TYPE_CHECKING:
+#     import zuul.lib.connections
+set_type_checking_flag = True
 
 # -- Options for HTML output ---------------------------------------------------
 
