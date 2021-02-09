@@ -18,7 +18,6 @@ import datetime
 import logging
 import hmac
 import hashlib
-import queue
 import threading
 import time
 import json
@@ -28,6 +27,7 @@ from typing import List, Optional
 
 import cherrypy
 import cachecontrol
+import kazoo.exceptions
 from cachecontrol.cache import DictCache
 from cachecontrol.heuristics import BaseHeuristic
 import cachetools
@@ -41,7 +41,7 @@ from github3.session import AppInstallationTokenAuth
 
 from zuul.connection import CachedBranchConnection
 from zuul.driver.github.graphql import GraphQLClient
-from zuul.lib.gearworker import ZuulGearWorker
+from zuul.lib.named_queue import NamedQueue
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag, Project
@@ -301,47 +301,80 @@ class GithubShaCache(object):
         return cached_prs
 
 
-class GithubGearmanWorker(object):
-    """A thread that answers gearman requests"""
-    log = logging.getLogger("zuul.GithubGearmanWorker")
+class GithubZookeeperWorker(threading.Thread):
+    """A thread that observes zookeper node for changes"""
+    log = logging.getLogger("zuul.GithubZookeeperWorker")
 
     def __init__(self, connection):
-        self.config = connection.sched.config
-        self.connection = connection
+        threading.Thread.__init__(self)
+        self._stopped = False
+        self._connection = connection  # GithubConnection
+        self._zk_client = connection.sched.zk_client
+        self._zk_connection_event = connection.sched.zk_connection_event
+        self.lock = threading.Lock()
+        self._process_event = threading.Event()
+        # Watching events provides an additional wake-up call but since only
+        # one event get processed at a time the thread loop assures that
+        # all events get processed.
 
-        handler = "github:%s:payload" % self.connection.connection_name
-        self.jobs = {
-            handler: self.handle_payload,
-        }
+    def start(self) -> None:
+        self._zk_connection_event.watch(self._connection.connection_name,
+                                        self._eventWatcher)
+        super().start()
 
-        self.gearworker = ZuulGearWorker(
-            'Zuul Github Connector',
-            'zuul.GithubGearmanWorker',
-            'github-gearman-worker',
-            self.config,
-            self.jobs)
+    def run(self) -> None:
+        """
+        In case an event gets lost, e.g. in case the ZK lock in
+        #_eventWatcher was not able to be acquired, this provides an
+        additional check for new events in ZK
+        """
+        election_node = "%s/%s" % (self._zk_connection_event.ELECTION_ROOT,
+                                   self._connection.connection_name)
+        self._zk_client.election(election_node, func=self._run,
+                                 repeat=lambda: not self._stopped)
 
-    def handle_payload(self, job):
-        args = json.loads(job.arguments)
-        headers = args.get("headers")
-        body = args.get("body")
+    def _run(self):
+        if not self._stopped:
+            if self._zk_connection_event.hasEvents(
+                    self._connection.connection_name):
+                try:
+                    self._processEvent()
+                except kazoo.exceptions.LockTimeout:
+                    self.log.warning("Could not acquire lock")
+            self._process_event.wait(1.0)
+            self._process_event.clear()
+        return self._stopped
 
-        delivery = headers.get('x-github-delivery')
-        log = get_annotated_logger(self.log, delivery)
-        log.debug("Github Webhook Received")
+    def stop(self) -> None:
+        self._stopped = True
+        self._zk_connection_event.unwatch(self._connection.connection_name)
 
-        # TODO(jlk): Validate project in the request is a project we know
+    def _eventWatcher(self, children: List[str]) -> None:
+        with self.lock:
+            if len(children) > 0:
+                self.log.debug("Changed events: %s" % children)
+                self._process_event.set()
 
-        try:
-            self.__dispatch_event(body, headers, log)
-            output = {'return_code': 200}
-        except Exception:
-            output = {'return_code': 503}
-            log.exception("Exception handling Github event:")
+    def _processEvent(self) -> None:
+        with self._zk_connection_event.pop(
+                self._connection.connection_name) as events:
+            for event in events:
+                headers = event.get("headers")
+                body = event.get("body")
 
-        job.sendWorkComplete(json.dumps(output))
+                delivery = headers.get('x-github-delivery')
+                log = get_annotated_logger(self.log, delivery)
+                log.debug("Github Webhook Received")
 
-    def __dispatch_event(self, body, headers, log):
+                # TODO(jlk): Validate project in the request is a project
+                # we know
+
+                try:
+                    self._dispatchEvent(body, headers, log)
+                except Exception as e:
+                    log.exception("Exception handling Github event:", e)
+
+    def _dispatchEvent(self, body, headers, log) -> None:
         try:
             event = headers['x-github-event']
             log.debug("X-Github-Event: " + event)
@@ -351,18 +384,12 @@ class GithubGearmanWorker(object):
 
         delivery = headers.get('x-github-delivery')
         try:
-            self.connection.addEvent(body, event, delivery)
+            self._connection.addEvent(body, event, delivery)
         except Exception:
             message = 'Exception deserializing JSON body'
             log.exception(message)
             # TODO(jlk): Raise this as something different?
             raise Exception(message)
-
-    def start(self):
-        self.gearworker.start()
-
-    def stop(self):
-        self.gearworker.stop()
 
 
 class GithubEventProcessor(object):
@@ -376,8 +403,9 @@ class GithubEventProcessor(object):
         self.event = None
 
     def run(self):
-        self.log.debug("Starting event processing, queue length %s",
-                       self.connection.getEventQueueSize())
+        self.log.debug("Starting event processing, queue length %s, %s",
+                       self.connection.getEventQueueSize(),
+                       self.connection.event_queue._qsize())
         try:
             self._process_event()
         except Exception:
@@ -703,7 +731,7 @@ class GithubEventConnector:
             name='GithubEventForwarder', target=self.run_event_forwarder,
             daemon=True)
         self._thread_pool = concurrent.futures.ThreadPoolExecutor()
-        self._event_forward_queue = queue.Queue()
+        self._event_forward_queue = NamedQueue("GithubEventForwardQueue")
 
     def stop(self):
         self._stopped = True
@@ -722,38 +750,44 @@ class GithubEventConnector:
         while True:
             if self._stopped:
                 return
-            try:
-                data = self.connection.getEvent()
-                processor = GithubEventProcessor(self, data)
-                future = self._thread_pool.submit(processor.run)
-                self._event_forward_queue.put(future)
-            except Exception:
-                self.log.exception("Exception moving GitHub event:")
-            finally:
-                self.connection.eventDone()
+            self._runEventDispatcherInner()
+
+    def _runEventDispatcherInner(self):
+        try:
+            data = self.connection.getEvent()
+            processor = GithubEventProcessor(self, data)
+            future = self._thread_pool.submit(processor.run)
+            self._event_forward_queue.put(future)
+        except Exception:
+            self.log.exception("Exception moving GitHub event:")
+        finally:
+            self.connection.eventDone()
 
     def run_event_forwarder(self):
         while True:
             if self._stopped:
                 return
-            try:
-                future = self._event_forward_queue.get()
-                if future is None:
-                    return
-                event = future.result()
-                if not event:
-                    return
-                self.connection.logEvent(event)
-                if isinstance(event, DequeueEvent):
-                    self.connection.sched.addManagementEvent(event)
-                else:
-                    self.connection.sched.addTriggerEvent(
-                        self.connection.driver_name, event
-                    )
-            except Exception:
-                self.log.exception("Exception moving GitHub event:")
-            finally:
-                self._event_forward_queue.task_done()
+            self._runEventForwarderInner()
+
+    def _runEventForwarderInner(self):
+        try:
+            future = self._event_forward_queue.get()
+            if future is None:
+                return
+            event = future.result()
+            if not event:
+                return
+            self.connection.logEvent(event)
+            if isinstance(event, DequeueEvent):
+                self.connection.sched.addManagementEvent(event)
+            else:
+                self.connection.sched.addTriggerEvent(
+                    self.connection.driver_name, event
+                )
+        except Exception:
+            self.log.exception("Exception moving GitHub event:")
+        finally:
+            self._event_forward_queue.task_done()
 
 
 class GithubUser(collections.Mapping):
@@ -1144,6 +1178,7 @@ class GithubConnection(CachedBranchConnection):
     log = logging.getLogger("zuul.GithubConnection")
     payload_path = 'payload'
     client_manager_class = GithubClientManager
+    _event_connector_class = GithubEventConnector
 
     def __init__(self, driver, connection_name, connection_config):
         super(GithubConnection, self).__init__(driver, connection_name,
@@ -1156,7 +1191,7 @@ class GithubConnection(CachedBranchConnection):
         self.canonical_hostname = self.connection_config.get(
             'canonical_hostname', self.server)
         self.source = driver.getSource(self)
-        self.event_queue = queue.Queue()
+        self.event_queue = NamedQueue('GithubEventQueue<%s>' % connection_name)
         self._sha_pr_cache = GithubShaCache()
 
         self._request_locks = {}
@@ -1182,23 +1217,24 @@ class GithubConnection(CachedBranchConnection):
 
     def onLoad(self):
         self.log.info('Starting GitHub connection: %s' % self.connection_name)
-        self.gearman_worker = GithubGearmanWorker(self)
+        self.zookeeper_worker = GithubZookeeperWorker(self)
         self._github_client_manager.initialize()
         self.log.info('Starting event connector')
         self._start_event_connector()
-        self.log.info('Starting GearmanWorker')
-        self.gearman_worker.start()
+        self.log.info('Starting ZookeeperWorker')
+        self.zookeeper_worker.start()
 
     def onStop(self):
         # TODO(jeblair): remove this check which is here only so that
         # zuul-web can call connections.stop to shut down the sql
         # connection.
-        if hasattr(self, 'gearman_worker'):
-            self.gearman_worker.stop()
+        if hasattr(self, 'zookeeper_worker'):
+            self.zookeeper_worker.stop()
+        if hasattr(self, 'github_event_connector'):
             self._stop_event_connector()
 
     def _start_event_connector(self):
-        self.github_event_connector = GithubEventConnector(self)
+        self.github_event_connector = self._event_connector_class(self)
         self.github_event_connector.start()
 
     def _stop_event_connector(self):
@@ -2252,15 +2288,14 @@ class GithubWebController(BaseWebController):
             headers[key.lower()] = value
         body = cherrypy.request.body.read()
         self._validate_signature(body, headers)
-        # We cannot send the raw body through gearman, so it's easy to just
+        # We cannot send the raw body through zookeeper, so it's easy to just
         # encode it as json, after decoding it as utf-8
         json_body = json.loads(body.decode('utf-8'))
 
-        job = self.zuul_web.rpc.submitJob(
-            'github:%s:payload' % self.connection.connection_name,
-            {'headers': headers, 'body': json_body})
-
-        return json.loads(job.data[0])
+        data = {'headers': headers, 'body': json_body}
+        self.zuul_web.zk_connection_event.push(
+            self.connection.connection_name, data)
+        return data
 
 
 def _status_as_tuple(status):
