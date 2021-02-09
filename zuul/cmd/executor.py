@@ -17,10 +17,10 @@ import logging
 import os
 import sys
 import signal
+from typing import Optional
 
 import zuul.cmd
-import zuul.executor.server
-
+from zuul.executor.server import COMMANDS, ExecutorServer
 from zuul.lib.config import get_default
 from zuul.zk import ZooKeeperClient
 
@@ -29,13 +29,18 @@ class Executor(zuul.cmd.ZuulDaemonApp):
     app_name = 'executor'
     app_description = 'A standalone Zuul executor.'
 
+    def __init__(self):
+        super().__init__()
+        self.executor_server: Optional[ExecutorServer] = None
+        self.log_streamer_pid: Optional[int] = None
+
     def createParser(self):
         parser = super(Executor, self).createParser()
         parser.add_argument('--keep-jobdir', dest='keep_jobdir',
                             action='store_true',
                             help='keep local jobdirs after run completes')
         parser.add_argument('command',
-                            choices=zuul.executor.server.COMMANDS,
+                            choices=COMMANDS,
                             nargs='?')
         return parser
 
@@ -45,7 +50,8 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        self.executor.stop()
+        if self.executor_server:
+            self.executor_server.stop()
 
     def start_log_streamer(self):
         pipe_read, pipe_write = os.pipe()
@@ -69,7 +75,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.log_streamer_pid = child_pid
 
     def run(self):
-        if self.args.command in zuul.executor.server.COMMANDS:
+        if self.args.command in COMMANDS:
             self.send_command(self.args.command)
             sys.exit(0)
 
@@ -100,7 +106,6 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         zk_client = ZooKeeperClient.fromConfig(self.config)
         zk_client.connect()
 
-        ExecutorServer = zuul.executor.server.ExecutorServer
         self.executor = ExecutorServer(self.config, zk_client,
                                        self.connections,
                                        jobdir_root=self.job_dir,

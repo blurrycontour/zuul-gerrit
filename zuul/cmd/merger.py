@@ -16,6 +16,7 @@
 
 import signal
 import sys
+from typing import Optional
 
 import zuul.cmd
 from zuul.merger.server import COMMANDS, MergeServer
@@ -25,6 +26,10 @@ from zuul.zk import ZooKeeperClient
 class Merger(zuul.cmd.ZuulDaemonApp):
     app_name = 'merger'
     app_description = 'A standalone Zuul merger.'
+
+    def __init__(self):
+        super().__init__()
+        self.merger: Optional[MergeServer] = None
 
     def createParser(self):
         parser = super(Merger, self).createParser()
@@ -39,8 +44,9 @@ class Merger(zuul.cmd.ZuulDaemonApp):
             self.args.nodaemon = True
 
     def exit_handler(self, signum, frame):
-        self.merger.stop()
-        self.merger.join()
+        if self.merger:
+            self.merger.stop()
+            self.merger.join()
         sys.exit(0)
 
     def run(self):
