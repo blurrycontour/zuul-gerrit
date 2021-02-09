@@ -12,10 +12,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.driver import Driver, ConnectionInterface, ReporterInterface
-from zuul.driver.sql import sqlconnection
-from zuul.driver.sql import sqlreporter
+from typing import Any, Dict, Optional
+
+import voluptuous as vs
+
+from zuul.connection import BaseConnection
+from zuul.driver import ConnectionInterface, Driver, ReporterInterface
+from zuul.driver.sql import sqlconnection, sqlreporter
 from zuul.lib import capabilities as cpb
+from zuul.model import Pipeline
 
 
 class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
@@ -28,11 +33,20 @@ class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
     def registerScheduler(self, scheduler):
         self.sched = scheduler
 
-    def getConnection(self, name, config):
+    def getConnection(
+        self,
+        name: str,
+        config: Dict[str, Any],
+    ) -> BaseConnection:
         return sqlconnection.SQLConnection(self, name, config)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(
+        self,
+        connection: BaseConnection,
+        pipeline: Pipeline,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> sqlreporter.SQLReporter:
         return sqlreporter.SQLReporter(self, connection, config)
 
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> vs.Schema:
         return sqlreporter.getSchema()

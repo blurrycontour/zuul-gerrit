@@ -17,6 +17,7 @@ import logging
 import os
 import sys
 import signal
+from typing import Optional
 
 import zuul.cmd
 import zuul.executor.client
@@ -35,6 +36,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
     def __init__(self):
         super(Scheduler, self).__init__()
         self.gear_server_pid = None
+        self.log = logging.getLogger("zuul.Scheduler")
+        self.sched: Optional[zuul.scheduler.Scheduler] = None
 
     def createParser(self):
         parser = super(Scheduler, self).createParser()
@@ -129,7 +132,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             self.start_gear_server()
 
         self.setup_logging('scheduler', 'log_config')
-        self.log = logging.getLogger("zuul.Scheduler")
 
         self.sched = zuul.scheduler.Scheduler(self.config)
 

@@ -15,11 +15,9 @@
 import logging
 import re
 from collections import OrderedDict
+from typing import Any, cast, Dict, Optional
 from urllib.parse import urlparse
 
-from zuul import model
-from zuul.driver.sql.sqlconnection import SQLConnection
-from zuul.driver.sql.sqlreporter import SQLReporter
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.git
@@ -35,6 +33,11 @@ import zuul.driver.gitlab
 import zuul.driver.elasticsearch
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
+from zuul.driver.sql.sqlconnection import SQLConnection
+from zuul.driver.sql.sqlreporter import SQLReporter
+from zuul.model import Pipeline
+from zuul.reporter import BaseReporter
+from zuul.source import BaseSource
 
 
 class DefaultConnection(BaseConnection):
@@ -47,7 +50,7 @@ class ConnectionRegistry(object):
     log = logging.getLogger("zuul.ConnectionRegistry")
 
     def __init__(self):
-        self.connections = OrderedDict()
+        self.connections: Dict[str, BaseConnection] = OrderedDict()
         self.drivers = {}
 
         self.registerDriver(zuul.driver.zuul.ZuulDriver())
@@ -192,12 +195,12 @@ class ConnectionRegistry(object):
         :return: The SQL connection.
 
         """
-        connection = self.connections.get('database')
+        connection = cast(SQLConnection, self.connections.get('database'))
         if not connection:
             raise Exception("No SQL connections")
         return connection
 
-    def getSqlReporter(self, pipeline: model.Pipeline) -> SQLReporter:
+    def getSqlReporter(self, pipeline: Pipeline) -> SQLReporter:
         """
         Gets the SQL reporter. Such reporter is based on
         `getSqlConnection`.
@@ -209,7 +212,7 @@ class ConnectionRegistry(object):
         connection = self.getSqlConnection()
         return connection.driver.getReporter(connection, pipeline)
 
-    def getSource(self, connection_name):
+    def getSource(self, connection_name) -> BaseSource:
         connection = self.connections[connection_name]
         return connection.driver.getSource(connection)
 
@@ -220,7 +223,12 @@ class ConnectionRegistry(object):
                 sources.append(connection.driver.getSource(connection))
         return sources
 
-    def getReporter(self, connection_name, pipeline, config=None):
+    def getReporter(
+        self,
+        connection_name: str,
+        pipeline: Pipeline,
+        config: Dict[str, Dict[str, Any]] = None,
+    ) -> BaseReporter:
         connection = self.connections[connection_name]
         return connection.driver.getReporter(connection, pipeline, config)
 
@@ -241,9 +249,14 @@ class ConnectionRegistry(object):
                     return self.getSource(connection.connection_name)
         return None
 
-    def getSourceByCanonicalHostname(self, canonical_hostname):
+    def getSourceByCanonicalHostname(
+        self, canonical_hostname
+    ) -> Optional[BaseSource]:
         for connection in self.connections.values():
             if hasattr(connection, 'canonical_hostname'):
-                if connection.canonical_hostname == canonical_hostname:
+                if (
+                    getattr(connection, "canonical_hostname", None)
+                    == canonical_hostname
+                ):
                     return self.getSource(connection.connection_name)
         return None

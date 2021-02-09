@@ -12,13 +12,24 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.driver import Driver, ConnectionInterface, TriggerInterface
-from zuul.driver import SourceInterface, ReporterInterface
-from zuul.driver.gerrit import gerritconnection
-from zuul.driver.gerrit import gerrittrigger
-from zuul.driver.gerrit import gerritsource
-from zuul.driver.gerrit import gerritreporter
+from typing import Any, Dict, Optional
+
+import voluptuous as vs
+
+from zuul.connection import BaseConnection
+from zuul.driver import (
+    ConnectionInterface,
+    Driver,
+    ReporterInterface,
+    SourceInterface,
+    TriggerInterface,
+)
+from zuul.driver.gerrit import (
+    gerritconnection, gerritreporter, gerritsource, gerrittrigger
+)
 from zuul.driver.util import to_list
+from zuul.model import Pipeline
+from zuul.source import BaseSource
 
 
 class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
@@ -43,22 +54,31 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
         for (con, checkers) in connection_checker_map.items():
             con.setWatchedCheckers(checkers)
 
-    def getConnection(self, name, config):
+    def getConnection(
+        self,
+        name: str,
+        config: Dict[str, Any],
+    ) -> BaseConnection:
         return gerritconnection.GerritConnection(self, name, config)
 
     def getTrigger(self, connection, config=None):
         return gerrittrigger.GerritTrigger(self, connection, config)
 
-    def getSource(self, connection):
+    def getSource(self, connection: BaseConnection) -> BaseSource:
         return gerritsource.GerritSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(
+        self,
+        connection: BaseConnection,
+        pipeline: Pipeline,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> gerritreporter.GerritReporter:
         return gerritreporter.GerritReporter(self, connection, config)
 
     def getTriggerSchema(self):
         return gerrittrigger.getSchema()
 
-    def getReporterSchema(self):
+    def getReporterSchema(self) -> vs.Schema:
         return gerritreporter.getSchema()
 
     def getRequireSchema(self):
