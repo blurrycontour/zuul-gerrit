@@ -6846,6 +6846,9 @@ class TestSchedulerTemplatedProject(ZuulTestCase):
                 name: untrusted-config
                 templates:
                   - test-three-and-four
+                check:
+                  jobs:
+                    - project-test7
             """)
         file_dict = {'zuul.d/project.yaml': in_repo_conf}
         B = self.fake_gerrit.addFakeChange('untrusted-config', 'stable-foo',
@@ -6856,11 +6859,25 @@ class TestSchedulerTemplatedProject(ZuulTestCase):
         self.assertHistory([
             dict(name='project-test1', result='SUCCESS', changes='1,1'),
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-test7', result='SUCCESS', changes='2,1'),
             dict(name='layered-project-test3', result='SUCCESS',
                  changes='2,1'),
             dict(name='layered-project-test4', result='SUCCESS',
                  changes='2,1'),
         ], ordered=False)
+
+        # Inheritance path should not contain items from branch stable
+        # This tests that not only is it the case that the stable
+        # branch project-template did not apply, but also that the
+        # stable branch definitions of the project-test7 did not apply
+        # (since the job definitions also have implied branch
+        # matchers).
+        job = self.getJobFromHistory('project-test7', branch='stable-foo')
+        inheritance_path = job.parameters['zuul']['_inheritance_path']
+        self.assertEqual(len(inheritance_path), 4)
+        stable_items = [x for x in inheritance_path
+                        if 'untrusted-config/zuul.d/jobs.yaml@stable#' in x]
+        self.assertEqual(len(stable_items), 0)
 
 
 class TestSchedulerSuccessURL(ZuulTestCase):
