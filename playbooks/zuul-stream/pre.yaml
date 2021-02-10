@@ -13,7 +13,9 @@
   post_tasks:
 
     - name: Install software
-      command: python3 -m pip install src/opendev.org/zuul/zuul
+      shell: |+
+        python3 -m pip install --upgrade pip setuptools wheel
+        python3 -m pip install src/opendev.org/zuul/zuul
       become: yes
 
     - name: Install managed ansible versions
