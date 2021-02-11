@@ -35,6 +35,7 @@ import {
   TimesIcon,
   TimesCircleIcon,
 } from '@patternfly/react-icons'
+import Linkify from 'linkifyjs/react'
 
 class BuildOutput extends React.Component {
   static propTypes = {
@@ -135,14 +136,19 @@ class BuildOutput extends React.Component {
 
   render () {
     const { output } = this.props
+    const linkify_options = {
+      validate: {
+        url: function (value) {
+          return /^(http|ftp)s?:\/\//.test(value)
+        }}}
     return (
-      <React.Fragment>
+      <Linkify options={linkify_options}>
         {this.renderHosts(output)}
         {Object.entries(output)
           .filter(([, values]) => values.failed.length > 0)
           .map(([host, values]) => (values.failed.map(failed => (
             this.renderFailedTask(host, failed)))))}
-      </React.Fragment>
+      </Linkify>
     )
   }
 }
