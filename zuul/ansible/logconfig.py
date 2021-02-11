@@ -73,6 +73,7 @@ _DEFAULT_SERVER_LOGGING_CONFIG = {
     'version': 1,
     'formatters': {
         'simple': {
+            'class': 'zuul.lib.logutil.MultiLineFormatter',
             'format': '%(asctime)s %(levelname)s %(name)s: %(message)s'
         },
     },
