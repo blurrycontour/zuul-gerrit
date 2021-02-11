@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ec0963f8_d7447877",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-02-11T19:35:21Z",
+      "side": 1,
+      "message": "Please insert a blank line here between the commit subject and body.",
+      "revId": "6c52bd19d6c3ce61d308a6aea5318fb67e53919c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b2db835a_b9c82ec9",
+        "filename": "web/package.json",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-02-11T19:35:21Z",
+      "side": 1,
+      "message": "This asserts it\u0027s distributed under an MIT (Expat) license, which is Apache compatible, so should be fine as far as legality is concerned.",
+      "revId": "6c52bd19d6c3ce61d308a6aea5318fb67e53919c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
