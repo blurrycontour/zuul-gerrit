@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9866d458_d774673e",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-12T15:34:31Z",
+      "side": 1,
+      "message": "Nothing uses this class, and I\u0027m not sure what the intent is; all of our zk connections are going to be very long lived; essentially, we\u0027re never going to close them; why would we do this as a context manager?",
+      "revId": "97d6d3e2f421069cd8e8496640bd6eff7df9fa2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
