@@ -3369,6 +3369,7 @@ class FakeNodepool(object):
         self.attributes = None
         self.resources = None
         self.python_path = 'auto'
+        self.shell_type = None
 
     def stop(self):
         self._running = False
@@ -3466,6 +3467,7 @@ class FakeNodepool(object):
                     private_ipv4=None,
                     public_ipv6=None,
                     python_path=self.python_path,
+                    shell_type=self.shell_type,
                     allocated_to=request_id,
                     state='ready',
                     state_time=now,
