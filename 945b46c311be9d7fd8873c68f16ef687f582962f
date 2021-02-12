@@ -22,6 +22,30 @@
       "revId": "945b46c311be9d7fd8873c68f16ef687f582962f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71238175_e61b2cda",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 32209
+      },
+      "writtenOn": "2021-02-12T22:51:14Z",
+      "side": 1,
+      "message": "I think we only want to make sure there is a \"\u003cprotocol\u003e://\" at the beginning of the string matched by Linkify, hence the \u0027^\u0027.\n\nNot sure I understood your example, what\u0027s the full text with the link that should be matched?",
+      "parentUuid": "c89457fc_e0f47432",
+      "range": {
+        "startLine": 142,
+        "startChar": 17,
+        "endLine": 142,
+        "endChar": 27
+      },
+      "revId": "945b46c311be9d7fd8873c68f16ef687f582962f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
