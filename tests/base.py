@@ -85,8 +85,10 @@ from zuul.driver.gerrit import GerritDriver
 from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.executor.server import JobDir
+from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
 from zuul.lib.queue import NamedQueue
+from zuul.zk.event_queues import ConnectionEventQueue
 from psutil import Popen
 
 import tests.fakegithub
@@ -262,7 +264,6 @@ class GithubDriverMock(GithubDriver):
             changes_db=db,
             upstream_root=self.upstream_root,
             git_url_with_auth=self.git_url_with_auth)
-        self.additional_event_queues.append(connection.event_queue)
         setattr(self.registry, 'fake_' + name, connection)
         client = connection.getGithubClient(None)
         registerProjects(connection.source.name, client, self.config)
@@ -1125,6 +1126,7 @@ class FakeElasticsearchConnection(elconnection.ElasticsearchConnection):
 
     def __init__(self, driver, connection_name, connection_config):
         self.driver = driver
+        self.connection_name = connection_name
         self.source_it = None
 
     def add_docs(self, source_it, index):
@@ -2722,10 +2724,9 @@ class FakeGithubConnection(githubconnection.GithubConnection):
                 % (self.zuul_web_port, self.connection_name),
                 json=data, headers=headers)
         else:
-            job = self.rpcclient.submitJob(
-                'github:%s:payload' % self.connection_name,
-                {'headers': headers, 'body': data})
-            return json.loads(job.data[0])
+            data = {'headers': headers, 'body': data}
+            self.event_queue.put(data)
+            return data
 
     def addProject(self, project):
         # use the original method here and additionally register it in the
@@ -4264,6 +4265,9 @@ class ZuulTestCase(BaseTestCase):
         self.changes: Dict[str, Dict[str, Change]] = {}
 
         self.additional_event_queues = []
+        self.connection_event_queues = DefaultKeyDict(
+            lambda cn: ConnectionEventQueue(self.zk_client, cn)
+        )
         self.poller_events = {}
         self._configureSmtp()
         self._configureMqtt()
@@ -4867,6 +4871,9 @@ class ZuulTestCase(BaseTestCase):
 
     def __areZooKeeperEventQueuesEmpty(self, matcher=None) -> bool:
         for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
+            for connection_name in sched.connections.connections:
+                if self.connection_event_queues[connection_name].hasEvents():
+                    return False
             if sched.management_events.hasEvents():
                 return False
             if sched.trigger_events.hasEvents():
