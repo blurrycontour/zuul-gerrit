@@ -1934,7 +1934,12 @@ class GithubConnection(CachedBranchConnection):
         github = self.getGithubClient(project, zuul_event_id=zuul_event_id)
         owner, proj = project.split('/')
         pull_request = github.issue(owner, proj, pr_number)
-        pull_request.remove_label(label)
+        try:
+            pull_request.remove_label(label)
+        except github3.exceptions.NotFoundError:
+            # The label is not existing, so everything ok
+            log.debug('Label %s not found on %s#%s', label, proj, pr_number)
+            pass
         log.debug("Removed label %s from %s#%s", label, proj, pr_number)
 
     def updateCheck(self, project, pr_number, sha, status, completed, context,
