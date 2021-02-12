@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aeb75a79_f51fce12",
+        "filename": "releasenotes/notes/zookeeper-connections-e19eb2dfd2804087.yaml",
+        "patchSetId": 67
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-12T22:26:29Z",
+      "side": 1,
+      "message": "We already told people we would error in 4.0 in this release note:\n\nhttps://zuul-ci.org/docs/zuul/reference/releasenotes.html#relnotes-3-19-0\n\nSo it\u0027s *this* release that\u0027s going to error, not a future release.",
+      "revId": "69b7f29bf45c5da3b1358530f3e87a4ae53b0354",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
