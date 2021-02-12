@@ -19,7 +19,6 @@ import json
 import logging
 import os
 import re
-import queue
 import socket
 import sys
 import threading
@@ -37,6 +36,7 @@ from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.queue import NamedQueue
 from zuul.lib.statsd import get_statsd, normalize_statsd_name
 import zuul.lib.queue
 import zuul.lib.repl
@@ -147,7 +147,7 @@ class Scheduler(threading.Thread):
             )
         )
 
-        self.result_event_queue = queue.Queue()
+        self.result_event_queue = NamedQueue("ResultEventQueue")
         self.global_watcher = GlobalEventWatcher(
             self.zk_client, self.wake_event.set
         )
