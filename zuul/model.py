@@ -13,7 +13,7 @@
 # under the License.
 
 import abc
-from collections import OrderedDict
+from collections import OrderedDict, UserDict
 import copy
 import json
 import logging
@@ -3332,6 +3332,15 @@ class AbstractEvent(abc.ABC):
         event = cls()
         event.updateFromDict(data)
         return event
+
+
+class ConnectionEvent(AbstractEvent, UserDict):
+
+    def toDict(self) -> Dict[str, Any]:
+        return self.data
+
+    def updateFromDict(self, d: Dict[str, Any]) -> None:
+        self.data.update(d)
 
 
 class ManagementEvent(AbstractEvent):
