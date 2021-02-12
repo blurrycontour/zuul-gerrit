@@ -14,7 +14,7 @@
 # under the License.
 
 import abc
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict, defaultdict, UserDict
 import copy
 import json
 import logging
@@ -3487,6 +3487,15 @@ class AbstractEvent(abc.ABC):
         event = cls()
         event.updateFromDict(data)
         return event
+
+
+class ConnectionEvent(AbstractEvent, UserDict):
+
+    def toDict(self):
+        return self.data
+
+    def updateFromDict(self, d):
+        self.data.update(d)
 
 
 class ManagementEvent(AbstractEvent):
