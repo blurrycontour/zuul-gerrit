@@ -1588,6 +1588,10 @@ class AnsibleJob(object):
                         host_vars['ansible_kubectl_context'] = \
                             node.get('kubectl_context')
 
+                shell_type = node.get('shell_type')
+                if shell_type:
+                    host_vars['ansible_shell_type'] = shell_type
+
                 host_keys = []
                 for key in node.get('host_keys', []):
                     if port != 22:
