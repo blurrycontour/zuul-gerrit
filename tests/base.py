@@ -28,7 +28,6 @@ import itertools
 import json
 import logging
 import os
-import queue
 import random
 import re
 from collections import defaultdict, namedtuple
@@ -87,6 +86,7 @@ from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.executor.server import JobDir
 from zuul.lib.connections import ConnectionRegistry
+from zuul.lib.queue import NamedQueue
 from psutil import Popen
 
 import tests.fakegithub
@@ -1160,7 +1160,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         super(FakeGerritConnection, self).__init__(driver, connection_name,
                                                    connection_config)
 
-        self.event_queue = queue.Queue()
+        self.event_queue = NamedQueue('FakeGerritConnectionEventQueue')
         self.fixture_dir = os.path.join(FIXTURE_DIR, 'gerrit')
         self.change_number = 0
         self.changes = changes_db
@@ -4901,27 +4901,15 @@ class ZuulTestCase(BaseTestCase):
             i = i + 1
             if time.time() - start > self.wait_timeout:
                 self.log.error("Timeout waiting for Zuul to settle")
-                self.log.error("Queue status:")
-                for event_queue in self.__event_queues(matcher):
-                    self.log.error("  %s: %s" %
-                                   (event_queue, event_queue.empty()))
-                self.log.error(
-                    "All ZK event queues empty: %s",
-                    self.__areZooKeeperEventQueuesEmpty(matcher),
+                self._logQueueStatus(
+                    self.log.error, matcher,
+                    self._areZookeeperEventQueuesEmpty(matcher),
+                    self.__areAllMergeJobsWaiting(matcher),
+                    self.__haveAllBuildsReported(matcher),
+                    self.__areAllBuildsWaiting(matcher),
+                    self.__areAllNodeRequestsComplete(matcher),
+                    all(self.__eventQueuesEmpty(matcher))
                 )
-                self.log.error("All builds waiting: %s" %
-                               (self.__areAllBuildsWaiting(matcher),))
-                self.log.error("All merge jobs waiting: %s" %
-                               (self.__areAllMergeJobsWaiting(matcher),))
-                self.log.error("All builds reported: %s" %
-                               (self.__haveAllBuildsReported(matcher),))
-                self.log.error("All requests completed: %s" %
-                               (self.__areAllNodeRequestsComplete(matcher),))
-                self.log.error("All event queues empty: %s" %
-                               (all(self.__eventQueuesEmpty(matcher)),))
-                for app in self.scheds.filter(matcher):
-                    self.log.error("[Sched: %s] Merge client jobs: %s" %
-                                   (app.sched, app.sched.merger.jobs,))
                 raise Exception("Timeout waiting for Zuul to settle")
 
             # Make sure no new events show up while we're checking
@@ -4956,6 +4944,32 @@ class ZuulTestCase(BaseTestCase):
                     lambda app: app.sched.run_handler_lock.release())
             self.executor_server.lock.release()
             self.scheds.execute(lambda app: app.sched.wake_event.wait(0.1))
+
+    def _logQueueStatus(
+        self,
+        logger,
+        matcher,
+        areZookeeperEventQueuesEmpty,
+        areAllMergeJobsWaiting,
+        haveAllBuildsReported,
+        areAllBuildsWaiting,
+        areAllNodeRequestsComplete,
+        allEventQueuesEmpty
+    ):
+        logger("Queue status:")
+        for event_queue in self.__event_queues(matcher):
+            self.log.debug("  %s: %s", event_queue, event_queue.empty())
+        logger("All ZK event queues empty: %s", areZookeeperEventQueuesEmpty)
+        logger("All merge jobs waiting: %s", areAllMergeJobsWaiting)
+        logger("All builds reported: %s", haveAllBuildsReported)
+        logger("All builds waiting: %s", areAllBuildsWaiting)
+        logger("All requests completed: %s", areAllNodeRequestsComplete)
+        logger("All event queues empty: %s", allEventQueuesEmpty)
+        for app in self.scheds.filter(matcher):
+            logger(
+                "[Sched: %s] Merge client jobs: %s",
+                app.sched, app.sched.merger.jobs
+            )
 
     def waitForPoll(self, poller, timeout=30):
         self.log.debug("Wait for poll on %s", poller)
