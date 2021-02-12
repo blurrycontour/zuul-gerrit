@@ -26,7 +26,7 @@ import textwrap
 import types
 import urllib.parse
 import yaml
-from collections import OrderedDict
+from collections import OrderedDict, UserDict
 from typing import Any, Dict, List, Optional, Tuple, Type, TypeVar, Union
 from uuid import uuid4
 
@@ -3383,6 +3383,15 @@ class AbstractEvent(abc.ABC):
         event = cls()
         event.updateFromDict(data)
         return event
+
+
+class ConnectionEvent(AbstractEvent, UserDict):
+
+    def toDict(self) -> Dict[str, Any]:
+        return self.data
+
+    def updateFromDict(self, d: Dict[str, Any]) -> None:
+        self.data.update(d)
 
 
 class ManagementEvent(AbstractEvent):
