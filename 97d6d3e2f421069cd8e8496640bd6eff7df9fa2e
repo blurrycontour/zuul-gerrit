@@ -16,6 +16,24 @@
       "revId": "97d6d3e2f421069cd8e8496640bd6eff7df9fa2e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3c641442_54c81b6b",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-12T15:40:06Z",
+      "side": 1,
+      "message": "That\u0027s mainly what my cleanup in https://review.opendev.org/c/zuul/zuul/+/771442/10 is about. This connection class would be used in the \"Connect xyz to ZooKeeper\" changes (sometimes as a context manager), but I thought it would be nicer to have only a single class as entry point to ZooKeeper.\n\nAs the cleanup mentioned above was previously further up in the stack, I rebased it on top of this change to directly incorporate it as a fixup/squash commit. AFAIK I still have to adapt the \"Connect xyz to ZooKeeper\" patches to make that fully work as there might be some leftovers from the rebase.",
+      "parentUuid": "9866d458_d774673e",
+      "revId": "97d6d3e2f421069cd8e8496640bd6eff7df9fa2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
