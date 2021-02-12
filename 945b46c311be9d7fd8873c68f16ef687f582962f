@@ -46,6 +46,30 @@
       "revId": "945b46c311be9d7fd8873c68f16ef687f582962f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c2f35bd_8b5b68b6",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-12T22:59:02Z",
+      "side": 1,
+      "message": "Oops my bad, I though this applied to the console tab too, this is working as expected.",
+      "parentUuid": "71238175_e61b2cda",
+      "range": {
+        "startLine": 142,
+        "startChar": 17,
+        "endLine": 142,
+        "endChar": 27
+      },
+      "revId": "945b46c311be9d7fd8873c68f16ef687f582962f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
