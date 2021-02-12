@@ -26,12 +26,10 @@ import time
 import traceback
 import urllib
 from configparser import ConfigParser
-from queue import Queue
 from threading import Thread
 from typing import Optional, Dict, TYPE_CHECKING, Callable, Any
 
 from statsd import StatsClient
-
 
 from zuul import configloader
 from zuul import exceptions
@@ -42,8 +40,8 @@ from zuul.lib.commandsocket import CommandSocket
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.queue import NamedQueue
 from zuul.lib.statsd import get_statsd
-import zuul.lib.queue
 import zuul.lib.repl
 from zuul.merger.client import MergeClient
 from zuul.model import (
@@ -162,7 +160,7 @@ class Scheduler(threading.Thread):
         )
         self.zk_nodepool: ZooKeeperNodepool = ZooKeeperNodepool(zk_client)
 
-        self.result_event_queue: Queue = Queue()
+        self.result_event_queue = NamedQueue("ResultEventQueue")
         self.global_watcher = GlobalEventWatcher(
             self.zk_client, self.wake_event.set
         )
