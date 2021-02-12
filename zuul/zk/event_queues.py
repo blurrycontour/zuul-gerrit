@@ -13,6 +13,7 @@
 # under the License.
 
 import enum
+import functools
 import json
 import logging
 import threading
@@ -32,6 +33,7 @@ from typing import (
     TypeVar,
     Tuple,
     Type,
+    TYPE_CHECKING,
 )
 
 from kazoo.exceptions import NoNodeError
@@ -39,8 +41,10 @@ from kazoo.protocol.states import EventType, WatchedEvent, ZnodeStat
 
 from zuul import model
 from zuul.lib.collections import DefaultKeyDict
-from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import ZooKeeperClient, ZooKeeperBase
+
+if TYPE_CHECKING:
+    from zuul.lib.connections import ConnectionRegistry
 
 
 RESULT_EVENT_TYPE_MAP: Dict[str, Type[model.ResultEvent]] = {
@@ -63,6 +67,7 @@ MANAGEMENT_EVENT_TYPE_MAP: Dict[str, Type[model.ManagementEvent]] = {
 
 TENANT_ROOT = "/zuul/events/tenant"
 SCHEDULER_GLOBAL_ROOT = "/zuul/events/scheduler-global"
+CONNECTION_ROOT = "/zuul/events/connection"
 
 _AbstractEventT = TypeVar("_AbstractEventT", bound=model.AbstractEvent)
 _EventQueueT = TypeVar("_EventQueueT", bound="ZooKeeperEventQueue")
@@ -164,7 +169,7 @@ class PipelineEventWatcher(ZooKeeperBase):
 
 
 class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
-    """Abstract API for tenant specific events via ZooKeeper"""
+    """Abstract API for events via ZooKeeper"""
 
     log = logging.getLogger("zuul.zk.event_queues.ZooKeeperEventQueue")
 
@@ -172,22 +177,17 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
         self,
         client: ZooKeeperClient,
         event_root: str,
-        event_prefix: EventPrefix,
     ):
         super().__init__(client)
-        self.event_prefix = event_prefix
         self.event_root = event_root
         self.kazoo_client.ensure_path(self.event_root)
 
+    def _list_events(self) -> List[str]:
+        return self.kazoo_client.get_children(self.event_root)
+
     def __len__(self) -> int:
         try:
-            return len(
-                [
-                    e
-                    for e in self.kazoo_client.get_children(self.event_root)
-                    if e.startswith(self.event_prefix.value)
-                ]
-            )
+            return len(self._list_events())
         except NoNodeError:
             return 0
 
@@ -206,10 +206,13 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
         except NoNodeError:
             self.log.warning("Event %s was already acknowledged", event)
 
+    @property
+    def _event_create_path(self) -> str:
+        return f"{self.event_root}/"
+
     def _put(self, data: Dict[str, Any]) -> str:
-        event_path = "{}/{}-".format(self.event_root, self.event_prefix.value)
         return self.kazoo_client.create(
-            event_path,
+            self._event_create_path,
             json.dumps(data).encode("utf-8"),
             sequence=True,
             makepath=True,
@@ -219,15 +222,12 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
         self,
     ) -> Generator[Tuple[Dict[str, Any], EventAckRef], None, None]:
         try:
-            events = self.kazoo_client.get_children(self.event_root)
+            # We need to sort this ourself, since Kazoo doesn't guarantee any
+            # ordering of the returned children.
+            events = sorted(self._list_events())
         except NoNodeError:
             return
 
-        # We need to sort this ourself, since Kazoo doesn't guarantee any
-        # ordering of the returned children.
-        events = sorted(
-            e for e in events if e.startswith(self.event_prefix.value)
-        )
         for event_id in events:
             path = "/".join((self.event_root, event_id))
             # TODO: implement sharding of large events
@@ -243,6 +243,32 @@ class ZooKeeperEventQueue(Generic[_AbstractEventT], ZooKeeperBase, Iterable):
     def _remove(self, path: str) -> None:
         with suppress(NoNodeError):
             self.kazoo_client.delete(path, recursive=True)
+
+
+class SchedulerEventQueue(ZooKeeperEventQueue[_AbstractEventT]):
+    """Abstract API for scheduler events via ZooKeeper"""
+
+    log = logging.getLogger("zuul.zk.event_queues.SchedulerEventQueue")
+
+    def __init__(
+        self,
+        client: ZooKeeperClient,
+        event_root: str,
+        event_prefix: EventPrefix,
+    ):
+        super().__init__(client, event_root)
+        self.event_prefix = event_prefix
+
+    def _list_events(self) -> List[str]:
+        return [
+            e
+            for e in self.kazoo_client.get_children(self.event_root)
+            if e.startswith(self.event_prefix.value)
+        ]
+
+    @property
+    def _event_create_path(self) -> str:
+        return "{}/{}-".format(self.event_root, self.event_prefix.value)
 
 
 class ManagementEventResultFuture(ZooKeeperBase):
@@ -290,7 +316,7 @@ class ManagementEventResultFuture(ZooKeeperBase):
         return True
 
 
-class ManagementEventQueue(ZooKeeperEventQueue[model.ManagementEvent]):
+class ManagementEventQueue(SchedulerEventQueue[model.ManagementEvent]):
     """Management events via ZooKeeper"""
 
     RESULTS_ROOT = "/zuul/results/management"
@@ -400,7 +426,7 @@ class GlobalManagementEventQueue(ManagementEventQueue):
                 super(ManagementEventQueue, self).ack(merged_event)
 
 
-class PipelineResultEventQueue(ZooKeeperEventQueue[model.ResultEvent]):
+class PipelineResultEventQueue(SchedulerEventQueue[model.ResultEvent]):
     """Result events via ZooKeeper"""
 
     log = logging.getLogger("zuul.zk.event_queues.PipelineResultEventQueue")
@@ -444,7 +470,7 @@ class PipelineResultEventQueue(ZooKeeperEventQueue[model.ResultEvent]):
             yield event
 
 
-class TriggerEventQueue(ZooKeeperEventQueue[model.TriggerEvent]):
+class TriggerEventQueue(SchedulerEventQueue[model.TriggerEvent]):
     """Trigger events via ZooKeeper"""
 
     log = logging.getLogger("zuul.zk.event_queues.TriggerEventQueue")
@@ -453,7 +479,7 @@ class TriggerEventQueue(ZooKeeperEventQueue[model.TriggerEvent]):
         self,
         client: ZooKeeperClient,
         event_root: str,
-        connections: ConnectionRegistry,
+        connections: "ConnectionRegistry",
     ):
         self.connections = connections
         super().__init__(client, event_root, EventPrefix.TRIGGER)
@@ -488,7 +514,7 @@ class GlobalTriggerEventQueue(TriggerEventQueue):
     def __init__(
         self,
         client: ZooKeeperClient,
-        connections: ConnectionRegistry,
+        connections: "ConnectionRegistry",
     ):
         super().__init__(client, SCHEDULER_GLOBAL_ROOT, connections)
 
@@ -501,14 +527,14 @@ class PipelineTriggerEventQueue(TriggerEventQueue):
         client: ZooKeeperClient,
         tenant_name: str,
         pipeline_name: str,
-        connections: ConnectionRegistry,
+        connections: "ConnectionRegistry",
     ):
         event_root = "/".join((TENANT_ROOT, tenant_name, pipeline_name))
         super().__init__(client, event_root, connections)
 
     @classmethod
     def create_registry(
-        cls, client: ZooKeeperClient, connections: ConnectionRegistry
+        cls, client: ZooKeeperClient, connections: "ConnectionRegistry"
     ) -> DefaultKeyDict[DefaultKeyDict["TriggerEventQueue"]]:
         return DefaultKeyDict(
             lambda t: cls._create_registry(client, t, connections)
@@ -519,8 +545,56 @@ class PipelineTriggerEventQueue(TriggerEventQueue):
         cls,
         client: ZooKeeperClient,
         tenant_name: str,
-        connections: ConnectionRegistry,
+        connections: "ConnectionRegistry",
     ) -> DefaultKeyDict["TriggerEventQueue"]:
         return DefaultKeyDict(
             lambda p: cls(client, tenant_name, p, connections)
         )
+
+
+class ConnectionEventQueue(ZooKeeperEventQueue[model.ResultEvent]):
+    """Connection events via ZooKeeper"""
+
+    log = logging.getLogger("zuul.zk.event_queues.ConnectionEventQueue")
+
+    def __init__(self, client: ZooKeeperClient, connection_name: str):
+        event_root = "/".join((CONNECTION_ROOT, connection_name, "events"))
+        super().__init__(client, event_root)
+        self.election_root = "/".join(
+            (CONNECTION_ROOT, connection_name, "election")
+        )
+        self.kazoo_client.ensure_path(self.election_root)
+        self.election = self.kazoo_client.Election(self.election_root)
+
+    def _event_watch(
+        self,
+        callback: Callable[[], Optional[bool]],
+        event_list: List[str],
+        event: Optional[WatchedEvent] = None,
+    ) -> Optional[bool]:
+        if event_list:
+            if event is None:
+                # Handle initial call when the watch is created. If there are
+                # already events in the queue we trigger the callback.
+                return callback()
+            elif event.type == EventType.CHILD:
+                return callback()
+        return None
+
+    def register_event_watch(self, callback: Callable[[], Any]) -> None:
+        self.kazoo_client.ChildrenWatch(
+            self.event_root, functools.partial(self._event_watch, callback)
+        )
+
+    def put(self, data: Dict[str, Any]) -> None:
+        self._put(data)
+
+    def __iter__(self) -> Generator[model.ConnectionEvent, None, None]:
+        for data, ack_ref in self._iter_events():
+            if not data:
+                self.log.warning("Malformed event found: %s", data)
+                self._remove(ack_ref.path)
+                continue
+            event = model.ConnectionEvent.fromDict(data)
+            event.ack_ref = ack_ref
+            yield event
