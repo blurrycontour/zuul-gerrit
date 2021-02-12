@@ -312,7 +312,7 @@ class TestMergerRepo(ZuulTestCase):
                          'none@example.org', 'User Name', '0', '0')
         self.waitUntilSettled()
 
-        # Break the gitmodules
+        # Break the gitmodules with uncommited changes
         path = work_repo.local_path
         with open(os.path.join(path, '.gitmodules'), 'w') as f:
             f.write('[submodule "libfoo"]\n'
@@ -320,7 +320,21 @@ class TestMergerRepo(ZuulTestCase):
                     '---\n'
                     'url = git://example.com/git/lib.git')
 
-        # And now reset the repo again. This should not crash
+        # And now reset the repo. This should not crash
+        work_repo.reset()
+
+        # Break the gitmodules with a commit
+        path = work_repo.local_path
+        with open(os.path.join(path, '.gitmodules'), 'w') as f:
+            f.write('[submodule "libfoo"]\n'
+                    'path = include/foo\n'
+                    '---\n'
+                    'url = git://example.com/git/lib.git')
+        git_repo = work_repo._createRepoObject(work_repo.local_path,
+                                               work_repo.env)
+        git_repo.git.add('.gitmodules')
+        git_repo.index.commit("Broken gitmodule")
+        # And now reset the repo. This should not crash
         work_repo.reset()
 
     def test_files_changes(self):
