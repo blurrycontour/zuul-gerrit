@@ -33,14 +33,14 @@ from zuul.lib.logutil import get_annotated_logger
 NULL_REF = '0000000000000000000000000000000000000000'
 
 
-def reset_repo_to_head(repo):
+def reset_repo_to_head(repo, ref='HEAD'):
     # This lets us reset the repo even if there is a file in the root
     # directory named 'HEAD'.  Currently, GitPython does not allow us
     # to instruct it to always include the '--' to disambiguate.  This
     # should no longer be necessary if this PR merges:
     #   https://github.com/gitpython-developers/GitPython/pull/319
     try:
-        repo.git.reset('--hard', 'HEAD', '--')
+        repo.git.reset('--hard', ref, '--')
     except git.GitCommandError as e:
         # git nowadays may use 1 as status to indicate there are still unstaged
         # modifications after the reset
@@ -270,10 +270,11 @@ class Repo(object):
                 if attempt < self.retry_attempts:
                     if 'fatal: bad config' in e.stderr.lower():
                         # This error can be introduced by a merge conflict
+                        # or someone committing faulty configuration
                         # in the .gitmodules which was left by the last
-                        # merge operation. In this case reset and clean
-                        # the repo and try again immediately.
-                        reset_repo_to_head(repo)
+                        # merge operation. In this case reset and clean the repo
+                        # and try again immediately.
+                        reset_repo_to_head(repo, 'HEAD^')
                         repo.git.clean('-x', '-f', '-d')
                     elif 'fatal: not a git repository' in e.stderr.lower():
                         # If we get here the git.Repo object was happy with its
