@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c89457fc_e0f47432",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-12T22:42:02Z",
+      "side": 1,
+      "message": "That doesn\u0027t seem to match links that are prefixed with some text, e.g. `Get:1 http://mirro...`, perhaps the `^` could be dropped?",
+      "range": {
+        "startLine": 142,
+        "startChar": 17,
+        "endLine": 142,
+        "endChar": 27
+      },
+      "revId": "945b46c311be9d7fd8873c68f16ef687f582962f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
