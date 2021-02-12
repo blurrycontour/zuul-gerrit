@@ -310,7 +310,6 @@ class GitlabDriverMock(GitlabDriver):
             self, name, config, self.rpcclient,
             changes_db=db,
             upstream_root=self.upstream_root)
-        self.additional_event_queues.append(connection.event_queue)
         setattr(self.registry, 'fake_' + name, connection)
         registerProjects(connection.source.name, connection.gl_client,
                          self.config)
@@ -1836,10 +1835,9 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
                 % (self.zuul_web_port, self.connection_name),
                 data=payload, headers=headers)
         else:
-            job = self.rpcclient.submitJob(
-                'gitlab:%s:payload' % self.connection_name,
-                {'payload': payload})
-            return json.loads(job.data[0])
+            data = {'payload': payload}
+            self.event_queue.put(data)
+            return data
 
     def setZuulWebPort(self, port):
         self.zuul_web_port = port
