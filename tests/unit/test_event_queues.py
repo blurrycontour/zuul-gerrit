@@ -57,10 +57,6 @@ class DummyEvent(model.AbstractEvent):
         return cls()
 
 
-class DummyPrefix:
-    value = "dummy"
-
-
 class DummyEventQueue(event_queues.ZooKeeperEventQueue):
 
     def put(self, event):
@@ -77,7 +73,7 @@ class TestEventQueue(EventQueueBaseTestCase):
 
     def setUp(self):
         super().setUp()
-        self.queue = DummyEventQueue(self.zk_client, "root", DummyPrefix())
+        self.queue = DummyEventQueue(self.zk_client, "root")
 
     def test_missing_ack_ref(self):
         # Every event from a ZK event queue should have an ack_ref
@@ -429,3 +425,44 @@ class TestEventWatchers(EventQueueBaseTestCase):
 
         result_queues["other-tenant"]["post"].put(DummyResultEvent())
         self._wait_for_event(event)
+
+
+class TestConnectionEventQueue(EventQueueBaseTestCase):
+
+    def test_connection_events(self):
+        # Test enqueue/dequeue of the connection event queue.
+        queue = event_queues.ConnectionEventQueue(self.zk_client, "dummy")
+
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+
+        payload = {"message": "hello world!"}
+        queue.put(payload)
+        queue.put(payload)
+
+        self.assertEqual(len(queue), 2)
+        self.assertTrue(queue.hasEvents())
+
+        acked = 0
+        for event in queue:
+            self.assertIsInstance(event, model.ConnectionEvent)
+            self.assertEqual(event, payload)
+            queue.ack(event)
+            acked += 1
+
+        self.assertEqual(acked, 2)
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+
+    def test_event_watch(self):
+        # Test the registered function is called on new events.
+        queue = event_queues.ConnectionEventQueue(self.zk_client, "dummy")
+
+        event = threading.Event()
+        queue.registerEventWatch(event.set)
+        self.assertFalse(event.is_set())
+
+        queue.put({"message": "hello world!"})
+        for _ in iterate_timeout(5, "event set"):
+            if event.is_set():
+                break
