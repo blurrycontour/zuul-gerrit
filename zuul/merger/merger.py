@@ -270,11 +270,26 @@ class Repo(object):
                 if attempt < self.retry_attempts:
                     if 'fatal: bad config' in e.stderr.lower():
                         # This error can be introduced by a merge conflict
+                        # or someone committing faulty configuration
                         # in the .gitmodules which was left by the last
                         # merge operation. In this case reset and clean
                         # the repo and try again immediately.
-                        reset_repo_to_head(repo)
-                        repo.git.clean('-x', '-f', '-d')
+                        reset_ref = 'HEAD'
+                        if not repo.is_dirty():
+                            reset_ref = "{}^".format(repo.git.log(
+                                '--diff-filter=A',
+                                '-n', '1',
+                                '--pretty=format:%H',
+                                '--', '.gitmodules'))
+                        try:
+                            repo.head.reset(reset_ref, working_tree=True)
+                            repo.git.clean('-x', '-f', '-d')
+                        except Exception:
+                            # If we get here there probably isn't
+                            # a valid commit we can easily find so
+                            # delete the repo to make sure it doesn't
+                            # get stuck in a broken state.
+                            shutil.rmtree(self.local_path)
                     elif 'fatal: not a git repository' in e.stderr.lower():
                         # If we get here the git.Repo object was happy with its
                         # lightweight way of checking if this is a valid git
