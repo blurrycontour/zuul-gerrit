@@ -69,6 +69,23 @@
       "revId": "6c52bd19d6c3ce61d308a6aea5318fb67e53919c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b042a3e_9d26e773",
+        "filename": "web/package.json",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-02-12T16:20:11Z",
+      "side": 1,
+      "message": "No change needed from my perspective, I was just letting other reviewers know the license state for the proposed additional dependency so they wouldn\u0027t need to redo the same research themselves.",
+      "revId": "6c52bd19d6c3ce61d308a6aea5318fb67e53919c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
