@@ -29,6 +29,7 @@ import {
   InfoCircleIcon,
   SearchPlusIcon,
 } from '@patternfly/react-icons'
+import ReactAnsi from '@softwarefactory-project/re-ansi'
 
 import {
   hasInterestingKeys,
@@ -91,7 +92,7 @@ class TaskOutput extends React.Component {
     } else if (typeof(value) === 'string') {
       ret = (
         <pre>
-          {value}
+          <ReactAnsi log={value} />
         </pre>
       )
     } else if (typeof(value) === 'object') {
