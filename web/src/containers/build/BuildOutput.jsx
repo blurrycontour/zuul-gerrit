@@ -35,7 +35,9 @@ import {
   TimesIcon,
   TimesCircleIcon,
 } from '@patternfly/react-icons'
-import Linkify from 'linkifyjs/react'
+
+const reactStringReplace = require('react-string-replace')
+const LINK_MATCH = new RegExp(`((http|ftp)s?://[^ ]+)`)
 
 class BuildOutput extends React.Component {
   static propTypes = {
@@ -107,11 +109,13 @@ class BuildOutput extends React.Component {
               {task.stdout_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stdout'}`}><summary></summary>
                   <pre key="stdout" title="stdout">
-                    {task.stdout_lines.slice(0, -max_lines).join('\n')}
+                    {reactStringReplace(task.stdout_lines.slice(0, -max_lines).join('\n'), LINK_MATCH, (match, i) => (
+                      <a key={match + i} href={match}>{match}</a>))}
                   </pre>
                 </details>)}
               <pre key="stdout" title="stdout">
-                {task.stdout_lines.slice(-max_lines).join('\n')}
+                {reactStringReplace(task.stdout_lines.slice(-max_lines).join('\n'), LINK_MATCH, (match, i) => (
+                  <a key={match + i} href={match}>{match}</a>))}
               </pre>
             </Fragment>
           )}
@@ -120,12 +124,14 @@ class BuildOutput extends React.Component {
               {task.stderr_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
                   <pre key="stderr" title="stderr">
-                    {task.stderr_lines.slice(0, -max_lines).join('\n')}
+                    {reactStringReplace(task.stderr_lines.slice(0, -max_lines).join('\n'), LINK_MATCH, (match, i) => (
+                      <a key={match + i} href={match}>{match}</a>))}
                   </pre>
                 </details>
               )}
               <pre key="stderr" title="stderr">
-                {task.stderr_lines.slice(-max_lines).join('\n')}
+                {reactStringReplace(task.stderr_lines.slice(-max_lines).join('\n'), LINK_MATCH, (match, i) => (
+                  <a key={match + i} href={match}>{match}</a>))}
               </pre>
             </Fragment>
           )}
@@ -136,19 +142,14 @@ class BuildOutput extends React.Component {
 
   render () {
     const { output } = this.props
-    const linkify_options = {
-      validate: {
-        url: function (value) {
-          return /^(http|ftp)s?:\/\//.test(value)
-        }}}
     return (
-      <Linkify options={linkify_options}>
+      <React.Fragment>
         {this.renderHosts(output)}
         {Object.entries(output)
           .filter(([, values]) => values.failed.length > 0)
           .map(([host, values]) => (values.failed.map(failed => (
             this.renderFailedTask(host, failed)))))}
-      </Linkify>
+      </React.Fragment>
     )
   }
 }
