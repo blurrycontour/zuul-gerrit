@@ -40,6 +40,7 @@ const SCROLL_OFFSET = -50
 export default function LogFile({
   logfileName,
   logfileContent,
+  logfileSize,
   isFetching,
   handleBreadcrumbItemClick,
   location,
@@ -138,6 +139,8 @@ export default function LogFile({
     setScrollOnPageLoad(false)
   }
 
+  const show = logfileSize > 10 * 1024 * 1024 ? (msg => msg) : (msg => <ReactAnsi log={msg} />)
+
   function renderLogfile(logfileContent, severity) {
     return (
       <>
@@ -224,7 +227,7 @@ export default function LogFile({
                             line.severity || 0
                           }`}
                         >
-                          <ReactAnsi log={line.text + '\n'} />
+                          {show(line.text + '\n')}
                         </span>
                       </td>
                     </tr>
@@ -289,6 +292,7 @@ export default function LogFile({
 LogFile.propTypes = {
   logfileName: PropTypes.string.isRequired,
   logfileContent: PropTypes.array,
+  logfileSize: PropTypes.number,
   severity: PropTypes.number,
   isFetching: PropTypes.bool.isRequired,
   handleBreadcrumbItemClick: PropTypes.func.isRequired,
