@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "81e8a112_03d92acd",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-13T16:11:12Z",
+      "side": 1,
+      "message": "This import is responsible for most of the increased test time.  Because of the multi process worker used in the executor, this is imported anew for each process, and even a null test might do that about 5 times to read the configuration.  The import initializes all of the drivers.\n\n1) Let\u0027s omit this bit of type annotations for now.\n2) Let\u0027s take a look at minimizing the code needed for the spawned processes for the merger (possibly move those into static methods in a dedicated file).",
+      "revId": "db0bba85c7bf3d7708a54360ed1d027d62a67eb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "eb2aa810_60271e5f",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-13T16:11:12Z",
+      "side": 1,
+      "message": "This change to instantiate an unneeded ConnectionRegistry caused 0.5s of additional runtime for each test.  It initializes all of the drivers.",
+      "revId": "db0bba85c7bf3d7708a54360ed1d027d62a67eb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
