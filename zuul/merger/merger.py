@@ -33,21 +33,6 @@ from zuul.lib.logutil import get_annotated_logger
 NULL_REF = '0000000000000000000000000000000000000000'
 
 
-def reset_repo_to_head(repo):
-    # This lets us reset the repo even if there is a file in the root
-    # directory named 'HEAD'.  Currently, GitPython does not allow us
-    # to instruct it to always include the '--' to disambiguate.  This
-    # should no longer be necessary if this PR merges:
-    #   https://github.com/gitpython-developers/GitPython/pull/319
-    try:
-        repo.git.reset('--hard', 'HEAD', '--')
-    except git.GitCommandError as e:
-        # git nowadays may use 1 as status to indicate there are still unstaged
-        # modifications after the reset
-        if e.status != 1:
-            raise
-
-
 def redact_url(url):
     parsed = urlsplit(url)
     if parsed.password is None:
@@ -539,7 +524,7 @@ class Repo(object):
             # that we clean up anything that might be left over from a merge
             # while still only preparing the working copy once.
             repo.head.reference = ref
-            reset_repo_to_head(repo)
+            repo.head.reset(working_tree=True)
             repo.git.clean('-x', '-f', '-d')
             repo.git.checkout(ref)
 
