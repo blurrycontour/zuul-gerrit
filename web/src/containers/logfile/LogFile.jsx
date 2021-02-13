@@ -26,6 +26,7 @@ import {
   ToggleGroupItem,
 } from '@patternfly/react-core'
 import { FileCodeIcon } from '@patternfly/react-icons'
+import ReactAnsi from '@softwarefactory-project/re-ansi'
 
 import { Fetching } from '../Fetching'
 
@@ -223,7 +224,7 @@ export default function LogFile({
                             line.severity || 0
                           }`}
                         >
-                          {line.text + '\n'}
+                          <ReactAnsi log={line.text + '\n'} />
                         </span>
                       </td>
                     </tr>
