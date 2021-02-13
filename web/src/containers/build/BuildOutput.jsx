@@ -36,6 +36,8 @@ import {
   TimesCircleIcon,
 } from '@patternfly/react-icons'
 
+import ReactAnsi from '@softwarefactory-project/re-ansi'
+
 class BuildOutput extends React.Component {
   static propTypes = {
     output: PropTypes.object,
@@ -106,11 +108,11 @@ class BuildOutput extends React.Component {
               {task.stdout_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stdout'}`}><summary></summary>
                   <pre key="stdout" title="stdout">
-                    {task.stdout_lines.slice(0, -max_lines).join('\n')}
+                    <ReactAnsi log={task.stdout_lines.slice(0, -max_lines).join('\n')} />
                   </pre>
                 </details>)}
               <pre key="stdout" title="stdout">
-                {task.stdout_lines.slice(-max_lines).join('\n')}
+                <ReactAnsi log={task.stdout_lines.slice(-max_lines).join('\n')} />
               </pre>
             </Fragment>
           )}
@@ -119,12 +121,12 @@ class BuildOutput extends React.Component {
               {task.stderr_lines.length > max_lines && (
                 <details className={`${'foldable'} ${'stderr'}`}><summary></summary>
                   <pre key="stderr" title="stderr">
-                    {task.stderr_lines.slice(0, -max_lines).join('\n')}
+                    <ReactAnsi log={task.stderr_lines.slice(0, -max_lines).join('\n')} />
                   </pre>
                 </details>
               )}
               <pre key="stderr" title="stderr">
-                {task.stderr_lines.slice(-max_lines).join('\n')}
+                <ReactAnsi log={task.stderr_lines.slice(-max_lines).join('\n')} />
               </pre>
             </Fragment>
           )}
