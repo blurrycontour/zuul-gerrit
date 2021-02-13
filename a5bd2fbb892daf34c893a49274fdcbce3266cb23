@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b439e84f_f173f870",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-13T21:33:33Z",
+      "side": 1,
+      "message": "Would using `[^\\s]` be safer?",
+      "range": {
+        "startLine": 40,
+        "startChar": 49,
+        "endLine": 40,
+        "endChar": 50
+      },
+      "revId": "a5bd2fbb892daf34c893a49274fdcbce3266cb23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "07ea767e_d7a68344",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-02-13T21:33:33Z",
+      "side": 1,
+      "message": "Perhaps it\u0027s worth creating a component, and since this is not related to zuul, it might be good to publish it separately?",
+      "range": {
+        "startLine": 112,
+        "startChar": 21,
+        "endLine": 112,
+        "endChar": 39
+      },
+      "revId": "a5bd2fbb892daf34c893a49274fdcbce3266cb23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
