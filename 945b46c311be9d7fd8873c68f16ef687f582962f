@@ -70,6 +70,23 @@
       "revId": "945b46c311be9d7fd8873c68f16ef687f582962f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "16aa5b2c_919090f8",
+        "filename": "web/src/containers/build/BuildOutput.jsx",
+        "patchSetId": 6
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-13T15:55:06Z",
+      "side": 1,
+      "message": "This regex looks like it might make the algo O(n^2) if it\u0027s applied to every point in the string.",
+      "revId": "945b46c311be9d7fd8873c68f16ef687f582962f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
