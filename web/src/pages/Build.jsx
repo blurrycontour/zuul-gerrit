@@ -197,6 +197,7 @@ class BuildPage extends React.Component {
         <LogFile
           logfileContent={logfile}
           logfileName={logfileName}
+          logfileSize={logfile.size}
           isFetching={isFetchingLogfile}
           // We let the LogFile component itself handle the severity default
           // value in case it's not set via the URL.

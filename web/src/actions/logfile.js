@@ -65,6 +65,7 @@ const receiveLogfile = (buildId, file, data) => {
   return {
     type: LOGFILE_FETCH_SUCCESS,
     buildId,
+    size: data.length,
     fileName: file,
     fileContent: out,
     receivedAt: Date.now()
