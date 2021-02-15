@@ -35,10 +35,10 @@ class TestZK(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk_client = ZooKeeperClient()
+        self.zk_client = ZooKeeperClient(self.zk_config)
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
-        self.zk_client.connect(self.zk_config)
+        self.zk_client.connect()
 
     def _createRequest(self):
         req = model.HoldRequest()
