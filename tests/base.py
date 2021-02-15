@@ -111,10 +111,10 @@ import zuul.merger.server
 import zuul.model
 import zuul.nodepool
 import zuul.rpcclient
-import zuul.zk
 import zuul.configloader
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
+from zuul.zk import ZooKeeperClient
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -3629,13 +3629,14 @@ class ChrootedKazooFixture(fixtures.Fixture):
                               for x in range(8))
 
         rand_test_path = '%s_%s_%s' % (random_bits, os.getpid(), self.test_id)
-        self.zookeeper_chroot = "/nodepool_test/%s" % rand_test_path
+        self.zookeeper_chroot = f"/test/{rand_test_path}"
 
         self.addCleanup(self._cleanup)
 
         # Ensure the chroot path exists and clean up any pre-existing znodes.
         _tmp_client = kazoo.client.KazooClient(
-            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port))
+            hosts=f'{self.zookeeper_host}:{self.zookeeper_port}', timeout=10
+        )
         _tmp_client.start()
 
         if _tmp_client.exists(self.zookeeper_chroot):
@@ -3992,13 +3993,13 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk = zuul.zk.ZooKeeper(enable_cache=True)
-        zk.connect(self.zk_config, timeout=30.0)
+        zk_client = ZooKeeperClient()
+        zk_client.connect(self.zk_config, timeout=30.0)
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
         self.sched.setNodepool(nodepool)
-        self.sched.setZooKeeper(zk)
+        self.sched.setZooKeeper(zk_client)
 
         self.sched.start()
         executor_client.gearman.waitForServer()
@@ -4626,7 +4627,7 @@ class ZuulTestCase(BaseTestCase):
         self.rpcclient.shutdown()
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
-        self.scheds.execute(lambda app: app.sched.zk.disconnect())
+        self.scheds.execute(lambda app: app.sched.zk_client.disconnect())
         self.printHistory()
         # We whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.
