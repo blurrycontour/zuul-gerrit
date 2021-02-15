@@ -395,8 +395,7 @@ not read from a git repository. Zuul supports two kinds of reconfigurations.
 The full reconfiguration refetches and reloads the configuration of
 all tenants. To do so, run ``zuul-scheduler full-reconfigure``. For
 example this can be used to fix eventual configuration inconsistencies
-after connection problems to Gerrit/Github. The signal based method by
-sending a `SIGHUP` signal to the scheduler PID is deprecated.
+after connection problems to Gerrit/Github.
 
 The smart reconfiguration reloads only the tenants that changed their
 configuration in the tenant config file. To do so, run
