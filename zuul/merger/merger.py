@@ -14,6 +14,8 @@
 # under the License.
 
 from contextlib import contextmanager
+from logging import Logger
+from typing import Optional
 from urllib.parse import urlsplit, urlunsplit, urlparse
 import hashlib
 import logging
@@ -25,6 +27,7 @@ import time
 import git
 import gitdb
 import paramiko
+from zuul.zk import ZooKeeperClient
 
 import zuul.model
 
@@ -721,18 +724,30 @@ class Repo(object):
 
 
 class Merger(object):
-    def __init__(self, working_root, connections, email, username,
-                 speed_limit, speed_time, cache_root=None, logger=None,
-                 execution_context=False, git_timeout=300):
+    def __init__(
+        self,
+        working_root: str,
+        connections,
+        zk_client: ZooKeeperClient,
+        email: str,
+        username: str,
+        speed_limit: str,
+        speed_time: str,
+        cache_root: Optional[str] = None,
+        logger: Optional[Logger] = None,
+        execution_context: bool = False,
+        git_timeout: int = 300,
+    ):
         self.logger = logger
         if logger is None:
             self.log = logging.getLogger("zuul.Merger")
         else:
             self.log = logger
-        self.repos = {}
+        self.repos = {}  # type: ignore
         self.working_root = working_root
         os.makedirs(working_root, exist_ok=True)
         self.connections = connections
+        self.zk_client = zk_client
         self.email = email
         self.username = username
         self.speed_limit = speed_limit
