@@ -522,8 +522,8 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         logfile = open(ansible_log, 'r')
         self.addCleanup(logfile.close)
 
-        zk_client = ZooKeeperClient()
-        zk_client.connect(self.zk_config, timeout=30.0)
+        zk_client = ZooKeeperClient(self.zk_config, timeout=30.0)
+        zk_client.connect()
         self.addCleanup(zk_client.disconnect)
 
         # Start the finger gateway daemon
