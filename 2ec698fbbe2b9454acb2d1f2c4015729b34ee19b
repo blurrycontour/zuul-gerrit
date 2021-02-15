@@ -16,6 +16,23 @@
       "revId": "2ec698fbbe2b9454acb2d1f2c4015729b34ee19b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "360e4ab3_d8a20d23",
+        "filename": "tests/base.py",
+        "patchSetId": 69
+      },
+      "lineNbr": 4182,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-15T15:16:41Z",
+      "side": 1,
+      "message": "Makes sense; let\u0027s keep this in mind when we refactor the connection class.  I think if we can find a way to have separate connections that would make more realistic tests.  There are only about 4 tests that use a separate merger, so efficiency isn\u0027t a big concern.",
+      "revId": "2ec698fbbe2b9454acb2d1f2c4015729b34ee19b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
