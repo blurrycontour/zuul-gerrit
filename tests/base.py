@@ -3702,7 +3702,8 @@ class ZuulWebFixture(fixtures.Fixture):
                  additional_event_queues, upstream_root: str,
                  rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
                  add_cleanup: Callable[[Callable[[], None]], None],
-                 test_root, info=None, zk_hosts=None, fake_sql=True):
+                 test_root: str, zk_hosts: str, fake_sql: bool = True,
+                 info: Optional[zuul.model.WebInfo] = None):
         super(ZuulWebFixture, self).__init__()
         self.gearman_server_port = gearman_server_port
         self.connections = TestConnectionRegistry(
