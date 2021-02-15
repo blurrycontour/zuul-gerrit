@@ -12,12 +12,14 @@
 import logging
 import time
 from abc import ABCMeta
+from configparser import ConfigParser
 from typing import Optional, List, Callable
 
 from kazoo.client import KazooClient
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
 
+from zuul.lib.config import get_default
 from zuul.zk.exceptions import NoClientException
 
 
@@ -27,10 +29,34 @@ class ZooKeeperClient(object):
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
 
-    def __init__(self):
+    def __init__(
+        self,
+        hosts: str,
+        read_only: bool = False,
+        timeout: float = 10.0,
+        tls_cert: Optional[str] = None,
+        tls_key: Optional[str] = None,
+        tls_ca: Optional[str] = None,
+    ):
         """
         Initialize the ZooKeeper base client object.
+
+        :param str hosts: Comma-separated list of hosts to connect to (e.g.
+            127.0.0.1:2181,127.0.0.1:2182,[::1]:2183).
+        :param bool read_only: If True, establishes a read-only connection.
+        :param float timeout: The ZooKeeper session timeout, in
+            seconds (default: 10.0).
+        :param str tls_key: Path to TLS key
+        :param str tls_cert: Path to TLS cert
+        :param str tls_ca: Path to TLS CA cert
         """
+        self.hosts = hosts
+        self.read_only = read_only
+        self.timeout = timeout
+        self.tls_cert = tls_cert
+        self.tls_key = tls_key
+        self.tls_ca = tls_ca
+
         self.client: Optional[KazooClient] = None
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
@@ -67,32 +93,18 @@ class ZooKeeperClient(object):
             self.log.warning("Retrying zookeeper connection")
             self._last_retry_log = now
 
-    def connect(self, hosts: str, read_only: bool = False,
-                timeout: float = 10.0, tls_cert: Optional[str] = None,
-                tls_key: Optional[str] = None,
-                tls_ca: Optional[str] = None):
-        """
-        Establish a connection with ZooKeeper cluster.
-
-        Convenience method if a pre-existing ZooKeeper connection is not
-        supplied to the ZooKeeper object at instantiation time.
-
-        :param str hosts: Comma-separated list of hosts to connect to (e.g.
-            127.0.0.1:2181,127.0.0.1:2182,[::1]:2183).
-        :param bool read_only: If True, establishes a read-only connection.
-        :param float timeout: The ZooKeeper session timeout, in
-            seconds (default: 10.0).
-        :param str tls_key: Path to TLS key
-        :param str tls_cert: Path to TLS cert
-        :param str tls_ca: Path to TLS CA cert
-        """
+    def connect(self):
         if self.client is None:
-            args = dict(hosts=hosts, read_only=read_only, timeout=timeout)
-            if tls_key:
+            args = dict(
+                hosts=self.hosts,
+                read_only=self.read_only,
+                timeout=self.timeout,
+            )
+            if self.tls_key:
                 args['use_ssl'] = True
-                args['keyfile'] = tls_key
-                args['certfile'] = tls_cert
-                args['ca'] = tls_ca
+                args['keyfile'] = self.tls_key
+                args['certfile'] = self.tls_cert
+                args['ca'] = self.tls_ca
             self.client = KazooClient(**args)
             self.client.add_listener(self._connectionListener)
             # Manually retry initial connection attempt
@@ -130,6 +142,31 @@ class ZooKeeperClient(object):
         """
         if self.client is not None:
             self.client.set_hosts(hosts=hosts)
+
+    @classmethod
+    def fromConfig(cls, config: ConfigParser) -> "ZooKeeperClient":
+        hosts = get_default(config, "zookeeper", "hosts")
+        if not hosts:
+            raise Exception("The zookeeper hosts config value is required")
+        tls_key = get_default(config, "zookeeper", "tls_key")
+        tls_cert = get_default(config, "zookeeper", "tls_cert")
+        tls_ca = get_default(config, "zookeeper", "tls_ca")
+        if not all([tls_key, tls_cert, tls_ca]):
+            raise Exception(
+                "A TLS ZooKeeper connection is required; please supply the "
+                "tls_* zookeeper config values."
+            )
+        timeout = float(
+            get_default(config, "zookeeper", "session_timeout", 120.0)
+        )
+
+        return cls(
+            hosts=hosts,
+            timeout=timeout,
+            tls_key=tls_key,
+            tls_cert=tls_cert,
+            tls_ca=tls_ca,
+        )
 
 
 class ZooKeeperBase(metaclass=ABCMeta):

@@ -19,7 +19,6 @@ import sys
 
 import zuul.cmd
 from zuul.merger.server import COMMANDS, MergeServer
-from zuul.lib.config import get_default
 from zuul.zk import ZooKeeperClient
 
 
@@ -53,25 +52,8 @@ class Merger(zuul.cmd.ZuulDaemonApp):
 
         self.setup_logging('merger', 'log_config')
 
-        zk_client = ZooKeeperClient()
-        zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts')
-        if not zookeeper_hosts:
-            raise Exception("The zookeeper hosts config value is required")
-        zookeeper_tls_key = get_default(self.config, 'zookeeper', 'tls_key')
-        zookeeper_tls_cert = get_default(self.config, 'zookeeper', 'tls_cert')
-        zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
-        if not (zookeeper_tls_key and zookeeper_tls_cert and zookeeper_tls_ca):
-            raise Exception("A TLS ZooKeeper connection is required; "
-                            "please supply the tls_* zookeeper config values.")
-        zookeeper_timeout = float(get_default(self.config, 'zookeeper',
-                                              'session_timeout', 10.0))
-        zk_client.connect(
-            zookeeper_hosts,
-            timeout=zookeeper_timeout,
-            tls_cert=zookeeper_tls_cert,
-            tls_key=zookeeper_tls_key,
-            tls_ca=zookeeper_tls_ca,
-        )
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
 
         self.merger = MergeServer(self.config, zk_client, self.connections)
         self.merger.start()
