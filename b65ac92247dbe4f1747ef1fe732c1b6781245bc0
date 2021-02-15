@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5cc53dcf_5dda10bc",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-15T18:54:12Z",
+      "side": 1,
+      "message": "Oh, should we put this \u0027repo.git.log\u0027 inside the try/except?  Just in case it goes bad, let\u0027s go right to the rmtree.",
+      "revId": "b65ac92247dbe4f1747ef1fe732c1b6781245bc0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
