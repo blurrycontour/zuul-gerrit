@@ -2549,9 +2549,18 @@ class ExecutorServer(BaseMergeServer):
     _job_class = AnsibleJob
     _repo_locks_class = RepoLocks
 
-    def __init__(self, config, connections=None, jobdir_root=None,
-                 keep_jobdir=False, log_streaming_port=DEFAULT_FINGER_PORT,
-                 log_console_port=DEFAULT_STREAM_PORT):
+    def __init__(
+        self,
+        config,
+        zk_client,
+        connections=None,
+        jobdir_root=None,
+        keep_jobdir=False,
+        log_streaming_port=DEFAULT_FINGER_PORT,
+        log_console_port=DEFAULT_STREAM_PORT,
+    ):
+        # TODO(jeblair): add zk client to merger and remove this assignment
+        self.zk_client = zk_client
         super().__init__(config, 'executor', connections)
 
         self.keep_jobdir = keep_jobdir

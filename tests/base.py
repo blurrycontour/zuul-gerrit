@@ -4178,6 +4178,9 @@ class ZuulTestCase(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
+        self.zk_client = ZooKeeperClient()
+        self.zk_client.connect(hosts=self.zk_config)
+
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
                 rootdir=os.environ.get("ZUUL_TEST_ROOT"))
@@ -4284,7 +4287,9 @@ class ZuulTestCase(BaseTestCase):
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
-            self.config, executor_connections,
+            self.config,
+            self.zk_client,
+            executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
@@ -4628,6 +4633,7 @@ class ZuulTestCase(BaseTestCase):
         self.rpcclient.shutdown()
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
+        self.zk_client.disconnect()
         self.scheds.execute(lambda app: app.sched.zk_client.disconnect())
         self.printHistory()
         # We whitelist watchdog threads as they have relatively long delays
