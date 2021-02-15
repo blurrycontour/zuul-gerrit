@@ -66,11 +66,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         except Exception:
             self.log.exception("Reconfiguration failed:")
 
-    def reconfigure_handler(self, signum, frame):
-        signal.signal(signal.SIGHUP, signal.SIG_IGN)
-        self.fullReconfigure()
-        signal.signal(signal.SIGHUP, self.reconfigure_handler)
-
     def exit_handler(self, signum, frame):
         self.sched.exit()
         self.sched.join()
@@ -177,8 +172,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
             # we might be able to have a nicer way of exiting here.
             self.sched.stop()
             sys.exit(1)
-
-        signal.signal(signal.SIGHUP, self.reconfigure_handler)
 
         if self.args.nodaemon:
             signal.signal(signal.SIGTERM, self.exit_handler)
