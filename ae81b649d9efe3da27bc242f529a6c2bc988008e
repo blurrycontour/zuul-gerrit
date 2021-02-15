@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c15e3999_b80d85e3",
+        "filename": "zuul/cmd/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-15T06:24:05Z",
+      "side": 1,
+      "message": "nit: This import shouldn\u0027t be needed anymore.",
+      "revId": "ae81b649d9efe3da27bc242f529a6c2bc988008e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
