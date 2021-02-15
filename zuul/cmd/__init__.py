@@ -120,10 +120,7 @@ class ZuulApp(object):
         parser = self.createParser()
         self.args = parser.parse_args(args)
 
-        # The arguments debug and foreground both lead to nodaemon mode so
-        # set nodaemon if one of them is set.
-        if ((hasattr(self.args, 'debug') and self.args.debug) or
-                (hasattr(self.args, 'foreground') and self.args.foreground)):
+        if hasattr(self.args, 'foreground') and self.args.foreground:
             self.args.nodaemon = True
         else:
             self.args.nodaemon = False

@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    Running the zuul processes with the -d switch to enforce running in
+    foreground has been removed. Switch to use -f instead for this purpose.
