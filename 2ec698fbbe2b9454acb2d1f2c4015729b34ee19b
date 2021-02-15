@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ebe534db_2f953854",
+        "filename": "tests/base.py",
+        "patchSetId": 69
+      },
+      "lineNbr": 4182,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-15T10:25:41Z",
+      "side": 1,
+      "message": "I\u0027ve created the ZooKeeper client directly in the test case and shared it with the different components (executor, merger). This is necessary to make later patches (which actually use the zk_client) work as otherwise the cleanup might be called before the components stop resulting in \"Missing Kazoo client\" exceptions. I think, we also decided to share the client in the tests last week.",
+      "revId": "2ec698fbbe2b9454acb2d1f2c4015729b34ee19b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
