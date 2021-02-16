@@ -370,10 +370,9 @@ export function fetchBuildManifest(buildId, state) {
           const response = await Axios.get(artifact.url)
           return dispatch(receiveBuildManifest(buildId, response.data))
         } catch(error) {
+          // Show the error since we expected a manifest but did not
+          // receive it.
           dispatch(failedBuildManifest(buildId, error, artifact.url))
-          // Raise the error again, so fetchBuildAllInfo() doesn't call
-          // fetchLogFile which needs an existing manifest file.
-          throw error
         }
       }
     }
