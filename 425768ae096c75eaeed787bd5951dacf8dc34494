@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5430e877_456fb583",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-02-16T12:53:04Z",
+      "side": 1,
+      "message": "Thought for a possible followup improvement: I think a further improvement would be to delete the local repo and ensure_cloned during the last attempt. We still occasionally have problems with a broken cache where this would make probably make such problems self healing.",
+      "revId": "425768ae096c75eaeed787bd5951dacf8dc34494",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
