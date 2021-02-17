@@ -66,6 +66,14 @@ An MQTT report uses this schema:
 
       The internal zuul change reference.
 
+   .. attr:: trigger_time
+
+      The timestamp when the event was added to the scheduler.
+
+   .. attr:: enqueue_time
+
+      The timestamp when the event was added to the pipeline.
+
    .. attr:: buildset
 
       The buildset information.
