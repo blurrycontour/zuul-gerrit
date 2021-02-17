@@ -183,7 +183,7 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
 
 .. attr:: zookeeper
 
-   Client connection information for ZooKeeper
+   Client connection information for ZooKeeper.  TLS is required.
 
    .. attr:: hosts
       :required:
@@ -191,22 +191,25 @@ The following sections of ``zuul.conf`` are used by all Zuul components:
       A list of zookeeper hosts for Zuul to use when communicating
       with Nodepool.
 
+   .. attr:: tls_cert
+      :required:
+
+      The path to the PEM encoded certificate file.
+
+   .. attr:: tls_key
+      :required:
+
+      The path to the PEM encoded key file.
+
+   .. attr:: tls_ca
+      :required:
+
+      The path to the PEM encoded CA certificate file.
+
    .. attr:: session_timeout
       :default: 10.0
 
       The ZooKeeper session timeout, in seconds.
-
-   .. attr:: tls_cert
-
-      If using TLS, the path to the PEM encoded certificate file.
-
-   .. attr:: tls_key
-
-      If using TLS, the path to the PEM encoded key file.
-
-   .. attr:: tls_ca
-
-      If using TLS, the path to the PEM encoded CA certificate file.
 
 .. _scheduler:
 
