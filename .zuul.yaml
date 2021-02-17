@@ -224,9 +224,6 @@
             vars:
               tox_install_bindep: false
         - tox-py36:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
             nodeset: ubuntu-bionic
             timeout: 4800  # 80 minutes
             vars: &zuul_tox_vars
@@ -238,9 +235,6 @@
                     YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
             post-run: playbooks/common/post-system-logs.yaml
         - tox-py38:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
             timeout: 4800  # 80 minutes
             nodeset: ubuntu-bionic
             vars: *zuul_tox_vars
@@ -276,16 +270,10 @@
             vars:
               tox_install_bindep: false
         - tox-py36:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
             nodeset: ubuntu-bionic
             timeout: 4800  # 80 minutes
             vars: *zuul_tox_vars
         - tox-py38:
-            irrelevant-files:
-              - zuul/cmd/migrate.py
-              - playbooks/zuul-migrate/.*
             timeout: 4800  # 80 minutes
             nodeset: ubuntu-bionic
             vars: *zuul_tox_vars
