@@ -3656,6 +3656,11 @@ class ChrootedKazooFixture(fixtures.Fixture):
         rand_test_path = '%s_%s_%s' % (random_bits, os.getpid(), self.test_id)
         self.zookeeper_chroot = f"/test/{rand_test_path}"
 
+        self.zk_hosts = '%s:%s%s' % (
+            self.zookeeper_host,
+            self.zookeeper_port,
+            self.zookeeper_chroot)
+
         self.addCleanup(self._cleanup)
 
         # Ensure the chroot path exists and clean up any pre-existing znodes.
@@ -3985,6 +3990,11 @@ class BaseTestCase(testtools.TestCase):
             # Popen.cpu_times() is broken on darwin so patch it with a fake.
             Popen.cpu_times = cpu_times
 
+    def setupZK(self):
+        self.zk_chroot_fixture = self.useFixture(
+            ChrootedKazooFixture(self.id())
+        )
+
 
 class SymLink(object):
     def __init__(self, target):
@@ -4292,11 +4302,7 @@ class ZuulTestCase(BaseTestCase):
                 'gearman', 'ssl_key',
                 os.path.join(FIXTURE_DIR, 'gearman/client.key'))
 
-        zk_hosts = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
-        self.config.set('zookeeper', 'hosts', zk_hosts)
+        self.config.set('zookeeper', 'hosts', self.zk_chroot_fixture.zk_hosts)
         self.config.set('zookeeper', 'session_timeout', '30')
         self.config.set('zookeeper', 'tls_cert',
                         self.zk_chroot_fixture.zookeeper_cert)
@@ -4562,10 +4568,6 @@ class ZuulTestCase(BaseTestCase):
         with open(os.path.join(FIXTURE_DIR, 'ssh.pem')) as i:
             with open(private_key_file, 'w') as o:
                 o.write(i.read())
-
-    def setupZK(self):
-        self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id()))
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
