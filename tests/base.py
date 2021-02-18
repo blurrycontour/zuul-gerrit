@@ -3953,6 +3953,17 @@ class BaseTestCase(testtools.TestCase):
             # Popen.cpu_times() is broken on darwin so patch it with a fake.
             Popen.cpu_times = cpu_times
 
+    def setupZK(self):
+        zk_chroot_fixture = self.useFixture(
+            ChrootedKazooFixture(self.id())
+        )
+        zk_hosts = "{}:{}{}".format(
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot,
+        )
+        return zk_chroot_fixture, zk_hosts
+
 
 class SymLink(object):
     def __init__(self, target):
@@ -4178,11 +4189,12 @@ class ZuulTestCase(BaseTestCase):
     def setUp(self):
         super(ZuulTestCase, self).setUp()
 
-        self.setupZK()
+        zk_chroot_fixture, zk_hosts = self.setupZK()
         self.fake_nodepool = FakeNodepool(
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot
+        )
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4264,10 +4276,6 @@ class ZuulTestCase(BaseTestCase):
                 'gearman', 'ssl_key',
                 os.path.join(FIXTURE_DIR, 'gearman/client.key'))
 
-        zk_hosts = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
         self.config.set('zookeeper', 'hosts', zk_hosts)
         self.config.set('zookeeper', 'session_timeout', '30')
 
@@ -4529,10 +4537,6 @@ class ZuulTestCase(BaseTestCase):
         with open(os.path.join(FIXTURE_DIR, 'ssh.pem')) as i:
             with open(private_key_file, 'w') as o:
                 o.write(i.read())
-
-    def setupZK(self):
-        self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id()))
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
