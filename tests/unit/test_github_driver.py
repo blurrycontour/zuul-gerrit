@@ -1616,7 +1616,7 @@ class TestGithubWebhook(ZuulTestCase):
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
-                           self.test_root, self.zk_config))
+                           self.test_root, self.zk_hosts))
 
         host = '127.0.0.1'
         # Wait until web server is started

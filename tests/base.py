@@ -3951,6 +3951,17 @@ class BaseTestCase(testtools.TestCase):
             # Popen.cpu_times() is broken on darwin so patch it with a fake.
             Popen.cpu_times = cpu_times
 
+    def setupZK(self):
+        zk_chroot_fixture = self.useFixture(
+            ChrootedKazooFixture(self.id())
+        )
+        zk_hosts = "{}:{}{}".format(
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot,
+        )
+        return zk_chroot_fixture, zk_hosts
+
 
 class SymLink(object):
     def __init__(self, target):
@@ -4173,13 +4184,14 @@ class ZuulTestCase(BaseTestCase):
     def setUp(self):
         super(ZuulTestCase, self).setUp()
 
-        self.setupZK()
+        self.zk_chroot_fixture, self.zk_hosts = self.setupZK()
         self.fake_nodepool = FakeNodepool(
             self.zk_chroot_fixture.zookeeper_host,
             self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            self.zk_chroot_fixture.zookeeper_chroot
+        )
 
-        self.zk_client = ZooKeeperClient(hosts=self.zk_config)
+        self.zk_client = ZooKeeperClient(hosts=self.zk_hosts)
         self.zk_client.connect()
 
         if not KEEP_TEMPDIRS:
@@ -4302,7 +4314,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.scheds = SchedulerTestManager()
         self.scheds.create(
-            self.log, self.config, self.zk_config, self.changes,
+            self.log, self.config, self.zk_hosts, self.changes,
             self.additional_event_queues, self.upstream_root, self.rpcclient,
             self.poller_events, self.git_url_with_auth, self.source_only,
             self.fake_sql, self.addCleanup)
@@ -4513,14 +4525,6 @@ class ZuulTestCase(BaseTestCase):
         with open(os.path.join(FIXTURE_DIR, 'ssh.pem')) as i:
             with open(private_key_file, 'w') as o:
                 o.write(i.read())
-
-    def setupZK(self):
-        self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id()))
-        self.zk_config = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)
