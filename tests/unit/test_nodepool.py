@@ -18,7 +18,7 @@ import time
 from zuul import model
 import zuul.nodepool
 
-from tests.base import BaseTestCase, ChrootedKazooFixture, FakeNodepool
+from tests.base import BaseTestCase, FakeNodepool
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
@@ -31,14 +31,9 @@ class TestNodepool(BaseTestCase):
         super(TestNodepool, self).setUp()
 
         self.statsd = None
-        self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id()))
-        self.zk_config = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+        zk_chroot_fixture, zk_hosts = self.setupZK()
 
-        self.zk_client = ZooKeeperClient(self.zk_config)
+        self.zk_client = ZooKeeperClient(zk_hosts)
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
@@ -50,9 +45,10 @@ class TestNodepool(BaseTestCase):
         self.nodepool = zuul.nodepool.Nodepool(self)
 
         self.fake_nodepool = FakeNodepool(
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+            zk_chroot_fixture.zookeeper_host,
+            zk_chroot_fixture.zookeeper_port,
+            zk_chroot_fixture.zookeeper_chroot
+        )
         self.addCleanup(self.fake_nodepool.stop)
 
     def waitForRequests(self):
