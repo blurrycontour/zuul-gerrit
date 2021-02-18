@@ -3111,6 +3111,14 @@ class RecordingMergeClient(zuul.merger.client.MergeClient):
             name, data, build_set, precedence, event=event)
 
 
+class TestZooKeeperClient(ZooKeeperClient):
+    TLS_REQUIRED = False
+
+
+class TestMergeServer(zuul.merger.server.MergeServer):
+    _zk_client_class = TestZooKeeperClient
+
+
 class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     """An Ansible executor to be used in tests.
 
@@ -3124,6 +3132,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     """
 
     _job_class = RecordingAnsibleJob
+    _zk_client_class = TestZooKeeperClient
 
     def __init__(self, *args, **kw):
         self._run_ansible: bool = kw.pop('_run_ansible', False)
@@ -3227,6 +3236,10 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         for build in self.running_builds:
             build.release()
         super(RecordingExecutorServer, self).stop()
+
+
+class TestScheduler(zuul.scheduler.Scheduler):
+    _zk_client_class = TestZooKeeperClient
 
 
 class FakeGearmanServer(gear.Server):
@@ -3969,23 +3982,26 @@ class SymLink(object):
 
 
 class SchedulerTestApp:
-    def __init__(self, log: Logger, config: ConfigParser, zk_config: str,
-                 changes: Dict[str, Dict[str, Change]],
-                 additional_event_queues, upstream_root: str,
-                 rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
-                 source_only: bool,
-                 fake_sql: bool,
-                 add_cleanup: Callable[[Callable[[], None]], None]):
+    def __init__(
+        self,
+        log: Logger,
+        config: ConfigParser,
+        changes: Dict[str, Dict[str, Change]],
+        additional_event_queues,
+        upstream_root: str,
+        rpcclient: RPCClient,
+        poller_events,
+        git_url_with_auth: bool,
+        source_only: bool,
+        fake_sql: bool,
+        add_cleanup: Callable[[Callable[[], None]], None],
+    ):
 
         self.log = log
         self.config = config
-        self.zk_config = zk_config
         self.changes = changes
 
-        zk_client = ZooKeeperClient(self.zk_config, timeout=30.0)
-        zk_client.connect()
-
-        self.sched = zuul.scheduler.Scheduler(self.config, zk_client)
+        self.sched = TestScheduler(self.config)
         self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
@@ -4041,17 +4057,33 @@ class SchedulerTestManager:
     def __init__(self):
         self.instances = []
 
-    def create(self, log: Logger, config: ConfigParser, zk_config: str,
-               changes: Dict[str, Dict[str, Change]], additional_event_queues,
-               upstream_root: str, rpcclient: RPCClient, poller_events,
-               git_url_with_auth: bool, source_only: bool,
-               fake_sql: bool,
-               add_cleanup: Callable[[Callable[[], None]], None])\
-            -> SchedulerTestApp:
-        app = SchedulerTestApp(log, config, zk_config, changes,
-                               additional_event_queues, upstream_root,
-                               rpcclient, poller_events, git_url_with_auth,
-                               source_only, fake_sql, add_cleanup)
+    def create(
+        self,
+        log: Logger,
+        config: ConfigParser,
+        changes: Dict[str, Dict[str, Change]],
+        additional_event_queues,
+        upstream_root: str,
+        rpcclient: RPCClient,
+        poller_events,
+        git_url_with_auth: bool,
+        source_only: bool,
+        fake_sql: bool,
+        add_cleanup: Callable[[Callable[[], None]], None],
+    ) -> SchedulerTestApp:
+        app = SchedulerTestApp(
+            log,
+            config,
+            changes,
+            additional_event_queues,
+            upstream_root,
+            rpcclient,
+            poller_events,
+            git_url_with_auth,
+            source_only,
+            fake_sql,
+            add_cleanup,
+        )
         self.instances.append(app)
         return app
 
@@ -4176,8 +4208,8 @@ class ZuulTestCase(BaseTestCase):
                              % name)
 
     def _startMerger(self):
-        self.merge_server = zuul.merger.server.MergeServer(
-            self.config, self.zk_client, self.scheds.first.connections
+        self.merge_server = TestMergeServer(
+            self.config, self.scheds.first.connections
         )
         self.merge_server.start()
 
@@ -4281,6 +4313,10 @@ class ZuulTestCase(BaseTestCase):
             get_default(self.config, 'gearman', 'ssl_cert'),
             get_default(self.config, 'gearman', 'ssl_ca'))
 
+        # Provide ZooKeeper hosts in config, so each component can create its
+        # own connection.
+        self.config.set("zookeeper", "hosts", self.zk_hosts)
+
         gerritsource.GerritSource.replication_timeout = 1.5
         gerritsource.GerritSource.replication_retry_interval = 0.5
         gerritconnection.GerritEventConnector.delay = 0.0
@@ -4301,23 +4337,31 @@ class ZuulTestCase(BaseTestCase):
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
             self.config,
-            self.zk_client,
             executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
             _test_root=self.test_root,
             keep_jobdir=KEEP_TEMPDIRS,
-            log_console_port=self.log_console_port)
+            log_console_port=self.log_console_port,
+        )
         self.executor_server.start()
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds
 
         self.scheds = SchedulerTestManager()
         self.scheds.create(
-            self.log, self.config, self.zk_hosts, self.changes,
-            self.additional_event_queues, self.upstream_root, self.rpcclient,
-            self.poller_events, self.git_url_with_auth, self.source_only,
-            self.fake_sql, self.addCleanup)
+            self.log,
+            self.config,
+            self.changes,
+            self.additional_event_queues,
+            self.upstream_root,
+            self.rpcclient,
+            self.poller_events,
+            self.git_url_with_auth,
+            self.source_only,
+            self.fake_sql,
+            self.addCleanup,
+        )
 
         if hasattr(self, 'fake_github'):
             self.additional_event_queues.append(
@@ -4379,7 +4423,7 @@ class ZuulTestCase(BaseTestCase):
         config = configparser.ConfigParser()
         config.read(os.path.join(FIXTURE_DIR, config_file))
 
-        sections = ['zuul', 'scheduler', 'executor', 'merger']
+        sections = ['zuul', 'scheduler', 'executor', 'merger', 'zookeeper']
         for section in sections:
             if not config.has_section(section):
                 config.add_section(section)
@@ -4639,7 +4683,6 @@ class ZuulTestCase(BaseTestCase):
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
         self.zk_client.disconnect()
-        self.scheds.execute(lambda app: app.sched.zk_client.disconnect())
         self.printHistory()
         # We whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.

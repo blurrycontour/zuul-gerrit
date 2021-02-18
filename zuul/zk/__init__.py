@@ -29,6 +29,8 @@ class ZooKeeperClient(object):
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
 
+    TLS_REQUIRED = True
+
     def __init__(
         self,
         hosts: str,
@@ -157,7 +159,7 @@ class ZooKeeperClient(object):
         tls_key = get_default(config, "zookeeper", "tls_key")
         tls_cert = get_default(config, "zookeeper", "tls_cert")
         tls_ca = get_default(config, "zookeeper", "tls_ca")
-        if not all([tls_key, tls_cert, tls_ca]):
+        if cls.TLS_REQUIRED and not all([tls_key, tls_cert, tls_ca]):
             raise Exception(
                 "A TLS ZooKeeper connection is required; please supply the "
                 "tls_* zookeeper config values."
