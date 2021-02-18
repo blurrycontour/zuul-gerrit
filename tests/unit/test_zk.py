@@ -18,7 +18,7 @@ import testtools
 from zuul import model
 import zuul.zk.exceptions
 
-from tests.base import BaseTestCase, ChrootedKazooFixture
+from tests.base import BaseTestCase
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
@@ -28,15 +28,10 @@ class TestZK(BaseTestCase):
     def setUp(self):
         super().setUp()
 
-        self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id()))
-        zk_hosts = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+        self.setupZK()
 
         self.zk_client = ZooKeeperClient(
-            zk_hosts,
+            self.zk_chroot_fixture.zk_hosts,
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
             tls_key=self.zk_chroot_fixture.zookeeper_key,
             tls_ca=self.zk_chroot_fixture.zookeeper_ca)
