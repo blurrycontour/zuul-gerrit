@@ -27,7 +27,6 @@ import time
 import zuul.web
 import zuul.lib.log_streamer
 from zuul.lib.fingergw import FingerGateway
-from zuul.zk import ZooKeeperClient
 import tests.base
 from tests.base import iterate_timeout, ZuulWebFixture
 
@@ -251,7 +250,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         '''
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+            ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
@@ -330,7 +329,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
     def test_websocket_streaming(self):
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+            ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
@@ -406,7 +405,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
     def test_websocket_hangup(self):
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+            ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
@@ -522,14 +521,11 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         logfile = open(ansible_log, 'r')
         self.addCleanup(logfile.close)
 
-        zk_client = ZooKeeperClient.fromConfig(self.config)
-        zk_client.connect()
-        self.addCleanup(zk_client.disconnect)
-
         # Start the finger gateway daemon
         gateway = FingerGateway(
+            self.config,
             ('127.0.0.1', self.gearman_server.port, None, None, None),
-            zk_client, (self.host, 0),
+            (self.host, 0),
             user=None,
             command_socket=None,
             pid_file=None
