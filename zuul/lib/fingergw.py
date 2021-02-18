@@ -16,11 +16,13 @@ import functools
 import logging
 import socket
 import threading
+from configparser import ConfigParser
 from typing import Optional, Tuple
+
 import zuul.rpcclient
+from zuul.lib import streamer_utils
 from zuul.lib.commandsocket import CommandSocket
 from zuul.zk import ZooKeeperClient
-from zuul.lib import streamer_utils
 
 
 COMMANDS = ['stop']
@@ -99,12 +101,14 @@ class FingerGateway(object):
     executor, and streaming the results back to our client.
     '''
 
+    _zk_client_class = ZooKeeperClient
+
     log = logging.getLogger("zuul.fingergw")
 
     def __init__(
         self,
+        config: ConfigParser,
         gearman: Tuple,
-        zk_client: ZooKeeperClient,
         address: Tuple,
         user: Optional[str],
         command_socket: Optional[str],
@@ -113,6 +117,7 @@ class FingerGateway(object):
         '''
         Initialize the finger gateway.
 
+        :param config: The parsed Zuul configuration.
         :param tuple gearman: Gearman connection information. This should
             include the server, port, SSL key, SSL cert, and SSL CA.
         :param tuple address: The address and port to bind to for our gateway.
@@ -126,7 +131,6 @@ class FingerGateway(object):
         self.gear_ssl_key = gearman[2]
         self.gear_ssl_cert = gearman[3]
         self.gear_ssl_ca = gearman[4]
-        self.zk_client = zk_client
         self.address = address
         self.user = user
         self.pid_file = pid_file
@@ -143,6 +147,9 @@ class FingerGateway(object):
         self.command_map = dict(
             stop=self.stop,
         )
+
+        self.zk_client = self._zk_client_class.fromConfig(config)
+        self.zk_client.connect()
 
     def _runCommand(self):
         while self.command_running:
@@ -218,6 +225,8 @@ class FingerGateway(object):
                 self.command_socket.stop()
             except Exception:
                 self.log.exception("Error stopping command socket:")
+
+        self.zk_client.disconnect()
 
         self.log.info("Finger gateway is stopped")
 

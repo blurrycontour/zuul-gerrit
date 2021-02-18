@@ -31,6 +31,7 @@ import threading
 import time
 import traceback
 from concurrent.futures.process import ProcessPoolExecutor, BrokenProcessPool
+from configparser import ConfigParser
 from typing import Any, Dict, List, Optional
 
 import git
@@ -2557,15 +2558,14 @@ class ExecutorServer(BaseMergeServer):
 
     def __init__(
         self,
-        config,
-        zk_client,
+        config: ConfigParser,
         connections=None,
         jobdir_root=None,
         keep_jobdir=False,
         log_streaming_port=DEFAULT_FINGER_PORT,
         log_console_port=DEFAULT_STREAM_PORT,
     ):
-        super().__init__(config, 'executor', zk_client, connections)
+        super().__init__(config, 'executor', connections)
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -2615,7 +2615,7 @@ class ExecutorServer(BaseMergeServer):
 
         # TODO(tobiash): Take cgroups into account
         self.update_workers = multiprocessing.cpu_count()
-        self.update_threads = []
+        self.update_threads: List[threading.Thread] = []
         # If the execution driver ever becomes configurable again,
         # this is where it would happen.
         execution_wrapper_name = 'bubblewrap'
@@ -2654,7 +2654,7 @@ class ExecutorServer(BaseMergeServer):
                 if subprocess.Popen(["rm", "-Rf", jobdir]).wait():
                     raise RuntimeError("Couldn't delete: " + jobdir)
 
-        self.job_workers = {}
+        self.job_workers: Dict[str, AnsibleJob] = {}
         self.disk_accountant = DiskAccountant(self.jobdir_root,
                                               self.disk_limit_per_job,
                                               self.stopJobDiskFull,
@@ -2786,6 +2786,8 @@ class ExecutorServer(BaseMergeServer):
 
     def stop(self):
         self.log.debug("Stopping")
+        # Use the BaseMergeServer's stop method to disconnect from ZooKeeper.
+        super().stop()
         self.connections.stop()
         self.disk_accountant.stop()
         # The governor can change function registration, so make sure
@@ -2826,8 +2828,6 @@ class ExecutorServer(BaseMergeServer):
 
         # All job results should have been sent by now, shutdown the
         # gearman workers.
-        if self.process_merge_jobs:
-            super().stop()
         self.executor_gearworker.stop()
 
         if self.process_worker is not None:
