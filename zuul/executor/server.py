@@ -2554,14 +2554,13 @@ class ExecutorServer(BaseMergeServer):
     def __init__(
         self,
         config,
-        zk_client,
         connections=None,
         jobdir_root=None,
         keep_jobdir=False,
         log_streaming_port=DEFAULT_FINGER_PORT,
         log_console_port=DEFAULT_STREAM_PORT,
     ):
-        super().__init__(config, 'executor', zk_client, connections)
+        super().__init__(config, 'executor', connections)
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
@@ -2801,6 +2800,8 @@ class ExecutorServer(BaseMergeServer):
 
     def stop(self):
         self.log.debug("Stopping")
+        # Use the BaseMergeServer's stop method to disconnect from ZooKeeper.
+        super().stop()
         self.connections.stop()
         self.disk_accountant.stop()
         # The governor can change function registration, so make sure
@@ -2841,8 +2842,6 @@ class ExecutorServer(BaseMergeServer):
 
         # All job results should have been sent by now, shutdown the
         # gearman workers.
-        if self.process_merge_jobs:
-            super().stop()
         self.executor_gearworker.stop()
 
         if self.process_worker is not None:
