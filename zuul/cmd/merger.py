@@ -19,7 +19,6 @@ import sys
 
 import zuul.cmd
 from zuul.merger.server import COMMANDS, MergeServer
-from zuul.zk import ZooKeeperClient
 
 
 class Merger(zuul.cmd.ZuulDaemonApp):
@@ -52,10 +51,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
 
         self.setup_logging('merger', 'log_config')
 
-        zk_client = ZooKeeperClient.fromConfig(self.config)
-        zk_client.connect()
-
-        self.merger = MergeServer(self.config, zk_client, self.connections)
+        self.merger = MergeServer(self.config, self.connections)
         self.merger.start()
 
         if self.args.nodaemon:
@@ -68,7 +64,6 @@ class Merger(zuul.cmd.ZuulDaemonApp):
                     self.exit_handler(signal.SIGINT, None)
         else:
             self.merger.join()
-            zk_client.disconnect()
 
 
 def main():
