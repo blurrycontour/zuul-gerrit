@@ -25,7 +25,6 @@ from zuul.lib.config import get_default
 from zuul.lib.statsd import get_statsd_config
 from zuul.merger.client import MergeClient
 from zuul.nodepool import Nodepool
-from zuul.zk import ZooKeeperClient
 
 
 class Scheduler(zuul.cmd.ZuulDaemonApp):
@@ -140,10 +139,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         self.setup_logging('scheduler', 'log_config')
 
-        zk_client = ZooKeeperClient.fromConfig(self.config)
-        zk_client.connect()
-
-        self.sched = zuul.scheduler.Scheduler(self.config, zk_client)
+        self.sched = zuul.scheduler.Scheduler(self.config)
 
         self.sched.setZuulApp(self)
         merger = MergeClient(self.config, self.sched)
@@ -188,7 +184,6 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
                     self.exit_handler(signal.SIGINT, None)
         else:
             self.sched.join()
-            zk_client.disconnect()
 
 
 def main():

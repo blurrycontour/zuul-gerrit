@@ -305,14 +305,13 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
 
+    _zk_client_class = ZooKeeperClient
+
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
 
     def __init__(
-        self,
-        config: ConfigParser,
-        zk_client: ZooKeeperClient,
-        testonly: bool = False,
+        self, config: ConfigParser, testonly: bool = False
     ):
         threading.Thread.__init__(self)
         self.daemon = True
@@ -348,8 +347,10 @@ class Scheduler(threading.Thread):
         # self.triggers['connection_name'] = triggerObject
         self.triggers: Dict[str, BaseTrigger] = dict()
         self.config = config
-        self.zk_client = zk_client
-        self.zk_nodepool = ZooKeeperNodepool(zk_client)
+
+        self.zk_client = self._zk_client_class.fromConfig(self.config)
+        self.zk_client.connect()
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
 
         self.trigger_event_queue: Queue = Queue()
         self.result_event_queue: Queue = Queue()
@@ -402,6 +403,7 @@ class Scheduler(threading.Thread):
         self.stats_thread.start()
 
     def stop(self):
+        self.zk_client.disconnect()
         self._stopped = True
         self.stats_stop.set()
         self.stopConnections()

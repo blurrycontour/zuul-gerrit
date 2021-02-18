@@ -23,9 +23,6 @@ import zuul.driver.sql
 import zuul.driver.github
 import zuul.lib.auth
 
-from zuul.lib.config import get_default
-from zuul.zk import ZooKeeperClient
-
 
 class WebServer(zuul.cmd.ZuulDaemonApp):
     app_name = 'web'
@@ -49,31 +46,6 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
     def _run(self):
         info = zuul.model.WebInfo.fromConfig(self.config)
 
-        params = dict()
-
-        params['info'] = info
-        params['listen_address'] = get_default(self.config,
-                                               'web', 'listen_address',
-                                               '127.0.0.1')
-        params['listen_port'] = get_default(self.config, 'web', 'port', 9000)
-        params['static_cache_expiry'] = get_default(self.config, 'web',
-                                                    'static_cache_expiry',
-                                                    3600)
-        params['static_path'] = get_default(self.config,
-                                            'web', 'static_path',
-                                            None)
-        params['gear_server'] = get_default(self.config, 'gearman', 'server')
-        params['gear_port'] = get_default(self.config, 'gearman', 'port', 4730)
-        params['ssl_key'] = get_default(self.config, 'gearman', 'ssl_key')
-        params['ssl_cert'] = get_default(self.config, 'gearman', 'ssl_cert')
-        params['ssl_ca'] = get_default(self.config, 'gearman', 'ssl_ca')
-
-        params['command_socket'] = get_default(
-            self.config, 'web', 'command_socket',
-            '/var/lib/zuul/web.socket')
-
-        params['connections'] = self.connections
-        params['authenticators'] = self.authenticators
         # Validate config here before we spin up the ZuulWeb object
         for conn_name, connection in self.connections.connections.items():
             try:
@@ -82,12 +54,13 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                 self.log.exception("Error validating config")
                 sys.exit(1)
 
-        zk_client = ZooKeeperClient.fromConfig(self.config)
-        zk_client.connect()
-        params["zk_client"] = zk_client
-
         try:
-            self.web = zuul.web.ZuulWeb(**params)
+            self.web = zuul.web.ZuulWeb(
+                config=self.config,
+                info=info,
+                connections=self.connections,
+                authenticators=self.authenticators,
+            )
         except Exception:
             self.log.exception("Error creating ZuulWeb:")
             sys.exit(1)
