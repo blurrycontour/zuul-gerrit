@@ -20,7 +20,6 @@ from typing import Optional
 import zuul.cmd
 from zuul.lib.config import get_default
 from zuul.lib.fingergw import COMMANDS, FingerGateway
-from zuul.zk import ZooKeeperClient
 
 
 class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
@@ -73,12 +72,9 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
         ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
         ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
 
-        zk_client = ZooKeeperClient.fromConfig(self.config)
-        zk_client.connect()
-
         self.gateway = FingerGateway(
+            self.config,
             (gear_server, gear_port, ssl_key, ssl_cert, ssl_ca),
-            zk_client,
             (host, port),
             user,
             cmdsock,
@@ -101,7 +97,6 @@ class FingerGatewayApp(zuul.cmd.ZuulDaemonApp):
                     break
         else:
             self.gateway.wait()
-            zk_client.disconnect()
 
         self.log.info('Stopped Zuul finger gateway app')
 

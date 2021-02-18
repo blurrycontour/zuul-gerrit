@@ -42,6 +42,7 @@ from zuul.lib.statsd import get_statsd, normalize_statsd_name
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
+from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -326,6 +327,10 @@ class Scheduler(threading.Thread):
         self.triggers = dict()
         self.config = config
 
+        self.zk_client = ZooKeeperClient.fromConfig(self.config)
+        self.zk_client.connect()
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
+
         self.trigger_event_queue = queue.Queue()
         self.result_event_queue = queue.Queue()
         self.management_event_queue = zuul.lib.queue.MergedQueue()
@@ -377,6 +382,7 @@ class Scheduler(threading.Thread):
         self.stats_thread.start()
 
     def stop(self):
+        self.zk_client.disconnect()
         self._stopped = True
         self.stats_stop.set()
         self.stopConnections()
