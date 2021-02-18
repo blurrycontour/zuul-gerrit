@@ -89,7 +89,7 @@ class TestSchedulerZone(ZuulTestCase):
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_server_unzoned = RecordingExecutorServer(
-            config, self.zk_client,
+            config,
             connections=executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
