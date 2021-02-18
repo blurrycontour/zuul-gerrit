@@ -27,7 +27,7 @@ class TestWebURLs(ZuulTestCase):
     def setUp(self):
         super(TestWebURLs, self).setUp()
         self.web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+            ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,

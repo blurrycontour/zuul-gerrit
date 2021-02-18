@@ -20,7 +20,6 @@ from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
 import codecs
 import copy
-from typing import Optional
 from datetime import datetime
 import json
 import logging
@@ -38,6 +37,7 @@ import zuul.rpcclient
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.lib.auth import AuthenticatorRegistry
+from zuul.lib.config import get_default
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
@@ -1208,34 +1208,47 @@ class StreamManager(object):
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web.ZuulWeb")
 
-    # There is an import loop with ConnectionRegistry
+    _zk_client_class = ZooKeeperClient
+
     def __init__(self,
-                 listen_address: str, listen_port: int,
-                 gear_server: str, gear_port: int,
-                 connections,  # ConnectionRegistry,
+                 config,
+                 connections,
                  authenticators: AuthenticatorRegistry,
-                 zk_client: ZooKeeperClient,
-                 ssl_key: str = None, ssl_cert: str = None, ssl_ca: str = None,
-                 static_cache_expiry: int = 3600,
-                 info: Optional[zuul.model.WebInfo] = None,
-                 static_path: Optional[str] = None,
-                 command_socket: Optional[str] = None):
+                 info: zuul.model.WebInfo = None):
         self.start_time = time.time()
-        self.listen_address = listen_address
-        self.listen_port = listen_port
+        self.config = config
+        self.listen_address = get_default(self.config,
+                                          'web', 'listen_address',
+                                          '127.0.0.1')
+        self.listen_port = get_default(self.config, 'web', 'port', 9000)
         self.server = None
-        self.static_cache_expiry = static_cache_expiry
+        self.static_cache_expiry = get_default(self.config, 'web',
+                                               'static_cache_expiry',
+                                               3600)
         self.info = info
-        self.static_path = os.path.abspath(static_path or STATIC_DIR)
+        self.static_path = os.path.abspath(
+            get_default(self.config, 'web', 'static_path', STATIC_DIR)
+        )
+        gear_server = get_default(self.config, 'gearman', 'server')
+        gear_port = get_default(self.config, 'gearman', 'port', 4730)
+        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
+        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
+        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
+
         # instanciate handlers
         self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
                                             ssl_key, ssl_cert, ssl_ca,
                                             client_id='Zuul Web Server')
-        self.zk_client = zk_client
+        self.zk_client = self._zk_client_class.fromConfig(self.config)
 
         self.connections = connections
         self.authenticators = authenticators
         self.stream_manager = StreamManager()
+
+        command_socket = get_default(
+            self.config, 'web', 'command_socket',
+            '/var/lib/zuul/web.socket'
+        )
 
         self.command_socket = commandsocket.CommandSocket(command_socket)
 
@@ -1352,8 +1365,8 @@ class ZuulWeb(object):
         cherrypy.config.update({
             'global': {
                 'environment': 'production',
-                'server.socket_host': listen_address,
-                'server.socket_port': int(listen_port),
+                'server.socket_host': self.listen_address,
+                'server.socket_port': int(self.listen_port),
             },
         })
 
@@ -1365,6 +1378,7 @@ class ZuulWeb(object):
 
     def start(self):
         self.log.debug("ZuulWeb starting")
+        self.zk_client.connect()
         self.stream_manager.start()
         self.wsplugin = WebSocketPlugin(cherrypy.engine)
         self.wsplugin.subscribe()

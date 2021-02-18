@@ -42,6 +42,7 @@ from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul.model import Build, HoldRequest, Tenant, TriggerEvent
+from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -287,10 +288,12 @@ class Scheduler(threading.Thread):
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
 
+    _zk_client_class = ZooKeeperClient
+
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
 
-    def __init__(self, config, zk_client, testonly=False):
+    def __init__(self, config, testonly=False):
         threading.Thread.__init__(self)
         self.daemon = True
         self.hostname = socket.getfqdn()
@@ -326,8 +329,9 @@ class Scheduler(threading.Thread):
         self.triggers = dict()
         self.config = config
 
-        self.zk_client = zk_client
-        self.zk_nodepool = ZooKeeperNodepool(zk_client)
+        self.zk_client = self._zk_client_class.fromConfig(self.config)
+        self.zk_client.connect()
+        self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
 
         self.trigger_event_queue = queue.Queue()
         self.result_event_queue = queue.Queue()
@@ -380,6 +384,7 @@ class Scheduler(threading.Thread):
         self.stats_thread.start()
 
     def stop(self):
+        self.zk_client.disconnect()
         self._stopped = True
         self.stats_stop.set()
         self.stopConnections()

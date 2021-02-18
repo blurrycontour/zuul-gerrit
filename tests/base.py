@@ -3111,6 +3111,18 @@ class RecordingMergeClient(zuul.merger.client.MergeClient):
             name, data, build_set, precedence, event=event)
 
 
+class TestZooKeeperClient(ZooKeeperClient):
+    TLS_REQUIRED = False
+
+
+class TestMergeServer(zuul.merger.server.MergeServer):
+    _zk_client_class = TestZooKeeperClient
+
+
+class TestZuulWeb(zuul.web.ZuulWeb):
+    _zk_client_class = TestZooKeeperClient
+
+
 class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     """An Ansible executor to be used in tests.
 
@@ -3124,6 +3136,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
     """
 
     _job_class = RecordingAnsibleJob
+    _zk_client_class = TestZooKeeperClient
 
     def __init__(self, *args, **kw):
         self._run_ansible = kw.pop('_run_ansible', False)
@@ -3228,6 +3241,10 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         for build in self.running_builds:
             build.release()
         super(RecordingExecutorServer, self).stop()
+
+
+class TestScheduler(zuul.scheduler.Scheduler):
+    _zk_client_class = TestZooKeeperClient
 
 
 class FakeGearmanServer(gear.Server):
@@ -3698,7 +3715,7 @@ class WebProxyFixture(fixtures.Fixture):
 
 
 class ZuulWebFixture(fixtures.Fixture):
-    def __init__(self, gearman_server_port,
+    def __init__(self,
                  changes: Dict[str, Dict[str, Change]], config: ConfigParser,
                  additional_event_queues, upstream_root: str,
                  rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
@@ -3706,7 +3723,7 @@ class ZuulWebFixture(fixtures.Fixture):
                  test_root: str, fake_sql: bool = True,
                  info: Optional[zuul.model.WebInfo] = None):
         super(ZuulWebFixture, self).__init__()
-        self.gearman_server_port = gearman_server_port
+        self.config = config
         self.connections = TestConnectionRegistry(
             changes, config, additional_event_queues, upstream_root, rpcclient,
             poller_events, git_url_with_auth, add_cleanup, fake_sql)
@@ -3722,20 +3739,14 @@ class ZuulWebFixture(fixtures.Fixture):
             self.info = zuul.model.WebInfo.fromConfig(config)
         else:
             self.info = info
-        self.zk_client = ZooKeeperClient.fromConfig(config,
-                                                    _require_tls=False)
-        self.zk_client.connect()
         self.test_root = test_root
 
     def _setUp(self):
         # Start the web server
-        self.web = zuul.web.ZuulWeb(
-            listen_address='::', listen_port=0,
-            gear_server='127.0.0.1', gear_port=self.gearman_server_port,
+        self.web = TestZuulWeb(
+            config=self.config,
             info=self.info,
             connections=self.connections,
-            zk_client=self.zk_client,
-            command_socket=os.path.join(self.test_root, 'web.socket'),
             authenticators=self.authenticators)
         self.web.start()
         self.addCleanup(self.stop)
@@ -3983,11 +3994,7 @@ class SchedulerTestApp:
         self.config = config
         self.changes = changes
 
-        zk_client = ZooKeeperClient.fromConfig(self.config,
-                                               _require_tls=False)
-        zk_client.connect()
-
-        self.sched = zuul.scheduler.Scheduler(self.config, zk_client)
+        self.sched = TestScheduler(self.config)
         self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
@@ -4181,8 +4188,8 @@ class ZuulTestCase(BaseTestCase):
                              % name)
 
     def _startMerger(self):
-        self.merge_server = zuul.merger.server.MergeServer(
-            self.config, self.zk_client, self.scheds.first.connections
+        self.merge_server = TestMergeServer(
+            self.config, self.scheds.first.connections
         )
         self.merge_server.start()
 
@@ -4253,6 +4260,11 @@ class ZuulTestCase(BaseTestCase):
         self.config.set(
             'merger', 'command_socket',
             os.path.join(self.test_root, 'merger.socket'))
+        self.config.set('web', 'listen_address', '::')
+        self.config.set('web', 'port', '0')
+        self.config.set(
+            'web', 'command_socket',
+            os.path.join(self.test_root, 'web.socket'))
 
         self.statsd = FakeStatsd()
         if self.config.has_section('statsd'):
@@ -4279,16 +4291,16 @@ class ZuulTestCase(BaseTestCase):
         self.config.set('zookeeper', 'hosts', zk_hosts)
         self.config.set('zookeeper', 'session_timeout', '30')
 
-        self.zk_client = ZooKeeperClient.fromConfig(self.config,
-                                                    _require_tls=False)
-        self.zk_client.connect()
-
         self.rpcclient = zuul.rpcclient.RPCClient(
             self.config.get('gearman', 'server'),
             self.gearman_server.port,
             get_default(self.config, 'gearman', 'ssl_key'),
             get_default(self.config, 'gearman', 'ssl_cert'),
             get_default(self.config, 'gearman', 'ssl_ca'))
+
+        # Provide ZooKeeper hosts in config, so each component can create its
+        # own connection.
+        self.config.set("zookeeper", "hosts", zk_hosts)
 
         gerritsource.GerritSource.replication_timeout = 1.5
         gerritsource.GerritSource.replication_retry_interval = 0.5
@@ -4310,7 +4322,6 @@ class ZuulTestCase(BaseTestCase):
                                        source_only=self.source_only)
         self.executor_server = RecordingExecutorServer(
             self.config,
-            self.zk_client,
             executor_connections,
             jobdir_root=self.jobdir_root,
             _run_ansible=self.run_ansible,
@@ -4391,7 +4402,9 @@ class ZuulTestCase(BaseTestCase):
         config = configparser.ConfigParser()
         config.read(os.path.join(FIXTURE_DIR, config_file))
 
-        sections = ['zuul', 'scheduler', 'executor', 'merger', 'zookeeper']
+        sections = [
+            'zuul', 'scheduler', 'executor', 'merger', 'web', 'zookeeper'
+        ]
         for section in sections:
             if not config.has_section(section):
                 config.add_section(section)
@@ -4650,8 +4663,6 @@ class ZuulTestCase(BaseTestCase):
         self.rpcclient.shutdown()
         self.gearman_server.shutdown()
         self.fake_nodepool.stop()
-        self.zk_client.disconnect()
-        self.scheds.execute(lambda app: app.sched.zk_client.disconnect())
         self.printHistory()
         # We whitelist watchdog threads as they have relatively long delays
         # before noticing they should exit, but they should exit on their own.
