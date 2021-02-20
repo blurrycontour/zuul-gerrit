@@ -340,7 +340,15 @@ class PlayBook extends React.Component {
           <React.Fragment key={idx}>
             <Row key='play'>
               <Col sm={12}>
-                <strong>Play: {play.play.name}</strong>
+                <strong>Play: {play.play.name} {
+                  moment.duration(
+                    moment(play.play.duration.end).diff(play.play.duration.start)
+                  ).format({ 
+                      template: 'h [hr] m [min] s [sec]',
+                      largest: 2,
+                      minValue: 1,
+                  })}
+                </strong>
               </Col>
             </Row>
             {play.tasks.map((task, idx2) => (
