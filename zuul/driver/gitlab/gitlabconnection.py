@@ -31,6 +31,7 @@ from zuul.connection import CachedBranchConnection
 from zuul.web.handler import BaseWebController
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.logutil import get_annotated_logger
+from zuul.exceptions import MergeFailure
 from zuul.model import Branch, Project, Ref, Tag
 
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
@@ -387,7 +388,10 @@ class GitlabAPIClient():
         path = "/projects/%s/merge_requests/%s/merge" % (
             quote_plus(project_name), number)
         resp = self.put(self.baseurl + path, zuul_event_id=zuul_event_id)
-        self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        try:
+            self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        except GitlabAPIClientException as e:
+            raise MergeFailure('Merge request merge failed: %s' % e)
         return resp[0]
 
 
