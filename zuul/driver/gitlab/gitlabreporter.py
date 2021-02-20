@@ -75,6 +75,7 @@ class GitlabReporter(BaseReporter):
                                   self._approval, event=item.event)
 
     def mergeMR(self, item):
+        log = get_annotated_logger(self.log, item.event)
         project = item.change.project.name
         mr_number = item.change.number
 
@@ -83,15 +84,15 @@ class GitlabReporter(BaseReporter):
                 self.connection.mergeMR(project, mr_number)
                 item.change.is_merged = True
                 return
-            except MergeFailure:
-                self.log.exception(
-                    'Merge attempt of change %s  %s/2 failed.' %
-                    (item.change, i), exc_info=True)
+            except MergeFailure as e:
+                log.exception('Merge attempt of change %s  %s/2 failed.',
+                              item.change, i, exc_info=True)
+                error_message = str(e)
                 if i == 1:
                     time.sleep(2)
-        self.log.warning(
-            'Merge of change %s failed after 2 attempts, giving up' %
-            item.change)
+        log.warning('Merge of change %s failed after 2 attempts, giving up',
+                    item.change)
+        raise MergeFailure(error_message)
 
     def getSubmitAllowNeeds(self):
         return []
