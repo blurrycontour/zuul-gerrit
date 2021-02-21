@@ -3702,7 +3702,7 @@ class ZuulWebFixture(fixtures.Fixture):
                  additional_event_queues, upstream_root: str,
                  rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
                  add_cleanup: Callable[[Callable[[], None]], None],
-                 test_root: str, zk_hosts: str, fake_sql: bool = True,
+                 test_root: str, fake_sql: bool = True,
                  info: Optional[zuul.model.WebInfo] = None):
         super(ZuulWebFixture, self).__init__()
         self.gearman_server_port = gearman_server_port
@@ -3721,7 +3721,9 @@ class ZuulWebFixture(fixtures.Fixture):
             self.info = zuul.model.WebInfo.fromConfig(config)
         else:
             self.info = info
-        self.zk_hosts = zk_hosts
+        self.zk_client = ZooKeeperClient.fromConfig(config,
+                                                    _require_tls=False)
+        self.zk_client.connect()
         self.test_root = test_root
 
     def _setUp(self):
@@ -3731,8 +3733,7 @@ class ZuulWebFixture(fixtures.Fixture):
             gear_server='127.0.0.1', gear_port=self.gearman_server_port,
             info=self.info,
             connections=self.connections,
-            zk_hosts=self.zk_hosts,
-            zk_timeout=10,
+            zk_client=self.zk_client,
             command_socket=os.path.join(self.test_root, 'web.socket'),
             authenticators=self.authenticators)
         self.web.start()
@@ -3958,7 +3959,7 @@ class SymLink(object):
 
 
 class SchedulerTestApp:
-    def __init__(self, log: Logger, config: ConfigParser, zk_config: str,
+    def __init__(self, log: Logger, config: ConfigParser,
                  changes: Dict[str, Dict[str, Change]],
                  additional_event_queues, upstream_root: str,
                  rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
@@ -3968,7 +3969,6 @@ class SchedulerTestApp:
 
         self.log = log
         self.config = config
-        self.zk_config = zk_config
         self.changes = changes
 
         self.sched = zuul.scheduler.Scheduler(self.config)
@@ -3994,7 +3994,8 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk_client = ZooKeeperClient(self.zk_config, timeout=30.0)
+        zk_client = ZooKeeperClient.fromConfig(self.config,
+                                               _require_tls=False)
         zk_client.connect()
 
         self.sched.setExecutor(executor_client)
@@ -4030,14 +4031,14 @@ class SchedulerTestManager:
     def __init__(self):
         self.instances = []
 
-    def create(self, log: Logger, config: ConfigParser, zk_config: str,
+    def create(self, log: Logger, config: ConfigParser,
                changes: Dict[str, Dict[str, Change]], additional_event_queues,
                upstream_root: str, rpcclient: RPCClient, poller_events,
                git_url_with_auth: bool, source_only: bool,
                fake_sql: bool,
                add_cleanup: Callable[[Callable[[], None]], None])\
             -> SchedulerTestApp:
-        app = SchedulerTestApp(log, config, zk_config, changes,
+        app = SchedulerTestApp(log, config, changes,
                                additional_event_queues, upstream_root,
                                rpcclient, poller_events, git_url_with_auth,
                                source_only, fake_sql, add_cleanup)
@@ -4179,9 +4180,6 @@ class ZuulTestCase(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk_client = ZooKeeperClient(hosts=self.zk_config)
-        self.zk_client.connect()
-
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
                 rootdir=os.environ.get("ZUUL_TEST_ROOT"))
@@ -4262,6 +4260,19 @@ class ZuulTestCase(BaseTestCase):
                 'gearman', 'ssl_key',
                 os.path.join(FIXTURE_DIR, 'gearman/client.key'))
 
+        zk_hosts = '%s:%s%s' % (
+            self.zk_chroot_fixture.zookeeper_host,
+            self.zk_chroot_fixture.zookeeper_port,
+            self.zk_chroot_fixture.zookeeper_chroot)
+        if not self.config.has_section('zookeeper'):
+            self.config.add_section('zookeeper')
+        self.config.set('zookeeper', 'hosts', zk_hosts)
+        self.config.set('zookeeper', 'session_timeout', '30')
+
+        self.zk_client = ZooKeeperClient.fromConfig(self.config,
+                                                    _require_tls=False)
+        self.zk_client.connect()
+
         self.rpcclient = zuul.rpcclient.RPCClient(
             self.config.get('gearman', 'server'),
             self.gearman_server.port,
@@ -4302,7 +4313,7 @@ class ZuulTestCase(BaseTestCase):
 
         self.scheds = SchedulerTestManager()
         self.scheds.create(
-            self.log, self.config, self.zk_config, self.changes,
+            self.log, self.config, self.changes,
             self.additional_event_queues, self.upstream_root, self.rpcclient,
             self.poller_events, self.git_url_with_auth, self.source_only,
             self.fake_sql, self.addCleanup)
@@ -4517,10 +4528,6 @@ class ZuulTestCase(BaseTestCase):
     def setupZK(self):
         self.zk_chroot_fixture = self.useFixture(
             ChrootedKazooFixture(self.id()))
-        self.zk_config = '%s:%s%s' % (
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
 
     def copyDirToRepo(self, project, source_path):
         self.init_repo(project)

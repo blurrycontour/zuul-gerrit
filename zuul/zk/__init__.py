@@ -144,14 +144,17 @@ class ZooKeeperClient(object):
             self.client.set_hosts(hosts=hosts)
 
     @classmethod
-    def fromConfig(cls, config: ConfigParser) -> "ZooKeeperClient":
+    def fromConfig(cls, config: ConfigParser,
+                   _require_tls=True) -> "ZooKeeperClient":
+        # _require_tls is temporary, only used until we move the tests
+        # to use TLS.
         hosts = get_default(config, "zookeeper", "hosts")
         if not hosts:
             raise Exception("The zookeeper hosts config value is required")
         tls_key = get_default(config, "zookeeper", "tls_key")
         tls_cert = get_default(config, "zookeeper", "tls_cert")
         tls_ca = get_default(config, "zookeeper", "tls_ca")
-        if not all([tls_key, tls_cert, tls_ca]):
+        if _require_tls and not all([tls_key, tls_cert, tls_ca]):
             raise Exception(
                 "A TLS ZooKeeper connection is required; please supply the "
                 "tls_* zookeeper config values."
