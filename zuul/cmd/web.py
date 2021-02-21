@@ -24,6 +24,7 @@ import zuul.driver.github
 import zuul.lib.auth
 
 from zuul.lib.config import get_default
+from zuul.zk import ZooKeeperClient
 
 
 class WebServer(zuul.cmd.ZuulDaemonApp):
@@ -81,16 +82,9 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
                 self.log.exception("Error validating config")
                 sys.exit(1)
 
-        params["zk_hosts"] = get_default(
-            self.config, 'zookeeper', 'hosts', None)
-        if not params["zk_hosts"]:
-            raise Exception("The zookeeper hosts config value is required")
-        params["zk_tls_key"] = get_default(self.config, 'zookeeper', 'tls_key')
-        params["zk_tls_cert"] = get_default(self.config,
-                                            'zookeeper', 'tls_cert')
-        params["zk_tls_ca"] = get_default(self.config, 'zookeeper', 'tls_ca')
-        params["zk_timeout"] = float(get_default(self.config, 'zookeeper',
-                                                 'session_timeout', 10.0))
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+        params["zk_client"] = zk_client
 
         try:
             self.web = zuul.web.ZuulWeb(**params)

@@ -255,7 +255,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
-                           self.test_root, self.zk_config))
+                           self.test_root))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
@@ -334,7 +334,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
-                           self.test_root, self.zk_config))
+                           self.test_root))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
@@ -410,7 +410,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
-                           self.test_root, self.zk_config))
+                           self.test_root))
 
         # Start the finger streamer daemon
         streamer = zuul.lib.log_streamer.LogStreamer(
@@ -522,7 +522,8 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
         logfile = open(ansible_log, 'r')
         self.addCleanup(logfile.close)
 
-        zk_client = ZooKeeperClient(self.zk_config, timeout=30.0)
+        zk_client = ZooKeeperClient.fromConfig(self.config,
+                                               _require_tls=False)
         zk_client.connect()
         self.addCleanup(zk_client.disconnect)
 
