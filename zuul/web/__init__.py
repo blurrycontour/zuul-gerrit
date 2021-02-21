@@ -39,6 +39,10 @@ from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.lib.auth import AuthenticatorRegistry
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from zuul.zk import ZooKeeperClient
+
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
 cherrypy.tools.websocket = WebSocketTool()
 
@@ -1211,10 +1215,7 @@ class ZuulWeb(object):
                  gear_server: str, gear_port: int,
                  connections,  # ConnectionRegistry,
                  authenticators: AuthenticatorRegistry,
-                 zk_hosts: str, zk_timeout: float = 10.0,
-                 zk_tls_cert: Optional[str] = None,
-                 zk_tls_key: Optional[str] = None,
-                 zk_tls_ca: Optional[str] = None,
+                 zk_client: ZooKeeperClient,
                  ssl_key: str = None, ssl_cert: str = None, ssl_ca: str = None,
                  static_cache_expiry: int = 3600,
                  info: Optional[zuul.model.WebInfo] = None,
@@ -1231,15 +1232,6 @@ class ZuulWeb(object):
         self.rpc = zuul.rpcclient.RPCClient(gear_server, gear_port,
                                             ssl_key, ssl_cert, ssl_ca,
                                             client_id='Zuul Web Server')
-        self.zk_client = ZooKeeperClient(
-            hosts=zk_hosts,
-            read_only=True,
-            timeout=zk_timeout,
-            tls_cert=zk_tls_cert,
-            tls_key=zk_tls_key,
-            tls_ca=zk_tls_ca,
-        )
-        self.zk_client.connect()
 
         self.connections = connections
         self.authenticators = authenticators
