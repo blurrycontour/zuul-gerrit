@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e6153a47_5d705bdd",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-21T15:45:11Z",
+      "side": 1,
+      "message": "Docstring needs to move to the connect method.  I\u0027ll fix this in a new patchset.",
+      "revId": "135883d5e61680305dadf15c4ba7dec80478c277",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
