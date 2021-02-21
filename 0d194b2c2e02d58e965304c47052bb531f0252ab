@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "03ae8f3b_8c96ac39",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 40
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-21T15:17:11Z",
+      "side": 1,
+      "message": "I think even some folks strongly in favor of type annotations will agree with me that, due to their awkward syntax, they make the code harder to read (even if they make it more comprehensible).  Anyway, be careful putting assertions like this in commit messages.  While they make the code easier to work with in your editor, they make it harder for others to read.",
+      "revId": "0d194b2c2e02d58e965304c47052bb531f0252ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bd56fb37_e851c76c",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 2836,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-21T15:17:11Z",
+      "side": 1,
+      "message": "Based on our email thread, let\u0027s drop the variable annotations and stick to function signatures.",
+      "revId": "0d194b2c2e02d58e965304c47052bb531f0252ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
