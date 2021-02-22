@@ -3541,6 +3541,21 @@ class Ref(object):
         self.newrev = None
         self.files = []
 
+    def serialize(self):
+        return {
+            "project": self.project.name,
+            "ref": self.ref,
+            "oldrev": self.oldrev,
+            "newrev": self.newrev,
+            "files": self.files,
+        }
+
+    def deserialize(self, data):
+        self.ref = data.get("ref")
+        self.oldrev = data.get("oldrev")
+        self.newrev = data.get("newrev")
+        self.files = data.get("files", [])
+
     def _id(self):
         return self.newrev
 
@@ -3634,6 +3649,15 @@ class Branch(Ref):
         d['branch'] = self.branch
         return d
 
+    def serialize(self):
+        d = super().serialize()
+        d["branch"] = self.branch
+        return d
+
+    def deserialize(self, data):
+        super().deserialize(data)
+        self.branch = data.get("branch")
+
 
 class Tag(Ref):
     """An existing tag state for a Project."""
@@ -3695,6 +3719,62 @@ class Change(Branch):
     @property
     def cache_key(self):
         return (self.project.connection_name, self.cache_stat.key)
+
+    @property
+    def cache_version(self):
+        return -1 if self.cache_stat is None else self.cache_stat.version
+
+    def deserialize(self, data):
+        super().deserialize(data)
+        self.number = data.get("number")
+        self.urls = data.get("urls")
+        self.uris = data.get("uris", [])
+        self.patchset = data.get("patchset")
+        self.git_needs_changes = [
+            tuple(k) for k in data.get("git_needs_changes", [])]
+        self.git_needed_by_changes = [
+            tuple(k) for k in data.get("git_needed_by_changes", [])]
+        self.compat_needs_changes = [
+            tuple(k) for k in data.get("git_needs_changes", [])]
+        self.compat_needed_by_changes = [
+            tuple(k) for k in data.get("git_needed_by_changes", [])]
+        self.commit_needs_changes = (
+            None if data.get("commit_needs_changes") is None
+            else [tuple(k) for k in data.get("commit_needs_changes", [])]
+        )
+        self.refresh_deps = data.get("refresh_deps", False)
+        self.is_current_patchset = data.get("is_current_patchset", True)
+        self.can_merge = data.get("can_merge", False)
+        self.is_merged = data.get("is_merged", False)
+        self.failed_to_merge = data.get("failed_to_merge", False)
+        self.open = data.get("open")
+        self.owner = data.get("owner")
+        self.message = data.get("message")
+        self.commit_id = data.get("commit_id")
+
+    def serialize(self):
+        d = super().serialize()
+        d.update({
+            "number": self.number,
+            "url": self.url,
+            "uris": self.uris,
+            "patchset": self.patchset,
+            "git_needs_changes": self.git_needs_changes,
+            "git_needed_by_changes": self.git_needed_by_changes,
+            "compat_needs_changes": self.git_needs_changes,
+            "compat_needed_by_changes": self.git_needed_by_changes,
+            "commit_needs_changes": self.commit_needs_changes,
+            "refresh_deps": self.refresh_deps,
+            "is_current_patchset": self.is_current_patchset,
+            "can_merge": self.can_merge,
+            "is_merged": self.is_merged,
+            "failed_to_merge": self.failed_to_merge,
+            "open": self.open,
+            "owner": self.owner,
+            "message": self.message,
+            "commit_id": self.commit_id,
+        })
+        return d
 
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)

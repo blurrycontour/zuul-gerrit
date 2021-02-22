@@ -14,12 +14,14 @@
 
 import json
 import queue
+import uuid
 
 import testtools
 
 from zuul import model
 from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
+from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
 from zuul.zk.config_cache import SystemConfigCache, UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi
@@ -1210,3 +1212,132 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
 
         self.config_cache.set(uac, attrs)
         self.assertTrue(self.config_cache.is_valid)
+
+
+class DummyChange:
+
+    def __init__(self, data):
+        self.uid = uuid.uuid4().hex
+        self.updateFromDict(data)
+        self.cache_stat = None
+
+    @property
+    def cache_version(self):
+        return -1 if self.cache_stat is None else self.cache_stat.version
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data)
+
+    def toDict(self):
+        return self.__dict__
+
+    def updateFromDict(self, data):
+        self.__dict__.update(data)
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
+
+class DummyChangeCache(AbstractChangeCache):
+
+    def _changeFromData(self, data):
+        return DummyChange.fromDict(data)
+
+    def _dataFromChange(self, change):
+        return change.toDict()
+
+    def _updateChange(self, change, data):
+        change.updateFromDict(data)
+
+
+class TestChangeCache(ZooKeeperBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.cache = DummyChangeCache(self.zk_client, "test")
+
+    def test_insert(self):
+        change_foo = DummyChange({"foo": "bar"})
+        change_bar = DummyChange({"bar": "foo"})
+        self.cache.set("foo", change_foo)
+        self.cache.set("bar", change_bar)
+
+        self.assertEqual(self.cache.get("foo"), change_foo)
+        self.assertEqual(self.cache.get("bar"), change_bar)
+
+    def test_update(self):
+        change = DummyChange({"foo": "bar"})
+        self.cache.set("foo", change)
+
+        change.number = 123
+        self.cache.set("foo", change)
+
+        # The change instance must stay the same
+        updated_change = self.cache.get("foo")
+        self.assertIs(change, updated_change)
+        self.assertEqual(change.number, 123)
+
+    def test_delete(self):
+        change = DummyChange({"foo": "bar"})
+        self.cache.set("foo", change)
+        self.cache.delete("foo")
+        self.assertIsNone(self.cache.get("foo"))
+
+        # Deleting an non-existent key should not raise an exception
+        self.cache.delete("invalid")
+
+    def test_concurrent_update(self):
+        change = DummyChange({"foo": "bar"})
+        self.cache.set("foo", change)
+
+        updated_change = DummyChange({"foo": "bar"})
+        # Copy cache stat over as if this change was retrieved via a
+        # different change cache.
+        updated_change.cache_stat = change.cache_stat
+        self.cache.set("foo", updated_change)
+        self.assertIs(self.cache.get("foo"), updated_change)
+
+        # Attempt to update with the old change stat
+        with testtools.ExpectedException(ConcurrentUpdateError):
+            self.cache.set("foo", change)
+
+    def test_cache_sync(self):
+        other_cache = DummyChangeCache(self.zk_client, "test")
+
+        change = DummyChange({"foo": "bar"})
+        self.cache.set("foo", change)
+
+        self.assertEqual(self.cache.get("foo"), other_cache.get("foo"))
+
+        change_other = other_cache.get("foo")
+        change_other.number = 123
+        other_cache.set("foo", change_other)
+
+        change = self.cache.get("foo")
+        self.assertEqual(change.number, 123)
+
+        other_cache.delete("foo")
+        self.assertIsNone(self.cache.get("foo"))
+
+    def test_cleanup(self):
+        change = DummyChange({"foo": "bar"})
+        self.cache.set("foo", change)
+
+        self.cache.cleanup()
+        self.assertEqual(len(self.cache._data_cleanup_candidates), 0)
+        self.assertEqual(
+            len(self.zk_client.client.get_children(self.cache.data_root)), 1)
+
+        change.number = 123
+        self.cache.set("foo", change)
+
+        self.cache.cleanup()
+        self.assertEqual(len(self.cache._data_cleanup_candidates), 1)
+        self.assertEqual(
+            len(self.zk_client.client.get_children(self.cache.data_root)), 2)
+
+        self.cache.cleanup()
+        self.assertEqual(len(self.cache._data_cleanup_candidates), 0)
+        self.assertEqual(
+            len(self.zk_client.client.get_children(self.cache.data_root)), 1)
