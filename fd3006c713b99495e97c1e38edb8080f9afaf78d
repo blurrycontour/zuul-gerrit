@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5772bebb_f06ebc3f",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-22T17:34:18Z",
+      "side": 1,
+      "message": "As discussed on 776838, let\u0027s remove these subclasses.",
+      "revId": "fd3006c713b99495e97c1e38edb8080f9afaf78d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "24e75e34_ebbd3f00",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4086,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-22T17:34:18Z",
+      "side": 1,
+      "message": "This probably doesn\u0027t need to take up so many lines.",
+      "revId": "fd3006c713b99495e97c1e38edb8080f9afaf78d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "16a0f8a8_c625cb8c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2616,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-22T17:34:18Z",
+      "side": 1,
+      "message": "Let\u0027s avoid adding type hints for variables.",
+      "revId": "fd3006c713b99495e97c1e38edb8080f9afaf78d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0bd1765d_775139a4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2655,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-22T17:34:18Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "fd3006c713b99495e97c1e38edb8080f9afaf78d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
