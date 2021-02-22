@@ -2188,6 +2188,8 @@ class Scheduler(threading.Thread):
                   "change caches", change)
         for source in self.connections.getSources():
             for other_change in source.getCachedChanges():
+                if not isinstance(other_change, Change):
+                    continue
                 if other_change.commit_needs_changes is None:
                     continue
                 for connection_name, key in other_change.commit_needs_changes:
