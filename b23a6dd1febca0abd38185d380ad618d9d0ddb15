@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb15c711_b812466a",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4267,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-22T06:37:45Z",
+      "side": 1,
+      "message": "In https://review.opendev.org/c/zuul/zuul/+/776640/1/tests/base.py I added the zookeeper section in the setup_config() method in tets/base.py. Not sure what\u0027s the best way to go here, but using setup_config() for this looks a little more consistent for this purpose as it also creates all the other sections.",
+      "revId": "b23a6dd1febca0abd38185d380ad618d9d0ddb15",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "931cff6d_001a6259",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-02-22T06:37:45Z",
+      "side": 1,
+      "message": "I\u0027m not sure, if the _require_tls parameter is enough to make this fully work with the tests. I had the same problem when moving the ZooKeeper initialization to the server classes (https://review.opendev.org/c/zuul/zuul/+/776640). As some of the components are only initialized in the production code, e.g. the executor, overriding the require_tls parameter in the tests won\u0027t work here. In my change I made the require_tls a class attribute and used a TestZooKeeperClient class to override this parameter for testing. I\u0027m not sure if that is the more profound solution, but it allows at least to override the parameter for testing also in the executor.\n\nIf we enable/enforce TLS in the tests before my change above comes in the stack this should be fine and I can simply remove the additional work from that change. If not, it would be great if we could adapt this change here directly, so I don\u0027t have to update the _require_tls evaluation again in my change.",
+      "revId": "b23a6dd1febca0abd38185d380ad618d9d0ddb15",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
