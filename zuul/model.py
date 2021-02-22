@@ -3541,6 +3541,21 @@ class Ref(object):
         self.newrev = None
         self.files = []
 
+    def serialize(self):
+        return {
+            "project": self.project.name,
+            "ref": self.ref,
+            "oldrev": self.oldrev,
+            "newrev": self.newrev,
+            "files": self.files,
+        }
+
+    def deserialize(self, data):
+        self.ref = data.get("ref")
+        self.oldrev = data.get("oldrev")
+        self.newrev = data.get("newrev")
+        self.files = data.get("files", [])
+
     def _id(self):
         return self.newrev
 
@@ -3634,6 +3649,15 @@ class Branch(Ref):
         d['branch'] = self.branch
         return d
 
+    def serialize(self):
+        d = super().serialize()
+        d["branch"] = self.branch
+        return d
+
+    def deserialize(self, data):
+        super().deserialize(data)
+        self.branch = data.get("branch")
+
 
 class Tag(Ref):
     """An existing tag state for a Project."""
@@ -3645,8 +3669,10 @@ class Tag(Ref):
 
 class Change(Branch):
     """A proposed new state for a Project."""
-    def __init__(self, project):
+    def __init__(self, project, connection_registry=None):
         super(Change, self).__init__(project)
+        self.connection_registry = connection_registry
+
         self.number = None
         # The gitweb url for browsing the change
         self.url = None
@@ -3657,17 +3683,17 @@ class Change(Branch):
 
         # Changes that the source determined are needed due to the
         # git DAG:
-        self.git_needs_changes = []
-        self.git_needed_by_changes = []
+        self._git_needs_changes = []
+        self._git_needed_by_changes = []
 
         # Changes that the source determined are needed by backwards
         # compatible processing of Depends-On headers (Gerrit only):
-        self.compat_needs_changes = []
-        self.compat_needed_by_changes = []
+        self._compat_needs_changes = []
+        self._compat_needed_by_changes = []
 
         # Changes that the pipeline manager determined are needed due
         # to Depends-On headers (all drivers):
-        self.commit_needs_changes = None
+        self._commit_needs_changes = None
         self.refresh_deps = False
 
         self.is_current_patchset = True
@@ -3684,6 +3710,143 @@ class Change(Branch):
         # This can be the commit id of the patchset enqueued or
         # in the case of a PR the id of HEAD of the branch.
         self.commit_id = None
+
+        # Cache info about this change (cache key, uuid, version)
+        self.cache_stat = None
+        self._dependency_cache = {}
+
+    @property
+    def git_needs_changes(self):
+        return self._getLazyChangeList("_git_needs_changes")
+
+    @git_needs_changes.setter
+    def git_needs_changes(self, changes):
+        self._setLazyChangeList("_git_needs_changes", changes)
+
+    @property
+    def git_needed_by_changes(self):
+        return self._getLazyChangeList("_git_needed_by_changes")
+
+    @git_needed_by_changes.setter
+    def git_needed_by_changes(self, changes):
+        self._setLazyChangeList("_git_needed_by_changes", changes)
+
+    @property
+    def compat_needs_changes(self):
+        return self._getLazyChangeList("_compat_needs_changes")
+
+    @compat_needs_changes.setter
+    def compat_needs_changes(self, changes):
+        self._setLazyChangeList("_compat_needs_changes", changes)
+
+    @property
+    def compat_needed_by_changes(self):
+        return self._getLazyChangeList("_compat_needed_by_changes")
+
+    @compat_needed_by_changes.setter
+    def compat_needed_by_changes(self, changes):
+        self._setLazyChangeList("_compat_needed_by_changes", changes)
+
+    @property
+    def commit_needs_changes(self):
+        if self._commit_needs_changes is None:
+            return None
+        return self._getLazyChangeList("_commit_needs_changes")
+
+    @commit_needs_changes.setter
+    def commit_needs_changes(self, changes):
+        self._setLazyChangeList("_commit_needs_changes", changes)
+
+    def _getLazyChangeList(self, attribute_name):
+        # TODO: Remove after all drivers have been converted to use
+        # lazy change lists.
+        if self.connection_registry is None:
+            return getattr(self, attribute_name)
+
+        return [self._resolveChangeByKey(c)
+                for c in getattr(self, attribute_name)]
+
+    def _setLazyChangeList(self, attribute_name, changes):
+        # TODO: Remove after all drivers have been converted to use
+        # lazy change lists.
+        if self.connection_registry is None:
+            return setattr(self, attribute_name, changes)
+
+        deps = {c.cache_key: c for c in changes}
+        setattr(self, attribute_name, list(deps.keys()))
+        self._dependency_cache.update(deps)
+        self._maintainDependencyCache()
+
+    def _resolveChangeByKey(self, change_key):
+        change = self._dependency_cache.get(change_key)
+        if change is None:
+            connection_name, key = change_key
+            source = self.connection_registry.getSource(connection_name)
+            change = source.getChangeByKey(key)
+        self._dependency_cache[change.cache_key] = change
+        return change
+
+    def _maintainDependencyCache(self):
+        commit_needs_changes = self._commit_needs_changes or []
+        valid_keys = {
+            *self._git_needs_changes,
+            *self._git_needed_by_changes,
+            *self._compat_needs_changes,
+            *self._compat_needed_by_changes,
+            *commit_needs_changes,
+        }
+        outdated = set(self._dependency_cache.keys()) - valid_keys
+        for key in outdated:
+            del self._dependency_cache[key]
+
+    @property
+    def cache_version(self):
+        return -1 if self.cache_stat is None else self.cache_stat.version
+
+    def deserialize(self, data):
+        super().deserialize(data)
+        self.number = data.get("number")
+        self.urls = data.get("urls")
+        self.uris = data.get("uris", [])
+        self.patchset = data.get("patchset")
+        self._git_needs_changes = data.get("_git_needs_changes", [])
+        self._git_needed_by_changes = data.get("_git_needed_by_changes", [])
+        self._compat_needs_changes = data.get("_git_needs_changes", [])
+        self._compat_needed_by_changes = data.get("_git_needed_by_changes", [])
+        self._commit_needs_changes = data.get("_commit_needs_changes")
+        self.refresh_deps = data.get("refresh_deps", False)
+        self.is_current_patchset = data.get("is_current_patchset", True)
+        self.can_merge = data.get("can_merge", False)
+        self.is_merged = data.get("is_merged", False)
+        self.failed_to_merge = data.get("failed_to_merge", False)
+        self.open = data.get("open")
+        self.owner = data.get("owner")
+        self.message = data.get("message")
+        self.commit_id = data.get("commit_id")
+
+    def serialize(self):
+        d = super().serialize()
+        d.update({
+            "number": self.number,
+            "url": self.url,
+            "uris": self.uris,
+            "patchset": self.patchset,
+            "_git_needs_changes": self._git_needs_changes,
+            "_git_needed_by_changes": self._git_needed_by_changes,
+            "_compat_needs_changes": self._git_needs_changes,
+            "_compat_needed_by_changes": self._git_needed_by_changes,
+            "_commit_needs_changes": self._commit_needs_changes,
+            "refresh_deps": self.refresh_deps,
+            "is_current_patchset": self.is_current_patchset,
+            "can_merge": self.can_merge,
+            "is_merged": self.is_merged,
+            "failed_to_merge": self.failed_to_merge,
+            "open": self.open,
+            "owner": self.owner,
+            "message": self.message,
+            "commit_id": self.commit_id,
+        })
+        return d
 
     def _id(self):
         return '%s,%s' % (self.number, self.patchset)
