@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "e19d2236_4df61c47",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4267,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-22T17:29:20Z",
+      "side": 1,
+      "message": "That works for me, I\u0027ll move it.",
+      "revId": "b23a6dd1febca0abd38185d380ad618d9d0ddb15",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "931cff6d_001a6259",
         "filename": "zuul/zk/__init__.py",
         "patchSetId": 3
@@ -33,6 +50,23 @@
       "revId": "b23a6dd1febca0abd38185d380ad618d9d0ddb15",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c6a874d8_cbe50324",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-22T17:29:20Z",
+      "side": 1,
+      "message": "I understand the problem.  As I would prefer to avoid adding test-specific subclasess, let\u0027s do this:\n\n1) merge this change\n2) make a new change to switch the tests to tls (we have done this in nodepool, so we know how).  we\u0027ll remove the _require_tls flag in that change.\n3) merge your change to move init into the components (we could either do that immediately after 2, or leave it in its current position several changes down the stack).",
+      "revId": "b23a6dd1febca0abd38185d380ad618d9d0ddb15",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
