@@ -14,12 +14,14 @@
 
 import json
 import queue
+import uuid
 
 import testtools
 
 from zuul import model
 from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
+from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
 from zuul.zk.config_cache import SystemConfigCache, UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi
@@ -1213,3 +1215,171 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
 
         self.config_cache.set(uac, attrs)
         self.assertTrue(self.config_cache.is_valid)
+
+
+class DummyChange:
+
+    def __init__(self, project, data=None):
+        self.uid = uuid.uuid4().hex
+        self.project = project
+        self.cache_stat = None
+        if data is not None:
+            self.deserialize(data)
+
+    @property
+    def cache_version(self):
+        return -1 if self.cache_stat is None else self.cache_stat.version
+
+    def serialize(self):
+        return self.__dict__
+
+    def deserialize(self, data):
+        self.__dict__.update(data)
+
+
+class DummyChangeCache(AbstractChangeCache):
+
+    CHANGE_TYPE_MAP = {
+        "DummyChange": DummyChange,
+    }
+
+    def _getChangeClass(self, change_type):
+        return self.CHANGE_TYPE_MAP[change_type]
+
+    def _getChangeType(self, change):
+        return type(change).__name__
+
+
+class DummySource:
+
+    def getProject(self, project_name):
+        return project_name
+
+
+class DummyConnection:
+
+    def __init__(self):
+        self.connection_name = "DummyConnection"
+        self.source = DummySource()
+
+
+class TestChangeCache(ZooKeeperBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.cache = DummyChangeCache(self.zk_client, DummyConnection())
+
+    def test_insert(self):
+        change_foo = DummyChange("project", {"foo": "bar"})
+        change_bar = DummyChange("project", {"bar": "foo"})
+        self.cache.set("foo", change_foo)
+        self.cache.set("bar", change_bar)
+
+        self.assertEqual(self.cache.get("foo"), change_foo)
+        self.assertEqual(self.cache.get("bar"), change_bar)
+
+    def test_update(self):
+        change = DummyChange("project", {"foo": "bar"})
+        self.cache.set("foo", change)
+
+        change.number = 123
+        self.cache.set("foo", change, change.cache_version)
+
+        # The change instance must stay the same
+        updated_change = self.cache.get("foo")
+        self.assertIs(change, updated_change)
+        self.assertEqual(change.number, 123)
+
+    def test_delete(self):
+        change = DummyChange("project", {"foo": "bar"})
+        self.cache.set("foo", change)
+        self.cache.delete("foo")
+        self.assertIsNone(self.cache.get("foo"))
+
+        # Deleting an non-existent key should not raise an exception
+        self.cache.delete("invalid")
+
+    def test_concurrent_update(self):
+        change = DummyChange("project", {"foo": "bar"})
+        self.cache.set("foo", change)
+
+        # Attempt to update with the old change stat
+        with testtools.ExpectedException(ConcurrentUpdateError):
+            self.cache.set("foo", change, change.cache_version - 1)
+
+    def test_change_update_retry(self):
+        change = DummyChange("project", {"foobar": 0})
+        self.cache.set("foobar", change)
+
+        # Update the change so we have a new cache stat.
+        change.foobar = 1
+        self.cache.set("foobar", change, change.cache_version)
+        self.assertEqual(self.cache.get("foobar").foobar, 1)
+
+        def updater(c):
+            c.foobar += 1
+
+        # Change the cache stat so the change is considered outdated and we
+        # need to retry because of a concurrent update error.
+        change.cache_stat = model.CacheStat(change.cache_stat.key,
+                                            uuid.uuid4().hex,
+                                            change.cache_version - 1)
+        updated_change = self.cache.updateChangeWithRetry(
+            "foobar", change, updater)
+        self.assertEqual(updated_change.foobar, 2)
+
+    def test_cache_sync(self):
+        other_cache = DummyChangeCache(self.zk_client, DummyConnection())
+
+        key = "foo foo"  # Use a key that needs escaping
+        change = DummyChange("project", {"foo": "bar"})
+        self.cache.set(key, change)
+        self.assertIsNotNone(other_cache.get(key))
+
+        change_other = other_cache.get(key)
+        change_other.number = 123
+        other_cache.set(key, change_other, change_other.cache_version)
+
+        for _ in iterate_timeout(10, "update to propagate"):
+            if getattr(change, "number", None) == 123:
+                break
+
+        other_cache.delete(key)
+        self.assertIsNone(self.cache.get(key))
+
+    def test_cleanup(self):
+        change = DummyChange("project", {"foo": "bar"})
+        self.cache.set("foo", change)
+
+        self.cache.cleanup()
+        self.assertEqual(len(self.cache._data_cleanup_candidates), 0)
+        self.assertEqual(
+            len(self.zk_client.client.get_children(self.cache.data_root)), 1)
+
+        change.number = 123
+        self.cache.set("foo", change, change.cache_version)
+
+        self.cache.cleanup()
+        self.assertEqual(len(self.cache._data_cleanup_candidates), 1)
+        self.assertEqual(
+            len(self.zk_client.client.get_children(self.cache.data_root)), 2)
+
+        self.cache.cleanup()
+        self.assertEqual(len(self.cache._data_cleanup_candidates), 0)
+        self.assertEqual(
+            len(self.zk_client.client.get_children(self.cache.data_root)), 1)
+
+    def test_watch_cleanup(self):
+        change = DummyChange("project", {"foo": "bar"})
+        self.cache.set("foo", change)
+
+        for _ in iterate_timeout(10, "watch to be registered"):
+            if change.cache_stat.key in self.cache._watched_keys:
+                break
+
+        self.cache.delete("foo")
+        self.assertIsNone(self.cache.get("foo"))
+
+        for _ in iterate_timeout(10, "watch to be removed"):
+            if change.cache_stat.key not in self.cache._watched_keys:
+                break
