@@ -434,7 +434,7 @@ class FakeGerritChange(object):
                                 self.latest_patchset),
             parent)
         repo.head.reference = ref
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
 
         path = os.path.join(self.upstream_root, self.project)
@@ -462,7 +462,7 @@ class FakeGerritChange(object):
 
         r = repo.index.commit(msg)
         repo.head.reference = 'master'
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
         repo.heads['master'].checkout()
         return r
@@ -864,7 +864,7 @@ class FakeGerritChange(object):
         repo = git.Repo(path)
 
         repo.head.reference = self.branch
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         repo.git.merge('-s', 'resolve', self.patchsets[-1]['ref'])
         repo.heads[self.branch].commit = repo.head.commit
 
@@ -2424,7 +2424,7 @@ class FakeGithubPullRequest(object):
             ref.set_object('refs/tags/init')
         self.number_of_commits += 1
         repo.head.reference = ref
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
 
         if files:
@@ -2445,7 +2445,7 @@ class FakeGithubPullRequest(object):
         # each sha on a PR may have a status set on it
         self.statuses[self.head_sha] = []
         repo.head.reference = 'master'
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
         repo.heads['master'].checkout()
 
@@ -4687,7 +4687,7 @@ class ZuulTestCase(BaseTestCase):
             repo.create_tag(tag)
 
         repo.head.reference = master
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
 
     def create_branch(self, project, branch, commit_filename='README'):
@@ -4704,14 +4704,14 @@ class ZuulTestCase(BaseTestCase):
         repo.index.commit('%s commit' % branch)
 
         repo.head.reference = repo.heads['master']
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
 
     def delete_branch(self, project, branch):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         repo.head.reference = repo.heads['master']
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         repo.delete_head(repo.heads[branch], force=True)
 
     def create_commit(self, project, files=None, head='master',
@@ -5223,7 +5223,7 @@ class ZuulTestCase(BaseTestCase):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         repo.head.reference = branch
-        zuul.merger.merger.reset_repo_to_head(repo)
+        repo.head.reset(working_tree=True)
         for fn, content in files.items():
             fn = os.path.join(path, fn)
             try:
