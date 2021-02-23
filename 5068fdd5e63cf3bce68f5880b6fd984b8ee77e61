@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "002aef08_9792ecba",
+        "filename": "web/package.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-02-23T21:00:57Z",
+      "side": 1,
+      "message": "Judging from commits touching https://github.com/mac-s-g/react-json-view/commits/master/package.json they don\u0027t seem to use Git tags, but the fix appears to be in 1.20.5 and later as best as I can tell.",
+      "revId": "5068fdd5e63cf3bce68f5880b6fd984b8ee77e61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
