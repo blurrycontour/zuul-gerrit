@@ -963,8 +963,8 @@ class Scheduler(threading.Thread):
         finally:
             self.layout_lock.release()
         duration = round(time.monotonic() - start, 3)
-        self.log.info("Tenant reconfiguration complete (duration: %s seconds)",
-                      duration)
+        self.log.info("Tenant reconfiguration complete for %s (duration: %s "
+                      "seconds)", event.tenant_name, duration)
 
     def _reenqueueGetProject(self, tenant, item):
         project = item.change.project
