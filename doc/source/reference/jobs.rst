@@ -439,6 +439,12 @@ of item.
    .. var:: items
       :type: list
 
+      .. note::
+
+         ``zuul.items`` conflicts with the ``items()`` builtin so the
+         variable can only be accessed with python dictionary like syntax,
+         e.g: ``zuul['items']``
+
       A list of dictionaries, each representing an item being tested
       with this change with the format:
 
