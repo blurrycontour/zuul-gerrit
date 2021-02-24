@@ -19,8 +19,8 @@ import time
 import voluptuous as v
 
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.reporter import BaseReporter
-from zuul.lib.artifacts import get_artifacts_from_result_data
 
 
 class SQLReporter(BaseReporter):

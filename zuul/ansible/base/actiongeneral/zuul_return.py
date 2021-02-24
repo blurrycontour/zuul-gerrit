@@ -39,34 +39,31 @@ def merge_dict(dict_a, dict_b):
     return dict_b
 
 
+def merge_zuul_list(dict_a, dict_b, key):
+    value_a = dict_a.get('zuul', {}).get(key, [])
+    value_b = dict_b.get('zuul', {}).get(key, [])
+    if not isinstance(value_a, list):
+        value_a = []
+    if not isinstance(value_b, list):
+        value_b = []
+    return value_a + value_b
+
+
 def merge_data(dict_a, dict_b):
     """
     Merge dict_a into dict_b, handling any special cases for zuul variables
     """
-    artifacts = merge_artifacts(dict_a, dict_b)
+    artifacts = merge_zuul_list(dict_a, dict_b, 'artifacts')
     file_comments = merge_file_comments(dict_a, dict_b)
+    warnings = merge_zuul_list(dict_a, dict_b, 'warnings')
     merge_dict(dict_a, dict_b)
     if artifacts:
         dict_b.setdefault('zuul', {})['artifacts'] = artifacts
     if file_comments:
         dict_b.setdefault("zuul", {})["file_comments"] = file_comments
+    if warnings:
+        dict_b.setdefault('zuul', {})['warnings'] = warnings
     return dict_b
-
-
-def merge_artifacts(dict_a, dict_b):
-    """Merge artifacts from both dictionary
-
-    The artifacts from both dictionaries will be merged (additive) into a new
-    list.
-    """
-    artifacts_a = dict_a.get('zuul', {}).get("artifacts", [])
-    if not isinstance(artifacts_a, list):
-        artifacts_a = []
-    artifacts_b = dict_b.get('zuul', {}).get("artifacts", [])
-    if not isinstance(artifacts_b, list):
-        artifacts_b = []
-    artifacts = artifacts_a + artifacts_b
-    return artifacts
 
 
 def merge_file_comments(dict_a, dict_b):
