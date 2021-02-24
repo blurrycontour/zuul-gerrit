@@ -19,7 +19,6 @@ import copy
 import json
 import logging
 import os
-from itertools import chain
 from enum import Enum
 from functools import total_ordering
 
@@ -1837,8 +1836,8 @@ class Job(ConfigObject):
         project_canonical_names = set()
         project_canonical_names.update(self.required_projects.keys())
         project_canonical_names.update(self._projectsFromPlaybooks(
-            chain(self.pre_run, [self.run[0]], self.post_run,
-                  self.cleanup_run), with_implicit=True))
+            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
+                            self.cleanup_run), with_implicit=True))
 
         projects = list()
         for project_canonical_name in project_canonical_names:
