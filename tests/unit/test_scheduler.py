@@ -15,16 +15,15 @@
 import configparser
 import gc
 import json
-import textwrap
-
 import os
 import re
 import shutil
 import socket
+import textwrap
+import threading
 import time
 from collections import namedtuple
-from unittest import mock
-from unittest import skip
+from unittest import mock, skip
 from kazoo.exceptions import NoNodeError
 
 import git
@@ -138,19 +137,19 @@ class TestSchedulerZone(ZuulTestCase):
             value='1', kind='g')
         """
 
-        self.gearman_server.hold_jobs_in_queue = True
+        self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        queue = self.gearman_server.getQueue()
+        queue = list(self.executor_api.queued())
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 1)
-        self.assertEqual(b'executor:execute:test-provider.vpn', queue[0].name)
+        self.assertEqual('test-provider.vpn', queue[0].zone)
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
         self.waitUntilSettled()
 
         self.assertEqual(self.getJobFromHistory('project-merge').result,
@@ -178,19 +177,19 @@ class TestSchedulerZoneFallback(ZuulTestCase):
 
     def test_jobs_executed(self):
         "Test that jobs are executed and a change is merged per zone"
-        self.gearman_server.hold_jobs_in_queue = True
+        self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        queue = self.gearman_server.getQueue()
+        queue = list(self.executor_api.queued())
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 1)
-        self.assertEqual(b'executor:execute', queue[0].name)
+        self.assertEqual('default-zone', queue[0].zone)
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
         self.waitUntilSettled()
 
         self.assertEqual(self.getJobFromHistory('project-merge').result,
@@ -941,7 +940,7 @@ class TestScheduler(ZuulTestCase):
     def test_failed_change_at_head_with_queue(self):
         "Test that if a change at the head fails, queued jobs are canceled"
 
-        self.gearman_server.hold_jobs_in_queue = True
+        self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
@@ -956,54 +955,42 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
 
         self.waitUntilSettled()
-        queue = self.gearman_server.getQueue()
+        queue = list(self.executor_api.queued())
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 1)
-        self.assertEqual(queue[0].name, b'executor:execute')
-        job_args = json.loads(queue[0].arguments.decode('utf8'))
+        self.assertEqual(queue[0].zone, 'default-zone')
+        job_args = queue[0].params
         self.assertEqual(job_args['job'], 'project-merge')
         self.assertEqual(job_args['items'][0]['number'], '%d' % A.number)
 
-        self.gearman_server.release('.*-merge')
+        self.executor_api.release('.*-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
+        self.executor_api.release('.*-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('.*-merge')
+        self.executor_api.release('.*-merge')
         self.waitUntilSettled()
-        queue = self.gearman_server.getQueue()
+        queue = list(self.executor_api.queued())
 
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 6)
 
-        self.assertEqual(
-            json.loads(queue[0].arguments.decode('utf8'))['job'],
-            'project-test1')
-        self.assertEqual(
-            json.loads(queue[1].arguments.decode('utf8'))['job'],
-            'project-test2')
-        self.assertEqual(
-            json.loads(queue[2].arguments.decode('utf8'))['job'],
-            'project-test1')
-        self.assertEqual(
-            json.loads(queue[3].arguments.decode('utf8'))['job'],
-            'project-test2')
-        self.assertEqual(
-            json.loads(queue[4].arguments.decode('utf8'))['job'],
-            'project-test1')
-        self.assertEqual(
-            json.loads(queue[5].arguments.decode('utf8'))['job'],
-            'project-test2')
+        self.assertEqual(queue[0].params['job'], 'project-test1')
+        self.assertEqual(queue[1].params['job'], 'project-test2')
+        self.assertEqual(queue[2].params['job'], 'project-test1')
+        self.assertEqual(queue[3].params['job'], 'project-test2')
+        self.assertEqual(queue[4].params['job'], 'project-test1')
+        self.assertEqual(queue[5].params['job'], 'project-test2')
 
-        self.release(queue[0])
+        self.executor_api.release(queue[0])
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 0)
-        queue = self.gearman_server.getQueue()
+        queue = list(self.executor_api.queued())
         self.assertEqual(len(queue), 2)  # project-test2, project-merge for B
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 0)
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 0)
@@ -1370,7 +1357,7 @@ class TestScheduler(ZuulTestCase):
     def test_project_merge_conflict(self):
         "Test that gate merge conflicts are handled properly"
 
-        self.gearman_server.hold_jobs_in_queue = True
+        self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project',
                                            'master', 'A',
                                            files={'conflict': 'foo'})
@@ -1390,15 +1377,15 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.reported, 1)
         self.assertEqual(C.reported, 1)
 
-        self.gearman_server.release('project-merge')
+        self.executor_api.release('project-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('project-merge')
+        self.executor_api.release('project-merge')
         self.waitUntilSettled()
-        self.gearman_server.release('project-merge')
+        self.executor_api.release('project-merge')
         self.waitUntilSettled()
 
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
@@ -1420,11 +1407,11 @@ class TestScheduler(ZuulTestCase):
     def test_delayed_merge_conflict(self):
         "Test that delayed check merge conflicts are handled properly"
 
-        # Hold jobs in the gearman queue so that we can test whether
+        # Hold jobs in the ZooKeeper queue so that we can test whether
         # the executor sucesfully merges a change based on an old
         # repo state (frozen by the scheduler) which would otherwise
         # conflict.
-        self.gearman_server.hold_jobs_in_queue = True
+        self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project',
                                            'master', 'A',
                                            files={'conflict': 'foo'})
@@ -1450,16 +1437,16 @@ class TestScheduler(ZuulTestCase):
 
         # A merges while B and C are queued in check
         # Release A project-merge
-        queue = self.gearman_server.getQueue()
-        self.release(queue[0])
+        queue = list(self.executor_api.queued())
+        self.executor_api.release(queue[0])
         self.waitUntilSettled()
 
         # Release A project-test*
         # gate has higher precedence, so A's test jobs are added in
         # front of the merge jobs for B and C
-        queue = self.gearman_server.getQueue()
-        self.release(queue[0])
-        self.release(queue[1])
+        queue = list(self.executor_api.queued())
+        self.executor_api.release(queue[0])
+        self.executor_api.release(queue[1])
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
@@ -1476,13 +1463,13 @@ class TestScheduler(ZuulTestCase):
 
         # B and C report merge conflicts
         # Release B project-merge
-        queue = self.gearman_server.getQueue()
-        self.release(queue[0])
+        queue = list(self.executor_api.queued())
+        self.executor_api.release(queue[0])
         self.waitUntilSettled()
 
         # Release C
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
@@ -2704,14 +2691,24 @@ class TestScheduler(ZuulTestCase):
             if self.executor_server.job_workers:
                 break
 
+        tevent = threading.Event()
+
+        def data_watch(data, stat, event):
+            if not any([data, stat, event]):
+                return
+            # Set the threading event as soon as the cancel node is present
+            tevent.set()
+            return False
+
+        builds = list(self.executor_api.all())
+        # Use a DataWatch to avoid a race condition between creating and
+        # immediately deleting the cancel node in ZooKeeper.
+        self.zk_client.client.DataWatch(f"{builds[0].path}/cancel", data_watch)
+
         # Abandon change to cancel build
         self.fake_gerrit.addEvent(A.getChangeAbandonedEvent())
 
-        for _ in iterate_timeout(30, 'Wait for executor:stop request'):
-            stop_jobs = [x for x in self.gearman_server.jobs_history
-                         if b'executor:stop' in x.name]
-            if stop_jobs:
-                break
+        self.assertTrue(tevent.wait(timeout=30))
 
         self.executor_server.hold_jobs_in_start = False
         self.waitUntilSettled()
@@ -2871,7 +2868,8 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.gearman_server.getQueue()), 0)
+        queue = list(self.executor_api.queued())
+        self.assertEqual(len(queue), 0)
         self.assertTrue(self.scheds.first.sched._areAllBuildsComplete())
         self.assertEqual(len(self.history), 0)
         self.assertEqual(A.data['status'], 'MERGED')
@@ -3017,22 +3015,24 @@ class TestScheduler(ZuulTestCase):
         "Test that pending jobs are cleaned up if removed from layout"
 
         # We want to hold the project-merge job that the fake change enqueues
-        self.gearman_server.hold_jobs_in_queue = True
+        self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         # The assertion is that we have one job in the queue, project-merge
-        self.assertEqual(len(self.gearman_server.getQueue()), 1)
+        queue = list(self.executor_api.queued())
+        self.assertEqual(len(queue), 1)
 
         self.commitConfigUpdate('common-config', 'layouts/no-jobs.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
         self.waitUntilSettled()
 
-        self.gearman_server.release('gate-noop')
+        self.executor_api.release('gate-noop')
         self.waitUntilSettled()
         # asserting that project-merge is removed from queue
-        self.assertEqual(len(self.gearman_server.getQueue()), 0)
+        queue = list(self.executor_api.queued())
+        self.assertEqual(len(queue), 0)
         self.assertTrue(self.scheds.first.sched._areAllBuildsComplete())
 
         self.assertEqual(len(self.history), 1)
@@ -3377,7 +3377,7 @@ class TestScheduler(ZuulTestCase):
     def test_queue_precedence(self):
         "Test that queue precedence works"
 
-        self.gearman_server.hold_jobs_in_queue = True
+        self.hold_jobs_in_queue = True
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -3385,8 +3385,8 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
 
         self.waitUntilSettled()
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release()
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
         self.waitUntilSettled()
 
         # Run one build at a time to ensure non-race order:
