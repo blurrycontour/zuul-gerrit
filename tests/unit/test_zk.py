@@ -31,7 +31,7 @@ from zuul.zk.sharding import (
     NODE_BYTE_SIZE_LIMIT,
 )
 
-from tests.base import BaseTestCase, iterate_timeout
+from tests.base import BaseTestCase, HoldableExecutorApi, iterate_timeout
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
