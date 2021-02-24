@@ -12,111 +12,25 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import gear
-import json
 import logging
-import time
-import threading
 from uuid import uuid4
 
 import zuul.executor.common
-from zuul.lib.config import get_default
-from zuul.lib.gear_utils import getGearmanFunctions
-from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import (
     Build,
     BuildCompletedEvent,
+    BuildRequestState,
     BuildStartedEvent,
-    PRECEDENCE_HIGH,
-    PRECEDENCE_LOW,
-    PRECEDENCE_NORMAL,
+    PRIORITY_MAP,
 )
 from zuul.zk.event_queues import PipelineResultEventQueue
-
-
-class GearmanCleanup(threading.Thread):
-    """ A thread that checks to see if outstanding builds have
-    completed without reporting back. """
-    log = logging.getLogger("zuul.GearmanCleanup")
-
-    def __init__(self, gearman):
-        threading.Thread.__init__(self)
-        self.daemon = True
-        self.gearman = gearman
-        self.wake_event = threading.Event()
-        self._stopped = False
-
-    def stop(self):
-        self._stopped = True
-        self.wake_event.set()
-
-    def run(self):
-        while True:
-            self.wake_event.wait(300)
-            if self._stopped:
-                return
-            try:
-                self.gearman.lookForLostBuilds()
-            except Exception:
-                self.log.exception("Exception checking builds:")
-
-
-def getJobData(job):
-    if not len(job.data):
-        return {}
-    d = job.data[-1]
-    if not d:
-        return {}
-    return json.loads(d)
-
-
-class ZuulGearmanClient(gear.Client):
-    def __init__(self, zuul_gearman):
-        super(ZuulGearmanClient, self).__init__('Zuul Executor Client')
-        self.__zuul_gearman = zuul_gearman
-
-    def handleWorkComplete(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkComplete(packet)
-        self.__zuul_gearman.onBuildCompleted(job)
-        return job
-
-    def handleWorkFail(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkFail(packet)
-        self.__zuul_gearman.onBuildCompleted(job)
-        return job
-
-    def handleWorkException(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkException(packet)
-        self.__zuul_gearman.onBuildCompleted(job)
-        return job
-
-    def handleWorkStatus(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkStatus(packet)
-        self.__zuul_gearman.onWorkStatus(job)
-        return job
-
-    def handleWorkData(self, packet):
-        job = super(ZuulGearmanClient, self).handleWorkData(packet)
-        self.__zuul_gearman.onWorkStatus(job)
-        return job
-
-    def handleDisconnect(self, job):
-        job = super(ZuulGearmanClient, self).handleDisconnect(job)
-        self.__zuul_gearman.onDisconnect(job)
-
-    def handleStatusRes(self, packet):
-        try:
-            job = super(ZuulGearmanClient, self).handleStatusRes(packet)
-        except gear.UnknownJobError:
-            handle = packet.getArgument(0)
-            for build in self.__zuul_gearman.builds.values():
-                if build.__gearman_job.handle == handle:
-                    self.__zuul_gearman.onUnknownJob(job)
+from zuul.zk.executor import ExecutorApi
 
 
 class ExecutorClient(object):
     log = logging.getLogger("zuul.ExecutorClient")
+    _executor_api_class = ExecutorApi
 
     def __init__(self, config, sched):
         self.config = config
@@ -124,29 +38,13 @@ class ExecutorClient(object):
         self.builds = {}
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
 
+        self.executor_api = self._executor_api_class(self.sched.zk_client)
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.sched.zk_client
         )
 
-        server = config.get('gearman', 'server')
-        port = get_default(self.config, 'gearman', 'port', 4730)
-        ssl_key = get_default(self.config, 'gearman', 'ssl_key')
-        ssl_cert = get_default(self.config, 'gearman', 'ssl_cert')
-        ssl_ca = get_default(self.config, 'gearman', 'ssl_ca')
-        self.gearman = ZuulGearmanClient(self)
-        self.gearman.addServer(server, port, ssl_key, ssl_cert, ssl_ca,
-                               keepalive=True, tcp_keepidle=60,
-                               tcp_keepintvl=30, tcp_keepcnt=5)
-
-        self.cleanup_thread = GearmanCleanup(self)
-        self.cleanup_thread.start()
-
     def stop(self):
         self.log.debug("Stopping")
-        self.cleanup_thread.stop()
-        self.cleanup_thread.join()
-        self.gearman.shutdown()
-        self.log.debug("Stopped")
 
     def execute(self, job, item, pipeline, dependent_changes=[],
                 merger_items=[]):
@@ -191,15 +89,13 @@ class ExecutorClient(object):
                 completed_event
             )
 
-            return build
+            return
 
         # Update zuul attempts after addBuild above to ensure build_set
         # is up to date.
         attempts = build.build_set.getTries(job.name)
         params["zuul"]['attempts'] = attempts
 
-        functions = getGearmanFunctions(self.gearman)
-        function_name = 'executor:execute'
         # Because all nodes belong to the same provider, region and
         # availability zone we can get executor_zone from only the first
         # node.
@@ -208,50 +104,36 @@ class ExecutorClient(object):
             executor_zone = params[
                 "nodes"][0]['attributes'].get('executor-zone')
 
+        zone_known = False
         if executor_zone:
-            _fname = '%s:%s' % (
-                function_name,
-                executor_zone)
-            if _fname in functions:
-                function_name = _fname
-            else:
+            # Check the component registry for executors subscribed to this
+            # zone
+            # TODO (felix): This is not very efficient in its current state as
+            # we are querying ZooKeeper for every build request to get the list
+            # of components. To improve this, we could implement a cache in the
+            # component registry, so it would be sufficient to iterate over
+            # local dictionaries instead.
+            for comp in self.sched.component_registry.all(kind="executor"):
+                if comp.zone == executor_zone:
+                    zone_known = True
+                    break
+
+            if not zone_known:
                 self.log.warning(
                     "Job requested '%s' zuul-executor zone, but no "
                     "zuul-executors found for this zone; ignoring zone "
-                    "request" % executor_zone)
+                    "request", executor_zone)
+                # Fall back to the default zone
+                executor_zone = None
 
-        gearman_job = gear.TextJob(
-            function_name, json_dumps(params), unique=uuid)
-
-        build.__gearman_job = gearman_job
-        build.__gearman_worker = None
-
-        if pipeline.precedence == PRECEDENCE_NORMAL:
-            precedence = gear.PRECEDENCE_NORMAL
-        elif pipeline.precedence == PRECEDENCE_HIGH:
-            precedence = gear.PRECEDENCE_HIGH
-        elif pipeline.precedence == PRECEDENCE_LOW:
-            precedence = gear.PRECEDENCE_LOW
-
-        try:
-            self.gearman.submitJob(gearman_job, precedence=precedence,
-                                   timeout=300)
-        except Exception:
-            log.exception("Unable to submit job to Gearman")
-            # TODO (felix): Directly put the result event in the queue
-            self.onBuildCompleted(gearman_job, 'EXCEPTION')
-            return build
-
-        if not gearman_job.handle:
-            log.error("No job handle was received for %s after"
-                      " 300 seconds; marking as lost.",
-                      gearman_job)
-            # TODO (felix): Directly put the result event in the queue
-            self.onBuildCompleted(gearman_job, 'NO_HANDLE')
-
-        log.debug("Received handle %s for %s", gearman_job.handle, build)
-
-        return build
+        build.build_request_ref = self.executor_api.submit(
+            uuid=uuid,
+            tenant_name=build.build_set.item.pipeline.tenant.name,
+            pipeline_name=build.build_set.item.pipeline.name,
+            params=params,
+            zone=executor_zone,
+            precedence=PRIORITY_MAP[pipeline.precedence],
+        )
 
     def cancel(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id,
@@ -260,121 +142,77 @@ class ExecutorClient(object):
         log.info("Cancel build %s for job %s", build, build.job)
 
         build.canceled = True
-        try:
-            job = build.__gearman_job  # noqa
-        except AttributeError:
-            log.debug("Build has no associated gearman job")
+
+        if not build.build_request_ref:
+            log.debug("Build has not been submitted to ZooKeeper")
             return False
 
-        if build.__gearman_worker is not None:
-            log.debug("Build has already started")
-            self.cancelRunningBuild(build)
-            log.debug("Canceled running build")
-            return True
-        else:
-            log.debug("Build has not started yet")
+        build_request = self.executor_api.get(build.build_request_ref)
+        if build_request:
+            log.debug("Canceling build request %s", build_request)
+            # If we can acquire the build request lock here, the build wasn't
+            # picked up by any executor server yet. With acquiring the lock
+            # we prevent the executor server from picking up the build so we
+            # can cancel it before it will run.
+            if self.executor_api.lock(build_request, blocking=False):
+                log.debug(
+                    "Canceling build %s directly because it is not locked by "
+                    "any executor",
+                    build_request,
+                )
+                # Mark the build request as complete and forward the event to
+                # the scheduler, so the executor server doesn't pick up the
+                # request. The build will be deleted from the scheduler when it
+                # picks up the BuildCompletedEvent.
+                try:
+                    build_request.state = BuildRequestState.COMPLETED
+                    self.executor_api.update(build_request)
 
-        log.debug("Looking for build in queue")
-        if self.cancelJobInQueue(build):
-            log.debug("Removed build from queue")
+                    result = {"result": "CANCELED"}
+                    tenant_name = build.build_set.item.pipeline.tenant.name
+                    pipeline_name = build.build_set.item.pipeline.name
+                    event = BuildCompletedEvent(build_request.uuid, result)
+                    self.result_events[tenant_name][pipeline_name].put(event)
+                finally:
+                    self.executor_api.unlock(build_request)
+            else:
+                log.debug(
+                    "Sending cancel request for build %s because it is locked",
+                    build_request,
+                )
+                # If the build request is locked, schedule a cancel request in
+                # the executor server.
+                self.executor_api.requestCancel(build_request)
+
+            log.debug("Canceled build")
+            return True
+
+        return False
+
+    def resumeBuild(self, build: Build) -> bool:
+        log = get_annotated_logger(self.log, build.zuul_event_id)
+
+        if not build.build_request_ref:
+            log.debug("Build has not been submitted")
             return False
 
-        time.sleep(1)
-
-        log.debug("Still unable to find build to cancel")
-        if build.__gearman_worker is not None:
-            log.debug("Build has just started")
-            self.cancelRunningBuild(build)
-            log.debug("Canceled running build")
-            return True
-        log.error("Unable to cancel build")
-
-    def onBuildCompleted(self, job, result=None):
-        if job.unique in self.meta_jobs:
-            del self.meta_jobs[job.unique]
-            return
-
-    # TODO (felix): Remove this once the builds are executed via ZooKeeper.
-    # It's currently necessary to set the correct private attribute on the
-    # build for the gearman worker.
-    def setWorkerInfo(self, build, data):
-        # Update information about worker
-        build.worker.updateFromData(data)
-        build.__gearman_worker = build.worker.name
-
-    def onWorkStatus(self, job):
-        data = getJobData(job)
-        self.log.debug("Build %s update %s" % (job, data))
-
-    def onDisconnect(self, job):
-        self.log.info("Gearman job %s lost due to disconnect" % job)
-        self.onBuildCompleted(job, 'DISCONNECT')
-
-    def onUnknownJob(self, job):
-        self.log.info("Gearman job %s lost due to unknown handle" % job)
-        self.onBuildCompleted(job, 'LOST')
-
-    def cancelJobInQueue(self, build):
-        log = get_annotated_logger(self.log, build.zuul_event_id,
-                                   build=build.uuid)
-        job = build.__gearman_job
-
-        req = gear.CancelJobAdminRequest(job.handle)
-        job.connection.sendAdminRequest(req, timeout=300)
-        log.debug("Response to cancel build request: %s", req.response.strip())
-        if req.response.startswith(b"OK"):
-            # Since this isn't otherwise going to get a build complete
-            # event, send one to the scheduler so that it can unlock
-            # the nodes.
-            tenant_name = build.build_set.item.pipeline.tenant.name
-            pipeline_name = build.build_set.item.pipeline.name
-
-            event = BuildCompletedEvent(build.uuid, {"result": "CANCELED"})
-            self.result_events[tenant_name][pipeline_name].put(event)
+        build_request = self.executor_api.get(build.build_request_ref)
+        if build_request:
+            log.debug("Requesting resume for build %s", build)
+            self.executor_api.requestResume(build_request)
             return True
         return False
 
-    def cancelRunningBuild(self, build):
+    def removeBuild(self, build: Build) -> None:
         log = get_annotated_logger(self.log, build.zuul_event_id)
-        if not build.__gearman_worker:
-            log.error("Build %s has no manager while canceling", build)
-        stop_uuid = str(uuid4().hex)
-        data = dict(uuid=build.__gearman_job.unique,
-                    zuul_event_id=build.zuul_event_id)
-        stop_job = gear.TextJob("executor:stop:%s" % build.__gearman_worker,
-                                json_dumps(data), unique=stop_uuid)
-        self.meta_jobs[stop_uuid] = stop_job
-        log.debug("Submitting stop job: %s", stop_job)
-        self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
-                               timeout=300)
-        return True
+        log.debug("Removing build %s", build.uuid)
 
-    def resumeBuild(self, build):
-        log = get_annotated_logger(self.log, build.zuul_event_id)
-        if not build.__gearman_worker:
-            log.error("Build %s has no manager while resuming", build)
-        resume_uuid = str(uuid4().hex)
-        data = dict(uuid=build.__gearman_job.unique,
-                    zuul_event_id=build.zuul_event_id)
-        stop_job = gear.TextJob("executor:resume:%s" % build.__gearman_worker,
-                                json_dumps(data), unique=resume_uuid)
-        self.meta_jobs[resume_uuid] = stop_job
-        log.debug("Submitting resume job: %s", stop_job)
-        self.gearman.submitJob(stop_job, precedence=gear.PRECEDENCE_HIGH,
-                               timeout=300)
+        if not build.build_request_ref:
+            log.debug("Build has not been submitted to ZooKeeper")
+            return
 
-    def lookForLostBuilds(self):
-        self.log.debug("Looking for lost builds")
-        # Construct a list from the values iterator to protect from it changing
-        # out from underneath us.
-        for build in list(self.builds.values()):
-            if build.result:
-                # The build has finished, it will be removed
-                continue
-            job = build.__gearman_job
-            if not job.handle:
-                # The build hasn't been enqueued yet
-                continue
-            p = gear.Packet(gear.constants.REQ, gear.constants.GET_STATUS,
-                            job.handle)
-            job.connection.sendPacket(p)
+        build_request = self.executor_api.get(build.build_request_ref)
+        if build_request:
+            self.executor_api.remove(build_request)
+
+        del self.builds[build.uuid]
