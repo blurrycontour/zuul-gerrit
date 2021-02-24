@@ -1,0 +1,11 @@
+---
+deprecations:
+  - |
+    Shared ``queues`` should be configured per project instead of per
+    pipeline. Specifying :attr:`project.<pipeline>.queue` was already
+    deprecated and will now produce a warning message when patchsets
+    using the old syntax are uploaded.  The configuration errors area
+    of the web UI will also display instances of the old syntax.
+
+    Please use these tools to identify and update to the new syntax.
+    A later release will remove support for the old syntax entirely.
