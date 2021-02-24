@@ -215,8 +215,6 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         connection_name = args['connection']
         project_name = args['project']
-        self._update(connection_name, project_name,
-                     zuul_event_id=zuul_event_id)
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
         try:
