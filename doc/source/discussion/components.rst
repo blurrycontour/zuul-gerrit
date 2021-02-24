@@ -35,7 +35,6 @@ which is described below.
       Web [href="#web-server"]
 
       Merger -- Gearman
-      Executor -- Gearman
       Executor -- Statsd
       Web -- Database
       Web -- Gearman

@@ -34,7 +34,7 @@ class TestInventoryBase(ZuulTestCase):
         if shell_type:
             self.fake_nodepool.shell_type = shell_type
         self.executor_server.hold_jobs_in_build = True
-        self.gearman_server.hold_jobs_in_queue = True
+        self.hold_jobs_in_queue = True
 
         if self.use_gerrit:
             A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -67,8 +67,8 @@ class TestInventoryBase(ZuulTestCase):
         return yaml.safe_load(open(setup_inv_path, 'r'))
 
     def runJob(self, name):
-        self.gearman_server.hold_jobs_in_queue = False
-        self.gearman_server.release('^%s$' % name)
+        self.hold_jobs_in_queue = False
+        self.executor_api.release(f'^{name}$')
         self.waitUntilSettled()
 
     def cancelExecutorJobs(self):
@@ -76,7 +76,7 @@ class TestInventoryBase(ZuulTestCase):
             executor_client = app.sched.executor
             builds = [b for b in executor_client.builds.values()]
             for build in builds:
-                executor_client.cancelJobInQueue(build)
+                executor_client.cancel(build)
 
 
 class TestInventoryGithub(TestInventoryBase):

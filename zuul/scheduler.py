@@ -28,9 +28,7 @@ import urllib
 
 from kazoo.exceptions import NotEmptyError
 
-from zuul import configloader
-from zuul import model
-from zuul import exceptions
+from zuul import configloader, exceptions
 from zuul import version as zuul_version
 from zuul import rpclistener
 from zuul.lib import commandsocket
@@ -53,6 +51,7 @@ from zuul.model import (
     BuildPausedEvent,
     BuildStartedEvent,
     BuildStatusEvent,
+    Change,
     ChangeManagementEvent,
     DequeueEvent,
     EnqueueEvent,
@@ -65,6 +64,7 @@ from zuul.model import (
     SmartReconfigureEvent,
     Tenant,
     TenantReconfigureEvent,
+    TimeDataBase,
     UnparsedAbideConfig,
 )
 from zuul.zk import ZooKeeperClient
@@ -112,6 +112,7 @@ class Scheduler(threading.Thread):
     _stats_interval = 30
     _cleanup_interval = 60 * 60
     _merger_client_class = MergeClient
+    _executor_client_class = ExecutorClient
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
@@ -190,7 +191,7 @@ class Scheduler(threading.Thread):
 
         if not testonly:
             time_dir = self._get_time_database_dir()
-            self.time_database = model.TimeDataBase(time_dir)
+            self.time_database = TimeDataBase(time_dir)
 
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
@@ -219,7 +220,7 @@ class Scheduler(threading.Thread):
             default_version=default_ansible_version)
 
         if not testonly:
-            self.executor = ExecutorClient(self.config, self)
+            self.executor = self._executor_client_class(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
             self.nodepool = nodepool.Nodepool(
                 self.zk_client, self.hostname, self.statsd, self)
@@ -1180,7 +1181,7 @@ class Scheduler(threading.Thread):
             for item in shared_queue.queue:
                 if item.change.project != change.project:
                     continue
-                if (isinstance(item.change, model.Change) and
+                if (isinstance(item.change, Change) and
                         item.change.number == change.number and
                         item.change.patchset == change.patchset) or\
                    (item.change.ref == change.ref):
@@ -1553,10 +1554,10 @@ class Scheduler(threading.Thread):
             return
 
         build.start_time = event.data["start_time"]
-        # TODO (felix): Remove this once the builds are executed via ZooKeeper.
-        # It's currently necessary to set the correct private attribute on the
-        # build for the gearman worker.
-        self.executor.setWorkerInfo(build, event.data)
+        # Update information about worker
+        if event.data:
+            # Noop builds don't provide any event data
+            build.worker.updateFromData(event.data)
 
         log = get_annotated_logger(self.log, build.zuul_event_id)
         if build.build_set is not build.build_set.item.current_build_set:
@@ -1790,7 +1791,7 @@ class Scheduler(threading.Thread):
         # If the build was canceled, we did actively cancel the job so
         # don't overwrite the result and don't retry.
         if build.canceled:
-            result = build.result
+            result = build.result or "CANCELED"
             build.retry = False
 
         build.end_time = event_result["end_time"]
@@ -1818,7 +1819,7 @@ class Scheduler(threading.Thread):
 
         # The test suite expects the build to be removed from the
         # internal dict after it's added to the report queue.
-        del self.executor.builds[build.uuid]
+        self.executor.removeBuild(build)
 
         if build.build_set is not build.build_set.item.current_build_set:
             log.debug("Build %s is not in the current build set", build)
