@@ -347,6 +347,7 @@ class TestGithubDriver(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.builds), 1)
         self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
         # Stop queuing timer triggered jobs so that the assertions
         # below don't race against more jobs being queued.
         self.commitConfigUpdate('org/common-config',
@@ -357,8 +358,6 @@ class TestGithubDriver(ZuulTestCase):
         # can end up with one more event firing, so give it an extra
         # second to settle.
         time.sleep(1)
-        self.waitUntilSettled()
-        self.executor_server.release()
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='project-bitrot', result='SUCCESS',
