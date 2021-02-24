@@ -21,10 +21,6 @@ import os
 import time
 from unittest import mock
 
-import zuul.executor.server
-import zuul.model
-import gear
-
 from tests.base import (
     ZuulTestCase,
     AnsibleZuulTestCase,
@@ -35,7 +31,9 @@ from tests.base import (
 
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
+from zuul.executor.server import AnsibleJob
 from zuul.lib.ansible import AnsibleManager
+from zuul.model import BuildRequest
 
 
 class TestExecutorRepos(ZuulTestCase):
@@ -436,10 +434,20 @@ class TestAnsibleJob(ZuulTestCase):
     def setUp(self):
         super(TestAnsibleJob, self).setUp()
         ansible_version = AnsibleManager().default_version
-        args = '{"ansible_version": "%s"}' % ansible_version
-        job = gear.TextJob('executor:execute', args, unique='test')
-        self.test_job = zuul.executor.server.AnsibleJob(self.executor_server,
-                                                        job)
+        build_request = BuildRequest(
+            "test",
+            state=None,
+            precedence=200,
+            params={
+                "ansible_version": ansible_version,
+                "zuul_event_id": 0,
+            },
+            zone=None,
+            tenant_name=None,
+            pipeline_name=None,
+        )
+
+        self.test_job = AnsibleJob(self.executor_server, build_request)
 
     def test_getHostList_host_keys(self):
         # Test without connection_port set
