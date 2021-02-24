@@ -156,7 +156,6 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         connection_name = args['connection']
         project_name = args['project']
-        self._update(connection_name, project_name)
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
         try:
