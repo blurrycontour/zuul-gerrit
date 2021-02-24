@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "38919813_05530c7c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-24T15:46:18Z",
+      "side": 1,
+      "message": "This commit message could use more information to help reviewers understand the change.  I didn\u0027t understand it at first and had to go do some research.  Here is what I would write based on what I learned:\n\nIn Patternfly 4, the Table component has moved to patternfly/react-table.  Update the table in the Labels tab to use the new component.  This matches the new table style used in the Builds and Buildsets tabs.",
+      "revId": "84f7efdbb094b9919bc491903d6b81fabe54f705",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
