@@ -20,12 +20,19 @@ import time
 import threading
 from uuid import uuid4
 
-import zuul.model
 from zuul.lib.config import get_default
 from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Build
+from zuul.model import (
+    Build,
+    BuildCompletedEvent,
+    BuildStartedEvent,
+    PRECEDENCE_HIGH,
+    PRECEDENCE_LOW,
+    PRECEDENCE_NORMAL,
+)
+from zuul.zk.event_queues import PipelineResultEventQueue
 
 
 class GearmanCleanup(threading.Thread):
@@ -116,6 +123,10 @@ class ExecutorClient(object):
         self.sched = sched
         self.builds = {}
         self.meta_jobs = {}  # A list of meta-jobs like stop or describe
+
+        self.result_events = PipelineResultEventQueue.createRegistry(
+            self.sched.zk_client
+        )
 
         server = config.get('gearman', 'server')
         port = get_default(self.config, 'gearman', 'port', 4730)
@@ -324,10 +335,16 @@ class ExecutorClient(object):
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
         item.addBuild(build)
+        self.builds[uuid] = build
 
         if job.name == 'noop':
-            self.sched.onBuildStarted(build)
-            self.sched.onBuildCompleted(build, 'SUCCESS', {}, [])
+            started_event = BuildStartedEvent(build.uuid, None)
+            self.result_events[tenant.name][pipeline.name].put(started_event)
+
+            result = {"result": "SUCCESS"}
+            completed_event = BuildCompletedEvent(build.uuid, result)
+            self.result_events[tenant.name][pipeline.name].put(completed_event)
+
             return build
 
         # Update zuul attempts after addBuild above to ensure build_set
@@ -361,13 +378,12 @@ class ExecutorClient(object):
 
         build.__gearman_job = gearman_job
         build.__gearman_worker = None
-        self.builds[uuid] = build
 
-        if pipeline.precedence == zuul.model.PRECEDENCE_NORMAL:
+        if pipeline.precedence == PRECEDENCE_NORMAL:
             precedence = gear.PRECEDENCE_NORMAL
-        elif pipeline.precedence == zuul.model.PRECEDENCE_HIGH:
+        elif pipeline.precedence == PRECEDENCE_HIGH:
             precedence = gear.PRECEDENCE_HIGH
-        elif pipeline.precedence == zuul.model.PRECEDENCE_LOW:
+        elif pipeline.precedence == PRECEDENCE_LOW:
             precedence = gear.PRECEDENCE_LOW
 
         try:
@@ -375,6 +391,7 @@ class ExecutorClient(object):
                                    timeout=300)
         except Exception:
             log.exception("Unable to submit job to Gearman")
+            # TODO (felix): Directly put the result event in the queue
             self.onBuildCompleted(gearman_job, 'EXCEPTION')
             return build
 
@@ -382,6 +399,7 @@ class ExecutorClient(object):
             log.error("No job handle was received for %s after"
                       " 300 seconds; marking as lost.",
                       gearman_job)
+            # TODO (felix): Directly put the result event in the queue
             self.onBuildCompleted(gearman_job, 'NO_HANDLE')
 
         log.debug("Received handle %s for %s", gearman_job.handle, build)
@@ -429,84 +447,17 @@ class ExecutorClient(object):
             del self.meta_jobs[job.unique]
             return
 
-        build = self.builds.get(job.unique)
-        if build:
-            log = get_annotated_logger(self.log, build.zuul_event_id,
-                                       build=job.unique)
-
-            data = getJobData(job)
-            build.node_labels = data.get('node_labels', [])
-            build.node_name = data.get('node_name')
-            if result is None:
-                result = data.get('result')
-                build.error_detail = data.get('error_detail')
-            if result is None:
-                if (build.build_set.getTries(build.job.name) >=
-                    build.job.attempts):
-                    result = 'RETRY_LIMIT'
-                else:
-                    build.retry = True
-            if result in ('DISCONNECT', 'ABORTED'):
-                # Always retry if the executor just went away
-                build.retry = True
-            if result == 'MERGER_FAILURE':
-                # The build result MERGER_FAILURE is a bit misleading here
-                # because when we got here we know that there are no merge
-                # conflicts. Instead this is most likely caused by some
-                # infrastructure failure. This can be anything like connection
-                # issue, drive corruption, full disk, corrupted git cache, etc.
-                # This may or may not be a recoverable failure so we should
-                # retry here respecting the max retries. But to be able to
-                # distinguish from RETRY_LIMIT which normally indicates pre
-                # playbook failures we keep the build result after the max
-                # attempts.
-                if (build.build_set.getTries(build.job.name) <
-                    build.job.attempts):
-                    build.retry = True
-
-            result_data = data.get('data', {})
-            warnings = data.get('warnings', [])
-            log.info("Build complete, result %s, warnings %s",
-                     result, warnings)
-
-            if build.retry:
-                result = 'RETRY'
-
-            # If the build was canceled, we did actively cancel the job so
-            # don't overwrite the result and don't retry.
-            if build.canceled:
-                result = build.result
-                build.retry = False
-
-            self.sched.onBuildCompleted(build, result, result_data, warnings)
-            # The test suite expects the build to be removed from the
-            # internal dict after it's added to the report queue.
-            del self.builds[job.unique]
-        else:
-            if not job.name.startswith("executor:stop:"):
-                self.log.error("Unable to find build %s" % job.unique)
+    # TODO (felix): Remove this once the builds are executed via ZooKeeper.
+    # It's currently necessary to set the correct private attribute on the
+    # build for the gearman worker.
+    def setWorkerInfo(self, build, data):
+        # Update information about worker
+        build.worker.updateFromData(data)
+        build.__gearman_worker = build.worker.name
 
     def onWorkStatus(self, job):
         data = getJobData(job)
         self.log.debug("Build %s update %s" % (job, data))
-        build = self.builds.get(job.unique)
-        if build:
-            started = (build.url is not None)
-            # Allow URL to be updated
-            build.url = data.get('url', build.url)
-            # Update information about worker
-            build.worker.updateFromData(data)
-            build.__gearman_worker = build.worker.name
-
-            if 'paused' in data:
-                result_data = data.get('data', {})
-                self.sched.onBuildPaused(build, result_data)
-
-            if not started:
-                self.log.info("Build %s started" % job)
-                self.sched.onBuildStarted(build)
-        else:
-            self.log.error("Unable to find build %s" % job.unique)
 
     def onDisconnect(self, job):
         self.log.info("Gearman job %s lost due to disconnect" % job)
@@ -525,14 +476,14 @@ class ExecutorClient(object):
         job.connection.sendAdminRequest(req, timeout=300)
         log.debug("Response to cancel build request: %s", req.response.strip())
         if req.response.startswith(b"OK"):
-            try:
-                del self.builds[job.unique]
-            except Exception:
-                pass
             # Since this isn't otherwise going to get a build complete
             # event, send one to the scheduler so that it can unlock
             # the nodes.
-            self.sched.onBuildCompleted(build, 'CANCELED', {}, [])
+            tenant_name = build.build_set.item.pipeline.tenant.name
+            pipeline_name = build.build_set.item.pipeline.name
+
+            event = BuildCompletedEvent(build.uuid, {"result": "CANCELED"})
+            self.result_events[tenant_name][pipeline_name].put(event)
             return True
         return False
 
