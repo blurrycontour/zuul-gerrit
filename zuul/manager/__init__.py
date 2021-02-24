@@ -554,6 +554,22 @@ class PipelineManager(metaclass=ABCMeta):
                 relevant_errors.append(err)
         return relevant_errors
 
+    def _findRelevantWarnings(self, item, layout):
+        if item.item_ahead:
+            parent_layout = item.item_ahead.layout
+        else:
+            parent_layout = item.pipeline.tenant.layout
+
+        relevant_warnings = []
+        for err in layout.loading_errors.warnings:
+            econtext = err.key.context
+            if ((err.key not in
+                 parent_layout.loading_errors.warning_keys) or
+                (econtext.project == item.change.project.name and
+                 econtext.branch == item.change.branch)):
+                relevant_warnings.append(err)
+        return relevant_warnings
+
     def _loadDynamicLayout(self, item):
         log = get_annotated_logger(self.log, item.event)
         # Load layout
@@ -583,7 +599,8 @@ class PipelineManager(metaclass=ABCMeta):
                     self.sched.ansible_manager,
                     include_config_projects=True,
                     zuul_event_id=None)
-                trusted_errors = len(trusted_layout.loading_errors) > 0
+                trusted_errors = len(
+                    trusted_layout.loading_errors.errors) > 0
 
             # Then create the config a second time but without changes
             # to config repos so that we actually use this config.
@@ -595,7 +612,8 @@ class PipelineManager(metaclass=ABCMeta):
                     self.sched.ansible_manager,
                     include_config_projects=False,
                     zuul_event_id=None)
-                untrusted_errors = len(untrusted_layout.loading_errors) > 0
+                untrusted_errors = len(
+                    untrusted_layout.loading_errors.errors) > 0
 
             # Configuration state handling switchboard. Intentionally verbose
             # and repetetive to be exceptionally clear that we handle all
@@ -703,7 +721,11 @@ class PipelineManager(metaclass=ABCMeta):
         if build_set.unable_to_merge:
             return fallback_layout
         self.log.debug("Preparing dynamic layout for: %s" % item.change)
-        return self._loadDynamicLayout(item)
+        layout = self._loadDynamicLayout(item)
+        if layout:
+            for warning in self._findRelevantWarnings(item, layout):
+                item.warning(warning.short_error or warning.error)
+        return layout
 
     def scheduleMerge(self, item, files=None, dirs=None):
         log = item.annotateLogger(self.log)

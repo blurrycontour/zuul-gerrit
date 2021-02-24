@@ -325,6 +325,38 @@ def reference_exceptions(stanza, obj, accumulator):
         accumulator.addError(context, start_mark, m, str(e))
 
 
+def add_deprecation_warning(accumulator, conf, stanza, warning):
+    conf = copy.deepcopy(conf)
+    context = conf.pop('_source_context')
+    start_mark = conf.pop('_start_mark')
+    intro = textwrap.fill(textwrap.dedent("""\
+    Zuul encountered deprecated syntax while parsing its
+    configuration in the repo {repo} on branch {branch}.  The
+    syntax was:""".format(
+        repo=context.project.name,
+        branch=context.branch,
+    )))
+
+    m = textwrap.dedent("""\
+    {intro}
+
+    {warning}
+
+    The syntax appears in the following {stanza} stanza:
+
+    {content}
+
+    {start_mark}""")
+
+    m = m.format(intro=intro,
+                 warning=indent(warning),
+                 stanza=stanza,
+                 content=indent(start_mark.snippet.rstrip()),
+                 start_mark=str(start_mark))
+
+    accumulator.addWarning(context, start_mark, m, warning)
+
+
 class ZuulMark(object):
     # The yaml mark class differs between the C and python versions.
     # The C version does not provide a snippet, and also appears to
@@ -995,7 +1027,7 @@ class ProjectTemplateParser(object):
 
         return vs.Schema(project)
 
-    def fromYaml(self, conf, validate=True, freeze=True):
+    def fromYaml(self, conf, loading_errors, validate=True, freeze=True):
         if validate:
             self.schema(conf)
         source_context = conf['_source_context']
@@ -1011,6 +1043,11 @@ class ProjectTemplateParser(object):
             project_template.pipelines[pipeline_name] = project_pipeline
             # TODO(tobiash): Remove pipeline specific queue after deprecation
             project_pipeline.queue_name = conf_pipeline.get('queue')
+            if project_pipeline.queue_name:
+                add_deprecation_warning(
+                    loading_errors, conf, 'project or project-template',
+                    'Shared queues should be configured per project now '
+                    'instead of per pipeline.')
             project_pipeline.debug = conf_pipeline.get('debug')
             project_pipeline.fail_fast = conf_pipeline.get(
                 'fail-fast')
@@ -1087,7 +1124,7 @@ class ProjectParser(object):
 
         return vs.Schema(project)
 
-    def fromYaml(self, conf):
+    def fromYaml(self, conf, loading_errors):
         self.schema(conf)
 
         project_name = conf.get('name')
@@ -1105,7 +1142,7 @@ class ProjectParser(object):
             # Parse the project as a template since they're mostly the
             # same.
             project_config = self.pcontext.project_template_parser. \
-                fromYaml(conf, validate=False, freeze=False)
+                fromYaml(conf, loading_errors, validate=False, freeze=False)
 
             project_config.name = project_name
         else:
@@ -1120,7 +1157,7 @@ class ProjectParser(object):
             # Parse the project as a template since they're mostly the
             # same.
             project_config = self.pcontext.project_template_parser.\
-                fromYaml(conf, validate=False, freeze=False)
+                fromYaml(conf, loading_errors, validate=False, freeze=False)
 
             project_config.name = project.canonical_name
 
@@ -2012,7 +2049,7 @@ class TenantParser(object):
                     'project-template', config_template, loading_errors):
                 parsed_config.project_templates.append(
                     pcontext.project_template_parser.fromYaml(
-                        config_template))
+                        config_template, loading_errors))
 
         for config_project in unparsed_config.projects:
             classes = self._getLoadClasses(tenant, config_project)
@@ -2024,7 +2061,7 @@ class TenantParser(object):
                 # processed differently later
                 name = config_project.get('name')
                 parsed_project = pcontext.project_parser.fromYaml(
-                    config_project)
+                    config_project, loading_errors)
                 if name and name.startswith('^'):
                     parsed_config.projects_by_regex.setdefault(
                         name, []).append(parsed_project)
@@ -2263,11 +2300,11 @@ class ConfigLoader(object):
             tenant = self.tenant_parser.fromYaml(
                 abide, conf_tenant, ansible_manager)
             abide.tenants[tenant.name] = tenant
-            if len(tenant.layout.loading_errors):
+            if len(tenant.layout.loading_errors.errors):
                 self.log.warning(
                     "%s errors detected during %s tenant "
                     "configuration loading" % (
-                        len(tenant.layout.loading_errors), tenant.name))
+                        len(tenant.layout.loading_errors.errors), tenant.name))
                 # Log accumulated errors
                 for err in tenant.layout.loading_errors.errors[:10]:
                     self.log.warning(err.error)
@@ -2298,11 +2335,11 @@ class ConfigLoader(object):
         new_tenant = self.tenant_parser.fromYaml(
             new_abide, unparsed_config, ansible_manager)
         new_abide.tenants[tenant.name] = new_tenant
-        if len(new_tenant.layout.loading_errors):
+        if len(new_tenant.layout.loading_errors.errors):
             self.log.warning(
                 "%s errors detected during %s tenant "
                 "configuration re-loading" % (
-                    len(new_tenant.layout.loading_errors), tenant.name))
+                    len(new_tenant.layout.loading_errors.errors), tenant.name))
             # Log accumulated errors
             for err in new_tenant.layout.loading_errors.errors[:10]:
                 self.log.warning(err.error)
