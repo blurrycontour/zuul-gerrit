@@ -2959,6 +2959,7 @@ class ExecutorServer(BaseMergeServer):
             # requests.
             log.exception('Process pool got broken')
             self.resetProcessPool()
+            task._send_aborted()
         except Exception:
             log.exception('Got exception while updating repo %s/%s',
                           task.connection_name, task.project_name)
