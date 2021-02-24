@@ -20,6 +20,7 @@ import logging
 import multiprocessing
 import os
 import psutil
+import re
 import shutil
 import signal
 import shlex
@@ -30,7 +31,7 @@ import threading
 import time
 import traceback
 from concurrent.futures.process import ProcessPoolExecutor, BrokenProcessPool
-import re
+from typing import Dict
 
 import git
 from urllib.parse import urlsplit
@@ -56,6 +57,10 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
+from zuul.model import (
+    BuildCompletedEvent, BuildPausedEvent, BuildStartedEvent, BuildStatusEvent
+)
+from zuul.zk.event_queues import PipelineResultEventQueue
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -906,7 +911,7 @@ class AnsibleJob(object):
         self.paused = True
 
         data = {'paused': self.paused, 'data': self.getResultData()}
-        self.job.sendWorkData(json.dumps(data))
+        self.executor_server.pauseBuild(self.job, data)
         self._resume_event.wait()
 
     def resume(self):
@@ -935,7 +940,7 @@ class AnsibleJob(object):
             self.time_starting_build = time.monotonic()
 
             # report that job has been taken
-            self.job.sendWorkData(json.dumps(self._base_job_data()))
+            self.executor_server.startBuild(self.job, self._base_job_data())
 
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
@@ -952,13 +957,13 @@ class AnsibleJob(object):
             self.executor_server.resetProcessPool()
             self._send_aborted()
         except ExecutorError as e:
-            result_data = json.dumps(dict(result='ERROR',
-                                          error_detail=e.args[0]))
-            self.log.debug("Sending result: %s" % (result_data,))
-            self.job.sendWorkComplete(result_data)
+            result_data = dict(result='ERROR', error_detail=e.args[0])
+            self.log.debug("Sending result: %s", result_data)
+            self.executor_server.completeBuild(self.job, result_data)
         except Exception:
             self.log.exception("Exception while executing job")
-            self.job.sendWorkException(traceback.format_exc())
+            data = {"exception": traceback.format_exc()}
+            self.executor_server.completeBuild(self.job, data)
         finally:
             self.running = False
             if self.jobdir:
@@ -997,7 +1002,7 @@ class AnsibleJob(object):
 
     def _send_aborted(self):
         result = dict(result='ABORTED')
-        self.job.sendWorkComplete(json.dumps(result))
+        self.executor_server.completeBuild(self.job, result)
 
     def _execute(self):
         args = self.arguments
@@ -1179,8 +1184,7 @@ class AnsibleJob(object):
                 hostname=self.executor_server.hostname,
                 uuid=self.job.unique)
 
-        self.job.sendWorkData(json.dumps(data))
-        self.job.sendWorkStatus(0, 100)
+        self.executor_server.updateBuildStatus(self.job, data)
 
         result = self.runPlaybooks(args)
         success = result == 'SUCCESS'
@@ -1197,11 +1201,9 @@ class AnsibleJob(object):
         warnings = []
         self.mapLines(merger, args, data, item_commit, warnings)
         warnings.extend(get_warnings_from_result_data(data, logger=self.log))
-        result_data = json.dumps(dict(result=result,
-                                      warnings=warnings,
-                                      data=data))
-        self.log.debug("Sending result: %s" % (result_data,))
-        self.job.sendWorkComplete(result_data)
+        result_data = dict(result=result, warnings=warnings, data=data)
+        self.log.debug("Sending result: %s", result_data)
+        self.executor_server.completeBuild(self.job, result_data)
 
     def getResultData(self):
         data = {}
@@ -1294,14 +1296,14 @@ class AnsibleJob(object):
             # can't fetch them, it should resolve itself.
             self.log.exception("Could not fetch refs to merge from remote")
             result = dict(result='ABORTED')
-            self.job.sendWorkComplete(json.dumps(result))
+            self.executor_server.completeBuild(self.job, result)
             return None
         if not ret:  # merge conflict
             result = dict(result='MERGER_FAILURE')
             if self.executor_server.statsd:
                 base_key = "zuul.executor.{hostname}.merger"
                 self.executor_server.statsd.incr(base_key + ".FAILURE")
-            self.job.sendWorkComplete(json.dumps(result))
+            self.executor_server.completeBuild(self.job, result)
             return None
 
         if self.executor_server.statsd:
@@ -2728,6 +2730,10 @@ class ExecutorServer(BaseMergeServer):
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
 
+        self.result_events = PipelineResultEventQueue.createRegistry(
+            self.zk_client
+        )
+
         self.executor_jobs = {
             "executor:resume:%s" % self.hostname: self.resumeJob,
             "executor:stop:%s" % self.hostname: self.stopJob,
@@ -3155,3 +3161,53 @@ class ExecutorServer(BaseMergeServer):
             job_worker.stop(reason)
         except Exception:
             log.exception("Exception sending stop command to worker:")
+
+    def startBuild(self, job: gear.TextJob, data: Dict) -> None:
+        # Mark the gearman job as started, as we are still using it for the
+        # actual job execution. The data, however, will be passed to the
+        # scheduler via the event queues in ZooKeeper.
+        job.sendWorkData(json.dumps(data))
+
+        params = json.loads(job.arguments)
+        tenant_name = params["zuul"]["tenant"]
+        pipeline_name = params["zuul"]["pipeline"]
+
+        event = BuildStartedEvent(job.unique, data)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def updateBuildStatus(self, job: gear.TextJob, data: Dict) -> None:
+        job.sendWorkData(json.dumps(data))
+
+        params = json.loads(job.arguments)
+        tenant_name = params["zuul"]["tenant"]
+        pipeline_name = params["zuul"]["pipeline"]
+
+        event = BuildStatusEvent(job.unique, data)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def pauseBuild(self, job: gear.TextJob, data: Dict) -> None:
+        # Mark the gearman job as paused, as we are still using it for the
+        # actual job execution. The data, however, will be passed to the
+        # scheduler via the event queues in ZooKeeper.
+        job.sendWorkData(json.dumps(data))
+
+        params = json.loads(job.arguments)
+        tenant_name = params["zuul"]["tenant"]
+        pipeline_name = params["zuul"]["pipeline"]
+
+        event = BuildPausedEvent(job.unique, data)
+        self.result_events[tenant_name][pipeline_name].put(event)
+
+    def completeBuild(self, job: gear.TextJob, result: Dict) -> None:
+        # Mark the gearman job as complete, as we are still using it for the
+        # actual job execution. The result, however, will be passed to the
+        # scheduler via the event queues in ZooKeeper.
+        # TODO (felix): Remove the data from the complete() call
+        job.sendWorkComplete(json.dumps(result))
+
+        params = json.loads(job.arguments)
+        tenant_name = params["zuul"]["tenant"]
+        pipeline_name = params["zuul"]["pipeline"]
+
+        event = BuildCompletedEvent(job.unique, result)
+        self.result_events[tenant_name][pipeline_name].put(event)

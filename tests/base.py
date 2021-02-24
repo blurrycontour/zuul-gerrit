@@ -4025,6 +4025,8 @@ class SchedulerTestApp:
         if validate_tenants is None:
             self.connections.registerScheduler(self.sched)
 
+        # TODO (felix): Can be removed when the merger jobs are switched to
+        # ZooKeeper.
         self.event_queues = [
             self.sched.result_event_queue,
         ]
@@ -4358,6 +4360,8 @@ class ZuulTestCase(BaseTestCase):
             lambda app: app.start(self.validate_tenants))
 
     def __event_queues(self, matcher) -> List[Queue]:
+        # TODO (felix): Can be removed when the merger jobs are switched to
+        # ZooKeeper.
         sched_queues = map(lambda app: app.event_queues,
                            self.scheds.filter(matcher))
         return [item for sublist in sched_queues for item in sublist] + \
@@ -4864,7 +4868,10 @@ class ZuulTestCase(BaseTestCase):
             for (build_uuid, job_worker) in \
                 self.executor_server.job_workers.items():
                 if build_uuid not in seen_builds:
-                    self.log.debug("%s is not finalized" % build_uuid)
+                    log = get_annotated_logger(
+                        self.log, event=None, build=build_uuid
+                    )
+                    log.debug("Build is not finalized")
                     return False
         return True
 
@@ -4925,6 +4932,10 @@ class ZuulTestCase(BaseTestCase):
                     ].hasEvents():
                         return False
                     if sched.pipeline_trigger_events[tenant.name][
+                        pipeline_name
+                    ].hasEvents():
+                        return False
+                    if sched.pipeline_result_events[tenant.name][
                         pipeline_name
                     ].hasEvents():
                         return False
