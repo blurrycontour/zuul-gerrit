@@ -34,7 +34,7 @@ from zuul.zk.components import (
     BaseComponent, ComponentRegistry, ExecutorComponent
 )
 
-from tests.base import BaseTestCase, iterate_timeout
+from tests.base import BaseTestCase, HoldableExecutorApi, iterate_timeout
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -352,7 +352,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        client.submit("A", "tenant", "pipeline", {}, None)
+        client.submit("A", "tenant", "pipeline", {}, None, '1')
         request_queue.get(timeout=30)
 
         # Executor receives request
@@ -435,7 +435,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        client.submit("A", "tenant", "pipeline", {}, None)
+        client.submit("A", "tenant", "pipeline", {}, None, '1')
         request_queue.get(timeout=30)
 
         # Executor receives request
@@ -487,7 +487,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
                              build_event_callback=eq_put)
 
         # Scheduler submits request
-        a_path = client.submit("A", "tenant", "pipeline", {}, None)
+        a_path = client.submit("A", "tenant", "pipeline", {}, None, '1')
         request_queue.get(timeout=30)
 
         # Executor receives nothing
@@ -523,7 +523,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         client = ExecutorApi(self.zk_client)
 
         # Scheduler submits request
-        a_path = client.submit("A", "tenant", "pipeline", {}, None)
+        a_path = client.submit("A", "tenant", "pipeline", {}, None, '1')
         sched_a = client.get(a_path)
 
         # Simulate the server side
@@ -542,11 +542,15 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # requests
         executor_api = ExecutorApi(self.zk_client)
 
-        executor_api.submit("A", "tenant", "pipeline", {}, "zone")
-        path_b = executor_api.submit("B", "tenant", "pipeline", {}, None)
-        path_c = executor_api.submit("C", "tenant", "pipeline", {}, "zone")
-        path_d = executor_api.submit("D", "tenant", "pipeline", {}, "zone")
-        path_e = executor_api.submit("E", "tenant", "pipeline", {}, "zone")
+        executor_api.submit("A", "tenant", "pipeline", {}, "zone", '1')
+        path_b = executor_api.submit("B", "tenant", "pipeline", {},
+                                     None, '1')
+        path_c = executor_api.submit("C", "tenant", "pipeline", {},
+                                     "zone", '1')
+        path_d = executor_api.submit("D", "tenant", "pipeline", {},
+                                     "zone", '1')
+        path_e = executor_api.submit("E", "tenant", "pipeline", {},
+                                     "zone", '1')
 
         b = executor_api.get(path_b)
         c = executor_api.get(path_c)
@@ -603,7 +607,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
         # Simulate the client side
         client = ExecutorApi(self.zk_client)
-        client.submit("A", "tenant", "pipeline", {}, None)
+        client.submit("A", "tenant", "pipeline", {}, None, '1')
 
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
