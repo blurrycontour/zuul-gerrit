@@ -4867,7 +4867,10 @@ class ZuulTestCase(BaseTestCase):
             for (build_uuid, job_worker) in \
                 self.executor_server.job_workers.items():
                 if build_uuid not in seen_builds:
-                    self.log.debug("%s is not finalized" % build_uuid)
+                    log = get_annotated_logger(
+                        self.log, event=None, build=build_uuid
+                    )
+                    log.debug("%s is not finalized", build_uuid)
                     return False
         return True
 
@@ -4925,6 +4928,10 @@ class ZuulTestCase(BaseTestCase):
                     ].hasEvents():
                         return False
                     if sched.pipeline_trigger_events[tenant.name][
+                        pipeline_name
+                    ].hasEvents():
+                        return False
+                    if sched.pipeline_result_events[tenant.name][
                         pipeline_name
                     ].hasEvents():
                         return False

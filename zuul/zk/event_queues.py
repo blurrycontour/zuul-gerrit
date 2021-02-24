@@ -33,6 +33,7 @@ RESULT_EVENT_TYPE_MAP = {
     "BuildCompletedEvent": model.BuildCompletedEvent,
     "BuildPausedEvent": model.BuildPausedEvent,
     "BuildStartedEvent": model.BuildStartedEvent,
+    "BuildStatusEvent": model.BuildStatusEvent,
     "FilesChangesCompletedEvent": model.FilesChangesCompletedEvent,
     "MergeCompletedEvent": model.MergeCompletedEvent,
     "NodesProvisionedEvent": model.NodesProvisionedEvent,
