@@ -19,7 +19,6 @@ import copy
 import json
 import logging
 import os
-from itertools import chain
 from enum import Enum
 from functools import total_ordering
 
