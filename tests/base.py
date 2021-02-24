@@ -3994,8 +3994,8 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk_client = ZooKeeperClient()
-        zk_client.connect(self.zk_config, timeout=30.0)
+        zk_client = ZooKeeperClient(self.zk_config, timeout=30.0)
+        zk_client.connect()
 
         self.sched.setExecutor(executor_client)
         self.sched.setMerger(merge_client)
@@ -4179,8 +4179,8 @@ class ZuulTestCase(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_port,
             self.zk_chroot_fixture.zookeeper_chroot)
 
-        self.zk_client = ZooKeeperClient()
-        self.zk_client.connect(hosts=self.zk_config)
+        self.zk_client = ZooKeeperClient(hosts=self.zk_config)
+        self.zk_client.connect()
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(

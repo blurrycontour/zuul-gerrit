@@ -138,24 +138,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         merger = zuul.merger.client.MergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
 
-        zk_client = ZooKeeperClient()
-        zookeeper_hosts = get_default(self.config, 'zookeeper', 'hosts')
-        if not zookeeper_hosts:
-            raise Exception("The zookeeper hosts config value is required")
-        zookeeper_tls_key = get_default(self.config, 'zookeeper', 'tls_key')
-        zookeeper_tls_cert = get_default(self.config, 'zookeeper', 'tls_cert')
-        zookeeper_tls_ca = get_default(self.config, 'zookeeper', 'tls_ca')
-        if not (zookeeper_tls_key and zookeeper_tls_cert and zookeeper_tls_ca):
-            raise Exception("A TLS ZooKeeper connection is required; "
-                            "please supply the tls_* zookeeper config values.")
-        zookeeper_timeout = float(get_default(self.config, 'zookeeper',
-                                              'session_timeout', 10.0))
-        zk_client.connect(
-            zookeeper_hosts,
-            timeout=zookeeper_timeout,
-            tls_cert=zookeeper_tls_cert,
-            tls_key=zookeeper_tls_key,
-            tls_ca=zookeeper_tls_ca)
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
 
         self.configure_connections(require_sql=True)
         self.sched.setExecutor(gearman)
