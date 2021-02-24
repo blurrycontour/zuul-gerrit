@@ -26,9 +26,9 @@ import time
 import traceback
 import urllib
 
-from zuul import configloader
-from zuul import model
-from zuul import exceptions
+from kazoo.exceptions import NotEmptyError
+
+from zuul import configloader, exceptions
 from zuul import version as zuul_version
 from zuul import rpclistener
 from zuul.lib import commandsocket
@@ -50,6 +50,7 @@ from zuul.model import (
     BuildPausedEvent,
     BuildStartedEvent,
     BuildStatusEvent,
+    Change,
     ChangeManagementEvent,
     DequeueEvent,
     EnqueueEvent,
@@ -62,6 +63,7 @@ from zuul.model import (
     SmartReconfigureEvent,
     Tenant,
     TenantReconfigureEvent,
+    TimeDataBase,
     UnparsedAbideConfig,
 )
 from zuul.zk import ZooKeeperClient
@@ -108,6 +110,7 @@ class Scheduler(threading.Thread):
     _stats_interval = 30
     _cleanup_interval = 60 * 60
     _merger_client_class = MergeClient
+    _executor_client_class = ExecutorClient
 
     # Number of seconds past node expiration a hold request will remain
     EXPIRED_HOLD_REQUEST_TTL = 24 * 60 * 60
@@ -185,7 +188,7 @@ class Scheduler(threading.Thread):
 
         if not testonly:
             time_dir = self._get_time_database_dir()
-            self.time_database = model.TimeDataBase(time_dir)
+            self.time_database = TimeDataBase(time_dir)
 
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
@@ -214,7 +217,7 @@ class Scheduler(threading.Thread):
             default_version=default_ansible_version)
 
         if not testonly:
-            self.executor = ExecutorClient(self.config, self)
+            self.executor = self._executor_client_class(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
             self.nodepool = nodepool.Nodepool(self)
 
@@ -995,20 +998,10 @@ class Scheduler(threading.Thread):
                 self.cancelJob(build_set, request.job)
 
     def _cleanupBuild(self, build):
-        # TODO (felix): The cancel call can be removed once we switch the
-        # builds to ZooKeeper. It's main purpose is to cancel/complete the
-        # runnig gearman job which otherwise breaks the tests in case of a
-        # reconfiguration.
-        try:
-            self.executor.cancel(build)
-        except Exception:
-            self.log.exception(
-                "Exception while canceling paused build %s", build
-            )
         # Directly delete the build rather than putting a CANCELED event in the
         # result event queue since the result event queue won't be processed
         # anymore once the tenant is removed.
-        del self.executor.builds[build.uuid]
+        self.executor.removeBuild(build)
 
         # Make sure we return the nodes to nodepool as we won't receive a
         # build completed event in this case.
@@ -1045,9 +1038,14 @@ class Scheduler(threading.Thread):
 
         # Delete the tenant root path for this tenant in ZooKeeper to remove
         # all tenant specific event queues
-        self.zk_client.client.delete(
-            f"{TENANT_ROOT}/{tenant.name}", recursive=True
-        )
+        try:
+            self.zk_client.client.delete(
+                f"{TENANT_ROOT}/{tenant.name}", recursive=True
+            )
+        except NotEmptyError:
+            # TODO (felix): For debugging
+            self.zk_client._show_tree(f"{TENANT_ROOT}/{tenant.name}")
+            self.log.warning("Cleaning up tenant %s failed", tenant.name)
 
     def _reconfigureTenant(self, tenant):
         # This is called from _doReconfigureEvent while holding the
@@ -1144,7 +1142,7 @@ class Scheduler(threading.Thread):
             for item in shared_queue.queue:
                 if item.change.project != change.project:
                     continue
-                if (isinstance(item.change, model.Change) and
+                if (isinstance(item.change, Change) and
                         item.change.number == change.number and
                         item.change.patchset == change.patchset) or\
                    (item.change.ref == change.ref):
@@ -1517,10 +1515,10 @@ class Scheduler(threading.Thread):
             return
 
         build.start_time = time.time()
-        # TODO (felix): Remove this once the builds are executed via ZooKeeper.
-        # It's currently necessary to set the correct private attribute on the
-        # build for the gearman worker.
-        self.executor.setWorkerInfo(build, event.data)
+        # Update information about worker
+        if event.data:
+            # Noop builds don't provide any event data
+            build.worker.updateFromData(event.data)
 
         log = get_annotated_logger(self.log, build.zuul_event_id)
         if build.build_set is not build.build_set.item.current_build_set:
@@ -1754,7 +1752,7 @@ class Scheduler(threading.Thread):
         # If the build was canceled, we did actively cancel the job so
         # don't overwrite the result and don't retry.
         if build.canceled:
-            result = build.result
+            result = build.result or "CANCELED"
             build.retry = False
 
         build.end_time = time.time()
@@ -1782,7 +1780,7 @@ class Scheduler(threading.Thread):
 
         # The test suite expects the build to be removed from the
         # internal dict after it's added to the report queue.
-        del self.executor.builds[build.uuid]
+        self.executor.removeBuild(build)
 
         if build.build_set is not build.build_set.item.current_build_set:
             log.debug("Build %s is not in the current build set", build)
