@@ -213,7 +213,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
         yield from self.inState(BuildRequest.REQUESTED)
 
     def submit(self, uuid, tenant_name, pipeline_name, params, zone,
-               precedence=200):
+               event_id, precedence=200):
         log = get_annotated_logger(self.log, event=None, build=uuid)
 
         path = "/".join([self._getZoneRoot(zone), uuid])
@@ -226,6 +226,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
             zone,
             tenant_name,
             pipeline_name,
+            event_id,
         )
 
         log.debug("Submitting build request to ZooKeeper %s", build_request)
