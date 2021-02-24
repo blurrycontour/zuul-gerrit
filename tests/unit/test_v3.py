@@ -4223,7 +4223,7 @@ class TestDataReturn(AnsibleZuulTestCase):
 
         # Stop the job worker to simulate an executor restart
         for job_worker in self.executor_server.job_workers.values():
-            if job_worker.job.unique == paused_job.uuid:
+            if job_worker.build_request.uuid == paused_job.uuid:
                 job_worker.stop()
         self.waitUntilSettled("stop job worker")
 
@@ -5839,7 +5839,7 @@ class TestJobPause(AnsibleZuulTestCase):
 
         # Stop the job worker of compile1 to simulate an executor restart
         for job_worker in self.executor_server.job_workers.values():
-            if job_worker.job.unique == compile1.unique:
+            if job_worker.build_request.uuid == compile1.unique:
                 job_worker.stop()
         self.waitUntilSettled("Stop job")
 
@@ -6088,7 +6088,7 @@ class TestJobPause(AnsibleZuulTestCase):
         # Stop the job worker of test to simulate an executor restart
         job_test = self.builds[1]
         for job_worker in self.executor_server.job_workers.values():
-            if job_worker.job.unique == job_test.unique:
+            if job_worker.build_request.uuid == job_test.uuid:
                 job_worker.stop()
 
         self.executor_server.hold_jobs_in_build = False
