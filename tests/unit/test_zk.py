@@ -21,7 +21,7 @@ from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi, BuildRequestEvent
 from zuul.zk.nodepool import ZooKeeperNodepool
 
-from tests.base import BaseTestCase, iterate_timeout
+from tests.base import BaseTestCase, HoldableExecutorApi, iterate_timeout
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -85,17 +85,6 @@ class TestZK(ZooKeeperBaseTestCase):
         # Test deleting the request
         self.zk_nodepool.deleteHoldRequest(req1)
         self.assertEqual([], self.zk_nodepool.getHoldRequests())
-
-
-class HoldableExecutorApi(ExecutorApi):
-    hold_in_queue = False
-
-    @property
-    def initial_state(self):
-        # This supports holding build requests in tests
-        if self.hold_in_queue:
-            return BuildRequest.HOLD
-        return BuildRequest.REQUESTED
 
 
 class TestExecutorApi(ZooKeeperBaseTestCase):
