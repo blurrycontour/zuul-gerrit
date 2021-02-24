@@ -1267,6 +1267,7 @@ class TestTenantInfoConfigBroken(BaseTestWeb):
         self.assertIn('Zuul encountered an error while accessing the repo '
                       'org/project3',
                       config_errors[0]['error'])
+        self.assertFalse(config_errors[0]['warning'])
 
         self.assertEqual(
             config_errors[1]['source_context']['project'], 'org/project2')
@@ -1279,6 +1280,22 @@ class TestTenantInfoConfigBroken(BaseTestWeb):
 
         resp = self.get_url("api/tenant/non-tenant/config-errors")
         self.assertEqual(404, resp.status_code)
+
+
+class TestTenantInfoConfigWarnings(BaseTestWeb):
+
+    @simple_layout('layouts/queue-warning.yaml')
+    def test_tenant_info_broken_config(self):
+        config_errors = self.get_url(
+            "api/tenant/tenant-one/config-errors").json()
+        self.assertEqual(
+            len(config_errors), 1)
+
+        self.assertEqual(
+            config_errors[0]['source_context']['project'], 'org/common-config')
+        self.assertIn('Shared queues should be configured per project',
+                      config_errors[0]['error'])
+        self.assertTrue(config_errors[0]['warning'])
 
 
 class TestWebSocketInfo(TestInfo):

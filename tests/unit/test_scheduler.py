@@ -3624,6 +3624,39 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.history[4].pipeline, 'check')
         self.assertEqual(self.history[5].pipeline, 'check')
 
+    @simple_layout('layouts/queue-warning.yaml')
+    def test_queue_deprecation_warnings(self):
+        # Test that we do not warn about queue deprecation in existing
+        # configs
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertNotIn('Warning', A.messages[-1])
+
+    @simple_layout('layouts/queue-warning.yaml')
+    def test_queue_deprecation_warnings_new(self):
+        # Test that we warn about queue deprecation in new changes
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                name: org/project
+                gate:
+                  queue: integrated-overridden
+                  jobs:
+                    - base
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn('Warning', A.messages[-1])
+        self.assertIn('Shared queues should be configured per project',
+                      A.messages[-1])
+
     def test_reconfigure_merge(self):
         """Test that two reconfigure events are merged"""
 

@@ -160,17 +160,18 @@ class LoadingErrors(object):
     def __init__(self):
         self.errors = []
         self.error_keys = set()
+        self.warnings = []
+        self.warning_keys = set()
 
     def addError(self, context, mark, error, short_error=None):
         e = ConfigurationError(context, mark, error, short_error)
         self.errors.append(e)
         self.error_keys.add(e.key)
 
-    def __getitem__(self, index):
-        return self.errors[index]
-
-    def __len__(self):
-        return len(self.errors)
+    def addWarning(self, context, mark, warning, short_warning=None):
+        w = ConfigurationError(context, mark, warning, short_warning)
+        self.warnings.append(w)
+        self.warning_keys.add(w.key)
 
 
 class NoMatchingParentError(Exception):
@@ -2667,7 +2668,8 @@ class QueueItem(object):
         self.current_build_set.debug_messages.append(indent + msg)
 
     def warning(self, msg):
-        self.current_build_set.warning_messages.append(msg)
+        if msg not in self.current_build_set.warning_messages:
+            self.current_build_set.warning_messages.append(msg)
         self.log.info(msg)
 
     def freezeJobGraph(self, layout, skip_file_matcher=False):

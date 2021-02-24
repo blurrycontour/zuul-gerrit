@@ -189,6 +189,7 @@ class TestJob(BaseTestCase):
         })
         self.layout.addJob(python27diablo)
 
+        loading_errors = model.LoadingErrors()
         project_config = self.pcontext.project_parser.fromYaml({
             '_source_context': self.context,
             '_start_mark': self.start_mark,
@@ -199,7 +200,7 @@ class TestJob(BaseTestCase):
                                   'run': 'playbooks/python27.yaml'}}
                 ]
             }
-        })
+        }, loading_errors)
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)
@@ -250,6 +251,7 @@ class TestJob(BaseTestCase):
         })
         self.layout.addJob(python27)
 
+        loading_errors = model.LoadingErrors()
         project_config = self.pcontext.project_parser.fromYaml({
             '_source_context': self.context,
             '_start_mark': self.start_mark,
@@ -259,7 +261,7 @@ class TestJob(BaseTestCase):
                     'python27',
                 ]
             }
-        })
+        }, loading_errors)
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)
@@ -316,6 +318,7 @@ class TestJob(BaseTestCase):
 
         self.layout.addJob(job)
 
+        loading_errors = model.LoadingErrors()
         project_config = self.pcontext.project_parser.fromYaml(
             {
                 '_source_context': self.context,
@@ -326,8 +329,7 @@ class TestJob(BaseTestCase):
                         'job'
                     ]
                 }
-            }
-        )
+            }, loading_errors)
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)

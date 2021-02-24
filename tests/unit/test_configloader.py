@@ -409,7 +409,7 @@ class TestTenantExcludeAll(TenantParserTestCase):
         # validate that there are no config errors in that tenant.
         tenant_two = self.scheds.first.sched.abide.tenants.get('tenant-two')
         self.assertEquals(
-            len(tenant_two.layout.loading_errors), 0,
+            len(tenant_two.layout.loading_errors.errors), 0,
             "No error should have been accumulated")
 
 
@@ -505,7 +505,7 @@ class TestSplitConfig(ZuulTestCase):
         # This check ensures the .zuul.ignore flag file is working in
         # the config directory.
         self.assertEquals(
-            len(tenant.layout.loading_errors), 0)
+            len(tenant.layout.loading_errors.errors), 0)
 
     def test_dynamic_split_config(self):
         in_repo_conf = textwrap.dedent(

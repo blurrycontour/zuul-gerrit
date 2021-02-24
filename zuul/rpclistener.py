@@ -547,7 +547,13 @@ class RPCListener(RPCListenerBase):
         for err in tenant.layout.loading_errors.errors:
             output.append({
                 'source_context': err.key.context.toDict(),
-                'error': err.error})
+                'error': err.error,
+                'warning': False})
+        for err in tenant.layout.loading_errors.warnings:
+            output.append({
+                'source_context': err.key.context.toDict(),
+                'error': err.error,
+                'warning': True})
         job.sendWorkComplete(json.dumps(output))
 
     def handle_connection_list(self, job):
