@@ -19,7 +19,6 @@ import copy
 import json
 import logging
 import os
-from itertools import chain
 from functools import total_ordering
 
 import re2
@@ -1867,8 +1866,8 @@ class Job(ConfigObject):
         project_canonical_names = set()
         project_canonical_names.update(self.required_projects.keys())
         project_canonical_names.update(self._projectsFromPlaybooks(
-            chain(self.pre_run, [self.run[0]], self.post_run,
-                  self.cleanup_run), with_implicit=True))
+            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
+                            self.cleanup_run), with_implicit=True))
 
         projects = list()
         for project_canonical_name in project_canonical_names:
@@ -2061,7 +2060,7 @@ class BuildRequest:
     ALL_STATES = (REQUESTED, HOLD, RUNNING, PAUSED, COMPLETED)
 
     def __init__(self, uuid, state, precedence, params, zone,
-                 tenant_name, pipeline_name):
+                 tenant_name, pipeline_name, event_id):
         self.uuid = uuid
         self.state = state
         self.precedence = precedence
@@ -2069,6 +2068,7 @@ class BuildRequest:
         self.zone = zone
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
+        self.event_id = event_id
 
         # ZK related data
         self.path = None
@@ -2084,6 +2084,7 @@ class BuildRequest:
             "zone": self.zone,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
+            "event_id": self.event_id,
         }
 
     @classmethod
@@ -2096,6 +2097,7 @@ class BuildRequest:
             data["zone"],
             data["tenant_name"],
             data["pipeline_name"],
+            data["event_id"],
         )
 
         return build_request
