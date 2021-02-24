@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "929e611f_18a74282",
+        "filename": "doc/source/reference/config.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-24T15:53:17Z",
+      "side": 1,
+      "message": ":attr:`tenant.config-projects.\u003cproject\u003e.load-branch` will link to the actual location.  I\u0027ll push up a new PS with that.",
+      "revId": "2c2b6e9ae76d76cafd5ed7fa807b1706156f7074",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
