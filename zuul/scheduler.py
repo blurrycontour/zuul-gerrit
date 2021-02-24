@@ -45,10 +45,12 @@ from zuul import nodepool
 from zuul.executor.client import ExecutorClient
 from zuul.merger.client import MergeClient
 from zuul.model import (
+    Abide,
     Build,
     BuildCompletedEvent,
     BuildPausedEvent,
     BuildStartedEvent,
+    BuildStatusEvent,
     ChangeManagementEvent,
     DequeueEvent,
     EnqueueEvent,
@@ -61,6 +63,7 @@ from zuul.model import (
     SmartReconfigureEvent,
     Tenant,
     TenantReconfigureEvent,
+    UnparsedAbideConfig,
 )
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponentRegistry
@@ -70,7 +73,9 @@ from zuul.zk.event_queues import (
     GlobalTriggerEventQueue,
     PipelineEventWatcher,
     PipelineManagementEventQueue,
+    PipelineResultEventQueue,
     PipelineTriggerEventQueue,
+    TENANT_ROOT,
 )
 from zuul.zk.nodepool import ZooKeeperNodepool
 
@@ -173,8 +178,11 @@ class Scheduler(threading.Thread):
                 self.zk_client, self.connections
             )
         )
-        self.abide = model.Abide()
-        self.unparsed_abide = model.UnparsedAbideConfig()
+        self.pipeline_result_events = PipelineResultEventQueue.createRegistry(
+            self.zk_client
+        )
+        self.abide = Abide()
+        self.unparsed_abide = UnparsedAbideConfig()
 
         if not testonly:
             time_dir = self._get_time_database_dir()
@@ -371,22 +379,7 @@ class Scheduler(threading.Thread):
         self.result_event_queue.put(event)
         self.wake_event.set()
 
-    def onBuildStarted(self, build):
-        build.start_time = time.time()
-        event = BuildStartedEvent(build)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
-
-    def onBuildPaused(self, build, result_data):
-        build.result_data = result_data
-        event = BuildPausedEvent(build)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
-
-    def onBuildCompleted(self, build, result, result_data, warnings):
-        build.end_time = time.time()
-        build.result_data = result_data
-        build.build_set.warning_messages.extend(warnings)
+    def _reportBuildStats(self, build):
         # Note, as soon as the result is set, other threads may act
         # upon this, even though the event hasn't been fully
         # processed. This could result in race conditions when e.g. skipping
@@ -414,9 +407,9 @@ class Scheduler(threading.Thread):
                 #   <host>.<project>.<branch>.job.<job>.<result>
                 key = '%s.%s' % (
                     jobkey,
-                    'RETRY' if result is None else result
+                    'RETRY' if build.result is None else build.result
                 )
-                if result in ['SUCCESS', 'FAILURE'] and build.start_time:
+                if build.result in ['SUCCESS', 'FAILURE'] and build.start_time:
                     dt = int((build.end_time - build.start_time) * 1000)
                     self.statsd.timing(key, dt)
                 self.statsd.incr(key)
@@ -428,9 +421,6 @@ class Scheduler(threading.Thread):
                     self.statsd.timing(key, dt)
         except Exception:
             self.log.exception("Exception reporting runtime stats")
-        event = BuildCompletedEvent(build, result)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
 
     def onMergeCompleted(self, build_set, merged, updated,
                          commit, files, repo_state, item_in_branches):
@@ -1016,6 +1006,11 @@ class Scheduler(threading.Thread):
         for pipeline in tenant.layout.pipelines.values():
             self._reconfigureDeletePipeline(pipeline)
 
+        # Delete the tenant root path for this tenant in ZooKeeper to remove
+        # all tenant specific event queues
+        self.zk_client.client.delete(f"{TENANT_ROOT}/{tenant.name}",
+                                     recursive=True)
+
     def _reconfigureDeletePipeline(self, pipeline):
         self.log.info("Removing pipeline %s during reconfiguration" %
                       (pipeline,))
@@ -1037,12 +1032,13 @@ class Scheduler(threading.Thread):
             for build in builds_to_cancel:
                 self.log.info(
                     "Canceling build %s during reconfiguration" % (build,))
-                self.cancelJob(build.build_set, build.job, build=build)
+                self.cancelJob(build.build_set, build.job,
+                               build=build, force=True)
             for build_set, request in requests_to_cancel:
                 self.log.info(
                     "Canceling node request %s during reconfiguration",
                     request)
-                self.cancelJob(build_set, request.job)
+                self.cancelJob(build_set, request.job, force=True)
 
     def _doPromoteEvent(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
@@ -1182,8 +1178,7 @@ class Scheduler(threading.Thread):
 
                 # Give result events priority -- they let us stop builds,
                 # whereas trigger events cause us to execute builds.
-                while (not self.result_event_queue.empty() and
-                       not self._stopped):
+                if not self._stopped:
                     self.process_result_queue()
 
                 if not self._stopped:
@@ -1426,29 +1421,66 @@ class Scheduler(threading.Thread):
             )
 
     def process_result_queue(self):
-        self.log.debug("Fetching result event")
-        event = self.result_event_queue.get()
-        self.log.debug("Processing result event %s" % event)
-        try:
-            if isinstance(event, BuildStartedEvent):
-                self._doBuildStartedEvent(event)
-            elif isinstance(event, BuildPausedEvent):
-                self._doBuildPausedEvent(event)
-            elif isinstance(event, BuildCompletedEvent):
-                self._doBuildCompletedEvent(event)
-            elif isinstance(event, MergeCompletedEvent):
-                self._doMergeCompletedEvent(event)
-            elif isinstance(event, FilesChangesCompletedEvent):
-                self._doFilesChangesCompletedEvent(event)
-            elif isinstance(event, NodesProvisionedEvent):
-                self._doNodesProvisionedEvent(event)
-            else:
-                self.log.error("Unable to handle event %s" % event)
-        finally:
-            self.result_event_queue.task_done()
+        for tenant in self.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                for event in self.pipeline_result_events[tenant.name][
+                    pipeline.name
+                ]:
+                    if self._stopped:
+                        return
+                    self.log.debug(
+                        "Processing result event %s for build %s",
+                        event,
+                        event.build,
+                    )
+                    try:
+                        self._process_result_event(event)
+                    finally:
+                        self.pipeline_result_events[tenant.name][
+                            pipeline.name
+                        ].ack(event)
+
+        # TODO (felix): The old result event queue is still used for the merge
+        # results and will be removed once we switch the merge jobs to ZK as
+        # well.
+        while not self.result_event_queue.empty() and not self._stopped:
+            self.log.debug("Fetching result event")
+            event = self.result_event_queue.get()
+            try:
+                if isinstance(event, MergeCompletedEvent):
+                    self._doMergeCompletedEvent(event)
+                elif isinstance(event, FilesChangesCompletedEvent):
+                    self._doFilesChangesCompletedEvent(event)
+                elif isinstance(event, NodesProvisionedEvent):
+                    self._doNodesProvisionedEvent(event)
+                else:
+                    self.log.error("Unable to handle event %s", event)
+            finally:
+                self.result_event_queue.task_done()
+
+    def _process_result_event(self, event):
+        if isinstance(event, BuildStartedEvent):
+            self._doBuildStartedEvent(event)
+        elif isinstance(event, BuildStatusEvent):
+            self._doBuildStatusEvent(event)
+        elif isinstance(event, BuildPausedEvent):
+            self._doBuildPausedEvent(event)
+        elif isinstance(event, BuildCompletedEvent):
+            self._doBuildCompletedEvent(event)
+        else:
+            self.log.error("Unable to handle event %s", event)
 
     def _doBuildStartedEvent(self, event):
-        build = event.build
+        build = self.executor.builds.get(event.build)
+        if not build:
+            return
+
+        build.start_time = time.time()
+        # TODO (felix): Remove this once the builds are executed via ZooKeeper.
+        # It's currently necessary to set the correct private attribute on the
+        # build for the gearman worker.
+        self.executor.setWorkerInfo(build, event.data)
+
         log = get_annotated_logger(self.log, build.zuul_event_id)
         if build.build_set is not build.build_set.item.current_build_set:
             log.warning("Build %s is not in the current build set", build)
@@ -1462,14 +1494,25 @@ class Scheduler(threading.Thread):
                 build))
         except Exception:
             log.exception("Exception estimating build time:")
-        pipeline.manager.onBuildStarted(event.build)
+        pipeline.manager.onBuildStarted(build)
+
+    def _doBuildStatusEvent(self, event):
+        build = self.executor.builds.get(event.build)
+        if not build:
+            return
+
+        # Allow URL to be updated
+        build.url = event.data.get('url', build.url)
 
     def _doBuildPausedEvent(self, event):
-        build = event.build
+        build = self.executor.builds.get(event.build)
+        if not build:
+            return
 
         # Setting paused is deferred to event processing stage to avoid a race
         # with child job skipping.
         build.paused = True
+        build.result_data = event.data.get("data", {})
 
         log = get_annotated_logger(self.log, build.zuul_event_id)
         if build.build_set is not build.build_set.item.current_build_set:
@@ -1489,7 +1532,7 @@ class Scheduler(threading.Thread):
                 log.exception(
                     "Exception while canceling paused build %s", build)
             return
-        pipeline.manager.onBuildPaused(event.build)
+        pipeline.manager.onBuildPaused(build)
 
     def _handleExpiredHoldRequest(self, request):
         '''
@@ -1617,26 +1660,88 @@ class Scheduler(threading.Thread):
         return False
 
     def _doBuildCompletedEvent(self, event):
-        build = event.build
-        build.result = event.result
-        zuul_event_id = build.zuul_event_id
-        log = get_annotated_logger(self.log, zuul_event_id)
+        # Get the local build object from the executor client
+        build = self.executor.builds.get(event.build)
+        if not build:
+            self.log.error("Unable to find build %s", event.build)
+            return
+
+        log = get_annotated_logger(
+            self.log, event=build.zuul_event_id, build=build.uuid
+        )
+        event_result = event.result
+
+        build.node_labels = event_result.get("node_labels", [])
+        build.node_name = event_result.get("node_name")
+        result = event_result.get("result")
+        build.error_detail = event_result.get("error_detail")
+
+        if result is None:
+            if (
+                build.build_set.getTries(build.job.name) >= build.job.attempts
+            ):
+                result = "RETRY_LIMIT"
+            else:
+                build.retry = True
+        if result in ("DISCONNECT", "ABORTED"):
+            # Always retry if the executor just went away
+            build.retry = True
+        if result == "MERGER_FAILURE":
+            # The build result MERGER_FAILURE is a bit misleading here
+            # because when we got here we know that there are no merge
+            # conflicts. Instead this is most likely caused by some
+            # infrastructure failure. This can be anything like connection
+            # issue, drive corruption, full disk, corrupted git cache, etc.
+            # This may or may not be a recoverable failure so we should
+            # retry here respecting the max retries. But to be able to
+            # distinguish from RETRY_LIMIT which normally indicates pre
+            # playbook failures we keep the build result after the max
+            # attempts.
+            if (
+                build.build_set.getTries(build.job.name) < build.job.attempts
+            ):
+                build.retry = True
+
+        result_data = event_result.get("data", {})
+        warnings = event_result.get("warnings", [])
+
+        log.info("Build complete, result %s, warnings %s", result, warnings)
+
+        if build.retry:
+            result = "RETRY"
+
+        # If the build was canceled, we did actively cancel the job so
+        # don't overwrite the result and don't retry.
+        if build.canceled:
+            result = build.result
+            build.retry = False
+
+        build.end_time = time.time()
+        build.result_data = result_data
+        build.build_set.warning_messages.extend(warnings)
+
+        build.result = result
+        self._reportBuildStats(build)
 
         # Regardless of any other conditions which might cause us not
         # to pass this on to the pipeline manager, make sure we return
         # the nodes to nodepool.
         try:
-            event.build.held = self._processAutohold(build)
+            build.held = self._processAutohold(build)
             self.log.debug(
-                'build "%s" held status set to %s' % (event.build,
-                                                      event.build.held))
+                'build "%s" held status set to %s', build, build.held
+            )
         except Exception:
-            log.exception("Unable to process autohold for %s" % build)
+            log.exception("Unable to process autohold for %s", build)
         try:
             self.nodepool.returnNodeSet(build.nodeset, build=build,
-                                        zuul_event_id=zuul_event_id)
+                                        zuul_event_id=build.zuul_event_id)
         except Exception:
             log.exception("Unable to return nodeset %s" % build.nodeset)
+
+        # The test suite expects the build to be removed from the
+        # internal dict after it's added to the report queue.
+        del self.executor.builds[build.uuid]
 
         if build.build_set is not build.build_set.item.current_build_set:
             log.debug("Build %s is not in the current build set", build)
@@ -1651,7 +1756,8 @@ class Scheduler(threading.Thread):
                 self.time_database.update(build, duration, build.result)
             except Exception:
                 log.exception("Exception recording build time:")
-        pipeline.manager.onBuildCompleted(event.build)
+
+        pipeline.manager.onBuildCompleted(build)
 
     def _doMergeCompletedEvent(self, event):
         build_set = event.build_set
@@ -1771,7 +1877,18 @@ class Scheduler(threading.Thread):
                         other_change.refresh_deps = True
         change.refresh_deps = True
 
-    def cancelJob(self, buildset, job, build=None, final=False):
+    def cancelJob(self, buildset, job, build=None, final=False,
+                  force=False):
+        """Cancel a running build
+
+        Set final to true to create a fake build result even if the
+        job has not run.  TODO: explain this better.
+
+        Set force to true to forcibly release build resources without
+        waiting for a result from the executor.  Use this when
+        removing pipelines.
+
+        """
         item = buildset.item
         log = get_annotated_logger(self.log, item.event)
         job_name = job.name
@@ -1793,6 +1910,12 @@ class Scheduler(threading.Thread):
                         "Exception while canceling build %s for change %s",
                         build, item.change)
 
+                if (not was_running) or force:
+                    nodeset = buildset.getJobNodeSet(job_name)
+                    if nodeset:
+                        self.nodepool.returnNodeSet(
+                            nodeset, build=build, zuul_event_id=item.event)
+
                 # In the unlikely case that a build is removed and
                 # later added back, make sure we clear out the nodeset
                 # so it gets requested again.
@@ -1803,13 +1926,18 @@ class Scheduler(threading.Thread):
                         "Exception while removing nodeset from build %s "
                         "for change %s", build, build.build_set.item.change)
 
-                if not was_running:
-                    nodeset = buildset.getJobNodeSet(job_name)
-                    if nodeset:
-                        self.nodepool.returnNodeSet(
-                            nodeset, build=build, zuul_event_id=item.event)
                 if build.result is None:
                     build.result = 'CANCELED'
+
+                if force:
+                    # Directly delete the build rather than putting a
+                    # CANCELED event in the result event queue since
+                    # the result event queue won't be processed
+                    # anymore once the pipeline is removed.
+                    try:
+                        del self.executor.builds[build.uuid]
+                    except KeyError:
+                        pass
             else:
                 nodeset = buildset.getJobNodeSet(job_name)
                 if nodeset:
