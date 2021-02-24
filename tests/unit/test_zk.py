@@ -31,7 +31,7 @@ from zuul.zk.sharding import (
     NODE_BYTE_SIZE_LIMIT,
 )
 
-from tests.base import BaseTestCase, iterate_timeout
+from tests.base import BaseTestCase, HoldableExecutorApi, iterate_timeout
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -237,17 +237,6 @@ class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
         self.assertEqual(len(master_files), 0)
         self.assertEqual(len(stable_files), 0)
         self.assertEqual(len(other_files), 1)
-
-
-class HoldableExecutorApi(ExecutorApi):
-    hold_in_queue = False
-
-    @property
-    def initial_state(self):
-        # This supports holding build requests in tests
-        if self.hold_in_queue:
-            return BuildRequest.HOLD
-        return BuildRequest.REQUESTED
 
 
 class TestExecutorApi(ZooKeeperBaseTestCase):
