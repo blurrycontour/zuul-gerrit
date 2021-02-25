@@ -41,13 +41,11 @@
         check: 'success'
         comment: false
         #status: 'success'
-      sqlreporter:
     failure:
       github:
         check: 'failure'
         comment: false
         #status: 'failure'
-      sqlreporter:
 
 - pipeline:
     name: gate
@@ -100,13 +98,11 @@
         comment: false
         #status: 'success'
         merge: true
-      sqlreporter:
     failure:
       github:
         check: 'failure'
         #status: 'failure'
         comment: false
-      sqlreporter:
     window-floor: 20
     window-increase-factor: 2
 
@@ -120,10 +116,6 @@
       github:
         - event: push
           ref: ^refs/heads/.*$
-    success:
-      sqlreporter:
-    failure:
-      sqlreporter:
 
 - pipeline:
     name: tag
@@ -135,7 +127,3 @@
       github:
         - event: push
           ref: ^refs/tags/.*$
-    success:
-      sqlreporter:
-    failure:
-      sqlreporter:
