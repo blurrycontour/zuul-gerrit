@@ -27,7 +27,11 @@ class ChangeQueue extends React.Component {
 
   render () {
     const { queue, pipeline, expanded } = this.props
-    let shortName = queue.name
+    let fullName = queue.name
+    if(queue.branch) {
+      fullName = `${fullName} (${queue.branch})`
+    }
+    let shortName = fullName
     if (shortName.length > 32) {
       shortName = shortName.substr(0, 32) + '...'
     }
@@ -45,7 +49,7 @@ class ChangeQueue extends React.Component {
     })
     return (
       <div className="change-queue" data-zuul-pipeline={pipeline}>
-        <p>Queue: <abbr title={queue.name}>{shortName}</abbr></p>
+        <p>Queue: <abbr title={fullName}>{shortName}</abbr></p>
         {changesList}
       </div>)
   }
