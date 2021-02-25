@@ -148,6 +148,31 @@ pipeline.
       all pipelines of this project.  For more information see
       :ref:`variable inheritance <user_jobs_variable_inheritance>`.
 
+   .. attr:: queue
+
+      This specifies the
+      name of the shared queue this project is in.  Any projects
+      which interact with each other in tests should be part of the
+      same shared queue in order to ensure that they don't merge
+      changes which break the others.  This is a free-form string;
+      just set the same value for each group of projects.
+
+      The name can refer to the name of a :attr:`queue` which allows
+      further configuration of the queue.
+
+      Each pipeline for a project can only belong to one queue,
+      therefore Zuul will use the first value that it encounters.
+      It need not appear in the first instance of a :attr:`project`
+      stanza; it may appear in secondary instances or even in a
+      :ref:`project-template` definition.
+
+      Pipeline managers other than `dependent` do not use this
+      attribute, however, it may still be used if
+      :attr:`scheduler.relative_priority` is enabled.
+
+      .. note:: This attribute is not evaluated speculatively and
+                its setting shall be merged to be effective.
+
    .. attr:: <pipeline>
 
       Each pipeline that the project participates in should have an
@@ -168,29 +193,13 @@ pipeline.
 
       .. attr:: queue
 
-         If this pipeline is a :value:`dependent
-         <pipeline.manager.dependent>` pipeline, this specifies the
-         name of the shared queue this project is in.  Any projects
-         which interact with each other in tests should be part of the
-         same shared queue in order to ensure that they don't merge
-         changes which break the others.  This is a free-form string;
-         just set the same value for each group of projects.
+         This is the same as :attr:`project.queue` but on per pipeline
+         level for backwards compatibility reasons. If :attr:`project.queue`
+         is defined this setting is ignored.
 
-         The name can refer to the name of a :attr:`queue` which allows
-         further configuration of the queue.
-
-         Each pipeline for a project can only belong to one queue,
-         therefore Zuul will use the first value that it encounters.
-         It need not appear in the first instance of a :attr:`project`
-         stanza; it may appear in secondary instances or even in a
-         :ref:`project-template` definition.
-
-         Pipeline managers other than `dependent` do not use this
-         attribute, however, it may still be used if
-         :attr:`scheduler.relative_priority` is enabled.
-
-         .. note:: This attribute is not evaluated speculatively and
-                   its setting shall be merged to be effective.
+         .. note:: It is deprecated to define the queue in the pipeline
+                   configuration. Configure it on :attr:`project.queue`
+                   instead.
 
       .. attr:: debug
 
