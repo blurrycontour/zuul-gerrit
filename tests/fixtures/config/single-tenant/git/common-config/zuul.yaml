@@ -113,6 +113,10 @@
       - .*-requires
     run: playbooks/project-testfile.yaml
 
+- queue:
+    name: integrated-per-branch
+    per-branch: true
+
 - project:
     name: org/project
     check:
@@ -182,6 +186,26 @@
         - project-test2:
             dependencies: project-merge
         - project1-project2-integration:
+            dependencies: project-merge
+
+- project:
+    name: org/project3
+    queue: integrated-per-branch
+    check:
+      jobs:
+        - project-merge
+        - project-test1:
+            dependencies: project-merge
+        - project-test2:
+            dependencies: project-merge
+        - project1-project2-integration:
+            dependencies: project-merge
+    gate:
+      jobs:
+        - project-merge
+        - project-test1:
+            dependencies: project-merge
+        - project-test2:
             dependencies: project-merge
 
 - project:
