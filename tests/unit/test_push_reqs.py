@@ -40,8 +40,8 @@ class TestPushRequirements(ZuulTestCase):
 
         # Make a gerrit change, and emit a ref-updated event
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
-        self.fake_gerrit.addEvent(B.getRefUpdatedEvent())
         B.setMerged()
+        self.fake_gerrit.addEvent(B.getRefUpdatedEvent())
         self.waitUntilSettled()
 
         # All but one pipeline should be skipped, increasing builds by 1

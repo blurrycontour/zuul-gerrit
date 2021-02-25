@@ -1399,6 +1399,7 @@ class TestScheduler(ZuulTestCase):
         p = "review.example.com/org/project"
         upstream = self.getUpstreamRepos([p])
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A_parent = str(upstream[p].commit('master'))
         A.setMerged()
         A_commit = str(upstream[p].commit('master'))
         self.log.debug("A commit: %s" % A_commit)
@@ -1409,7 +1410,7 @@ class TestScheduler(ZuulTestCase):
                 "name": "User Name",
             },
             "refUpdate": {
-                "oldRev": "90f173846e3af9154517b88543ffbd1691f31366",
+                "oldRev": A_parent,
                 "newRev": A_commit,
                 "refName": "master",
                 "project": "org/project",
@@ -1425,13 +1426,21 @@ class TestScheduler(ZuulTestCase):
     def test_post_ignore_deletes(self):
         "Test that deleting refs does not trigger post jobs"
 
+        # create branch and checkout to allow master branch to be deleted
+        self.create_branch('org/project', 'stable')
+        self.waitUntilSettled()
+        path = os.path.join(self.upstream_root, 'org/project')
+        repo = git.Repo(path)
+        repo.heads['stable'].checkout()
+
+        master_hexsha = self.delete_branch('org/project', 'master')
         e = {
             "type": "ref-updated",
             "submitter": {
                 "name": "User Name",
             },
             "refUpdate": {
-                "oldRev": "90f173846e3af9154517b88543ffbd1691f31366",
+                "oldRev": master_hexsha,
                 "newRev": "0000000000000000000000000000000000000000",
                 "refName": "master",
                 "project": "org/project",
@@ -4357,6 +4366,7 @@ class TestScheduler(ZuulTestCase):
         p = "review.example.com/org/project"
         upstream = self.getUpstreamRepos([p])
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A_parent = str(upstream[p].commit('master'))
         A.setMerged()
         A_commit = str(upstream[p].commit('master'))
         self.log.debug("A commit: %s" % A_commit)
@@ -4370,7 +4380,7 @@ class TestScheduler(ZuulTestCase):
             project='org/project',
             trigger=None,
             ref='master',
-            oldrev='90f173846e3af9154517b88543ffbd1691f31366',
+            oldrev=A_parent,
             newrev=A_commit)
         self.waitUntilSettled()
         job_names = [x.name for x in self.history]
@@ -4390,6 +4400,7 @@ class TestScheduler(ZuulTestCase):
         p = "review.example.com/org/project"
         upstream = self.getUpstreamRepos([p])
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A_parent = str(upstream[p].commit('master'))
         A.setMerged()
         A_commit = str(upstream[p].commit('master'))
         self.log.debug("A commit: %s" % A_commit)
@@ -4400,12 +4411,13 @@ class TestScheduler(ZuulTestCase):
             project='org/project',
             trigger=None,
             ref='master',
-            oldrev='90f173846e3af9154517b88543ffbd1691f31366',
+            oldrev=A_parent,
             newrev=A_commit)
 
         p = "review.example.com/org/project1"
         upstream = self.getUpstreamRepos([p])
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        B_parent = str(upstream[p].commit('master'))
         B.setMerged()
         B_commit = str(upstream[p].commit('master'))
         self.log.debug("B commit: %s" % B_commit)
@@ -4416,7 +4428,7 @@ class TestScheduler(ZuulTestCase):
             project='org/project1',
             trigger=None,
             ref='master',
-            oldrev='90f173846e3af9154517b88543ffbd1691f31366',
+            oldrev=B_parent,
             newrev=B_commit)
 
         self.waitUntilSettled()
@@ -5999,6 +6011,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_nodepool.pause()
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -8701,10 +8714,10 @@ class TestReconfigureBranch(ZuulTestCase):
         self.waitUntilSettled()
 
     def _deleteBranch(self):
-        self.delete_branch('org/project1', 'stable')
+        revision = self.delete_branch('org/project1', 'stable')
         self.fake_gerrit.addEvent(
             self.fake_gerrit.getFakeBranchDeletedEvent(
-                'org/project1', 'stable'))
+                'org/project1', 'stable', revision))
         self.waitUntilSettled()
 
     def _expectReconfigure(self, doReconfigure):
