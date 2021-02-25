@@ -3,6 +3,7 @@
 set -eu
 
 cd $(dirname $0)
+SCRIPT_DIR="$(pwd)"
 
 # Select docker or podman
 if command -v docker > /dev/null; then
@@ -32,6 +33,11 @@ if [ "${COMPOSE}" == "docker-compose" ]; then
 else
   podman-compose down
 fi
+
+CA_DIR=$SCRIPT_DIR/ca
+
+mkdir -p $CA_DIR
+$SCRIPT_DIR/zk-ca.sh $CA_DIR zuul-test-zookeeper
 
 ${COMPOSE} up -d
 
