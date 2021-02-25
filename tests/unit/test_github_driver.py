@@ -252,8 +252,8 @@ class TestGithubDriver(ZuulTestCase):
 
         A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
         old_sha = '0' * 40
-        new_sha = A.head_sha
         A.setMerged("merging A")
+        new_sha = A.getTargetBranchHeadSha()
         pevent = self.fake_github.getPushEvent(project='org/project',
                                                ref='refs/heads/master',
                                                old_rev=old_sha,
@@ -1022,9 +1022,9 @@ class TestGithubDriver(ZuulTestCase):
         self.waitUntilSettled()
 
         A = self.fake_github.openFakePullRequest(project, branch, 'A')
-        old_sha = A.head_sha
+        old_sha = A.getTargetBranchHeadSha()
         A.setMerged("merging A")
-        new_sha = random_sha1()
+        new_sha = A.getTargetBranchHeadSha()
 
         self._test_push_event_reconfigure(project, branch,
                                           expect_reconfigure=True,
@@ -1119,9 +1119,9 @@ class TestGithubDriver(ZuulTestCase):
         repo._set_branch_protection(branch, False)
 
         A = self.fake_github.openFakePullRequest(project, branch, 'A')
-        old_sha = A.head_sha
+        old_sha = A.getTargetBranchHeadSha()
         A.setMerged("merging A")
-        new_sha = random_sha1()
+        new_sha = A.getTargetBranchHeadSha()
 
         self._test_push_event_reconfigure(project, branch,
                                           expect_reconfigure=False,
@@ -1582,9 +1582,9 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         self.waitUntilSettled()
 
         A = self.fake_github.openFakePullRequest(project, branch, 'A')
-        old_sha = A.head_sha
+        old_sha = A.getTargetBranchHeadSha()
         A.setMerged("merging A")
-        new_sha = random_sha1()
+        new_sha = A.getTargetBranchHeadSha()
 
         # branch is not protected, no reconfiguration even if config file
         self._test_push_event_reconfigure(project, branch,

@@ -23,8 +23,8 @@ class TestSupercedent(ZuulTestCase):
     def test_supercedent(self):
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        arev = A.patchsets[-1]['revision']
         A.setMerged()
+        arev = A.head_sha
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -40,8 +40,8 @@ class TestSupercedent(ZuulTestCase):
         self.assertEqual(len(self.builds), 1)
 
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        crev = C.patchsets[-1]['revision']
         C.setMerged()
+        crev = C.head_sha
         self.fake_gerrit.addEvent(C.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -59,8 +59,8 @@ class TestSupercedent(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = True
         self.create_branch('org/project', 'stable')
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        arev = A.patchsets[-1]['revision']
         A.setMerged()
+        arev = A.head_sha
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -68,8 +68,8 @@ class TestSupercedent(ZuulTestCase):
 
         # This change should not be superceded
         B = self.fake_gerrit.addFakeChange('org/project', 'stable', 'B')
-        brev = B.patchsets[-1]['revision']
         B.setMerged()
+        brev = B.head_sha
         self.fake_gerrit.addEvent(B.getRefUpdatedEvent())
         self.waitUntilSettled()
 
