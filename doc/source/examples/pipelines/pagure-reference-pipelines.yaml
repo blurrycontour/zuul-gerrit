@@ -18,15 +18,12 @@
       pagure.io:
         status: 'pending'
         comment: false
-      sqlreporter:
     success:
       pagure.io:
         status: 'success'
-      sqlreporter:
     failure:
       pagure.io:
         status: 'failure'
-      sqlreporter:
 
 - pipeline:
     name: gate
@@ -39,7 +36,6 @@
         open: True
         tags: gateit
         status: success
-      sqlreporter:
     trigger:
        pagure.io:
          - event: pg_pull_request
@@ -54,18 +50,15 @@
       pagure.io:
         status: 'pending'
         comment: false
-      sqlreporter:
     success:
       pagure.io:
         status: 'success'
         merge: true
         comment: true
-      sqlreporter:
     failure:
       pagure.io:
         status: 'failure'
         comment: true
-      sqlreporter:
 
 - pipeline:
     name: promote
@@ -83,11 +76,9 @@
     success:
       pagure.io:
         comment: true
-      sqlreporter:
     failure:
       pagure.io:
         comment: true
-      sqlreporter:
 
 - pipeline:
     name: post
@@ -98,5 +89,3 @@
       pagure.io:
         - event: pg_push
           ref: ^refs/heads/.*$
-    success:
-      sqlreporter:
