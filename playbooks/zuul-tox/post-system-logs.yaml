@@ -1,0 +1,5 @@
+- hosts: all
+  tasks:
+
+    - name: Collect zookeeper logs
+      shell: "cp /opt/zookeeper/logs/* {{ zuul_output_dir }}/logs/"
