@@ -45,14 +45,48 @@
       zuul_ansible_version: 2.9
 
 - job:
-    name: zuul-tox-remote
+    name: zuul-tox
+    description: |
+      Zuul unit tests with ZooKeeper running
     parent: tox
+    nodeset: ubuntu-bionic
+    pre-run: playbooks/zuul-tox/pre.yaml
+    post-run: playbooks/zuul-tox/post-system-logs.yaml
+    vars:
+      tox_environment:
+        ZUUL_ZK_CA: /opt/zookeeper/ca/certs/cacert.pem
+        ZUUL_ZK_CERT: /opt/zookeeper/ca/certs/client.pem
+        ZUUL_ZK_KEY: /opt/zookeeper/ca/keys/clientkey.pem
+        ZUUL_TEST_ROOT: /tmp/zuul-test
+        YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+      test_setup_environment:
+        ZUUL_TEST_ROOT: /tmp/zuul-test
+        YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+
+- job:
+    name: zuul-tox-remote
+    parent: zuul-tox
+    timeout: 2700  # 45 minutes
     vars:
       tox_envlist: remote
       tox_environment:
         ZUUL_SSH_KEY: /home/zuul/.ssh/id_rsa
         ZUUL_REMOTE_IPV4: "{{ nodepool.interface_ip }}"
         ZUUL_REMOTE_KEEP: "true"
+
+- job:
+    name: zuul-tox-py36
+    parent: zuul-tox
+    timeout: 4800  # 80 minutes
+    vars:
+      tox_envlist: py36
+
+- job:
+    name: zuul-tox-py38
+    parent: zuul-tox
+    timeout: 4800  # 80 minutes
+    vars:
+      tox_envlist: py38
 
 - job:
     name: zuul-build-dashboard
@@ -223,22 +257,8 @@
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - tox-py36:
-            nodeset: ubuntu-bionic
-            timeout: 4800  # 80 minutes
-            vars: &zuul_tox_vars
-                test_setup_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                    YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
-                tox_environment:
-                    ZUUL_TEST_ROOT: /tmp/zuul-test
-                    YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
-            post-run: playbooks/common/post-system-logs.yaml
-        - tox-py38:
-            timeout: 4800  # 80 minutes
-            nodeset: ubuntu-bionic
-            vars: *zuul_tox_vars
-            post-run: playbooks/common/post-system-logs.yaml
+        - zuul-tox-py36
+        - zuul-tox-py38
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
@@ -253,8 +273,7 @@
               - web/.*
         - zuul-stream-functional-2.8
         - zuul-stream-functional-2.9
-        - zuul-tox-remote:
-            timeout: 2700  # 45 minutes
+        - zuul-tox-remote
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-build-image
@@ -289,8 +308,7 @@
               - web/.*
         - zuul-stream-functional-2.8
         - zuul-stream-functional-2.9
-        - zuul-tox-remote:
-            timeout: 2700  # 45 minutes
+        - zuul-tox-remote
         - zuul-quick-start:
             requires: nodepool-container-image
             dependencies: zuul-upload-image
