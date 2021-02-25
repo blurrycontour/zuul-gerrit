@@ -29,7 +29,10 @@ services:
       - ZOO_AUTOPURGE_PURGEINTERVAL=1
       - ZOO_LOG4J_PROP=WARN
     ports:
-      - "2181:2181"
+      - "2281:2281"
     tmpfs:
       - /data
       - /datalog
+    volumes:
+      - "./ca:/var/certs:z"
+      - "./zoo.cfg:/conf/zoo.cfg:z"
