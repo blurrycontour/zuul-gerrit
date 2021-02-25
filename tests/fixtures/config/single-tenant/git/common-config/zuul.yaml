@@ -113,6 +113,10 @@
       - .*-requires
     run: playbooks/project-testfile.yaml
 
+- queue:
+    name: integrated
+    per-branch: true
+
 - project:
     name: org/project
     check:

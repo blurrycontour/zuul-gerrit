@@ -154,6 +154,11 @@ class TestWeb(BaseTestWeb):
                     self.assertEqual(q['window'], 20)
                 else:
                     self.assertEqual(q['window'], 0)
+                # 'per-branch: true' is only for 'integrated' configured
+                if q['name'] == 'integrated':
+                    self.assertEqual(q['branch'], 'master')
+                else:
+                    self.assertNotIn('branch', q)
                 for head in q['heads']:
                     for change in head:
                         self.assertIn(
