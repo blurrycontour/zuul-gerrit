@@ -24,3 +24,4 @@ zuul/web/static/*
 !.keep
 node_modules
 yarn-error.log
+tools/ca/
