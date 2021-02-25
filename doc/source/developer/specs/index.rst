@@ -17,6 +17,7 @@ documentation instead.
    :maxdepth: 1
 
    tenant-scoped-admin-web-API
+   code-review-ACL-for-admin-API
    kubernetes-operator
    circular-dependencies
    zuul-runner
