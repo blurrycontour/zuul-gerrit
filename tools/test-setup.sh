@@ -7,23 +7,15 @@
 # This setup needs to be run as a user that can run sudo.
 TOOLSDIR=$(dirname $0)
 
-# Config Zookeeper to run on tmpfs
-sudo service zookeeper stop
-DATADIR=$(sed -n -e 's/^dataDir=//p' /etc/zookeeper/conf/zoo.cfg)
-sudo mount -t tmpfs -o nodev,nosuid,size=500M none $DATADIR
-echo "autopurge.purgeInterval=1" | sudo tee -a /etc/zookeeper/conf/zoo.cfg
-echo "maxClientCnxns=1000" | sudo tee -a /etc/zookeeper/conf/zoo.cfg
-
 # Prepare a tmpfs for Zuul test root
 if [[ -n "${ZUUL_TEST_ROOT:-}" ]]; then
     sudo mkdir -p "$ZUUL_TEST_ROOT"
     sudo mount -t tmpfs -o noatime,nodev,nosuid,size=64M none "$ZUUL_TEST_ROOT"
 fi
 
-# Be sure mysql and zookeeper are started.
+# Be sure mysql is started.
 sudo service mysql start
 sudo service postgresql start
-sudo service zookeeper start
 
 # The root password for the MySQL database; pass it in via
 # MYSQL_ROOT_PW.
