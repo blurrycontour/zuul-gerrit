@@ -371,6 +371,9 @@ class Pipeline(object):
             j_queues.append(j_queue)
             j_queue['heads'] = []
             j_queue['window'] = queue.window
+            # Only return 'branch' when it's none-None, i.e. queue is per_branch
+            if queue.project_branches and queue.project_branches[0][1]:
+                j_queue['branch'] = queue.project_branches[0][1]
 
             j_changes = []
             for e in queue.queue:
