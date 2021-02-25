@@ -65,15 +65,17 @@ class DependentPipelineManager(SharedQueuePipelineManager):
 
         # for project in change_queue, project.source get changes, then dedup.
         sources = set()
-        for project in change_queue.projects:
+        for project, _ in change_queue.project_branches:
             sources.add(project.source)
 
         seen = set(change.needed_by_changes)
         needed_by_changes = change.needed_by_changes[:]
         for source in sources:
             log.debug("  Checking source: %s", source)
+            projects = [project_branch[0]
+                        for project_branch in change_queue.project_branches]
             for c in source.getChangesDependingOn(change,
-                                                  change_queue.projects,
+                                                  projects,
                                                   self.pipeline.tenant):
                 if c not in seen:
                     seen.add(c)

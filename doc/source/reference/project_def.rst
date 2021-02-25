@@ -176,6 +176,9 @@ pipeline.
          changes which break the others.  This is a free-form string;
          just set the same value for each group of projects.
 
+         The name can refer to the name of a :attr:`queue` which allows
+         further configuration of the queue.
+
          Each pipeline for a project can only belong to one queue,
          therefore Zuul will use the first value that it encounters.
          It need not appear in the first instance of a :attr:`project`
