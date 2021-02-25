@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e32612a3_99f480d4",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 891,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-25T23:14:14Z",
+      "side": 1,
+      "message": "This reads a little weird, possibly because it\u0027s in reverse chrono order?  Maybe:\n\nTo cause the executor to stop accepting new jobs and exit when all running jobs are finished...",
+      "revId": "1465b9c508633f57f15945e9b6cf50b68f057591",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
