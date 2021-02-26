@@ -156,12 +156,12 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
 
         if all([self.server_ssl_key, self.server_ssl_cert,
                 self.server_ssl_ca]):
-            if hasattr(ssl, 'PROTOCOL_TLS_SERVER'):
+            if hasattr(ssl, 'PROTOCOL_TLS'):
                 # Python 3.6+ supports auto-negotiation of tls version
-                protocol = ssl.PROTOCOL_TLS_SERVER
+                protocol = ssl.PROTOCOL_TLS
             else:
                 # Fallback for Python 3.5
-                protocol = ssl.PROTOCOL_TLSv1
+                protocol = ssl.PROTOCOL_TLSv1_2
             context = ssl.SSLContext(protocol)
             context.load_cert_chain(self.server_ssl_cert, self.server_ssl_key)
             context.load_verify_locations(self.server_ssl_ca)
