@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6793e8ff_84ae8dcc",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 1438,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:23:32Z",
+      "side": 1,
+      "message": "Should we not emit the event so that we better test the \"refresh\" functionality?",
+      "revId": "526799d03735438f00b17e3c0e0bf0abe10bf9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
