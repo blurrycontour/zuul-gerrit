@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "78b5398d_2d0a992e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:18:37Z",
+      "side": 1,
+      "message": "What events don\u0027t trigger updates of cached changes?  Why shouldn\u0027t we add handling for those events?\n\nThis method gets called a lot, and refreshing is expensive.  We really should try to avoid doing this.\n\nIt sort of looks like you may have been going for an idea where the current (non-refresh) behavior is used in all of the current call locations, but the new refresh behavior is used in the next change?\n\nIf that\u0027s the case, it\u0027s probably worth mentioning in the commit message.  That way reviewers fully understand the purpose of the change.  It\u0027s probably not apparent when you read this, but every paragraph of this comment was written after leaving this change and going somewhere else to try to understand it.\n\nFurther, if that is the case, then I think that helps address my concern in the first paragraph.  I\u0027m going to assume so and review the rest of the change under those assumptions.  But I\u0027d still like to know what sort of events we\u0027re missing.",
+      "revId": "5e29e77aab37c394e5f09fb9aeaf3d16a1f6d3b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1095de58_6701b2d8",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:18:37Z",
+      "side": 1,
+      "message": "Refresh should default to False.",
+      "revId": "5e29e77aab37c394e5f09fb9aeaf3d16a1f6d3b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f3b30a0_1fbb3e25",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:18:37Z",
+      "side": 1,
+      "message": "refresh\u003drefresh -- this is ignoring the argument and always refreshing.",
+      "revId": "5e29e77aab37c394e5f09fb9aeaf3d16a1f6d3b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e727cf8_86f8c579",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:18:37Z",
+      "side": 1,
+      "message": "Functionally it\u0027s the same, but in some invocations of _getChange, you say \"refresh\u003dTrue\" but here you use \"refresh\u003drefresh\".  It might be good to standardize -- it helps in reviews like this where we\u0027re jumping across all the drivers.  I\u0027d vote for True but would be happy with either.",
+      "revId": "5e29e77aab37c394e5f09fb9aeaf3d16a1f6d3b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "911d4c59_79245d30",
+        "filename": "zuul/driver/gitlab/gitlabsource.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:18:37Z",
+      "side": 1,
+      "message": "default to False",
+      "revId": "5e29e77aab37c394e5f09fb9aeaf3d16a1f6d3b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "82c3c97b_429824ae",
+        "filename": "zuul/driver/pagure/paguresource.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:18:37Z",
+      "side": 1,
+      "message": "refresh\u003drefresh.",
+      "revId": "5e29e77aab37c394e5f09fb9aeaf3d16a1f6d3b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
