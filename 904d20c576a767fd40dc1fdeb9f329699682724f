@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "35ddb40d_bf4a8e55",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:29:03Z",
+      "side": 1,
+      "message": "I wonder how you discovered this?  :)",
+      "revId": "904d20c576a767fd40dc1fdeb9f329699682724f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
