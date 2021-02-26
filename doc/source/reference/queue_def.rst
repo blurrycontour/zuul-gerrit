@@ -63,5 +63,16 @@ Here is an example ``queue`` configuration.
       items fail to report (e.g. merge failure when some items were already
       merged). In this case the target branch(es) might be in a broken state.
 
-      In general, circular dependencies are considered to be an antipattern but
-      can't be avoided in certain cases.
+      In general, circular dependencies are considered to be an
+      antipattern since they add extra constraints to continuous
+      deployment systems.  Additionally, due to the lack of atomicity
+      in merge operations in code review systems, it may be possible
+      for only part of a cycle to be merged.  In that case, manual
+      interventios (such as reverting a commit, or bypassing gating to
+      force-merge the remaining commits) may be required.
+
+      .. warning:: If the remote system is able to merge the first but
+                   unable to merge the second or later change in a
+                   dependency cycle, then the gating system for a
+                   project may be broken and may require an
+                   intervention to correct.
