@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3ea5274_92b2ad1a",
+        "filename": "tests/fixtures/config/circular-dependencies/git/common-config/zuul.yaml",
+        "patchSetId": 50
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T22:45:56Z",
+      "side": 1,
+      "message": "Why is this pipeline here?  (And gate too?)\n\nThey really clutter up the test output.  I find it helpful to read the logs from test runs to understand what zuul is doing and make sure that it\u0027s behaving as expected (and not doing something that we won\u0027t catch just from test assertions).  But all the extra queue messages from these pipelines make it pretty hard to read.",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cf243867_006ba327",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 50
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T22:45:56Z",
+      "side": 1,
+      "message": "On ps29 we agreed to support changes behind, but in ps 36 this was added with no followup comment on the review.  It would be helpful to reply to old comments if you change your mind.\n\nI have implemented the algorithm I suggested in ps29 and will upload it as a followup.",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "56d0cef0_609e30e1",
+        "filename": "zuul/model.py",
+        "patchSetId": 50
+      },
+      "lineNbr": 4136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T22:45:56Z",
+      "side": 1,
+      "message": "Nit: maybe consider a 2 line version of this?  Any of the ways to write this in 2 lines would more closely match the predominant style and conserve vertical space (if we did the whole method like this, it would grow from 15 to 26 lines).",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
