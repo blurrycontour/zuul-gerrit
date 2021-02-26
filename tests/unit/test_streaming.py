@@ -155,7 +155,13 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
         self.streaming_data[name] = ''
         with socket.create_connection(gateway_address) as s:
             if self.use_ssl:
-                context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+                if hasattr(ssl, 'PROTOCOL_TLS'):
+                    # Python 3.6+ supports auto-negotiation of tls version
+                    protocol = ssl.PROTOCOL_TLS
+                else:
+                    # Fallback for Python 3.5
+                    protocol = ssl.PROTOCOL_TLSv1_2
+                context = ssl.SSLContext(protocol)
                 context.verify_mode = ssl.CERT_REQUIRED
                 context.check_hostname = False
                 context.load_cert_chain(

@@ -1,0 +1,13 @@
+- hosts: all
+  tasks:
+
+    - name: Make sure openssl is present
+      become: yes
+      package:
+        name:
+          - openssl
+      state: present
+
+    - name: Generate new ceritificates
+      chdir: src/opendev.org/zuul/zuul/tests/fixtures/fingergw
+      command: cp /var/ssh/nodepool.pub /var/node/authorized_keys
