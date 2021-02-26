@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b40b211_d2b962da",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:44:17Z",
+      "side": 1,
+      "message": "Or a very busy GitHub system. :)",
+      "revId": "ba6d86ada2960e1aca8bb1a81321e013027fa5b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8a6e9a72_72d71021",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2196,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-26T23:44:17Z",
+      "side": 1,
+      "message": "We should probably note that this must be json serializable in order to be forward compatible with ZooKeeper.  But the current change is json serializable, and I doubt we\u0027re going to add very much else to this before we start putting queue items in ZK.",
+      "revId": "ba6d86ada2960e1aca8bb1a81321e013027fa5b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
