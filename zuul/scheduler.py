@@ -1187,13 +1187,13 @@ class Scheduler(threading.Thread):
         if project is None:
             raise ValueError('Unknown project %s' % event.project_name)
         change = project.source.getChange(event, project)
-        if change.project.name != project.name:
+        if change.project.canonical_name != project.canonical_name:
             if event.change:
                 item = 'Change %s' % event.change
             else:
                 item = 'Ref %s' % event.ref
             raise Exception('%s does not belong to project "%s"'
-                            % (item, project.name))
+                            % (item, project.canonical_name))
         for shared_queue in pipeline.queues:
             for item in shared_queue.queue:
                 if item.change.project != change.project:
