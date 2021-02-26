@@ -212,14 +212,21 @@
     parent: opendev-release-python
     pre-run: playbooks/release/pre.yaml
 
+- job:
+    name: tox-py38-ubuntu-focal
+    parent: tox-py38
+
+- job:
+    name: tox-py38-ubuntu-focal-new-certificate
+    parent: tox-py38
+    pre-run: playbooks/fingergw-ssl-test/pre.yaml
+
 - project:
     vars:
       node_version: 14
       release_python: python3
     check:
       jobs:
-        - zuul-build-image
-        - zuul-tox-docs
         - tox-linters:
             vars:
               tox_install_bindep: false
@@ -234,34 +241,16 @@
                     ZUUL_TEST_ROOT: /tmp/zuul-test
                     YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
             post-run: playbooks/common/post-system-logs.yaml
-        - tox-py38:
-            timeout: 4800  # 80 minutes
-            nodeset: ubuntu-bionic
+        - tox-py38-ubuntu-focal:
+            timeout: 1800
+            nodeset: ubuntu-focal
             vars: *zuul_tox_vars
             post-run: playbooks/common/post-system-logs.yaml
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-tox-remote:
-            timeout: 2700  # 45 minutes
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
-        - zuul-client-zuul-functional
-        - zuul-build-python-release
+        - tox-py38-ubuntu-focal-new-certificate:
+            timeout: 1800
+            nodeset: ubuntu-focal
+            vars: *zuul_tox_vars
+            post-run: playbooks/common/post-system-logs.yaml
     gate:
       jobs:
         - zuul-upload-image
