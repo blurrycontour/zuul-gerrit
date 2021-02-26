@@ -59,7 +59,13 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
         '''
         with socket.create_connection((server, port), timeout=10) as s:
             if use_ssl:
-                context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+                if hasattr(ssl, 'PROTOCOL_TLS'):
+                    # Python 3.6+ supports auto-negotiation of tls version
+                    protocol = ssl.PROTOCOL_TLS
+                else:
+                    # Fallback for Python 3.5
+                    protocol = ssl.PROTOCOL_TLSv1_2
+                context = ssl.SSLContext(protocol)
                 context.verify_mode = ssl.CERT_REQUIRED
                 context.check_hostname = False
                 context.load_cert_chain(self.fingergw.finger_client_ssl_cert,
