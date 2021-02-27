@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9bd592d1_6829d283",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-27T01:12:15Z",
+      "side": 1,
+      "message": "Unfortunately, this will be *all* of the executors, but executors.accepting would only be the unzoned ones.\n\nI think we should make zuul.executors.X be all executors; zuul.executors.zone.\u003czone\u003e.X be each zone, and zuul.executors.unzoned.X be the unzoned executors.  That also avoids name collisions.  I have implemented this in https://review.opendev.org/c/zuul/zuul/+/777852",
+      "revId": "59c93ed108308170ad58305c5038ca91a80803d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
