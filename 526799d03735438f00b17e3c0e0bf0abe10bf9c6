@@ -51,6 +51,24 @@
       "revId": "526799d03735438f00b17e3c0e0bf0abe10bf9c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "13c1b61f_30f280fc",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 1438,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-02-27T14:42:20Z",
+      "side": 1,
+      "message": "Based on clarification on irc: Initially (when the parent change didn\u0027t exist yet). An event was neccesary to trigger an update of the data which is used by canMerge. With the parent change canMerge on Github updates this information on the fly for the cycle-can-merge check due to lack of events we can receive from github (notably branch protection changes).\n\nNow that we use the allow_refresh in this change we can omit the event in this test case to test both, the parent change and this change at once.",
+      "parentUuid": "6253e6e8_dd194ce8",
+      "revId": "526799d03735438f00b17e3c0e0bf0abe10bf9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
