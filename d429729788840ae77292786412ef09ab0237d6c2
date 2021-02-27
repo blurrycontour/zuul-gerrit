@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "320ba85e_91d19312",
+        "filename": "doc/source/reference/queue_def.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-02-27T07:25:56Z",
+      "side": 1,
+      "message": "typo: interventions",
+      "revId": "d429729788840ae77292786412ef09ab0237d6c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
