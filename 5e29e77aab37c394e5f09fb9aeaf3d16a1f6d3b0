@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "64be5a0c_4fe5a824",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-02-27T07:46:17Z",
+      "side": 1,
+      "message": "The main reason for this was that there was an earlier optimization to store all information that\u0027s needed for a canmerge check within the change for github prs (https://review.opendev.org/c/zuul/zuul/+/753243). Before that optimization we did refreshing the canmerge information on every call. Due to github\u0027s limitations it is not possible to reliably update this information. E.g. this depends on the branch protection settings of github where it doesn\u0027t send any event if this changed. Also status events can be ambiguous.\n\nAnyway as you see in the github part we don\u0027t refresh the whole change but fetch only the required data. If I recall correctly exactly this was the issue we tried to fix here. However maybe this change goes too far and should only add a \u0027allow-refresh\u0027 flag that triggers refreshing of such volatile information (on github) and remove the refreshing from the other drivers where we don\u0027t have this problem.\n\ntldr: I\u0027d suggest to change this flag to \u0027allow-refresh\u0027 and only make the github driver act on this flag (maybe later gitlab needs similar things).",
+      "parentUuid": "78b5398d_2d0a992e",
+      "revId": "5e29e77aab37c394e5f09fb9aeaf3d16a1f6d3b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1095de58_6701b2d8",
         "filename": "zuul/driver/github/githubsource.py",
         "patchSetId": 4
