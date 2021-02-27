@@ -437,38 +437,54 @@ class Scheduler(threading.Thread):
         functions = getGearmanFunctions(self.rpc.gearworker.gearman)
         functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
         executors_online = 0
+        executors_accepting = 0
+        executors_running = 0
+        executors_queued = 0
         mergers_online = 0
         merge_queue = 0
         merge_running = 0
         for (name, (queued, running, registered)) in functions.items():
             if name.startswith('executor:execute'):
-                executors_accepting = registered
+                executors_accepting += registered
                 execute_queue = queued - running
+                executors_queued += execute_queue
                 execute_running = running
+                executors_running += running
                 tokens = name.split(':', 2)
                 if len(tokens) == 2:
                     # unzoned case
-                    self.statsd.gauge('zuul.executors.accepting',
-                                      executors_accepting)
-                    self.statsd.gauge('zuul.executors.jobs_running',
+                    self.statsd.gauge('zuul.executors.unzoned.accepting',
+                                      registered)
+                    self.statsd.gauge('zuul.executors.unzoned.jobs_running',
                                       execute_running)
-                    self.statsd.gauge('zuul.executors.jobs_queued',
+                    self.statsd.gauge('zuul.executors.unzoned.jobs_queued',
                                       execute_queue)
                 else:
                     # zoned case
                     zone = tokens[2]
-                    self.statsd.gauge('zuul.executors.%s.accepting' %
+                    self.statsd.gauge('zuul.executors.zone.%s.accepting' %
                                       normalize_statsd_name(zone),
-                                      executors_accepting)
-                    self.statsd.gauge('zuul.executors.%s.jobs_running' %
+                                      registered)
+                    self.statsd.gauge('zuul.executors.zone.%s.jobs_running' %
                                       normalize_statsd_name(zone),
                                       execute_running)
-                    self.statsd.gauge('zuul.executors.%s.jobs_queued' %
+                    self.statsd.gauge('zuul.executors.zone.%s.jobs_queued' %
                                       normalize_statsd_name(zone),
                                       execute_queue)
 
-            if name.startswith('executor:stop'):
+            if name.startswith('executor:online'):
                 executors_online += registered
+                tokens = name.split(':', 2)
+                if len(tokens) == 2:
+                    # unzoned case
+                    self.statsd.gauge('zuul.executors.unzoned.online',
+                                      registered)
+                else:
+                    # zoned case
+                    zone = tokens[2]
+                    self.statsd.gauge('zuul.executors.zone.%s.online' %
+                                      normalize_statsd_name(zone),
+                                      registered)
             if name == 'merger:merge':
                 mergers_online = registered
             if name.startswith('merger:'):
@@ -478,6 +494,9 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
         self.statsd.gauge('zuul.executors.online', executors_online)
+        self.statsd.gauge('zuul.executors.accepting', executors_accepting)
+        self.statsd.gauge('zuul.executors.jobs_running', executors_running)
+        self.statsd.gauge('zuul.executors.jobs_queued', executors_queued)
 
         self.statsd.gauge('zuul.scheduler.eventqueues.trigger',
                           self.trigger_event_queue.qsize())

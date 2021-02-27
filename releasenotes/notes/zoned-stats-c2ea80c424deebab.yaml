@@ -1,0 +1,13 @@
+---
+upgrade:
+  - |
+    Three sets of statsd starts are now reported for executors: zoned,
+    unzoned, and all executors.  The existing statsd keys now
+    correspond to all executors; new statsd keys are available for
+    zoned and unzoned executors.  See :stat:`zuul.executors` for
+    details.
+fixes:
+  - |
+    If zoned executors were used with prior releases of Zuul, the
+    reported executor statistics would only represent a single,
+    unspecified zone.  This has now been corrected.

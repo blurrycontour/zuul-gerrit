@@ -116,9 +116,11 @@ class TestSchedulerZone(ZuulTestCase):
         # be two executors online and two accepting (one unzoned and one zoned)
         self.assertReportedStat('zuul.executors.online', value='2', kind='g')
         self.assertReportedStat(
-            'zuul.executors.accepting', value='1', kind='g')
+            'zuul.executors.accepting', value='2', kind='g')
         self.assertReportedStat(
-            'zuul.executors.test-provider_vpn.accepting', value='1', kind='g')
+            'zuul.executors.unzoned.accepting', value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.executors.zone.test-provider_vpn.accepting', value='1', kind='g')
 
         self.gearman_server.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
