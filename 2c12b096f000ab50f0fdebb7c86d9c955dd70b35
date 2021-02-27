@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1600e8fd_00b15358",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1345,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-27T00:29:53Z",
+      "side": 1,
+      "message": "It\u0027s a little disconcerting to call this within a lock, but it looks like we\u0027re doing that right now, so it\u0027s not a substantial change.  The non-blocking nature of this combined with the granular locks is probably why this is okay.",
+      "revId": "2c12b096f000ab50f0fdebb7c86d9c955dd70b35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
