@@ -34,6 +34,23 @@
       "revId": "526799d03735438f00b17e3c0e0bf0abe10bf9c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6253e6e8_dd194ce8",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 1438,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-02-27T14:25:13Z",
+      "side": 1,
+      "message": "Right -- I\u0027m pointing out that the case we\u0027re testing is the one where we *do* get an event, so we have left the new code untested.  I guess we could test both, but I bet there are other tests that update changes after events.  The one new one we need is a test that doesn\u0027t emit an event.",
+      "revId": "526799d03735438f00b17e3c0e0bf0abe10bf9c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
