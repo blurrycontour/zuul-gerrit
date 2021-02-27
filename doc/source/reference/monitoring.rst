@@ -337,7 +337,14 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
 .. stat:: zuul.executors
 
-   Holds metrics related to Zuul executors.
+   Holds metrics related to unzoned executors.
+
+   This is a copy of :stat:`zuul.executors.unzoned`.  It does not
+   include information about zoned executors.
+
+   .. warning:: The metrics at this location are deprecated and will
+                be removed in a future version.  Please begin using
+                :stat:`zuul.executors.unzoned` instead.
 
    .. stat:: online
       :type: gauge
@@ -361,6 +368,61 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       executor to run on.  This should ideally be at zero; persistent
       higher values indicate more executor resources would be useful.
 
+   .. stat:: unzoned
+
+      Holds metrics related to unzoned executors.
+
+      .. stat:: online
+         :type: gauge
+
+         The number of unzoned Zuul executor processes online.
+
+      .. stat:: accepting
+         :type: gauge
+
+         The number of unzoned Zuul executor processes accepting new
+         jobs.
+
+      .. stat:: jobs_running
+         :type: gauge
+
+         The number of unzoned executor jobs running.
+
+      .. stat:: jobs_queued
+         :type: gauge
+
+         The number of jobs allocated nodes, but queued waiting for an
+         unzoned executor to run on.  This should ideally be at zero;
+         persistent higher values indicate more executor resources
+         would be useful.
+
+   .. stat:: zone
+
+      Holds metrics related to zoned executors.
+
+      .. stat:: <zone>.online
+         :type: gauge
+
+         The number of Zuul executor processes online in this zone.
+
+      .. stat:: <zone>.accepting
+         :type: gauge
+
+         The number of Zuul executor processes accepting new jobs in
+         this zone.
+
+      .. stat:: <zone>.jobs_running
+         :type: gauge
+
+         The number of executor jobs running in this zone.
+
+      .. stat:: <zone>.jobs_queued
+         :type: gauge
+
+         The number of jobs allocated nodes, but queued waiting for an
+         executor in this zone to run on.  This should ideally be at
+         zero; persistent higher values indicate more executor
+         resources would be useful.
 
 .. stat:: zuul.scheduler
 

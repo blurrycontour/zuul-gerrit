@@ -114,11 +114,21 @@ class TestSchedulerZone(ZuulTestCase):
 
         # Validate that the reported executor stats are correct. There must
         # be two executors online and two accepting (one unzoned and one zoned)
-        self.assertReportedStat('zuul.executors.online', value='2', kind='g')
+        # TODO(corvus): remove deprecated top-level stats in 5.0
+        self.assertReportedStat(
+            'zuul.executors.online', value='1', kind='g')
         self.assertReportedStat(
             'zuul.executors.accepting', value='1', kind='g')
         self.assertReportedStat(
-            'zuul.executors.test-provider_vpn.accepting', value='1', kind='g')
+            'zuul.executors.unzoned.online', value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.executors.unzoned.accepting', value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.executors.zone.test-provider_vpn.online',
+            value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.executors.zone.test-provider_vpn.accepting',
+            value='1', kind='g')
 
         self.gearman_server.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
