@@ -1044,8 +1044,13 @@ class AnsibleJob(object):
             task.wait()
 
             if not task.success:
-                raise ExecutorError(
-                    'Failed to update project %s' % task.canonical_name)
+                # Repo updates usually are transient errors so retry the job.
+                result = dict(
+                    result=None,
+                    error_detail=f'Failed to update project '
+                                 f'{task.project_name}')
+                self.job.sendWorkComplete(json.dumps(result))
+                return
 
             self.project_info[task.canonical_name] = {
                 'refs': task.refs,
