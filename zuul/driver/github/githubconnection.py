@@ -1598,7 +1598,17 @@ class GithubConnection(CachedBranchConnection):
                 number, owner, proj))
         pr = probj.as_dict()
         try:
-            pr['files'] = [f.filename for f in probj.files()]
+            if pr.get('changed_files', 0) > 999:
+                # Don't request more than ten pages. If we exceed this we
+                # need to determine the files via the mergers asynchronously
+                # in order to not block the event processing by iterating on
+                # too many pages.
+                self.log.warning('Pull request #%s of %s/%s has too many '
+                                 'files. Files will be requested '
+                                 'asynchronously', number, owner, proj)
+                pr['files'] = None
+            else:
+                pr['files'] = [f.filename for f in probj.files()]
         except github3.exceptions.ServerError as exc:
             # NOTE: For PRs with a lot of lines changed, Github will return
             # an error (HTTP 500) because it can't generate the diff.
