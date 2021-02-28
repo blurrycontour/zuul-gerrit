@@ -133,6 +133,7 @@ class CallbackModule(default.CallbackModule):
         self._log("[%s] Starting to log %s for task %s"
                   % (host, log_id, task_name), job=False, executor=True)
         while True:
+            logger_retries = 0
             try:
                 s = socket.create_connection((ip, port), 5)
                 # Disable the socket timeout after we have successfully
@@ -152,8 +153,10 @@ class CallbackModule(default.CallbackModule):
                     % (ip, port))
                 return
             except Exception:
-                self._log("[%s] Waiting on logger" % host,
-                          executor=True, debug=True)
+                if logger_retries % 10 == 0:
+                    self._log("[%s] Waiting on logger" % host,
+                              executor=True, debug=True)
+                logger_retries += 1
                 time.sleep(0.1)
                 continue
             msg = "%s\n" % log_id
