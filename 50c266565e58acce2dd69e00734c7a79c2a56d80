@@ -50,6 +50,24 @@
       "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d98e783d_22e6869d",
+        "filename": "zuul/model.py",
+        "patchSetId": 50
+      },
+      "lineNbr": 4136,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-03-01T06:43:11Z",
+      "side": 1,
+      "message": "To be honest I find this formatting much more readable than the 2 line version as you can better differentiate between the if condition and the body of the statement. In the 2 line version you always have to search for the end of the if condition \"):\" to see where the body line starts. I\u0027d also find this method much more readable if it would take 26 instead of 15 lines and I don\u0027t see the point in saving lines of code in such cases.",
+      "parentUuid": "56d0cef0_609e30e1",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
