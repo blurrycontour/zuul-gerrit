@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "c3945348_4e1b03c5",
+        "filename": "tests/fixtures/config/circular-dependencies/git/common-config/zuul.yaml",
+        "patchSetId": 50
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-01T16:02:17Z",
+      "side": 1,
+      "message": "Ack, thanks!",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cf243867_006ba327",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 50
@@ -72,6 +89,23 @@
     },
     {
       "key": {
+        "uuid": "79b9bd39_afb1eb3c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 50
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-01T16:02:17Z",
+      "side": 1,
+      "message": "Ack.",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "56d0cef0_609e30e1",
         "filename": "zuul/model.py",
         "patchSetId": 50
@@ -101,6 +135,23 @@
       "side": 1,
       "message": "To be honest I find this formatting much more readable than the 2 line version as you can better differentiate between the if condition and the body of the statement. In the 2 line version you always have to search for the end of the if condition \"):\" to see where the body line starts. I\u0027d also find this method much more readable if it would take 26 instead of 15 lines and I don\u0027t see the point in saving lines of code in such cases.",
       "parentUuid": "56d0cef0_609e30e1",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8dbe36bf_e8d967e6",
+        "filename": "zuul/model.py",
+        "patchSetId": 50
+      },
+      "lineNbr": 4136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-01T16:02:17Z",
+      "side": 1,
+      "message": "It looks like we disagree on this.  I will say that from my pov, it\u0027s important not to waste vertical space (I don\u0027t mean never add an extra line, vertical space can be really useful), but excess use of vertical space means I have to scroll more to read the code.\n\nThere is more than one way to write this in two lines.  Other Zuul contributors share your concern about scanning, and in Zuul they have chosen to adopt this practice:\n\nif (something\n        and something_else):\n   do_things()\n\nThe Zuul project has adopted pep8 as a style guide, and we do generally adhere to that (including the frequently ignored \"A Foolish Consistency is the Hobgoblin of Little Minds\" admonition; we\u0027re not super-strict).  Pep8 does discuss this issue in this section:\n\n  https://www.python.org/dev/peps/pep-0008/#indentation\n\nWhere it suggests several solutions (scan down to the 4th verbatim block).  The 4 line version is not one of them.\n\nPlease do consider adopting that form of the 2 line version.  It is used by your colleagues already, I think it may address your concerns while also mitigating mine, so it may be a good compromise.",
       "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
