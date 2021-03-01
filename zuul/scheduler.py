@@ -34,10 +34,9 @@ from zuul import rpclistener
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
-from zuul.lib.gear_utils import getGearmanFunctions
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.queue import NamedQueue
-from zuul.lib.statsd import get_statsd, normalize_statsd_name
+from zuul.lib.statsd import get_statsd
 import zuul.lib.queue
 import zuul.lib.repl
 from zuul import nodepool
@@ -268,6 +267,15 @@ class Scheduler(threading.Thread):
     def _runStats(self):
         if not self.statsd:
             return
+
+        # TODO (felix): Reactivate stats collection.
+        # Without gearman, we could utilize the ZooKeeperComponentRegistry to
+        # find out the number of online executors. However, we would have to
+        # store information like the accepting_work flag in ZK wich is not of
+        # interest for anything else.
+        # Furthermore, the scheduler would need access to the ExecutorApi only
+        # to find the number of running/queued builds, but for nothing else.
+        """
         functions = getGearmanFunctions(self.rpc.gearworker.gearman)
         functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
         mergers_online = 0
@@ -333,6 +341,7 @@ class Scheduler(threading.Thread):
                           self.result_event_queue.qsize())
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           len(self.management_events))
+        """
 
     def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()
