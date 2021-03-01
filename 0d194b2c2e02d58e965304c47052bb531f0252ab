@@ -33,6 +33,24 @@
       "revId": "0d194b2c2e02d58e965304c47052bb531f0252ab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d79b44d5_c37f458b",
+        "filename": "tests/base.py",
+        "patchSetId": 40
+      },
+      "lineNbr": 2836,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-01T09:30:09Z",
+      "side": 1,
+      "message": "In this case we are setting instance level attributes where the type can\u0027t be inferred. I think the __init__ should be an exception to that rule as we are otherwise loosing a lot of the benefits of type annotations since the types can\u0027t be inferred automatically. This should mainly apply to optional attributes and values coming from opaque data structures.",
+      "parentUuid": "bd56fb37_e851c76c",
+      "revId": "0d194b2c2e02d58e965304c47052bb531f0252ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
