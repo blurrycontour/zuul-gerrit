@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3769e919_42d8279d",
+        "filename": "tests/fixtures/config/circular-dependencies/git/common-config/zuul.yaml",
+        "patchSetId": 50
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-01T07:01:32Z",
+      "side": 1,
+      "message": "I think the reason for adding those pipelines was to test a certain edge case. However, I don\u0027t remember the details anymore and I also can\u0027t find a related test case. Given that the tests are still passing w/o them in https://review.opendev.org/c/zuul/zuul/+/777843/ I think it makes sense to remove them.",
+      "parentUuid": "c3ea5274_92b2ad1a",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cf243867_006ba327",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 50
@@ -30,6 +48,24 @@
       "writtenOn": "2021-02-26T22:45:56Z",
       "side": 1,
       "message": "On ps29 we agreed to support changes behind, but in ps 36 this was added with no followup comment on the review.  It would be helpful to reply to old comments if you change your mind.\n\nI have implemented the algorithm I suggested in ps29 and will upload it as a followup.",
+      "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a0f9e175_b4d9e063",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 50
+      },
+      "lineNbr": 434,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-01T07:01:32Z",
+      "side": 1,
+      "message": "Thanks for taking care of that. Looking at the diff between ps29 and ps30 I think I was under the impression that this could be solved w/o any additional logic (I was obviously wrong).",
+      "parentUuid": "cf243867_006ba327",
       "revId": "50c266565e58acce2dd69e00734c7a79c2a56d80",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
