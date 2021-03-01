@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f811a834_41a1c15a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 779,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-01T23:49:03Z",
+      "side": 1,
+      "message": "Since this is getting another patchset for the log line, let\u0027s drop the type annotation here.",
+      "revId": "b77649066d30e62fdd1bbe66ad7058fd3fdedeed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "406e7c7c_64aa4bbb",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-01T23:49:03Z",
+      "side": 1,
+      "message": "This log isn\u0027t going to look great.  At info level, we\u0027re going to see a bunch of \"Needed projects\" lines but no job.  We should probably lower this log line to debug.",
+      "revId": "b77649066d30e62fdd1bbe66ad7058fd3fdedeed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
