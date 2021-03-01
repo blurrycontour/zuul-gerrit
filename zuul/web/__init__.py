@@ -1057,6 +1057,9 @@ class ZuulWebAPI(object):
             file = 'failing.svg'
         path = os.path.join(self.zuulweb.static_path, file)
 
+        # Ensure the badge are not cached
+        cherrypy.response.headers['Cache-Control'] = "no-cache"
+
         return cherrypy.lib.static.serve_file(
             path=path, content_type="image/svg+xml")
 
