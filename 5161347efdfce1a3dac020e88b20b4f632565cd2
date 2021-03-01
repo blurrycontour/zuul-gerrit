@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "12a906ef_d9483f3a",
+        "filename": "zuul/model.py",
+        "patchSetId": 51
+      },
+      "lineNbr": 2231,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-01T18:50:00Z",
+      "side": 1,
+      "message": "This is where the conflict was; I verified no code changes.",
+      "revId": "5161347efdfce1a3dac020e88b20b4f632565cd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
