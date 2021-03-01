@@ -138,6 +138,8 @@
 - project:
     name: org/project1
     queue: integrated
+    vars:
+      var_name: "var_value"
     check:
       jobs:
         - project-merge

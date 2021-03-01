@@ -709,6 +709,7 @@ class TestWeb(BaseTestWeb):
                     'templates': [],
                     'default_branch': 'master',
                     'queue_name': 'integrated',
+                    'variables': dict(var_name="var_value"),
                     'merge_mode': 'merge-resolve',
                     'pipelines': [{
                         'name': 'check',

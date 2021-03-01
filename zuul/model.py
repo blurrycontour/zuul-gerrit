@@ -3571,6 +3571,7 @@ class ProjectConfig(ConfigObject):
             d['merge_mode'] = None
         d['templates'] = self.templates
         d['queue_name'] = self.queue_name
+        d['variables'] = self.variables
         return d
 
 
