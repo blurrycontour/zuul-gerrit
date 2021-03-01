@@ -247,7 +247,8 @@ class CachedBranchConnection(BaseConnection):
         self._project_branch_cache_exclude_unprotected.pop(project.name, None)
         self._project_branch_cache_include_unprotected.pop(project.name, None)
 
-    def checkBranchCache(self, project_name: str, event) -> None:
+    def checkBranchCache(self, project_name: str, event,
+                         protected: bool = None) -> None:
         """Clear the cache for a project when a branch event is processed
 
         This method must be called when a branch event is processed: if the
@@ -258,9 +259,13 @@ class CachedBranchConnection(BaseConnection):
             The project name.
         :params event:
             The event, inherit from `zuul.model.TriggerEvent` class.
+        :params protected:
+            If defined the caller already knows if the branch is protected
+            so the query can be skipped.
         """
-        protected = self.isBranchProtected(project_name, event.branch,
-                                           zuul_event_id=event)
+        if protected is None:
+            protected = self.isBranchProtected(project_name, event.branch,
+                                               zuul_event_id=event)
         if protected is not None:
 
             # If the branch appears in the exclude_unprotected cache but
