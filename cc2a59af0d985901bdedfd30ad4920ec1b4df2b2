@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a289955_fc64808b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 2705,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-02T13:26:49Z",
+      "side": 1,
+      "message": "This remaps the online function from noop to executeJob. Is that intended?",
+      "revId": "cc2a59af0d985901bdedfd30ad4920ec1b4df2b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
