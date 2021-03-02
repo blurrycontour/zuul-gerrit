@@ -16,6 +16,23 @@
       "revId": "cc2a59af0d985901bdedfd30ad4920ec1b4df2b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "af39aa22_fa133fdd",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 2705,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-02T14:08:35Z",
+      "side": 1,
+      "message": "Nope, that was a rebase snafu.",
+      "revId": "cc2a59af0d985901bdedfd30ad4920ec1b4df2b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
