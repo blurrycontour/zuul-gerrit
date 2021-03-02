@@ -368,6 +368,11 @@ class ZuulSafeLoader(yaml.SafeLoader):
     def construct_mapping(self, node, deep=False):
         keys = set()
         for k, v in node.value:
+            # The key << needs to be treated special since that will merge
+            # the anchor into the mapping and not create a key on its own.
+            if k.value == '<<':
+                continue
+
             if k.value in keys:
                 mark = ZuulMark(node.start_mark, node.end_mark,
                                 self.zuul_stream)

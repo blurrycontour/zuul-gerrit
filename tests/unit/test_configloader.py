@@ -17,9 +17,10 @@ import fixtures
 import logging
 import textwrap
 
-from zuul.configloader import AuthorizationRuleParser
+from zuul.configloader import AuthorizationRuleParser, safe_load_yaml
 
 from tests.base import ZuulTestCase
+from zuul.model import SourceContext
 
 
 class TenantParserTestCase(ZuulTestCase):
@@ -74,6 +75,41 @@ class TestTenantSimple(TenantParserTestCase):
         job = tenant.layout.jobs.get("project2-job")
         self.assertEqual(job[0].variant_description, "")
         self.assertEqual(job[1].variant_description, "stable")
+
+    def test_merge_anchor(self):
+        to_parse = textwrap.dedent(
+            """
+            - job:
+                name: job1
+                vars: &docker_vars
+                  registry: 'registry.example.org'
+
+            - job:
+                name: job2
+                vars:
+                  <<: &buildenv_vars
+                    image_name: foo
+                  <<: *docker_vars
+
+            - job:
+                name: job3
+                vars:
+                  <<: *buildenv_vars
+                  <<: *docker_vars
+            """)
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        project = tenant.config_projects[0]
+        source_context = SourceContext(project, 'master', 'zuul.yaml', True)
+
+        data = safe_load_yaml(to_parse, source_context)
+        self.assertEqual(len(data), 3)
+        job_vars = [i['job']['vars'] for i in data]
+        # Test that merging worked
+        self.assertEqual(job_vars, [
+            {'registry': 'registry.example.org'},
+            {'registry': 'registry.example.org', 'image_name': 'foo'},
+            {'registry': 'registry.example.org', 'image_name': 'foo'},
+        ])
 
 
 class TestTenantOverride(TenantParserTestCase):
