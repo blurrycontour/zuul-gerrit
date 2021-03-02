@@ -842,7 +842,7 @@ under the :var:`zuul.artifacts` dictionary.  For example:
                 url: http://example.com/path/to/package.tar.gz
                 metadata:
                   version: 3.0
-              - name: docs:
+              - name: docs
                 url: build/docs/
 
 If the value of **url** is a relative URL, it will be combined with
