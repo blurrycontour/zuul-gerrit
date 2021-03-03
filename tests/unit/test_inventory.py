@@ -27,10 +27,12 @@ class TestInventoryBase(ZuulTestCase):
     tenant_config_file = 'config/inventory/main.yaml'
     use_gerrit = True
 
-    def setUp(self, python_path=None):
+    def setUp(self, python_path=None, shell_type=None):
         super(TestInventoryBase, self).setUp()
         if python_path:
             self.fake_nodepool.python_path = python_path
+        if shell_type:
+            self.fake_nodepool.shell_type = shell_type
         self.executor_server.hold_jobs_in_build = True
         self.gearman_server.hold_jobs_in_queue = True
 
@@ -141,6 +143,36 @@ class TestInventoryPythonPath(TestInventoryBase):
         self.waitUntilSettled()
 
 
+class TestInventoryShellType(TestInventoryBase):
+
+    def setUp(self):
+        super(TestInventoryPythonPath, self).setUp(shell_type='cmd')
+
+    def test_single_inventory(self):
+        inventory = self._get_build_inventory('single-inventory')
+
+        all_nodes = ('ubuntu-xenial',)
+        self.assertIn('all', inventory)
+        self.assertIn('hosts', inventory['all'])
+        self.assertIn('vars', inventory['all'])
+        for node_name in all_nodes:
+            self.assertIn(node_name, inventory['all']['hosts'])
+            node_vars = inventory['all']['hosts'][node_name]
+            self.assertEqual(
+                'cmd', node_vars['ansible_shell_type'])
+
+        self.assertIn('zuul', inventory['all']['vars'])
+        z_vars = inventory['all']['vars']['zuul']
+        self.assertIn('executor', z_vars)
+        self.assertIn('src_root', z_vars['executor'])
+        self.assertIn('job', z_vars)
+        self.assertEqual(z_vars['job'], 'single-inventory')
+        self.assertEqual(z_vars['message'], 'QQ==')
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+
 class TestInventoryAutoPython(TestInventoryBase):
 
     def test_auto_python_ansible28_inventory(self):
@@ -183,6 +215,8 @@ class TestInventory(TestInventoryBase):
             node_vars = inventory['all']['hosts'][node_name]
             self.assertEqual(
                 'auto', node_vars['ansible_python_interpreter'])
+            self.assertNotIn(
+                'ansible_shell_type', node_vars)
         self.assertIn('zuul', inventory['all']['vars'])
         self.assertIn('attempts', inventory['all']['vars']['zuul'])
         self.assertEqual(1, inventory['all']['vars']['zuul']['attempts'])
