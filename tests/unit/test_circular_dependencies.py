@@ -325,16 +325,24 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(C.addApproval("Approved", 1))
         self.waitUntilSettled()
 
-        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(len(self.builds), 3)
+
+        # Make sure the out-of-cycle change (A) is enqueued after the cycle.
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        queue_change_numbers = []
+        for queue in tenant.layout.pipelines["gate"].queues:
+            for item in queue.queue:
+                queue_change_numbers.append(item.change.number)
+        self.assertEqual(queue_change_numbers, ['2', '3', '1'])
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 0)
+        self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
         self.assertEqual(C.reported, 2)
-        self.assertEqual(A.data["status"], "NEW")
+        self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "MERGED")
 

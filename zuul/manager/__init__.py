@@ -386,7 +386,7 @@ class PipelineManager(metaclass=ABCMeta):
                 log.debug("Change %s is already in queue, ignoring" % change)
                 return True
 
-            cycle = None
+            cycle = []
             if hasattr(change, "needs_changes"):
                 cycle = self.cycleForChange(change, dependency_graph, event)
                 if cycle and not self.canProcessCycle(change.project):
@@ -423,15 +423,18 @@ class PipelineManager(metaclass=ABCMeta):
 
             # Items in a dependency cycle are expected to be enqueued after
             # each other. To prevent non-cycle items from being enqueued
-            # between items of the same cycle, we skip that step when a cycle
-            # was found.
-            if not cycle:
-                self.enqueueChangesBehind(change, event, quiet,
-                                          ignore_requirements, change_queue,
-                                          history, dependency_graph)
-            else:
-                self.log.debug("Skip enqueueing changes behind because of "
-                               "dependency cycle")
+            # between items of the same cycle, enqueue items behind each item
+            # in the cycle once all items in the cycle are enqueued.
+            if all([self.isChangeAlreadyInQueue(c, change_queue)
+                    for c in cycle]):
+                if cycle:
+                    self.log.debug("Cycle complete, enqueing changes behind")
+                for c in cycle or [change]:
+                    self.enqueueChangesBehind(c, event, quiet,
+                                              ignore_requirements,
+                                              change_queue, history,
+                                              dependency_graph)
+
             zuul_driver = self.sched.connections.drivers['zuul']
             tenant = self.pipeline.tenant
             zuul_driver.onChangeEnqueued(
@@ -453,6 +456,7 @@ class PipelineManager(metaclass=ABCMeta):
                           change, change.project)
                 # Change can not be part of multiple cycles, so we can return
                 return scc
+        return []
 
     def canProcessCycle(self, project):
         layout = self.pipeline.tenant.layout
@@ -509,7 +513,7 @@ class PipelineManager(metaclass=ABCMeta):
     def dequeueIncompleteCycle(self, change, dependency_graph, event,
                                change_queue):
         log = get_annotated_logger(self.log, event)
-        cycle = self.cycleForChange(change, dependency_graph, event) or []
+        cycle = self.cycleForChange(change, dependency_graph, event)
         enqueued_cycle_items = [i for i in (self.getItemForChange(c,
                                                                   change_queue)
                                             for c in cycle) if i is not None]
