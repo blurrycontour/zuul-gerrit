@@ -474,6 +474,30 @@ class TestAnsibleJob(ZuulTestCase):
             host['host_vars']['ansible_ssh_common_args'],
             '-o StrictHostKeyChecking=false')
 
+    def test_getHostList_shell_type(self):
+        # Test without shell type set
+        node = {'name': 'fake-host',
+                'host_keys': ['fake-host-key'],
+                'interface_ip': 'localhost'}
+        host = self.test_job.getHostList({'nodes': [node],
+                                          'host_vars': {},
+                                          'vars': {},
+                                          'groups': [],
+                                          })[0]
+        self.assertNotIn('ansible_shell_type', host['host_vars'])
+
+        # Test with custom shell type set.
+        node['shell_type'] = 'cmd'
+        host = self.test_job.getHostList({'nodes': [node],
+                                          'host_vars': {},
+                                          'vars': {},
+                                          'groups': [],
+                                          })[0]
+        self.assertIn('ansible_shell_type', host['host_vars'])
+        self.assertEqual(
+            host['host_vars']['ansible_shell_type'],
+            'cmd')
+
 
 class TestExecutorHostname(ZuulTestCase):
     config_file = 'zuul-executor-hostname.conf'
