@@ -4060,6 +4060,24 @@ class TestDataReturn(AnsibleZuulTestCase):
                  result='FAILURE', changes='1,1'),
         ])
 
+    def test_data_return_child_jobs_pre_failure(self):
+        A = self.fake_gerrit.addFakeChange('org/project-pre-fail', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertIn('data-return : RETRY_LIMIT', A.messages[-1])
+        self.assertIn('skipped-job : SKIPPED', A.messages[-1])
+        self.assertHistory([
+            dict(name='data-return-child-jobs',
+                 result='SUCCESS', changes='1,1'),
+            dict(name='data-return',
+                 result=None, changes='1,1'),
+            dict(name='data-return',
+                 result=None, changes='1,1'),
+            dict(name='data-return',
+                 result=None, changes='1,1'),
+        ])
+
     def test_data_return_child_from_paused_job(self):
         A = self.fake_gerrit.addFakeChange('org/project6', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))

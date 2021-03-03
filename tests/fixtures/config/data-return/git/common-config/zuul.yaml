@@ -17,6 +17,10 @@
     parent: null
 
 - job:
+    name: skipped-job
+    run: playbooks/success.yaml
+
+- job:
     name: data-return
     run: playbooks/data-return.yaml
 
@@ -160,7 +164,6 @@
             dependencies:
               - data-return-child-jobs-failure
 
-
 - project:
     name: org/project6
     check:
@@ -201,4 +204,19 @@
               - name: data-return-b
                 soft: true
               - name: data-return-c
+                soft: true
+
+- project:
+    name: org/project-pre-fail
+    check:
+      jobs:
+        - data-return-child-jobs
+        - skipped-job:
+            dependencies:
+              - data-return-child-jobs
+        - data-return:
+            pre-run: playbooks/failure.yaml
+            dependencies:
+              - data-return-child-jobs
+              - name: skipped-job
                 soft: true
