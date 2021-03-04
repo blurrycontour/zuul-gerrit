@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d681cdac_f6f7e917",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2021-03-04T10:04:47Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we compute the files from all parents instead of setting it to None?\n\nMy impression is that now what used to be an incomplete list of changed files, becomes\nan empty one.",
+      "range": {
+        "startLine": 77,
+        "startChar": 8,
+        "endLine": 78,
+        "endChar": 24
+      },
+      "revId": "53d6eefbb207dda9541c26bf93c7007144f9bd63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
