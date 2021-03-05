@@ -74,6 +74,8 @@ class GerritChange(Change):
             self.is_current_patchset = True
         else:
             self.is_current_patchset = False
+        if len(data['currentPatchSet']['parents']) > 1:
+            files = None
         self.files = files
         self.id = data['id']
         self.is_merged = data.get('status', '') == 'MERGED'
@@ -116,7 +118,12 @@ class GerritChange(Change):
         if str(current_revision['_number']) == self.patchset:
             self.ref = current_revision['ref']
             self.commit = data['current_revision']
-            files = list(current_revision.get('files', []).keys())
+            if len(current_revision['commit']['parents']) > 1:
+                # exclude "/COMMIT_MSG" and "/MERGE_LIST"
+                files = connection.queryChangeFilesListHTTP(
+                    self.number, self.commit_id)[2:]
+            else:
+                files = list(current_revision.get('files', []).keys())
             self.is_current_patchset = True
         else:
             self.is_current_patchset = False

@@ -380,7 +380,7 @@ class FakeGerritChange(object):
 
     def __init__(self, gerrit, number, project, branch, subject,
                  status='NEW', upstream_root=None, files={},
-                 parent=None):
+                 parent=None, merge_branch=None):
         self.gerrit = gerrit
         self.source = gerrit
         self.reported = 0
@@ -421,11 +421,13 @@ class FakeGerritChange(object):
             'url': '%s/%s' % (self.gerrit.baseurl.rstrip('/'), number)}
 
         self.upstream_root = upstream_root
-        self.addPatchset(files=files, parent=self.initial_parent)
+        self.addPatchset(files=files, parent=self.initial_parent,
+                         merge_branch=merge_branch)
         self.data['submitRecords'] = self.getSubmitRecords()
         self.open = status == 'NEW'
 
-    def addFakeChangeToRepo(self, msg, files, large, parent):
+    def addFakeChangeToRepo(self, msg, files, large, parent,
+                            merge_branch=None):
         path = os.path.join(self.upstream_root, self.project)
         repo = git.Repo(path)
         parent = parent or self.initial_parent
@@ -437,6 +439,9 @@ class FakeGerritChange(object):
         repo.head.reference = ref
         repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
+
+        if merge_branch:
+            repo.git.merge(merge_branch, no_ff=True)
 
         path = os.path.join(self.upstream_root, self.project)
         if not large:
@@ -461,14 +466,22 @@ class FakeGerritChange(object):
                 f.close()
                 repo.index.add([fn])
 
-        r = repo.index.commit(msg)
+        if merge_branch:
+            if msg:
+                repo.git.commit('--amend', '-m', msg)
+            else:
+                repo.git.commit('--amend', '-C', 'HEAD')
+            r = repo.commit('HEAD')
+        else:
+            r = repo.index.commit(msg)
         repo.head.reference = 'master'
         repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
         repo.heads['master'].checkout()
         return r
 
-    def addPatchset(self, files=None, large=False, parent=None):
+    def addPatchset(self, files=None, large=False, parent=None,
+                    merge_branch=None):
         self.latest_patchset += 1
         if not files:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
@@ -476,11 +489,12 @@ class FakeGerritChange(object):
                     (self.branch, self.number, self.latest_patchset))
             files = {fn: data}
         msg = self.subject + '-' + str(self.latest_patchset)
-        c = self.addFakeChangeToRepo(msg, files, large, parent)
-        ps_files = [{'file': '/COMMIT_MSG',
-                     'type': 'ADDED'},
-                    {'file': 'README',
-                     'type': 'MODIFIED'}]
+        c = self.addFakeChangeToRepo(msg, files, large, parent, merge_branch)
+        ps_files = [{'file': '/COMMIT_MSG', 'type': 'ADDED'}]
+        if merge_branch:
+            ps_files.append({'file': '/MERGE_LIST', 'type': 'ADDED'})
+        ps_files.append({'file': 'README', 'type': 'MODIFIED'})
+
         for f in files:
             ps_files.append({'file': f, 'type': 'ADDED'})
         d = {'approvals': [],
@@ -788,7 +802,7 @@ class FakeGerritChange(object):
         num = len(self.patchsets)
         files = {}
         for f in rev['files']:
-            if f['file'] == '/COMMIT_MSG':
+            if f['file'] == '/COMMIT_MSG' or f['file'] == '/MERGE_LIST':
                 continue
             files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
         parents = self.patchsets[-1]['parents']
@@ -859,6 +873,33 @@ class FakeGerritChange(object):
             })
         return {"changes": changes}
 
+    def queryFirstParentFilesHTTP(self, revision):
+        rev = None
+        for ps in self.patchsets:
+            if ps['revision'] == revision:
+                rev = ps
+                break
+        else:
+            return None
+
+        path = os.path.join(self.upstream_root, self.project)
+        repo = git.Repo(path)
+        repodiff = repo.commit(revision).diff(rev['parents'][0])
+
+        diff_files = set()
+        for x in repodiff:
+            if x.a_blob is not None:
+                diff_files.add(x.a_blob.path)
+            if x.b_blob is not None:
+                diff_files.add(x.b_blob.path)
+
+        files = {"/COMMIT_MSG": {"status": "A"},
+                 "/MERGE_LIST": {"status": "A"}}
+        for diff_file in diff_files:
+            files[diff_file] = {"status": "A"}
+
+        return files
+
     def setMerged(self):
         if (self.depends_on_change and
                 self.depends_on_change.data['status'] != 'MERGED'):
@@ -905,6 +946,8 @@ class GerritWebServer(object):
             related_re = re.compile(r'/a/changes/(.*)/revisions/(.*)/related')
             change_search_re = re.compile(r'/a/changes/\?n=500.*&q=(.*)')
             version_re = re.compile(r'/a/config/server/version')
+            first_parent_files_re = re.compile(
+                r'/a/changes/(.*?)/revisions/(.*?)/files\?parent=1')
 
             def do_POST(self):
                 path = self.path
@@ -949,6 +992,9 @@ class GerritWebServer(object):
                 m = self.version_re.match(path)
                 if m:
                     return self.version()
+                m = self.first_parent_files_re.match(path)
+                if m:
+                    return self.get_first_parent_files(m.group(1), m.group(2))
                 self.send_response(500)
                 self.end_headers()
 
@@ -1044,6 +1090,16 @@ class GerritWebServer(object):
                 if not change:
                     return self._404()
                 data = change.queryRevisionHTTP(revision)
+                if data is None:
+                    return self._404()
+                self.send_data(data)
+                self.end_headers()
+
+            def get_first_parent_files(self, number, revision):
+                change = fake_gerrit.changes.get(int(number))
+                if not change:
+                    return self._404()
+                data = change.queryFirstParentFilesHTTP(revision)
                 if data is None:
                     return self._404()
                 self.send_data(data)
@@ -1184,12 +1240,13 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.fake_checkers.append(kw)
 
     def addFakeChange(self, project, branch, subject, status='NEW',
-                      files=None, parent=None):
+                      files=None, parent=None, merge_branch=None):
         """Add a change to the fake Gerrit."""
         self.change_number += 1
         c = FakeGerritChange(self, self.change_number, project, branch,
                              subject, upstream_root=self.upstream_root,
-                             status=status, files=files, parent=parent)
+                             status=status, files=files, parent=parent,
+                             merge_branch=merge_branch)
         self.changes[self.change_number] = c
         return c
 

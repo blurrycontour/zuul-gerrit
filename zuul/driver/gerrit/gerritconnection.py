@@ -1191,6 +1191,11 @@ class GerritConnection(BaseConnection):
             number, data['current_revision']))
         return data, related
 
+    def queryChangeFilesListHTTP(self, number, revision, event=None):
+        files = self.get('changes/%s/revisions/%s/files?parent=1' % (
+            number, revision))
+        return list(files.keys())
+
     def queryChange(self, number, event=None):
         if self.session:
             data, related = self.queryChangeHTTP(number, event=event)
