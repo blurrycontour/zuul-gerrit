@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb7f96b5_b01d55a3",
+        "filename": "tools/.gitattributes",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-05T18:33:52Z",
+      "side": 1,
+      "message": "I don\u0027t think we should set git line ending enforcements in any of our repos. In the past we often had problems with repos using git enforced line endings that resulted in unclean working copies during job runtime.",
+      "revId": "f23765bc2ff32aea61048ab89555cde815c59f0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
