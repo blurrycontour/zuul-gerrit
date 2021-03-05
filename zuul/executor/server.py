@@ -2699,10 +2699,17 @@ class ExecutorServer(BaseMergeServer):
         if self.zone:
             function_name += ':%s' % self.zone
 
+        # This function only exists so we can count how many executors
+        # are online.
+        online_name = 'executor:online'
+        if self.zone:
+            online_name += ':%s' % self.zone
+
         self.executor_jobs = {
             "executor:resume:%s" % self.hostname: self.resumeJob,
             "executor:stop:%s" % self.hostname: self.stopJob,
             function_name: self.executeJob,
+            online_name: self.noop,
         }
 
         self.executor_gearworker = ZuulGearWorker(
@@ -2719,6 +2726,10 @@ class ExecutorServer(BaseMergeServer):
 
     def _repoLock(self, connection_name, project_name):
         return self.repo_locks.getRepoLock(connection_name, project_name)
+
+    def noop(self, job):
+        """A noop gearman job so we can register for statistics."""
+        job.sendWorkComplete()
 
     def start(self):
         # Start merger worker only if we process merge jobs
