@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "deb0c5b9_3b0986d7",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2021-03-05T11:39:07Z",
+      "side": 1,
+      "message": "A more fitting name to the test would be good:\n\n`test_inventory_shell_type`",
+      "range": {
+        "startLine": 151,
+        "startChar": 8,
+        "endLine": 151,
+        "endChar": 29
+      },
+      "revId": "0ba8dec72ba7746c3b7fb2acd671e5b9dc17ae83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8abb9b99_87b6018c",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2021-03-05T11:39:07Z",
+      "side": 1,
+      "message": "This doesn\u0027t look relevant to the test and I guess it\u0027s forgotten copy paste from the test above?",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 164,
+        "endChar": 1
+      },
+      "revId": "0ba8dec72ba7746c3b7fb2acd671e5b9dc17ae83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
