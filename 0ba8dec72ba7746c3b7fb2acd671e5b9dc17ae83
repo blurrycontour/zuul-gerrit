@@ -45,6 +45,30 @@
       "revId": "0ba8dec72ba7746c3b7fb2acd671e5b9dc17ae83",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d7257faf_0a5a9552",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2021-03-05T11:40:59Z",
+      "side": 1,
+      "message": "At second glance it seems like a lot test uses the `single-inventory` part and I\u0027m probably just clueless to why that is.",
+      "parentUuid": "8abb9b99_87b6018c",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 164,
+        "endChar": 1
+      },
+      "revId": "0ba8dec72ba7746c3b7fb2acd671e5b9dc17ae83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
