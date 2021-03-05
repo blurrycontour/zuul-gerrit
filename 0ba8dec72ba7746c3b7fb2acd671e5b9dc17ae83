@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "71dba105_e0903d20",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 32721
+      },
+      "writtenOn": "2021-03-05T14:08:55Z",
+      "side": 1,
+      "message": "I followed the structure of the rest of the file, where test class points to what\u0027s tested and the test method what config is used. I agree that I would have chosen to do differently, but I think following file style is more important for maintainability",
+      "parentUuid": "deb0c5b9_3b0986d7",
+      "range": {
+        "startLine": 151,
+        "startChar": 8,
+        "endLine": 151,
+        "endChar": 29
+      },
+      "revId": "0ba8dec72ba7746c3b7fb2acd671e5b9dc17ae83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8abb9b99_87b6018c",
         "filename": "tests/unit/test_inventory.py",
         "patchSetId": 2
@@ -69,6 +93,30 @@
       "revId": "0ba8dec72ba7746c3b7fb2acd671e5b9dc17ae83",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eec2effb_ebf335b9",
+        "filename": "tests/unit/test_inventory.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 32721
+      },
+      "writtenOn": "2021-03-05T14:08:55Z",
+      "side": 1,
+      "message": "Yes, same as above, all tests seem to do all the asserts listed here, even though they are really unrelated to the subject of the test. I would have but all of them in one method and called that one if I wanted the same set of assertions for all configs, but I don\u0027t want to undertake that refactoring at this point, instead going with the style of the file when extending it.",
+      "parentUuid": "d7257faf_0a5a9552",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 164,
+        "endChar": 1
+      },
+      "revId": "0ba8dec72ba7746c3b7fb2acd671e5b9dc17ae83",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
