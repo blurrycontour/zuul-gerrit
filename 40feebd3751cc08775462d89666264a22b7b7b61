@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "71ffddc8_0aa98a1a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-07T01:15:20Z",
+      "side": 1,
+      "message": "This is a good idea, but it also interacts/conflicts with my change to use TLS in tests.  If we go ahead and rebase this on the TLS change, then we can simplify this change and a later change.  I\u0027ve done that in my alternate stack.",
+      "revId": "40feebd3751cc08775462d89666264a22b7b7b61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "446b17ff_34d8a26a",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 4197,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-07T01:15:20Z",
+      "side": 1,
+      "message": "In my change, I just started passing the fixture to FakeNodepool, so this all (plus the cert/ca/key) becomes a single argument.",
+      "revId": "40feebd3751cc08775462d89666264a22b7b7b61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
