@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "60549704_b63dbc8d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 27
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-07T01:15:05Z",
+      "side": 1,
+      "message": "The configloader was originally written with quite a lot of class methods, but we learned that approach became extremely verbose, and difficult to read and understand.  So we abandoned that in favor of the current approach of using actual instances.  I\u0027d rather not change direction again.\n\nAnyway, the time period where ZooKeeper won\u0027t be required for config validation will be very short, so let\u0027s avoid optimizing for that and instead go ahead and accept that, like gearman now, ZK will be required for config validation in the future and proceed accordingly.  I think we can omit this change.\n\nI\u0027ve reworked the stack without this change and will upload those shortly.",
+      "revId": "3ead1f4671c13ab0c8433146d556d5290d0179ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69716f2d_d0729899",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 3362,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-07T01:15:05Z",
+      "side": 1,
+      "message": "Why does this take longer now?",
+      "revId": "3ead1f4671c13ab0c8433146d556d5290d0179ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
