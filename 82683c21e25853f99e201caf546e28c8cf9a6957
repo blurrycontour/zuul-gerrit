@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "41424f3d_c533defc",
+        "filename": "tests/base.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3123,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-07T01:15:33Z",
+      "side": 1,
+      "message": "We can omit all of this and other TLS-specific code by rebasing on the TLS-in-tests change.",
+      "revId": "82683c21e25853f99e201caf546e28c8cf9a6957",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
