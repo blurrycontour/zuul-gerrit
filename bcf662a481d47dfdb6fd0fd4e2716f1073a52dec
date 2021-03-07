@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d523e891_47925fed",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 26
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-07T01:15:57Z",
+      "side": 1,
+      "message": "If we omit that change as I suggest, we do still need to instantiate a scheduler, but I\u0027ve modified this change to keep the \"load\u003dFalse\" behavior from the original config validation patch.  I don\u0027t think it\u0027s a substantial difference.",
+      "revId": "bcf662a481d47dfdb6fd0fd4e2716f1073a52dec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
