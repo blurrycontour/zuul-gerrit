@@ -59,7 +59,9 @@ class TestTenantValidationClient(BaseClientTestCase):
             [os.path.join(sys.prefix, 'bin/zuul'),
              '-c', os.path.join(self.test_root, 'tenant_ok.conf'),
              'tenant-conf-check'], stdout=subprocess.PIPE)
-        p.communicate()
+        out, err = p.communicate()
+        self.log.debug("stdout: %s", out)
+        self.log.debug("stderr: %s", err)
         self.assertEqual(p.returncode, 0, 'The command must exit 0')
 
         self.config.set(
@@ -71,7 +73,9 @@ class TestTenantValidationClient(BaseClientTestCase):
             [os.path.join(sys.prefix, 'bin/zuul'),
              '-c', os.path.join(self.test_root, 'tenant_ko.conf'),
              'tenant-conf-check'], stdout=subprocess.PIPE)
-        out, _ = p.communicate()
+        out, err = p.communicate()
+        self.log.debug("stdout: %s", out)
+        self.log.debug("stderr: %s", err)
         self.assertEqual(p.returncode, 1, "The command must exit 1")
         self.assertIn(
             b"expected a dictionary for dictionary", out,
