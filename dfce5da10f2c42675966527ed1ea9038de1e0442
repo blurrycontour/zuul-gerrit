@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "42ba7779_57768ab4",
+        "filename": "zuul/cmd/client.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-08T23:03:50Z",
+      "side": 1,
+      "message": "Note: no registerScheduler here.",
+      "revId": "dfce5da10f2c42675966527ed1ea9038de1e0442",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e4654eba_a15854a2",
         "filename": "zuul/cmd/scheduler.py",
         "patchSetId": 8
@@ -16,6 +33,23 @@
       "revId": "dfce5da10f2c42675966527ed1ea9038de1e0442",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ca8e9795_bd4fd17f",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-08T23:03:50Z",
+      "side": 1,
+      "message": "No, this is important because this is what causes the connections to actually start listening and generating events.  We don\u0027t call this method in the client where we effectively start a scheduler and perform tenant validation.\n\nThe load argument is in registerConnections which has been removed.",
+      "revId": "dfce5da10f2c42675966527ed1ea9038de1e0442",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
