@@ -68,6 +68,23 @@
       "revId": "dfce5da10f2c42675966527ed1ea9038de1e0442",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5ab90d69_8c60ad90",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-08T23:30:13Z",
+      "side": 1,
+      "message": "Oh yes, that we can do.",
+      "revId": "dfce5da10f2c42675966527ed1ea9038de1e0442",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
