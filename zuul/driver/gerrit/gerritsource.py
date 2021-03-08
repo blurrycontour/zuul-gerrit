@@ -46,7 +46,9 @@ class GerritSource(BaseSource):
     def isMerged(self, change, head=None):
         return self.connection.isMerged(change, head)
 
-    def canMerge(self, change, allow_needs, event=None):
+    def canMerge(self, change, allow_needs, event=None, allow_refresh=False):
+        # Gerrit changes have no volatile data that cannot be updated via
+        # events and thus needs not to act on allow_refresh.
         return self.connection.canMerge(change, allow_needs, event=event)
 
     def postConfig(self):
