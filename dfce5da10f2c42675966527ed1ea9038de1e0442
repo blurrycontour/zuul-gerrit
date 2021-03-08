@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e4654eba_a15854a2",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-03-08T21:15:14Z",
+      "side": 1,
+      "message": "This method has a load argument which defaults to true. I think that is now dead code and we can remove that argument and always run the on load code because we only call registerScheduler() at load time now?",
+      "revId": "dfce5da10f2c42675966527ed1ea9038de1e0442",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
