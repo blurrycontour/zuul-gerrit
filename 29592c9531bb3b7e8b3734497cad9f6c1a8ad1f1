@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "730e8e63_fb7cff94",
+        "filename": "zuul/driver/gitlab/gitlabsource.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-03-08T12:58:47Z",
+      "side": 1,
+      "message": "Shouldn\u0027t the default value be false?",
+      "range": {
+        "startLine": 50,
+        "startChar": 70,
+        "endLine": 50,
+        "endChar": 74
+      },
+      "revId": "29592c9531bb3b7e8b3734497cad9f6c1a8ad1f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
