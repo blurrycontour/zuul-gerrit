@@ -50,6 +50,24 @@
       "revId": "dfce5da10f2c42675966527ed1ea9038de1e0442",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fb17e247_59cf6390",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-03-08T23:26:43Z",
+      "side": 1,
+      "message": "Right, I\u0027m not suggesting we remove this call. I was trying to point out that this call seems to indicate that unmodified code (https://opendev.org/zuul/zuul/src/branch/master/zuul/lib/connections.py#L72-L78) should possibly be updated to remove the load flag since it isn\u0027t used anymore as far as I can tell.\n\nI think anytime we call connections.registerScheduler() now we want load\u003dTrue so we can drop the argument and condition for it?",
+      "parentUuid": "ca8e9795_bd4fd17f",
+      "revId": "dfce5da10f2c42675966527ed1ea9038de1e0442",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
