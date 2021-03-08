@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b893708d_e1cd84cd",
+        "filename": "tests/base.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 3614,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-03-08T20:45:09Z",
+      "side": 1,
+      "message": "Should this be renamed to 2281?",
+      "range": {
+        "startLine": 3614,
+        "startChar": 59,
+        "endLine": 3614,
+        "endChar": 63
+      },
+      "revId": "74a9c9de9b52b75b7286b7e4873667517b390446",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
