@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dbf1a8a5_d08fdc2e",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-09T20:16:15Z",
+      "side": 1,
+      "message": "This case is not exercised in my local testing because the additional repo is not listed in the tenant config of the test fixture and further there is no change of this repo active.\n\nHowever the test fixture you adapted is used in quite a lot of test cases so the additional repo there makes the each test more expensive. Instead you could duplicate this test case and use it as a template with the same tenant config as TestChangeQueues which already uses a config including branched gate queues.",
+      "revId": "18b1ff3f8c9327d4a0b428789e9a3edbf76d2bed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
