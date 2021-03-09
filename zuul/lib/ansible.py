@@ -321,6 +321,11 @@ class AnsibleManager:
 
     def copyAnsibleFiles(self):
         if os.path.exists(self.zuul_ansible_dir):
+            # Ensure we can delete the files by setting writtable mode
+            for dirpath, dirnames, filenames in os.walk(self.zuul_ansible_dir):
+                os.chmod(dirpath, 0o755)
+                for filename in filenames:
+                    os.chmod(os.path.join(dirpath, filename), 0o600)
             shutil.rmtree(self.zuul_ansible_dir)
 
         library_path = os.path.dirname(os.path.abspath(zuul.ansible.__file__))
