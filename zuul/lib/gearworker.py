@@ -64,7 +64,10 @@ class ZuulGearWorker:
     def unregister(self):
         self.log.debug('Unregistering all jobs (%s)' % len(self.jobs))
         for job in self.jobs:
-            self.gearman.unRegisterFunction(job)
+            try:
+                self.gearman.unRegisterFunction(job)
+            except KeyError:
+                self.log.debug("Job %s already unregistered", job)
 
     def stop(self):
         self._running = False
