@@ -22,6 +22,30 @@
       "revId": "53d6eefbb207dda9541c26bf93c7007144f9bd63",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ebe514f2_3471d098",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-09T19:36:25Z",
+      "side": 1,
+      "message": "None is completely fine here. It will trigger an async fetch of the files via the zuul mergers/executors (fileschanges call).",
+      "parentUuid": "d681cdac_f6f7e917",
+      "range": {
+        "startLine": 77,
+        "startChar": 8,
+        "endLine": 78,
+        "endChar": 24
+      },
+      "revId": "53d6eefbb207dda9541c26bf93c7007144f9bd63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
