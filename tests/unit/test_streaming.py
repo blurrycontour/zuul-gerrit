@@ -1,4 +1,4 @@
-# Copyright 2017 Red Hat, Inc.
+# Copyright 2021 Red Hat, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,7 +14,6 @@
 
 import io
 import logging
-import json
 import os
 import os.path
 import re
@@ -24,38 +23,31 @@ import testtools
 import threading
 import time
 
+import requests
+
 import zuul.web
 import zuul.lib.log_streamer
 from zuul.lib.fingergw import FingerGateway
 import tests.base
 from tests.base import iterate_timeout, ZuulWebFixture
 
-from ws4py.client import WebSocketBaseClient
 
-
-class WSClient(WebSocketBaseClient):
+class WSClient:
     def __init__(self, port, build_uuid):
         self.port = port
         self.build_uuid = build_uuid
         self.results = ''
-        self.event = threading.Event()
-        uri = 'ws://[::1]:%s/api/tenant/tenant-one/console-stream' % port
-        super(WSClient, self).__init__(uri)
-
+        base = 'http://localhost:%s/api/tenant/tenant-one' % port
+        self.url = '%s/event-stream?uuid=%s' % (base, build_uuid)
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
 
-    def received_message(self, message):
-        if message.is_text:
-            self.results += message.data.decode('utf-8')
-
     def run(self):
-        self.connect()
-        req = {'uuid': self.build_uuid, 'logfile': None}
-        self.send(json.dumps(req))
-        self.event.set()
-        super(WSClient, self).run()
-        self.close()
+        with requests.get(self.url, stream=True) as r:
+            for line in r.iter_lines():
+                if line == b"":
+                    continue
+                self.results = self.results + line.decode('utf-8') + "\n"
 
 
 class TestLogStreamer(tests.base.BaseTestCase):
@@ -207,7 +199,6 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
     def runWSClient(self, port, build_uuid):
         client = WSClient(port, build_uuid)
-        client.event.wait()
         return client
 
     def runFingerClient(self, build_uuid, gateway_address, event):
@@ -380,9 +371,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
         # Start a thread with the websocket client
         client1 = self.runWSClient(web.port, build.uuid)
-        client1.event.wait()
         client2 = self.runWSClient(web.port, build.uuid)
-        client2.event.wait()
 
         # Allow the job to complete
         flag_file = os.path.join(build_dir, 'test_wait')

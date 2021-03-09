@@ -16,8 +16,6 @@ import cherrypy
 import socket
 
 from cachetools.func import ttl_cache
-from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
-from ws4py.websocket import WebSocket
 import codecs
 import copy
 from datetime import datetime
@@ -40,7 +38,6 @@ from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
 
 STATIC_DIR = os.path.join(os.path.dirname(__file__), 'static')
-cherrypy.tools.websocket = WebSocketTool()
 
 COMMANDS = ['stop', 'repl', 'norepl']
 
@@ -113,116 +110,30 @@ class ChangeFilter(object):
         return change['id'] == self.desired
 
 
-class LogStreamHandler(WebSocket):
+def log_streamer(server, port, build_uuid):
+    """
+    Create a client to connect to the finger streamer and pull results.
+
+    :param str server: The executor server running the job.
+    :param str port: The executor server port.
+    :param str build_uuid: The build UUID to stream.
+    """
     log = logging.getLogger("zuul.web")
-
-    def __init__(self, *args, **kw):
-        kw['heartbeat_freq'] = 20
-        super(LogStreamHandler, self).__init__(*args, **kw)
-        self.streamer = None
-
-    def received_message(self, message):
-        if message.is_text:
-            req = json.loads(message.data.decode('utf-8'))
-            self.log.debug("Websocket request: %s", req)
-            if self.streamer:
-                self.log.debug("Ignoring request due to existing streamer")
-                return
-            try:
-                self._streamLog(req)
-            except Exception:
-                self.log.exception("Error processing websocket message:")
-                raise
-
-    def closed(self, code, reason=None):
-        self.log.debug("Websocket closed: %s %s", code, reason)
-        if self.streamer:
-            try:
-                self.streamer.zuulweb.stream_manager.unregisterStreamer(
-                    self.streamer)
-            except Exception:
-                self.log.exception("Error on remote websocket close:")
-
-    def logClose(self, code, msg):
-        self.log.debug("Websocket close: %s %s", code, msg)
-        try:
-            self.close(code, msg)
-        except Exception:
-            self.log.exception("Error closing websocket:")
-
-    def _streamLog(self, request):
-        """
-        Stream the log for the requested job back to the client.
-
-        :param dict request: The client request parameters.
-        """
-        for key in ('uuid', 'logfile'):
-            if key not in request:
-                return self.logClose(
-                    4000,
-                    "'{key}' missing from request payload".format(
-                        key=key))
-
-        port_location = self.zuulweb.rpc.get_job_log_stream_address(
-            request['uuid'])
-        if not port_location:
-            return self.logClose(4011, "Error with Gearman")
-
-        self.streamer = LogStreamer(
-            self.zuulweb, self,
-            port_location['server'], port_location['port'],
-            request['uuid'])
-
-
-class LogStreamer(object):
-    log = logging.getLogger("zuul.web")
-
-    def __init__(self, zuulweb, websocket, server, port, build_uuid):
-        """
-        Create a client to connect to the finger streamer and pull results.
-
-        :param str server: The executor server running the job.
-        :param str port: The executor server port.
-        :param str build_uuid: The build UUID to stream.
-        """
-        self.log.debug("Connecting to finger server %s:%s", server, port)
-        Decoder = codecs.getincrementaldecoder('utf8')
-        self.decoder = Decoder()
-        self.finger_socket = socket.create_connection(
-            (server, port), timeout=10)
-        self.finger_socket.settimeout(None)
-        self.websocket = websocket
-        self.zuulweb = zuulweb
-        self.uuid = build_uuid
-        msg = "%s\n" % build_uuid    # Must have a trailing newline!
-        self.finger_socket.sendall(msg.encode('utf-8'))
-        self.zuulweb.stream_manager.registerStreamer(self)
-
-    def __repr__(self):
-        return '<LogStreamer %s uuid:%s>' % (self.websocket, self.uuid)
-
-    def errorClose(self):
-        self.websocket.logClose(4011, "Unknown error")
-
-    def handle(self, event):
-        if event & select.POLLIN:
-            data = self.finger_socket.recv(1024)
-            if data:
-                data = self.decoder.decode(data)
-                if data:
-                    self.websocket.send(data, False)
-            else:
-                # Make sure we flush anything left in the decoder
-                data = self.decoder.decode(b'', final=True)
-                if data:
-                    self.websocket.send(data, False)
-                self.zuulweb.stream_manager.unregisterStreamer(self)
-                self.finger_socket.close()
-                return self.websocket.logClose(1000, "No more data")
-        else:
-            self.zuulweb.stream_manager.unregisterStreamer(self)
-            self.finger_socket.close()
-            return self.websocket.logClose(1000, "Remote error")
+    log.debug("Connecting to finger server %s:%s", server, port)
+    finger_socket = socket.create_connection((server, port), timeout=10)
+    finger_socket.settimeout(None)
+    msg = "%s\n" % build_uuid    # Must have a trailing newline!
+    finger_socket.sendall(msg.encode('utf-8'))
+    while True:
+        data = finger_socket.recv(1024)
+        if not data:
+            finger_socket.close()
+            return
+        # Here we ensure each line is separated by a \n\n
+        sep = "\n\n"
+        normalized = sep.join(
+            filter(lambda x: x != "", data.decode('utf-8').split('\n')))
+        yield (normalized + sep)
 
 
 class ZuulWebAPI(object):
@@ -1097,9 +1008,15 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
-    @cherrypy.tools.websocket(handler_cls=LogStreamHandler)
-    def console_stream(self, tenant):
-        cherrypy.request.ws_handler.zuulweb = self.zuulweb
+    def console_stream(self, tenant, uuid):
+        cherrypy.response.headers["Content-Type"] = "text/event-stream"
+        port_location = self.rpc.get_job_log_stream_address(uuid)
+        if not port_location:
+            raise cherrypy.HTTPError(404, "Build not found")
+        return log_streamer(
+            port_location['server'], port_location['port'], uuid)
+
+    console_stream._cp_config = {'response.stream': True}
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1142,69 +1059,6 @@ class StaticHandler(object):
                 path=os.path.join(self.root, path))
 
 
-class StreamManager(object):
-    log = logging.getLogger("zuul.web")
-
-    def __init__(self):
-        self.streamers = {}
-        self.poll = select.poll()
-        self.bitmask = (select.POLLIN | select.POLLERR |
-                        select.POLLHUP | select.POLLNVAL)
-        self.wake_read, self.wake_write = os.pipe()
-        self.poll.register(self.wake_read, self.bitmask)
-
-    def start(self):
-        self._stopped = False
-        self.thread = threading.Thread(
-            target=self.run,
-            name='StreamManager')
-        self.thread.start()
-
-    def stop(self):
-        self._stopped = True
-        os.write(self.wake_write, b'\n')
-        self.thread.join()
-
-    def run(self):
-        while True:
-            for fd, event in self.poll.poll():
-                if self._stopped:
-                    return
-                if fd == self.wake_read:
-                    os.read(self.wake_read, 1024)
-                    continue
-                streamer = self.streamers.get(fd)
-                if streamer:
-                    try:
-                        streamer.handle(event)
-                    except Exception:
-                        self.log.exception("Error in streamer:")
-                        streamer.errorClose()
-                        self.unregisterStreamer(streamer)
-                else:
-                    try:
-                        self.poll.unregister(fd)
-                    except KeyError:
-                        pass
-
-    def registerStreamer(self, streamer):
-        self.log.debug("Registering streamer %s", streamer)
-        self.streamers[streamer.finger_socket.fileno()] = streamer
-        self.poll.register(streamer.finger_socket.fileno(), self.bitmask)
-        os.write(self.wake_write, b'\n')
-
-    def unregisterStreamer(self, streamer):
-        self.log.debug("Unregistering streamer %s", streamer)
-        try:
-            self.poll.unregister(streamer.finger_socket)
-        except KeyError:
-            pass
-        try:
-            del self.streamers[streamer.finger_socket.fileno()]
-        except KeyError:
-            pass
-
-
 class ZuulWeb(object):
     log = logging.getLogger("zuul.web.ZuulWeb")
 
@@ -1241,7 +1095,6 @@ class ZuulWeb(object):
 
         self.connections = connections
         self.authenticators = authenticators
-        self.stream_manager = StreamManager()
 
         command_socket = get_default(
             self.config, 'web', 'command_socket',
@@ -1327,7 +1180,7 @@ class ZuulWeb(object):
         route_map.connect('api', '/api/tenant/{tenant}/'
                           'project-ssh-key/{project:.*}.pub',
                           controller=api, action='project_ssh_key')
-        route_map.connect('api', '/api/tenant/{tenant}/console-stream',
+        route_map.connect('api', '/api/tenant/{tenant}/event-stream',
                           controller=api, action='console_stream')
         route_map.connect('api', '/api/tenant/{tenant}/builds',
                           controller=api, action='builds')
@@ -1377,9 +1230,6 @@ class ZuulWeb(object):
     def start(self):
         self.log.debug("ZuulWeb starting")
         self.zk_client.connect()
-        self.stream_manager.start()
-        self.wsplugin = WebSocketPlugin(cherrypy.engine)
-        self.wsplugin.subscribe()
         cherrypy.engine.start()
 
         self.log.debug("Starting command processor")
@@ -1398,8 +1248,6 @@ class ZuulWeb(object):
         # started again (e.g., in the unit tests) it will reuse the
         # same host/port settings.
         cherrypy.server.httpserver = None
-        self.wsplugin.unsubscribe()
-        self.stream_manager.stop()
         self.zk_client.disconnect()
         self.stop_repl()
         self._command_running = False

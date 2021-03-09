@@ -15,7 +15,6 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import Sockette from 'sockette'
 import {Checkbox, Form, FormGroup, FormControl} from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
@@ -52,9 +51,9 @@ class StreamPage extends React.Component {
   }
 
   componentWillUnmount () {
-    if (this.ws) {
-      console.log('Remove ws')
-      this.ws.close()
+    if (this.source) {
+      console.log('Remove event source')
+      this.source.close()
     }
   }
 
@@ -81,15 +80,7 @@ class StreamPage extends React.Component {
   }
 
   componentDidMount() {
-    const params = {
-      uuid: this.props.match.params.buildId
-    }
-    const urlParams = new URLSearchParams(this.props.location.search)
-    const logfile = urlParams.get('logfile')
-    if (logfile) {
-      params.logfile = logfile
-    }
-    document.title = 'Zuul Stream | ' + params.uuid.slice(0, 7)
+    document.title = 'Zuul Stream | ' + this.props.match.params.uuid.slice(0, 7)
 
     const term = new Terminal()
 
@@ -109,30 +100,11 @@ class StreamPage extends React.Component {
     term.open(this.terminal)
     term.focus()
 
-    this.ws = new Sockette(getStreamUrl(this.props.tenant.apiPrefix), {
-      timeout: 5e3,
-      maxAttempts: 3,
-      onopen: () => {
-        console.log('onopen')
-        this.ws.send(JSON.stringify(params))
-      },
-      onmessage: e => {
-        this.onMessage(e.data)
-      },
-      onreconnect: e => {
-        console.log('Reconnecting...', e)
-      },
-      onmaximum: e => {
-        console.log('Stop Attempting!', e)
-      },
-      onclose: e => {
-        console.log('onclose', e)
+    this.source = new EventSource(getStreamUrl(this.props.tenant.apiPrefix, this.props.match.params.buildId))
+    this.source.onmessage = this.onMessage
+    this.source.onerror = () => {
         this.onMessage('\n--- END OF STREAM ---\n')
-      },
-      onerror: e => {
-        console.log('onerror:', e)
-      }
-    })
+    }
 
     this.term = term
 
