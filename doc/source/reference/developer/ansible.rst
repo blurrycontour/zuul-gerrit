@@ -44,14 +44,13 @@ All jobs run with the :py:mod:`zuul.ansible.base.callback.zuul_stream` callback
 plugin enabled, which writes the build log to a file so that the
 :py:class:`zuul.lib.log_streamer.LogStreamer` can provide the data on demand
 over the finger protocol. Finally, :py:class:`zuul.web.LogStreamHandler`
-exposes that log stream over a websocket connection as part of
+exposes that log stream over a server-sent-event http stream as part of
 :py:class:`zuul.web.ZuulWeb`.
 
 .. autoclass:: zuul.ansible.base.callback.zuul_stream.CallbackModule
    :members:
 
 .. autoclass:: zuul.lib.log_streamer.LogStreamer
-.. autoclass:: zuul.web.LogStreamHandler
 .. autoclass:: zuul.web.ZuulWeb
 
 In addition to real-time streaming, Zuul also installs another callback module,
