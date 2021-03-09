@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a16805bd_7d961790",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-09T08:50:44Z",
+      "side": 1,
+      "message": "In order to retain the previous behavior for the config validation, the creation of executor, merger and nodepool needs to be skipped if the testonly flag is set:\n\n    if not testonly:\n        self.executor \u003d ExecutorClient(self.config, self)\n        self.merger \u003d self._merger_client_class(self.config, self)\n        self.nodepool \u003d nodepool.Nodepool(self)",
+      "revId": "e75b448505b5b3dfde86c8ffff9529d0058b2e91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
