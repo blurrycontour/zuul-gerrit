@@ -35,6 +35,16 @@ class BaseClientTestCase(BaseTestCase):
             rootdir=os.environ.get("ZUUL_TEST_ROOT"))).path
         self.config = configparser.ConfigParser()
         self.config.read(os.path.join(FIXTURE_DIR, self.config_file))
+        self.setupZK()
+        self.config.add_section('zookeeper')
+        self.config.set('zookeeper', 'hosts', self.zk_chroot_fixture.zk_hosts)
+        self.config.set('zookeeper', 'session_timeout', '30')
+        self.config.set('zookeeper', 'tls_cert',
+                        self.zk_chroot_fixture.zookeeper_cert)
+        self.config.set('zookeeper', 'tls_key',
+                        self.zk_chroot_fixture.zookeeper_key)
+        self.config.set('zookeeper', 'tls_ca',
+                        self.zk_chroot_fixture.zookeeper_ca)
 
 
 class TestTenantValidationClient(BaseClientTestCase):

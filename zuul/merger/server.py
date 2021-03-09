@@ -56,7 +56,6 @@ class BaseMergeServer(metaclass=ABCMeta):
         self,
         config: ConfigParser,
         component: str,
-        zk_client: ZooKeeperClient,
         connections,
     ):
         self.connections = connections
@@ -72,15 +71,17 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.merge_root = get_default(config, component, 'git_dir',
                                       '/var/lib/zuul/{}-git'.format(component))
-        self.zk_client = zk_client
+
+        self.config = config
+
+        self.zk_client = ZooKeeperClient.fromConfig(self.config)
+        self.zk_client.connect()
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
         # well as to support the merger:cat functon to supply
         # configuration information to Zuul when it starts.
         self.merger = self._getMerger(self.merge_root, None)
-
-        self.config = config
 
         # Repo locking is needed on the executor
         self.repo_locks = self._repo_locks_class()
@@ -100,10 +101,18 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     def _getMerger(self, root, cache_root, logger=None):
         return merger.Merger(
-            root, self.connections, self.zk_client, self.merge_email,
-            self.merge_name, self.merge_speed_limit, self.merge_speed_time,
-            cache_root, logger, execution_context=True,
-            git_timeout=self.git_timeout)
+            root,
+            self.connections,
+            self.zk_client,
+            self.merge_email,
+            self.merge_name,
+            self.merge_speed_limit,
+            self.merge_speed_time,
+            cache_root,
+            logger,
+            execution_context=True,
+            git_timeout=self.git_timeout,
+        )
 
     def _repoLock(self, connection_name, project_name):
         # The merger does not need locking so return a null lock.
@@ -138,6 +147,7 @@ class BaseMergeServer(metaclass=ABCMeta):
     def stop(self):
         self.log.debug('Stopping merger worker')
         self.merger_gearworker.stop()
+        self.zk_client.disconnect()
 
     def join(self):
         self.merger_gearworker.join()
@@ -239,10 +249,9 @@ class MergeServer(BaseMergeServer):
     def __init__(
         self,
         config: ConfigParser,
-        zk_client: ZooKeeperClient,
         connections,
     ):
-        super().__init__(config, 'merger', zk_client, connections)
+        super().__init__(config, 'merger', connections)
 
         self.command_map = dict(
             stop=self.stop,

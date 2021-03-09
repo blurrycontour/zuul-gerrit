@@ -1044,7 +1044,7 @@ class TestPagureWebhook(ZuulTestCase):
         super(TestPagureWebhook, self).setUp()
         # Start the web server
         self.web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+            ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
@@ -1092,7 +1092,7 @@ class TestPagureWebhookWhitelist(ZuulTestCase):
         super(TestPagureWebhookWhitelist, self).setUp()
         # Start the web server
         self.web = self.useFixture(
-            ZuulWebFixture(self.gearman_server.port, self.changes, self.config,
+            ZuulWebFixture(self.changes, self.config,
                            self.additional_event_queues, self.upstream_root,
                            self.rpcclient, self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
