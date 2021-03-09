@@ -3352,11 +3352,20 @@ class FakeNodepool(object):
 
     log = logging.getLogger("zuul.test.FakeNodepool")
 
-    def __init__(self, host, port, chroot):
+    def __init__(self, zk_chroot_fixture):
         self.complete_event = threading.Event()
         self.host_keys = None
+
         self.client = kazoo.client.KazooClient(
-            hosts='%s:%s%s' % (host, port, chroot))
+            hosts='%s:%s%s' % (
+                zk_chroot_fixture.zookeeper_host,
+                zk_chroot_fixture.zookeeper_port,
+                zk_chroot_fixture.zookeeper_chroot),
+            use_ssl=True,
+            keyfile=zk_chroot_fixture.zookeeper_key,
+            certfile=zk_chroot_fixture.zookeeper_cert,
+            ca=zk_chroot_fixture.zookeeper_ca,
+        )
         self.client.start()
         self.registerLauncher()
         self._running = True
@@ -3616,10 +3625,25 @@ class ChrootedKazooFixture(fixtures.Fixture):
             host = zk_host
             port = None
 
+        zk_ca = os.environ.get('ZUUL_ZK_CA', None)
+        if not zk_ca:
+            zk_ca = os.path.join(os.path.dirname(__file__),
+                                 '../tools/ca/certs/cacert.pem')
+        self.zookeeper_ca = zk_ca
+        zk_cert = os.environ.get('ZUUL_ZK_CERT', None)
+        if not zk_cert:
+            zk_cert = os.path.join(os.path.dirname(__file__),
+                                   '../tools/ca/certs/client.pem')
+        self.zookeeper_cert = zk_cert
+        zk_key = os.environ.get('ZUUL_ZK_KEY', None)
+        if not zk_key:
+            zk_key = os.path.join(os.path.dirname(__file__),
+                                  '../tools/ca/keys/clientkey.pem')
+        self.zookeeper_key = zk_key
         self.zookeeper_host = host
 
         if not port:
-            self.zookeeper_port = 2181
+            self.zookeeper_port = 2281
         else:
             self.zookeeper_port = int(port)
 
@@ -3638,7 +3662,11 @@ class ChrootedKazooFixture(fixtures.Fixture):
 
         # Ensure the chroot path exists and clean up any pre-existing znodes.
         _tmp_client = kazoo.client.KazooClient(
-            hosts=f'{self.zookeeper_host}:{self.zookeeper_port}', timeout=10
+            hosts=f'{self.zookeeper_host}:{self.zookeeper_port}', timeout=10,
+            use_ssl=True,
+            keyfile=self.zookeeper_key,
+            certfile=self.zookeeper_cert,
+            ca=self.zookeeper_ca,
         )
         _tmp_client.start()
 
@@ -3653,7 +3681,12 @@ class ChrootedKazooFixture(fixtures.Fixture):
         '''Remove the chroot path.'''
         # Need a non-chroot'ed client to remove the chroot path
         _tmp_client = kazoo.client.KazooClient(
-            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port))
+            hosts='%s:%s' % (self.zookeeper_host, self.zookeeper_port),
+            use_ssl=True,
+            keyfile=self.zookeeper_key,
+            certfile=self.zookeeper_cert,
+            ca=self.zookeeper_ca,
+        )
         _tmp_client.start()
         _tmp_client.delete(self.zookeeper_chroot, recursive=True)
         _tmp_client.stop()
@@ -3724,8 +3757,7 @@ class ZuulWebFixture(fixtures.Fixture):
             self.info = zuul.model.WebInfo.fromConfig(config)
         else:
             self.info = info
-        self.zk_client = ZooKeeperClient.fromConfig(config,
-                                                    _require_tls=False)
+        self.zk_client = ZooKeeperClient.fromConfig(config)
         self.zk_client.connect()
         self.test_root = test_root
 
@@ -3997,8 +4029,7 @@ class SchedulerTestApp:
             self.config, self.sched)
         merge_client = RecordingMergeClient(self.config, self.sched)
         nodepool = zuul.nodepool.Nodepool(self.sched)
-        zk_client = ZooKeeperClient.fromConfig(self.config,
-                                               _require_tls=False)
+        zk_client = ZooKeeperClient.fromConfig(self.config)
         zk_client.connect()
 
         self.sched.setExecutor(executor_client)
@@ -4181,10 +4212,7 @@ class ZuulTestCase(BaseTestCase):
         super(ZuulTestCase, self).setUp()
 
         self.setupZK()
-        self.fake_nodepool = FakeNodepool(
-            self.zk_chroot_fixture.zookeeper_host,
-            self.zk_chroot_fixture.zookeeper_port,
-            self.zk_chroot_fixture.zookeeper_chroot)
+        self.fake_nodepool = FakeNodepool(self.zk_chroot_fixture)
 
         if not KEEP_TEMPDIRS:
             tmp_root = self.useFixture(fixtures.TempDir(
@@ -4272,9 +4300,14 @@ class ZuulTestCase(BaseTestCase):
             self.zk_chroot_fixture.zookeeper_chroot)
         self.config.set('zookeeper', 'hosts', zk_hosts)
         self.config.set('zookeeper', 'session_timeout', '30')
+        self.config.set('zookeeper', 'tls_cert',
+                        self.zk_chroot_fixture.zookeeper_cert)
+        self.config.set('zookeeper', 'tls_key',
+                        self.zk_chroot_fixture.zookeeper_key)
+        self.config.set('zookeeper', 'tls_ca',
+                        self.zk_chroot_fixture.zookeeper_ca)
 
-        self.zk_client = ZooKeeperClient.fromConfig(self.config,
-                                                    _require_tls=False)
+        self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
 
         self.rpcclient = zuul.rpcclient.RPCClient(
