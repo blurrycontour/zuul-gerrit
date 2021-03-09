@@ -16,6 +16,24 @@
       "revId": "a9545a49dd74a3c03cd350a01819bb767d292244",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0e9a0841_fbf1fd7a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-03-09T22:05:37Z",
+      "side": 1,
+      "message": "I added this extra measurement point because the original timestamp is influenced by the driver  performance (e.g. getChange induce variance). With regards to the upcoming scheduler HA feature, I suspect it is important to measure how long the scheduler takes to enqueue a change from here.",
+      "parentUuid": "29007008_8705cf51",
+      "revId": "a9545a49dd74a3c03cd350a01819bb767d292244",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
