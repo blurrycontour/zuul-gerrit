@@ -14,7 +14,6 @@
 
 import io
 import logging
-import json
 import os
 import os.path
 import re
@@ -24,38 +23,37 @@ import testtools
 import threading
 import time
 
+import requests
+
 import zuul.web
 import zuul.lib.log_streamer
 from zuul.lib.fingergw import FingerGateway
 import tests.base
 from tests.base import iterate_timeout, ZuulWebFixture
 
-from ws4py.client import WebSocketBaseClient
 
-
-class WSClient(WebSocketBaseClient):
+class WSClient:
     def __init__(self, port, build_uuid):
         self.port = port
         self.build_uuid = build_uuid
         self.results = ''
-        self.event = threading.Event()
-        uri = 'ws://[::1]:%s/api/tenant/tenant-one/console-stream' % port
-        super(WSClient, self).__init__(uri)
-
+        base = 'http://localhost:%s/api/tenant/tenant-one' % port
+        self.url = '%s/event-stream?uuid=%s' % (base, build_uuid)
+        self.r = None
         self.thread = threading.Thread(target=self.run)
         self.thread.start()
 
-    def received_message(self, message):
-        if message.is_text:
-            self.results += message.data.decode('utf-8')
+    def close(self):
+        if self.r:
+            self.r.close()
 
     def run(self):
-        self.connect()
-        req = {'uuid': self.build_uuid, 'logfile': None}
-        self.send(json.dumps(req))
-        self.event.set()
-        super(WSClient, self).run()
-        self.close()
+        with requests.get(self.url, stream=True) as r:
+            self.r = r
+            for line in r.iter_lines():
+                if line == b"":
+                    continue
+                self.results = self.results + line.decode('utf-8') + "\n"
 
 
 class TestLogStreamer(tests.base.BaseTestCase):
@@ -207,7 +205,6 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
     def runWSClient(self, port, build_uuid):
         client = WSClient(port, build_uuid)
-        client.event.wait()
         return client
 
     def runFingerClient(self, build_uuid, gateway_address, event):
@@ -228,7 +225,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
             s.sendall(msg.encode('utf-8'))
             event.set()  # notify we are connected and req sent
             while True:
-                data = s.recv(1024)
+                data = s.recv()
                 if not data:
                     break
                 self.streaming_data += data.decode('utf-8')
@@ -308,7 +305,6 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
         # Start a thread with the websocket client
         client1 = self.runWSClient(web.port, build.uuid)
-        client1.event.wait()
 
         # Allow the job to complete
         flag_file = os.path.join(build_dir, 'test_wait')
@@ -380,9 +376,7 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
         # Start a thread with the websocket client
         client1 = self.runWSClient(web.port, build.uuid)
-        client1.event.wait()
         client2 = self.runWSClient(web.port, build.uuid)
-        client2.event.wait()
 
         # Allow the job to complete
         flag_file = os.path.join(build_dir, 'test_wait')
@@ -452,7 +446,6 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
 
         # Start a thread with the websocket client
         client1 = self.runWSClient(web.port, build.uuid)
-        client1.event.wait()
 
         # Wait until we've streamed everything so far
         for x in iterate_timeout(30, "streamer is caught up"):
@@ -461,16 +454,10 @@ class TestStreaming(tests.base.AnsibleZuulTestCase):
                     break
             # This is intensive, give it some time
             time.sleep(1)
-        self.assertNotEqual(len(web.web.stream_manager.streamers.keys()), 0)
 
         # Hangup the client side
-        client1.close(1000, 'test close')
+        client1.close()
         client1.thread.join()
-
-        # The client should be de-registered shortly
-        for x in iterate_timeout(30, "client cleanup"):
-            if len(web.web.stream_manager.streamers.keys()) == 0:
-                break
 
         # Allow the job to complete
         flag_file = os.path.join(build_dir, 'test_wait')
