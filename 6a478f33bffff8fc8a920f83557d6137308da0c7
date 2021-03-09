@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b2b9b742_61b58948",
+        "filename": "tests/unit/test_streaming.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-09T21:05:31Z",
+      "side": 1,
+      "message": "Do whatever your lawyers say of course, but my understanding is it\u0027s usually better to add dates rather than replace them (eg 2017, 2021 or 2017-2021).",
+      "revId": "6a478f33bffff8fc8a920f83557d6137308da0c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
