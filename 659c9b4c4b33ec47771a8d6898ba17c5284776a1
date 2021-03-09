@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5afb46e4_d3be6efe",
+        "filename": ".zuul.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-09T20:02:41Z",
+      "side": 1,
+      "message": "zuul.yaml is not needed as zuul ignores file matchers of jobs that have changed config.",
+      "revId": "659c9b4c4b33ec47771a8d6898ba17c5284776a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
