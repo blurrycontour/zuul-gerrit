@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e0a644bc_bc377f65",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-09T19:50:32Z",
+      "side": 1,
+      "message": "I think a comment explaining the files \u003d None wouldn\u0027t make sense here.",
+      "revId": "ba2fd451c5988481d6992df9cf3e1b3f3a56b849",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
