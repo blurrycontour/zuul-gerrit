@@ -32,7 +32,6 @@ import queue
 import random
 import re
 from collections import defaultdict, namedtuple
-from logging import Logger
 from queue import Queue
 from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
 
@@ -3998,19 +3997,33 @@ class SymLink(object):
 
 
 class SchedulerTestApp:
-    def __init__(self, log: Logger, config: ConfigParser,
-                 changes: Dict[str, Dict[str, Change]],
-                 additional_event_queues, upstream_root: str,
-                 rpcclient: RPCClient, poller_events, git_url_with_auth: bool,
-                 source_only: bool,
-                 fake_sql: bool,
-                 add_cleanup: Callable[[Callable[[], None]], None]):
-
+    def __init__(self, log, config, changes, additional_event_queues,
+                 upstream_root, rpcclient, poller_events,
+                 git_url_with_auth, source_only, fake_sql,
+                 add_cleanup, validate_tenants):
         self.log = log
         self.config = config
         self.changes = changes
+        self.validate_tenants = validate_tenants
 
-        self.sched = zuul.scheduler.Scheduler(self.config)
+        # Register connections from the config using fakes
+        self.connections = TestConnectionRegistry(
+            self.changes,
+            self.config,
+            additional_event_queues,
+            upstream_root,
+            rpcclient,
+            poller_events,
+            git_url_with_auth,
+            add_cleanup,
+            fake_sql,
+        )
+        self.connections.configure(self.config, source_only=source_only)
+
+        self.sched = zuul.scheduler.Scheduler(self.config, self.connections)
+        if validate_tenants is None:
+            self.connections.registerScheduler(self.sched)
+
         self.sched.setZuulApp(self)
         self.sched._stats_interval = 1
 
@@ -4019,15 +4032,6 @@ class SchedulerTestApp:
             self.sched.trigger_event_queue,
             self.sched.management_event_queue
         ]
-
-        # Register connections from the config using fakes
-        self.connections = TestConnectionRegistry(
-            self.changes, self.config, additional_event_queues,
-            upstream_root, rpcclient, poller_events,
-            git_url_with_auth, add_cleanup, fake_sql)
-        self.connections.configure(self.config, source_only=source_only)
-
-        self.sched.registerConnections(self.connections)
 
         executor_client = zuul.executor.client.ExecutorClient(
             self.config, self.sched)
@@ -4065,20 +4069,20 @@ class SchedulerTestApp:
 
 
 class SchedulerTestManager:
-    def __init__(self):
+    def __init__(self, validate_tenants):
         self.instances = []
+        self.validate_tenants = validate_tenants
 
-    def create(self, log: Logger, config: ConfigParser,
-               changes: Dict[str, Dict[str, Change]], additional_event_queues,
-               upstream_root: str, rpcclient: RPCClient, poller_events,
-               git_url_with_auth: bool, source_only: bool,
-               fake_sql: bool,
-               add_cleanup: Callable[[Callable[[], None]], None])\
-            -> SchedulerTestApp:
+    def create(self, log, config, changes, additional_event_queues,
+               upstream_root, rpcclient, poller_events,
+               git_url_with_auth, source_only, fake_sql, add_cleanup,
+               validate_tenants):
         app = SchedulerTestApp(log, config, changes,
                                additional_event_queues, upstream_root,
-                               rpcclient, poller_events, git_url_with_auth,
-                               source_only, fake_sql, add_cleanup)
+                               rpcclient, poller_events,
+                               git_url_with_auth, source_only,
+                               fake_sql, add_cleanup,
+                               validate_tenants)
         self.instances.append(app)
         return app
 
@@ -4346,12 +4350,12 @@ class ZuulTestCase(BaseTestCase):
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds
 
-        self.scheds = SchedulerTestManager()
+        self.scheds = SchedulerTestManager(self.validate_tenants)
         self.scheds.create(
             self.log, self.config, self.changes,
             self.additional_event_queues, self.upstream_root, self.rpcclient,
             self.poller_events, self.git_url_with_auth, self.source_only,
-            self.fake_sql, self.addCleanup)
+            self.fake_sql, self.addCleanup, self.validate_tenants)
 
         if hasattr(self, 'fake_github'):
             self.additional_event_queues.append(
