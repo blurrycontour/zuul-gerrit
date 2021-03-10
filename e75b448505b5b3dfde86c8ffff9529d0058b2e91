@@ -16,6 +16,23 @@
       "revId": "e75b448505b5b3dfde86c8ffff9529d0058b2e91",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c6017126_aa679bad",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T00:06:21Z",
+      "side": 1,
+      "message": "Ah, thanks.  I guess it passed on my workstation since I have a gearman server running.",
+      "revId": "e75b448505b5b3dfde86c8ffff9529d0058b2e91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
