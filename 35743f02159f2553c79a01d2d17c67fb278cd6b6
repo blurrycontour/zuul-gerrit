@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37002a8a_e32896a0",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T19:03:45Z",
+      "side": 1,
+      "message": "The thing about this is that the following code fails:\n\n  component.set(\u0027state\u0027, ZooKeeperComponentState.RUNNING)\n  assert component.get(\u0027state\u0027) \u003d\u003d ZooKeeperComponentState.RUNNING\n\nWhich is pretty counter-intuitive.  But if we retain the existing pattern that we use both for Zuul model objects as well as for ZK interaction with Nodepool, where we use string constants (improved by making them class attributes as, for example, in the Pipeline class), we can do the following:\n\n  component.set(\u0027state\u0027, component.STATE_RUNNING)\n  assert component.get(\u0027state\u0027) \u003d\u003d component.STATE_RUNNING\n\nThat saves extra import statements in all the files that use this.  To accomplish this, we only need to do this:\n\n  class ZooKeeperComponentReadOnly:\n    STATE_RUNNING \u003d \u0027running\u0027\n\nMy preference would be to do that -- it matches the existing code, and is shorter, simpler, and has all the safety of enums (you won\u0027t accidentally set state to \"RUNNNING\" without causing an error) plus the advantage of input\u003doutput.",
+      "revId": "35743f02159f2553c79a01d2d17c67fb278cd6b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
