@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb67b3ac_a74c7ad0",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T22:23:52Z",
+      "side": 1,
+      "message": "Why the cast to a list?  Is it ever a tuple?",
+      "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0497bc72_8f28009b",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T22:23:52Z",
+      "side": 1,
+      "message": "Same question re list",
+      "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5992e207_78769680",
+        "filename": "zuul/driver/pagure/paguremodel.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T22:23:52Z",
+      "side": 1,
+      "message": "Why do we need the default here (and gitlab)?",
+      "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
