@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c44f3db7_55d4b6de",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3778,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T22:16:35Z",
+      "side": 1,
+      "message": "Is this serializable?",
+      "revId": "ae2ea82ef0a00a8d0b7528ccd40f532ed1f42733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3a7f22e4_4cefe79d",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3829,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T22:16:35Z",
+      "side": 1,
+      "message": "Looks like these docs bitrotted.",
+      "revId": "ae2ea82ef0a00a8d0b7528ccd40f532ed1f42733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b22ea8bd_6f6087e7",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3838,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T22:16:35Z",
+      "side": 1,
+      "message": "Is this serializable?",
+      "revId": "ae2ea82ef0a00a8d0b7528ccd40f532ed1f42733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
