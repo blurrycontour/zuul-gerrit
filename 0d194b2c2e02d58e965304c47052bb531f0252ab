@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1a747d9b_ef455dd4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 40
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 30637
+      },
+      "writtenOn": "2021-03-10T16:30:26Z",
+      "side": 1,
+      "message": "I dont\u0027t agree. Could you clarify what do you mean by awkward syntax? To me is seems more or less like common syntax in any other language. Is \"self.jobdir: Optional[JobDir] \u003d None\" harder to read than \"self.jobdir \u003d None\"? Seems to me in respect to the the conversation in the mailing list (http://lists.zuul-ci.org/pipermail/zuul-discuss/2021-February/thread.html#1504) that dropping this has no real base. I don\u0027t think that only my editor can benefit from type annotations. I fail to understand why someone would think that clarifying the type on declaration is a bad think.",
+      "parentUuid": "03ae8f3b_8c96ac39",
+      "revId": "0d194b2c2e02d58e965304c47052bb531f0252ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bd56fb37_e851c76c",
         "filename": "tests/base.py",
         "patchSetId": 40
