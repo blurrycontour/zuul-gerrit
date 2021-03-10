@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dc44df4a_ac9c26ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 24
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T22:19:57Z",
+      "side": 1,
+      "message": "It\u0027s not entirely clear what\u0027s being fixed here.  This is where either a test and/or more detail in the commit message would help.",
+      "revId": "f5fb5817e59fb8e01a4c6ed398fb747b95796a61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "41527f96_21dd4bed",
+        "filename": "zuul/driver/pagure/paguremodel.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-10T22:19:57Z",
+      "side": 1,
+      "message": "Where is this used?  Should this be added to the TriggerEvent class instead?",
+      "revId": "f5fb5817e59fb8e01a4c6ed398fb747b95796a61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
