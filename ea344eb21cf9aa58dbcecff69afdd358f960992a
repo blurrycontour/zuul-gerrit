@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "33ae4606_83a0b7d4",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3497,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T06:46:41Z",
+      "side": 1,
+      "message": "I\u0027m removing the config from the event entirely in one of the later patches. However to make the to-/fromDict() work in the current implementation, I need the config for the instance creation. But you are right, that in the current form the dict is not JSON serializable. I\u0027ll try to make this clear in the commit message.",
+      "parentUuid": "c6602ddf_0735ac72",
+      "revId": "ea344eb21cf9aa58dbcecff69afdd358f960992a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9887b007_ffd2b414",
         "filename": "zuul/model.py",
         "patchSetId": 23
@@ -30,6 +48,24 @@
       "writtenOn": "2021-03-10T19:26:59Z",
       "side": 1,
       "message": "This seems like we\u0027re only including the first project/branch combination, whereas if this event was merged with another, it could have more than one.  Shouldn\u0027t we serialize it the same way?\n\nISTR you mentioned elsewhere that by putting these into ZK we may lose our ability to de-duplicate them; maybe that\u0027s the reasoning here.  But if so, I think we should either leave a code comment here explaining the difference until that\u0027s merged, or implement the current data structure until we need to change it (so that we\u0027re reviewing the entirety of that change at once).  Otherwise, we increase the risk of introducing an error if something changes between now and then.",
+      "revId": "ea344eb21cf9aa58dbcecff69afdd358f960992a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b54900fe_c96c0bbd",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3560,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T06:46:41Z",
+      "side": 1,
+      "message": "The events in the queue will be immutable, but the tenant reconfiguration events will still be de-duplicated on the consumer side. I\u0027ll refactor this so we are not assuming that there is only one project-branch combination at encode/decode time.",
+      "parentUuid": "9887b007_ffd2b414",
       "revId": "ea344eb21cf9aa58dbcecff69afdd358f960992a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
