@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6e0178aa_9120dfdd",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T07:44:17Z",
+      "side": 1,
+      "message": "I wanted to create a copy of the list here to avoid issues in case it might be modified later on. However, given the context (deserialization) I think it\u0027s save to assume that the list won\u0027t be modified. Will remove the list()",
+      "parentUuid": "cb67b3ac_a74c7ad0",
+      "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0497bc72_8f28009b",
         "filename": "zuul/driver/github/githubmodel.py",
         "patchSetId": 25
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "43ae4580_c0bab646",
+        "filename": "zuul/driver/github/githubmodel.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T07:44:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0497bc72_8f28009b",
+      "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5992e207_78769680",
         "filename": "zuul/driver/pagure/paguremodel.py",
         "patchSetId": 25
@@ -47,6 +83,24 @@
       "writtenOn": "2021-03-10T22:23:52Z",
       "side": 1,
       "message": "Why do we need the default here (and gitlab)?",
+      "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b4a6617b_f936af93",
+        "filename": "zuul/driver/pagure/paguremodel.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T07:44:17Z",
+      "side": 1,
+      "message": "The way I wrote the updateFromDict (see also models.py) is that I don\u0027t require the field to be present in the given dict and will use the same default as in the __init__.\n\nAgain, given the context we could simplify the updateFromDict methods to directly access the keys since it\u0027s probably safe to assume that the given dict contains all fields:\n\n    def updateFromDict(self, d):\n        super().updateFromDict(d)\n        self.trigger_name \u003d d[\"trigger_name\"]\n        self.title \u003d d[\"title\"]\n        ...\n\nWhat do you think?",
+      "parentUuid": "5992e207_78769680",
       "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
