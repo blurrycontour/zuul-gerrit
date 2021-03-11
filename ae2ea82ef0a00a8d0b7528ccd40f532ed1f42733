@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "267034c6_7ecfcda2",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3778,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T07:04:28Z",
+      "side": 1,
+      "message": "No, not JSON serializable in the current form. I\u0027m thinking if we should maybe move this change up the stack right to where the result events via Zookeeper are implemented. I think I was in a rush here to just implement the to-/fromDict for all the events.",
+      "parentUuid": "c44f3db7_55d4b6de",
+      "revId": "ae2ea82ef0a00a8d0b7528ccd40f532ed1f42733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3a7f22e4_4cefe79d",
         "filename": "zuul/model.py",
         "patchSetId": 23
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9645c572_c0543069",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3829,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T07:04:28Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "3a7f22e4_4cefe79d",
+      "revId": "ae2ea82ef0a00a8d0b7528ccd40f532ed1f42733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b22ea8bd_6f6087e7",
         "filename": "zuul/model.py",
         "patchSetId": 23
@@ -47,6 +83,24 @@
       "writtenOn": "2021-03-10T22:16:35Z",
       "side": 1,
       "message": "Is this serializable?",
+      "revId": "ae2ea82ef0a00a8d0b7528ccd40f532ed1f42733",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "addd6aaf_2d1ba2cf",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3838,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T07:04:28Z",
+      "side": 1,
+      "message": "I\u0027ll move this change further up in the stack.",
+      "parentUuid": "b22ea8bd_6f6087e7",
       "revId": "ae2ea82ef0a00a8d0b7528ccd40f532ed1f42733",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
