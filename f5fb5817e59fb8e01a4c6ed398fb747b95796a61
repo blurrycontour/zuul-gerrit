@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0f91a6b3_4ac38b3b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 24
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T07:28:22Z",
+      "side": 1,
+      "message": "Done. The fix is the wrong initialization of the \"check_run\" attribute in the Github trigger event. This never caused any issues as is correctly assigned here https://opendev.org/zuul/zuul/src/branch/master/zuul/driver/github/githubconnection.py#L643",
+      "parentUuid": "dc44df4a_ac9c26ce",
+      "revId": "f5fb5817e59fb8e01a4c6ed398fb747b95796a61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "41527f96_21dd4bed",
         "filename": "zuul/driver/pagure/paguremodel.py",
         "patchSetId": 24
@@ -30,6 +48,24 @@
       "writtenOn": "2021-03-10T22:19:57Z",
       "side": 1,
       "message": "Where is this used?  Should this be added to the TriggerEvent class instead?",
+      "revId": "f5fb5817e59fb8e01a4c6ed398fb747b95796a61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3cf02ff0_1441f9ca",
+        "filename": "zuul/driver/pagure/paguremodel.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-11T07:28:22Z",
+      "side": 1,
+      "message": "This attribute seems to be only used in the Pagure and Gitlab drivers:\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/driver/pagure/pagureconnection.py#L346\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/driver/gitlab/gitlabconnection.py#L194\n\nSince this looked driver specific to me I did not move it into the TriggerEvent class.",
+      "parentUuid": "41527f96_21dd4bed",
       "revId": "f5fb5817e59fb8e01a4c6ed398fb747b95796a61",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
