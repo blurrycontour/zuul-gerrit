@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "42ed8fa1_d165af9f",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-12T21:44:23Z",
+      "side": 1,
+      "message": "Why don\u0027t we set these values to words so it\u0027s easy to debug?\n\nSTOPPED \u003d \u0027stopped\u0027",
+      "revId": "a9bf0cb88f0ef17ffe0c2a3bdfbe0761b50d4397",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
