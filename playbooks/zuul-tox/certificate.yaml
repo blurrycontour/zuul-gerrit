@@ -1,0 +1,12 @@
+- hosts: all
+  tasks:
+    - name: Install packages
+      become: yes
+      package:
+        name:
+          - openssl
+        state: present
+    - name: Generate new ceritificates
+      command: ./create_certificate.sh
+      args:
+        chdir: "{{ zuul.project.src_dir }}/tests/fixtures/gearman"
