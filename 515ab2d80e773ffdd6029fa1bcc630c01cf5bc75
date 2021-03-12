@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bd6145b5_557cdc6f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2021-03-12T14:16:30Z",
+      "side": 1,
+      "message": "not crazy about this class name. AnsibleJobThreadManager or something maybe? I dunno.",
+      "range": {
+        "startLine": 158,
+        "startChar": 6,
+        "endLine": 158,
+        "endChar": 23
+      },
+      "revId": "515ab2d80e773ffdd6029fa1bcc630c01cf5bc75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
