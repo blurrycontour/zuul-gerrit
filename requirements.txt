@@ -11,7 +11,7 @@ python-daemon>=2.0.4
 extras
 statsd>=3.0
 voluptuous>=0.10.2
-gear>=0.13.0,<1.0.0,!=0.15.0
+git+https://github.com/g-chauvel/opendev-gear@f1e7fe56fd01b1e013c4b20fe5cfa32837ba79a0
 apscheduler>=3.0
 PrettyTable>=0.6,<0.8
 babel>=1.0
