@@ -104,6 +104,23 @@
       "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f1e84045_013b4098",
+        "filename": "zuul/driver/pagure/paguremodel.py",
+        "patchSetId": 25
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-12T15:23:52Z",
+      "side": 1,
+      "message": "I think I\u0027d prefer that, because we should have a high confidence that all fields exist, and this way we don\u0027t have to duplicate initial values.  We will probably have to do this for new fields that we add, but even then, we can eventually remove those.",
+      "revId": "51d802a2e214fd8922330b1e551e5ceac9a3e03e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
