@@ -69,6 +69,23 @@
       "revId": "f5fb5817e59fb8e01a4c6ed398fb747b95796a61",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "204d000f_1e23da69",
+        "filename": "zuul/driver/pagure/paguremodel.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-12T22:21:54Z",
+      "side": 1,
+      "message": "Okay, it looks like it\u0027s not critical to these drivers, and they could actually just do what we no in the github and gerrit drivers.  It\u0027s basically a shortcut so that later when we create the Change object, we don\u0027t have to strip refs/tags from the ref.  It doesn\u0027t seem like a big deal, and we may as well just treat it as driver-specific information since we\u0027re handling that anyway.",
+      "revId": "f5fb5817e59fb8e01a4c6ed398fb747b95796a61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
