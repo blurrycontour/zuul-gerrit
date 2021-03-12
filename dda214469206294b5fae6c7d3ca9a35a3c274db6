@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "20434308_7537bd2b",
+        "filename": "zuul/lib/collections.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-12T23:01:18Z",
+      "side": 1,
+      "message": "Maybe just use the one from collections instead of typing?",
+      "revId": "dda214469206294b5fae6c7d3ca9a35a3c274db6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e6571d2e_c6359f69",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-12T23:01:18Z",
+      "side": 1,
+      "message": "Let\u0027s prune the type checking from this file.",
+      "revId": "dda214469206294b5fae6c7d3ca9a35a3c274db6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
