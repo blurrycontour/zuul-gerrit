@@ -22,6 +22,30 @@
       "revId": "515ab2d80e773ffdd6029fa1bcc630c01cf5bc75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0fdada22_a949c6e3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 37
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-03-12T14:38:49Z",
+      "side": 1,
+      "message": "I don\u0027t mind either way, it\u0027s just that right now, this class is managing the gearman worker.",
+      "parentUuid": "bd6145b5_557cdc6f",
+      "range": {
+        "startLine": 158,
+        "startChar": 6,
+        "endLine": 158,
+        "endChar": 23
+      },
+      "revId": "515ab2d80e773ffdd6029fa1bcc630c01cf5bc75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
