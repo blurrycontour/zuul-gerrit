@@ -50,6 +50,9 @@
       Zuul unit tests with ZooKeeper running
     parent: tox
     nodeset: ubuntu-bionic
+    required-projects:
+      - zuul/zuul
+      - opendev/gear
     pre-run: playbooks/zuul-tox/pre.yaml
     post-run: playbooks/zuul-tox/post-system-logs.yaml
     vars:
