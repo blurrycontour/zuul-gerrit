@@ -50,6 +50,9 @@
       Zuul unit tests with ZooKeeper running
     parent: tox
     nodeset: ubuntu-bionic
+    required-projects:
+      - zuul/zuul
+      - opendev/gear
     pre-run: playbooks/zuul-tox/pre.yaml
     post-run: playbooks/zuul-tox/post-system-logs.yaml
     vars:
@@ -103,7 +106,26 @@
 - job:
     name: zuul-tox-py38
     parent: zuul-tox
-    timeout: 4800  # 80 minutes
+    timeout: 2000
+    vars:
+      tox_envlist: py38
+      python_version: 3.8
+
+- job:
+    name: zuul-tox-py38-focal
+    parent: zuul-tox
+    nodeset: ubuntu-focal
+    timeout: 2000
+    vars:
+      tox_envlist: py38
+      python_version: 3.8
+
+- job:
+    name: zuul-tox-py38-focal-new-certificate
+    parent: zuul-tox
+    nodeset: ubuntu-focal
+    pre-run: playbooks/zuul-tox/certificate.yaml
+    timeout: 2000
     vars:
       tox_envlist: py38
       python_version: 3.8
@@ -272,35 +294,12 @@
       release_python: python3
     check:
       jobs:
-        - zuul-build-image
-        - zuul-tox-docs
         - tox-linters:
             vars:
               tox_install_bindep: false
-        - zuul-tox-py36
         - zuul-tox-py38
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            success-url: 'npm/reports/bundle.html'
-            files:
-              - web/.*
-        - zuul-stream-functional-2.8
-        - zuul-stream-functional-2.9
-        - zuul-tox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - nodepool-zuul-functional:
-            voting: false
-        - zuul-tox-zuul-client
-        - zuul-build-python-release
+        - zuul-tox-py38-focal
+        - zuul-tox-py38-focal-new-certificate
     gate:
       jobs:
         - zuul-upload-image
