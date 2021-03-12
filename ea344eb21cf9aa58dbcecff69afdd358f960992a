@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "c040e3b4_6d54651e",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3497,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-12T21:49:58Z",
+      "side": 1,
+      "message": "Where is this fixed then?  I\u0027d like to avoid merging dead code (we\u0027ve established that this code won\u0027t work for the intended purpose, so I\u0027d like to see how it\u0027s going to work before we merge anything).",
+      "revId": "ea344eb21cf9aa58dbcecff69afdd358f960992a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9887b007_ffd2b414",
         "filename": "zuul/model.py",
         "patchSetId": 23
