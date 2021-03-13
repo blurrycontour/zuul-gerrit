@@ -15,6 +15,7 @@
 import json
 import logging
 import os
+import socket
 import threading
 from abc import ABCMeta
 from configparser import ConfigParser
@@ -26,6 +27,7 @@ from zuul.lib.config import get_default
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.merger import merger
 from zuul.merger.merger import nullcontext
+from zuul.zk.components import ZooKeeperComponentRegistry
 
 COMMANDS = ['stop', 'pause', 'unpause']
 
@@ -76,6 +78,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
+        self.zk_component_registry = ZooKeeperComponentRegistry(self.zk_client)
 
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
@@ -251,6 +254,10 @@ class MergeServer(BaseMergeServer):
         connections,
     ):
         super().__init__(config, 'merger', connections)
+        self.hostname = socket.getfqdn()
+        self.zk_component = self.zk_component_registry.register(
+            'mergers', self.hostname
+        )
 
         self.command_map = dict(
             stop=self.stop,
@@ -273,9 +280,11 @@ class MergeServer(BaseMergeServer):
             target=self.runCommand, name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
+        self.zk_component.set('state', self.zk_component.RUNNING)
 
     def stop(self):
         self.log.debug("Stopping")
+        self.zk_component.set('state', self.zk_component.STOPPED)
         super().stop()
         self._command_running = False
         self.command_socket.stop()
@@ -286,11 +295,13 @@ class MergeServer(BaseMergeServer):
 
     def pause(self):
         self.log.debug('Pausing')
+        self.zk_component.set('state', self.zk_component.PAUSED)
         super().pause()
 
     def unpause(self):
         self.log.debug('Resuming')
         super().unpause()
+        self.zk_component.set('state', self.zk_component.RUNNING)
 
     def runCommand(self):
         while self._command_running:
