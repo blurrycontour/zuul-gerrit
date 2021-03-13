@@ -13,13 +13,15 @@
 # under the License.
 
 from zuul.driver import Driver, ConnectionInterface, SourceInterface
+from zuul.driver import TriggerInterface
 from zuul.driver.git import gitconnection
 from zuul.driver.git import gitsource
 from zuul.driver.git import gittrigger
 
 
-class GitDriver(Driver, ConnectionInterface, SourceInterface):
-    name = 'git'
+class GitDriver(Driver, ConnectionInterface, SourceInterface,
+                TriggerInterface):
+    name = "git"
 
     def getConnection(self, name, config):
         return gitconnection.GitConnection(self, name, config)
