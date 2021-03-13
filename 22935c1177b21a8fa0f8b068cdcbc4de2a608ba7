@@ -16,6 +16,24 @@
       "revId": "22935c1177b21a8fa0f8b068cdcbc4de2a608ba7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bfb73587_7c8597fa",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-13T12:18:20Z",
+      "side": 1,
+      "message": "Implemented in followup: https://review.opendev.org/c/zuul/zuul/+/780412",
+      "parentUuid": "c7cc5e49_1e5f3486",
+      "revId": "22935c1177b21a8fa0f8b068cdcbc4de2a608ba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
