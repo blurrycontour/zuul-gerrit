@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba83e4d7_b3bf4ccf",
+        "filename": "doc/source/reference/developer/specs/zuul-image-building.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-13T10:57:52Z",
+      "side": 1,
+      "message": "We could also add the optional possibility to auto-convert the image format within nodepool builder. This could enable a different tradeoff where uploading the images to some temporary storage within the build job is considered expensive.",
+      "revId": "7146f86ad3f836f7a095c7a4899b105544e85a29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
