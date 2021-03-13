@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8c1cf9ef_bd4af0fe",
+        "filename": "doc/source/reference/glossary.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 416,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-13T13:29:44Z",
+      "side": 1,
+      "message": "typo: open source",
+      "revId": "06e8bfc7f85012d98839ba25ddd533678fbdb04d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
