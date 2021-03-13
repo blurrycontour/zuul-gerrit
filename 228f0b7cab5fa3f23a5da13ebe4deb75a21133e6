@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4005e06e_5e5c8a9f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-13T13:00:47Z",
+      "side": 1,
+      "message": "Can you explain the reason for this change? I guess this is for future possibility to easily change the python version to be used for this test?",
+      "revId": "228f0b7cab5fa3f23a5da13ebe4deb75a21133e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
