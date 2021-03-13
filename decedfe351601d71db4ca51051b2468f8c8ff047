@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2d092faa_efa361ec",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1022,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-13T12:39:28Z",
+      "side": 1,
+      "message": "This correctly tests the branched-queue case. However I think it would be a good idea to keep the \u0027self.assertNotIn(\u0027branch\u0027, q)\u0027 part in test_web_status you had earlier which uses unbranched queues to also verify the non-branched-queue case.",
+      "revId": "decedfe351601d71db4ca51051b2468f8c8ff047",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
