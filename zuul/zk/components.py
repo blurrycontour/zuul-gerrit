@@ -17,6 +17,7 @@ import threading
 from typing import Any, Dict, List, Optional
 
 from kazoo.client import KazooClient
+from kazoo.exceptions import NoNodeError
 
 from zuul.zk import NoClientException, ZooKeeperBase, ZooKeeperClient
 
@@ -153,12 +154,15 @@ class ZooKeeperComponentRegistry(ZooKeeperBase):
 
         result = []
         path = "{}/{}".format(self.ROOT, kind)
-        self.kazoo_client.ensure_path(path)
-        for node in self.kazoo_client.get_children(path):
-            path = "{}/{}/{}".format(self.ROOT, kind, node)
-            data, _ = self.kazoo_client.get(path)
-            content = json.loads(data.decode("UTF-8"))
-            result.append(ZooKeeperComponentReadOnly(self.client, content))
+        try:
+            for node in self.kazoo_client.get_children(path):
+                path = "{}/{}/{}".format(self.ROOT, kind, node)
+                data, _ = self.kazoo_client.get(path)
+                content = json.loads(data.decode("UTF-8"))
+                result.append(ZooKeeperComponentReadOnly(self.client, content))
+        except NoNodeError:
+            # If the node doesn't exist there is no component registered.
+            pass
         return result
 
     def register(self, kind: str, hostname: str) -> ZooKeeperComponent:
