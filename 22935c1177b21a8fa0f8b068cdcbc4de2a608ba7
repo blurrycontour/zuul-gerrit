@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7cc5e49_1e5f3486",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 26
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-13T12:13:47Z",
+      "side": 1,
+      "message": "Instead of always doing a network round trip here I think we should just catch the NoNodeError here.",
+      "revId": "22935c1177b21a8fa0f8b068cdcbc4de2a608ba7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
