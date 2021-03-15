@@ -71,6 +71,23 @@
     },
     {
       "key": {
+        "uuid": "7ee214f0_c8a853e3",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T17:41:08Z",
+      "side": 1,
+      "message": "Ah, good, you added it in a later patchset.  I\u0027m guessing the test helped catch that.",
+      "revId": "0e637c56307da02a73b0bf2aa51ffc770a794de0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "64056be9_f8ff51a3",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 30
