@@ -51,6 +51,23 @@
       "revId": "dda214469206294b5fae6c7d3ca9a35a3c274db6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f16a4de7_fac545d2",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T17:50:53Z",
+      "side": 1,
+      "message": "I think you may be right; this is proving to be impractical.  The class and method annotations tend to need too many type annotations in initializers.  And we also wanted to avoid recursive annotations, which is proving difficult.  Finally, I don\u0027t think anyone has proposed generics before, but I do think they go beyond the limited type hints that we envisioned.",
+      "revId": "dda214469206294b5fae6c7d3ca9a35a3c274db6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
