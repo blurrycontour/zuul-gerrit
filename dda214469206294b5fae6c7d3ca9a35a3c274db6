@@ -33,6 +33,24 @@
       "revId": "dda214469206294b5fae6c7d3ca9a35a3c274db6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ed6f37df_d789a4c4",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-15T15:04:05Z",
+      "side": 1,
+      "message": "I think it might make sense to take a stance and get rid of type annotations and type checking in Zuul completely. I have a different opinion on the usefulness of the annotations, but would prefer to have a clear NO instead of the current state where I don\u0027t know when it\u0027s ok to add type hints and when to leave them out.\n\nI tried to remove all type annotations from the method bodies and only kept the class + method level annotations, which I though was what we agreed on.",
+      "parentUuid": "e6571d2e_c6359f69",
+      "revId": "dda214469206294b5fae6c7d3ca9a35a3c274db6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
