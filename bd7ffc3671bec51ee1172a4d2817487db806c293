@@ -2,6 +2,91 @@
   "comments": [
     {
       "key": {
+        "uuid": "953eb4ac_0de972eb",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T18:33:14Z",
+      "side": 1,
+      "message": "Below I\u0027m suggesting we use real management events because they are simple and low-cost, but here I think it makes sense to test with a dummy driver so we can avoid the overhead and distraction of actual driver behavior (that will be tested later anyway).",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffda610b_3ae95d1e",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T18:33:14Z",
+      "side": 1,
+      "message": "We should have a comment about what the test is trying to ascertain.  I will try to add those; you can tell me if I\u0027m wrong.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dc7a05f3_1f975b97",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T18:33:14Z",
+      "side": 1,
+      "message": "We can use real management events, which not only makes this simpler but gives more confidence in the actual code.  The use of a non-serializable \u0027config\u0027 value as discussed in a previous change would be a problem here, except that we can set that to None which is json serializable.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2378e63a_12c4f27c",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T18:33:14Z",
+      "side": 1,
+      "message": "IIUC, the global event has technically been \"acked\", since the event record has been deleted, but it\u0027s been replaced by an un-acked pipeline event, and the result hasn\u0027t been created; I think this comment is a little misleading.  But it sort of depends on when you consider a management event to be \"acked\".  I got pretty hung up on this; would you consider this accurate?\n\n  Event was just forwarded and since we expect a result, the future should not be completed yet.\n\nI put that in my revision.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a05c9980_29940ff2",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T18:33:14Z",
+      "side": 1,
+      "message": "I\u0027d like to use real result events if we can, but right now we don\u0027t inherit from the new event interface, so we would be getting ahead of ourselves.  I\u0027m adding a TODO for us to look at that later.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d76ef88_77330343",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 31
