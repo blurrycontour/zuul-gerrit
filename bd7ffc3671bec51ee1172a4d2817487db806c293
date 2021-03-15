@@ -87,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "be2855dd_96d29c11",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T21:18:52Z",
+      "side": 1,
+      "message": "I was able to remove this patch and the test still passed because it was treated as an invalid event, so I\u0027m going to add some more assertions to the test to make sure that we actually process the events we think we should.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3d76ef88_77330343",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 31
@@ -115,6 +132,57 @@
       "writtenOn": "2021-03-15T17:13:58Z",
       "side": 1,
       "message": "Yeah, it\u0027s not perfectly consistent, sorry.  :(  It\u0027s supposed to be camelCase for everything.  Sometimes things slip through and it\u0027s admittedly less important for internal methods that are only used in the same file.  I think it was the public \"create_registry\" method that made me think the rework was worth doing.\n\nAnd, yes, this essentially follows the old Java convention: CapitalClasses.camelCaseMethods() and .snake_case_attributes.  That was fairly common in python 1.5.2 days and not unheard of in the early 2.x versions.  People don\u0027t acknowledge that now though.  Anyway, if we started from scratch or decided to do a major reformatting, I\u0027d go with the current style.  But in the mean time, consistency, or at least as close as we can get, is worth it.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f250dbe5_e39aa8c5",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T21:18:52Z",
+      "side": 1,
+      "message": "This deletes the original event before reporting the result, so if the scheduler crashes between these two lines, the caller will wait forever.  I think it may be safer to reverse the order.  I\u0027m going to go ahead and do that in my revision, but this is pretty delicate, so I want to make sure you agree.  I\u0027ll leave a note about the importance of it.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "79321640_c14983e0",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T21:18:52Z",
+      "side": 1,
+      "message": "Why is the result created as an ephemeral node?  If the scheduler crashes between reporting the result and the client reading it, then the client won\u0027t see the result.\n\nIdeally we want the client to delete the event after deleting it in order to avoid having these stick around for the lifetime of the scheduler anyway.  But we can\u0027t rely on the client doing that, because someone may have hit CTRL-C.  So I think we should do the following:\n\n1) Don\u0027t create the nodes as ephemeral.\n2) Have the client delete the node (this is already the case).\n3) Periodically look for leaked result nodes and delete them.\n\nHere\u0027s an alternative (but I don\u0027t think we should do this):\n\nCurrently the client ignores the data in the result callback in favor of simply performing a ZK get on the znode.  If we used the data from the callback instead of re-reading it, we would not be subject to the race with the server crashing before the client reads the data.  That might be worth doing just to save a ZK read call, however, it still doesn\u0027t solve the issue of clients not cleaning up results and them sticking around until the server exits.  For that reason alone, I think we should drop the ephemeral flag and add a cleanup process.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "660d54b8_47002594",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T21:18:52Z",
+      "side": 1,
+      "message": "Based on your response to the earlier patchset and the code in the tests, I think I understand what this is now.  But if I\u0027m following it correctly, couldn\u0027t we use a dictionary keyed by tuple instead?",
       "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
