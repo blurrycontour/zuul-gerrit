@@ -22,6 +22,30 @@
       "revId": "36b4bdce532bf081ef67a4d172bb21392c7f0608",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d657122_34f48d0b",
+        "filename": "doc/source/reference/developer/index.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2021-03-15T15:32:54Z",
+      "side": 1,
+      "message": "That was indeed a good observation, I fixed it by switching to command-output, which includes the command executed, not only the output. https://sphinxcontrib-programoutput.readthedocs.io/en/latest/",
+      "parentUuid": "6070c9d3_490ebc73",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 63
+      },
+      "revId": "36b4bdce532bf081ef67a4d172bb21392c7f0608",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
