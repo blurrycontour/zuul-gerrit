@@ -16,6 +16,23 @@
       "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a24d10a1_0a7ab657",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T17:13:58Z",
+      "side": 1,
+      "message": "Yeah, it\u0027s not perfectly consistent, sorry.  :(  It\u0027s supposed to be camelCase for everything.  Sometimes things slip through and it\u0027s admittedly less important for internal methods that are only used in the same file.  I think it was the public \"create_registry\" method that made me think the rework was worth doing.\n\nAnd, yes, this essentially follows the old Java convention: CapitalClasses.camelCaseMethods() and .snake_case_attributes.  That was fairly common in python 1.5.2 days and not unheard of in the early 2.x versions.  People don\u0027t acknowledge that now though.  Anyway, if we started from scratch or decided to do a major reformatting, I\u0027d go with the current style.  But in the mean time, consistency, or at least as close as we can get, is worth it.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
