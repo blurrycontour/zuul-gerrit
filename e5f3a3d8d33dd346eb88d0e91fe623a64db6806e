@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7bdd9be8_ea664c93",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T22:05:15Z",
+      "side": 0,
+      "message": "Whis is this code removed?",
+      "revId": "e5f3a3d8d33dd346eb88d0e91fe623a64db6806e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

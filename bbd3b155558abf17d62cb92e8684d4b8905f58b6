@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1cc69df5_52e8f8c9",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T22:05:15Z",
+      "side": 1,
+      "message": "I\u0027m concerned by the increase in these calls; but if we move the change cache into ZK, this should be reduced, right?\n\nDo you think it\u0027s okay to merge this change without the change cache in ZK ready to go?\n\nThere are some events where we get file listings right?  So this shouldn\u0027t affect every event, just events where we don\u0027t get files (because they are too large?).",
+      "revId": "bbd3b155558abf17d62cb92e8684d4b8905f58b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e7e3db17_0a4df2a4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1101,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T22:05:15Z",
+      "side": 1,
+      "message": "You could pass in the logger and save an extra call to this function.",
+      "revId": "bbd3b155558abf17d62cb92e8684d4b8905f58b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
