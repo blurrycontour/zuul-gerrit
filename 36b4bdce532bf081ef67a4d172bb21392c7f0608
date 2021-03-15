@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6070c9d3_490ebc73",
+        "filename": "doc/source/reference/developer/index.rst",
+        "patchSetId": 13
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-03-15T13:38:18Z",
+      "side": 1,
+      "message": "The documentation doesn\u0027t really show the command to run, perhaps we could just document that `tox -va` can list the available python tests?",
+      "range": {
+        "startLine": 11,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 63
+      },
+      "revId": "36b4bdce532bf081ef67a4d172bb21392c7f0608",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
