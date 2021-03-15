@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d76ef88_77330343",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-15T14:50:27Z",
+      "side": 1,
+      "message": "I\u0027m honestly confused when to use camelCase vs snake_case in Zuul. I was under the impression that it\u0027s mostly camelCase, but snake_case for private methods. I tried to follow that style, (I might have used snake_case out of habit sometimes). From your update it now seems it should be camelCase for everything (except properties?!).",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
