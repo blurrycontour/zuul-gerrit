@@ -37,6 +37,40 @@
     },
     {
       "key": {
+        "uuid": "b08bfc4b_eda33093",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T17:03:32Z",
+      "side": 1,
+      "message": "Okay, so it\u0027s a reference to the event for use when acking, not a reference to an \"event ack\".  I was expecting it to be the latter, and could not find an ack ref attribute on the serialized version of the event in the queue.  That\u0027s because it\u0027s an attribute that\u0027s added after the fact to the de-serialized object.\n\nI\u0027ll add some documentation about this.",
+      "revId": "0e637c56307da02a73b0bf2aa51ffc770a794de0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba5d2af0_4546ae2b",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 30
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-15T17:03:32Z",
+      "side": 1,
+      "message": "The merge method doesn\u0027t appear to update merged_events; we should make sure to test this case.",
+      "revId": "0e637c56307da02a73b0bf2aa51ffc770a794de0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "64056be9_f8ff51a3",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 30
