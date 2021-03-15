@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "1a1f1582_79f5d1a8",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 3497,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-15T13:34:30Z",
+      "side": 1,
+      "message": "The config is removed in https://review.opendev.org/c/zuul/zuul/+/761738\nI just wanted to avoid changing everything at once in one big change, so I figured it might be better to split out the to/fromDict implementation and only do smaller adaptions later on.",
+      "parentUuid": "c040e3b4_6d54651e",
+      "revId": "ea344eb21cf9aa58dbcecff69afdd358f960992a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9887b007_ffd2b414",
         "filename": "zuul/model.py",
         "patchSetId": 23
