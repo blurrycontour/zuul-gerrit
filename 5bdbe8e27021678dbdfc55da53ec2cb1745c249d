@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0c61de19_ff7c3a58",
+        "filename": "doc/requirements.txt",
+        "patchSetId": 14
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-03-15T16:37:44Z",
+      "side": 1,
+      "message": "Out of curiosity, under what circumstances does tox need to be installed into the tox venv for building docs?",
+      "revId": "5bdbe8e27021678dbdfc55da53ec2cb1745c249d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f2619dfd_38fcabec",
+        "filename": "playbooks/zuul-tox-docs/pre.yaml",
+        "patchSetId": 14
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-03-15T16:37:44Z",
+      "side": 1,
+      "message": "Would it be more user-friendly to add the \"doc\" profile to the yarn entry in bindep.txt? We already do that with graphviz.",
+      "revId": "5bdbe8e27021678dbdfc55da53ec2cb1745c249d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
