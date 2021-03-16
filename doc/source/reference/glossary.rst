@@ -275,7 +275,7 @@ Glossary
       present in the git repo.  The downside to this approach is that
       jobs in this pipeline run without any connection to the
       underlying changes which created the commits.  If only the
-      latest updates to a branch matter, then the :value:`supercedent
+      latest updates to a branch master, then the :value:`supercedent
       <pipeline.manager.supercedent>` pipeline manager is recommended;
       otherwise :value:`independent <pipeline.manager.independent>`
       may be a better choice.  See also :term:`tag` and
