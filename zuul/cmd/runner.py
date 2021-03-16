@@ -79,6 +79,22 @@ class Runner(zuul.cmd.ZuulApp):
             action='store_true',
             help='Skip ansible install and validation')
 
+        playbook_filter_doc = ('can be index: `0`, `10`, `-10`, `1..3`,'
+                               'playbook name,'
+                               'or phase: `pre`, `run` or `post`')
+
+        parser.add_argument(
+            '--skip-playbook',
+            action='append',
+            default=[],
+            help='Playbook to skip, ' + playbook_filter_doc)
+
+        parser.add_argument(
+            '--playbook',
+            action='append',
+            default=[],
+            help='Playbook to run, ' + playbook_filter_doc)
+
         # TODO(jhesketh):
         #  - Enable command line argument override from environ
         #  - Allow supplying the job via either raw input or zuul endpoint
@@ -88,6 +104,9 @@ class Runner(zuul.cmd.ZuulApp):
 
     def parseArguments(self, args=None):
         super(Runner, self).parseArguments()
+        if self.args.playbook and self.args.skip_playbook:
+            print("--playbook and --skip-playbook are exclusive")
+            sys.exit(1)
         # Parse node command line argument
         nodes = []
         if getattr(self.args, "nodes", None) is not None:
@@ -129,6 +148,68 @@ class Runner(zuul.cmd.ZuulApp):
                 print("%d: %s" % (idx, self.show_play(playbook)))
                 idx += 1
 
+    def match_name(path, paths):
+        """Check if the path is in the list of paths"""
+        return any([True for skip in paths if path.endswith(skip)])
+
+    def match_range(index, indexes, max_index):
+        """Check if the index is in the list of indexes"""
+        def to_abs(val):
+            pos = int(val)
+            if pos < 0:
+                return max_index + pos
+            return pos
+
+        for idx in indexes:
+            try:
+                if index == to_abs(idx):
+                    return True
+            except ValueError:
+                pass
+            try:
+                (start, end) = map(to_abs, idx.split('..'))
+                if (index >= start and index <= end):
+                    return True
+            except ValueError:
+                pass
+
+    def filter_playbook(args, phase, index, path, max_index):
+        # Check skip
+        if phase in args.skip_playbook:
+            return False
+        if Runner.match_range(index, args.skip_playbook, max_index):
+            return False
+        if Runner.match_name(path, args.skip_playbook):
+            return False
+
+        # Check keep
+        if not args.playbook:
+            return True
+        if phase in args.playbook:
+            return True
+        if Runner.match_range(index, args.playbook, max_index):
+            return True
+        if Runner.match_name(path, args.playbook):
+            return True
+
+        # Otherwise we filter
+        return False
+
+    def filter_playbooks(args, job_params):
+        index = -1
+        max_index = len(job_params['pre_playbooks']) + len(
+            job_params['playbooks']) + len(job_params['post_playbooks'])
+        for phase in ('pre', 'run', 'post'):
+            acc = []
+            key = (phase + '_') if phase != 'run' else ''
+            for pos, play in enumerate(job_params[key + 'playbooks']):
+                index += 1
+                if Runner.filter_playbook(
+                        args, phase, index, play['path'], max_index):
+                    acc.append(play)
+            job_params[key + 'playbooks'] = acc
+        return job_params
+
     def main(self):
         self.parseArguments()
         # TODO: use zuul common logging
@@ -159,7 +240,8 @@ class Runner(zuul.cmd.ZuulApp):
 
         try:
             rc = 0
-            job_params = self.runner.grabFrozenJob()
+            job_params = Runner.filter_playbooks(
+                self.args, self.runner.grabFrozenJob())
             if self.args.list_playbooks:
                 self.list_playbooks(job_params)
             else:
