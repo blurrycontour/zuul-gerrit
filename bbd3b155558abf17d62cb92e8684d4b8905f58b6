@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "476fb5f5_7b84b7e3",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-16T06:41:46Z",
+      "side": 1,
+      "message": "With the change cache in Zookeeper we\u0027d still have those additional calls to getChange() but they\u0027d always hit the cache. I\u0027m thinking that at the current stage (only a single scheduler supported) it might make sense to remove `refresh\u003dTrue` in the event processing path as we know that the cache is up-to-date.\n\nWith the current implementation as-is, we are causing quite some extra load on the API endpoints (Github, ...).",
+      "parentUuid": "1cc69df5_52e8f8c9",
+      "revId": "bbd3b155558abf17d62cb92e8684d4b8905f58b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e7e3db17_0a4df2a4",
         "filename": "zuul/scheduler.py",
         "patchSetId": 18
@@ -30,6 +48,24 @@
       "writtenOn": "2021-03-15T22:05:15Z",
       "side": 1,
       "message": "You could pass in the logger and save an extra call to this function.",
+      "revId": "bbd3b155558abf17d62cb92e8684d4b8905f58b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "745dc2e5_a9b15546",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 1101,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-16T06:41:46Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "e7e3db17_0a4df2a4",
       "revId": "bbd3b155558abf17d62cb92e8684d4b8905f58b6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false

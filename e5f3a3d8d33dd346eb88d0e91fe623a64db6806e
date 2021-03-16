@@ -16,6 +16,24 @@
       "revId": "e5f3a3d8d33dd346eb88d0e91fe623a64db6806e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd85fe72_61e5a19d",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-16T06:41:46Z",
+      "side": 0,
+      "message": "I don\u0027t remember. I probably messed up during a rebase.",
+      "parentUuid": "7bdd9be8_ea664c93",
+      "revId": "e5f3a3d8d33dd346eb88d0e91fe623a64db6806e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
