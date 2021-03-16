@@ -241,7 +241,7 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
             root, self.connections, None, email, username,
             speed_limit, speed_time, cache_root, logger)
 
-    def _grabFrozenJob(self):
+    def grabFrozenJob(self):
         url = self.runner_config.api
         if self.runner_config.tenant:
             url = os.path.join(url, "tenant", self.runner_config.tenant)
@@ -261,12 +261,15 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
                 "freeze-job")
         if self.runner_config.job:
             url = os.path.join(url, self.runner_config.job)
-        self.job_params = requests.get(url).json()
+        return requests.get(url).json()
+
+    def ensureJobParams(self):
+        if not self.job_params:
+            self.job_params = self.grabFrozenJob()
 
     def prepareWorkspace(self):
         self.ansible_manager.copyAnsibleFiles()
-        if not self.job_params:
-            self._grabFrozenJob()
+        self.ensureJobParams()
         self.merger = self.getMerger(self.merge_root)
         self.start_update_thread()
 
@@ -332,7 +335,7 @@ class LocalRunnerContextManager(AnsibleJobContextManager):
                     secret, "unknown")
 
     def execute(self, skip_ansible_install=False):
-        self._grabFrozenJob()
+        self.ensureJobParams()
         self._setNodesAndSecrets()
         if not skip_ansible_install and not self.ansible_manager.validate():
             self.ansible_manager.install()
