@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "53adbb54_3755849f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 980,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-17T13:56:53Z",
+      "side": 0,
+      "message": "Was it on purpose that getChange() is called with the project as the value for the `refresh` flag? It definitely works, but I changed it to be more explicit (same for the enqueue event).",
+      "revId": "625fd8b8f91be9d1d50e465ea9c45ec7fa0e8d12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "408266bd_3f510bff",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3617,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-17T13:56:53Z",
+      "side": 1,
+      "message": "Maybe there is a better name for this class?!",
+      "revId": "b40722d6dbbe4b3be3890a9f8793bc484822634d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
