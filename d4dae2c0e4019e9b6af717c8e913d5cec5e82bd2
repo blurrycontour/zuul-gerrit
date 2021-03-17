@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "abf1e688_12d07338",
+        "filename": "doc/source/examples/docker-compose.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2021-03-17T22:55:03Z",
+      "side": 1,
+      "message": "Explicitly set \u0027hostname: localhost\u0027 on the keycloak service to make it possible to reach it with localhost:8082 instead of keycloak:8082",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 1
+      },
+      "revId": "d4dae2c0e4019e9b6af717c8e913d5cec5e82bd2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
