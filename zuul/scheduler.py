@@ -486,7 +486,7 @@ class Scheduler(threading.Thread):
         )
 
     def _addTriggerEvent(self, event):
-        event.trigger_timestamp = time.monotonic()
+        event.arrived_at_scheduler_timestamp = time.time()
         self.trigger_event_queue.put(event)
         self.wake_event.set()
 

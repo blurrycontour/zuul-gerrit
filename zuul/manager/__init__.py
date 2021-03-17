@@ -1245,8 +1245,14 @@ class PipelineManager(metaclass=ABCMeta):
                 if dt:
                     self.sched.statsd.timing(key + '.resident_time', dt)
                     self.sched.statsd.incr(key + '.total_changes')
-            if added and hasattr(item.event, 'trigger_timestamp'):
-                elapsed = time.monotonic() - item.event.trigger_timestamp
-                self.sched.statsd.timing(key + '.enqueue_time', elapsed)
+            if added and hasattr(item.event, 'arrived_at_scheduler_timestamp'):
+                now = time.time()
+                processing = now - item.event.arrived_at_scheduler_timestamp
+                elapsed = now - item.event.timestamp
+                self.sched.statsd.timing(
+                    basekey + '.event_enqueue_processing_time',
+                    processing)
+                self.sched.statsd.timing(
+                    basekey + '.event_enqueue_time', elapsed)
         except Exception:
             self.log.exception("Exception reporting pipeline stats")
