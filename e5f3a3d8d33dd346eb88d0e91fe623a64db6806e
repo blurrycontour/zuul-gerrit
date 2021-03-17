@@ -52,6 +52,23 @@
       "revId": "e5f3a3d8d33dd346eb88d0e91fe623a64db6806e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "010a2543_74cae72f",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 18
+      },
+      "lineNbr": 698,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-17T00:18:46Z",
+      "side": 0,
+      "message": "Makes sense.  That probably should be used for trigger matching, but isn\u0027t currently.  So this is probably the best solution here (and enabling account matching in github triggers could be implemented later).",
+      "revId": "e5f3a3d8d33dd346eb88d0e91fe623a64db6806e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
