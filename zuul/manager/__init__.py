@@ -1564,8 +1564,9 @@ class PipelineManager(metaclass=ABCMeta):
                     self.sched.statsd.incr(key + '.total_changes')
             if added and hasattr(item.event, 'arrived_at_scheduler_timestamp'):
                 now = time.time()
-                processing = now - item.event.arrived_at_scheduler_timestamp
-                elapsed = now - item.event.timestamp
+                arrived = item.event.arrived_at_scheduler_timestamp
+                processing = int((now - arrived) * 1000)
+                elapsed = int((now - item.event.timestamp) * 1000)
                 self.sched.statsd.timing(
                     basekey + '.event_enqueue_processing_time',
                     processing)
