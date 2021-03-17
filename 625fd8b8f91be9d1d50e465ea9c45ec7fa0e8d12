@@ -16,6 +16,24 @@
       "revId": "625fd8b8f91be9d1d50e465ea9c45ec7fa0e8d12",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9d518dc6_d64249b0",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 1247,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-17T13:53:17Z",
+      "side": 1,
+      "message": "Yes, makes sense. I proposed this as a separate change: https://review.opendev.org/c/zuul/zuul/+/781099",
+      "parentUuid": "73ed65e6_f85eb00c",
+      "revId": "625fd8b8f91be9d1d50e465ea9c45ec7fa0e8d12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
