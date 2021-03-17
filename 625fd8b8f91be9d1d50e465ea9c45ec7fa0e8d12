@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "73ed65e6_f85eb00c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 29
+      },
+      "lineNbr": 1247,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-17T00:34:24Z",
+      "side": 1,
+      "message": "I think there\u0027s an opportunity to normalize enqueue events to more closely match dequeue events (the \"trigger\" association should no longer be necessary; I think it may be cruft.  After doing that, we should be able to collapse both of these cases into one to reduce duplication, and then maybe move that to a _forward_event method (so this case structure is more clear and easy to read).",
+      "revId": "625fd8b8f91be9d1d50e465ea9c45ec7fa0e8d12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
