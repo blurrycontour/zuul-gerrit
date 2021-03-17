@@ -12,6 +12,7 @@
 import collections
 import logging
 import textwrap
+import time
 import urllib
 from abc import ABCMeta, abstractmethod
 
@@ -416,7 +417,7 @@ class PipelineManager(metaclass=ABCMeta):
             if enqueue_time:
                 item.enqueue_time = enqueue_time
             item.live = live
-            self.reportStats(item)
+            self.reportStats(item, added=True)
             item.quiet = quiet
             if item.live and not item.reported_enqueue:
                 self.reportEnqueue(item)
@@ -1522,7 +1523,7 @@ class PipelineManager(metaclass=ABCMeta):
                 log.error("Reporting item %s received: %s", item, ret)
         return ret
 
-    def reportStats(self, item):
+    def reportStats(self, item, added=False):
         if not self.sched.statsd:
             return
         try:
@@ -1561,5 +1562,8 @@ class PipelineManager(metaclass=ABCMeta):
                 if dt:
                     self.sched.statsd.timing(key + '.resident_time', dt)
                     self.sched.statsd.incr(key + '.total_changes')
+            if added and hasattr(item.event, 'trigger_timestamp'):
+                elapsed = time.monotonic() - item.event.trigger_timestamp
+                self.sched.statsd.timing(key + '.enqueue_time', elapsed)
         except Exception:
             self.log.exception("Exception reporting pipeline stats")

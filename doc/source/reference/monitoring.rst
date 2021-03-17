@@ -113,6 +113,12 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
                      The number of changes for this project processed by the
                      pipeline since Zuul started.
 
+                  .. stat:: euqueue_time
+                     :type: timer
+
+                     A timer metric reporting how long a trigger event takes
+                     to be enqueued in a pipeline.
+
       .. stat:: resident_time
          :type: timer
 
