@@ -178,11 +178,29 @@ class Nodepool(object):
         :param HoldRequest request: Hold request associated with the NodeSet
         '''
         self.log.info("Holding nodeset %s" % (nodeset,))
+        resources = defaultdict(int)
         nodes = nodeset.getNodes()
 
+        duration = None
+        project = None
+        tenant = None
+        if build:
+            project = build.build_set.item.change.project
+            tenant = build.build_set.item.pipeline.tenant.name
+        if (build and build.start_time and build.end_time and
+            build.build_set and build.build_set.item and
+            build.build_set.item.change and
+            build.build_set.item.change.project):
+            duration = build.end_time - build.start_time
+            self.log.info(
+                "Nodeset %s with %s nodes was in use "
+                "for %s seconds for build %s for project %s",
+                nodeset, len(nodeset.nodes), duration, build, project)
         for node in nodes:
             if node.lock is None:
                 raise Exception("Node %s is not locked" % (node,))
+            if node.resources:
+                add_resources(resources, node.resources)
             node.state = model.STATE_HOLD
             node.hold_job = " ".join([request.tenant,
                                       request.project,
@@ -221,6 +239,20 @@ class Nodepool(object):
             # Although any exceptions thrown here are handled higher up in
             # _doBuildCompletedEvent, we always want to try to unlock it.
             self.sched.zk_nodepool.unlockHoldRequest(request)
+
+        # When holding a nodeset we need to update the gauges to avoid
+        # leaking resources
+        if tenant and project and resources:
+            project_name = project.canonical_name
+            subtract_resources(
+                self.current_resources_by_tenant[tenant], resources)
+            subtract_resources(
+                self.current_resources_by_project[project_name], resources)
+            self.emitStatsResources()
+
+            if duration:
+                self.emitStatsResourceCounters(
+                    tenant, project_name, resources, duration)
 
     def useNodeSet(self, nodeset, build_set=None, event=None):
         self.log.info("Setting nodeset %s in use" % (nodeset,))
