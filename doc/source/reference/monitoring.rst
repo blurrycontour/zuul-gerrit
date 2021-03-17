@@ -32,6 +32,23 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
    Zuul will report counters for each type of event it receives from
    each of its configured drivers.
 
+.. stat:: zuul.tenant.<tenant>.event_enqueue_processing_time
+   :type: timer
+
+   A timer metric reporting the time from when the scheduler receives
+   a trigger event from a driver until the corresponding item is
+   enqueued in a pipeline.  This measures the performance of the
+   scheduler in dispatching events.
+
+.. stat:: zuul.tenant.<tenant>.event_enqueue_time
+   :type: timer
+
+   A timer metric reporting the time from when a trigger event was
+   received from the remote system to when the corresponding item is
+   enqueued in a pipeline.  This includes
+   :stat:`zuul.tenant.<tenant>.event_enqueue_processing_time` and any
+   driver-specific pre-processing of the event.
+
 .. stat:: zuul.tenant.<tenant>.pipeline
 
    Holds metrics specific to jobs. This hierarchy includes:
@@ -112,12 +129,6 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
                      The number of changes for this project processed by the
                      pipeline since Zuul started.
-
-                  .. stat:: euqueue_time
-                     :type: timer
-
-                     A timer metric reporting how long a trigger event takes
-                     to be enqueued in a pipeline.
 
       .. stat:: resident_time
          :type: timer

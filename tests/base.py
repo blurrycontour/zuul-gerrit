@@ -5064,6 +5064,8 @@ class ZuulTestCase(BaseTestCase):
           - ``g`` gauge
           - ``ms`` timing
           - ``s`` set
+
+        :returns: The value
         """
 
         if value:
@@ -5111,7 +5113,7 @@ class ZuulTestCase(BaseTestCase):
                 if key == k:
                     if kind is None:
                         # key with no qualifiers is found
-                        return True
+                        return s_value
 
                     # if no kind match, look for other keys
                     if kind != s_kind:
@@ -5123,14 +5125,14 @@ class ZuulTestCase(BaseTestCase):
                         # length, hence foiling string matching.
                         if kind == 'ms':
                             if float(value) == float(s_value):
-                                return True
+                                return s_value
                         if value == s_value:
-                            return True
+                            return s_value
                         # otherwise keep looking for other matches
                         continue
 
                     # this key matches
-                    return True
+                    return s_value
             time.sleep(0.1)
 
         raise Exception("Key %s not found in reported stats" % key)
