@@ -84,84 +84,49 @@ class RPCListenerSlow(RPCListenerBase):
             return
         job.sendWorkComplete()
 
-    def _common_enqueue(self, job):
-        args = json.loads(job.arguments)
-        event = model.TriggerEvent()
-        event.timestamp = time.time()
-        errors = ''
-        tenant = None
-        project = None
-        pipeline = None
+    def _common_enqueue(self, job, args):
+        tenant_name = args['tenant']
+        pipeline_name = args['pipeline']
+        project_name = args['project']
+        change = args.get('change')
+        ref = args.get('ref')
+        oldrev = args.get('oldrev')
+        newrev = args.get('newrev')
+        try:
+            self.sched.enqueue(tenant_name, pipeline_name, project_name,
+                               change, ref, oldrev, newrev)
+        except Exception as e:
+            job.sendWorkException(str(e).encode('utf8'))
+            return
 
-        tenant = self.sched.abide.tenants.get(args['tenant'])
-        if tenant:
-            event.tenant_name = args['tenant']
-
-            (trusted, project) = tenant.getProject(args['project'])
-            if project:
-                event.project_hostname = project.canonical_hostname
-                event.project_name = project.name
-            else:
-                errors += 'Invalid project: %s\n' % (args['project'],)
-
-            pipeline = tenant.layout.pipelines.get(args['pipeline'])
-            if pipeline:
-                event.forced_pipeline = args['pipeline']
-            else:
-                errors += 'Invalid pipeline: %s\n' % (args['pipeline'],)
-        else:
-            errors += 'Invalid tenant: %s\n' % (args['tenant'],)
-
-        return (args, event, errors, project)
+        job.sendWorkComplete()
 
     def handle_enqueue(self, job):
-        (args, event, errors, project) = self._common_enqueue(job)
-
-        if not errors:
-            event.change_number, event.patch_number = args['change'].split(',')
-            try:
-                ch = project.source.getChange(event, refresh=True)
-                if ch.project.name != project.name:
-                    errors += ('Change %s does not belong to project "%s", '
-                               % (args['change'], project.name))
-            except Exception:
-                errors += 'Invalid change: %s\n' % (args['change'],)
-
-        if errors:
-            job.sendWorkException(errors.encode('utf8'))
-        else:
-            self.sched.enqueue(event)
-            job.sendWorkComplete()
+        args = json.loads(job.arguments)
+        self._common_enqueue(job, args)
 
     def handle_enqueue_ref(self, job):
-        (args, event, errors, project) = self._common_enqueue(job)
-
-        if not errors:
-            event.ref = args['ref']
-            event.oldrev = args['oldrev']
-            event.newrev = args['newrev']
-            try:
-                int(event.oldrev, 16)
-                if len(event.oldrev) != 40:
-                    errors += 'Old rev must be 40 character sha1: ' \
-                              '%s\n' % event.oldrev
-            except Exception:
-                errors += 'Old rev must be base16 hash: ' \
-                          '%s\n' % event.oldrev
-            try:
-                int(event.newrev, 16)
-                if len(event.newrev) != 40:
-                    errors += 'New rev must be 40 character sha1: ' \
-                              '%s\n' % event.newrev
-            except Exception:
-                errors += 'New rev must be base16 hash: ' \
-                          '%s\n' % event.newrev
+        args = json.loads(job.arguments)
+        oldrev = args['oldrev']
+        newrev = args['newrev']
+        errors = ''
+        try:
+            int(oldrev, 16)
+            if len(oldrev) != 40:
+                errors += f'Old rev must be 40 character sha1: {oldrev}\n'
+        except Exception:
+            errors += f'Old rev must be base16 hash: {oldrev}\n'
+        try:
+            int(newrev, 16)
+            if len(newrev) != 40:
+                errors += f'New rev must be 40 character sha1: {newrev}\n'
+        except Exception:
+            errors += f'New rev must be base16 hash: {newrev}\n'
 
         if errors:
             job.sendWorkException(errors.encode('utf8'))
         else:
-            self.sched.enqueue(event)
-            job.sendWorkComplete()
+            self._common_enqueue(job, args)
 
     def handle_promote(self, job):
         args = json.loads(job.arguments)
