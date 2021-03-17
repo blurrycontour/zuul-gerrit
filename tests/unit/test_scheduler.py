@@ -4445,9 +4445,14 @@ class TestScheduler(ZuulTestCase):
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
-        with testtools.ExpectedException(
-            zuul.rpcclient.RPCFailure,
-            'Change 2,1 does not belong to project "org/project1"'):
+        matcher = AfterPreprocessing(
+            str, MatchesRegex(
+                r'.*Change <Change \w+ org/project2 2,1> does not belong to '
+                r'project "org/project1"',
+                re.DOTALL
+            )
+        )
+        with testtools.ExpectedException(zuul.rpcclient.RPCFailure, matcher):
             r = client.enqueue(tenant='tenant-one',
                                pipeline='gate',
                                project='org/project1',
@@ -4714,8 +4719,10 @@ class TestScheduler(ZuulTestCase):
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
         self.addCleanup(client.shutdown)
-        with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
-                                         "Invalid tenant"):
+        matcher = AfterPreprocessing(
+            str, MatchesRegex(r'.*Unknown tenant', re.DOTALL)
+        )
+        with testtools.ExpectedException(zuul.rpcclient.RPCFailure, matcher):
             r = client.enqueue(tenant='tenant-foo',
                                pipeline='gate',
                                project='org/project',
@@ -4723,8 +4730,10 @@ class TestScheduler(ZuulTestCase):
                                change='1,1')
             self.assertEqual(r, False)
 
-        with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
-                                         "Invalid project"):
+        matcher = AfterPreprocessing(
+            str, MatchesRegex(r'.*Unknown project', re.DOTALL)
+        )
+        with testtools.ExpectedException(zuul.rpcclient.RPCFailure, matcher):
             r = client.enqueue(tenant='tenant-one',
                                pipeline='gate',
                                project='project-does-not-exist',
@@ -4732,8 +4741,10 @@ class TestScheduler(ZuulTestCase):
                                change='1,1')
             self.assertEqual(r, False)
 
-        with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
-                                         "Invalid pipeline"):
+        matcher = AfterPreprocessing(
+            str, MatchesRegex(r'.*Unknown pipeline', re.DOTALL)
+        )
+        with testtools.ExpectedException(zuul.rpcclient.RPCFailure, matcher):
             r = client.enqueue(tenant='tenant-one',
                                pipeline='pipeline-does-not-exist',
                                project='org/project',
@@ -4741,8 +4752,10 @@ class TestScheduler(ZuulTestCase):
                                change='1,1')
             self.assertEqual(r, False)
 
-        with testtools.ExpectedException(zuul.rpcclient.RPCFailure,
-                                         "Invalid change"):
+        matcher = AfterPreprocessing(
+            str, MatchesRegex(r'.*Unknown change', re.DOTALL)
+        )
+        with testtools.ExpectedException(zuul.rpcclient.RPCFailure, matcher):
             r = client.enqueue(tenant='tenant-one',
                                pipeline='gate',
                                project='org/project',

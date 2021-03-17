@@ -3616,18 +3616,21 @@ class PromoteEvent(ManagementEvent):
         )
 
 
-class DequeueEvent(ManagementEvent):
-    """Dequeue a change from a pipeline
+class ChangeManagementEvent(ManagementEvent):
+    """Base class for events that dequeue/enqueue changes
 
     :arg str tenant_name: the name of the tenant
     :arg str pipeline_name: the name of the pipeline
     :arg str project_name: the name of the project
-    :arg str change: optional, the change to dequeue
-    :arg str ref: optional, the ref to look for
+    :arg str change: optional, the change
+    :arg str ref: optional, the ref
+    :arg str oldrev: optional, the old revision
+    :arg str newrev: optional, the new revision
     """
 
-    def __init__(self, tenant_name, pipeline_name, project_name, change, ref):
-        super(DequeueEvent, self).__init__()
+    def __init__(self, tenant_name, pipeline_name, project_name,
+                 change=None, ref=None, oldrev=None, newrev=None):
+        super().__init__()
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.project_name = project_name
@@ -3637,9 +3640,8 @@ class DequeueEvent(ManagementEvent):
         else:
             self.change_number, self.patch_number = (None, None)
         self.ref = ref
-        # set to mock values
-        self.oldrev = '0000000000000000000000000000000000000000'
-        self.newrev = '0000000000000000000000000000000000000000'
+        self.oldrev = oldrev or '0000000000000000000000000000000000000000'
+        self.newrev = newrev or '0000000000000000000000000000000000000000'
 
     def toDict(self):
         d = super().toDict()
@@ -3652,11 +3654,6 @@ class DequeueEvent(ManagementEvent):
         d["newrev"] = self.newrev
         return d
 
-    def updateFromDict(self, d):
-        super().updateFromDict(d)
-        self.oldrev = d.get("oldrev")
-        self.newrev = d.get("newrev")
-
     @classmethod
     def fromDict(cls, data):
         event = cls(
@@ -3665,32 +3662,19 @@ class DequeueEvent(ManagementEvent):
             data.get("project_name"),
             data.get("change"),
             data.get("ref"),
+            data.get("oldrev"),
+            data.get("newrev"),
         )
         event.updateFromDict(data)
         return event
 
 
-class EnqueueEvent(ManagementEvent):
-    """Enqueue a change into a pipeline
+class DequeueEvent(ChangeManagementEvent):
+    """Dequeue a change from a pipeline"""
 
-    :arg TriggerEvent trigger_event: a TriggerEvent describing the
-        trigger, pipeline, and change to enqueue
-    """
 
-    def __init__(self, trigger_event):
-        super(EnqueueEvent, self).__init__()
-        self.trigger_event = trigger_event
-
-    def toDict(self):
-        d = super().toDict()
-        d["trigger_event"] = self.trigger_event.toDict()
-        return d
-
-    @classmethod
-    def fromDict(cls, data):
-        return cls(
-            TriggerEvent.fromDict(data["trigger_event"]),
-        )
+class EnqueueEvent(ChangeManagementEvent):
+    """Enqueue a change into a pipeline"""
 
 
 class ResultEvent:

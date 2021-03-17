@@ -48,6 +48,7 @@ from zuul.model import (
     BuildCompletedEvent,
     BuildPausedEvent,
     BuildStartedEvent,
+    ChangeManagementEvent,
     DequeueEvent,
     EnqueueEvent,
     FilesChangesCompletedEvent,
@@ -573,8 +574,11 @@ class Scheduler(threading.Thread):
         result.wait()
         self.log.debug("Dequeue complete")
 
-    def enqueue(self, trigger_event):
-        event = EnqueueEvent(trigger_event)
+    def enqueue(self, tenant_name, pipeline_name, canonical_project_name,
+                change, ref, oldrev, newrev):
+        event = EnqueueEvent(tenant_name, pipeline_name,
+                             canonical_project_name, change, ref, oldrev,
+                             newrev)
         result = self.management_events.put(event)
         self.log.debug("Waiting for enqueue")
         result.wait()
@@ -977,7 +981,7 @@ class Scheduler(threading.Thread):
         (trusted, project) = tenant.getProject(event.project_name)
         if project is None:
             raise ValueError('Unknown project %s' % event.project_name)
-        change = project.source.getChange(event, project)
+        change = project.source.getChange(event, refresh=True)
         if change.project.name != project.name:
             if event.change:
                 item = 'Change %s' % event.change
@@ -1001,13 +1005,24 @@ class Scheduler(threading.Thread):
 
     def _doEnqueueEvent(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)
-        full_project_name = ('/'.join([event.project_hostname,
-                                       event.project_name]))
-        (trusted, project) = tenant.getProject(full_project_name)
-        pipeline = tenant.layout.pipelines[event.forced_pipeline]
-        change = project.source.getChange(event, project)
+        if tenant is None:
+            raise ValueError(f'Unknown tenant {event.tenant_name}')
+        pipeline = tenant.layout.pipelines.get(event.pipeline_name)
+        if pipeline is None:
+            raise ValueError(f'Unknown pipeline {event.pipeline_name}')
+        (trusted, project) = tenant.getProject(event.project_name)
+        if project is None:
+            raise ValueError(f'Unknown project {event.project_name}')
+        try:
+            change = project.source.getChange(event, refresh=True)
+        except Exception as exc:
+            raise ValueError('Unknown change') from exc
+
+        if change.project.name != project.name:
+            raise Exception(
+                f'Change {change} does not belong to project "{project.name}"')
         self.log.debug("Event %s for change %s was directly assigned "
-                       "to pipeline %s" % (event, change, self))
+                       "to pipeline %s", event, change, self)
         pipeline.manager.addChange(change, event, ignore_requirements=True)
 
     def _areAllBuildsComplete(self):
@@ -1229,37 +1244,8 @@ class Scheduler(threading.Thread):
                     self._doSmartReconfigureEvent(event)
                 elif isinstance(event, TenantReconfigureEvent):
                     self._doTenantReconfigureEvent(event)
-                elif isinstance(event, (PromoteEvent, DequeueEvent)):
-                    try:
-                        tenant = self.abide.tenants[event.tenant_name]
-                        pipeline = tenant.layout.pipelines[event.pipeline_name]
-                        self.pipeline_management_events[tenant.name][
-                            pipeline.name
-                        ].put(event)
-                        event_forwarded = True
-                    except Exception:
-                        event.exception(
-                            "".join(
-                                traceback.format_exception(*sys.exc_info())
-                            )
-                        )
-                elif isinstance(event, EnqueueEvent):
-                    try:
-                        trigger_event = event.trigger_event
-                        tenant = self.abide.tenants[trigger_event.tenant_name]
-                        pipeline = tenant.layout.pipelines[
-                            trigger_event.forced_pipeline
-                        ]
-                        self.pipeline_management_events[tenant.name][
-                            pipeline.name
-                        ].put(event)
-                        event_forwarded = True
-                    except Exception:
-                        event.exception(
-                            "".join(
-                                traceback.format_exception(*sys.exc_info())
-                            )
-                        )
+                elif isinstance(event, (PromoteEvent, ChangeManagementEvent)):
+                    event_forwarded = self._forward_management_event(event)
                 else:
                     self.log.error("Unable to handle event %s", event)
             finally:
@@ -1267,6 +1253,27 @@ class Scheduler(threading.Thread):
                     self.management_events.ackWithoutResult(event)
                 else:
                     self.management_events.ack(event)
+
+    def _forward_management_event(self, event):
+        event_forwarded = False
+        try:
+            tenant = self.abide.tenants.get(event.tenant_name)
+            if tenant is None:
+                raise ValueError(f'Unknown tenant {event.tenant_name}')
+            pipeline = tenant.layout.pipelines.get(event.pipeline_name)
+            if pipeline is None:
+                raise ValueError(f'Unknown pipeline {event.pipeline_name}')
+            self.pipeline_management_events[tenant.name][
+                pipeline.name
+            ].put(event)
+            event_forwarded = True
+        except Exception:
+            event.exception(
+                "".join(
+                    traceback.format_exception(*sys.exc_info())
+                )
+            )
+        return event_forwarded
 
     def process_management_queue(self):
         for tenant in self.abide.tenants.values():
@@ -1294,7 +1301,7 @@ class Scheduler(threading.Thread):
             elif isinstance(event, DequeueEvent):
                 self._doDequeueEvent(event)
             elif isinstance(event, EnqueueEvent):
-                self._doEnqueueEvent(event.trigger_event)
+                self._doEnqueueEvent(event)
             else:
                 self.log.error("Unable to handle event %s" % event)
         except Exception:
