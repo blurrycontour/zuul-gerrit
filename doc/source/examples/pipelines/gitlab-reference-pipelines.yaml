@@ -17,17 +17,14 @@
       gitlab.com:
         comment: true
         approval: true
-      sqlreporter:
     failure:
       gitlab.com:
         comment: true
         approval: false
-      sqlreporter:
     start:
       gitlab.com:
         comment: true
         approval: false
-      sqlreporter:
 
 - pipeline:
     name: gate
@@ -53,17 +50,14 @@
         comment: true
         approval: true
         merge: true
-      sqlreporter:
     failure:
       gitlab.com:
         comment: true
         approval: false
-      sqlreporter:
     start:
       gitlab.com:
         comment: true
         approval: false
-      sqlreporter:
 
 - pipeline:
     name: promote
@@ -80,11 +74,9 @@
     success:
       gitlab.com:
         comment: true
-      sqlreporter:
     failure:
       gitlab.com:
         comment: true
-      sqlreporter:
 
 - pipeline:
     name: post
@@ -94,10 +86,6 @@
       gitlab.com:
         - event: gl_push
           ref: ^refs/heads/.*$
-    success:
-      sqlreporter:
-    failure:
-      sqlreporter:
 
 - pipeline:
     name: tag
@@ -107,7 +95,3 @@
       gitlab.com:
         - event: gl_push
           ref: ^refs/tags/.*$
-    success:
-      sqlreporter:
-    failure:
-      sqlreporter:
