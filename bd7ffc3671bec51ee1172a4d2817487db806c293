@@ -334,6 +334,23 @@
     },
     {
       "key": {
+        "uuid": "483e3b6d_d5029e5c",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-17T00:06:53Z",
+      "side": 1,
+      "message": "I like that suggestion; we may have other things that need garbage collecting.  I don\u0027t think we would need to run this very often (maybe every hour?) and it could delete things that are, say, \u003e24 old.",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "660d54b8_47002594",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 31
@@ -363,6 +380,23 @@
       "side": 1,
       "message": "Yes, we could. The API would look something like this:\n\n    event_queue[tenant.name, pipeline.name]\n\nPersonally I like the nested dict syntax better (tuples as keys looks a little unfamiliar to me), but it\u0027s an easy change in case you\u0027d prefer that.",
       "parentUuid": "660d54b8_47002594",
+      "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d08091f8_719ce05d",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 31
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-17T00:06:53Z",
+      "side": 1,
+      "message": "This is fine.  We need the defaultkeydict in order to pass in the reference to the client, so we may as well stick with this.  If we didn\u0027t need that, I would be in favor of simplifying it with a plain dict indexed by tuple.",
       "revId": "bd7ffc3671bec51ee1172a4d2817487db806c293",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
