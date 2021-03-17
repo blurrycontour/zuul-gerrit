@@ -78,8 +78,8 @@ Only Zuul fingergw and Zuul web need to be publicly accessible;
 executors never do. Executors should be accessible on TCP port 7900
 by fingergw and web.
 
-A database is only required if you create an sql driver in your Zuul
-connections configuration. Both Zuul scheduler and Zuul web will need
+A database is required and configured in ``database`` section of
+``/etc/zuul/zuul.conf``. Both Zuul scheduler and Zuul web will need
 access to it.
 
 If statsd is enabled, the executors and scheduler needs to be able to
