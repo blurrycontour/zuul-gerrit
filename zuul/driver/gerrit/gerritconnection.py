@@ -879,33 +879,42 @@ class GerritConnection(BaseConnection):
         needed_by_changes = set()
         git_needed_by_changes = []
         for (dep_num, dep_ps) in data.needed_by:
-            log.debug("Updating %s: Getting git-needed change %s,%s",
-                      change, dep_num, dep_ps)
-            dep = self._getChange(dep_num, dep_ps, history=history,
-                                  event=event)
-            if (dep.open and dep.is_current_patchset and
-                dep not in needed_by_changes):
-                git_needed_by_changes.append(dep)
-                needed_by_changes.add(dep)
+            try:
+                log.debug("Updating %s: Getting git-needed change %s,%s",
+                          change, dep_num, dep_ps)
+                dep = self._getChange(dep_num, dep_ps, history=history,
+                                      event=event)
+                if (dep.open and dep.is_current_patchset and
+                    dep not in needed_by_changes):
+                    git_needed_by_changes.append(dep)
+                    needed_by_changes.add(dep)
+            except Exception:
+                log.exception("Failed to get git-needed change %s,%s",
+                              dep_num, dep_ps)
         change.git_needed_by_changes = git_needed_by_changes
 
         compat_needed_by_changes = []
         for (dep_num, dep_ps) in self._getNeededByFromCommit(
                 change.id, change, event):
-            log.debug("Updating %s: Getting commit-needed change %s,%s",
-                      change, dep_num, dep_ps)
-            # Because a commit needed-by may be a cross-repo
-            # dependency, cause that change to refresh so that it will
-            # reference the latest patchset of its Depends-On (this
-            # change). In case the dep is already in history we already
-            # refreshed this change so refresh is not needed in this case.
-            refresh = (dep_num, dep_ps) not in history
-            dep = self._getChange(
-                dep_num, dep_ps, refresh=refresh, history=history, event=event)
-            if (dep.open and dep.is_current_patchset
-                and dep not in needed_by_changes):
-                compat_needed_by_changes.append(dep)
-                needed_by_changes.add(dep)
+            try:
+                log.debug("Updating %s: Getting commit-needed change %s,%s",
+                          change, dep_num, dep_ps)
+                # Because a commit needed-by may be a cross-repo
+                # dependency, cause that change to refresh so that it will
+                # reference the latest patchset of its Depends-On (this
+                # change). In case the dep is already in history we already
+                # refreshed this change so refresh is not needed in this case.
+                refresh = (dep_num, dep_ps) not in history
+                dep = self._getChange(
+                    dep_num, dep_ps, refresh=refresh, history=history,
+                    event=event)
+                if (dep.open and dep.is_current_patchset
+                    and dep not in needed_by_changes):
+                    compat_needed_by_changes.append(dep)
+                    needed_by_changes.add(dep)
+            except Exception:
+                log.exception("Failed to get commit-needed change %s,%s",
+                              dep_num, dep_ps)
         change.compat_needed_by_changes = compat_needed_by_changes
 
     def isMerged(self, change, head=None):
