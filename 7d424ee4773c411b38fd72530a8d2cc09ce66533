@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c81029a_d02a73c2",
+        "filename": "zuul/executor/common.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-18T19:46:11Z",
+      "side": 1,
+      "message": "Non-frozen job graph will throw an exception here because item.job_graph is None in this case.",
+      "revId": "7d424ee4773c411b38fd72530a8d2cc09ce66533",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71150a5a_dad5f757",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-18T19:46:11Z",
+      "side": 1,
+      "message": "If it\u0027s not frozen construct_gearman_params will fail with an exception (see comment in this method) so I guess it would make sense to check.",
+      "revId": "7d424ee4773c411b38fd72530a8d2cc09ce66533",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
