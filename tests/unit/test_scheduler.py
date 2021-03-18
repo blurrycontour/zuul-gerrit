@@ -440,10 +440,10 @@ class TestScheduler(ZuulTestCase):
         val = self.assertReportedStat(
             'zuul.tenant.tenant-one.event_enqueue_processing_time',
             kind='ms')
-        self.assertTrue(0.0 < float(val) < 60.0)
+        self.assertTrue(0.0 < float(val) < 60000.0)
         val = self.assertReportedStat(
             'zuul.tenant.tenant-one.event_enqueue_time', kind='ms')
-        self.assertTrue(0.0 < float(val) < 60.0)
+        self.assertTrue(0.0 < float(val) < 60000.0)
 
         for build in self.history:
             self.assertTrue(build.parameters['zuul']['voting'])
