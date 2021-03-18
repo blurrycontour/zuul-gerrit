@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c73d33b6_93368113",
+        "filename": "zuul/executor/common.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-03-18T22:32:34Z",
+      "side": 1,
+      "message": "It seems like an issue with the original code (it\u0027s copied from https://review.opendev.org/c/zuul/zuul/+/607078/35/zuul/executor/client.py#b337 ).",
+      "parentUuid": "3c81029a_d02a73c2",
+      "revId": "7d424ee4773c411b38fd72530a8d2cc09ce66533",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "71150a5a_dad5f757",
         "filename": "zuul/rpclistener.py",
         "patchSetId": 35
@@ -30,6 +48,24 @@
       "writtenOn": "2021-03-18T19:46:11Z",
       "side": 1,
       "message": "If it\u0027s not frozen construct_gearman_params will fail with an exception (see comment in this method) so I guess it would make sense to check.",
+      "revId": "7d424ee4773c411b38fd72530a8d2cc09ce66533",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c6b363d8_7f1f5808",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 545,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2021-03-18T22:32:34Z",
+      "side": 1,
+      "message": "Isn\u0027t it frozen by the above L539?",
+      "parentUuid": "71150a5a_dad5f757",
       "revId": "7d424ee4773c411b38fd72530a8d2cc09ce66533",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
