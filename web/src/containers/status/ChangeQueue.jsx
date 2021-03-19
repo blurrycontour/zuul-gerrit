@@ -20,15 +20,15 @@ import Change from './Change'
 
 class ChangeQueue extends React.Component {
   static propTypes = {
-    pipeline: PropTypes.string.isRequired,
+    pipeline: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired
   }
 
-  render () {
+  render() {
     const { queue, pipeline, expanded } = this.props
     let fullName = queue.name
-    if(queue.branch) {
+    if (queue.branch) {
       fullName = `${fullName} (${queue.branch})`
     }
     let shortName = fullName
@@ -49,8 +49,8 @@ class ChangeQueue extends React.Component {
       })
     })
     return (
-      <div className="change-queue" data-zuul-pipeline={pipeline}>
-        <p>Queue: <abbr title={fullName}>{shortName}</abbr></p>
+      <div className="change-queue" data-zuul-pipeline={pipeline.name}>
+        <p>Queue: <abbr title={queue.name}>{shortName}</abbr></p>
         {changesList}
       </div>)
   }
