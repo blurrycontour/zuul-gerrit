@@ -3839,6 +3839,7 @@ class TriggerEvent(object):
         # For logging
         self.zuul_event_id = None
         self.timestamp = None
+        self.arrived_at_scheduler_timestamp = None
 
     @property
     def canonical_project_name(self):
