@@ -15,6 +15,7 @@
 export const ADMIN_DEQUEUE_FAIL = 'ADMIN_DEQUEUE_FAIL'
 export const ADMIN_ENQUEUE_FAIL = 'ADMIN_ENQUEUE_FAIL'
 export const ADMIN_AUTOHOLD_FAIL = 'ADMIN_AUTOHOLD_FAIL'
+export const ADMIN_PROMOTE_FAIL = 'ADMIN_PROMOTE_FAIL'
 
 export const addDequeueError = error => ({
   type: ADMIN_DEQUEUE_FAIL,
@@ -28,5 +29,10 @@ export const addEnqueueError = error => ({
 
 export const addAutoholdError = error => ({
   type: ADMIN_AUTOHOLD_FAIL,
+  notification: error
+})
+
+export const addPromoteError = error => ({
+  type: ADMIN_PROMOTE_FAIL,
   notification: error
 })
