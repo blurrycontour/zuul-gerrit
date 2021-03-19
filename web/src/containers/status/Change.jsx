@@ -26,12 +26,14 @@ import {
   ModalVariant
 } from '@patternfly/react-core'
 import {
+  AngleDoubleUpIcon,
   BanIcon,
 } from '@patternfly/react-icons'
-import { dequeue, dequeue_ref } from '../../api'
-import { addDequeueError } from '../../actions/adminActions'
+import { dequeue, dequeue_ref, promote } from '../../api'
+import { addDequeueError, addPromoteError } from '../../actions/adminActions'
 
 import { addNotification } from '../../actions/notifications'
+import { fetchStatusIfNeeded } from '../../actions/status'
 
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
@@ -43,7 +45,7 @@ class Change extends React.Component {
     change: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
-    pipeline: PropTypes.string,
+    pipeline: PropTypes.object,
     tenant: PropTypes.object,
     user: PropTypes.object,
     dispatch: PropTypes.func
@@ -51,6 +53,7 @@ class Change extends React.Component {
 
   state = {
     showDequeueModal: false,
+    showPromoteModal: false,
     showAdminActions: false,
   }
 
@@ -63,12 +66,18 @@ class Change extends React.Component {
     // post-merge
     if (/^[0-9a-f]{40}$/.test(changeId)) {
       dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, changeRef, user.token)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(tenant))
+        })
         .catch(error => {
           this.props.dispatch(addDequeueError(error))
         })
       // pre-merge, ie we have a change id
     } else if (changeId !== 'N/A') {
       dequeue(tenant.apiPrefix, projectName, pipeline.name, changeId, user.token)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(tenant))
+        })
         .catch(error => {
           this.props.dispatch(addDequeueError(error))
         })
@@ -108,13 +117,59 @@ class Change extends React.Component {
     )
   }
 
+  promoteConfirm = () => {
+    const { tenant, user, change, pipeline } = this.props
+    let changeId = change.id || 'NA'
+    this.setState(() => ({ showPromoteModal: false }))
+    if (changeId !== 'N/A') {
+      promote(tenant.apiPrefix, pipeline.name, [changeId,], user.token)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          this.props.dispatch(addPromoteError(error))
+        })
+    } else {
+      this.props.dispatch(addNotification({
+        url: null,
+        status: 'Invalid change ' + changeId + ' for promotion',
+        text: '',
+        type: 'error'
+      }))
+    }
+  }
+
+  promoteCancel = () => {
+    this.setState(() => ({ showPromoteModal: false }))
+  }
+
+  renderPromoteModal() {
+    const { showPromoteModal } = this.state
+    const { change } = this.props
+    let changeId = change.id || 'N/A'
+    const title = 'You are about to promote a change'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        // titleIconVariant={BullhornIcon}
+        isOpen={showPromoteModal}
+        title={title}
+        onClose={this.promoteCancel}
+        actions={[
+          <Button key="prom_confirm" variant="primary" onClick={this.promoteConfirm}>Confirm</Button>,
+          <Button key="prom_cancel" variant="link" onClick={this.promoteCancel}>Cancel</Button>,
+        ]}>
+        <p>Please confirm that you want to promote change <strong>{changeId}</strong>.</p>
+      </Modal>
+    )
+  }
+
   renderAdminCommands(idx) {
     const { showAdminActions } = this.state
-    const { queue } = this.props
+    const { queue, pipeline } = this.props
     const dropdownCommands = [
       <DropdownItem
         key="dequeue"
-
         icon={<BanIcon style={{
           color: 'var(--pf-global--danger-color--100)',
         }} />}
@@ -125,6 +180,21 @@ class Change extends React.Component {
         }}
       >Dequeue</DropdownItem>,
     ]
+    if (pipeline.manager === 'dependent') {
+      dropdownCommands.push(
+        <DropdownItem
+          key="promote"
+          icon={<AngleDoubleUpIcon style={{
+            color: 'var(--pf-global--default-color--200)',
+          }} />}
+          description="Promote this change to the top of the queue"
+          onClick={(event) => {
+            event.preventDefault()
+            this.setState(() => ({ showPromoteModal: true }))
+          }}
+        >Promote</DropdownItem>
+      )
+    }
     return (
       <Dropdown
         title='Actions'
@@ -238,6 +308,7 @@ class Change extends React.Component {
           </tbody>
         </table>
         {this.renderDequeueModal()}
+        {this.renderPromoteModal()}
       </>
     )
   }
