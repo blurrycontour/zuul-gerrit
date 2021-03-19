@@ -20,7 +20,7 @@ import Change from './Change'
 
 class ChangeQueue extends React.Component {
   static propTypes = {
-    pipeline: PropTypes.string.isRequired,
+    pipeline: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired
   }
@@ -45,7 +45,7 @@ class ChangeQueue extends React.Component {
       })
     })
     return (
-      <div className="change-queue" data-zuul-pipeline={pipeline}>
+      <div className="change-queue" data-zuul-pipeline={pipeline.name}>
         <p>Queue: <abbr title={queue.name}>{shortName}</abbr></p>
         {changesList}
       </div>)

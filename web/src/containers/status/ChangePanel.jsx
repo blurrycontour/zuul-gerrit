@@ -20,9 +20,10 @@ import * as moment from 'moment'
 import 'moment-duration-format'
 
 import { Button, Modal, ModalVariant } from '@patternfly/react-core'
-import { TrashIcon, BullhornIcon } from '@patternfly/react-icons'
-import { dequeue, dequeue_ref } from '../../api'
+import { TrashIcon, BullhornIcon, AngleDoubleUpIcon } from '@patternfly/react-icons'
+import { dequeue, dequeue_ref, promote } from '../../api'
 import { addDequeueError } from '../../actions/adminActions'
+import { fetchStatusIfNeeded } from '../../actions/status'
 
 import { addError } from '../../actions/errors'
 
@@ -31,7 +32,7 @@ class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    pipeline: PropTypes.string,
+    pipeline: PropTypes.object,
     tenant: PropTypes.object,
     user: PropTypes.object,
     dispatch: PropTypes.func
@@ -42,6 +43,7 @@ class ChangePanel extends React.Component {
     this.state = {
       expanded: false,
       showDequeueModal: false,
+      showPromoteModal: false
     }
     this.onClick = this.onClick.bind(this)
     this.clicked = false
@@ -60,6 +62,18 @@ class ChangePanel extends React.Component {
       )
   }
 
+  renderPromoteButton () {
+      return (
+        <AngleDoubleUpIcon
+          title="Promote this change"
+          style={{cursor:'pointer'}}
+          onClick={(event) => {
+            event.preventDefault()
+            this.setState(() => ({showPromoteModal: true}))
+        }} />
+      )
+  }
+
   dequeueConfirm = () => {
     const { tenant, user, change, pipeline } = this.props
     let projectName = change.project
@@ -68,13 +82,13 @@ class ChangePanel extends React.Component {
     this.setState(() => ({showDequeueModal: false}))
     // post-merge
     if (/^[0-9a-f]{40}$/.test(changeId)) {
-      dequeue_ref(tenant.apiPrefix, projectName, pipeline, changeRef, user.token)
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, changeRef, user.token)
         .catch(error => {
            this.props.dispatch(addDequeueError(error))
         })
     // pre-merge, ie we have a change id
     } else if (changeId !== 'N/A') {
-      dequeue(tenant.apiPrefix, projectName, pipeline, changeId, user.token)
+      dequeue(tenant.apiPrefix, projectName, pipeline.name, changeId, user.token)
         .catch(error => {
           this.props.dispatch(addDequeueError(error))
         })
@@ -89,6 +103,31 @@ class ChangePanel extends React.Component {
 
   dequeueCancel = () => {
     this.setState(() => ({showDequeueModal: false}))
+  }
+
+  promoteConfirm = () => {
+    const { tenant, user, change, pipeline } = this.props
+    let changeId = change.id || 'NA'
+    this.setState(() => ({showPromoteModal: false}))
+     if (changeId !== 'N/A') {
+      promote(tenant.apiPrefix, pipeline.name, [changeId, ], user.token)
+        .then(() => {
+            this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
+        })
+        .catch(error => {
+          alert(error)
+        })
+    } else {
+        this.props.dispatch(addError({
+          url: null,
+          status: 'Invalid change ' + changeId + ' for promotion',
+          text: ''
+        }))
+    }
+  }
+
+  promoteCancel = () => {
+    this.setState(() => ({showPromoteModal: false}))
   }
 
   renderDequeueModal() {
@@ -109,6 +148,27 @@ class ChangePanel extends React.Component {
           <Button key="deq_cancel" variant="link" onClick={this.dequeueCancel}>Cancel</Button>,
         ]}>
       <p>Please confirm that you want to cancel <strong>all ongoing builds</strong> on change <strong>{ changeId }</strong> for project <strong>{ projectName }</strong>.</p>
+    </Modal>
+    )
+  }
+
+  renderPromoteModal() {
+    const { showPromoteModal } = this.state
+    const { change } = this.props
+    let changeId = change.id || 'N/A'
+    const title = 'You are about to promote a change'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        titleIconVariant={BullhornIcon}
+        isOpen={showPromoteModal}
+        title={title}
+        onClose={this.promoteCancel}
+        actions={[
+          <Button key="prom_confirm" variant="primary" onClick={this.promoteConfirm}>Confirm</Button>,
+          <Button key="prom_cancel" variant="link" onClick={this.promoteCancel}>Cancel</Button>,
+        ]}>
+      <p>Please confirm that you want to promote change <strong>{ changeId }</strong>.</p>
     </Modal>
     )
   }
@@ -375,14 +435,15 @@ class ChangePanel extends React.Component {
 
   render () {
     const { expanded } = this.state
-    const { change, globalExpanded, user, tenant } = this.props
+    const { change, globalExpanded, user, tenant, pipeline } = this.props
     let expand = globalExpanded
     if (this.clicked) {
       expand = expanded
     }
     const header = (
       <div className='panel panel-default zuul-change'>
-        { this.renderDequeueModal() }
+        <div>{ this.renderDequeueModal() }</div>
+        <div>{ this.renderPromoteModal() }</div>
         <div className='panel-heading zuul-patchset-header'
           onClick={this.onClick}>
           <div className='row'>
@@ -393,6 +454,11 @@ class ChangePanel extends React.Component {
                     {this.renderDequeueButton()}
                   </div>) :
                  ''}
+                 {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1 && pipeline.manager === 'dependent') ?
+                  (<div className='col-xs-1 my-auto text-left'>
+                     {this.renderPromoteButton()}
+                   </div>) :
+                  ''}
                 <div className='col-xs-8'>
                   <span className='change_project'>{change.project}</span>
                 </div>
