@@ -198,7 +198,7 @@ class Pipeline extends React.Component {
             <ChangeQueue
               queue={changeQueue}
               expanded={expanded}
-              pipeline={pipeline.name}
+              pipeline={pipeline}
               key={changeQueue.uuid}
             />
           ))}
