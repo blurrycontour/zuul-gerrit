@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "772a0975_a2e04423",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 35
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-19T19:52:56Z",
+      "side": 1,
+      "message": "I like this method of suppressing a distinct exception :)",
+      "revId": "b23b9d7844fb00a3a731cfb192ce1a65c96d3a3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
