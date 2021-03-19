@@ -417,7 +417,7 @@ class Scheduler(threading.Thread):
                        "%s due to event %s in project %s",
                        tenant.name, event, project)
         branch = event.branch if event is not None else None
-        event = TenantReconfigureEvent(tenant, project, branch)
+        event = TenantReconfigureEvent(tenant.name, project, branch)
         self.management_event_queue.put(event)
         self.wake_event.set()
 
