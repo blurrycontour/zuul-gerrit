@@ -27,10 +27,12 @@ import {
 } from '@patternfly/react-core'
 import {
   BanIcon,
+  AngleDoubleUpIcon,
   // BullhornIcon 
 } from '@patternfly/react-icons'
-import { dequeue, dequeue_ref } from '../../api'
-import { addDequeueError } from '../../actions/adminActions'
+import { dequeue, dequeue_ref, promote } from '../../api'
+import { addDequeueError, addPromoteError } from '../../actions/adminActions'
+import { fetchStatusIfNeeded } from '../../actions/status'
 
 import { addNotification } from '../../actions/notifications'
 
@@ -39,7 +41,7 @@ class ChangePanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
     change: PropTypes.object.isRequired,
-    pipeline: PropTypes.string,
+    pipeline: PropTypes.object,
     tenant: PropTypes.object,
     user: PropTypes.object,
     dispatch: PropTypes.func
@@ -50,6 +52,7 @@ class ChangePanel extends React.Component {
     this.state = {
       expanded: false,
       showDequeueModal: false,
+      showPromoteModal: false,
       showAdminActions: false,
     }
     this.onClick = this.onClick.bind(this)
@@ -71,6 +74,21 @@ class ChangePanel extends React.Component {
     )
   }
 
+  renderPromoteButton() {
+    return (
+      <AngleDoubleUpIcon
+        title="Promote this change"
+        style={{
+          cursor: 'pointer',
+          color: 'var(--pf-global--default-color--200)'
+        }}
+        onClick={(event) => {
+          event.preventDefault()
+          this.setState(() => ({ showPromoteModal: true }))
+        }} />
+    )
+  }
+
   dequeueConfirm = () => {
     const { tenant, user, change, pipeline } = this.props
     let projectName = change.project
@@ -79,13 +97,19 @@ class ChangePanel extends React.Component {
     this.setState(() => ({ showDequeueModal: false }))
     // post-merge
     if (/^[0-9a-f]{40}$/.test(changeId)) {
-      dequeue_ref(tenant.apiPrefix, projectName, pipeline, changeRef, user.token)
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, changeRef, user.token)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
+        })
         .catch(error => {
           this.props.dispatch(addDequeueError(error))
         })
       // pre-merge, ie we have a change id
     } else if (changeId !== 'N/A') {
-      dequeue(tenant.apiPrefix, projectName, pipeline, changeId, user.token)
+      dequeue(tenant.apiPrefix, projectName, pipeline.name, changeId, user.token)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
+        })
         .catch(error => {
           this.props.dispatch(addDequeueError(error))
         })
@@ -101,6 +125,32 @@ class ChangePanel extends React.Component {
 
   dequeueCancel = () => {
     this.setState(() => ({ showDequeueModal: false }))
+  }
+
+  promoteConfirm = () => {
+    const { tenant, user, change, pipeline } = this.props
+    let changeId = change.id || 'NA'
+    this.setState(() => ({ showPromoteModal: false }))
+    if (changeId !== 'N/A') {
+      promote(tenant.apiPrefix, pipeline.name, [changeId,], user.token)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(this.props.tenant))
+        })
+        .catch(error => {
+          this.props.dispatch(addPromoteError(error))
+        })
+    } else {
+      this.props.dispatch(addNotification({
+        url: null,
+        status: 'Invalid change ' + changeId + ' for promotion',
+        text: '',
+        type: 'error'
+      }))
+    }
+  }
+
+  promoteCancel = () => {
+    this.setState(() => ({ showPromoteModal: false }))
   }
 
   renderDequeueModal() {
@@ -121,6 +171,27 @@ class ChangePanel extends React.Component {
           <Button key="deq_cancel" variant="link" onClick={this.dequeueCancel}>Cancel</Button>,
         ]}>
         <p>Please confirm that you want to cancel <strong>all ongoing builds</strong> on change <strong>{changeId}</strong> for project <strong>{projectName}</strong>.</p>
+      </Modal>
+    )
+  }
+
+  renderPromoteModal() {
+    const { showPromoteModal } = this.state
+    const { change } = this.props
+    let changeId = change.id || 'N/A'
+    const title = 'You are about to promote a change'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        // titleIconVariant={BullhornIcon}
+        isOpen={showPromoteModal}
+        title={title}
+        onClose={this.promoteCancel}
+        actions={[
+          <Button key="prom_confirm" variant="primary" onClick={this.promoteConfirm}>Confirm</Button>,
+          <Button key="prom_cancel" variant="link" onClick={this.promoteCancel}>Cancel</Button>,
+        ]}>
+        <p>Please confirm that you want to promote change <strong>{changeId}</strong>.</p>
       </Modal>
     )
   }
@@ -398,8 +469,24 @@ class ChangePanel extends React.Component {
       </ul>)
   }
 
-  renderAdminCommands(user, tenant) {
+  renderAdminCommands(user, tenant, pipeline) {
     const { showAdminActions } = this.state
+
+    let dequeueAction = (
+      <div className='col-xs-4 text-center'>
+        {this.renderDequeueButton()} Dequeue
+      </div>
+    )
+    // TODO we should also check whether the change is already at the tip of the queue or not.
+    let promoteAction =
+      (pipeline.manager === 'dependent') ?
+        (
+          <div className='col-xs-4 text-center'>
+            {this.renderPromoteButton()} Promote
+          </div>
+        ) :
+        null
+
     if (user.isAdmin && user.scope.indexOf(tenant.name) !== -1) {
       return (
         <ExpandableSection
@@ -408,9 +495,8 @@ class ChangePanel extends React.Component {
           toggleText={showAdminActions ? 'Hide' : 'Actions'}
           onToggle={() => { this.setState({ showAdminActions: !showAdminActions }) }}>
           <div className='row'>
-            <div className='col-xs-6 text-center'>
-              {this.renderDequeueButton()} Dequeue
-            </div>
+            {dequeueAction}
+            {promoteAction}
           </div>
         </ExpandableSection>
       )
@@ -421,7 +507,7 @@ class ChangePanel extends React.Component {
 
   render() {
     const { expanded } = this.state
-    const { change, globalExpanded, user, tenant } = this.props
+    const { change, globalExpanded, user, tenant, pipeline } = this.props
     let expand = globalExpanded
     if (this.clicked) {
       expand = expanded
@@ -429,8 +515,9 @@ class ChangePanel extends React.Component {
     const header = (
       <div className='panel panel-default zuul-change'>
         {this.renderDequeueModal()}
+        {this.renderPromoteModal()}
         <div>
-          {this.renderAdminCommands(user, tenant)}
+          {this.renderAdminCommands(user, tenant, pipeline)}
         </div>
         <div className='panel-heading zuul-patchset-header'
           onClick={this.onClick}>
@@ -454,7 +541,7 @@ class ChangePanel extends React.Component {
           </div>
         </div>
         {expand ? this.renderJobList(change.jobs) : ''}
-      </div>
+      </div >
     )
     return (
       <React.Fragment>

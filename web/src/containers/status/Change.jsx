@@ -28,7 +28,7 @@ class Change extends React.Component {
     change: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
-    pipeline: PropTypes.string,
+    pipeline: PropTypes.object,
     tenant: PropTypes.object,
   }
 
