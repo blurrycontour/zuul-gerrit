@@ -278,6 +278,21 @@ function autohold_delete(apiPrefix, requestId, token) {
   return res
 }
 
+function promote(apiPrefix, pipeline, changes, token) {
+  const instance = Axios.create({
+    baseURL: apiUrl
+  })
+  instance.defaults.headers.common['Authorization'] = 'Bearer ' + token
+  let res = instance.post(
+    apiPrefix + '/promote',
+    {
+      pipeline: pipeline,
+      changes: changes,
+    }
+  )
+  return res
+}
+
 
 export {
   apiUrl,
@@ -310,4 +325,5 @@ export {
   dequeue_ref,
   enqueue,
   enqueue_ref,
+  promote,
 }
