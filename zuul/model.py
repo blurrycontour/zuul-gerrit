@@ -3470,6 +3470,9 @@ class Change(Branch):
 class AbstractEvent(abc.ABC):
     """Base class defining the interface for all events."""
 
+    # Opaque identifier in order to acknowledge an event
+    ack_ref = None
+
     @abc.abstractmethod
     def toDict(self):
         pass
@@ -3490,7 +3493,10 @@ class ManagementEvent(AbstractEvent):
     def __init__(self):
         self._wait_event = threading.Event()
         self._exc_info = None
+        self.traceback = None
         self.zuul_event_id = None
+        # Opaque identifier in order to report the result of an event
+        self.result_ref = None
 
     def exception(self, exc_info):
         self._exc_info = exc_info
@@ -3576,6 +3582,7 @@ class TenantReconfigureEvent(ManagementEvent):
         super(TenantReconfigureEvent, self).__init__()
         self.tenant_name = tenant_name
         self.project_branches = set([(project, branch)])
+        self.merged_events = []
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -3591,6 +3598,7 @@ class TenantReconfigureEvent(ManagementEvent):
         if self.tenant_name != other.tenant_name:
             raise Exception("Can not merge events from different tenants")
         self.project_branches |= other.project_branches
+        self.merged_events.append(other)
 
     def toDict(self):
         d = super().toDict()
@@ -3840,6 +3848,7 @@ class TriggerEvent(AbstractEvent):
         self.zuul_event_id = None
         self.timestamp = None
         self.arrived_at_scheduler_timestamp = None
+        self.driver_name = None
 
     def toDict(self):
         return {
