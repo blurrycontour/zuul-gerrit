@@ -339,7 +339,7 @@ class ChangePanel extends React.Component {
           </div>
         </div>
         {expand ? this.renderJobList(change.jobs) : ''}
-      </div>
+      </div >
     )
     return (
       <React.Fragment>
