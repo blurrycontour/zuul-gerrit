@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "652e6582_6ba11149",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 1094,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-19T19:27:46Z",
+      "side": 1,
+      "message": "Future idea for optimization would be to filter the tenants based on the sources.",
+      "revId": "2e6cfff81824617f2a3d358e920cc71653f6b51e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
