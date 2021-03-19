@@ -2154,6 +2154,74 @@ class TestCheckRunAnnotations(ZuulGithubAppTestCase, AnsibleZuulTestCase):
             "end_line": 3,
         })
 
+    def test_many_file_comments(self):
+        # Test that we only send 50 comments to github
+        project = "org/project"
+        github = self.fake_github.getGithubClient(None)
+
+        # The file must be part of this PR to make the comment function
+        # work. Thus we change it's content to provide some more text.
+        files_dict = {
+            "bigfile": textwrap.dedent(
+                """
+                section one
+                ===========
+
+                here is some text
+                """
+            ),
+        }
+
+        A = self.fake_github.openFakePullRequest(
+            project, "master", "A", files=files_dict
+        )
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # We should have a pending check for the head sha
+        self.assertIn(
+            A.head_sha, github.repo_from_project(project)._commits.keys())
+        check_runs = self.fake_github.getCommitChecks(project, A.head_sha)
+
+        self.assertEqual(1, len(check_runs))
+        check_run = check_runs[0]
+
+        self.assertEqual("tenant-one/check", check_run["name"])
+        self.assertEqual("completed", check_run["status"])
+        self.assertThat(
+            check_run["output"]["summary"],
+            MatchesRegex(r'.*Build succeeded.*', re.DOTALL)
+        )
+
+        annotations = check_run["output"]["annotations"]
+        self.assertEqual(50, len(annotations))
+
+        # Comments are sorted by uniqueness, so our most unique
+        # comment is first.
+        self.assertEqual(annotations[0], {
+            "path": "bigfile",
+            "annotation_level": "warning",
+            "message": "Insightful comment",
+            "start_line": 2,
+            "end_line": 2,
+        })
+        # This comment appears 3 times.
+        self.assertEqual(annotations[1], {
+            "path": "bigfile",
+            "annotation_level": "warning",
+            "message": "Useful comment",
+            "start_line": 1,
+            "end_line": 1,
+        })
+        # The rest.
+        self.assertEqual(annotations[4], {
+            "path": "bigfile",
+            "annotation_level": "warning",
+            "message": "Annoying comment",
+            "start_line": 1,
+            "end_line": 1,
+        })
+
 
 class TestGithubDriverEnterise(ZuulGithubAppTestCase):
     config_file = 'zuul-github-driver-enterprise.conf'
