@@ -161,6 +161,11 @@ class TriggerInterface(object, metaclass=abc.ABCMeta):
         """
         pass
 
+    @abc.abstractmethod
+    def getTriggerEventClass(self):
+        """Get the drivers's trigger event class."""
+        pass
+
 
 class SourceInterface(object, metaclass=abc.ABCMeta):
     """The source interface to be implemented by a driver.

@@ -15,6 +15,7 @@
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.gerrit import gerritconnection
+from zuul.driver.gerrit import gerritmodel
 from zuul.driver.gerrit import gerrittrigger
 from zuul.driver.gerrit import gerritsource
 from zuul.driver.gerrit import gerritreporter
@@ -48,6 +49,9 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
 
     def getTrigger(self, connection, config=None):
         return gerrittrigger.GerritTrigger(self, connection, config)
+
+    def getTriggerEventClass(self):
+        return gerritmodel.GerritTriggerEvent
 
     def getSource(self, connection):
         return gerritsource.GerritSource(self, connection)

@@ -15,6 +15,7 @@
 from zuul.driver import Driver, ConnectionInterface, TriggerInterface
 from zuul.driver import SourceInterface, ReporterInterface
 from zuul.driver.gitlab import gitlabconnection
+from zuul.driver.gitlab import gitlabmodel
 from zuul.driver.gitlab import gitlabsource
 from zuul.driver.gitlab import gitlabreporter
 from zuul.driver.gitlab import gitlabtrigger
@@ -29,6 +30,9 @@ class GitlabDriver(Driver, ConnectionInterface, TriggerInterface,
 
     def getTrigger(self, connection, config=None):
         return gitlabtrigger.GitlabTrigger(self, connection, config)
+
+    def getTriggerEventClass(self):
+        return gitlabmodel.GitlabTriggerEvent
 
     def getSource(self, connection):
         return gitlabsource.GitlabSource(self, connection)
