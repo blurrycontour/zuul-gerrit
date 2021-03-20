@@ -4032,14 +4032,12 @@ class SchedulerTestApp:
 
         self.event_queues = [
             self.sched.result_event_queue,
-            self.sched.management_event_queue
         ]
 
     def start(self, validate_tenants: list):
         self.sched.start()
         self.sched.executor.gearman.waitForServer()
-        self.sched.reconfigure(
-            self.config, validate_tenants=validate_tenants)
+        self.sched.prime(self.config, validate_tenants=validate_tenants)
 
     def fullReconfigure(self):
         try:
@@ -4916,10 +4914,16 @@ class ZuulTestCase(BaseTestCase):
 
     def __areZooKeeperEventQueuesEmpty(self, matcher=None) -> bool:
         for sched in map(lambda app: app.sched, self.scheds.filter(matcher)):
+            if sched.management_events.hasEvents():
+                return False
             if sched.trigger_events.hasEvents():
                 return False
             for tenant in sched.abide.tenants.values():
                 for pipeline_name in tenant.layout.pipelines:
+                    if sched.pipeline_management_events[tenant.name][
+                        pipeline_name
+                    ].hasEvents():
+                        return False
                     if sched.pipeline_trigger_events[tenant.name][
                         pipeline_name
                     ].hasEvents():

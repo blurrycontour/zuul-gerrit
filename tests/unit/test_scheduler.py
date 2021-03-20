@@ -18,6 +18,7 @@ import json
 import textwrap
 
 import os
+import re
 import shutil
 import socket
 import time
@@ -28,6 +29,7 @@ from kazoo.exceptions import NoNodeError
 
 import git
 import testtools
+from testtools.matchers import AfterPreprocessing, MatchesRegex
 from zuul.scheduler import Scheduler
 
 import zuul.change_matcher
@@ -3396,25 +3398,28 @@ class TestScheduler(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants['tenant-one']
         (trusted, project) = tenant.getProject('org/project')
 
-        self.scheds.first.sched.run_handler_lock.acquire()
-        self.assertEqual(
-            self.scheds.first.sched.management_event_queue.qsize(), 0)
+        with self.scheds.first.sched.run_handler_lock:
+            mgmt_queue_size = len(self.scheds.first.sched.management_events)
+            self.assertEqual(mgmt_queue_size, 0)
 
-        self.scheds.first.sched.reconfigureTenant(tenant, project, None)
-        self.assertEqual(
-            self.scheds.first.sched.management_event_queue.qsize(), 1)
+            self.scheds.first.sched.reconfigureTenant(tenant, project, None)
+            mgmt_queue_size = len(self.scheds.first.sched.management_events)
+            self.assertEqual(mgmt_queue_size, 1)
 
-        self.scheds.first.sched.reconfigureTenant(tenant, project, None)
-        # The second event should have been combined with the first
-        # so we should still only have one entry.
-        self.assertEqual(
-            self.scheds.first.sched.management_event_queue.qsize(), 1)
+            self.scheds.first.sched.reconfigureTenant(tenant, project, None)
+            mgmt_queue_size = len(self.scheds.first.sched.management_events)
+            self.assertEqual(mgmt_queue_size, 2)
 
-        self.scheds.first.sched.run_handler_lock.release()
+            # The second event should be combined with the first so we should
+            # only see the merged entry when consuming from the queue.
+            mgmt_events = list(self.scheds.first.sched.management_events)
+            self.assertEqual(len(mgmt_events), 1)
+            self.assertEqual(len(mgmt_events[0].merged_events), 1)
+
         self.waitUntilSettled()
 
-        self.assertEqual(
-            self.scheds.first.sched.management_event_queue.qsize(), 0)
+        mgmt_queue_size = len(self.scheds.first.sched.management_events)
+        self.assertEqual(mgmt_queue_size, 0)
 
     def test_live_reconfiguration(self):
         "Test that live reconfiguration works"
@@ -4641,17 +4646,23 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
+        matcher = AfterPreprocessing(
+            str,
+            MatchesRegex(
+                '.*Change 4,1 does not belong to project "org/project1"',
+                re.DOTALL,
+            ),
+            annotate=False
+        )
         with testtools.ExpectedException(
-            zuul.rpcclient.RPCFailure,
-            'Change 4,1 does not belong to project "org/project1"'):
-            r = client.dequeue(
+            zuul.rpcclient.RPCFailure, matcher):
+            client.dequeue(
                 tenant='tenant-one',
                 pipeline='check',
                 project='org/project1',
                 change='4,1',
-                ref=None)
-            self.waitUntilSettled()
-            self.assertEqual(r, False)
+                ref=None
+            )
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
