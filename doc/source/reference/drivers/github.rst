@@ -42,7 +42,7 @@ Then in the zuul.conf, set webhook_token and api_token.
 Application
 ...........
 
-.. NOTE Duplicate content here and in zuul-from-scratch.rst.  Keep them
+.. NOTE Duplicate content here and in howtos/github_setup.rst.  Keep them
    in sync.
 
 To create a `GitHub application

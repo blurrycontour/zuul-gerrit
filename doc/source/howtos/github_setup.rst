@@ -15,20 +15,21 @@ In this example we will use `my-org`.
 .. NOTE Duplicate content here and in drivers/github.rst.  Keep them
    in sync.
 
-Create a `GitHub application
+To create a `GitHub application
 <https://developer.github.com/apps/building-integrations/setting-up-and-registering-github-apps/registering-github-apps/>`_:
 
 * Go to your organization settings page to create the application, e.g.:
   https://github.com/organizations/my-org/settings/apps/new
 * Set GitHub App name to "my-org-zuul"
-* Set Setup URL to your setup documentation, when users install the application
+* Set Setup URL to your setup documentation, when user install the application
   they are redirected to this url
 * Set Webhook URL to
-  ``http://<IP ADDRESS>:9000/api/connection/github/payload``.
-* Create a Webhook secret, and record it for later use
+  ``http://<zuul-hostname>:<port>/api/connection/<connection-name>/payload``.
+* Create a Webhook secret
 * Set permissions:
 
   * Repository administration: Read
+  * Checks: Read & Write
   * Repository contents: Read & Write (write to let zuul merge change)
   * Issues: Read & Write
   * Pull requests: Read & Write
@@ -36,6 +37,7 @@ Create a `GitHub application
 
 * Set events subscription:
 
+  * Check run
   * Commit comment
   * Create
   * Push
@@ -50,9 +52,7 @@ Create a `GitHub application
 
 * Set Where can this GitHub App be installed to "Any account"
 * Create the App
-* Generate a Private key in the app settings page and save the file
-  for later
-
+* Generate a Private key in the app settings page
 
 .. TODO See if we can script this using GitHub API
 
