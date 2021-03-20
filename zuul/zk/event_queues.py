@@ -23,6 +23,7 @@ from collections.abc import Iterable
 from contextlib import suppress
 
 from kazoo.exceptions import NoNodeError
+from kazoo.protocol.states import EventType
 
 from zuul import model
 from zuul.lib.collections import DefaultKeyDict
@@ -64,6 +65,71 @@ class EventPrefix(enum.Enum):
     MANAGEMENT = "100"
     RESULT = "200"
     TRIGGER = "300"
+
+
+class GlobalEventWatcher(ZooKeeperBase):
+
+    log = logging.getLogger("zuul.zk.event_queues.EventQueueWatcher")
+
+    def __init__(self, client, callback):
+        super().__init__(client)
+        self.callback = callback
+        self.kazoo_client.ensure_path(SCHEDULER_GLOBAL_ROOT)
+        self.kazoo_client.ChildrenWatch(
+            SCHEDULER_GLOBAL_ROOT, self._eventWatch
+        )
+
+    def _eventWatch(self, event_list):
+        if event_list:
+            self.callback()
+
+
+class PipelineEventWatcher(ZooKeeperBase):
+
+    log = logging.getLogger("zuul.zk.event_queues.EventQueueWatcher")
+
+    def __init__(self, client, callback):
+        super().__init__(client)
+        self.callback = callback
+        self.watched_tenants = set()
+        self.watched_pipelines = set()
+        self.kazoo_client.ensure_path(TENANT_ROOT)
+        self.kazoo_client.ChildrenWatch(TENANT_ROOT, self._tenantWatch)
+
+    def _tenantWatch(self, tenants):
+        for tenant_name in tenants:
+            tenant_path = "/".join((TENANT_ROOT, tenant_name))
+
+            if tenant_path in self.watched_tenants:
+                continue
+
+            self.kazoo_client.ChildrenWatch(
+                tenant_path,
+                lambda p: self._pipelineWatch(tenant_name, p),
+            )
+            self.watched_tenants.add(tenant_path)
+
+    def _pipelineWatch(self, tenant_name, pipelines):
+        for pipeline_name in pipelines:
+            pipeline_path = "/".join((TENANT_ROOT, tenant_name, pipeline_name))
+            if pipeline_path in self.watched_pipelines:
+                continue
+
+            self.kazoo_client.ChildrenWatch(
+                pipeline_path,
+                self._eventWatch,
+                send_event=True,
+            )
+            self.watched_pipelines.add(pipeline_path)
+
+    def _eventWatch(self, event_list, event=None):
+        if event is None:
+            # Handle initial call when the watch is created. If there are
+            # already events in the queue we trigger the callback.
+            if event_list:
+                self.callback()
+        elif event.type == EventType.CHILD:
+            self.callback()
 
 
 class ZooKeeperEventQueue(ZooKeeperBase, Iterable):
