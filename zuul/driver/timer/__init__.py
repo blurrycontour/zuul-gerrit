@@ -130,7 +130,7 @@ class TimerDriver(Driver, TriggerInterface):
                 event.timestamp = time.time()
                 log = get_annotated_logger(self.log, event)
                 log.debug("Adding event")
-                self.sched.addEvent(event)
+                self.sched.addTriggerEvent(self.name, event)
 
     def stop(self):
         if self.apsched:

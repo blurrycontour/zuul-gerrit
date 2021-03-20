@@ -258,7 +258,9 @@ class GerritEventConnector(threading.Thread):
 
         self._getChange(event)
         self.connection.logEvent(event)
-        self.connection.sched.addEvent(event)
+        self.connection.sched.addTriggerEvent(
+            self.connection.driver_name, event
+        )
 
     def _getChange(self, event):
         # Grab the change if we are managing the project or if it exists in the

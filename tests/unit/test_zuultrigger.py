@@ -12,6 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from unittest import mock
+
 from tests.base import ZuulTestCase, ZuulGithubAppTestCase
 from zuul.driver.zuul.zuulmodel import ZuulTriggerEvent
 
@@ -63,29 +65,24 @@ class TestZuulTriggerParentChangeEnqueued(ZuulTestCase):
         # Now directly enqueue a change into the check. As no pipeline reacts
         # on parent-change-enqueued from pipeline check no
         # parent-change-enqueued event is expected.
-        zuultrigger_event_count = 0
+        _add_trigger_event = self.scheds.first.sched.addTriggerEvent
 
-        def counting_put(*args, **kwargs):
-            nonlocal zuultrigger_event_count
-            if isinstance(args[0], ZuulTriggerEvent):
-                zuultrigger_event_count += 1
-            self.scheds.first.sched.trigger_event_queue\
-                .put_orig(*args, **kwargs)
+        def addTriggerEvent(driver_name, event):
+            self.assertNotIsInstance(event, ZuulTriggerEvent)
+            _add_trigger_event(driver_name, event)
 
-        self.scheds.first.sched.trigger_event_queue.put_orig = \
-            self.scheds.first.sched.trigger_event_queue.put
-        self.scheds.first.sched.trigger_event_queue.put = counting_put
+        with mock.patch.object(
+            self.scheds.first.sched, "addTriggerEvent", addTriggerEvent
+        ):
+            C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+            C.addApproval('Verified', -1)
+            D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
+            D.addApproval('Verified', -1)
+            D.setDependsOn(C, 1)
+            self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
 
-        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        C.addApproval('Verified', -1)
-        D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
-        D.addApproval('Verified', -1)
-        D.setDependsOn(C, 1)
-        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
-
-        self.waitUntilSettled()
-        self.assertEqual(len(self.history), 4)
-        self.assertEqual(zuultrigger_event_count, 0)
+            self.waitUntilSettled()
+            self.assertEqual(len(self.history), 4)
 
 
 class TestZuulTriggerParentChangeEnqueuedGithub(ZuulGithubAppTestCase):
@@ -145,31 +142,31 @@ class TestZuulTriggerParentChangeEnqueuedGithub(ZuulGithubAppTestCase):
         # on parent-change-enqueued from pipeline check no
         # parent-change-enqueued event is expected.
         self.waitUntilSettled()
-        zuultrigger_event_count = 0
 
-        def counting_put(*args, **kwargs):
-            nonlocal zuultrigger_event_count
-            if isinstance(args[0], ZuulTriggerEvent):
-                zuultrigger_event_count += 1
-            self.scheds.first.sched.trigger_event_queue\
-                .put_orig(*args, **kwargs)
+        _add_trigger_event = self.scheds.first.sched.addTriggerEvent
 
-        self.scheds.first.sched.trigger_event_queue.put_orig = \
-            self.scheds.first.sched.trigger_event_queue.put
-        self.scheds.first.sched.trigger_event_queue.put = counting_put
+        def addTriggerEvent(driver_name, event):
+            self.assertNotIsInstance(event, ZuulTriggerEvent)
+            _add_trigger_event(driver_name, event)
 
-        C = self.fake_github.openFakePullRequest('org/project', 'master', 'C')
-        C.addLabel('for-check')  # should go to check
+        with mock.patch.object(
+            self.scheds.first.sched, "addTriggerEvent", addTriggerEvent
+        ):
+            C = self.fake_github.openFakePullRequest(
+                'org/project', 'master', 'C'
+            )
+            C.addLabel('for-check')  # should go to check
 
-        msg = "Depends-On: https://github.com/org/project1/pull/%s" % C.number
-        D = self.fake_github.openFakePullRequest(
-            'org/project', 'master', 'D', body=msg)
-        D.addLabel('for-check')  # should go to check
-        self.fake_github.emitEvent(C.getPullRequestOpenedEvent())
+            msg = "Depends-On: https://github.com/org/project1/pull/{}".format(
+                C.number
+            )
+            D = self.fake_github.openFakePullRequest(
+                'org/project', 'master', 'D', body=msg)
+            D.addLabel('for-check')  # should go to check
+            self.fake_github.emitEvent(C.getPullRequestOpenedEvent())
 
-        self.waitUntilSettled()
-        self.assertEqual(len(self.history), 4)
-        self.assertEqual(zuultrigger_event_count, 0)
+            self.waitUntilSettled()
+            self.assertEqual(len(self.history), 4)
 
         # After starting recording installation containing org2/project
         # should not be contacted
