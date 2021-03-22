@@ -1101,23 +1101,22 @@ class Scheduler(threading.Thread):
 
     def process_global_trigger_queue(self):
         for event in self.trigger_events:
-            log = get_annotated_logger(
-                self.log, event.zuul_event_id
-            )
+            log = get_annotated_logger(self.log, event.zuul_event_id)
             log.debug("Forwarding trigger event %s", event)
             try:
                 for tenant in self.abide.tenants.values():
-                    self._forward_trigger_event(event, tenant)
+                    try:
+                        self._forward_trigger_event(event, tenant)
+                    except Exception:
+                        log.exception("Unable to forward event %s "
+                                      "to tenant %s", event, tenant.name)
             finally:
                 self.trigger_events.ack(event)
 
     def _forward_trigger_event(self, event, tenant):
-        log = get_annotated_logger(
-            self.log, event.zuul_event_id
-        )
-        _, project = tenant.getProject(
-            event.canonical_project_name
-        )
+        log = get_annotated_logger(self.log, event.zuul_event_id)
+        trusted, project = tenant.getProject(event.canonical_project_name)
+
         if project is None:
             return
 

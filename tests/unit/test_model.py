@@ -774,3 +774,37 @@ class TestFreezable(BaseTestCase):
         # still shows the ordered behavior.
         self.assertTrue(isinstance(o.odict2, types.MappingProxyType))
         self.assertEqual(list(o.odict2.keys()), seq)
+
+class TestRef(BaseTestCase):
+    def test_ref_equality(self):
+        change1 = model.Change('project1')
+        change1.ref = '/change1'
+        change1b = model.Change('project1')
+        change1b.ref = '/change1'
+        change2 = model.Change('project2')
+        change2.ref = '/change2'
+        self.assertFalse(change1.equals(change2))
+        self.assertTrue(change1.equals(change1b))
+
+        tag1 = model.Tag('project1')
+        tag1.ref = '/tag1'
+        tag1b = model.Tag('project1')
+        tag1b.ref = '/tag1'
+        tag2 = model.Tag('project2')
+        tag2.ref = '/tag2'
+        self.assertFalse(tag1.equals(tag2))
+        self.assertTrue(tag1.equals(tag1b))
+
+        self.assertFalse(tag1.equals(change1))
+
+        branch1 = model.Branch('project1')
+        branch1.ref = '/branch1'
+        branch1b = model.Branch('project1')
+        branch1b.ref = '/branch1'
+        branch2 = model.Branch('project2')
+        branch2.ref = '/branch2'
+        self.assertFalse(branch1.equals(branch2))
+        self.assertTrue(branch1.equals(branch1b))
+
+        self.assertFalse(branch1.equals(change1))
+        self.assertFalse(branch1.equals(tag1))
