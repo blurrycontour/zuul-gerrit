@@ -41,6 +41,10 @@
 - job:
     name: project-test1
     run: playbooks/project-test1.yaml
+    nodeset:
+      nodes:
+        - name: testnode
+          label: testlabel
 
 - job:
     name: project-test2
