@@ -31,6 +31,7 @@ import git
 import testtools
 from testtools.matchers import AfterPreprocessing, MatchesRegex
 from zuul.scheduler import Scheduler
+import fixtures
 
 import zuul.change_matcher
 from zuul.driver.gerrit import gerritreporter
@@ -8862,3 +8863,61 @@ class TestReconfigureBranchCreateDeleteHttp(TestReconfigureBranch):
         self._expectReconfigure(True)
         self._deleteBranch()
         self._expectReconfigure(True)
+
+
+class TestEventProcessing(ZuulTestCase):
+    tenant_config_file = 'config/event-processing/main.yaml'
+
+    # Some regression tests for ZK-distributed event processing
+
+    def test_independent_tenants(self):
+        # Test that an exception in one tenant doesn't break others
+
+        orig = zuul.scheduler.Scheduler._forward_trigger_event
+
+        def patched_forward(obj, *args, **kw):
+            if args[1].name == 'tenant-one':
+                raise Exception("test")
+            return orig(obj, *args, **kw)
+
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.scheduler.Scheduler._forward_trigger_event',
+            patched_forward))
+
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='checkjob', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+    @skip("Failure can only be detected in logs; see test_ref_equality")
+    def test_change_types(self):
+        # Test that when we decide whether to forward events, we can
+        # compare items with different change types (branch vs
+        # change).
+
+        # We can't detect a failure here except by observing the logs;
+        # this test is left in case that's useful in the future, but
+        # automated detection of this failure case is handled by
+        # test_ref_equality.
+
+        # Enqueue a tag
+        self.executor_server.hold_jobs_in_build = True
+        event = self.fake_gerrit.addFakeTag('org/project1', 'master', 'foo')
+        self.fake_gerrit.addEvent(event)
+
+        # Enqueue a change and make sure the scheduler is able to
+        # compare the two when forwarding the event
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='tagjob', result='SUCCESS'),
+            dict(name='checkjob', result='SUCCESS', changes='1,1'),
+        ], ordered=False)

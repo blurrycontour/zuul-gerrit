@@ -3419,7 +3419,9 @@ class Change(Branch):
         return '<Change 0x%x %s %s>' % (id(self), pname, self._id())
 
     def equals(self, other):
-        if self.number == other.number and self.patchset == other.patchset:
+        if (super().equals(other) and
+            isinstance(other, Change) and
+            self.number == other.number and self.patchset == other.patchset):
             return True
         return False
 
