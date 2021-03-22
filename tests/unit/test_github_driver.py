@@ -39,6 +39,32 @@ class TestGithubDriver(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
+    def test_node_failure(self):
+        self.fake_nodepool.pause()
+        body = "This is the\nPR body."
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A',
+                                                 body=body)
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        req = self.fake_nodepool.getNodeRequests()[0]
+        self.fake_nodepool.addFailRequest(req)
+
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        self.assertIn('NODE_FAILURE', A.comments[0])
+
+        self.fake_github.emitEvent(A.getCommentAddedEvent('test me'))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-test2', result='SUCCESS'),
+            dict(name='project-test1', result='SUCCESS'),
+            dict(name='project-test2', result='SUCCESS'),
+        ], ordered=False)
+
+    @simple_layout('layouts/basic-github.yaml', driver='github')
     def test_pull_event(self):
         self.executor_server.hold_jobs_in_build = True
 

@@ -8920,3 +8920,26 @@ class TestEventProcessing(ZuulTestCase):
             dict(name='tagjob', result='SUCCESS'),
             dict(name='checkjob', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+    def test_node_failure(self):
+        self.fake_nodepool.pause()
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        req = self.fake_nodepool.getNodeRequests()[0]
+        self.fake_nodepool.addFailRequest(req)
+
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
+        self.assertIn('checkjob : NODE_FAILURE', A.messages[0])
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='checkjob', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
