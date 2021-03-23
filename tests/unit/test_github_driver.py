@@ -1291,6 +1291,23 @@ class TestGithubDriver(ZuulTestCase):
                   if report[2] == 'merge']
         assert(len(merges) == 1 and merges[0][3] == 'squash')
 
+    @simple_layout('layouts/basic-github.yaml', driver='github')
+    def test_invalid_event(self):
+        # Regression test to make sure the event forwarder thread continues
+        # running in case the event from the GithubEventProcessor is None.
+        self.fake_github.emitEvent(("pull_request", "invalid"))
+        self.waitUntilSettled()
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master',
+                                                 'A')
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test1').result)
+        self.assertEqual('SUCCESS',
+                         self.getJobFromHistory('project-test2').result)
+
 
 class TestGithubUnprotectedBranches(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
