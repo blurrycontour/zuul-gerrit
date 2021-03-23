@@ -376,6 +376,21 @@ class GitlabAPIClient():
             raise MergeFailure('Merge request merge failed: %s' % e)
         return resp[0]
 
+    def set_commit_status(self, project_name, sha, state, name, url,
+                          description, pipeline_id=None, zuul_event_id=None):
+        path = "/projects/%s/statuses/%s" % (
+            quote_plus(project_name), sha)
+
+        params = {'state': state,
+                  'name': name,
+                  'target_url': url,
+                  'description': description
+        }
+        resp = self.post(self.baseurl + path, params=params,
+                         zuul_event_id=zuul_event_id)
+        self._manage_error(*resp, zuul_event_id=zuul_event_id)
+        return resp[0]
+
 
 class GitlabConnection(CachedBranchConnection):
     driver_name = 'gitlab'
@@ -598,6 +613,24 @@ class GitlabConnection(CachedBranchConnection):
         log = get_annotated_logger(self.log, event)
         self.gl_client.merge_mr(project_name, number, zuul_event_id=event)
         log.info("Merged MR %s#%s", project_name, number)
+
+    def setCommitStatus(self, project, sha, status, completed, url='',
+                        description='', context='', pipeline_id=None,
+                        zuul_event_id=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+
+        try:
+            self.gl_client.set_commit_status(
+                project,
+                sha,
+                status,
+                context,
+                url,
+                description,
+                pipeline_id,
+                zuul_event_id=zuul_event_id)
+        except Exception as e:
+            log.error("set_commit_status error {}".format(str(e)))
 
 
 class GitlabWebController(BaseWebController):
