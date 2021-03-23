@@ -30,9 +30,13 @@ class GitlabReporter(BaseReporter):
 
     def __init__(self, driver, connection, pipeline, config=None):
         super(GitlabReporter, self).__init__(driver, connection, config)
+        self._status = self.config.get('status', False)
         self._create_comment = self.config.get('comment', True)
         self._approval = self.config.get('approval', None)
         self._merge = self.config.get('merge', False)
+        self._contextShort = "zuul:{}".format(pipeline.name)
+        self._context = "Zuul {}/{}".format(pipeline.tenant.name,
+                                            pipeline.name)
 
     def report(self, item):
         """Report on an event."""
@@ -48,6 +52,8 @@ class GitlabReporter(BaseReporter):
                 self.addMRComment(item)
             if self._approval is not None:
                 self.setApproval(item)
+            if self._status:
+                self.updateStatus(item)
             if self._merge:
                 self.mergeMR(item)
                 if not item.change.is_merged:
@@ -96,9 +102,34 @@ class GitlabReporter(BaseReporter):
     def getSubmitAllowNeeds(self):
         return []
 
+    def _formatItemReportCommitStatus(self, item, status):
+        return "%s status:%s" % (self._context, status)
+
+    def updateStatus(self, item):
+        status = self._status
+        message = self._formatItemReportCommitStatus(item, status)
+        project = item.change.project.name
+        sha = item.change.patchset
+        completed = (
+            item.current_build_set.result is not None or status == "canceled"
+        )
+        details_url = item.formatStatusUrl()
+
+        self.connection.setCommitStatus(
+            project,
+            sha,
+            status,
+            completed,
+            details_url,
+            message,
+            self._contextShort,
+            zuul_event_id=item.event
+        )
+
 
 def getSchema():
     gitlab_reporter = v.Schema({
+        'status': v.Any('pending', 'running', 'success', 'failed', 'canceled'),
         'comment': bool,
         'approval': bool,
         'merge': bool,
