@@ -114,7 +114,7 @@
     description: |
       Builds the zuul dashboard without an overridden API URL.
     success-url: 'npm/html/'
-    files:
+    files: &zuul_build_dashboard_files
       - web/.*
       - playbooks/dashboard/.*
     vars:
@@ -336,6 +336,7 @@
             vars:
               download_artifact_job: zuul-build-python-release
         - opendev-promote-javascript-deployment-tarball:
+            files: *zuul_build_dashboard_files
             vars:
               download_artifact_job: zuul-build-dashboard
     release:
