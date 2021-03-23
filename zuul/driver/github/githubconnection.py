@@ -752,7 +752,7 @@ class GithubEventConnector:
                     return
                 event = future.result()
                 if not event:
-                    return
+                    continue
                 self.connection.logEvent(event)
                 if isinstance(event, DequeueEvent):
                     self.connection.sched.addManagementEvent(event)
