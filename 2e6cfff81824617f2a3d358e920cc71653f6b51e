@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "68e49dc8_c7a6184d",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-23T13:47:02Z",
+      "side": 1,
+      "message": "This is the bug in 782395",
+      "revId": "2e6cfff81824617f2a3d358e920cc71653f6b51e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "652e6582_6ba11149",
         "filename": "zuul/scheduler.py",
         "patchSetId": 24
