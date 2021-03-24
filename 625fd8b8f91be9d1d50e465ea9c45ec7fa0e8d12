@@ -33,6 +33,23 @@
       "revId": "625fd8b8f91be9d1d50e465ea9c45ec7fa0e8d12",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8c575bc8_f2657993",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 980,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-24T16:21:46Z",
+      "side": 0,
+      "message": "See https://review.opendev.org/c/zuul/zuul/+/782812",
+      "revId": "625fd8b8f91be9d1d50e465ea9c45ec7fa0e8d12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
