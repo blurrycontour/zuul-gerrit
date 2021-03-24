@@ -981,7 +981,7 @@ class Scheduler(threading.Thread):
         (trusted, project) = tenant.getProject(event.project_name)
         if project is None:
             raise ValueError('Unknown project %s' % event.project_name)
-        change = project.source.getChange(event, refresh=True)
+        change = project.source.getChange(event)
         if change.project.name != project.name:
             if event.change:
                 item = 'Change %s' % event.change
