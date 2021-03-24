@@ -113,6 +113,50 @@ class TestTenantSimple(TenantParserTestCase):
             {'registry': 'registry.example.org', 'image_name': 'foo'},
         ])
 
+    def test_deny_localhost_nodeset(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - nodeset:
+                name: localhost
+                nodes:
+                  - name: localhost
+                    label: ubuntu
+            """)
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # No job should have run due to the change introducing a config error
+        self.assertHistory([])
+        self.assertTrue(A.reported)
+        self.assertTrue("Nodes named 'localhost' are not allowed."
+                        in A.messages[0])
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - nodeset:
+                name: localhost-group
+                nodes:
+                  - name: ubuntu
+                    label: ubuntu
+                groups:
+                  - name: localhost
+                    nodes: ubuntu
+            """)
+        file_dict = {'zuul.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # No job should have run due to the change introducing a config error
+        self.assertHistory([])
+        self.assertTrue(B.reported)
+        self.assertTrue("Groups named 'localhost' are not allowed."
+                        in B.messages[0])
+
 
 class TestTenantOverride(TenantParserTestCase):
     tenant_config_file = 'config/tenant-parser/override.yaml'

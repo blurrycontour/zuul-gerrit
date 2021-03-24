@@ -497,6 +497,8 @@ class NodeSetParser(object):
                 allowed_labels=allowed_labels,
                 disallowed_labels=disallowed_labels)
         for conf_node in as_list(conf['nodes']):
+            if "localhost" in as_list(conf_node['name']):
+                raise Exception("Nodes named 'localhost' are not allowed.")
             for name in as_list(conf_node['name']):
                 if name in node_names:
                     raise DuplicateNodeError(name, conf_node['name'])
@@ -505,6 +507,8 @@ class NodeSetParser(object):
             for name in as_list(conf_node['name']):
                 node_names.add(name)
         for conf_group in as_list(conf.get('groups', [])):
+            if "localhost" in conf_group['name']:
+                raise Exception("Groups named 'localhost' are not allowed.")
             for node_name in as_list(conf_group['nodes']):
                 if node_name not in node_names:
                     raise NodeFromGroupNotFoundError(conf['name'], node_name,
