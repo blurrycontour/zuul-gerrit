@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fcd83a86_47d78334",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-24T15:42:59Z",
+      "side": 1,
+      "message": "We should never leak a semaphore; it\u0027s a bug if we do.  And hopefully we\u0027ve found all of those.  :)\n\nBut if we do, right now an operator can recover from that by restarting; but they won\u0027t have the option in the future.\n\nSince this naming system makes it easy to determine if a semaphore lock is still valid, let\u0027s add this to the periodic cleanup we were talking about earlier:\n\nPeriodically check that every semaphore holder still exists, and if not, delete it and log an error message.",
+      "revId": "59ac5f688090a302bd699e90a0177d53b76b1f84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
