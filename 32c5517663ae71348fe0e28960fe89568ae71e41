@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "02bc6072_6e38973c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-24T20:02:43Z",
+      "side": 1,
+      "message": "This is a slightly confusing name, in that it\u0027s used above as the imperative name of a function \"hey, computer, go process this event\" and here it\u0027s used as a descriptive noun \"an event related to processing\".  Maybe we should call this something else (\"_processing_event\"?), or maybe we should rename the other function _processEvent().\n\nI wouldn\u0027t mention it except I\u0027m literally trying to figure out what this does right now and am searching through the file and have to guess which one I\u0027m looking at.",
+      "revId": "32c5517663ae71348fe0e28960fe89568ae71e41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2faef37a_e79e9c77",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-24T20:02:43Z",
+      "side": 1,
+      "message": "How do we avoid processing the same events again on the next pass through this loop?\n\nI think we\u0027d need to maintain a set of event ids in the forward queue and skip those?",
+      "revId": "32c5517663ae71348fe0e28960fe89568ae71e41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
