@@ -16,6 +16,23 @@
       "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3ebad27f_4e3d7c10",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-24T20:04:10Z",
+      "side": 1,
+      "message": "The next patch at least exercises the election; and I think we can assume it works as advertised, so we can probably omit this.  Once we have multiple schedulers it might be a good time to add a test then (because we\u0027d be testing Zuul, not kazoo).",
+      "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
