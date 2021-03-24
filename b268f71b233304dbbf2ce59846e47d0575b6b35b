@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6522570b_8725a55e",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-24T18:01:50Z",
+      "side": 0,
+      "message": "We have to move this outside of the try/finally because otherwise we would delete the result path if we call wait with a short timeout.\n\nIn fact, this might be a bug in the current code if you call this method with a timeout, and the node is created between these two lines.  Ie:\n\n1) [A] self._wait_event.wait(timeout) returns False\n2) [B] node is created in other thread/process\n3) [A] \"return False\" is executed\n4) [A] finally clause is executed\n5) [A] node created by B is deleted",
+      "revId": "b268f71b233304dbbf2ce59846e47d0575b6b35b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
