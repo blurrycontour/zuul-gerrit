@@ -4901,9 +4901,9 @@ class ZuulTestCase(BaseTestCase):
                 return False
         return True
 
-    def __eventQueuesEmpty(self, matcher) -> Generator[bool, None, None]:
+    def __eventQueuesEmpty(self, matcher=None) -> Generator[bool, None, None]:
         for event_queue in self.__event_queues(matcher):
-            yield event_queue.empty()
+            yield not event_queue.unfinished_tasks
 
     def __eventQueuesJoin(self, matcher) -> None:
         for app in self.scheds.filter(matcher):
@@ -4988,7 +4988,8 @@ class ZuulTestCase(BaseTestCase):
                         all_event_queues_empty):
         logger("Queue status:")
         for event_queue in self.__event_queues(matcher):
-            self.log.debug("  %s: %s", event_queue, event_queue.empty())
+            is_empty = not event_queue.unfinished_tasks
+            self.log.debug("  %s: %s", event_queue, is_empty)
         logger("All ZK event queues empty: %s", all_zk_queues_empty)
         logger("All merge jobs waiting: %s", all_merge_jobs_waiting)
         logger("All builds reported: %s", all_builds_reported)
