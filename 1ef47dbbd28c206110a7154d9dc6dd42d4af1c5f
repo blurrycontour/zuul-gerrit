@@ -33,6 +33,40 @@
       "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c8665bd5_9cdfb1ca",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-24T21:37:21Z",
+      "side": 1,
+      "message": "Is this meant to be __iter__ instead given the class inherits from Iterable which indicates that __iter__ does exist?\n\nSo I think we either should remove Iterable or rename this to __iter__ and use this class directly as iterator.",
+      "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d2d1434_3df21cd3",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-24T21:37:21Z",
+      "side": 1,
+      "message": "For reference this uses ZooKeeperEventQueue as base class and has __iter__ which makes it a proper iterator.",
+      "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
