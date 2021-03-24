@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "71626b7f_07bbdfd0",
+        "filename": "doc/source/reference/developer/index.rst",
+        "patchSetId": 15
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-03-24T13:52:14Z",
+      "side": 1,
+      "message": "Aha, right. THIS is why tox is being added to doc/requirements.txt.",
+      "revId": "3059222b4c0e5cf9e07f6e8de7494abfc34f605d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6296ccb1_cede64bc",
+        "filename": "playbooks/zuul-tox-docs/pre.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-03-24T13:52:14Z",
+      "side": 1,
+      "message": "You still haven\u0027t explained why this is preferable to adding a doc profile to the yarn entry in bindep.txt though. A role added to a job definition does not communicate to anyone that they need to install it themselves to build documentation locally. We already indicate in bindep.txt that yarn is required for compilation and testing (though at the moment we only specify Alpine linux for it, looks like, presumably for our container image builds? Might make sense to broaden that entry too).",
+      "revId": "3059222b4c0e5cf9e07f6e8de7494abfc34f605d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
