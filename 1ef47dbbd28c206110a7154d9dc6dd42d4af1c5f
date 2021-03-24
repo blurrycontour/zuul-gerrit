@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "04f2ee59_3b2fce68",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-24T18:18:26Z",
+      "side": 1,
+      "message": "Should we add an election test?",
+      "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
