@@ -43,6 +43,7 @@ from github3.session import AppInstallationTokenAuth
 from zuul.connection import CachedBranchConnection
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.lib.gearworker import ZuulGearWorker
+from zuul.lib.queue import NamedQueue
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Branch, Tag, Project
@@ -713,7 +714,7 @@ class GithubEventConnector:
             name='GithubEventForwarder', target=self.run_event_forwarder,
             daemon=True)
         self._thread_pool = concurrent.futures.ThreadPoolExecutor()
-        self._event_forward_queue = queue.Queue()
+        self._event_forward_queue = NamedQueue("GithubEventForwardQueue")
 
     def stop(self):
         self._stopped = True
