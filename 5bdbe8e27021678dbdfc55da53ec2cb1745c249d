@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1eea05f9_cde2da91",
+        "filename": "doc/requirements.txt",
+        "patchSetId": 14
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 24162
+      },
+      "writtenOn": "2021-03-24T09:00:31Z",
+      "side": 1,
+      "message": "While it may not be true to our CI setup but is quite common for doc building to not run under tox (readthedocs does this).\n\nFor example I am currently using tox v4 and building docs with it will fail due to missing tox executable (it is called tox4 until it is released). Even after it is released `tox -va` will not longer work, as it would become `tox list`.\n\nIMHO, declaring the fact that `tox` is required in order to successfully build the docs is not a mistake, as we do need to run `tox -va` to build the docs. In fact it would be correct to put `tox\u003c4` to be fully correct.",
+      "parentUuid": "0c61de19_ff7c3a58",
+      "revId": "5bdbe8e27021678dbdfc55da53ec2cb1745c249d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f2619dfd_38fcabec",
         "filename": "playbooks/zuul-tox-docs/pre.yaml",
         "patchSetId": 14
