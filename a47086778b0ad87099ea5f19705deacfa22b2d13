@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "969d69c1_c1ef418b",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-25T22:55:09Z",
+      "side": 1,
+      "message": "This is a great name.  :)",
+      "revId": "a47086778b0ad87099ea5f19705deacfa22b2d13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
