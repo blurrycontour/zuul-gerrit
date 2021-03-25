@@ -16,6 +16,24 @@
       "revId": "b268f71b233304dbbf2ce59846e47d0575b6b35b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a8478b7_874efff5",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-25T09:41:01Z",
+      "side": 0,
+      "message": "I think my assumption was that if we hit a timeout the caller is not interested in the result anymore. This seems to be the way in which it is currently used.\n\nWith your implementation it\u0027s behaves more like a non-blocking wait (which is totally fine).",
+      "parentUuid": "6522570b_8725a55e",
+      "revId": "b268f71b233304dbbf2ce59846e47d0575b6b35b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
