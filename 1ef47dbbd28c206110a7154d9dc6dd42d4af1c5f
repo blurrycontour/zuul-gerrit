@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "42141809_cc427b0f",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-25T07:27:18Z",
+      "side": 1,
+      "message": "Iterable is the abstract base class that has __iter__() as abstract method. We could add __iter__ again as @abstractmethod here to make it clear that ZooKeeperEventQueue is an ABC. \nThe _iterEvents() method implements common logic that is then used by the concrete implementations. The __iter__ method is implementation dependent and can\u0027t be implemented. here.",
+      "parentUuid": "c8665bd5_9cdfb1ca",
+      "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7d2d1434_3df21cd3",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 8
@@ -64,6 +82,24 @@
       "writtenOn": "2021-03-24T21:37:21Z",
       "side": 1,
       "message": "For reference this uses ZooKeeperEventQueue as base class and has __iter__ which makes it a proper iterator.",
+      "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3c156def_1edf1d7a",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-25T07:27:18Z",
+      "side": 1,
+      "message": "Yep, same for the other event queue implementations.",
+      "parentUuid": "7d2d1434_3df21cd3",
       "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
