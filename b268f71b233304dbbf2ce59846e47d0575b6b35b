@@ -52,6 +52,24 @@
       "revId": "b268f71b233304dbbf2ce59846e47d0575b6b35b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7eb5b00d_7a8b8590",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-25T10:55:50Z",
+      "side": 0,
+      "message": "Thinking about this some more it might make sense to extend the API to also allow \"canceling\" the future (basically just delete the result node). Currently if we hit a timeout we would leak the result nodes for the duration of the client lifetime. Not sure though if this is really an edge-case worth considering.\n\nThe timeout parameter is currently not used, but at some point we will get rid off the Gearman RPC mechanism and directly drop the events into the management event queue and wait for the future on the client side, e.g. zuul-web. In that case a timeout will probably be useful.",
+      "parentUuid": "a7f0955e_bdbb94ec",
+      "revId": "b268f71b233304dbbf2ce59846e47d0575b6b35b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
