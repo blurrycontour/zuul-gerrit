@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "870eb842_c87dbfd2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-25T22:46:56Z",
+      "side": 1,
+      "message": "Since you pushed this change up for discussion --\n\nI think we need to keep these stats working through the whole process.  I think they\u0027re some of the most important stats, and they\u0027re likely to be used in alert systems.\n\nPersonally, I think having the executors write summary stats to the registry (maybe every 10 seconds?) or having the scheduler read the queue from zk would be acceptable ways to accomplish this.\n\nWe might need a little of both, since it makes sense for an executor to write accepting and running, but not queued.",
+      "revId": "64204a40fc71821997bf6c9b5926f355023aa89a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
