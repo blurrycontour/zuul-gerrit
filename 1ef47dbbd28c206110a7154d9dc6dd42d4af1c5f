@@ -71,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "0abe3d8c_7cb0f0ce",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-25T07:37:53Z",
+      "side": 1,
+      "message": "We could rename this to __iter__ and then do the following in the derived classes:\n\n    for data, ack_ref in super().__iter__():\n        ...\n\nHowever, I would prefer not to do that as then the ZooKeeperEventQueue is not an ABC anymore.",
+      "parentUuid": "42141809_cc427b0f",
+      "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7d2d1434_3df21cd3",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 8
