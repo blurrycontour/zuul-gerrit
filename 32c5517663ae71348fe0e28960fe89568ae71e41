@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "61faec18_b8b5837e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 650,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-25T07:56:19Z",
+      "side": 1,
+      "message": "Yes, that\u0027s indeed confusing. I\u0027ll rename the event to _notify_new_event or something along those lines.",
+      "parentUuid": "02bc6072_6e38973c",
+      "revId": "32c5517663ae71348fe0e28960fe89568ae71e41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2faef37a_e79e9c77",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2021-03-24T20:02:43Z",
       "side": 1,
       "message": "How do we avoid processing the same events again on the next pass through this loop?\n\nI think we\u0027d need to maintain a set of event ids in the forward queue and skip those?",
+      "revId": "32c5517663ae71348fe0e28960fe89568ae71e41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "050f9d9e_996ddd6c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-25T07:56:19Z",
+      "side": 1,
+      "message": "Good catch! I\u0027ll fix this in the next PS.",
+      "parentUuid": "2faef37a_e79e9c77",
       "revId": "32c5517663ae71348fe0e28960fe89568ae71e41",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
