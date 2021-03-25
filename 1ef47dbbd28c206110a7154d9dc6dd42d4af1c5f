@@ -107,6 +107,23 @@
     },
     {
       "key": {
+        "uuid": "b49098a7_d2813d57",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-25T22:53:59Z",
+      "side": 1,
+      "message": "Okay, so SchedulerEventQueue is the only subclass of this that doesn\u0027t implement __iter__, and it\u0027s also meant to be abstract.  This makes sense to me.",
+      "revId": "1ef47dbbd28c206110a7154d9dc6dd42d4af1c5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7d2d1434_3df21cd3",
         "filename": "zuul/zk/event_queues.py",
         "patchSetId": 8
