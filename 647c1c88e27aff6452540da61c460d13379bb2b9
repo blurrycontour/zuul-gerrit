@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4b7fb5e0_f626820f",
+        "filename": "zuul/zk/event_queues.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 302,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-26T01:03:04Z",
+      "side": 1,
+      "message": "The tests are timing out because they\u0027re catching a race here; tests.unit.test_scheduler.TestScheduler.test_client_promote_negative processes the promote event that we put before we create the result node.  We need to do this in the other order; the only risk is that we will create a result node and then fail to create the actual event node.  In that case, we will leak the result node until this client restarts.  That\u0027s probably acceptable.\n\n(We could try to delete the result node if we fail to create the event node, but the only reason we\u0027re likely to fail to create the event node is that ZK has gone away, so we\u0027re unlikely to be able to clean up immediately, and I think we want to go ahead and return the exception ASAP.)",
+      "revId": "647c1c88e27aff6452540da61c460d13379bb2b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
