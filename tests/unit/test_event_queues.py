@@ -320,6 +320,98 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
         self.assertEqual(len(pipeline_queue), 0)
         self.assertFalse(pipeline_queue.hasEvents())
 
+    def test_management_events_client(self):
+        # Test management events from a second client
+
+        queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+
+        # This client will submit a reconfigure event and wait for it.
+        external_client = ZooKeeperClient(
+            self.zk_chroot_fixture.zk_hosts,
+            tls_cert=self.zk_chroot_fixture.zookeeper_cert,
+            tls_key=self.zk_chroot_fixture.zookeeper_key,
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca)
+        self.addCleanup(external_client.disconnect)
+        external_client.connect()
+
+        external_queue = event_queues.GlobalManagementEventQueue(
+            external_client)
+
+        event = model.ReconfigureEvent(None)
+        result_future = external_queue.put(event)
+        self.assertIsNotNone(result_future)
+
+        self.assertEqual(len(queue), 1)
+        self.assertTrue(queue.hasEvents())
+        self.assertFalse(result_future.wait(0.1))
+
+        acked = 0
+        for event in queue:
+            self.assertIsInstance(event, model.ReconfigureEvent)
+            queue.ack(event)
+            acked += 1
+
+        self.assertEqual(acked, 1)
+        self.assertTrue(result_future.wait(5))
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+
+    def test_management_events_client_disconnect(self):
+        # Test management events from a second client which
+        # disconnects before the event is complete.
+
+        queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+
+        # This client will submit a reconfigure event and disconnect
+        # before it's complete.
+        external_client = ZooKeeperClient(
+            self.zk_chroot_fixture.zk_hosts,
+            tls_cert=self.zk_chroot_fixture.zookeeper_cert,
+            tls_key=self.zk_chroot_fixture.zookeeper_key,
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca)
+        self.addCleanup(external_client.disconnect)
+        external_client.connect()
+
+        external_queue = event_queues.GlobalManagementEventQueue(
+            external_client)
+
+        # Submit the event
+        event = model.ReconfigureEvent(None)
+        result_future = external_queue.put(event)
+        self.assertIsNotNone(result_future)
+
+        # Make sure the event is in the queue and the result node exists
+        self.assertEqual(len(queue), 1)
+        self.assertTrue(queue.hasEvents())
+        self.assertFalse(result_future.wait(0.1))
+        self.assertEqual(len(
+            self.zk_client.client.get_children('/zuul/results/management')), 1)
+
+        # Disconnect the originating client
+        external_client.disconnect()
+        # Ensure the result node is gone
+        self.assertEqual(len(
+            self.zk_client.client.get_children('/zuul/results/management')), 0)
+
+        # Process the event
+        acked = 0
+        for event in queue:
+            self.assertIsInstance(event, model.ReconfigureEvent)
+            queue.ack(event)
+            acked += 1
+
+        # Make sure the event has been processed and we didn't
+        # re-create the result node.
+        self.assertEqual(acked, 1)
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+        self.assertEqual(len(
+            self.zk_client.client.get_children('/zuul/results/management')), 0)
+
 
 # TODO: use actual model.ResultEvent once it inherits from
 # AbstractEvent and implements serialization.

@@ -279,9 +279,9 @@ class ManagementEventResultFuture(ZooKeeperBase):
         # that an event has been processed is to check for a result;
         # the original event may have been deleted when forwaded to a
         # different queue.
+        if not self._wait_event.wait(timeout):
+            return False
         try:
-            if not self._wait_event.wait(timeout):
-                return False
             try:
                 data, _ = self.kazoo_client.get(self._result_path)
                 result = json.loads(data.decode("utf-8"))
@@ -321,6 +321,10 @@ class ManagementEventQueue(SchedulerEventQueue):
             "event_data": event.toDict(),
             "result_path": result_path,
         }
+        if needs_result and not event.result_ref:
+            # The event was not forwarded, create the result ref
+            self.kazoo_client.create(result_path, None,
+                                     makepath=True, ephemeral=True)
         self._put(data)
         if needs_result and result_path:
             return ManagementEventResultFuture(self.client, result_path)
@@ -367,14 +371,16 @@ class ManagementEventQueue(SchedulerEventQueue):
         if not event.result_ref:
             return
 
-        # TODO: Add a cleanup thread that deletes old events.
         result_data = {"traceback": event.traceback,
                        "timestamp": time.monotonic()}
-        self.kazoo_client.create(
-            event.result_ref,
-            json.dumps(result_data).encode("utf-8"),
-            makepath=True,
-        )
+        try:
+            self.kazoo_client.set(
+                event.result_ref,
+                json.dumps(result_data).encode("utf-8"),
+            )
+        except NoNodeError:
+            self.log.warning(f"No result node found for {event}; "
+                             "client may have disconnected")
 
 
 class PipelineManagementEventQueue(ManagementEventQueue):
