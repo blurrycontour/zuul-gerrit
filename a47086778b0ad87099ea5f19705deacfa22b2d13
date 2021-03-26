@@ -16,6 +16,23 @@
       "revId": "a47086778b0ad87099ea5f19705deacfa22b2d13",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4248afe8_de5a3f7f",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 691,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-26T06:39:05Z",
+      "side": 1,
+      "message": "This has a race condition between the dispatcher and forwarder thread. An in-progress event might be acked and removed from the set between start of the iteration and the check here. This can lead to events being processed twice. In order to fix that we need to create a copy of the set before iterating.",
+      "revId": "a47086778b0ad87099ea5f19705deacfa22b2d13",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
