@@ -6860,6 +6860,32 @@ class TestAmbiguousProjectNames(ZuulTestCase):
                          'SUCCESS')
         self.assertEqual(r, True)
 
+    def test_client_enqueue_ref_canonical(self):
+        "Test that the RPC client can enqueue a ref using canonical name"
+        p = "review.example.com/org/project"
+        upstream = self.getUpstreamRepos([p])
+        A = self.fake_review_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
+        A_commit = str(upstream[p].commit('master'))
+        self.log.debug("A commit: %s" % A_commit)
+
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.enqueue_ref(
+            tenant='tenant-one',
+            pipeline='post',
+            project='review.example.com/org/project',
+            trigger=None,
+            ref='master',
+            oldrev='90f173846e3af9154517b88543ffbd1691f31366',
+            newrev=A_commit)
+        self.waitUntilSettled()
+        job_names = [x.name for x in self.history]
+        self.assertEqual(len(self.history), 1)
+        self.assertIn('project-post', job_names)
+        self.assertEqual(r, True)
+
 
 class TestExecutor(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'

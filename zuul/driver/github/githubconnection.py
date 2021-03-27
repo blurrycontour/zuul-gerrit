@@ -597,6 +597,7 @@ class GithubEventProcessor(object):
         event = DequeueEvent(
             dequeue_attrs["tenant"],
             dequeue_attrs["pipeline"],
+            self.connection.canonical_hostname,
             project,
             change,
             ref=None
