@@ -119,6 +119,9 @@ class GerritEventConnector(threading.Thread):
 
     IGNORED_EVENTS = (
         'cache-eviction',  # evict-cache plugin
+        'ref-replicated',
+        'ref-replication-scheduled',
+        'ref-replication-done'
     )
 
     log = logging.getLogger("zuul.GerritEventConnector")
@@ -217,9 +220,6 @@ class GerritEventConnector(threading.Thread):
             'comment-added': 'author',
             'ref-updated': 'submitter',
             'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
-            'ref-replicated': None,
-            'ref-replication-done': None,
-            'ref-replication-scheduled': None,
             'topic-changed': 'changer',
             'project-created': None,  # Gerrit 2.14
             'pending-check': None,  # Gerrit 3.0+
