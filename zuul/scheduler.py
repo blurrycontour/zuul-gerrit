@@ -567,18 +567,35 @@ class Scheduler(threading.Thread):
         self.log.debug("Promotion complete")
 
     def dequeue(self, tenant_name, pipeline_name, project_name, change, ref):
-        event = DequeueEvent(
-            tenant_name, pipeline_name, project_name, change, ref)
+        # We need to do some pre-processing here to get the correct
+        # form of the project hostname and name based on un-known
+        # inputs.
+        tenant = self.abide.tenants.get(tenant_name)
+        if tenant is None:
+            raise ValueError(f'Unknown tenant {tenant_name}')
+        (trusted, project) = tenant.getProject(project_name)
+
+        event = DequeueEvent(tenant_name, pipeline_name,
+                             project.canonical_hostname, project.name,
+                             change, ref)
         result = self.management_events.put(event)
         self.log.debug("Waiting for dequeue")
         result.wait()
         self.log.debug("Dequeue complete")
 
-    def enqueue(self, tenant_name, pipeline_name, canonical_project_name,
+    def enqueue(self, tenant_name, pipeline_name, project_name,
                 change, ref, oldrev, newrev):
+        # We need to do some pre-processing here to get the correct
+        # form of the project hostname and name based on un-known
+        # inputs.
+        tenant = self.abide.tenants.get(tenant_name)
+        if tenant is None:
+            raise ValueError(f'Unknown tenant {tenant_name}')
+        (trusted, project) = tenant.getProject(project_name)
+
         event = EnqueueEvent(tenant_name, pipeline_name,
-                             canonical_project_name, change, ref, oldrev,
-                             newrev)
+                             project.canonical_hostname, project.name,
+                             change, ref, oldrev, newrev)
         result = self.management_events.put(event)
         self.log.debug("Waiting for enqueue")
         result.wait()

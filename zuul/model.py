@@ -3634,6 +3634,7 @@ class ChangeManagementEvent(ManagementEvent):
 
     :arg str tenant_name: the name of the tenant
     :arg str pipeline_name: the name of the pipeline
+    :arg str project_hostname: the hostname of the project
     :arg str project_name: the name of the project
     :arg str change: optional, the change
     :arg str ref: optional, the ref
@@ -3641,11 +3642,13 @@ class ChangeManagementEvent(ManagementEvent):
     :arg str newrev: optional, the new revision
     """
 
-    def __init__(self, tenant_name, pipeline_name, project_name,
-                 change=None, ref=None, oldrev=None, newrev=None):
+    def __init__(self, tenant_name, pipeline_name, project_hostname,
+                 project_name, change=None, ref=None, oldrev=None,
+                 newrev=None):
         super().__init__()
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
+        self.project_hostname = project_hostname
         self.project_name = project_name
         self.change = change
         if change is not None:
@@ -3660,6 +3663,7 @@ class ChangeManagementEvent(ManagementEvent):
         d = super().toDict()
         d["tenant_name"] = self.tenant_name
         d["pipeline_name"] = self.pipeline_name
+        d["project_hostname"] = self.project_hostname
         d["project_name"] = self.project_name
         d["change"] = self.change
         d["ref"] = self.ref
@@ -3672,6 +3676,7 @@ class ChangeManagementEvent(ManagementEvent):
         event = cls(
             data.get("tenant_name"),
             data.get("pipeline_name"),
+            data.get("project_hostname"),
             data.get("project_name"),
             data.get("change"),
             data.get("ref"),
