@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b3c4604_577d6b11",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 20
+      },
+      "lineNbr": 1029,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T23:04:21Z",
+      "side": 1,
+      "message": "We should support zuul-web being unzoned in a mixed system (zuul-web unzoned, and both zoned and unzoned executors).  In that case, a user should omit \"zone\" here.  We should explicitly mention that.",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b8f9fc60_e19e9b4b",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 20
+      },
+      "lineNbr": 1290,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T23:04:21Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1cec5430_2410a582",
+        "filename": "releasenotes/notes/distributed-executors-270abdf6cd3dc303.yaml",
+        "patchSetId": 20
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T23:04:21Z",
+      "side": 1,
+      "message": "typo: typically",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8a10d4ae_5489243e",
+        "filename": "tests/unit/test_component_registry.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T23:04:21Z",
+      "side": 1,
+      "message": "Is this adding an undocumented config value?",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e043ed6b_61d6f0f8",
+        "filename": "zuul/lib/fingergw.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T23:04:21Z",
+      "side": 1,
+      "message": "Instead of this, why don\u0027t we register this information in the component registry?",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "88649c9a_0d730ebc",
+        "filename": "zuul/rpclistener.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T23:04:21Z",
+      "side": 1,
+      "message": "This doesn\u0027t appear to handle the case of an unzoned request in a mixed zoned/unzoned system.  I think for that we could just do this:\n\nif (build.worker.zone and source_zone !\u003d build.worker.zone):",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
