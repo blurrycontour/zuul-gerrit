@@ -25,6 +25,7 @@ from contextlib import suppress
 
 from kazoo.exceptions import NoNodeError
 from kazoo.protocol.states import EventType
+from kazoo.recipe.election import Election
 
 from zuul import model
 from zuul.lib.collections import DefaultKeyDict
@@ -581,3 +582,13 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
             event = model.ConnectionEvent.fromDict(data)
             event.ack_ref = ack_ref
             yield event
+
+
+class EventReceiverElection(Election):
+    """Election for a singleton event receiver."""
+
+    def __init__(self, client, connection_name, receiver_name):
+        self.election_root = "/".join(
+            (CONNECTION_ROOT, connection_name, f"election-{receiver_name}")
+        )
+        super().__init__(client.client, self.election_root)
