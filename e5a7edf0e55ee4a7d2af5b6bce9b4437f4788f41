@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c5bdd5a7_b620b2c0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T23:06:37Z",
+      "side": 1,
+      "message": "How do we handle the case where we want SSL between zones (ie, from on-premises to a remote cloud) but still want the main fingergw to not require SSL (so people on-prem can still \"finger uuid@zuul\")?",
+      "revId": "e5a7edf0e55ee4a7d2af5b6bce9b4437f4788f41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
