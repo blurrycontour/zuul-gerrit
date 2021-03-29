@@ -104,6 +104,24 @@ class TestEventQueue(EventQueueBaseTestCase):
         self.assertEqual(list(self.queue._iterEvents()), [])
         self.assertEqual(len(self.queue), 0)
 
+    def test_out_of_band_ack(self):
+        # Test that out-of-band acks are not causing side-effects for
+        # other consumers.
+        self.queue._put({})
+        self.queue._put({})
+
+        ack_events = list(self.queue)
+        self.assertEqual(len(ack_events), 2)
+
+        for index, event in enumerate(self.queue):
+            # Ack all events in the queue while we have only consumed the
+            # first event in this iteration.
+            for e in ack_events:
+                self.queue.ack(e)
+
+        # Queue did not return the second event since it was removed.
+        self.assertEqual(index, 0)
+
 
 class DummyTriggerEvent(model.TriggerEvent):
     pass

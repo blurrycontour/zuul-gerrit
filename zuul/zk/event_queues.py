@@ -193,7 +193,11 @@ class ZooKeeperEventQueue(ZooKeeperBase, Iterable):
         for event_id in events:
             path = "/".join((self.event_root, event_id))
             # TODO: implement sharding of large events
-            data, zstat = self.kazoo_client.get(path)
+            try:
+                data, zstat = self.kazoo_client.get(path)
+            except NoNodeError:
+                # Node was acked/removed in the meantime
+                continue
             try:
                 event = json.loads(data)
             except json.JSONDecodeError:
