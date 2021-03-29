@@ -17,18 +17,19 @@
 import os
 import logging
 import threading
-import time
 
 import git
 
 from zuul.driver.git.gitmodel import EMPTY_GIT_REF
+from zuul.zk.event_queues import EventReceiverElection
 
 
 # This class may be used by any driver to implement git head polling.
 class GitWatcher(threading.Thread):
     log = logging.getLogger("zuul.connection.git.watcher")
 
-    def __init__(self, connection, baseurl, poll_delay, callback):
+    def __init__(self, connection, baseurl, poll_delay, callback,
+                 election_name="watcher"):
         """Watch for branch changes
 
         Watch every project listed in the connection and call a
@@ -43,6 +44,8 @@ class GitWatcher(threading.Thread):
         :param function callback:
            A callback method to be called for each updated ref.  The sole
            argument is a dictionary describing the update.
+        :param str election_name:
+           Name to use in the Zookeeper election of the watcher.
         """
         threading.Thread.__init__(self)
         self.daemon = True
@@ -50,8 +53,13 @@ class GitWatcher(threading.Thread):
         self.baseurl = baseurl
         self.poll_delay = poll_delay
         self._stopped = False
+        self._stop_event = threading.Event()
         self.projects_refs = {}
         self.callback = callback
+        self.watcher_election = EventReceiverElection(
+            connection.sched.zk_client,
+            connection.connection_name,
+            election_name)
         # This is used by the test framework
         self._event_count = 0
         self._pause = False
@@ -110,37 +118,44 @@ class GitWatcher(threading.Thread):
             events.append(event)
         return events
 
-    def _run(self):
+    def _poll(self):
         self.log.debug("Walk through projects refs for connection: %s" %
                        self.connection.connection_name)
-        try:
-            for project in self.connection.projects:
-                refs = self.lsRemote(project)
-                self.log.debug("Read %s refs for project %s",
-                               len(refs), project)
-                if not self.projects_refs.get(project):
-                    # State for this project does not exist yet so add it.
-                    # No event will be triggered in this loop as
-                    # projects_refs['project'] and refs are equal
-                    self.projects_refs[project] = refs
-                events = self.compareRefs(project, refs)
+        for project in self.connection.projects:
+            refs = self.lsRemote(project)
+            self.log.debug("Read %s refs for project %s",
+                           len(refs), project)
+            if not self.projects_refs.get(project):
+                # State for this project does not exist yet so add it.
+                # No event will be triggered in this loop as
+                # projects_refs['project'] and refs are equal
                 self.projects_refs[project] = refs
-                # Send events to the scheduler
-                for event in events:
-                    self.log.debug("Sending event: %s" % event)
-                    self.callback(event)
-                    self._event_count += 1
-        except Exception as e:
-            self.log.debug("Unexpected issue in _run loop: %s" % str(e))
+            events = self.compareRefs(project, refs)
+            self.projects_refs[project] = refs
+            # Send events to the scheduler
+            for event in events:
+                self.log.debug("Sending event: %s" % event)
+                self.callback(event)
+                self._event_count += 1
 
-    def run(self):
+    def _run(self):
         while not self._stopped:
             if not self._pause:
-                self._run()
+                self._poll()
                 # Polling wait delay
             else:
                 self.log.debug("Watcher is on pause")
-            time.sleep(self.poll_delay)
+            self._stop_event.wait(self.poll_delay)
+
+    def run(self):
+        while not self._stopped:
+            try:
+                self.watcher_election.run(self._run)
+            except Exception:
+                self.log.exception("Unexpected issue in _run loop:")
 
     def stop(self):
+        self.log.debug("Stopping watcher")
         self._stopped = True
+        self._stop_event.set()
+        self.watcher_election.cancel()

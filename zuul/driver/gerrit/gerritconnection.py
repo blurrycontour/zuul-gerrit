@@ -42,7 +42,7 @@ from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Tag, Branch, Project
-from zuul.zk.event_queues import ConnectionEventQueue
+from zuul.zk.event_queues import ConnectionEventQueue, EventReceiverElection
 
 # HTTP timeout in seconds
 TIMEOUT = 30
@@ -335,6 +335,11 @@ class GerritWatcher(threading.Thread):
         self.hostname = hostname
         self.port = port
         self.gerrit_connection = gerrit_connection
+        self._stop_event = threading.Event()
+        self.watcher_election = EventReceiverElection(
+            gerrit_connection.sched.zk_client,
+            gerrit_connection.connection_name,
+            "watcher")
         self.keepalive = keepalive
         self._stopped = False
 
@@ -392,10 +397,6 @@ class GerritWatcher(threading.Thread):
 
             if ret and ret not in [-1, 130]:
                 raise Exception("Gerrit error executing stream-events")
-        except Exception:
-            self.log.exception("Exception on ssh event stream with %s:",
-                               self.gerrit_connection.connection_name)
-            time.sleep(5)
         finally:
             # If we don't close on exceptions to connect we can leak the
             # connection and DoS Gerrit.
@@ -403,11 +404,18 @@ class GerritWatcher(threading.Thread):
 
     def run(self):
         while not self._stopped:
-            self._run()
+            try:
+                self.watcher_election.run(self._run)
+            except Exception:
+                self.log.exception("Exception on ssh event stream with %s:",
+                                   self.gerrit_connection.connection_name)
+                self._stop_event.wait(5)
 
     def stop(self):
         self.log.debug("Stopping watcher")
         self._stopped = True
+        self._stop_event.set()
+        self.watcher_election.cancel(self._run)
 
 
 class GerritPoller(threading.Thread):
@@ -419,6 +427,8 @@ class GerritPoller(threading.Thread):
         threading.Thread.__init__(self)
         self.connection = connection
         self.last_merged_poll = 0
+        self.poller_election = EventReceiverElection(
+            connection.sched.zk_client, connection.connection_name, "poller")
         self._stopped = False
         self._stop_event = threading.Event()
 
@@ -449,43 +459,30 @@ class GerritPoller(threading.Thread):
                 }}
 
     def _poll_checkers(self):
-        try:
-            for checker in self.connection.watched_checkers:
-                changes = self.connection.get(
-                    'plugins/checks/checks.pending/?'
-                    'query=checker:%s+(state:NOT_STARTED)' % checker)
-                for change in changes:
-                    for uuid, check in change['pending_checks'].items():
-                        event = self._makePendingCheckEvent(
-                            change, uuid, check)
-                        self.connection.addEvent(event)
-        except Exception:
-            self.log.exception("Exception on Gerrit poll with %s:",
-                               self.connection.connection_name)
+        for checker in self.connection.watched_checkers:
+            changes = self.connection.get(
+                'plugins/checks/checks.pending/?'
+                'query=checker:%s+(state:NOT_STARTED)' % checker)
+            for change in changes:
+                for uuid, check in change['pending_checks'].items():
+                    event = self._makePendingCheckEvent(
+                        change, uuid, check)
+                    self.connection.addEvent(event)
 
     def _poll_merged_changes(self):
-        try:
-            now = datetime.datetime.utcnow()
-            age = self.last_merged_poll
-            if age:
-                # Allow an extra 4 seconds for request time
-                age = int(math.ceil((now - age).total_seconds())) + 4
-            changes = self.connection.simpleQueryHTTP(
-                "status:merged -age:%ss" % (age,))
-            self.last_merged_poll = now
-            for change in changes:
-                event = self._makeChangeMergedEvent(change)
-                self.connection.addEvent(event)
-        except Exception:
-            self.log.exception("Exception on Gerrit poll with %s:",
-                               self.connection.connection_name)
+        now = datetime.datetime.utcnow()
+        age = self.last_merged_poll
+        if age:
+            # Allow an extra 4 seconds for request time
+            age = int(math.ceil((now - age).total_seconds())) + 4
+        changes = self.connection.simpleQueryHTTP(
+            "status:merged -age:%ss" % (age,))
+        self.last_merged_poll = now
+        for change in changes:
+            event = self._makeChangeMergedEvent(change)
+            self.connection.addEvent(event)
 
     def _run(self):
-        self._poll_checkers()
-        if not self.connection.enable_stream_events:
-            self._poll_merged_changes()
-
-    def run(self):
         last_start = time.time()
         while not self._stopped:
             next_start = last_start + self.poll_interval
@@ -493,12 +490,24 @@ class GerritPoller(threading.Thread):
             if self._stopped:
                 break
             last_start = time.time()
-            self._run()
+
+            self._poll_checkers()
+            if not self.connection.enable_stream_events:
+                self._poll_merged_changes()
+
+    def run(self):
+        while not self._stopped:
+            try:
+                self.poller_election.run(self._run)
+            except Exception:
+                self.log.exception("Exception on Gerrit poll with %s:",
+                                   self.connection.connection_name)
 
     def stop(self):
         self.log.debug("Stopping watcher")
         self._stopped = True
         self._stop_event.set()
+        self.poller_election.cancel()
 
 
 class GerritConnection(BaseConnection):
@@ -1540,7 +1549,8 @@ class GerritConnection(BaseConnection):
             self,
             self.baseurl,
             self.ref_watcher_poll_interval,
-            self.refWatcherCallback)
+            self.refWatcherCallback,
+            election_name="ref-watcher")
         self.ref_watcher_thread.start()
 
     def _stop_event_connector(self):
