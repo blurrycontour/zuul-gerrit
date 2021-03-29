@@ -2,6 +2,57 @@
   "comments": [
     {
       "key": {
+        "uuid": "4a61b054_e2feca77",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T22:42:38Z",
+      "side": 1,
+      "message": "It\u0027s a little ambiguous, but I think \"source zone\" means \"the zone provided with the request\".  However, what about the case of an unzoned zuul-web making a request?  In that case, the scheduler should provide the zoned fingergw address.\n\nI think these rules should be:\n   * Address of executor if the zone provided with the request matches the zone of the executor running the build, or the executor is un-zoned.\n   * Address of fingergw in the target zone otherwise.",
+      "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7dc520bc_4ebdee3b",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T22:42:38Z",
+      "side": 1,
+      "message": "Perhaps we should go ahead and use the ZK component registry for this?",
+      "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d7f4f4b_05008665",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T22:42:38Z",
+      "side": 1,
+      "message": "In the proposed change, we are adding zone information to zuul-web and zuul-fingergw, and I believe that is to support the idea that some or all of these services might be geographically distributed.  In other words (just focusing on zuul-web here): an operator may deploy a Zuul with 2 zuul-web processes, each of which is in an executor zone, and load balance between them.  These processes need to know their own zones so that they can make appropriate requests to fingergw services for log forwarding, however, they will be indistinguishable from each other for end users.  A user could connect to either one and will be able to access logs from anywhere.\n\nIt *almost* goes without saying since I believe universal accessibility is really the point of this spec, but it\u0027s still probably worth being clear that end users will never need to see or know anything about executor zoning, and that zuul-web and zuul-fingergw will still have a single canonical URL for end users to use and type into their address bars or terminals.  Maybe something like:\n\nWhile zuul-web and zuul-fingergw will be aware of what zone they are running in, end-users will not need this information; the user-facing instances of those services will continue to serve the entirely of the Zuul system regardless of which zone they reside in, all from a single public URL or address.",
+      "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f94adff_780e17e5",
         "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
         "patchSetId": 7
@@ -22,6 +73,23 @@
       "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79c274e9_7a5701ed",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T22:42:38Z",
+      "side": 1,
+      "message": "I think that method to supply a CA file and only accept connections from certs signed by that CA, right?  If so, I agree.",
+      "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
