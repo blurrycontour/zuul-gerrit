@@ -16,6 +16,23 @@
       "revId": "abad438e537b73f87a99bc7131134fc5d72e955e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f8c38f46_cb05d25e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T13:36:34Z",
+      "side": 1,
+      "message": "Maybe, but we would need to change all of the events for all of the drivers, so it may not be a small change.",
+      "revId": "abad438e537b73f87a99bc7131134fc5d72e955e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
