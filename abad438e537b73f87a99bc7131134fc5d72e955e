@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "779c46c5_ee1c5c5a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 581,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-29T05:42:36Z",
+      "side": 1,
+      "message": "Would it make sense to pass \"project.canonical_project_name\" instead and rename the field in the event to \"canonical_project_name\"? It just seems that internally we always need the canonical project name and this way we don\u0027t have to construct it manually in the _doXYZEvent() methods.",
+      "revId": "abad438e537b73f87a99bc7131134fc5d72e955e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
