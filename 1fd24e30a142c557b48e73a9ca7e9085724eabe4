@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "52c49328_a9f6f32d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-29T18:01:53Z",
+      "side": 1,
+      "message": "This change got me thinking:\n\nAt a high level, this shouldn\u0027t be an issue because deleting queue entries should only be done by one actor at a time.  We exepect schedulers to lock queues when they are processing them (and this is why we have pipeline queues, so the locks can be fine-grained).\n\nAnd in this case, we also have one \"owner\" -- the winner of the github connection election.  However, that single owner has two threads, and the second one is changing the queue out from under the first.\n\nThis made me consider what happens when we have multiple schedulers and we stop this one while it\u0027s processing.  Right now, we stop the dispatching thread (the one that reads from zk), and then once it joins, we stop the forwarding thread (the one that deletes from zk).  Between those two periods, the second scheduler will be able to start its dispatching thread and will lack information about any in-progress events from the first scheduler.  We may double-forward events because of this.\n\nInstead of trying to plug that hole too, maybe we can address that and the issue in this patch by moving all of the zk event handling back into one thread, so this behaves more like how we expect the rest of the system to behave: a single thread processing the event queue at a time.\n\nWe can still parallelize the work, but by keeping the acks in the original thread, we can ensure that at least from an outside perspective, the event queue has a single owner while it\u0027s being processed.\n\nI wrote https://review.opendev.org/c/zuul/zuul/+/783726",
+      "revId": "1fd24e30a142c557b48e73a9ca7e9085724eabe4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
