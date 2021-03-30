@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fcf9f9d9_2688a324",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-03-30T20:09:31Z",
+      "side": 1,
+      "message": "This actually does the opposite.  It currently uses the short name (\"bar\") not the full name (\"foo/bar\").  This change will make it use the full name.\n\nIt\u0027s not clear from the commit message why we should make this change.",
+      "revId": "f91a0eb6a2bdba7bc4f50f51188870a7fb4593ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
