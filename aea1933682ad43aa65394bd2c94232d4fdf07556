@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "08a99b42_883a162c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 681,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-03-30T08:38:22Z",
+      "side": 1,
+      "message": "If _dispatchEventsMain() raises an exception we probably want to cancel/remove futures in _event_forward_queue so we don\u0027t try to ack those later, as they might haven been processed by a different scheduler in the meantime.",
+      "revId": "aea1933682ad43aa65394bd2c94232d4fdf07556",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
