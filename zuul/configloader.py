@@ -953,13 +953,11 @@ class JobParser(object):
         return job
 
     def _makeZuulRole(self, job, role):
-        name = role['zuul'].split('/')[-1]
-
         (trusted, project) = self.pcontext.tenant.getProject(role['zuul'])
         if project is None:
             return None
 
-        return model.ZuulRole(role.get('name', name),
+        return model.ZuulRole(role.get('name', project.name),
                               project.canonical_name)
 
     def _makeImplicitRole(self, job):
