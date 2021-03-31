@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "c9e2691d_4210261d",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 20
+      },
+      "lineNbr": 1030,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-31T07:55:35Z",
+      "side": 1,
+      "message": "Hostname override should be documented here.",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b8f9fc60_e19e9b4b",
         "filename": "doc/source/discussion/components.rst",
         "patchSetId": 20
@@ -70,6 +87,24 @@
     },
     {
       "key": {
+        "uuid": "9fd2d7ca_26c94b02",
+        "filename": "tests/unit/test_component_registry.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-31T07:55:35Z",
+      "side": 1,
+      "message": "That adds the hostname config value just like the executor has as an optional override. I agree that this should be documented.",
+      "parentUuid": "8a10d4ae_5489243e",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e043ed6b_61d6f0f8",
         "filename": "zuul/lib/fingergw.py",
         "patchSetId": 20
@@ -81,6 +116,24 @@
       "writtenOn": "2021-03-29T23:04:21Z",
       "side": 1,
       "message": "Instead of this, why don\u0027t we register this information in the component registry?",
+      "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b29fba65_e87bf0bd",
+        "filename": "zuul/lib/fingergw.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-31T07:55:35Z",
+      "side": 1,
+      "message": "Ack, now that the component registry exists we should use that instead.",
+      "parentUuid": "e043ed6b_61d6f0f8",
       "revId": "a786e5cd49a5b47d1e951910cebf57fc5b541abb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
