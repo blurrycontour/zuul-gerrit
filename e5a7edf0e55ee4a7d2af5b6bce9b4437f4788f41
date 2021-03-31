@@ -16,6 +16,24 @@
       "revId": "e5a7edf0e55ee4a7d2af5b6bce9b4437f4788f41",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5305d3d7_fac21cdf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-31T07:49:00Z",
+      "side": 1,
+      "message": "I\u0027d handle that by deploying a separate fingergw for user access and use the ssl enabled ones only for cross zone traffic.",
+      "parentUuid": "c5bdd5a7_b620b2c0",
+      "revId": "e5a7edf0e55ee4a7d2af5b6bce9b4437f4788f41",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
