@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b060d18c_2d31c45e",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-31T07:18:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a61b054_e2feca77",
+      "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7dc520bc_4ebdee3b",
         "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
         "patchSetId": 7
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "bd4bca7f_60010ea2",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-31T07:18:59Z",
+      "side": 1,
+      "message": "Yes, of course, that now makes much more sense since that now exists.",
+      "parentUuid": "7dc520bc_4ebdee3b",
+      "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d7f4f4b_05008665",
         "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
         "patchSetId": 7
@@ -47,6 +83,24 @@
       "writtenOn": "2021-03-29T22:42:38Z",
       "side": 1,
       "message": "In the proposed change, we are adding zone information to zuul-web and zuul-fingergw, and I believe that is to support the idea that some or all of these services might be geographically distributed.  In other words (just focusing on zuul-web here): an operator may deploy a Zuul with 2 zuul-web processes, each of which is in an executor zone, and load balance between them.  These processes need to know their own zones so that they can make appropriate requests to fingergw services for log forwarding, however, they will be indistinguishable from each other for end users.  A user could connect to either one and will be able to access logs from anywhere.\n\nIt *almost* goes without saying since I believe universal accessibility is really the point of this spec, but it\u0027s still probably worth being clear that end users will never need to see or know anything about executor zoning, and that zuul-web and zuul-fingergw will still have a single canonical URL for end users to use and type into their address bars or terminals.  Maybe something like:\n\nWhile zuul-web and zuul-fingergw will be aware of what zone they are running in, end-users will not need this information; the user-facing instances of those services will continue to serve the entirely of the Zuul system regardless of which zone they reside in, all from a single public URL or address.",
+      "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "328b12d4_8b9663af",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-31T07:18:59Z",
+      "side": 1,
+      "message": "Yes, you\u0027re right that in the end universal accessibility is the point of this spec. I\u0027ll add your proposed clarification.",
+      "parentUuid": "6d7f4f4b_05008665",
       "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -87,6 +141,24 @@
       "writtenOn": "2021-03-29T22:42:38Z",
       "side": 1,
       "message": "I think that method to supply a CA file and only accept connections from certs signed by that CA, right?  If so, I agree.",
+      "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d7e0ddd2_ffee7831",
+        "filename": "doc/source/reference/developer/specs/enhanced-regional-executors.rst",
+        "patchSetId": 7
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-03-31T07:18:59Z",
+      "side": 1,
+      "message": "Yes, essentially the same we do with gearman.",
+      "parentUuid": "79c274e9_7a5701ed",
       "revId": "22823f10839c7ee211f09aefa59bb237982f64b9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
