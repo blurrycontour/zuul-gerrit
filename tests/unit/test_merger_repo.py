@@ -883,3 +883,56 @@ class TestMerger(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
 
         self.assertFalse(os.path.exists(fpath))
+
+    def test_update_after_ff_merge(self):
+        # Test update to branch from pre existing fast forwardable commit
+        # causes the branch to update
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        upstream_repo = git.Repo(parent_path)
+
+        # Get repo and update for the first time.
+        merger = self.executor_server.merger
+        merger.updateRepo('gerrit', 'org/project1')
+        repo = merger.getRepo('gerrit', 'org/project1')
+
+        # Branch master must exist
+        self.assertEqual(['master'], repo.getBranches())
+
+        # Create a new change in the upstream repo
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        item_a = self._item_from_fake_change(A)
+        change_sha = A.data['currentPatchSet']['revision']
+        change_ref = 'refs/changes/01/1/1'
+
+        # This will pull the upstream change into the zuul repo
+        self.log.info('Merge the new change so it is present in the zuul repo')
+        merger.mergeChanges([item_a], zuul_event_id='testeventid')
+        repo = merger.getRepo('gerrit', 'org/project1')
+        zuul_repo = git.Repo(repo.local_path)
+        zuul_ref = repo.refNameToZuulRef('master')
+        self.assertEqual(upstream_repo.commit(change_ref).hexsha,
+                         zuul_repo.commit(zuul_ref).hexsha)
+        self.assertNotEqual(upstream_repo.commit(change_ref).hexsha,
+                            zuul_repo.commit('refs/heads/master').hexsha)
+
+        # Update upstream master to point at the change commit simulating a
+        # fast forward merge of a change
+        upstream_repo.refs.master.commit = change_sha
+        self.assertEqual(upstream_repo.commit('refs/heads/master').hexsha,
+                         change_sha)
+        repo_state_update_branch_ff_rev = {
+            'refs/heads/master': change_sha,
+        }
+        # This should update master
+        self.log.info('Update the repo and ensure it has updated properly')
+        merger.updateRepo('gerrit', 'org/project1',
+                          repo_state=repo_state_update_branch_ff_rev)
+        repo = merger.getRepo('gerrit', 'org/project1')
+        zuul_repo = git.Repo(repo.local_path)
+        zuul_ref = repo.refNameToZuulRef('master')
+        self.assertEqual(upstream_repo.commit(change_ref).hexsha,
+                         zuul_repo.commit(zuul_ref).hexsha)
+        self.assertEqual(upstream_repo.commit('refs/heads/master').hexsha,
+                         zuul_repo.commit('refs/heads/master').hexsha)
+        self.assertEqual(upstream_repo.commit(change_ref).hexsha,
+                         zuul_repo.commit('refs/heads/master').hexsha)

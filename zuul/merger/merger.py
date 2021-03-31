@@ -617,6 +617,10 @@ class Repo(object):
                 # GitPython throws an error if a revision does not
                 # exist
                 return True
+            # If the rev exists in the repo we also need to check that ref
+            # refers to it, otherwise ref is out of date and needs updating.
+            if repo.commit(ref).hexsha != rev:
+                return True
         return False
 
     def getFiles(self, files, dirs=[], branch=None, commit=None,
