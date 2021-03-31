@@ -431,16 +431,27 @@ class Scheduler(threading.Thread):
 
     def onMergeCompleted(self, build_set, merged, updated,
                          commit, files, repo_state, item_in_branches):
-        event = MergeCompletedEvent(build_set, merged, updated,
-                                    commit, files, repo_state,
-                                    item_in_branches)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
+        tenant_name = build_set.item.pipeline.tenant.name
+        pipeline_name = build_set.item.pipeline.name
+        event = MergeCompletedEvent(
+            build_set.uuid,
+            merged,
+            updated,
+            commit,
+            files,
+            repo_state,
+            item_in_branches,
+        )
+
+        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def onFilesChangesCompleted(self, build_set, files):
-        event = FilesChangesCompletedEvent(build_set, files)
-        self.result_event_queue.put(event)
-        self.wake_event.set()
+        tenant_name = build_set.item.pipeline.tenant.name
+        pipeline_name = build_set.item.pipeline.name
+        event = FilesChangesCompletedEvent(
+            build_set.uuid, build_set.item.queue.name, files
+        )
+        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
 
     def onNodesProvisioned(self, req):
         event = NodesProvisionedEvent(req)
@@ -1432,37 +1443,35 @@ class Scheduler(threading.Thread):
                 ]:
                     if self._stopped:
                         return
-                    self.log.debug(
-                        "Processing result event %s for build %s",
-                        event,
-                        event.build,
+
+                    log = get_annotated_logger(
+                        self.log,
+                        event=getattr(event, "zuul_event_id", None),
+                        build=getattr(event, "build", None),
                     )
+                    log.debug("Processing result event %s", event)
                     try:
-                        self._process_result_event(event)
+                        self._process_result_event(event, pipeline)
                     finally:
                         self.pipeline_result_events[tenant.name][
                             pipeline.name
                         ].ack(event)
 
-        # TODO (felix): The old result event queue is still used for the merge
-        # results and will be removed once we switch the merge jobs to ZK as
+        # TODO (felix): The old result event queue is still used for the nodes
+        # provisioned results and will be removed once we move those to ZK as
         # well.
         while not self.result_event_queue.empty() and not self._stopped:
             self.log.debug("Fetching result event")
             event = self.result_event_queue.get()
             try:
-                if isinstance(event, MergeCompletedEvent):
-                    self._doMergeCompletedEvent(event)
-                elif isinstance(event, FilesChangesCompletedEvent):
-                    self._doFilesChangesCompletedEvent(event)
-                elif isinstance(event, NodesProvisionedEvent):
+                if isinstance(event, NodesProvisionedEvent):
                     self._doNodesProvisionedEvent(event)
                 else:
                     self.log.error("Unable to handle event %s", event)
             finally:
                 self.result_event_queue.task_done()
 
-    def _process_result_event(self, event):
+    def _process_result_event(self, event, pipeline):
         if isinstance(event, BuildStartedEvent):
             self._doBuildStartedEvent(event)
         elif isinstance(event, BuildStatusEvent):
@@ -1471,6 +1480,10 @@ class Scheduler(threading.Thread):
             self._doBuildPausedEvent(event)
         elif isinstance(event, BuildCompletedEvent):
             self._doBuildCompletedEvent(event)
+        if isinstance(event, MergeCompletedEvent):
+            self._doMergeCompletedEvent(event, pipeline)
+        elif isinstance(event, FilesChangesCompletedEvent):
+            self._doFilesChangesCompletedEvent(event, pipeline)
         else:
             self.log.error("Unable to handle event %s", event)
 
@@ -1763,29 +1776,54 @@ class Scheduler(threading.Thread):
 
         pipeline.manager.onBuildCompleted(build)
 
-    def _doMergeCompletedEvent(self, event):
-        build_set = event.build_set
-        if build_set is not build_set.item.current_build_set:
-            self.log.warning("Build set %s is not current" % (build_set,))
-            return
-        pipeline = build_set.item.pipeline
+    def _doMergeCompletedEvent(self, event, pipeline):
         if not pipeline:
-            self.log.warning("Build set %s is not associated with a pipeline" %
-                             (build_set,))
+            self.log.warning(
+                "Build set %s is not associated with a pipeline",
+                event.build_set_uuid,
+            )
             return
-        pipeline.manager.onMergeCompleted(event)
 
-    def _doFilesChangesCompletedEvent(self, event):
-        build_set = event.build_set
-        if build_set is not build_set.item.current_build_set:
+        build_set = None
+        for item in pipeline.getAllItems():
+            # If the provided buildset UUID doesn't match any current one,
+            # we assume that it's not current anymore.
+            if item.current_build_set.uuid == event.build_set_uuid:
+                build_set = item.current_build_set
+                break
+
+        if not build_set:
             self.log.warning("Build set %s is not current", build_set)
             return
-        pipeline = build_set.item.pipeline
+
+        pipeline.manager.onMergeCompleted(event, build_set)
+
+    def _doFilesChangesCompletedEvent(self, event, pipeline):
         if not pipeline:
-            self.log.warning("Build set %s is not associated with a pipeline",
-                             build_set)
+            self.log.warning(
+                "Build set %s is not associated with a pipeline",
+                event.build_set_uuid
+            )
             return
-        pipeline.manager.onFilesChangesCompleted(event)
+
+        build_set = None
+        queues = [
+            q for q in pipeline.queues if q.name == event.queue_name
+        ]
+
+        for queue in queues:
+            # Look up the build set from the queue
+            for item in queue.queue:
+                # If the provided buildset UUID doesn't match the current one,
+                # we assume that it's not current anymore.
+                if item.current_build_set.uuid == event.build_set_uuid:
+                    build_set = item.current_build_set
+                    break
+        if not build_set:
+            self.log.warning("Build set %s is not current", build_set)
+            return
+
+        pipeline.manager.onFilesChangesCompleted(event, build_set)
 
     def _doNodesProvisionedEvent(self, event):
         request = event.request

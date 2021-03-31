@@ -1153,8 +1153,6 @@ class Merger(object):
         seen = set()
         recent = {}
         repo_state = {}
-        # A list of branch names the last item appears in.
-        item_in_branches = []
         for item in items:
             # If we're in the executor context we need to lock the repo.
             # If not repo_locks will give us a fake lock.
@@ -1182,7 +1180,8 @@ class Merger(object):
                         item['ref'], item['newrev'])
         item = items[-1]
         repo = self.getRepo(item['connection'], item['project'])
-        item_in_branches = False
+        # A list of branch names the last item appears in.
+        item_in_branches = []
         if item.get('newrev'):
             item_in_branches = repo.contains(item['newrev'])
         return (True, repo_state, item_in_branches)
