@@ -16,6 +16,24 @@
       "revId": "28035d9af47b8480bec354ef2b8535bdbaeda553",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "74d9be0f_5c30d6b5",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1471,
+      "author": {
+        "id": 31760
+      },
+      "writtenOn": "2021-03-31T00:49:54Z",
+      "side": 1,
+      "message": "result is not used for unreachable (it returns None) so that shouldn\u0027t be needed but I have set the pre_failed to True anyway.",
+      "parentUuid": "c98899ab_d7cc8c26",
+      "revId": "28035d9af47b8480bec354ef2b8535bdbaeda553",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
