@@ -1287,9 +1287,13 @@ class Scheduler(threading.Thread):
             ].put(event)
             event_forwarded = True
         except Exception:
+            type, val, tb = sys.exc_info()
+            # Remove local variables from the traceback to prevent leaking
+            # large objects.
+            traceback.clear_frames(tb)
             event.exception(
                 "".join(
-                    traceback.format_exception(*sys.exc_info())
+                    traceback.format_exception(type, val, tb)
                 )
             )
         return event_forwarded
@@ -1325,8 +1329,12 @@ class Scheduler(threading.Thread):
                 self.log.error("Unable to handle event %s" % event)
         except Exception:
             self.log.exception("Exception in management event:")
+            type, val, tb = sys.exc_info()
+            # Remove local variables from the traceback to prevent leaking
+            # large objects.
+            traceback.clear_frames(tb)
             event.exception(
-                "".join(traceback.format_exception(*sys.exc_info()))
+                "".join(traceback.format_exception(type, val, tb))
             )
 
     def process_result_queue(self):
