@@ -1406,21 +1406,18 @@ class PipelineManager(metaclass=ABCMeta):
 
         return True
 
-    def onFilesChangesCompleted(self, event):
-        build_set = event.build_set
+    def onFilesChangesCompleted(self, event, build_set):
         item = build_set.item
         item.change.files = event.files
         build_set.files_state = build_set.COMPLETE
 
-    def onMergeCompleted(self, event):
-        build_set = event.build_set
+    def onMergeCompleted(self, event, build_set):
         if build_set.merge_state == build_set.COMPLETE:
-            self._onGlobalRepoStateCompleted(event)
+            self._onGlobalRepoStateCompleted(event, build_set)
         else:
-            self._onMergeCompleted(event)
+            self._onMergeCompleted(event, build_set)
 
-    def _onMergeCompleted(self, event):
-        build_set = event.build_set
+    def _onMergeCompleted(self, event, build_set):
         item = build_set.item
         item.change.containing_branches = event.item_in_branches
         build_set.merge_state = build_set.COMPLETE
@@ -1439,20 +1436,20 @@ class PipelineManager(metaclass=ABCMeta):
             self.log.info("Unable to merge change %s" % item.change)
             item.setUnableToMerge()
 
-    def _onGlobalRepoStateCompleted(self, event):
+    def _onGlobalRepoStateCompleted(self, event, build_set):
         if not event.updated:
-            item = event.build_set.item
+            item = build_set.item
             self.log.info("Unable to get global repo state for change %s"
                           % item.change)
             item.setUnableToMerge()
         else:
-            repo_state = event.build_set.repo_state
+            repo_state = build_set.repo_state
             for connection in event.repo_state.keys():
                 if connection in repo_state:
                     repo_state[connection].update(event.repo_state[connection])
                 else:
                     repo_state[connection] = event.repo_state[connection]
-            event.build_set.repo_state_state = event.build_set.COMPLETE
+            build_set.repo_state_state = build_set.COMPLETE
 
     def onNodesProvisioned(self, event):
         # TODOv3(jeblair): handle provisioning failure here
