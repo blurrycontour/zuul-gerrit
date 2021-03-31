@@ -1048,8 +1048,6 @@ class Merger(object):
         seen = set()
         recent = {}
         repo_state = {}
-        # A list of branch names the last item appears in.
-        item_in_branches = []
         for item in items:
             # If we're in the executor context we have the repo_locks object
             # and perform per repo locking.

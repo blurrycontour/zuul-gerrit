@@ -1276,14 +1276,12 @@ class PipelineManager(metaclass=ABCMeta):
 
         return True
 
-    def onFilesChangesCompleted(self, event):
-        build_set = event.build_set
+    def onFilesChangesCompleted(self, event, build_set):
         item = build_set.item
         item.change.files = event.files
         build_set.files_state = build_set.COMPLETE
 
-    def onMergeCompleted(self, event):
-        build_set = event.build_set
+    def onMergeCompleted(self, event, build_set):
         item = build_set.item
         item.change.containing_branches = event.item_in_branches
         build_set.merge_state = build_set.COMPLETE

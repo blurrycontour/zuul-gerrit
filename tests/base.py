@@ -4041,8 +4041,8 @@ class SchedulerTestApp:
         if validate_tenants is None:
             self.connections.registerScheduler(self.sched)
 
-        # TODO (felix): Can be removed when the merger jobs are switched to
-        # ZooKeeper.
+        # TODO (felix): Can be removed when the nodes provisioned events are
+        # switched to ZooKeeper.
         self.event_queues = [
             self.sched.result_event_queue,
         ]
@@ -4376,8 +4376,8 @@ class ZuulTestCase(BaseTestCase):
             lambda app: app.start(self.validate_tenants))
 
     def __event_queues(self, matcher) -> List[Queue]:
-        # TODO (felix): Can be removed when the merger jobs are switched to
-        # ZooKeeper.
+        # TODO (felix): Can be removed when the nodes provisioned events are
+        # switched to ZooKeeper.
         sched_queues = map(lambda app: app.event_queues,
                            self.scheds.filter(matcher))
         return [item for sublist in sched_queues for item in sublist] + \
