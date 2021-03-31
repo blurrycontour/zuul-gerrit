@@ -1940,6 +1940,102 @@ class JobGraph(object):
         return all_parent_jobs
 
 
+"""
+class MergeRequestState(Enum):
+    REQUESTED = 0
+    RUNNING = 1
+    COMPLETED = 2
+
+
+@total_ordering
+class MergeRequest:
+
+    def __init__(
+        self,
+        uuid,
+        state,
+        job_type,
+        payload,
+        precedence,
+        build_set_uuid,
+        tenant_name,
+        pipeline_name,
+        queue_name,
+    ):
+        self.uuid = uuid
+        self.state = state
+        self.job_type = job_type
+        self.payload = payload
+        self.precedence = precedence
+        self.build_set_uuid = build_set_uuid
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+        self.queue_name = queue_name
+
+        # Path to the future result if requested
+        self.result_path = None
+
+        # ZK related data
+        self.path = None
+        self._zstat = None
+        self.lock = None
+
+    def toDict(self):
+        return {
+            "uuid": self.uuid,
+            "state": self.state.name,
+            "job_type": self.job_type.name,
+            "payload": self.payload,
+            "precedence": self.precedence,
+            "build_set_uuid": self.build_set_uuid,
+            "tenant_name": self.tenant_name,
+            "pipeline_name": self.pipeline_name,
+            "queue_name": self.queue_name,
+            "result_path": self.result_path,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        job = cls(
+            data["uuid"],
+            MergeRequestState[data["state"]],
+            MergeRequestState[data["job_type"]],
+            data["payload"],
+            data["precedence"],
+            data["build_set_uuid"],
+            data["tenant_name"],
+            data["pipeline_name"],
+            data["queue_name"],
+        )
+        job.result_path = data.get("result_path")
+        return job
+
+    def __lt__(self, other):
+        # Sort jobs by precedence and their creation time in ZooKeeper in
+        # ascending order to prevent older jobs from starving.
+        if self.precedence == other.precedence:
+            if self._zstat and other._zstat:
+                return self._zstat.ctime < other._zstat.ctime
+            return self.uuid < other.uuid
+        return self.precedence < other.precedence
+
+    def __eq__(self, other):
+        same_prec = self.precedence == other.precedence
+        if self._zstat and other._zstat:
+            same_ctime = self._zstat.ctime == other._zstat.ctime
+        else:
+            same_ctime = self.uuid == other.uuid
+
+        return same_prec and same_ctime
+
+    def __repr__(self):
+        return (
+            f"<MergeRequest {self.uuid}, job_type={self.job_type.name}, "
+            f"state={self.state.name}, path={self.path}>"
+        )
+"""
+
+
 class BuildRequestState(Enum):
     # Waiting
     REQUESTED = 0
@@ -3889,7 +3985,7 @@ class BuildCompletedEvent(ResultEvent):
 class MergeCompletedEvent(ResultEvent):
     """A remote merge operation has completed
 
-    :arg BuildSet build_set: The build_set which is ready.
+    :arg str build_set_uuid: The UUID of the build_set which is ready.
     :arg bool merged: Whether the merge succeeded (changes with refs).
     :arg bool updated: Whether the repo was updated (changes without refs).
     :arg str commit: The SHA of the merged commit (changes with refs).
@@ -3898,19 +3994,21 @@ class MergeCompletedEvent(ResultEvent):
         commit in the merge list appears (changes without refs).
     """
 
-    def __init__(self, build_set, merged, updated, commit,
+    def __init__(self, build_set_uuid, queue_name, merged, updated, commit,
                  files, repo_state, item_in_branches):
-        self.build_set = build_set
+        self.build_set_uuid = build_set_uuid
+        self.queue_name = queue_name
         self.merged = merged
         self.updated = updated
         self.commit = commit
-        self.files = files
-        self.repo_state = repo_state
-        self.item_in_branches = item_in_branches
+        self.files = files or []
+        self.repo_state = repo_state or {}
+        self.item_in_branches = item_in_branches or []
 
     def toDict(self):
         return {
-            "build_set": self.build_set,
+            "build_set_uuid": self.build_set_uuid,
+            "queue_name": self.queue_name,
             "merged": self.merged,
             "updated": self.updated,
             "commit": self.commit,
@@ -3922,7 +4020,8 @@ class MergeCompletedEvent(ResultEvent):
     @classmethod
     def fromDict(cls, data):
         return cls(
-            data.get("build_set"),
+            data.get("build_set_uuid"),
+            data.get("queue_name"),
             data.get("merged"),
             data.get("updated"),
             data.get("commit"),
@@ -3939,20 +4038,23 @@ class FilesChangesCompletedEvent(ResultEvent):
     :arg list files: List of files changed.
     """
 
-    def __init__(self, build_set, files):
-        self.build_set = build_set
-        self.files = files
+    def __init__(self, build_set_uuid, queue_name, files):
+        self.build_set_uuid = build_set_uuid
+        self.queue_name = queue_name
+        self.files = files or []
 
     def toDict(self):
         return {
-            "build_set": self.build_set,
+            "build_set_uuid": self.build_set_uuid,
+            "queue_name": self.queue_name,
             "files": list(self.files),
         }
 
     @classmethod
     def fromDict(cls, data):
         return cls(
-            data.get("build_set"),
+            data.get("build_set_uuid"),
+            data.get("queue_name"),
             list(data.get("files", [])),
         )
 
