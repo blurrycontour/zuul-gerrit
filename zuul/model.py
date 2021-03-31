@@ -3804,7 +3804,7 @@ class BuildCompletedEvent(ResultEvent):
 class MergeCompletedEvent(ResultEvent):
     """A remote merge operation has completed
 
-    :arg BuildSet build_set: The build_set which is ready.
+    :arg str build_set_uuid: The UUID of the build_set which is ready.
     :arg bool merged: Whether the merge succeeded (changes with refs).
     :arg bool updated: Whether the repo was updated (changes without refs).
     :arg str commit: The SHA of the merged commit (changes with refs).
@@ -3813,19 +3813,21 @@ class MergeCompletedEvent(ResultEvent):
         commit in the merge list appears (changes without refs).
     """
 
-    def __init__(self, build_set, merged, updated, commit,
+    def __init__(self, build_set_uuid, queue_name, merged, updated, commit,
                  files, repo_state, item_in_branches):
-        self.build_set = build_set
+        self.build_set_uuid = build_set_uuid
+        self.queue_name = queue_name
         self.merged = merged
         self.updated = updated
         self.commit = commit
-        self.files = files
-        self.repo_state = repo_state
-        self.item_in_branches = item_in_branches
+        self.files = files or []
+        self.repo_state = repo_state or {}
+        self.item_in_branches = item_in_branches or []
 
     def toDict(self):
         return {
-            "build_set": self.build_set,
+            "build_set_uuid": self.build_set_uuid,
+            "queue_name": self.queue_name,
             "merged": self.merged,
             "updated": self.updated,
             "commit": self.commit,
@@ -3837,7 +3839,8 @@ class MergeCompletedEvent(ResultEvent):
     @classmethod
     def fromDict(cls, data):
         return cls(
-            data.get("build_set"),
+            data.get("build_set_uuid"),
+            data.get("queue_name"),
             data.get("merged"),
             data.get("updated"),
             data.get("commit"),
@@ -3854,20 +3857,23 @@ class FilesChangesCompletedEvent(ResultEvent):
     :arg list files: List of files changed.
     """
 
-    def __init__(self, build_set, files):
-        self.build_set = build_set
-        self.files = files
+    def __init__(self, build_set_uuid, queue_name, files):
+        self.build_set_uuid = build_set_uuid
+        self.queue_name = queue_name
+        self.files = files or []
 
     def toDict(self):
         return {
-            "build_set": self.build_set,
+            "build_set_uuid": self.build_set_uuid,
+            "queue_name": self.queue_name,
             "files": list(self.files),
         }
 
     @classmethod
     def fromDict(cls, data):
         return cls(
-            data.get("build_set"),
+            data.get("build_set_uuid"),
+            data.get("queue_name"),
             list(data.get("files", [])),
         )
 
