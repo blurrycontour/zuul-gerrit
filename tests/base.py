@@ -4153,8 +4153,8 @@ class SchedulerTestApp:
         if validate_tenants is None:
             self.connections.registerScheduler(self.sched)
 
-        # TODO (felix): Can be removed when the merger jobs are switched to
-        # ZooKeeper.
+        # TODO (felix): Can be removed when the nodes provisioned events are
+        # switched to ZooKeeper.
         self.event_queues = [
             self.sched.result_event_queue,
         ]
@@ -4497,8 +4497,8 @@ class ZuulTestCase(BaseTestCase):
             lambda app: app.start(self.validate_tenants))
 
     def __event_queues(self, matcher) -> List[Queue]:
-        # TODO (felix): Can be removed when the merger jobs are switched to
-        # ZooKeeper.
+        # TODO (felix): Can be removed when the nodes provisioned events are
+        # switched to ZooKeeper.
         sched_queues = map(lambda app: app.event_queues,
                            self.scheds.filter(matcher))
         return [item for sublist in sched_queues for item in sublist] + \
@@ -5093,11 +5093,11 @@ class ZuulTestCase(BaseTestCase):
                 self.log.error("Timeout waiting for Zuul to settle")
                 self._logQueueStatus(
                     self.log.error, matcher,
-                    self.__areZooKeeperEventQueuesEmpty(matcher),
                     self.__areAllMergeJobsWaiting(matcher),
                     self.__haveAllBuildsReported(matcher),
                     self.__areAllBuildsWaiting(matcher),
                     self.__areAllNodeRequestsComplete(matcher),
+                    self.__areZooKeeperEventQueuesEmpty(matcher),
                     all(self.__eventQueuesEmpty(matcher))
                 )
                 raise Exception("Timeout waiting for Zuul to settle")
@@ -5112,11 +5112,11 @@ class ZuulTestCase(BaseTestCase):
                 self.__eventQueuesJoin(matcher)
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.acquire())
-                if (self.__areZooKeeperEventQueuesEmpty(matcher) and
-                    self.__areAllMergeJobsWaiting(matcher) and
+                if (self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported(matcher) and
                     self.__areAllBuildsWaiting(matcher) and
                     self.__areAllNodeRequestsComplete(matcher) and
+                    self.__areZooKeeperEventQueuesEmpty(matcher) and
                     all(self.__eventQueuesEmpty(matcher))):
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
