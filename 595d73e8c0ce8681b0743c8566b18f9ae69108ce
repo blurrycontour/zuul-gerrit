@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f3f6736b_7cded048",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-01T18:24:26Z",
+      "side": 1,
+      "message": "Semaphore handler doesn\u0027t use this at all, let\u0027s not do this.",
+      "revId": "595d73e8c0ce8681b0743c8566b18f9ae69108ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
