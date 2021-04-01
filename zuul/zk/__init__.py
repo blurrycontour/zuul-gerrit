@@ -188,3 +188,7 @@ class ZooKeeperBase(metaclass=ABCMeta):
 
     def _onDisconnect(self):
         pass
+
+    def unregister(self):
+        self.client.on_connect_listeners.remove(self._onConnect)
+        self.client.on_disconnect_listeners.remove(self._onDisconnect)

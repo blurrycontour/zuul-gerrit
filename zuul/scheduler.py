@@ -922,6 +922,11 @@ class Scheduler(threading.Thread):
         old_tenant = self.abide.tenants.get(tenant.name)
 
         if old_tenant:
+            # The semaphore handler contains references to layouts. If we
+            # do not unregister the handler from the ZK client it cannot be
+            # garbage collected which prevents the layouts from being GC'd
+            # and we have a memory leak.
+            old_tenant.semaphore_handler.unregister()
             self._reenqueueTenant(old_tenant, tenant)
 
         # TODOv3(jeblair): update for tenants
