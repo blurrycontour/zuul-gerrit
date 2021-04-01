@@ -22,7 +22,7 @@ from zuul import model
 from zuul.configloader import AuthorizationRuleParser, safe_load_yaml
 
 from tests.base import ZuulTestCase
-from zuul.model import SourceContext
+from zuul.model import MergeRequest, SourceContext
 
 
 class TenantParserTestCase(ZuulTestCase):
@@ -326,8 +326,8 @@ class TestTenantGroups4(TenantParserTestCase):
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes
-        cat_jobs = [job for job in self.gearman_server.jobs_history
-                    if job.name == b'merger:cat']
+        cat_jobs = [job for job in self.merge_job_history.values()
+                    if job.job_type == MergeRequest.CAT]
         self.assertEqual(1, len(cat_jobs))
         old_layout = tenant.layout
 
@@ -361,8 +361,8 @@ class TestTenantGroups5(TenantParserTestCase):
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes
-        cat_jobs = [job for job in self.gearman_server.jobs_history
-                    if job.name == b'merger:cat']
+        cat_jobs = [job for job in self.merge_job_history.values()
+                    if job.job_type == MergeRequest.CAT]
         self.assertEqual(1, len(cat_jobs))
 
 
@@ -609,7 +609,7 @@ class TestUnparsedConfigCache(ZuulTestCase):
         # Clear the unparsed branch cache so all projects (except for
         # org/project2) are retrieved from the cache in Zookeeper.
         sched.abide.unparsed_project_branch_cache.clear()
-        self.gearman_server.jobs_history.clear()
+        del self.merge_job_history
 
         # Create a tenant reconfiguration event with a known ltime that is
         # smaller than the ltime of the items in the cache.
@@ -621,8 +621,8 @@ class TestUnparsedConfigCache(ZuulTestCase):
 
         # As the cache should be valid, we only expect a cat job for
         # org/project2
-        cat_jobs = [job for job in self.gearman_server.jobs_history
-                    if job.name == b"merger:cat"]
+        cat_jobs = [job for job in self.merge_job_history.values()
+                    if job.job_type == MergeRequest.CAT]
         self.assertEqual(len(cat_jobs), 1)
         sched.apsched.start()
 
