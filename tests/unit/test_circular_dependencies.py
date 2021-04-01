@@ -901,7 +901,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
 
     def test_cycle_merge_conflict(self):
-        self.gearman_server.hold_merge_jobs_in_queue = True
+        self.hold_merge_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
 
@@ -927,8 +927,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.waitUntilSettled()
 
-        self.gearman_server.hold_merge_jobs_in_queue = False
-        self.gearman_server.release()
+        self.hold_merge_jobs_in_queue = False
+        self.merger_api.release()
         self.waitUntilSettled()
 
         self.assertEqual(A.reported, 0)

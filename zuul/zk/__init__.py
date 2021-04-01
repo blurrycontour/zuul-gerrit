@@ -14,7 +14,6 @@ import logging
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
-from typing import Optional, List, Callable
 
 from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeError
@@ -33,12 +32,12 @@ class ZooKeeperClient(object):
 
     def __init__(
         self,
-        hosts: str,
-        read_only: bool = False,
-        timeout: float = 10.0,
-        tls_cert: Optional[str] = None,
-        tls_key: Optional[str] = None,
-        tls_ca: Optional[str] = None,
+        hosts,
+        read_only=False,
+        timeout=10.0,
+        tls_cert=None,
+        tls_key=None,
+        tls_ca=None,
     ):
         """
         Initialize the ZooKeeper base client object.
@@ -59,11 +58,11 @@ class ZooKeeperClient(object):
         self.tls_key = tls_key
         self.tls_ca = tls_ca
 
-        self.client: Optional[KazooClient] = None
+        self.client = None
         self._last_retry_log: int = 0
-        self.on_connect_listeners: List[Callable[[], None]] = []
-        self.on_disconnect_listeners: List[Callable[[], None]] = []
-        self.on_connection_lost_listeners: List[Callable[[], None]] = []
+        self.on_connect_listeners = []
+        self.on_disconnect_listeners = []
+        self.on_connection_lost_listeners = []
 
     def _connectionListener(self, state):
         """

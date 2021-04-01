@@ -20,7 +20,7 @@ import textwrap
 from zuul.configloader import AuthorizationRuleParser, safe_load_yaml
 
 from tests.base import ZuulTestCase
-from zuul.model import SourceContext
+from zuul.model import MergeRequestType, SourceContext
 
 
 class TenantParserTestCase(ZuulTestCase):
@@ -280,8 +280,8 @@ class TestTenantGroups4(TenantParserTestCase):
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes
-        cat_jobs = [job for job in self.gearman_server.jobs_history
-                    if job.name == b'merger:cat']
+        cat_jobs = [job for job in self.merge_job_history.values()
+                    if job.job_type == MergeRequestType.CAT]
         self.assertEqual(1, len(cat_jobs))
         old_layout = tenant.layout
 
@@ -315,8 +315,8 @@ class TestTenantGroups5(TenantParserTestCase):
                          tpc.load_classes)
         # Check that only one merger:cat job was requested
         # org/project1 and org/project2 have an empty load_classes
-        cat_jobs = [job for job in self.gearman_server.jobs_history
-                    if job.name == b'merger:cat']
+        cat_jobs = [job for job in self.merge_job_history.values()
+                    if job.job_type == MergeRequestType.CAT]
         self.assertEqual(1, len(cat_jobs))
 
 

@@ -462,31 +462,6 @@ class Scheduler(threading.Thread):
         except Exception:
             self.log.exception("Exception reporting runtime stats")
 
-    def onMergeCompleted(self, build_set, merged, updated,
-                         commit, files, repo_state, item_in_branches):
-        tenant_name = build_set.item.pipeline.tenant.name
-        pipeline_name = build_set.item.pipeline.name
-        event = MergeCompletedEvent(
-            build_set.uuid,
-            build_set.item.queue.name,
-            merged,
-            updated,
-            commit,
-            files,
-            repo_state,
-            item_in_branches,
-        )
-
-        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
-
-    def onFilesChangesCompleted(self, build_set, files):
-        tenant_name = build_set.item.pipeline.tenant.name
-        pipeline_name = build_set.item.pipeline.name
-        event = FilesChangesCompletedEvent(
-            build_set.uuid, build_set.item.queue.name, files
-        )
-        self.pipeline_result_events[tenant_name][pipeline_name].put(event)
-
     def onNodesProvisioned(self, req):
         event = NodesProvisionedEvent(req)
         self.result_event_queue.put(event)
@@ -1189,9 +1164,6 @@ class Scheduler(threading.Thread):
 
     def _areAllBuildsComplete(self):
         self.log.debug("Checking if all builds are complete")
-        if self.merger.areMergesOutstanding():
-            self.log.debug("Waiting on merger")
-            return False
         waiting = False
         for tenant in self.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():

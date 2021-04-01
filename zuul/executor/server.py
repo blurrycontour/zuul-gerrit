@@ -2840,9 +2840,6 @@ class ExecutorServer(BaseMergeServer):
         # it has stopped.
         self.governor_stop_event.set()
         self.governor_thread.join()
-        # Stop accepting new jobs
-        if self.merger_gearworker is not None:
-            self.merger_gearworker.gearman.setFunctions([])
         # Tell the executor worker to abort any jobs it just accepted,
         # and grab the list of currently running job workers.
         with self.run_lock:

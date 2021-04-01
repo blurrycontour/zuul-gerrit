@@ -29,3 +29,7 @@ class NoClientException(ZuulZooKeeperException):
 
 class BuildRequestNotFound(ZuulZooKeeperException):
     pass
+
+
+class MergeRequestNotFound(ZuulZooKeeperException):
+    pass

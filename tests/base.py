@@ -68,7 +68,12 @@ import paramiko
 
 from zuul.driver.sql.sqlconnection import DatabaseSession
 from zuul.model import (
-    BuildRequest, BuildRequestState, Change, PRECEDENCE_NORMAL, WebInfo
+    BuildRequest,
+    BuildRequestState,
+    Change,
+    MergeRequestState,
+    PRECEDENCE_NORMAL,
+    WebInfo,
 )
 from zuul.rpcclient import RPCClient
 
@@ -118,6 +123,7 @@ from zuul.lib.logutil import get_annotated_logger
 
 import tests.fakegithub
 from tests.zk.executor import TestExecutorApi
+from tests.zk.merger import TestMergerApi
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
 
@@ -3108,16 +3114,25 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
 
 class RecordingMergeClient(zuul.merger.client.MergeClient):
 
+    _merger_api_class = TestMergerApi
+
     def __init__(self, config, sched):
         super().__init__(config, sched)
         self.history = {}
 
-    def submitJob(self, name, data, build_set,
-                  precedence=PRECEDENCE_NORMAL, event=None):
-        self.history.setdefault(name, [])
-        self.history[name].append((data, build_set))
+    def submitJob(
+        self,
+        job_type,
+        data,
+        build_set,
+        precedence=PRECEDENCE_NORMAL,
+        needs_result=False,
+        event=None,
+    ):
+        self.history.setdefault(job_type, [])
+        self.history[job_type].append((data, build_set))
         return super().submitJob(
-            name, data, build_set, precedence, event=event)
+            job_type, data, build_set, precedence, needs_result, event=event)
 
 
 class TestExecutorClient(zuul.executor.client.ExecutorClient):
@@ -4346,6 +4361,7 @@ class ZuulTestCase(BaseTestCase):
         executor_connections.configure(self.config,
                                        source_only=self.source_only)
         self.executor_api = TestExecutorApi(self.zk_client)
+        self.merger_api = TestMergerApi(self.zk_client)
         self.executor_server = RecordingExecutorServer(
             self.config,
             executor_connections,
@@ -4673,7 +4689,6 @@ class ZuulTestCase(BaseTestCase):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.scheds.execute(lambda app: app.sched.executor.stop())
-        self.scheds.execute(lambda app: app.sched.merger.stop())
         if self.merge_server:
             self.merge_server.stop()
             self.merge_server.join()
@@ -4805,12 +4820,36 @@ class ZuulTestCase(BaseTestCase):
         return self.executor_api.hold_in_queue
 
     @hold_jobs_in_queue.setter
-    def hold_jobs_in_queue(self, hold_jobs_in_queue: bool):
-        """Helper method to set hold_in_queue on all involved BuildQueues"""
+    def hold_jobs_in_queue(self, hold_in_queue):
+        """Helper method to set hold_in_queue on all involved Executor APIs"""
 
-        self.executor_api.hold_in_queue = hold_jobs_in_queue
+        self.executor_api.hold_in_queue = hold_in_queue
         for app in self.scheds:
-            app.sched.executor.executor_api.hold_in_queue = hold_jobs_in_queue
+            app.sched.executor.executor_api.hold_in_queue = hold_in_queue
+
+    @property
+    def hold_merge_jobs_in_queue(self):
+        return self.merger_api.hold_in_queue
+
+    @hold_merge_jobs_in_queue.setter
+    def hold_merge_jobs_in_queue(self, hold_in_queue):
+        """Helper method to set hold_in_queue on all involved Merger APIs"""
+
+        self.merger_api.hold_in_queue = hold_in_queue
+        for app in self.scheds:
+            app.sched.merger.merger_api.hold_in_queue = hold_in_queue
+
+    @property
+    def merge_job_history(self):
+        history = {}
+        for app in self.scheds:
+            history.update(app.sched.merger.merger_api.history)
+        return history
+
+    @merge_job_history.deleter
+    def merge_job_history(self):
+        for app in self.scheds:
+            app.sched.merger.merger_api.history.clear()
 
     def __haveAllBuildsReported(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
@@ -4894,24 +4933,13 @@ class ZuulTestCase(BaseTestCase):
 
     def __areAllMergeJobsWaiting(self, matcher) -> bool:
         for app in self.scheds.filter(matcher):
-            merge_client = app.sched.merger
-            for client_job in list(merge_client.jobs):
-                if not client_job.handle:
-                    self.log.debug("%s has no handle" % client_job)
+            queued_merge_jobs = list(
+                app.sched.merger.merger_api.inState()
+            )
+            # Always ignore merge jobs which are on hold
+            for job in queued_merge_jobs:
+                if job.state != MergeRequestState.HOLD:
                     return False
-                server_job = self.gearman_server.jobs.get(client_job.handle)
-                if not server_job:
-                    self.log.debug("%s is not known to the gearman server" %
-                                   client_job)
-                    return False
-                if not hasattr(server_job, 'waiting'):
-                    self.log.debug("%s is being enqueued" % server_job)
-                    return False
-                if server_job.waiting:
-                    self.log.debug("%s is waiting" % server_job)
-                    continue
-                self.log.debug("%s is not waiting" % server_job)
-                return False
         return True
 
     def __eventQueuesEmpty(self, matcher=None) -> Generator[bool, None, None]:
@@ -4979,11 +5007,11 @@ class ZuulTestCase(BaseTestCase):
                 self.__eventQueuesJoin(matcher)
                 self.scheds.execute(
                     lambda app: app.sched.run_handler_lock.acquire())
-                if (self.__areZooKeeperEventQueuesEmpty(matcher) and
-                    self.__areAllMergeJobsWaiting(matcher) and
+                if (self.__areAllMergeJobsWaiting(matcher) and
                     self.__haveAllBuildsReported(matcher) and
                     self.__areAllBuildsWaiting(matcher) and
                     self.__areAllNodeRequestsComplete(matcher) and
+                    self.__areZooKeeperEventQueuesEmpty(matcher) and
                     all(self.__eventQueuesEmpty(matcher))):
                     # The queue empty check is placed at the end to
                     # ensure that if a component adds an event between
