@@ -389,16 +389,17 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             self.log.exception("Error cleaning up event queue %s", self)
 
 
-class ManagementEventResultFuture(ZooKeeperSimpleBase):
-    """Returned when a management event is put into a queue."""
+class EventResultFuture(ZooKeeperSimpleBase):
+    """Base class for result futures for different events."""
 
-    log = logging.getLogger("zuul.zk.event_queues.MangementEventResultFuture")
+    log = logging.getLogger("zuul.zk.event_queues.EventResultFuture")
 
     def __init__(self, client, result_path):
         super().__init__(client)
         self._result_path = result_path
         self._wait_event = threading.Event()
         self.kazoo_client.DataWatch(self._result_path, self._resultCallback)
+        self.data = {}
 
     def _resultCallback(self, data=None, stat=None):
         if data is None:
@@ -407,6 +408,11 @@ class ManagementEventResultFuture(ZooKeeperSimpleBase):
         self._wait_event.set()
         # Stop the watch if we got a result
         return False
+
+    def _read(self, path):
+        # Internal method to read the result data; may be overridden
+        # by subclasses.
+        return self.kazoo_client.get(self._result_path)[0]
 
     def wait(self, timeout=None):
         """Wait until the result for this event has been written."""
@@ -419,21 +425,71 @@ class ManagementEventResultFuture(ZooKeeperSimpleBase):
             return False
         try:
             try:
-                data, _ = self.kazoo_client.get(self._result_path)
-                result = json.loads(data.decode("utf-8"))
+                path = self._result_path
+                data = self._read(path)
+                self.data = json.loads(data.decode("utf-8"))
             except json.JSONDecodeError:
                 self.log.exception(
                     "Malformed result data in %s", self._result_path
                 )
                 raise
-            tb = result.get("traceback")
+        finally:
+            with suppress(NoNodeError):
+                self.kazoo_client.delete(self._result_path, recursive=True)
+        return True
+
+
+class MergerEventResultFuture(EventResultFuture):
+
+    log = logging.getLogger("zuul.zk.event_queues.ManagementEventResultFuture")
+
+    def __init__(self, client, result_path, waiter_path):
+        super().__init__(client, result_path)
+
+        self._waiter_path = waiter_path
+        self.merged = None
+        self.updated = None
+        self.commit = None
+        self.files = None
+        self.repo_state = None
+        self.item_in_branches = None
+
+    def _read(self, path):
+        with sharding.BufferedShardReader(self.kazoo_client, path) as stream:
+            return stream.read()
+
+    def wait(self, timeout=None):
+        try:
+            res = super().wait(timeout)
+        finally:
+            with suppress(NoNodeError):
+                self.kazoo_client.delete(self._waiter_path)
+        if self.data is not None:
+            self.merged = self.data.get("merged", False)
+            self.updated = self.data.get("updated", False)
+            self.commit = self.data.get("commit")
+            self.files = self.data.get("files", {})
+            self.repo_state = self.data.get("repo_state", {})
+            self.item_in_branches = self.data.get("item_in_branches", [])
+        return res
+
+
+class ManagementEventResultFuture(EventResultFuture):
+    """Returned when a management event is put into a queue."""
+
+    log = logging.getLogger("zuul.zk.event_queues.ManagementEventResultFuture")
+
+    def __init__(self, client, result_path: str):
+        super().__init__(client, result_path)
+
+    def wait(self, timeout=None):
+        res = super().wait(timeout)
+        if self.data is not None:
+            tb = self.data.get("traceback")
             if tb is not None:
                 # TODO: raise some kind of ManagementEventException here
                 raise RuntimeError(tb)
-        finally:
-            with suppress(NoNodeError):
-                self.kazoo_client.delete(self._result_path)
-        return True
+        return res
 
 
 class ManagementEventQueue(ZooKeeperEventQueue):

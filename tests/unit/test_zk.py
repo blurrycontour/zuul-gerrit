@@ -18,11 +18,12 @@ import queue
 import testtools
 
 from zuul import model
-from zuul.model import BuildRequest, HoldRequest
+from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi, BuildRequestEvent
+from zuul.zk.merger import MergerApi
 from zuul.zk.layout import LayoutStateStore, LayoutState
 from zuul.zk.locks import locked
 from zuul.zk.nodepool import ZooKeeperNodepool
@@ -35,8 +36,10 @@ from zuul.zk.sharding import (
 from zuul.zk.components import (
     BaseComponent, ComponentRegistry, ExecutorComponent
 )
-
-from tests.base import BaseTestCase, HoldableExecutorApi, iterate_timeout
+from tests.base import (
+    BaseTestCase, HoldableExecutorApi, HoldableMergerApi,
+    iterate_timeout
+)
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -681,6 +684,407 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         request_queue.get(timeout=30)
 
         # Executor receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+
+class TestMergerApi(ZooKeeperBaseTestCase):
+    def _get_zk_tree(self, root):
+        items = []
+        for x in self.zk_client.client.get_children(root):
+            path = '/'.join([root, x])
+            items.append(path)
+            items.extend(self._get_zk_tree(path))
+        return items
+
+    def _get_watches(self):
+        chroot = self.zk_chroot_fixture.zookeeper_chroot
+        data = self.zk_client.client.command(b'wchp')
+        ret = {}
+        sessions = None
+        for line in data.split('\n'):
+            if line.startswith('\t'):
+                if sessions is not None:
+                    sessions.append(line.strip())
+            else:
+                line = line.strip()
+                if not line:
+                    continue
+                if line.startswith(chroot):
+                    line = line[len(chroot):]
+                    sessions = []
+                    ret[line] = sessions
+                else:
+                    sessions = None
+        return ret
+
+    def test_merge_request(self):
+        # Test the lifecycle of a merge request
+        request_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # Simulate the client side
+        client = MergerApi(self.zk_client)
+        # Simulate the server side
+        server = MergerApi(self.zk_client,
+                           merge_request_callback=rq_put)
+
+        # Scheduler submits request
+        payload = {'merge': 'test'}
+        client.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+        request_queue.get(timeout=30)
+
+        # Merger receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+        params = client.getMergeParams(a)
+        self.assertEqual(params, payload)
+        client.clearMergeParams(a)
+        params = client.getMergeParams(a)
+        self.assertIsNone(params)
+
+        # Merger locks request
+        self.assertTrue(server.lock(a, blocking=False))
+        a.state = MergeRequest.RUNNING
+        server.update(a)
+        self.assertEqual(client.get(a.path).state, MergeRequest.RUNNING)
+
+        # Merger should see no pending requests
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 0)
+
+        # Merger removes and unlocks merge request on completion
+        server.remove(a)
+        server.unlock(a)
+
+        self.assertEqual(self._get_zk_tree(client.MERGE_REQUEST_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.MERGE_RESULT_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
+        self.assertEqual(self._get_watches(), {})
+
+    def test_merge_request_hold(self):
+        # Test that we can hold a merge request in "queue"
+        request_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        # Simulate the client side
+        client = HoldableMergerApi(self.zk_client)
+        client.hold_in_queue = True
+        # Simulate the server side
+        server = MergerApi(self.zk_client,
+                           merge_request_callback=rq_put)
+
+        # Scheduler submits request
+        payload = {'merge': 'test'}
+        client.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+        request_queue.get(timeout=30)
+
+        # Merger receives nothing
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 0)
+
+        # Test releases hold
+        # We have to get a new merge_request object to update it.
+        a = client.get(f"{client.MERGE_REQUEST_ROOT}/A")
+        self.assertEqual(a.uuid, 'A')
+        a.state = MergeRequest.REQUESTED
+        client.update(a)
+
+        # Merger receives request
+        request_queue.get(timeout=30)
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # The rest is redundant.
+
+    def test_merge_request_result(self):
+        # Test the lifecycle of a merge request
+        request_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # Simulate the client side
+        client = MergerApi(self.zk_client)
+        # Simulate the server side
+        server = MergerApi(self.zk_client,
+                           merge_request_callback=rq_put)
+
+        # Scheduler submits request
+        payload = {'merge': 'test'}
+        future = client.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+            needs_result=True,
+        )
+        request_queue.get(timeout=30)
+
+        # Merger receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # Merger locks request
+        self.assertTrue(server.lock(a, blocking=False))
+        a.state = MergeRequest.RUNNING
+        server.update(a)
+        self.assertEqual(client.get(a.path).state, MergeRequest.RUNNING)
+
+        # Merger reports result
+        result_data = {'result': 'ok'}
+        server.reportResult(a, result_data)
+
+        self.assertEqual(set(self._get_zk_tree(client.MERGE_RESULT_ROOT)),
+                         set(['/zuul/merge-results/A',
+                              '/zuul/merge-results/A/seq0000000000']))
+        self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT),
+                         ['/zuul/merge-waiters/A'])
+
+        # Merger removes and unlocks merge request on completion
+        server.remove(a)
+        server.unlock(a)
+
+        # Scheduler awaits result
+        self.assertTrue(future.wait())
+        self.assertEqual(future.data, result_data)
+
+        self.assertEqual(self._get_zk_tree(client.MERGE_REQUEST_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.MERGE_RESULT_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.MERGE_WAITER_ROOT), [])
+        self.assertEqual(self._get_zk_tree(client.LOCK_ROOT), [])
+        self.assertEqual(self._get_watches(), {})
+
+    def test_lost_merge_request_result(self):
+        # Test that we can clean up orphaned merge results
+        request_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # Simulate the client side
+        client = MergerApi(self.zk_client)
+        # Simulate the server side
+        server = MergerApi(self.zk_client,
+                           merge_request_callback=rq_put)
+
+        # Scheduler submits request
+        payload = {'merge': 'test'}
+        future = client.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+            needs_result=True,
+        )
+        request_queue.get(timeout=30)
+
+        # Merger receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # Merger locks request
+        self.assertTrue(server.lock(a, blocking=False))
+        a.state = MergeRequest.RUNNING
+        server.update(a)
+        self.assertEqual(client.get(a.path).state, MergeRequest.RUNNING)
+
+        # Merger reports result
+        result_data = {'result': 'ok'}
+        server.reportResult(a, result_data)
+
+        # Merger removes and unlocks merge request on completion
+        server.remove(a)
+        server.unlock(a)
+
+        # Scheduler "disconnects"
+        self.zk_client.client.delete(future._waiter_path)
+
+        # Find orphaned results
+        lost_merge_results = list(client.lostMergeResults())
+
+        self.assertEqual(1, len(lost_merge_results))
+        self.assertEqual(future._result_path, lost_merge_results[0])
+
+    def test_nonexistent_lock(self):
+        request_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        # Simulate the client side
+        client = MergerApi(self.zk_client)
+
+        # Scheduler submits request
+        payload = {'merge': 'test'}
+        client.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+        client_a = client.get(f"{client.MERGE_REQUEST_ROOT}/A")
+
+        # Simulate the server side
+        server = MergerApi(self.zk_client,
+                           merge_request_callback=rq_put)
+        server_a = list(server.next())[0]
+
+        client.remove(client_a)
+
+        # Try to lock a request that was just removed
+        self.assertFalse(server.lock(server_a))
+
+    def test_lost_merge_requests(self):
+        # Test that lostMergeRequests() returns unlocked running merge
+        # requests
+        merger_api = MergerApi(self.zk_client)
+
+        payload = {'merge': 'test'}
+        merger_api.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+        merger_api.submit(
+            uuid='B',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='BB',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+        merger_api.submit(
+            uuid='C',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='CC',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+        merger_api.submit(
+            uuid='D',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='DD',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+
+        b = merger_api.get(f"{merger_api.MERGE_REQUEST_ROOT}/B")
+        c = merger_api.get(f"{merger_api.MERGE_REQUEST_ROOT}/C")
+        d = merger_api.get(f"{merger_api.MERGE_REQUEST_ROOT}/D")
+
+        b.state = MergeRequest.RUNNING
+        merger_api.update(b)
+
+        c.state = MergeRequest.RUNNING
+        merger_api.lock(c)
+        merger_api.update(c)
+
+        d.state = MergeRequest.COMPLETED
+        merger_api.update(d)
+
+        # Wait until the latest state transition is reflected in the Merger
+        # APIs cache. Using a DataWatch for this purpose could lead to race
+        # conditions depending on which DataWatch is executed first. The
+        # DataWatch might be triggered for the correct event, but the cache
+        # might still be outdated as the DataWatch that updates the cache
+        # itself wasn't triggered yet.
+        cache = merger_api._cached_merge_requests
+        for _ in iterate_timeout(30, "cache to be up-to-date"):
+            if (cache[b.path].state == MergeRequest.RUNNING and
+                cache[c.path].state == MergeRequest.RUNNING):
+                break
+
+        # The lost_merges method should only return merges which are running
+        # but not locked by any merger, in this case merge b
+        lost_merge_requests = list(merger_api.lostMergeRequests())
+
+        self.assertEqual(1, len(lost_merge_requests))
+        self.assertEqual(b.path, lost_merge_requests[0].path)
+
+    def test_existing_merge_request(self):
+        # Test that a merger sees an existing merge request when
+        # coming online
+
+        # Test the lifecycle of a merge request
+        request_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # Simulate the client side
+        client = MergerApi(self.zk_client)
+        payload = {'merge': 'test'}
+        client.submit(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            params=payload,
+            event_id='1',
+        )
+
+        # Simulate the server side
+        server = MergerApi(self.zk_client,
+                           merge_request_callback=rq_put)
+
+        # Scheduler submits request
+        request_queue.get(timeout=30)
+
+        # Merger receives request
         reqs = list(server.next())
         self.assertEqual(len(reqs), 1)
         a = reqs[0]

@@ -2055,6 +2055,104 @@ class JobGraph(object):
 
 
 @total_ordering
+class MergeRequest:
+
+    # States:
+    REQUESTED = "requested"
+    HOLD = "hold"  # Used by tests to stall processing
+    RUNNING = "running"
+    COMPLETED = "completed"
+
+    ALL_STATES = (REQUESTED, HOLD, RUNNING, COMPLETED)
+
+    # Types:
+    MERGE = "merge"
+    CAT = "cat"
+    REF_STATE = "refstate"
+    FILES_CHANGES = "fileschanges"
+
+    def __init__(
+        self,
+        uuid,
+        state,
+        job_type,
+        precedence,
+        build_set_uuid,
+        tenant_name,
+        pipeline_name,
+        event_id
+    ):
+        self.uuid = uuid
+        self.state = state
+        self.job_type = job_type
+        self.precedence = precedence
+        self.build_set_uuid = build_set_uuid
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+        self.event_id = event_id
+
+        # Path to the future result if requested
+        self.result_path = None
+
+        # ZK related data
+        self.path = None
+        self._zstat = None
+        self.lock = None
+
+    def toDict(self):
+        return {
+            "uuid": self.uuid,
+            "state": self.state,
+            "job_type": self.job_type,
+            "precedence": self.precedence,
+            "build_set_uuid": self.build_set_uuid,
+            "tenant_name": self.tenant_name,
+            "pipeline_name": self.pipeline_name,
+            "result_path": self.result_path,
+            "event_id": self.event_id,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        job = cls(
+            data["uuid"],
+            data["state"],
+            data["job_type"],
+            data["precedence"],
+            data["build_set_uuid"],
+            data["tenant_name"],
+            data["pipeline_name"],
+            data["event_id"],
+        )
+        job.result_path = data.get("result_path")
+        return job
+
+    def __lt__(self, other):
+        # Sort jobs by precedence and their creation time in ZooKeeper in
+        # ascending order to prevent older jobs from starving.
+        if self.precedence == other.precedence:
+            if self._zstat and other._zstat:
+                return self._zstat.ctime < other._zstat.ctime
+            return self.uuid < other.uuid
+        return self.precedence < other.precedence
+
+    def __eq__(self, other):
+        same_prec = self.precedence == other.precedence
+        if self._zstat and other._zstat:
+            same_ctime = self._zstat.ctime == other._zstat.ctime
+        else:
+            same_ctime = self.uuid == other.uuid
+
+        return same_prec and same_ctime
+
+    def __repr__(self):
+        return (
+            f"<MergeRequest {self.uuid}, job_type={self.job_type}, "
+            f"state={self.state}, path={self.path}>"
+        )
+
+
+@total_ordering
 class BuildRequest:
     """A request for a build in a specific zone"""
 
