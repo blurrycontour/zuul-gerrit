@@ -30,11 +30,17 @@ from zuul.driver.github.githubconnection import GithubShaCache
 from zuul.zk.layout import LayoutState
 import zuul.rpcclient
 from zuul.lib import strings
+from zuul.model import MergeRequestType
 
-from tests.base import (AnsibleZuulTestCase, BaseTestCase,
-                        ZuulGithubAppTestCase, ZuulTestCase,
-                        simple_layout, random_sha1)
-from tests.base import ZuulWebFixture
+from tests.base import (
+    AnsibleZuulTestCase,
+    BaseTestCase,
+    simple_layout,
+    random_sha1,
+    ZuulGithubAppTestCase,
+    ZuulTestCase,
+    ZuulWebFixture,
+)
 
 EMPTY_LAYOUT_STATE = LayoutState("", "", 0)
 
@@ -976,9 +982,9 @@ class TestGithubDriver(ZuulTestCase):
         self.waitUntilSettled()
 
         if expected_cat_jobs is not None:
-            # clear the gearman jobs history so we can count the cat jobs
+            # clear the merge jobs history so we can count the cat jobs
             # issued during reconfiguration
-            self.gearman_server.jobs_history.clear()
+            del self.merge_job_history
 
         self.fake_github.emitEvent(pevent)
         self.waitUntilSettled()
@@ -995,8 +1001,8 @@ class TestGithubDriver(ZuulTestCase):
         if expected_cat_jobs is not None:
             # Check the expected number of cat jobs here as the (empty) config
             # of org/project should be cached.
-            cat_jobs = set([job for job in self.gearman_server.jobs_history
-                           if job.name == b'merger:cat'])
+            cat_jobs = [job for job in self.merge_job_history.values()
+                        if job.job_type == MergeRequestType.CAT]
             self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
@@ -1570,9 +1576,9 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         self.waitUntilSettled()
 
         if expected_cat_jobs is not None:
-            # clear the gearman jobs history so we can count the cat jobs
+            # clear the merge jobs history so we can count the cat jobs
             # issued during reconfiguration
-            self.gearman_server.jobs_history.clear()
+            del self.merge_job_history
 
         self.fake_github.emitEvent(pevent)
         self.waitUntilSettled()
@@ -1589,8 +1595,8 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         if expected_cat_jobs is not None:
             # Check the expected number of cat jobs here as the (empty) config
             # of org/project should be cached.
-            cat_jobs = set([job for job in self.gearman_server.jobs_history
-                           if job.name == b'merger:cat'])
+            cat_jobs = [job for job in self.merge_job_history.values()
+                        if job.job_type == MergeRequestType.CAT]
             self.assertEqual(expected_cat_jobs, len(cat_jobs), cat_jobs)
 
     def test_push_event_reconfigure_complex_branch(self):

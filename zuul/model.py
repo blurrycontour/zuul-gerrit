@@ -15,6 +15,7 @@
 
 import abc
 from collections import OrderedDict, defaultdict, UserDict
+from enum import Enum
 import copy
 import json
 import logging
@@ -2053,6 +2054,108 @@ class JobGraph(object):
         if name in self.project_metadata:
             return self.project_metadata[name]
         return None
+
+
+class MergeRequestState(Enum):
+    REQUESTED = 0
+    HOLD = 1
+    RUNNING = 2
+    COMPLETED = 3
+
+
+class MergeRequestType(Enum):
+    MERGE = 0
+    CAT = 1
+    REF_STATE = 2
+    FILES_CHANGES = 3
+
+
+@total_ordering
+class MergeRequest:
+
+    def __init__(
+        self,
+        uuid,
+        state,
+        job_type,
+        payload,
+        precedence,
+        build_set_uuid,
+        tenant_name,
+        pipeline_name,
+        queue_name,
+    ):
+        self.uuid = uuid
+        self.state = state
+        self.job_type = job_type
+        self.payload = payload
+        self.precedence = precedence
+        self.build_set_uuid = build_set_uuid
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+        self.queue_name = queue_name
+
+        # Path to the future result if requested
+        self.result_path = None
+
+        # ZK related data
+        self.path = None
+        self._zstat = None
+        self.lock = None
+
+    def toDict(self):
+        return {
+            "uuid": self.uuid,
+            "state": self.state.name,
+            "job_type": self.job_type.name,
+            "payload": self.payload,
+            "precedence": self.precedence,
+            "build_set_uuid": self.build_set_uuid,
+            "tenant_name": self.tenant_name,
+            "pipeline_name": self.pipeline_name,
+            "queue_name": self.queue_name,
+            "result_path": self.result_path,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        job = cls(
+            data["uuid"],
+            MergeRequestState[data["state"]],
+            MergeRequestType[data["job_type"]],
+            data["payload"],
+            data["precedence"],
+            data["build_set_uuid"],
+            data["tenant_name"],
+            data["pipeline_name"],
+            data["queue_name"],
+        )
+        job.result_path = data.get("result_path")
+        return job
+
+    def __lt__(self, other):
+        # Sort jobs by precedence and their creation time in ZooKeeper in
+        # ascending order to prevent older jobs from starving.
+        if self.precedence == other.precedence:
+            if self._zstat and other._zstat:
+                return self._zstat.ctime < other._zstat.ctime
+            return self.uuid < other.uuid
+        return self.precedence < other.precedence
+
+    def __eq__(self, other):
+        same_prec = self.precedence == other.precedence
+        if self._zstat and other._zstat:
+            same_ctime = self._zstat.ctime == other._zstat.ctime
+        else:
+            same_ctime = self.uuid == other.uuid
+
+        return same_prec and same_ctime
+
+    def __repr__(self):
+        return (
+            f"<MergeRequest {self.uuid}, job_type={self.job_type.name}, "
+            f"state={self.state.name}, path={self.path}>"
+        )
 
 
 @total_ordering
