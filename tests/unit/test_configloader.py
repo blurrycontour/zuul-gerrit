@@ -401,6 +401,24 @@ class TestTenantConfigBranches(ZuulTestCase):
         # Now job must be defined on stable branch
         self._validate_job(common_job, 'stable')
 
+        # Now try to break the config in common-config on stable
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: base
+                parent: non-existing
+            """)
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('common-config', 'stable', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # No job should have run due to the change introducing a config error
+        self.assertHistory([])
+        self.assertTrue(A.reported)
+        self.assertTrue('Job non-existing not defined' in A.messages[0])
+
 
 class TestSplitConfig(ZuulTestCase):
     tenant_config_file = 'config/split-config/main.yaml'
