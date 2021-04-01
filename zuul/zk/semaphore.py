@@ -19,7 +19,7 @@ from urllib.parse import quote_plus
 from kazoo.exceptions import BadVersionError, NoNodeError
 
 from zuul.lib.logutil import get_annotated_logger
-from zuul.zk import ZooKeeperBase
+from zuul.zk import ZooKeeperSimpleBase
 
 
 def holdersFromData(data):
@@ -32,7 +32,7 @@ def holdersToData(holders):
     return json.dumps(holders).encode("utf8")
 
 
-class SemaphoreHandler(ZooKeeperBase):
+class SemaphoreHandler(ZooKeeperSimpleBase):
     log = logging.getLogger("zuul.zk.SemaphoreHandler")
 
     semaphore_root = "/zuul/semaphores"

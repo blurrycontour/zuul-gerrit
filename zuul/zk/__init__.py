@@ -169,19 +169,26 @@ class ZooKeeperClient(object):
         )
 
 
-class ZooKeeperBase(metaclass=ABCMeta):
-    """Base class for components that need to interact with Zookeeper."""
+class ZooKeeperSimpleBase(metaclass=ABCMeta):
+    """Base class for stateless Zookeeper interaction."""
 
     def __init__(self, client: ZooKeeperClient):
         self.client = client
-        self.client.on_connect_listeners.append(self._onConnect)
-        self.client.on_disconnect_listeners.append(self._onDisconnect)
 
     @property
     def kazoo_client(self) -> KazooClient:
         if not self.client.client:
             raise NoClientException()
         return self.client.client
+
+
+class ZooKeeperBase(ZooKeeperSimpleBase):
+    """Base class for registering state handling methods with ZooKeeper."""
+
+    def __init__(self, client: ZooKeeperClient):
+        super().__init__(client)
+        self.client.on_connect_listeners.append(self._onConnect)
+        self.client.on_disconnect_listeners.append(self._onDisconnect)
 
     def _onConnect(self):
         pass
