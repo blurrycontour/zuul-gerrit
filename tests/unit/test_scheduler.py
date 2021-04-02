@@ -8125,6 +8125,56 @@ class TestSemaphore(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
+    def test_semaphore_handler_cleanup(self):
+        "Test the semaphore handler leak cleanup"
+        self.executor_server.hold_jobs_in_build = True
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        # Save some variables for later use while the job is running
+        check_pipeline = tenant.layout.pipelines['check']
+        item = check_pipeline.getAllItems()[0]
+        job = item.getJob('semaphore-one-test1')
+
+        tenant.semaphore_handler.cleanupLeaks()
+
+        # Nothing has leaked; our handle should be present.
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # Make sure the semaphore is released normally
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
+        # Use our previously saved data to simulate a leaked semaphore
+        tenant.semaphore_handler.acquire(item, job, False)
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            1)
+
+        tenant.semaphore_handler.cleanupLeaks()
+        # Make sure the leaked semaphore is cleaned up
+        self.assertEqual(
+            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
+            0)
+
 
 class TestSemaphoreMultiTenant(ZuulTestCase):
     tenant_config_file = 'config/multi-tenant-semaphore/main.yaml'
