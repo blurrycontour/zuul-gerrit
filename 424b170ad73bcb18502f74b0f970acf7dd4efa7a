@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0613488_458e67c1",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-06T21:47:32Z",
+      "side": 1,
+      "message": "Why not return this all the time?",
+      "revId": "424b170ad73bcb18502f74b0f970acf7dd4efa7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
