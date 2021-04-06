@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "cae4458a_fb7dabac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-06T22:46:42Z",
+      "side": 1,
+      "message": "I think I was trying to get at this issue: this algo requires identifying all currently used semaphores, and that is unclear.",
+      "revId": "605d792f59270a50f9c8e0b568e300e9ed985422",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b02e9974_d1ab8a96",
         "filename": "zuul/zk/semaphore.py",
         "patchSetId": 1
@@ -39,6 +56,23 @@
       "revId": "605d792f59270a50f9c8e0b568e300e9ed985422",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc271181_cedd7115",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-06T22:46:42Z",
+      "side": 1,
+      "message": "Yep.",
+      "revId": "605d792f59270a50f9c8e0b568e300e9ed985422",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
