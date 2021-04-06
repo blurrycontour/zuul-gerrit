@@ -34,6 +34,23 @@
       "revId": "28035d9af47b8480bec354ef2b8535bdbaeda553",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "45803db7_fad23d47",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1471,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-06T21:13:43Z",
+      "side": 1,
+      "message": "Sorry if I wasn\u0027t clear.  The issue is if something causes this code to run (for example, if suddenly the host becomes reachable again, and then this runs and expected logs aren\u0027t available so it fails.  Zuul would report POST_FAILURE in that case instead of None.",
+      "revId": "28035d9af47b8480bec354ef2b8535bdbaeda553",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
