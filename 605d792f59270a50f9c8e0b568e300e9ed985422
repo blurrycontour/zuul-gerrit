@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "70159ba7_0c17cf9f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-06T22:43:28Z",
+      "side": 1,
+      "message": "Seems like you could have an election for the cleanups scheduler and have it run cleanups until it loses an election. Then you don\u0027t have to consider what multiple concurrent cleanups looks like?",
+      "revId": "605d792f59270a50f9c8e0b568e300e9ed985422",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b02e9974_d1ab8a96",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-06T22:43:28Z",
+      "side": 1,
+      "message": "Should this be an intersection? Intersection will give you the jobs in first_holders that are still running and haven\u0027t stopped without jobs in second_holders that have just started. The comments above imply that this is what you want I think.",
+      "range": {
+        "startLine": 178,
+        "startChar": 32,
+        "endLine": 178,
+        "endChar": 37
+      },
+      "revId": "605d792f59270a50f9c8e0b568e300e9ed985422",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
