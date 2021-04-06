@@ -51,6 +51,24 @@
       "revId": "28035d9af47b8480bec354ef2b8535bdbaeda553",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8b9f3ef8_b798233d",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1471,
+      "author": {
+        "id": 31760
+      },
+      "writtenOn": "2021-04-06T21:44:38Z",
+      "side": 1,
+      "message": "Ah ok, I see what you mean now.  Thanks for clarifying.",
+      "parentUuid": "45803db7_fad23d47",
+      "revId": "28035d9af47b8480bec354ef2b8535bdbaeda553",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
