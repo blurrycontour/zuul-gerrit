@@ -1044,8 +1044,17 @@ class AnsibleJob(object):
             task.wait()
 
             if not task.success:
+                # On transient error retry the job
+                if hasattr(task, 'transient_error') and task.transient_error:
+                    result = dict(
+                        result=None,
+                        error_detail=f'Failed to update project '
+                                     f'{task.project_name}')
+                    self.job.sendWorkComplete(json.dumps(result))
+                    return
+
                 raise ExecutorError(
-                    'Failed to update project %s' % task.canonical_name)
+                    'Failed to update project %s' % task.project_name)
 
             self.project_info[task.canonical_name] = {
                 'refs': task.refs,
@@ -2990,6 +2999,7 @@ class ExecutorServer(BaseMergeServer):
             # requests.
             log.exception('Process pool got broken')
             self.resetProcessPool()
+            task.transient_error = True
         except Exception:
             log.exception('Got exception while updating repo %s/%s',
                           task.connection_name, task.project_name)
