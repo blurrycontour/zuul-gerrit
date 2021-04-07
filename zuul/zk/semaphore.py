@@ -1,4 +1,5 @@
 # Copyright 2021 BMW Group
+# Copyright 2021 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -93,22 +94,21 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
         data, zstat = self.kazoo_client.get(semaphore_path)
         return holdersFromData(data), zstat
 
-    def release(self, item, job):
-        if not job.semaphore:
-            return
+    def getSemaphores(self):
+        try:
+            return self.kazoo_client.get_children(self.tenant_root)
+        except NoNodeError:
+            return []
 
-        log = get_annotated_logger(self.log, item.event)
-        semaphore_key = quote_plus(job.semaphore.name)
-        semaphore_path = f"{self.tenant_root}/{semaphore_key}"
-        semaphore_handle = f"{item.uuid}-{job.name}"
-
+    def _release(self, log, semaphore_path, semaphore_handle):
         while True:
             try:
                 semaphore_holders, zstat = self.getHolders(semaphore_path)
                 semaphore_holders.remove(semaphore_handle)
             except (ValueError, NoNodeError):
-                log.error("Semaphore can not be released for %s "
-                          "because the semaphore is not held", item)
+                log.error("Semaphore %s can not be released for %s "
+                          "because the semaphore is not held", semaphore_path,
+                          semaphore_handle)
                 break
 
             try:
@@ -118,12 +118,23 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
             except BadVersionError:
                 log.debug(
                     "Retrying semaphore %s release due to concurrent update",
-                    job.semaphore.name)
+                    semaphore_path)
                 continue
 
-            log.debug("Semaphore %s released: job %s, item %s",
-                      job.semaphore.name, job.name, item)
+            log.debug("Semaphore %s released for %s",
+                      semaphore_path, semaphore_handle)
             break
+
+    def release(self, item, job):
+        if not job.semaphore:
+            return
+
+        log = get_annotated_logger(self.log, item.event)
+        semaphore_key = quote_plus(job.semaphore.name)
+        semaphore_path = f"{self.tenant_root}/{semaphore_key}"
+        semaphore_handle = f"{item.uuid}-{job.name}"
+
+        self._release(log, semaphore_path, semaphore_handle)
 
     def semaphoreHolders(self, semaphore_name):
         semaphore_key = quote_plus(semaphore_name)
@@ -137,3 +148,42 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
     def _max_count(self, semaphore_name: str) -> int:
         semaphore = self.layout.semaphores.get(semaphore_name)
         return 1 if semaphore is None else semaphore.max
+
+    def cleanupLeaks(self):
+        # This is designed to account for jobs starting and stopping
+        # while this runs, and should therefore be safe to run outside
+        # of the scheduler main loop (and accross multiple
+        # schedulers).
+
+        first_semaphores_by_holder = {}
+        for semaphore in self.getSemaphores():
+            for holder in self.semaphoreHolders(semaphore):
+                first_semaphores_by_holder[holder] = semaphore
+        first_holders = set(first_semaphores_by_holder.keys())
+
+        running_handles = set()
+        for pipeline in self.layout.pipelines.values():
+            for item in pipeline.getAllItems():
+                for job in item.getJobs():
+                    running_handles.add(f"{item.uuid}-{job.name}")
+
+        second_semaphores_by_holder = {}
+        for semaphore in self.getSemaphores():
+            for holder in self.semaphoreHolders(semaphore):
+                second_semaphores_by_holder[holder] = semaphore
+        second_holders = set(second_semaphores_by_holder.keys())
+
+        # The stable set of holders; avoids race conditions with
+        # scheduler(s) starting jobs.
+        holders = first_holders.intersection(second_holders)
+        semaphores_by_holder = first_semaphores_by_holder
+        semaphores_by_holder.update(second_semaphores_by_holder)
+
+        for holder in holders:
+            if holder not in running_handles:
+                semaphore_name = semaphores_by_holder[holder]
+                semaphore_key = quote_plus(semaphore_name)
+                semaphore_path = f"{self.tenant_root}/{semaphore_key}"
+                self.log.error("Releasing leaked semaphore %s held by %s",
+                               semaphore_path, holder)
+                self._release(self.log, semaphore_path, holder)

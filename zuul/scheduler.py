@@ -99,6 +99,7 @@ class Scheduler(threading.Thread):
 
     log = logging.getLogger("zuul.Scheduler")
     _stats_interval = 30
+    _cleanup_interval = 60 * 60
     _merger_client_class = MergeClient
 
     # Number of seconds past node expiration a hold request will remain
@@ -129,6 +130,9 @@ class Scheduler(threading.Thread):
         self.stats_thread = threading.Thread(target=self.runStats)
         self.stats_thread.daemon = True
         self.stats_stop = threading.Event()
+        self.cleanup_thread = threading.Thread(target=self.runCleanup)
+        self.cleanup_thread.daemon = True
+        self.cleanup_stop = threading.Event()
         # TODO(jeblair): fix this
         # Despite triggers being part of the pipeline, there is one trigger set
         # per scheduler. The pipeline handles the trigger filters but since
@@ -219,15 +223,18 @@ class Scheduler(threading.Thread):
         self.rpc.start()
         self.rpc_slow.start()
         self.stats_thread.start()
+        self.cleanup_thread.start()
         self.zk_component.set('state', self.zk_component.RUNNING)
 
     def stop(self):
         self._stopped = True
         self.zk_component.set('state', self.zk_component.STOPPED)
         self.stats_stop.set()
+        self.cleanup_stop.set()
         self.stopConnections()
         self.wake_event.set()
         self.stats_thread.join()
+        self.cleanup_thread.join()
         self.rpc.stop()
         self.rpc.join()
         self.rpc_slow.stop()
@@ -325,6 +332,31 @@ class Scheduler(threading.Thread):
                           self.result_event_queue.qsize())
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           len(self.management_events))
+
+    def runCleanup(self):
+        # Run the first cleanup immediately after the first
+        # reconfiguration.
+        interval = 0
+        while not self.cleanup_stop.wait(interval):
+            try:
+                if not self.last_reconfigured:
+                    time.sleep(1)
+                    continue
+                self._runCleanup()
+            except Exception:
+                self.log.exception("Error in periodic cleanup:")
+            interval = self._cleanup_interval
+
+    def _runCleanup(self):
+        # Get the layout lock to make sure the abide doesn't change
+        # under us.
+        with self.layout_lock:
+            self.log.debug("Starting semaphore cleanup")
+            for tenant in self.abide.tenants.values():
+                try:
+                    tenant.semaphore_handler.cleanupLeaks()
+                except Exception:
+                    self.log.exception("Error in semaphore cleanup:")
 
     def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()
