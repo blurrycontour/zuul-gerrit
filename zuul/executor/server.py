@@ -1727,7 +1727,8 @@ class AnsibleJob(object):
         if not jobdir_playbook.trusted:
             path = self.checkoutUntrustedProject(project, branch, args)
         else:
-            path = self.checkoutTrustedProject(project, branch)
+            path = self.checkoutTrustedProject(
+                project, branch, args['repo_state'])
         path = os.path.join(path, playbook['path'])
 
         jobdir_playbook.path = self.findPlaybook(
@@ -1750,7 +1751,7 @@ class AnsibleJob(object):
 
         self.writeAnsibleConfig(jobdir_playbook)
 
-    def checkoutTrustedProject(self, project, branch):
+    def checkoutTrustedProject(self, project, branch, repo_state):
         root = self.jobdir.getTrustedProject(project.canonical_name,
                                              branch)
         if not root:
@@ -1762,6 +1763,17 @@ class AnsibleJob(object):
                 root,
                 self.executor_server.merge_root,
                 self.log)
+
+            items = [{
+                'connection': project.connection_name,
+                'project': project.name,
+                'branch': None,
+            }]
+            merger.setRepoState(
+                items, repo_state,
+                zuul_event_id=self.zuul_event_id,
+                process_worker=self.executor_server.process_worker)
+
             merger.checkoutBranch(project.connection_name, project.name,
                                   branch)
         else:
@@ -1799,6 +1811,17 @@ class AnsibleJob(object):
                     root,
                     self.executor_server.merge_root,
                     self.log)
+
+                # Since the project us unprepared restore the repo state
+                items = [{
+                    'connection': project.connection_name,
+                    'project': project.name,
+                    'branch': None,
+                }]
+                merger.setRepoState(
+                    items, args['repo_state'],
+                    zuul_event_id=self.zuul_event_id,
+                    process_worker=self.executor_server.process_worker)
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
                            project, branch, root)
@@ -1879,7 +1902,8 @@ class AnsibleJob(object):
         if not jobdir_playbook.trusted:
             path = self.checkoutUntrustedProject(project, branch, args)
         else:
-            path = self.checkoutTrustedProject(project, branch)
+            path = self.checkoutTrustedProject(project, branch,
+                                               args['repo_state'])
 
         # The name of the symlink is the requested name of the role
         # (which may be the repo name or may be something else; this
