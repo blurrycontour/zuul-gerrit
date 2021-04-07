@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4016a74e_39cf58b4",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 494,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-07T06:44:02Z",
+      "side": 1,
+      "message": "Likely not needed yet, but it is important that we react on session loss events of the zk client and exit the loop here if we lost the session. Otherwise there is a risk that we\u0027re double gathering the events. I\u0027ve observed the same problem on the nodepool stats reporting (which is yet to be fixed).",
+      "revId": "ebcbb544be70253ce80b38e39e6f7025c60032a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
