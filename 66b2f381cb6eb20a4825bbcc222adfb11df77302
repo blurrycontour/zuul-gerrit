@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c71cfd2b_75285925",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-07T17:19:45Z",
+      "side": 1,
+      "message": "This gets called when zk_client.disconnect() is called, which seems like in practice will only happen when the scheduler is shutting down.  In that case, _stopped should already be set.  Unless I\u0027m missing something, I\u0027m not sure this change adds anything.\n\nBased on the commit message, are we looking for something where if the zk connection is broken, we exit the loop so that we can try to win the election again?  (see below)",
+      "revId": "66b2f381cb6eb20a4825bbcc222adfb11df77302",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6457848a_128ce02b",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-07T17:19:45Z",
+      "side": 1,
+      "message": "There is a .lost attribute of the ZooKeeperClient class, but I think we do need the event-based system you have here, because our poll timeout is large -- it\u0027s possible we could lose the connection, another client could win the election and start reporting events, and then our connection could be restored, all before the poll timeout hits.\n\nSo I think the event trigger part of this change is mostly right, except that we need to trigger the event from ZooKeeperClient._connectionListener, and we probably need to double check the event right after the poll call below.",
+      "revId": "66b2f381cb6eb20a4825bbcc222adfb11df77302",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
