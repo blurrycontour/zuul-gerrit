@@ -33,6 +33,14 @@ services:
     volumes:
       - "certs:/var/certs:z"
       - "./zoo.cfg:/conf/zoo.cfg:z"
+    # introduced for 3.7.0: zookeeper shall wait for certificates to be available
+    # examples_zk_1.examples_default.pem is the last file created by ./tools/zk-ca.sh
+    command: |
+      /bin/sh -c '\
+        while [ ! -f /var/certs/keystores/examples_zk_1.examples_default.pem ] ; do \
+          sleep 1; \
+        done; \
+      zkServer.sh start-foreground'
   mysql:
     image: mariadb
     environment:
