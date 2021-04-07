@@ -86,7 +86,6 @@ from zuul.driver.github.githubconnection import GithubClientManager
 from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
-from zuul.lib.queue import NamedQueue
 from zuul.zk import ZooKeeperClient
 from zuul.zk.event_queues import ConnectionEventQueue
 from psutil import Popen
@@ -236,7 +235,6 @@ class GerritDriverMock(GerritDriver):
         if connection.web_server:
             self.add_cleanup(connection.web_server.stop)
 
-        self.additional_event_queues.append(connection.event_queue)
         setattr(self.registry, 'fake_' + name, connection)
         return connection
 
@@ -1159,7 +1157,6 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         super(FakeGerritConnection, self).__init__(driver, connection_name,
                                                    connection_config)
 
-        self.event_queue = NamedQueue('FakeGerritConnectionEventQueue')
         self.fixture_dir = os.path.join(FIXTURE_DIR, 'gerrit')
         self.change_number = 0
         self.changes = changes_db

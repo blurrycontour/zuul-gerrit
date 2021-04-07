@@ -41,8 +41,8 @@ from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib.logutil import get_annotated_logger
-from zuul.lib.queue import NamedQueue
 from zuul.model import Ref, Tag, Branch, Project
+from zuul.zk.event_queues import ConnectionEventQueue
 
 # HTTP timeout in seconds
 TIMEOUT = 30
@@ -131,16 +131,44 @@ class GerritEventConnector(threading.Thread):
         super(GerritEventConnector, self).__init__()
         self.daemon = True
         self.connection = connection
+        self.event_queue = connection.event_queue
         self._stopped = False
+        self._connector_wake_event = threading.Event()
 
     def stop(self):
         self._stopped = True
-        self.connection.addEvent(None)
+        self._connector_wake_event.set()
+        self.event_queue.election.cancel()
 
-    def _handleEvent(self):
-        ts, data = self.connection.getEvent()
-        if self._stopped:
-            return
+    def _onNewEvent(self):
+        self._connector_wake_event.set()
+        # Stop the data watch in case the connector was stopped
+        return not self._stopped
+
+    def run(self):
+        self.event_queue.registerEventWatch(self._onNewEvent)
+        while not self._stopped:
+            try:
+                self.event_queue.election.run(self._run)
+            except Exception:
+                self.log.exception("Exception moving Gerrit event:")
+
+    def _run(self):
+        while not self._stopped:
+            for event in self.event_queue:
+                try:
+                    self._handleEvent(event)
+                finally:
+                    self.event_queue.ack(event)
+                if self._stopped:
+                    return
+            self._connector_wake_event.wait(10)
+            self._connector_wake_event.clear()
+
+    def _handleEvent(self, connection_event):
+        timestamp = connection_event["timestamp"]
+        data = connection_event["payload"]
+
         # Gerrit can produce inconsistent data immediately after an
         # event, So ensure that we do not deliver the event to Zuul
         # until at least a certain amount of time has passed.  Note
@@ -148,9 +176,9 @@ class GerritEventConnector(threading.Thread):
         # only need to delay for the first event.  In essence, Zuul
         # should always be a constant number of seconds behind Gerrit.
         now = time.time()
-        time.sleep(max((ts + self.delay) - now, 0.0))
+        time.sleep(max((timestamp + self.delay) - now, 0.0))
         event = GerritTriggerEvent()
-        event.timestamp = ts
+        event.timestamp = timestamp
 
         # Gerrit events don't have an event id that could be used to globally
         # identify this event in the system so we have to generate one.
@@ -293,17 +321,6 @@ class GerritEventConnector(threading.Thread):
                 self.connection._getChange(event.change_number,
                                            event.patch_number,
                                            refresh=True, event=event)
-
-    def run(self):
-        while True:
-            if self._stopped:
-                return
-            try:
-                self._handleEvent()
-            except Exception:
-                self.log.exception("Exception moving Gerrit event:")
-            finally:
-                self.connection.eventDone()
 
 
 class GerritWatcher(threading.Thread):
@@ -527,7 +544,6 @@ class GerritConnection(BaseConnection):
         self.watcher_thread = None
         self.poller_thread = None
         self.ref_watcher_thread = None
-        self.event_queue = NamedQueue(f'GerritEventQueue<{connection_name}>')
         self.client = None
         self.watched_checkers = []
         self.project_checker_map = {}
@@ -1031,13 +1047,11 @@ class GerritConnection(BaseConnection):
         return heads
 
     def addEvent(self, data):
-        return self.event_queue.put((time.time(), data))
-
-    def getEvent(self):
-        return self.event_queue.get()
-
-    def eventDone(self):
-        self.event_queue.task_done()
+        event = {
+            "timestamp": time.time(),
+            "payload": data
+        }
+        self.event_queue.put(event)
 
     def review(self, item, message, submit, labels, checks_api,
                file_comments, zuul_event_id=None):
@@ -1467,6 +1481,10 @@ class GerritConnection(BaseConnection):
                 self._getRemoteVersion()
         except Exception:
             self.log.exception("Unable to determine remote Gerrit version")
+
+        self.log.info("Creating Zookeeper event queue")
+        self.event_queue = ConnectionEventQueue(self.sched.zk_client,
+                                                self.connection_name)
 
         if self.enable_stream_events:
             self._start_watcher_thread()
