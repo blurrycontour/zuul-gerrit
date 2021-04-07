@@ -340,6 +340,9 @@ class GerritWatcher(threading.Thread):
             gerrit_connection.sched.zk_client,
             gerrit_connection.connection_name,
             "watcher")
+        self._connection_lost_event = threading.Event()
+        gerrit_connection.sched.zk_client.on_connection_lost_listeners.append(
+            self._connection_lost_event.set)
         self.keepalive = keepalive
         self._stopped = False
 
@@ -357,8 +360,10 @@ class GerritWatcher(threading.Thread):
     def _listen(self, stdout, stderr):
         poll = select.poll()
         poll.register(stdout.channel)
-        while not self._stopped:
+        while not (self._stopped or self._connection_lost_event.is_set()):
             ret = poll.poll(self.poll_timeout)
+            if self._connection_lost_event.is_set():
+                return
             for (fd, event) in ret:
                 if fd == stdout.channel.fileno():
                     if event == select.POLLIN:
@@ -410,6 +415,7 @@ class GerritWatcher(threading.Thread):
                 self.log.exception("Exception on ssh event stream with %s:",
                                    self.gerrit_connection.connection_name)
                 self._stop_event.wait(5)
+            self._connection_lost_event.clear()
 
     def stop(self):
         self.log.debug("Stopping watcher")
@@ -431,6 +437,9 @@ class GerritPoller(threading.Thread):
             connection.sched.zk_client, connection.connection_name, "poller")
         self._stopped = False
         self._stop_event = threading.Event()
+        self._connection_lost_event = threading.Event()
+        connection.sched.zk_client.on_connection_lost_listeners.append(
+            self._connection_lost_event.set)
 
     def _makePendingCheckEvent(self, change, uuid, check):
         return {'type': 'pending-check',
@@ -484,10 +493,10 @@ class GerritPoller(threading.Thread):
 
     def _run(self):
         last_start = time.time()
-        while not self._stopped:
+        while not (self._stopped or self._connection_lost_event.is_set()):
             next_start = last_start + self.poll_interval
             self._stop_event.wait(max(next_start - time.time(), 0))
-            if self._stopped:
+            if self._stopped or self._connection_lost_event.is_set():
                 break
             last_start = time.time()
 
@@ -502,6 +511,7 @@ class GerritPoller(threading.Thread):
             except Exception:
                 self.log.exception("Exception on Gerrit poll with %s:",
                                    self.connection.connection_name)
+            self._connection_lost_event.clear()
 
     def stop(self):
         self.log.debug("Stopping watcher")

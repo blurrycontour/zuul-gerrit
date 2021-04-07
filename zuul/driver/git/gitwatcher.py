@@ -60,6 +60,9 @@ class GitWatcher(threading.Thread):
             connection.sched.zk_client,
             connection.connection_name,
             election_name)
+        self._connection_lost_event = threading.Event()
+        connection.sched.zk_client.on_connection_lost_listeners.append(
+            self._connection_lost_event.set)
         # This is used by the test framework
         self._event_count = 0
         self._pause = False
@@ -139,7 +142,7 @@ class GitWatcher(threading.Thread):
                 self._event_count += 1
 
     def _run(self):
-        while not self._stopped:
+        while not (self._stopped or self._connection_lost_event.is_set()):
             if not self._pause:
                 self._poll()
                 # Polling wait delay
@@ -153,6 +156,7 @@ class GitWatcher(threading.Thread):
                 self.watcher_election.run(self._run)
             except Exception:
                 self.log.exception("Unexpected issue in _run loop:")
+            self._connection_lost_event.clear()
 
     def stop(self):
         self.log.debug("Stopping watcher")
