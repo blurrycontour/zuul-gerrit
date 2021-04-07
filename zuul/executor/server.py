@@ -1063,6 +1063,7 @@ class AnsibleJob(object):
             self.executor_server.merge_root,
             self.log)
         repos = {}
+        merge_items = [i for i in args['items'] if i.get('number')]
         for project in args['projects']:
             self.log.debug("Cloning %s/%s" % (project['connection'],
                                               project['name'],))
@@ -1070,11 +1071,25 @@ class AnsibleJob(object):
                                   project['name'])
             repos[project['canonical_name']] = repo
 
+            # Restore repo state is only necesary if the project is not part
+            # of the merge items
+            found = False
+            for item in merge_items:
+                if (project['connection'] == item['connection'] and
+                        project['name'] == item['project']):
+                    found = True
+                    break
+
+            if not found:
+                merger._restoreRepoState(
+                    project['connection'], project['name'],
+                    repo, repo_state, self.zuul_event_id,
+                    process_worker=self.executor_server.process_worker)
+
         # The commit ID of the original item (before merging).  Used
         # later for line mapping.
         item_commit = None
 
-        merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
             item_commit = self.doMergeChanges(
                 merger, merge_items, repo_state)
