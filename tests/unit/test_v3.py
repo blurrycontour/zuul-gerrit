@@ -20,6 +20,7 @@ import os
 import sys
 import textwrap
 import gc
+from time import sleep
 from unittest import skip, skipIf
 
 import paramiko
@@ -2479,12 +2480,16 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
     def test_required_projects(self):
         # Test that the repo state is restored globally for the whole buildset
         # including required projects not in the dependency chain.
-        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.hold_jobs_in_start = True
         A = self.fake_gerrit.addFakeChange('org/requiringproject', 'master',
                                            'A')
         A.addApproval('Approved', 1)
         self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
-        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, 'Wait for build to be in starting phase'):
+            if self.executor_server.job_workers:
+                sleep(1)
+                break
 
         # The build require-test1 is running,
         # require-test2 is waiting for require-test1.
@@ -2506,8 +2511,13 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         self.log.info('Merge test change on common-config')
         B.setMerged()
 
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
+        # Reset repo to ensure the cached repo has the failing commit. This
+        # is needed to ensure that the repo state has been restored.
+        repo = self.executor_server.merger.getRepo(
+            'gerrit', 'org/requiredproject')
+        repo.reset()
+
+        self.executor_server.hold_jobs_in_start = False
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='require-test1', result='SUCCESS', changes='1,1'),
