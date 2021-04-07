@@ -16,6 +16,24 @@
       "revId": "ebcbb544be70253ce80b38e39e6f7025c60032a5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "192c5ba5_d91b6570",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 494,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-07T08:11:52Z",
+      "side": 1,
+      "message": "Ack. Pushed a follow up change https://review.opendev.org/c/zuul/zuul/+/785100\nWe probably also want to handle the connection lost events for the passive event gathering. I think it\u0027s not that critical as there are a lot of Zookeeper operations that might fail in case the connection is lost. However, there\u0027s still a small chance for a race condition.",
+      "parentUuid": "4016a74e_39cf58b4",
+      "revId": "ebcbb544be70253ce80b38e39e6f7025c60032a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
