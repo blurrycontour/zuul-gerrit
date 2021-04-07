@@ -28,7 +28,7 @@ from kazoo.protocol.states import EventType
 
 from zuul import model
 from zuul.lib.collections import DefaultKeyDict
-from zuul.zk import ZooKeeperBase
+from zuul.zk import ZooKeeperSimpleBase
 
 RESULT_EVENT_TYPE_MAP = {
     "BuildCompletedEvent": model.BuildCompletedEvent,
@@ -69,7 +69,7 @@ class EventPrefix(enum.Enum):
     TRIGGER = "300"
 
 
-class GlobalEventWatcher(ZooKeeperBase):
+class GlobalEventWatcher(ZooKeeperSimpleBase):
 
     log = logging.getLogger("zuul.zk.event_queues.EventQueueWatcher")
 
@@ -86,7 +86,7 @@ class GlobalEventWatcher(ZooKeeperBase):
             self.callback()
 
 
-class PipelineEventWatcher(ZooKeeperBase):
+class PipelineEventWatcher(ZooKeeperSimpleBase):
 
     log = logging.getLogger("zuul.zk.event_queues.EventQueueWatcher")
 
@@ -134,7 +134,7 @@ class PipelineEventWatcher(ZooKeeperBase):
             self.callback()
 
 
-class ZooKeeperEventQueue(ZooKeeperBase, Iterable):
+class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
     """Abstract API for events via ZooKeeper"""
 
     log = logging.getLogger("zuul.zk.event_queues.ZooKeeperEventQueue")
@@ -253,7 +253,7 @@ class SchedulerEventQueue(ZooKeeperEventQueue):
         return "{}/{}-".format(self.event_root, self.event_prefix.value)
 
 
-class ManagementEventResultFuture(ZooKeeperBase):
+class ManagementEventResultFuture(ZooKeeperSimpleBase):
     """Returned when a management event is put into a queue."""
 
     log = logging.getLogger("zuul.zk.event_queues.MangementEventResultFuture")
