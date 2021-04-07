@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa26b0a2_8b4e8914",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2500,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-07T18:33:49Z",
+      "side": 1,
+      "message": "In the issue that fungi and I discovered we want the inverse behavior to be tested. Specifically, Change A merges as a fastforward to repo foo branch main, then when Change B against repo bar is checked with a required-project of repo foo we want repo foo to update to latest master. The two changes are running in different buildset contexts.\n\nI think we should consider adding another test (possibly a variant of the one I had previously proposed) to test the scenario that fungi and I discovered as it is different to this one.",
+      "revId": "fc233e427b62d727e7fd8fd9653c9e59c19d79db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d41bf229_3e00ac8e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1085,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-07T18:33:49Z",
+      "side": 1,
+      "message": "If we are going to call _restoreRepoState() outside of a merger context we should consider making it a public method.",
+      "revId": "fc233e427b62d727e7fd8fd9653c9e59c19d79db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c97e5be2_a397ebce",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1107,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-07T18:33:49Z",
+      "side": 1,
+      "message": "This list is disjoint from the new merge_items list above. I think that means we were calling setRepoState() below on at least a subset of of the repos we are calling _restoreRepoState() against above. This has me confused as to how this change is helpful since setRepoState() calls _restoreRepoState() (see below).",
+      "revId": "fc233e427b62d727e7fd8fd9653c9e59c19d79db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c0664ea_df6fa813",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1109,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-07T18:33:49Z",
+      "side": 1,
+      "message": "This is the existing public method in the merger which calls merger._restoreRepoState(). This is what has me confused about the assertion that we should be using _restoreRepoState() for the fix of this problem. The general process previously seemed to be:\n\n  * Update all repos if necessary\n  * Merge changes\n  * Update repo to reflect merges using setRepoState\n\nWithin that process addressing stale refs in the first step across all repos seems to avoid needing to use merger internals. It also seems simpler to understand (though none of this is terribly simple).",
+      "revId": "fc233e427b62d727e7fd8fd9653c9e59c19d79db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
