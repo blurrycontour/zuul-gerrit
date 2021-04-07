@@ -16,6 +16,24 @@
       "revId": "424b170ad73bcb18502f74b0f970acf7dd4efa7a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ed105275_fcb800d8",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2021-04-07T13:05:43Z",
+      "side": 1,
+      "message": "Because the branch would be None if the queue is not \"per-branch\". I think in this case there is no need to return it (\"branch\": null).",
+      "parentUuid": "c0613488_458e67c1",
+      "revId": "424b170ad73bcb18502f74b0f970acf7dd4efa7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
