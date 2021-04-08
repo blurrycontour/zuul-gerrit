@@ -16,6 +16,40 @@
       "revId": "9af4e075322971a5d0d29775afac376c8a5579ff",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c6e20e5c_9435d948",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-08T20:40:12Z",
+      "side": 1,
+      "message": "It is stored in ZK!  So the idea is that we can stop here at any time, and even though this returned an event, it\u0027s still in ZK and unack\u0027d.  So the next processor can take over.\n\nWe\u0027re responsible for finishing processing any events we previously handled, which is why the method above continues running the second half of the process even after we\u0027ve stopped the first (to drain our second queue).\n\nOnly when everything is drained do we exit.  If it takes a while to drain the second half of our queue, we may pause processing for a while, but we won\u0027t lose events.\n\nI marked the initializer of self.event_queue below.",
+      "revId": "9af4e075322971a5d0d29775afac376c8a5579ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "884d2f2e_d801674c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1206,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-08T20:40:12Z",
+      "side": 1,
+      "message": "I believe this is the first event queue.",
+      "revId": "9af4e075322971a5d0d29775afac376c8a5579ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
