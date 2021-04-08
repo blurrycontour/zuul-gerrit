@@ -61,6 +61,7 @@ class ZooKeeperClient(object):
         self._last_retry_log: int = 0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners: List[Callable[[], None]] = []
+        self.on_connection_lost_listeners: List[Callable[[], None]] = []
 
     def _connectionListener(self, state):
         """
@@ -70,6 +71,11 @@ class ZooKeeperClient(object):
         """
         if state == KazooState.LOST:
             self.log.debug("ZooKeeper connection: LOST")
+            for listener in self.on_connection_lost_listeners:
+                try:
+                    listener()
+                except Exception:
+                    self.log.exception("Exception calling listener:")
         elif state == KazooState.SUSPENDED:
             self.log.debug("ZooKeeper connection: SUSPENDED")
         else:
