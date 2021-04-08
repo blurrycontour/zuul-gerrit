@@ -538,7 +538,7 @@ class Project(object):
     # This makes a Project instance a unique identifier for a given
     # project from a given source.
 
-    def __init__(self, name, source, foreign=False):
+    def __init__(self, name, source):
         self.name = name
         self.source = source
         self.connection_name = source.connection.connection_name
@@ -548,11 +548,6 @@ class Project(object):
         self.public_secrets_key = None
         self.private_ssh_key = None
         self.public_ssh_key = None
-        # foreign projects are those referenced in dependencies
-        # of layout projects, this should matter
-        # when deciding whether to enqueue their changes
-        # TODOv3 (jeblair): re-add support for foreign projects if needed
-        self.foreign = foreign
 
     def __str__(self):
         return self.name
@@ -4841,7 +4836,7 @@ class Layout(object):
             job_graph.addJob(frozen_job)
 
     def createJobGraph(self, item, ppc, skip_file_matcher=False):
-        # NOTE(pabelanger): It is possible for a foreign project not to have a
+        # NOTE(pabelanger): It is possible for a project not to have a
         # configured pipeline, if so return an empty JobGraph.
         ret = JobGraph()
         if ppc:
