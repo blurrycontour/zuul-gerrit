@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fd43c6b9_1395b0ec",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-08T06:17:18Z",
+      "side": 1,
+      "message": "I somehow expected the on disconnect listeners to also get called when the connection is lost. So yes, that doesn\u0027t work as intended. I\u0027ll add a hook to listen for connection losses.",
+      "parentUuid": "c71cfd2b_75285925",
+      "revId": "66b2f381cb6eb20a4825bbcc222adfb11df77302",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6457848a_128ce02b",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2021-04-07T17:19:45Z",
       "side": 1,
       "message": "There is a .lost attribute of the ZooKeeperClient class, but I think we do need the event-based system you have here, because our poll timeout is large -- it\u0027s possible we could lose the connection, another client could win the election and start reporting events, and then our connection could be restored, all before the poll timeout hits.\n\nSo I think the event trigger part of this change is mostly right, except that we need to trigger the event from ZooKeeperClient._connectionListener, and we probably need to double check the event right after the poll call below.",
+      "revId": "66b2f381cb6eb20a4825bbcc222adfb11df77302",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b36c60d5_1287d127",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-08T06:17:18Z",
+      "side": 1,
+      "message": "Ack. I used the event based approach as I wanted to avoid races in case the connection is lost but the client reconnects immediately.",
+      "parentUuid": "6457848a_128ce02b",
       "revId": "66b2f381cb6eb20a4825bbcc222adfb11df77302",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
