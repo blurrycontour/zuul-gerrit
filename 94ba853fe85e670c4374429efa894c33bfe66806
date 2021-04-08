@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8dd2a723_92ffe1bb",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-08T07:12:19Z",
+      "side": 1,
+      "message": "Type annotation is required due to the existing annotation in here.",
+      "revId": "94ba853fe85e670c4374429efa894c33bfe66806",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
