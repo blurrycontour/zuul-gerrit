@@ -1,0 +1,75 @@
+- pipeline:
+    name: gate
+    manager: dependent
+    trigger:
+      gerrit:
+        - event: comment-added
+          approval:
+            - Code-Review: 2
+    success:
+      gerrit:
+        Verified: 2
+        submit: true
+    failure:
+      gerrit:
+        Verified: -2
+    start:
+      gerrit:
+        Verified: 0
+    precedence: high
+
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: comment-added
+          approval:
+            - Code-Review: 2
+    success:
+      gerrit:
+        Verified: 1
+        submit: true
+    failure:
+      gerrit:
+        Verified: -1
+    start:
+      gerrit:
+        Verified: 0
+    precedence: high
+
+- job:
+    name: base
+    pre-run:
+      - playbooks/pre.yaml
+    roles:
+      - zuul: org/roles
+    parent: null
+
+- job:
+    name: test1
+    run: playbooks/test1.yaml
+
+- job:
+    name: test2
+    run: playbooks/test2.yaml
+
+- job:
+    name: require-test1
+    run: playbooks/require-test.yaml
+    required-projects:
+      - name: org/requiredproject
+
+- job:
+    name: require-test2
+    run: playbooks/require-test.yaml
+    required-projects:
+      - name: org/requiredproject
+
+- job:
+    name: dependent-test1
+    run: playbooks/require-test.yaml
+
+- job:
+    name: dependent-test2
+    run: playbooks/require-test.yaml
