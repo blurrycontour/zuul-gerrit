@@ -1,3 +1,0 @@
-- name: Test
-  debug:
-    msg: test-role

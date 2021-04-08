@@ -21,7 +21,6 @@ from zuul import model
 from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.tarjan import strongly_connected_components
-from zuul.model import QueueItem
 
 
 class DynamicChangeQueueContextManager(object):
@@ -859,24 +858,6 @@ class PipelineManager(metaclass=ABCMeta):
         self.log.debug("Preparing dynamic layout for: %s" % item.change)
         return self._loadDynamicLayout(item)
 
-    def _branchesForRepoState(self, projects, tenant, items=None):
-        if all(tenant.getExcludeUnprotectedBranches(project)
-               for project in projects):
-            branches = set()
-
-            # Add all protected branches of all involved projects
-            for project in projects:
-                branches.update(tenant.getProjectBranches(project))
-
-            # Additionally add all target branches of all involved items.
-            if items is not None:
-                branches.update(item.change.branch for item in items
-                                if hasattr(item.change, 'branch'))
-            branches = list(branches)
-        else:
-            branches = None
-        return branches
-
     def scheduleMerge(self, item, files=None, dirs=None):
         log = item.annotateLogger(self.log)
         log.debug("Scheduling merge for item %s (files: %s, dirs: %s)" %
@@ -895,8 +876,20 @@ class PipelineManager(metaclass=ABCMeta):
             item.change.project for item in items
             if tenant.getProject(item.change.project.canonical_name)[1]
         }
-        branches = self._branchesForRepoState(projects=projects, tenant=tenant,
-                                              items=items)
+        if all(tenant.getExcludeUnprotectedBranches(project)
+               for project in projects):
+            branches = set()
+
+            # Add all protected branches of all involved projects
+            for project in projects:
+                branches.update(tenant.getProjectBranches(project))
+
+            # Additionally add all target branches of all involved items.
+            branches.update(item.change.branch for item in items
+                            if hasattr(item.change, 'branch'))
+            branches = list(branches)
+        else:
+            branches = None
 
         if isinstance(item.change, model.Change):
             self.sched.merger.mergeChanges(build_set.merger_items,
@@ -924,54 +917,7 @@ class PipelineManager(metaclass=ABCMeta):
             event=item.event)
         return False
 
-    def scheduleGlobalRepoState(self, item: QueueItem) -> bool:
-        log = item.annotateLogger(self.log)
-        log.info('Scheduling global repo state for item %s', item)
-
-        tenant = item.pipeline.tenant
-        jobs = item.job_graph.getJobs()
-        projects = set()
-        for job in jobs:
-            log.debug('Processing job %s', job.name)
-            projects.update(job.getAffectedProjects(tenant))
-            log.debug('Needed projects: %s', projects)
-
-        # Filter projects for ones that are already in repo state
-        repo_state = item.current_build_set.repo_state
-        connections = self.sched.connections.connections
-        projects_to_remove = set()
-        for connection in repo_state.keys():
-            canonical_hostname = connections[connection].canonical_hostname
-            for project in repo_state[connection].keys():
-                canonical_project_name = canonical_hostname + '/' + project
-                for affected_project in projects:
-                    if canonical_project_name ==\
-                            affected_project.canonical_name:
-                        projects_to_remove.add(affected_project)
-        projects -= projects_to_remove
-
-        if not projects:
-            item.current_build_set.repo_state_state =\
-                item.current_build_set.COMPLETE
-            return True
-
-        branches = self._branchesForRepoState(projects=projects, tenant=tenant)
-
-        new_items = list()
-        for project in projects:
-            new_item = dict()
-            new_item['project'] = project.name
-            new_item['connection'] = project.connection_name
-            new_items.append(new_item)
-
-        # Get state for not yet tracked projects
-        self.sched.merger.getRepoState(items=new_items,
-                                       build_set=item.current_build_set,
-                                       event=item.event,
-                                       branches=branches)
-        return True
-
-    def prepareItem(self, item: QueueItem) -> bool:
+    def prepareItem(self, item):
         build_set = item.current_build_set
         tenant = item.pipeline.tenant
         # We always need to set the configuration of the item if it
@@ -1059,15 +1005,6 @@ class PipelineManager(metaclass=ABCMeta):
                 item.setConfigError("Unable to freeze job graph: %s" %
                                     (str(e)))
                 return False
-
-        # At this point we know all frozen jobs and their repos so update the
-        # repo state with all missing repos.
-        if build_set.repo_state_state == build_set.NEW:
-            build_set.repo_state_state = build_set.PENDING
-            self.scheduleGlobalRepoState(item)
-        if build_set.repo_state_state == build_set.PENDING:
-            return False
-
         return True
 
     def _processOneItem(self, item, nnfi):
@@ -1347,13 +1284,6 @@ class PipelineManager(metaclass=ABCMeta):
 
     def onMergeCompleted(self, event):
         build_set = event.build_set
-        if build_set.merge_state == build_set.COMPLETE:
-            self._onGlobalRepoStateCompleted(event)
-        else:
-            self._onMergeCompleted(event)
-
-    def _onMergeCompleted(self, event):
-        build_set = event.build_set
         item = build_set.item
         item.change.containing_branches = event.item_in_branches
         build_set.merge_state = build_set.COMPLETE
@@ -1371,21 +1301,6 @@ class PipelineManager(metaclass=ABCMeta):
         if not build_set.commit:
             self.log.info("Unable to merge change %s" % item.change)
             item.setUnableToMerge()
-
-    def _onGlobalRepoStateCompleted(self, event):
-        if not event.updated:
-            item = event.build_set.item
-            self.log.info("Unable to get global repo state for change %s"
-                          % item.change)
-            item.setUnableToMerge()
-        else:
-            repo_state = event.build_set.repo_state
-            for connection in event.repo_state.keys():
-                if connection in repo_state:
-                    repo_state[connection].update(event.repo_state[connection])
-                else:
-                    repo_state[connection] = event.repo_state[connection]
-            event.build_set.repo_state_state = event.build_set.COMPLETE
 
     def onNodesProvisioned(self, event):
         # TODOv3(jeblair): handle provisioning failure here

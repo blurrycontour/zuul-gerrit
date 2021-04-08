@@ -1,8 +1,0 @@
-- project:
-    name: org/dependentproject
-    check:
-      jobs:
-        - dependent-test1
-        - dependent-test2:
-            dependencies:
-              - dependent-test1
