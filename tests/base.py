@@ -2999,17 +2999,20 @@ class FakeSqlConnection(sqlconnection.SQLConnection):
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
     result = None
 
+    def _execute(self):
+        for _ in iterate_timeout(60, 'wait for merge'):
+            if not self.executor_server.hold_jobs_in_start:
+                break
+            time.sleep(1)
+
+        super()._execute()
+
     def doMergeChanges(self, merger, items, repo_state):
         # Get a merger in order to update the repos involved in this job.
         commit = super(RecordingAnsibleJob, self).doMergeChanges(
             merger, items, repo_state)
         if not commit:  # merge conflict
             self.recordResult('MERGER_FAILURE')
-
-        for _ in iterate_timeout(60, 'wait for merge'):
-            if not self.executor_server.hold_jobs_in_start:
-                break
-            time.sleep(1)
 
         return commit
 

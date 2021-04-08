@@ -20,6 +20,7 @@ import os
 import sys
 import textwrap
 import gc
+from time import sleep
 from unittest import skip, skipIf
 
 import paramiko
@@ -2440,11 +2441,15 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
     def test_inherited_playbooks(self):
         # Test that the repo state is restored globally for the whole buildset
         # including inherited projects not in the dependency chain.
-        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.hold_jobs_in_start = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Approved', 1)
         self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
-        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, 'Wait for build to be in starting phase'):
+            if self.executor_server.job_workers:
+                sleep(1)
+                break
 
         # The build test1 is running while test2 is waiting for test1.
         self.assertEqual(len(self.builds), 1)
@@ -2467,8 +2472,12 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         self.log.info('Merge test change on common-config')
         B.setMerged()
 
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
+        # Reset repo to ensure the cached repo has the failing commit. This
+        # is needed to ensure that the repo state has been restored.
+        repo = self.executor_server.merger.getRepo('gerrit', 'common-config')
+        repo.reset()
+
+        self.executor_server.hold_jobs_in_start = False
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='test1', result='SUCCESS', changes='1,1'),
@@ -2478,12 +2487,16 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
     def test_required_projects(self):
         # Test that the repo state is restored globally for the whole buildset
         # including required projects not in the dependency chain.
-        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.hold_jobs_in_start = True
         A = self.fake_gerrit.addFakeChange('org/requiringproject', 'master',
                                            'A')
         A.addApproval('Approved', 1)
         self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
-        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, 'Wait for build to be in starting phase'):
+            if self.executor_server.job_workers:
+                sleep(1)
+                break
 
         # The build require-test1 is running,
         # require-test2 is waiting for require-test1.
@@ -2505,8 +2518,13 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         self.log.info('Merge test change on common-config')
         B.setMerged()
 
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
+        # Reset repo to ensure the cached repo has the failing commit. This
+        # is needed to ensure that the repo state has been restored.
+        repo = self.executor_server.merger.getRepo(
+            'gerrit', 'org/requiredproject')
+        repo.reset()
+
+        self.executor_server.hold_jobs_in_start = False
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='require-test1', result='SUCCESS', changes='1,1'),
@@ -2516,7 +2534,7 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
     def test_dependent_project(self):
         # Test that the repo state is restored globally for the whole buildset
         # including dependent projects.
-        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.hold_jobs_in_start = True
         B = self.fake_gerrit.addFakeChange('org/requiredproject', 'master',
                                            'B')
         A = self.fake_gerrit.addFakeChange('org/dependentproject', 'master',
@@ -2524,7 +2542,11 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         A.setDependsOn(B, 1)
         A.addApproval('Approved', 1)
         self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
-        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, 'Wait for build to be in starting phase'):
+            if self.executor_server.job_workers:
+                sleep(1)
+                break
 
         # The build dependent-test1 is running,
         # dependent-test2 is waiting for dependent-test1.
@@ -2546,8 +2568,13 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         self.log.info('Merge test change on common-config')
         C.setMerged()
 
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
+        # Reset repo to ensure the cached repo has the failing commit. This
+        # is needed to ensure that the repo state has been restored.
+        repo = self.executor_server.merger.getRepo(
+            'gerrit', 'org/requiredproject')
+        repo.reset()
+
+        self.executor_server.hold_jobs_in_start = False
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='dependent-test1', result='SUCCESS', changes='1,1 2,1'),
@@ -5922,9 +5949,6 @@ class TestJobPause(AnsibleZuulTestCase):
     def test_job_reconfigure_resume(self):
         """
         Tests that a paused job is resumed after reconfiguration
-
-        Tests that a paused job is resumed after a reconfiguration removed the
-        last job which is in progress.
         """
         self.wait_timeout = 120
 
@@ -5942,25 +5966,16 @@ class TestJobPause(AnsibleZuulTestCase):
 
         self.assertEqual(len(self.builds), 2, 'compile and test in progress')
 
-        # Remove the test1 job.
-        self.commitConfigUpdate(
-            'org/project6',
-            'config/job-pause/git/org_project6/zuul-reconfigure.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
         self.waitUntilSettled()
 
-        # The "compile" job might be paused during the waitUntilSettled
-        # call and appear settled; it should automatically resume
-        # though, so just wait for it.
-        for x in iterate_timeout(60, 'job compile finished'):
-            if not self.builds:
-                break
+        self.executor_server.release('test')
         self.waitUntilSettled()
 
         self.assertHistory([
             dict(name='compile', result='SUCCESS', changes='1,1'),
-            dict(name='test', result='ABORTED', changes='1,1'),
-        ])
+            dict(name='test', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
 
     def test_job_pause_skipped_child(self):
         """

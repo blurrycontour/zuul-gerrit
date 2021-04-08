@@ -725,6 +725,10 @@ class Scheduler(threading.Thread):
             if event.validate_tenants is None:
                 for tenant in abide.tenants.values():
                     self._reconfigureTenant(tenant)
+                for old_tenant in self.abide.tenants.values():
+                    if not abide.tenants.get(old_tenant.name):
+                        # We deleted a tenant
+                        self._reconfigureDeleteTenant(old_tenant)
                 self.abide = abide
             else:
                 loading_errors = []
@@ -791,6 +795,8 @@ class Scheduler(threading.Thread):
                 tenant = abide.tenants.get(tenant_name)
                 if tenant is not None:
                     self._reconfigureTenant(tenant)
+                else:
+                    self._reconfigureDeleteTenant(old_tenant)
                 self.abide = abide
         duration = round(time.monotonic() - start, 3)
         self.log.info("Smart reconfiguration of tenants %s complete "
@@ -836,6 +842,10 @@ class Scheduler(threading.Thread):
         (trusted, new_project) = tenant.getProject(project.canonical_name)
         if new_project:
             return new_project
+
+        if item.live:
+            return None
+
         # If this is a non-live item we may be looking at a
         # "foreign" project, ie, one which is not defined in the
         # config but is constructed ad-hoc to satisfy a
@@ -860,6 +870,7 @@ class Scheduler(threading.Thread):
                 source = child_project.source
                 new_project = source.getProject(project.name)
                 return new_project
+
         return None
 
     def _reenqueueTenant(self, old_tenant, tenant):
@@ -890,8 +901,8 @@ class Scheduler(threading.Thread):
             items_to_remove = []
             builds_to_cancel = []
             requests_to_cancel = []
-            last_head = None
             for shared_queue in old_pipeline.queues:
+                last_head = None
                 # Attempt to keep window sizes from shrinking where possible
                 project, branch = shared_queue.project_branches[0]
                 new_queue = new_pipeline.getQueue(project, branch)
@@ -899,14 +910,10 @@ class Scheduler(threading.Thread):
                     new_queue.window = max(shared_queue.window,
                                            new_queue.window_floor)
                 for item in shared_queue.queue:
-                    if not item.item_ahead:
-                        last_head = item
-                    item.pipeline = None
-                    item.queue = None
-                    item.change.project = self._reenqueueGetProject(
-                        tenant, item)
                     # If the old item ahead made it in, re-enqueue
                     # this one behind it.
+                    new_project = self._reenqueueGetProject(
+                        tenant, item)
                     if item.item_ahead in items_to_remove:
                         old_item_ahead = None
                         item_ahead_valid = False
@@ -916,7 +923,12 @@ class Scheduler(threading.Thread):
                     item.item_ahead = None
                     item.items_behind = []
                     reenqueued = False
-                    if item.change.project:
+                    if new_project:
+                        item.change.project = new_project
+                        item.pipeline = None
+                        item.queue = None
+                        if not old_item_ahead or not last_head:
+                            last_head = item
                         try:
                             reenqueued = new_pipeline.manager.reEnqueueItem(
                                 item, last_head, old_item_ahead,
@@ -960,6 +972,10 @@ class Scheduler(threading.Thread):
                     "Canceling node request %s during reconfiguration",
                     request)
                 self.cancelJob(build_set, request.job)
+        for name, old_pipeline in old_tenant.layout.pipelines.items():
+            new_pipeline = tenant.layout.pipelines.get(name)
+            if not new_pipeline:
+                self._reconfigureDeletePipeline(old_pipeline)
 
     def _reconfigureTenant(self, tenant):
         # This is called from _doReconfigureEvent while holding the
@@ -992,6 +1008,41 @@ class Scheduler(threading.Thread):
             except Exception:
                 self.log.exception("Exception reporting initial "
                                    "pipeline stats:")
+
+    def _reconfigureDeleteTenant(self, tenant):
+        # Called when a tenant is deleted during reconfiguration
+        self.log.info("Removing tenant %s during reconfiguration" %
+                      (tenant,))
+        for pipeline in tenant.layout.pipelines.values():
+            self._reconfigureDeletePipeline(pipeline)
+
+    def _reconfigureDeletePipeline(self, pipeline):
+        self.log.info("Removing pipeline %s during reconfiguration" %
+                      (pipeline,))
+        for shared_queue in pipeline.queues:
+            builds_to_cancel = []
+            requests_to_cancel = []
+            for item in shared_queue.queue:
+                item.item_ahead = None
+                item.items_behind = []
+                self.log.info(
+                    "Removing item %s during reconfiguration" % (item,))
+                for build in item.current_build_set.getBuilds():
+                    builds_to_cancel.append(build)
+                for request_job, request in \
+                    item.current_build_set.node_requests.items():
+                    requests_to_cancel.append(
+                        (item.current_build_set, request))
+
+            for build in builds_to_cancel:
+                self.log.info(
+                    "Canceling build %s during reconfiguration" % (build,))
+                self.cancelJob(build.build_set, build.job, build=build)
+            for build_set, request in requests_to_cancel:
+                self.log.info(
+                    "Canceling node request %s during reconfiguration",
+                    request)
+                self.cancelJob(build_set, request.job)
 
     def _doPromoteEvent(self, event):
         tenant = self.abide.tenants.get(event.tenant_name)

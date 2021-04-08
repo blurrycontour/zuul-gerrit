@@ -288,15 +288,19 @@ class PipelineManager(metaclass=ABCMeta):
                 # failing.
                 if item_ahead_valid:
                     change_queue.moveItem(item, old_item_ahead)
-                # Get an updated copy of the layout and update the job
-                # graph if necessary.  This resumes the buildset merge
+
+                # Get an updated copy of the layout, but if we have a
+                # job graph already, then keep it (our repo state and
+                # jobs are frozen and will now only update if the item
+                # ahead changes).  This resumes the buildset merge
                 # state machine.  If we have an up-to-date layout, it
-                # will go ahead and refresh the job graph if needed;
-                # or it will send a new merge job if necessary, or it
-                # will do nothing if we're waiting on a merge job.
+                # will go ahead and refresh the job graph if there
+                # isn't one; or it will send a new merge job if
+                # necessary, or it will do nothing if we're waiting on
+                # a merge job.
                 has_job_graph = bool(item.job_graph)
-                item.job_graph = None
                 item.layout = None
+
                 # If the item is no longer active, but has a job graph we
                 # will make sure to update it.
                 if item.active or has_job_graph:
