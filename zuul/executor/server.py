@@ -14,7 +14,6 @@
 
 import base64
 import collections
-import copy
 import datetime
 import json
 import logging
@@ -1095,14 +1094,10 @@ class AnsibleJob(object):
         # later for line mapping.
         item_commit = None
 
-        # The repo state gets altered throughout the merge. Since we need the
-        # original repo state for trusted repos later copy it.
-        merged_repo_state = copy.deepcopy(repo_state)
-
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
             item_commit = self.doMergeChanges(
-                merger, merge_items, merged_repo_state)
+                merger, merge_items, repo_state)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -1116,7 +1111,7 @@ class AnsibleJob(object):
         state_items = [i for i in args['items'] if not i.get('number')]
         if state_items:
             merger.setRepoState(
-                state_items, merged_repo_state,
+                state_items, repo_state,
                 process_worker=self.executor_server.process_worker)
 
         # Early abort if abort requested
@@ -1829,7 +1824,6 @@ class AnsibleJob(object):
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
                            project, branch, root)
-            # merged_repo_state = None
             merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch, repo_state=repo_state,
