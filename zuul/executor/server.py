@@ -14,6 +14,7 @@
 
 import base64
 import collections
+import copy
 import datetime
 import json
 import logging
@@ -1083,18 +1084,25 @@ class AnsibleJob(object):
         for project in args['projects']:
             self.log.debug("Cloning %s/%s" % (project['connection'],
                                               project['name'],))
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
+            repo = merger.getRepo(
+                project['connection'],
+                project['name'],
+                repo_state=repo_state,
+                process_worker=self.executor_server.process_worker)
             repos[project['canonical_name']] = repo
 
         # The commit ID of the original item (before merging).  Used
         # later for line mapping.
         item_commit = None
 
+        # The repo state gets altered throughout the merge. Since we need the
+        # original repo state for trusted repos later copy it.
+        merged_repo_state = copy.deepcopy(repo_state)
+
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
             item_commit = self.doMergeChanges(
-                merger, merge_items, repo_state)
+                merger, merge_items, merged_repo_state)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -1108,7 +1116,7 @@ class AnsibleJob(object):
         state_items = [i for i in args['items'] if not i.get('number')]
         if state_items:
             merger.setRepoState(
-                state_items, repo_state,
+                state_items, merged_repo_state,
                 process_worker=self.executor_server.process_worker)
 
         # Early abort if abort requested
@@ -1736,7 +1744,7 @@ class AnsibleJob(object):
         if not jobdir_playbook.trusted:
             path = self.checkoutUntrustedProject(project, branch, args)
         else:
-            path = self.checkoutTrustedProject(project, branch)
+            path = self.checkoutTrustedProject(project, branch, args)
         path = os.path.join(path, playbook['path'])
 
         jobdir_playbook.path = self.findPlaybook(
@@ -1759,7 +1767,7 @@ class AnsibleJob(object):
 
         self.writeAnsibleConfig(jobdir_playbook)
 
-    def checkoutTrustedProject(self, project, branch):
+    def checkoutTrustedProject(self, project, branch, args):
         root = self.jobdir.getTrustedProject(project.canonical_name,
                                              branch)
         if not root:
@@ -1771,8 +1779,12 @@ class AnsibleJob(object):
                 root,
                 self.executor_server.merge_root,
                 self.log)
-            merger.checkoutBranch(project.connection_name, project.name,
-                                  branch)
+            merger.checkoutBranch(
+                project.connection_name, project.name,
+                branch,
+                repo_state=args['repo_state'],
+                process_worker=self.executor_server.process_worker,
+                zuul_event_id=self.zuul_event_id)
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
                            project, branch, root)
@@ -1803,16 +1815,26 @@ class AnsibleJob(object):
                         self.log)
                     break
 
+            repo_state = None
             if merger is None:
                 merger = self.executor_server._getMerger(
                     root,
                     self.executor_server.merge_root,
                     self.log)
 
+                # If we don't have this repo yet prepared we need to restore
+                # the repo state. Otherwise we have speculative merges in the
+                # repo and must not restore the repo state again.
+                repo_state = args['repo_state']
+
             self.log.debug("Cloning %s@%s into new untrusted space %s",
                            project, branch, root)
-            merger.checkoutBranch(project.connection_name, project.name,
-                                  branch)
+            # merged_repo_state = None
+            merger.checkoutBranch(
+                project.connection_name, project.name,
+                branch, repo_state=repo_state,
+                process_worker=self.executor_server.process_worker,
+                zuul_event_id=self.zuul_event_id)
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
                            project, branch, root)
@@ -1888,7 +1910,7 @@ class AnsibleJob(object):
         if not jobdir_playbook.trusted:
             path = self.checkoutUntrustedProject(project, branch, args)
         else:
-            path = self.checkoutTrustedProject(project, branch)
+            path = self.checkoutTrustedProject(project, branch, args)
 
         # The name of the symlink is the requested name of the role
         # (which may be the repo name or may be something else; this
