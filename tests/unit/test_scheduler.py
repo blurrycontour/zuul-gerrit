@@ -3005,32 +3005,6 @@ class TestScheduler(ZuulTestCase):
         self.assertRaises(Exception, self.assertReportedStat,
                           'test-gauge.1_2_3_4', '12', 'g')
 
-    def test_stuck_job_cleanup(self):
-        "Test that pending jobs are cleaned up if removed from layout"
-
-        # We want to hold the project-merge job that the fake change enqueues
-        self.gearman_server.hold_jobs_in_queue = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.waitUntilSettled()
-        # The assertion is that we have one job in the queue, project-merge
-        self.assertEqual(len(self.gearman_server.getQueue()), 1)
-
-        self.commitConfigUpdate('common-config', 'layouts/no-jobs.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.waitUntilSettled()
-
-        self.gearman_server.release('gate-noop')
-        self.waitUntilSettled()
-        # asserting that project-merge is removed from queue
-        self.assertEqual(len(self.gearman_server.getQueue()), 0)
-        self.assertTrue(self.scheds.first.sched._areAllBuildsComplete())
-
-        self.assertEqual(len(self.history), 1)
-        self.assertEqual(self.history[0].name, 'gate-noop')
-        self.assertEqual(self.history[0].result, 'SUCCESS')
-
     def test_file_head(self):
         # This is a regression test for an observed bug.  A change
         # with a file named "HEAD" in the root directory of the repo
@@ -3473,6 +3447,8 @@ class TestScheduler(ZuulTestCase):
             else:
                 time.sleep(0)
 
+    # TODO: see if we can find another way of raising an exception
+    # during reconfiguration.
     def test_live_reconfiguration_abort(self):
         # Raise an exception during reconfiguration and verify we
         # still function.
@@ -3502,229 +3478,9 @@ class TestScheduler(ZuulTestCase):
         # The final report fails because of the invalid value set above.
         self.assertEqual(A.reported, 1)
 
-    def test_live_reconfiguration_merge_conflict(self):
-        # A real-world bug: a change in a gate queue has a merge
-        # conflict and a job is added to its project while it's
-        # sitting in the queue.  The job gets added to the change and
-        # enqueued and the change gets stuck.
-        self.executor_server.hold_jobs_in_build = True
-
-        # This change is fine.  It's here to stop the queue long
-        # enough for the next change to be subject to the
-        # reconfiguration, as well as to provide a conflict for the
-        # next change.  This change will succeed and merge.
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addPatchset({'conflict': 'A'})
-        A.addApproval('Code-Review', 2)
-
-        # This change will be in merge conflict.  During the
-        # reconfiguration, we will add a job.  We want to make sure
-        # that doesn't cause it to get stuck.
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        B.addPatchset({'conflict': 'B'})
-        B.addApproval('Code-Review', 2)
-
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-
-        self.waitUntilSettled()
-
-        # No jobs have run yet
-        self.assertEqual(A.data['status'], 'NEW')
-        self.assertEqual(A.reported, 1)
-        self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(len(self.history), 0)
-
-        # Add the "project-test3" job.
-        self.commitConfigUpdate('common-config',
-                                'layouts/live-reconfiguration-add-job.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.waitUntilSettled()
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertEqual(A.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
-        self.assertEqual(B.data['status'], 'NEW')
-        self.assertIn('Merge Failed', B.messages[-1])
-        self.assertEqual(self.getJobFromHistory('project-merge').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test1').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test2').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test3').result,
-                         'SUCCESS')
-        self.assertEqual(len(self.history), 4)
-
-    def test_live_reconfiguration_failed_root(self):
-        # An extrapolation of test_live_reconfiguration_merge_conflict
-        # that tests a job added to a job tree with a failed root does
-        # not run.
-        self.executor_server.hold_jobs_in_build = True
-
-        # This change is fine.  It's here to stop the queue long
-        # enough for the next change to be subject to the
-        # reconfiguration.  This change will succeed and merge.
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addPatchset({'conflict': 'A'})
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.waitUntilSettled()
-        self.executor_server.release('.*-merge')
-        self.waitUntilSettled()
-
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
-        self.executor_server.failJob('project-merge', B)
-        B.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-        self.waitUntilSettled()
-
-        self.executor_server.release('.*-merge')
-        self.waitUntilSettled()
-
-        # Both -merge jobs have run, but no others.
-        self.assertEqual(A.data['status'], 'NEW')
-        self.assertEqual(A.reported, 1)
-        self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(B.reported, 1)
-        self.assertEqual(self.history[0].result, 'SUCCESS')
-        self.assertEqual(self.history[0].name, 'project-merge')
-        self.assertEqual(self.history[1].result, 'FAILURE')
-        self.assertEqual(self.history[1].name, 'project-merge')
-        self.assertEqual(len(self.history), 2)
-
-        # Add the "project-test3" job.
-        self.commitConfigUpdate('common-config',
-                                'layouts/live-reconfiguration-add-job.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.waitUntilSettled()
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertEqual(A.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
-        self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(B.reported, 2)
-        self.assertEqual(self.history[0].result, 'SUCCESS')
-        self.assertEqual(self.history[0].name, 'project-merge')
-        self.assertEqual(self.history[1].result, 'FAILURE')
-        self.assertEqual(self.history[1].name, 'project-merge')
-        self.assertEqual(self.history[2].result, 'SUCCESS')
-        self.assertEqual(self.history[3].result, 'SUCCESS')
-        self.assertEqual(self.history[4].result, 'SUCCESS')
-        self.assertEqual(len(self.history), 5)
-
-    def test_live_reconfiguration_failed_job(self):
-        # Test that a change with a removed failing job does not
-        # disrupt reconfiguration.  If a change has a failed job and
-        # that job is removed during a reconfiguration, we observed a
-        # bug where the code to re-set build statuses would run on
-        # that build and raise an exception because the job no longer
-        # existed.
-        self.executor_server.hold_jobs_in_build = True
-
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-
-        # This change will fail and later be removed by the reconfiguration.
-        self.executor_server.failJob('project-test1', A)
-
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-        self.executor_server.release('.*-merge')
-        self.waitUntilSettled()
-        self.executor_server.release('project-test1')
-        self.waitUntilSettled()
-
-        self.assertEqual(A.data['status'], 'NEW')
-        self.assertEqual(A.reported, 0)
-
-        self.assertEqual(self.getJobFromHistory('project-merge').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test1').result,
-                         'FAILURE')
-        self.assertEqual(len(self.history), 2)
-
-        # Remove the test1 job.
-        self.commitConfigUpdate('common-config',
-                                'layouts/live-reconfiguration-failed-job.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.waitUntilSettled()
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertEqual(self.getJobFromHistory('project-test2').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-testfile').result,
-                         'SUCCESS')
-        self.assertEqual(len(self.history), 4)
-
-        self.assertEqual(A.data['status'], 'NEW')
-        self.assertEqual(A.reported, 1)
-        self.assertIn('Build succeeded', A.messages[0])
-        # Ensure the removed job was not included in the report.
-        self.assertNotIn('project-test1', A.messages[0])
-
-    def test_live_reconfiguration_shared_queue(self):
-        # Test that a change with a failing job which was removed from
-        # this project but otherwise still exists in the system does
-        # not disrupt reconfiguration.
-
-        self.executor_server.hold_jobs_in_build = True
-
-        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
-
-        self.executor_server.failJob('project1-project2-integration', A)
-
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-        self.executor_server.release('.*-merge')
-        self.waitUntilSettled()
-        self.executor_server.release('project1-project2-integration')
-        self.waitUntilSettled()
-
-        self.assertEqual(A.data['status'], 'NEW')
-        self.assertEqual(A.reported, 0)
-
-        self.assertEqual(self.getJobFromHistory('project-merge').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory(
-            'project1-project2-integration').result, 'FAILURE')
-        self.assertEqual(len(self.history), 2)
-
-        # Remove the integration job.
-        self.commitConfigUpdate(
-            'common-config',
-            'layouts/live-reconfiguration-shared-queue.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.waitUntilSettled()
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertEqual(self.getJobFromHistory('project-merge').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test1').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory('project-test2').result,
-                         'SUCCESS')
-        self.assertEqual(self.getJobFromHistory(
-            'project1-project2-integration').result, 'FAILURE')
-        self.assertEqual(len(self.history), 4)
-
-        self.assertEqual(A.data['status'], 'NEW')
-        self.assertEqual(A.reported, 1)
-        self.assertIn('Build succeeded', A.messages[0])
-        # Ensure the removed job was not included in the report.
-        self.assertNotIn('project1-project2-integration', A.messages[0])
-
+    # TODO: consider removing this as it probably only passes since
+    # we're not re-freezing the jobs (the queue removal doesn't
+    # actually take effect).
     def test_live_reconfiguration_shared_queue_removed(self):
         # Test that changes in a shared queue survive a change of the
         # queue during reconfiguration. This is a regression test
@@ -3801,6 +3557,13 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
 
+    # TODO: deleting a project from a layout isn't expected to have an
+    # effect any more.  However, deleting it from the tenant is a
+    # different story.  Update this test to ensure that when we delete
+    # a project from the tenant and reconfigure, we dequeue any
+    # changes currently running for that project.  Leaving them in the
+    # system could have us end up with a change enqueued behind a
+    # non-existent project.
     def test_live_reconfiguration_del_project(self):
         # Test project deletion from layout
         # while changes are enqueued
@@ -5428,41 +5191,6 @@ class TestScheduler(ZuulTestCase):
             dict(name='job2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
 
-    @simple_layout('layouts/reconfigure-remove-add.yaml')
-    def test_reconfigure_remove_add(self):
-        # Test removing, then adding a job while in queue
-        self.executor_server.hold_jobs_in_build = True
-
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.waitUntilSettled()
-        self.assertTrue(len(self.builds), 2)
-        self.executor_server.release('job2')
-        self.assertTrue(len(self.builds), 1)
-
-        # Remove job2
-        self.commitConfigUpdate('org/common-config',
-                                'layouts/reconfigure-remove-add2.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.assertTrue(len(self.builds), 1)
-
-        # Add job2 back
-        self.commitConfigUpdate('org/common-config',
-                                'layouts/reconfigure-remove-add.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.assertTrue(len(self.builds), 2)
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        # This will run new builds for B
-        self.waitUntilSettled()
-        self.assertHistory([
-            dict(name='job2', result='SUCCESS', changes='1,1'),
-            dict(name='job1', result='SUCCESS', changes='1,1'),
-            dict(name='job2', result='SUCCESS', changes='1,1'),
-        ], ordered=False)
-
     def test_worker_update_metadata(self):
         "Test if a worker can send back metadata about itself"
         self.executor_server.hold_jobs_in_build = True
@@ -6270,6 +5998,11 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_nodepool.unpause()
         self.waitUntilSettled()
 
+    # TODO: this case is lo longer relevant, however if a project is
+    # removed from the tenant, a similar case occurs (the node should
+    # be returned unused since it's dequeued).  That might be covered
+    # by an existing dequeue test case; if not, update this to cover
+    # it.
     def test_nodepool_job_removal(self):
         "Test that nodes are returned unused after job removal"
 
@@ -7986,6 +7719,7 @@ class TestSemaphore(ZuulTestCase):
             len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
             0)
 
+    # TODO: remove the second half of this test (which removes jobs).
     def test_semaphore_reconfigure(self):
         "Test reconfigure with job semaphores"
         self.executor_server.hold_jobs_in_build = True
@@ -8029,48 +7763,6 @@ class TestSemaphore(ZuulTestCase):
         self.assertEqual(
             len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
             0)
-
-    def test_semaphore_reconfigure_job_removal(self):
-        "Test job removal during reconfiguration with semaphores"
-        self.executor_server.hold_jobs_in_build = True
-        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.assertEqual(
-            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
-            0)
-
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        self.assertEqual(
-            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
-            1)
-
-        self.commitConfigUpdate(
-            'common-config',
-            'config/semaphore/git/common-config/zuul-remove-job.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-        self.waitUntilSettled()
-
-        # Release job project-test1 which should be the only job left
-        self.executor_server.release('project-test1')
-        self.waitUntilSettled()
-
-        # The check pipeline should be empty
-        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-        check_pipeline = tenant.layout.pipelines['check']
-        items = check_pipeline.getAllItems()
-        self.assertEqual(len(items), 0)
-
-        # The semaphore should be released
-        self.assertEqual(
-            len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
-            0)
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
 
     def test_semaphore_reconfigure_job_removal_pending_node_request(self):
         """
@@ -8653,56 +8345,6 @@ class TestSchedulerFailFast(ZuulTestCase):
             dict(name='project-test4', result='SUCCESS', changes='1,1'),
             dict(name='project-test5', result='SUCCESS', changes='1,1'),
             dict(name='project-test6', result='FAILURE', changes='1,1'),
-        ], ordered=False)
-
-    def test_fail_fast_reconfigure(self):
-        """
-        Tests that a pipeline that is flagged with fail-fast
-        doesn't abort jobs when a job is removed during reconfig.
-        """
-        self.executor_server.hold_jobs_in_build = True
-        self.fake_nodepool.pause()
-
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.executor_server.failJob('project-test1', A)
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        self.waitUntilSettled()
-        self.assertEqual(len(self.builds), 1)
-        self.assertEqual(self.builds[0].name, 'project-merge')
-        self.executor_server.release('project-merge')
-        self.waitUntilSettled()
-
-        # Now project-test1, project-test2 and project-test6
-        # should be running
-        self.assertEqual(len(self.builds), 3)
-
-        # Commit new config that removes project-test1
-        self.commitConfigUpdate('common-config',
-                                'layouts/fail-fast-reconfigure.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-
-        # Release project-test1
-        self.executor_server.release('project-test1')
-        self.waitUntilSettled()
-
-        self.fake_nodepool.unpause()
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertEqual(len(self.builds), 0)
-        self.assertEqual(A.reported, 1)
-        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "1")
-        self.assertHistory([
-            dict(name='project-merge', result='SUCCESS', changes='1,1'),
-            dict(name='project-test1', result='ABORTED', changes='1,1'),
-            dict(name='project-test2', result='SUCCESS', changes='1,1'),
-            dict(name='project-test3', result='SUCCESS', changes='1,1'),
-            dict(name='project-test4', result='SUCCESS', changes='1,1'),
-            dict(name='project-test5', result='SUCCESS', changes='1,1'),
-            dict(name='project-test6', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
     def test_fail_fast_retry(self):
