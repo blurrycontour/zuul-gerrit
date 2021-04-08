@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af045aee_e2c47f18",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-08T20:31:48Z",
+      "side": 1,
+      "message": "Is self.event_queue stored in zk? If not then I think we would drop any events that have arrived to this scheduler without sending them off for preprocessing. If This scheduler is stopped to force another to take over we would experience in a gap in events.",
+      "revId": "9af4e075322971a5d0d29775afac376c8a5579ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
