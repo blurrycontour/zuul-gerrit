@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "054c95ea_a1330e0b",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 720,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-08T20:41:59Z",
+      "side": 1,
+      "message": "Oh, I should add if we\u0027re forcibly terminated, obviously we can\u0027t drain our second queue, but in that case the original events are still un-ack\u0027d, so again, they\u0027ll be processed by the next owner.",
+      "revId": "9af4e075322971a5d0d29775afac376c8a5579ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "884d2f2e_d801674c",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 2
