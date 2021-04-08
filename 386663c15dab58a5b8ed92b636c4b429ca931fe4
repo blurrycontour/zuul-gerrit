@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ad5b13e0_ba5a9311",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1082,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-08T17:15:28Z",
+      "side": 1,
+      "message": "This seems safe, but I\u0027m unable to convince myself that the comment is strictly true:\n\nIn doMergeChanges we call merger.mergeChanges which calls merger._mergeItem for every item.\n\nIn merger._mergeItem, if it\u0027s the first time we\u0027ve seen a project-branch in this merge sequence, we restore the repo state for that repo, and then we save it.  The act of saving the repo state should not actually change the repo state since it immedaitely follows restoring it.\n\nIn the initial merge requested by the scheduler as part of enqueing, that does alter the repo state because it\u0027s initially empty and it populates the repo state as it goes.  But in the executor, we begin with a fully populated repo state, and therefore, the save call should be a no-op.",
+      "revId": "386663c15dab58a5b8ed92b636c4b429ca931fe4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3be80180_1476b9f4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1807,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-08T17:15:28Z",
+      "side": 1,
+      "message": "This looks like a leftover.",
+      "revId": "386663c15dab58a5b8ed92b636c4b429ca931fe4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
