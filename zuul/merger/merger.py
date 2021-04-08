@@ -1039,7 +1039,7 @@ class Merger(object):
             self._restoreRepoState(item['connection'], item['project'], repo,
                                    repo_state, zuul_event_id)
 
-    def getRepoState(self, items, repo_locks, branches=None):
+    def getRepoState(self, items, branches=None, repo_locks=None):
         # Gets the repo state for items.  Generally this will be
         # called in any non-change pipeline.  We will return the repo
         # state for each item, but manipulated with any information in
@@ -1051,16 +1051,19 @@ class Merger(object):
         # A list of branch names the last item appears in.
         item_in_branches = []
         for item in items:
-            # If we're in the executor context we need to lock the repo.
-            # If not repo_locks will give us a fake lock.
-            lock = repo_locks.getRepoLock(item['connection'], item['project'])
+            # If we're in the executor context we have the repo_locks object
+            # and perform per repo locking.
+            if repo_locks is not None:
+                lock = repo_locks.getRepoLock(
+                    item['connection'], item['project'])
+            else:
+                lock = nullcontext()
             with lock:
                 repo = self.getRepo(item['connection'], item['project'])
-                key = (item['connection'], item['project'])
+                key = (item['connection'], item['project'], item['branch'])
                 if key not in seen:
                     try:
                         repo.reset()
-                        seen.add(key)
                     except Exception:
                         self.log.exception("Unable to reset repo %s" % repo)
                         return (False, {}, [])
@@ -1076,9 +1079,7 @@ class Merger(object):
                         item['ref'], item['newrev'])
         item = items[-1]
         repo = self.getRepo(item['connection'], item['project'])
-        item_in_branches = False
-        if item.get('newrev'):
-            item_in_branches = repo.contains(item['newrev'])
+        item_in_branches = repo.contains(item['newrev'])
         return (True, repo_state, item_in_branches)
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[]):
