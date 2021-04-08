@@ -4347,10 +4347,6 @@ class ZuulTestCase(BaseTestCase):
             self.poller_events, self.git_url_with_auth, self.source_only,
             self.fake_sql, self.addCleanup, self.validate_tenants)
 
-        if hasattr(self, 'fake_github'):
-            self.additional_event_queues.append(
-                self.fake_github.github_event_connector._event_forward_queue)
-
         self.merge_server = None
 
         # Cleanups are run in reverse order
