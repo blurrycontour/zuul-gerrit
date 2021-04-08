@@ -1314,9 +1314,9 @@ class AnsibleJob(object):
             # Compare the commit with the repo state. If it's included in the
             # repo state and it's the same we've set this ref already earlier
             # and don't have to set it again.
-            repo_state_project = repo_state.get(
+            project_repo_state = repo_state.get(
                 connection, {}).get(project, {})
-            repo_state_commit = repo_state_project.get(
+            repo_state_commit = project_repo_state.get(
                 'refs/heads/%s' % branch)
             if repo_state_commit != commit:
                 repo = merger.getRepo(connection, project)
@@ -3027,11 +3027,7 @@ class ExecutorServer(BaseMergeServer):
                zuul_event_id=None, build=None):
         # Update a repository in the main merger
 
-        state = None
-        if repo_state:
-            state = repo_state.get(connection_name, {}).get(project_name)
-
-        task = UpdateTask(connection_name, project_name, repo_state=state,
+        task = UpdateTask(connection_name, project_name, repo_state=repo_state,
                           zuul_event_id=zuul_event_id, build=build)
         task = self.update_queue.put(task)
         return task
