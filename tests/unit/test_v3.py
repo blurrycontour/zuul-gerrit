@@ -5951,9 +5951,6 @@ class TestJobPause(AnsibleZuulTestCase):
     def test_job_reconfigure_resume(self):
         """
         Tests that a paused job is resumed after reconfiguration
-
-        Tests that a paused job is resumed after a reconfiguration removed the
-        last job which is in progress.
         """
         self.wait_timeout = 120
 
@@ -5971,25 +5968,16 @@ class TestJobPause(AnsibleZuulTestCase):
 
         self.assertEqual(len(self.builds), 2, 'compile and test in progress')
 
-        # Remove the test1 job.
-        self.commitConfigUpdate(
-            'org/project6',
-            'config/job-pause/git/org_project6/zuul-reconfigure.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
         self.waitUntilSettled()
 
-        # The "compile" job might be paused during the waitUntilSettled
-        # call and appear settled; it should automatically resume
-        # though, so just wait for it.
-        for x in iterate_timeout(60, 'job compile finished'):
-            if not self.builds:
-                break
+        self.executor_server.release('test')
         self.waitUntilSettled()
 
         self.assertHistory([
             dict(name='compile', result='SUCCESS', changes='1,1'),
-            dict(name='test', result='ABORTED', changes='1,1'),
-        ])
+            dict(name='test', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
 
     def test_job_pause_skipped_child(self):
         """

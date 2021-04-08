@@ -350,7 +350,7 @@ class TestGithubDriver(ZuulTestCase):
         # Stop queuing timer triggered jobs so that the assertions
         # below don't race against more jobs being queued.
         self.commitConfigUpdate('org/common-config',
-                                'layouts/basic-github.yaml')
+                                'layouts/no-timer-github.yaml')
         self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
         self.waitUntilSettled()
         # If APScheduler is in mid-event when we remove the job, we
