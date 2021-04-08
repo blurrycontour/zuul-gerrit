@@ -760,7 +760,8 @@ class Merger(object):
         # behavior e.g. to keep the 'origin' remote intact.
         self.execution_context = execution_context
 
-    def _addProject(self, hostname, project_name, url, sshkey, zuul_event_id):
+    def _addProject(self, hostname, connection_name, project_name, url, sshkey,
+                    repo_state, zuul_event_id, process_worker=None):
         repo = None
         key = '/'.join([hostname, project_name])
         try:
@@ -776,6 +777,11 @@ class Merger(object):
                 logger=self.logger, git_timeout=self.git_timeout,
                 zuul_event_id=zuul_event_id)
 
+            # If we got a repo state restore it
+            if repo_state:
+                self._restoreRepoState(
+                    connection_name, project_name, repo, repo_state,
+                    zuul_event_id, process_worker=process_worker)
             self.repos[key] = repo
         except Exception:
             log = get_annotated_logger(self.log, zuul_event_id)
@@ -783,7 +789,8 @@ class Merger(object):
                           hostname, project_name)
         return repo
 
-    def getRepo(self, connection_name, project_name, zuul_event_id=None):
+    def getRepo(self, connection_name, project_name,
+                repo_state=None, zuul_event_id=None, process_worker=None):
         source = self.connections.getSource(connection_name)
         project = source.getProject(project_name)
         hostname = project.canonical_hostname
@@ -799,8 +806,9 @@ class Merger(object):
             raise Exception("Unable to set up repo for project %s/%s"
                             " without a url" %
                             (connection_name, project_name,))
-        return self._addProject(hostname, project_name, url, sshkey,
-                                zuul_event_id)
+        return self._addProject(hostname, connection_name, project_name, url,
+                                sshkey, repo_state, zuul_event_id,
+                                process_worker=process_worker)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
                    zuul_event_id=None,
@@ -831,11 +839,14 @@ class Merger(object):
             raise
 
     def checkoutBranch(self, connection_name, project_name, branch,
-                       zuul_event_id=None):
+                       repo_state=None, zuul_event_id=None,
+                       process_worker=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         log.info("Checking out %s/%s branch %s",
                  connection_name, project_name, branch)
         repo = self.getRepo(connection_name, project_name,
+                            repo_state=repo_state,
+                            process_worker=process_worker,
                             zuul_event_id=zuul_event_id)
         repo.checkout(branch, zuul_event_id=zuul_event_id)
 
