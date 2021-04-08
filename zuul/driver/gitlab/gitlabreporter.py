@@ -54,9 +54,9 @@ class GitlabReporter(BaseReporter):
                     msg = self._formatItemReportMergeFailure(item)
                     self.addMRComment(item, msg)
 
-    def addMRComment(self, item):
+    def addMRComment(self, item, comment=None):
         log = get_annotated_logger(self.log, item.event)
-        message = self._formatItemReport(item)
+        message = comment or self._formatItemReport(item)
         project = item.change.project.name
         mr_number = item.change.number
         log.debug('Reporting change %s, params %s, message: %s',
