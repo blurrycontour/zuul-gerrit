@@ -1011,6 +1011,10 @@ class AnsibleJob(object):
         projects = set()
         repo_state = args['repo_state']
 
+        with open(self.jobdir.job_output_file, 'a') as job_output:
+            job_output.write("{now} | Updating repositories\n".format(
+                now=datetime.datetime.now()
+            ))
         # Make sure all projects used by the job are updated...
         for project in args['projects']:
             self.log.debug("Updating project %s" % (project,))
@@ -1065,8 +1069,12 @@ class AnsibleJob(object):
         if self.aborted:
             self._send_aborted()
             return
-
         self.log.debug("Git updates complete")
+
+        with open(self.jobdir.job_output_file, 'a') as job_output:
+            job_output.write("{now} | Preparing job workspace\n".format(
+                now=datetime.datetime.now()
+            ))
         merger = self.executor_server._getMerger(
             self.jobdir.src_root,
             self.executor_server.merge_root,
