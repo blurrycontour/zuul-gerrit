@@ -41,7 +41,8 @@ from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Ref, Tag, Branch, Project, CacheStat
+from zuul.model import Ref, Tag, Branch, Project
+from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
 from zuul.zk.event_queues import ConnectionEventQueue, EventReceiverElection
 
 # HTTP timeout in seconds
@@ -50,6 +51,23 @@ TIMEOUT = 30
 
 class HTTPConflictException(Exception):
     message = "Received response 409"
+
+
+class GerritChangeCache(AbstractChangeCache):
+    log = logging.getLogger("zuul.driver.GerritChangeCache")
+
+    CHANGE_TYPE_MAP = {
+        "Ref": Ref,
+        "Tag": Tag,
+        "Branch": Branch,
+        "GerritChange": GerritChange,
+    }
+
+    def _getChangeClass(self, change_type):
+        return self.CHANGE_TYPE_MAP[change_type]
+
+    def _getChangeType(self, change):
+        return type(change).__name__
 
 
 class GerritChangeData(object):
@@ -298,7 +316,8 @@ class GerritEventConnector(threading.Thread):
         # cache as it may be a dependency
         if event.change_number:
             refresh = True
-            if event.change_number not in self.connection._change_cache:
+            key = str((event.change_number, event.patch_number))
+            if self.connection._change_cache.get(key) is None:
                 refresh = False
                 for tenant in self.connection.sched.abide.tenants.values():
                     # TODO(fungi): it would be better to have some simple means
@@ -585,7 +604,6 @@ class GerritConnection(BaseConnection):
                                                   default_gitweb_url_template)
         self.gitweb_url_template = url_template
 
-        self._change_cache = {}
         self.projects = {}
         self.gerrit_event_connector = None
         self.source = driver.getSource(self)
@@ -731,56 +749,44 @@ class GerritConnection(BaseConnection):
         # This lets the user supply a list of change objects that are
         # still in use.  Anything in our cache that isn't in the supplied
         # list should be safe to remove from the cache.
-        remove = {}
-        for change_number, patchsets in self._change_cache.items():
-            for patchset, change in patchsets.items():
-                if change not in relevant:
-                    remove.setdefault(change_number, [])
-                    remove[change_number].append(patchset)
-        for change_number, patchsets in remove.items():
-            for patchset in patchsets:
-                del self._change_cache[change_number][patchset]
-            if not self._change_cache[change_number]:
-                del self._change_cache[change_number]
+        for change in self._change_cache:
+            if change not in relevant:
+                self._change_cache.delete(change.cache_stat.key)
+        # TODO: remove entries older than X
+        self._change_cache.cleanup()
+
+    def updateChangeAttributes(self, change, **attrs):
+        for attempt in range(1, 6):
+            cache_stat = change.cache_stat
+            for name, value in attrs.items():
+                setattr(change, name, value)
+            try:
+                self._change_cache.set(cache_stat.key, change)
+                return
+            except ConcurrentUpdateError:
+                self.log.info("Conflicting cache update of %s (attempt: %s/5)",
+                              change, attempt)
+                if attempt == 5:
+                    raise
 
     def getChange(self, event, refresh=False):
         if event.change_number:
             change = self._getChange(event.change_number, event.patch_number,
                                      refresh=refresh)
         elif event.ref and event.ref.startswith('refs/tags/'):
-            project = self.source.getProject(event.project_name)
-            change = Tag(project)
-            change.tag = event.ref[len('refs/tags/'):]
-            change.ref = event.ref
-            change.oldrev = event.oldrev
-            change.newrev = event.newrev
-            change.url = self._getWebUrl(project, sha=event.newrev)
+            change = self._getTag(event)
         elif event.ref and not event.ref.startswith('refs/'):
             # Pre 2.13 Gerrit ref-updated events don't have branch prefixes.
-            project = self.source.getProject(event.project_name)
-            change = Branch(project)
-            change.branch = event.ref
-            change.ref = 'refs/heads/' + event.ref
-            change.oldrev = event.oldrev
-            change.newrev = event.newrev
-            change.url = self._getWebUrl(project, sha=event.newrev)
+            change = self._getBranch(event, branch=event.ref,
+                                     ref=f'refs/heads/{event.ref}')
         elif event.ref and event.ref.startswith('refs/heads/'):
             # From the timer trigger or Post 2.13 Gerrit
-            project = self.source.getProject(event.project_name)
-            change = Branch(project)
-            change.ref = event.ref
-            change.branch = event.ref[len('refs/heads/'):]
-            change.oldrev = event.oldrev
-            change.newrev = event.newrev
-            change.url = self._getWebUrl(project, sha=event.newrev)
+            change = self._getBranch(event,
+                                     branch=event.ref[len('refs/heads/'):],
+                                     ref=event.ref)
         elif event.ref:
             # catch-all ref (ie, not a branch or head)
-            project = self.source.getProject(event.project_name)
-            change = Ref(project)
-            change.ref = event.ref
-            change.oldrev = event.oldrev
-            change.newrev = event.newrev
-            change.url = self._getWebUrl(project, sha=event.newrev)
+            change = self._getRef(event)
         else:
             self.log.warning("Unable to get change for %s" % (event,))
             change = None
@@ -791,25 +797,72 @@ class GerritConnection(BaseConnection):
         # Ensure number and patchset are str
         number = str(number)
         patchset = str(patchset)
-        change = self._change_cache.get(number, {}).get(patchset)
+        key = str((number, patchset))
+        change = self._change_cache.get(key)
         if change and not refresh:
             return change
         if not change:
             change = GerritChange(None)
             change.number = number
             change.patchset = patchset
-        change.cache_stat = CacheStat((change.number, change.patchset),
-                                      None, None)
-        self._change_cache.setdefault(change.number, {})
-        self._change_cache[change.number][change.patchset] = change
         try:
-            self._updateChange(change, event, history)
+            return self._updateChange(key, change, event, history)
         except Exception:
-            if self._change_cache.get(change.number, {}).get(change.patchset):
-                del self._change_cache[change.number][change.patchset]
-                if not self._change_cache[change.number]:
-                    del self._change_cache[change.number]
+            self._change_cache.delete(key)
             raise
+
+    def _getTag(self, event):
+        tag = event.ref[len('refs/tags/'):]
+        key = str((event.project_name, tag, event.newrev))
+        change = self._change_cache.get(key)
+        if change:
+            return change
+        project = self.source.getProject(event.project_name)
+        change = Tag(project)
+        change.tag = tag
+        change.ref = event.ref
+        change.oldrev = event.oldrev
+        change.newrev = event.newrev
+        change.url = self._getWebUrl(project, sha=event.newrev)
+        try:
+            self._change_cache.set(key, change)
+        except ConcurrentUpdateError:
+            change = self._change_cache.get(key)
+        return change
+
+    def _getBranch(self, event, branch, ref):
+        key = str((event.project_name, branch, event.newrev))
+        change = self._change_cache.get(key)
+        if change:
+            return change
+        project = self.source.getProject(event.project_name)
+        change = Branch(project)
+        change.branch = branch
+        change.ref = ref
+        change.oldrev = event.oldrev
+        change.newrev = event.newrev
+        change.url = self._getWebUrl(project, sha=event.newrev)
+        try:
+            self._change_cache.set(key, change)
+        except ConcurrentUpdateError:
+            change = self._change_cache.get(key)
+        return change
+
+    def _getRef(self, event):
+        key = str((event.project_name, event.ref, event.newrev))
+        change = self._change_cache.get(key)
+        if change:
+            return change
+        project = self.source.getProject(event.project_name)
+        change = Ref(project)
+        change.ref = event.ref
+        change.oldrev = event.oldrev
+        change.newrev = event.newrev
+        change.url = self._getWebUrl(project, sha=event.newrev)
+        try:
+            self._change_cache.set(key, change)
+        except ConcurrentUpdateError:
+            change = self._change_cache.get(key)
         return change
 
     def _getDependsOnFromCommit(self, message, change, event):
@@ -850,7 +903,7 @@ class GerritConnection(BaseConnection):
                 records.append(result)
         return [(x.number, x.current_patchset) for x in records]
 
-    def _updateChange(self, change, event, history):
+    def _updateChange(self, key, change, event, history):
         log = get_annotated_logger(self.log, event)
 
         # In case this change is already in the history we have a
@@ -876,7 +929,23 @@ class GerritConnection(BaseConnection):
 
         log.info("Updating %s", change)
         data = self.queryChange(change.number, event=event)
-        change.update(data, self)
+        for attempt in range(1, 6):
+            try:
+                change.update(data, self)
+                self._change_cache.set(key, change)
+                break
+            except ConcurrentUpdateError:
+                self.log.info("Conflicting cache update of %s (attempt: %s/5)",
+                              change, attempt)
+                if attempt == 5:
+                    raise
+            if change.cache_version == -1:
+                # Creating the change failed because someone else
+                # created the change in the meantime. We need
+                # to get the new change object from the cache in
+                # order to have the correct version number for the
+                # update.
+                change = self._change_cache.get(key)
 
         if not change.is_merged:
             self._updateChangeDependencies(log, change, data, event, history)
@@ -906,7 +975,6 @@ class GerritConnection(BaseConnection):
             if (not dep.is_merged) and dep not in needs_changes:
                 git_needs_changes.append(dep.cache_key)
                 needs_changes.add(dep.cache_key)
-        change.git_needs_changes = git_needs_changes
 
         compat_needs_changes = []
         for (dep_num, dep_ps) in self._getDependsOnFromCommit(
@@ -918,7 +986,6 @@ class GerritConnection(BaseConnection):
             if dep.open and dep not in needs_changes:
                 compat_needs_changes.append(dep.cache_key)
                 needs_changes.add(dep.cache_key)
-        change.compat_needs_changes = compat_needs_changes
 
         needed_by_changes = set()
         git_needed_by_changes = []
@@ -935,7 +1002,6 @@ class GerritConnection(BaseConnection):
             except Exception:
                 log.exception("Failed to get git-needed change %s,%s",
                               dep_num, dep_ps)
-        change.git_needed_by_changes = git_needed_by_changes
 
         compat_needed_by_changes = []
         for (dep_num, dep_ps) in self._getNeededByFromCommit(
@@ -959,14 +1025,16 @@ class GerritConnection(BaseConnection):
             except Exception:
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
-        change.compat_needed_by_changes = compat_needed_by_changes
+
+        self.updateChangeAttributes(
+            change,
+            git_needs_changes=git_needs_changes,
+            compat_needs_changes=compat_needs_changes,
+            git_needed_by_changes=git_needed_by_changes,
+            compat_needed_by_changes=compat_needed_by_changes)
 
     def getChangeByKey(self, key):
-        try:
-            number, patchset = key
-            return self._change_cache[number][patchset]
-        except (KeyError, ValueError):
-            return None
+        return self._change_cache.get(key)
 
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)
@@ -977,7 +1045,16 @@ class GerritConnection(BaseConnection):
             return True
 
         data = self.queryChange(change.number)
-        change.update(data, self)
+        key = str((change.number, change.patchset))
+        while True:
+            try:
+                change.update(data, self)
+                self._change_cache.set(key, change)
+                break
+            except ConcurrentUpdateError:
+                self.log.debug("Conflicting cache update of %s needs to "
+                               "be retried.", change)
+
         if change.is_merged:
             self.log.debug("Change %s is merged" % (change,))
         else:
@@ -1528,6 +1605,9 @@ class GerritConnection(BaseConnection):
         self.log.info("Creating Zookeeper event queue")
         self.event_queue = ConnectionEventQueue(self.sched.zk_client,
                                                 self.connection_name)
+
+        self.log.debug('Creating Zookeeper change cache')
+        self._change_cache = GerritChangeCache(self.sched.zk_client, self)
 
         if self.enable_stream_events:
             self._start_watcher_thread()

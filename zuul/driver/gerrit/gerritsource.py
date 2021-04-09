@@ -113,9 +113,7 @@ class GerritSource(BaseSource):
         return changes
 
     def getCachedChanges(self):
-        for x in list(self.connection._change_cache.values()):
-            for y in list(x.values()):
-                yield y
+        yield from self.connection._change_cache
 
     def getProject(self, name):
         p = self.connection.getProject(name)
@@ -156,6 +154,9 @@ class GerritSource(BaseSource):
     def getRefForChange(self, change):
         partial = str(change).zfill(2)[-2:]
         return "refs/changes/%s/%s/.*" % (partial, change)
+
+    def setChangeAttributes(self, change, **attrs):
+        return self.connection.updateChangeAttributes(change, **attrs)
 
 
 approval = vs.Schema({'username': str,
