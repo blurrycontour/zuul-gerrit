@@ -1088,8 +1088,8 @@ class FakeGerritPoller(gerritconnection.GerritPoller):
 
     poll_interval = 1
 
-    def _run(self, *args, **kw):
-        r = super(FakeGerritPoller, self)._run(*args, **kw)
+    def _poll(self, *args, **kw):
+        r = super(FakeGerritPoller, self)._poll(*args, **kw)
         # Set the event so tests can confirm that the poller has run
         # after they changed something.
         self.connection._poller_event.set()
@@ -1108,8 +1108,8 @@ class FakeGerritRefWatcher(gitwatcher.GitWatcher):
         self.baseurl = self.connection.upstream_root
         self.poll_delay = 1
 
-    def _run(self, *args, **kw):
-        r = super(FakeGerritRefWatcher, self)._run(*args, **kw)
+    def _poll(self, *args, **kw):
+        r = super(FakeGerritRefWatcher, self)._poll(*args, **kw)
         # Set the event so tests can confirm that the watcher has run
         # after they changed something.
         self.connection._ref_watcher_event.set()
