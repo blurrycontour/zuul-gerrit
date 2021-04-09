@@ -1534,6 +1534,16 @@ class AnsibleJob(object):
             self._send_aborted()
             return
 
+        # Write out the git operation performed up to this point
+        repo_state_file = os.path.join(self.jobdir.log_root, 'repo-state.json')
+        # TODO: translate repo_state data keys from connection/project to workspace_path
+        repo_state_data = dict(
+            repo_state=self.repo_state,
+            merge_ops=[o.toDict() for o in self.merge_ops],
+        )
+        with open(repo_state_file, 'w') as f:
+            json.dump(repo_state_data, f, sort_keys=True, indent=2)
+
         # We set the nodes to "in use" as late as possible. So in case
         # the build failed during the checkout phase, the node is
         # still untouched and nodepool can re-allocate it to a
