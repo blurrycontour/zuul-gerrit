@@ -1370,9 +1370,10 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        self.log.debug("len %s" % self.fake_gerrit._change_cache.keys())
+        cached_changes = list(self.fake_gerrit._change_cache)
+        self.log.debug("len %s", [c.cache_key for c in cached_changes])
         # there should still be changes in the cache
-        self.assertNotEqual(len(self.fake_gerrit._change_cache.keys()), 0)
+        self.assertNotEqual(len(cached_changes), 0)
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
