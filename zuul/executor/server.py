@@ -1011,6 +1011,10 @@ class AnsibleJob(object):
         projects = set()
         repo_state = args['repo_state']
 
+        repo_state_file = os.path.join(self.jobdir.log_root, 'repo-state.json')
+        with open(repo_state_file, 'w') as f:
+            json.dump(repo_state, f, sort_keys=True, indent=2)
+
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write("{now} | Updating repositories\n".format(
                 now=datetime.datetime.now()
