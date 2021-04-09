@@ -28,8 +28,8 @@ EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
 
 class PullRequest(Change):
-    def __init__(self, project):
-        super(PullRequest, self).__init__(project)
+    def __init__(self, project, connection_registry):
+        super(PullRequest, self).__init__(project, connection_registry)
         self.project = None
         self.pr = None
         self.updated_at = None
@@ -64,6 +64,36 @@ class PullRequest(Change):
             self.updated_at > other.updated_at):
             return True
         return False
+
+    def serialize(self):
+        d = super().serialize()
+        d.update({
+            "pr": self.pr,
+            "updated_at": self.updated_at,
+            "title": self.title,
+            "body_text": self.body_text,
+            "reviews": list(self.reviews),
+            "labels": self.labels,
+            "draft": self.draft,
+            "review_decision": self.review_decision,
+            "required_contexts": list(self.required_contexts),
+            "contexts": list(self.contexts),
+            "branch_protected": self.branch_protected,
+        })
+        return d
+
+    def deserialize(self, data):
+        super().deserialize(data)
+        self.pr = data.get("pr")
+        self.updated_at = data.get("updated_at")
+        self.body_text = data.get("body_text")
+        self.reviews = data.get("reviews", [])
+        self.labels = data.get("labels", [])
+        self.draft = data.get("draft")
+        self.review_decision = data.get("review_decision")
+        self.required_contexts = set(data.get("required_contexts", []))
+        self.contexts = set(tuple(c) for c in data.get("contexts", []))
+        self.branch_protected = data.get("branch_protected", False)
 
 
 class GithubTriggerEvent(TriggerEvent):
