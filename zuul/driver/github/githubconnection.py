@@ -44,10 +44,11 @@ from zuul.connection import CachedBranchConnection
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.web.handler import BaseWebController
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import Ref, Branch, Tag, Project, CacheStat
+from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
 from zuul.model import DequeueEvent
+from zuul.zk.change_cache import AbstractChangeCache, ConcurrentUpdateError
 from zuul.zk.event_queues import ConnectionEventQueue
 
 GITHUB_BASE_URL = 'https://api.github.com'
@@ -90,6 +91,27 @@ class UTC(datetime.tzinfo):
 
 
 utc = UTC()
+
+
+class GithubChangeCache(AbstractChangeCache):
+    log = logging.getLogger("zuul.driver.github.GithubChangeCache")
+
+    def __init__(self, client, connection):
+        self.connection = connection
+        super().__init__(client, connection.connection_name)
+
+    def _changeFromData(self, data):
+        project = self.connection.source.getProject(data["project"])
+        pr = PullRequest(project.name)
+        pr.deserialize(data)
+        pr.project = project
+        return pr
+
+    def _dataFromChange(self, change):
+        return change.serialize()
+
+    def _updateChange(self, change, data):
+        change.deserialize(data)
 
 
 class GithubRequestLogger:
@@ -1167,7 +1189,6 @@ class GithubConnection(CachedBranchConnection):
     def __init__(self, driver, connection_name, connection_config):
         super(GithubConnection, self).__init__(driver, connection_name,
                                                connection_config)
-        self._change_cache = {}
         self._change_update_lock = {}
         self.projects = {}
         self.git_ssh_key = self.connection_config.get('sshkey')
@@ -1205,6 +1226,8 @@ class GithubConnection(CachedBranchConnection):
         self.event_queue = ConnectionEventQueue(
             self.sched.zk_client, self.connection_name
         )
+        self.log.debug('Creating Zookeeper change cache')
+        self._change_cache = GithubChangeCache(self.sched.zk_client, self)
         self.log.info('Starting event connector')
         self._start_event_connector()
 
@@ -1244,12 +1267,23 @@ class GithubConnection(CachedBranchConnection):
             project_name=project_name, zuul_event_id=zuul_event_id)
 
     def maintainCache(self, relevant):
-        remove = set()
-        for key, change in self._change_cache.items():
+        for change in self._change_cache:
             if change not in relevant:
-                remove.add(key)
-        for key in remove:
-            del self._change_cache[key]
+                self._change_cache.delete(change.cache_stat.key)
+        # TODO: remove entries older than X
+        self._change_cache.cleanup()
+
+    def updateChangeAttributes(self, change, **attrs):
+        while True:
+            cache_stat = change.cache_stat
+            for name, value in attrs.items():
+                setattr(change, name, value)
+            try:
+                self._change_cache.set(cache_stat.key, change)
+                return
+            except ConcurrentUpdateError:
+                self.log.debug("Conflicting cache update of %s needs to be "
+                               "retried.", change)
 
     def getChange(self, event, refresh=False):
         """Get the change representing an event."""
@@ -1288,7 +1322,7 @@ class GithubConnection(CachedBranchConnection):
         # because it can originate from different sources (github event, manual
         # enqueue event) where some might just parse the string and forward it.
         number = int(number)
-        key = (project.name, number, patchset)
+        key = str((project.name, number, patchset))
         change = self._change_cache.get(key)
         if change and not refresh:
             return change
@@ -1297,6 +1331,7 @@ class GithubConnection(CachedBranchConnection):
             change.project = project
             change.number = number
             change.patchset = patchset
+
         try:
             # This can be called multi-threaded during github event
             # preprocessing. In order to avoid data races perform locking
@@ -1306,9 +1341,23 @@ class GithubConnection(CachedBranchConnection):
             lock = self._change_update_lock.setdefault(key, threading.Lock())
             if lock.acquire(blocking=False):
                 try:
-                    self._updateChange(change, event)
-                    change.cache_stat = CacheStat(key, None, None)
-                    self._change_cache[key] = change
+                    pull = self.getPull(change.project.name, change.number,
+                                        event=event)
+                    while True:
+                        try:
+                            self._updateChange(change, event, pull)
+                            self._change_cache.set(key, change)
+                            break
+                        except ConcurrentUpdateError:
+                            self.log.debug("Conflicting cache update of %s "
+                                           "needs to be retried.", change)
+                        if change.cache_version == -1:
+                            # Creating the change failed because someone else
+                            # created the change in the meantime. We need
+                            # to get the new change object from the cache in
+                            # order to have the correct version number for the
+                            # update.
+                            change = self._change_cache.get(key)
 
                     if self.sched:
                         self.sched.onChangeUpdated(change, event)
@@ -1316,7 +1365,6 @@ class GithubConnection(CachedBranchConnection):
                     # We need to remove the lock here again so we don't leak
                     # them.
                     lock.release()
-                    del self._change_update_lock[key]
             else:
                 # We didn't get the lock so we don't need to update the same
                 # change again, but to be correct we should at least wait until
@@ -1327,8 +1375,8 @@ class GithubConnection(CachedBranchConnection):
                 with lock:
                     log.debug('Finished updating change %s', change)
         except Exception:
-            if key in self._change_cache:
-                del self._change_cache[key]
+            self.log.warning("Deleting cache key %s due to exception", key)
+            self._change_cache.delete(key)
             raise
         return change
 
@@ -1397,11 +1445,10 @@ class GithubConnection(CachedBranchConnection):
 
         return changes
 
-    def _updateChange(self, change, event):
+    def _updateChange(self, change, event, pull):
         log = get_annotated_logger(self.log, event)
         log.info("Updating %s" % (change,))
-        change.pr, pr_obj = self.getPull(
-            change.project.name, change.number, event=event)
+        change.pr, pr_obj = pull
         change.ref = "refs/pull/%s/head" % change.number
         change.branch = change.pr.get('base').get('ref')
         change.commit_id = change.pr.get('head').get('sha')
