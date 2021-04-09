@@ -81,6 +81,9 @@ class GerritSource(BaseSource):
             event=event)
         return change
 
+    def getChangeByKey(self, key):
+        return self.connection.getChangeByKey(key)
+
     def getChangesDependingOn(self, change, projects, tenant):
         changes = []
         if not change.uris:
@@ -110,9 +113,7 @@ class GerritSource(BaseSource):
         return changes
 
     def getCachedChanges(self):
-        for x in list(self.connection._change_cache.values()):
-            for y in list(x.values()):
-                yield y
+        yield from self.connection._change_cache
 
     def getProject(self, name):
         p = self.connection.getProject(name)
@@ -154,6 +155,16 @@ class GerritSource(BaseSource):
         partial = str(change).zfill(2)[-2:]
         return "refs/changes/%s/%s/.*" % (partial, change)
 
+    def setFiles(self, change, files):
+        return self.connection.updateChangeAttr(change, "files", files)
+
+    def setDependencies(self, change, dependencies):
+        return self.connection.updateChangeAttr(change, "commit_needs_changes",
+                                                dependencies)
+
+    def setRefreshDeps(self, change, refresh=True):
+        return self.connection.updateChangeAttr(change, "refresh_deps",
+                                                refresh)
 
 approval = vs.Schema({'username': str,
                       'email': str,
