@@ -102,7 +102,7 @@ class GithubSource(BaseSource):
         return self.connection.getChangesDependingOn(change, projects, tenant)
 
     def getCachedChanges(self):
-        return list(self.connection._change_cache.values())
+        return list(self.connection._change_cache)
 
     def getProject(self, name):
         p = self.connection.getProject(name)
@@ -159,6 +159,9 @@ class GithubSource(BaseSource):
 
     def getRefForChange(self, change):
         return "refs/pull/%s/head" % change
+
+    def setChangeAttributes(self, change, **attrs):
+        return self.connection.updateChangeAttributes(change, **attrs)
 
 
 review = v.Schema({'username': str,
