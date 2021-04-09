@@ -95,11 +95,14 @@ class GithubSource(BaseSource):
             event=event)
         return change
 
+    def getChangeByKey(self, key):
+        return self.connection.getChangeByKey(key)
+
     def getChangesDependingOn(self, change, projects, tenant):
         return self.connection.getChangesDependingOn(change, projects, tenant)
 
     def getCachedChanges(self):
-        return list(self.connection._change_cache.values())
+        return list(self.connection._change_cache)
 
     def getProject(self, name):
         p = self.connection.getProject(name)
@@ -157,6 +160,16 @@ class GithubSource(BaseSource):
     def getRefForChange(self, change):
         return "refs/pull/%s/head" % change
 
+    def setFiles(self, change, files):
+        return self.connection.updateChangeAttr(change, "files", files)
+
+    def setDependencies(self, change, dependencies):
+        return self.connection.updateChangeAttr(change, "commit_needs_changes",
+                                                dependencies)
+
+    def setRefreshDeps(self, change, refresh=True):
+        return self.connection.updateChangeAttr(change, "refresh_deps",
+                                                refresh)
 
 review = v.Schema({'username': str,
                    'email': str,
