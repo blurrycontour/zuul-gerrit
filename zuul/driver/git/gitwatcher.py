@@ -144,6 +144,8 @@ class GitWatcher(threading.Thread):
     def _run(self):
         while not (self._stopped or self._connection_lost_event.is_set()):
             if not self._pause:
+                # during tests, a sub-class _poll method is used to send
+                # notifications
                 self._poll()
                 # Polling wait delay
             else:

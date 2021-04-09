@@ -491,18 +491,22 @@ class GerritPoller(threading.Thread):
             event = self._makeChangeMergedEvent(change)
             self.connection.addEvent(event)
 
-    def _run(self):
-        last_start = time.time()
-        while not (self._stopped or self._connection_lost_event.is_set()):
-            next_start = last_start + self.poll_interval
-            self._stop_event.wait(max(next_start - time.time(), 0))
-            if self._stopped or self._connection_lost_event.is_set():
-                break
-            last_start = time.time()
+    def _poll(self):
+        next_start = self._last_start + self.poll_interval
+        self._stop_event.wait(max(next_start - time.time(), 0))
+        if self._stopped or self._connection_lost_event.is_set():
+            return
+        self._last_start = time.time()
+        self._poll_checkers()
+        if not self.connection.enable_stream_events:
+            self._poll_merged_changes()
 
-            self._poll_checkers()
-            if not self.connection.enable_stream_events:
-                self._poll_merged_changes()
+    def _run(self):
+        self._last_start = time.time()
+        while not (self._stopped or self._connection_lost_event.is_set()):
+            # during tests, a sub-class _poll method is used to send
+            # notifications
+            self._poll()
 
     def run(self):
         while not self._stopped:
