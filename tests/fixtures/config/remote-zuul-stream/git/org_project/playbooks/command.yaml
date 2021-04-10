@@ -89,6 +89,17 @@
         - failed_in_loop1
         - failed_in_loop2
       ignore_errors: True
+    - name: Command with different become values
+      shell: "{{ item.cmd }}"
+      become: "{{ item.sudo | default(False) }}"
+      with_items:
+        - cmd: touch a
+        - cmd: touch b
+          sudo: True
+        - cmd: touch c
+        - cmd: touch d
+          sudo: True
+
 
 - hosts: all
   tasks:
