@@ -171,7 +171,12 @@ class Console(object):
         self.logfile_name = LOG_STREAM_FILE.format(log_uuid=log_uuid)
 
     def __enter__(self):
-        self.logfile = open(self.logfile_name, 'ab', buffering=0)
+        # Make log file RW for all in case a task switch between users for
+        # different commands
+        last_umask = os.umask(0)
+        self.logfile = open(os.open(self.logfile_name,
+            os.O_CREAT | os.O_RDWR | os.O_APPEND, 0o666), 'ab', buffering=0)
+        os.umask(last_umask)
         return self
 
     def __exit__(self, etype, value, tb):
