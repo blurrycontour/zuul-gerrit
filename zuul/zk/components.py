@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeError
 
-from zuul.zk import NoClientException, ZooKeeperBase, ZooKeeperClient
+from zuul.zk import NoClientException, ZooKeeperSimpleBase, ZooKeeperClient
 
 
 class ZooKeeperComponentReadOnly(object):
@@ -128,7 +128,7 @@ class ZooKeeperComponent(ZooKeeperComponentReadOnly):
         self.kazoo_client.delete(self._path)
 
 
-class ZooKeeperComponentRegistry(ZooKeeperBase):
+class ZooKeeperComponentRegistry(ZooKeeperSimpleBase):
     """
     ZooKeeper component registry. Each zuul component can register itself
     using this registry. This will create a ephemeral zookeeper node, which
