@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "63f9ab38_6eab0ac5",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T20:46:47Z",
+      "side": 1,
+      "message": "This is likely to be accessed by the executor too.  People may be splitting the config file by service, so this could be misleading.  We could document that it\u0027s required for executor, or perhaps we should add a new section [keystore] ?",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "766bc024_aa0174a7",
+        "filename": "releasenotes/notes/zookeeper-key-storage-a1ad32aa8d63b05f.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T20:46:47Z",
+      "side": 1,
+      "message": "It seems like we shouldn\u0027t need to do that in the long run and this can be temporary.  If we provide a tool to extract keys from zk, that will give people control of backups (so they can decide to only do so in a more secure environment).",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "190622b0_2396b671",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T20:46:47Z",
+      "side": 1,
+      "message": "This should probably be info level.",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e23e81a_3d5e929c",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T20:46:47Z",
+      "side": 1,
+      "message": "Same.",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "55897580_eac3c802",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T20:46:47Z",
+      "side": 1,
+      "message": "Info.",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8631bb99_cc644341",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T20:46:47Z",
+      "side": 1,
+      "message": "Info.",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
