@@ -72,8 +72,10 @@ to appropriate values for your setup.
    [web]
    listen_address=0.0.0.0
 
+   [keystore]
+   password=secret
+
    [scheduler]
-   key_store_password=secret
    tenant_config=/etc/zuul/main.yaml
    EOF"
 

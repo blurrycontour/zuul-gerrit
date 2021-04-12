@@ -4254,8 +4254,8 @@ class ZuulTestCase(BaseTestCase):
         self.config.set(
             'scheduler', 'command_socket',
             os.path.join(self.test_root, 'scheduler.socket'))
-        if not self.config.has_option("scheduler", "key_store_password"):
-            self.config.set("scheduler", "key_store_password",
+        if not self.config.has_option("keystore", "password"):
+            self.config.set("keystore", "password",
                             uuid.uuid4().hex)
         self.config.set('merger', 'git_dir', self.merger_src_root)
         self.config.set('executor', 'git_dir', self.executor_src_root)
@@ -4417,7 +4417,8 @@ class ZuulTestCase(BaseTestCase):
         config.read(os.path.join(FIXTURE_DIR, config_file))
 
         sections = [
-            'zuul', 'scheduler', 'executor', 'merger', 'web', 'zookeeper'
+            'zuul', 'scheduler', 'executor', 'merger', 'web', 'zookeeper',
+            'keystore'
         ]
         for section in sections:
             if not config.has_section(section):
