@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "76ea216c_49624929",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4881,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T21:39:32Z",
+      "side": 1,
+      "message": "Nit: we could write this as \"Build is not finalized\" since the uuid is already in the message.",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c65b1323_4b928405",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T21:39:32Z",
+      "side": 1,
+      "message": "Review note: the lifecycle of the items in self.builds is changed a bit here.  Noop jobs now get an entry in self.builds, but for all jobs (noop and otherwise) the entry should be removed in the scheduler now, either upon normal completion, or in the new cleanup methods.",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6cf9c641_2d36f8c4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1172,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T21:39:32Z",
+      "side": 1,
+      "message": "I don\u0027t believe it\u0027s currently used.  It could be used to indicate the progress, but we do that in the scheduler with the time database instead.",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6367a12d_7f699b5d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-12T21:39:32Z",
+      "side": 1,
+      "message": "Just a note: We should still make sure the build is canceled in the future, even if the mechanism is different.  However it happens, we don\u0027t want it running after this point since it\u0027s effectively orphaned.\n\nAn actual concern: I think semaphores may not be handled in the case a pipeline or tenant is removed.  This method shares some code with scheduler.cancelJob, and that does return semaphores.  Perhaps we could use that instead of this?  Or otherwise somehow merge this code path?",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
