@@ -278,15 +278,15 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
             if self.backup and self.backup.hasProjectSSHKeys(
                 connection_name, project_name
             ):
-                self.log.debug("Using SSH key for %s/%s from backup key store",
-                               connection_name, project_name)
+                self.log.info("Using SSH key for %s/%s from backup key store",
+                              connection_name, project_name)
                 pk, _ = self.backup.getProjectSSHKeys(connection_name,
                                                       project_name)
                 with io.StringIO(pk) as o:
                     key = paramiko.RSAKey.from_private_key(o)
             else:
-                self.log.debug("Generating a new SSH key for %s/%s",
-                               connection_name, project_name)
+                self.log.info("Generating a new SSH key for %s/%s",
+                              connection_name, project_name)
                 key = paramiko.RSAKey.generate(bits=RSA_KEY_SIZE)
 
             try:
@@ -330,14 +330,14 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
                            connection_name, project_name)
             if self.backup and self.backup.hasProjectSecretsKeys(
                     connection_name, project_name):
-                self.log.debug(
+                self.log.info(
                     "Using secrets key for %s/%s from backup key store",
                     connection_name, project_name)
                 private_key, public_key = self.backup.getProjectSecretsKeys(
                     connection_name, project_name)
             else:
-                self.log.debug("Generating a new secrets key for %s/%s",
-                               connection_name, project_name)
+                self.log.info("Generating a new secrets key for %s/%s",
+                              connection_name, project_name)
                 private_key, public_key = encryption.generate_rsa_keypair()
 
             pem_private_key = encryption.serialize_rsa_private_key(

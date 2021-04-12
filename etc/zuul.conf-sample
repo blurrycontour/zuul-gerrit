@@ -18,8 +18,10 @@ start=true
 ;ssl_key=/path/to/server.key
 ;port=4730
 
+[keystore]
+password=secret
+
 [scheduler]
-key_store_password=secret
 tenant_config=/etc/zuul/main.yaml
 log_config=/etc/zuul/logging.conf
 pidfile=/var/run/zuul/zuul.pid
