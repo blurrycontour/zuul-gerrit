@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c27e7270_1f35b5d5",
+        "filename": "doc/source/discussion/components.rst",
+        "patchSetId": 9
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-13T05:39:08Z",
+      "side": 1,
+      "message": "Yes, if you think the executor might also need access it makes sense to move this to a [keystore] section.",
+      "parentUuid": "63f9ab38_6eab0ac5",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "766bc024_aa0174a7",
         "filename": "releasenotes/notes/zookeeper-key-storage-a1ad32aa8d63b05f.yaml",
         "patchSetId": 9
@@ -30,6 +48,24 @@
       "writtenOn": "2021-04-12T20:46:47Z",
       "side": 1,
       "message": "It seems like we shouldn\u0027t need to do that in the long run and this can be temporary.  If we provide a tool to extract keys from zk, that will give people control of backups (so they can decide to only do so in a more secure environment).",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a52c832d_4ad58b0c",
+        "filename": "releasenotes/notes/zookeeper-key-storage-a1ad32aa8d63b05f.yaml",
+        "patchSetId": 9
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-13T05:39:08Z",
+      "side": 1,
+      "message": "Ack. I added this to the Zuul v5 punch list https://etherpad.opendev.org/p/zuulv5",
+      "parentUuid": "766bc024_aa0174a7",
       "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
