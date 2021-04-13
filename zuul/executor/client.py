@@ -154,7 +154,12 @@ class ExecutorClient(object):
         # TODO: deprecate and remove this variable?
         params["zuul"]["_inheritance_path"] = list(job.inheritance_path)
 
-        build = Build(job, uuid, zuul_event_id=item.event.zuul_event_id)
+        build = Build(
+            job,
+            item.current_build_set,
+            uuid,
+            zuul_event_id=item.event.zuul_event_id,
+        )
         build.parameters = params
         build.nodeset = nodeset
 
