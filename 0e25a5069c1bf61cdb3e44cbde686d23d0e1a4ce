@@ -72,6 +72,23 @@
     },
     {
       "key": {
+        "uuid": "0d252b01_761c2af6",
+        "filename": "tests/unit/test_keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-13T17:30:45Z",
+      "side": 1,
+      "message": "Let\u0027s add an upgrade test to address the concern about accidentally involving passwords with the backup store.\n\n1) Create key in backup store.\n2) Load it via primary store.  (should cause it to be written to primary store and backup)\n3) Load it via backup store.  (this should work, but if we accidentally encrypted it, it would break)\n4) Load it via primary store.  (should not touch backup store; just to exercise the code path where it already exists)",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "190622b0_2396b671",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 9
@@ -83,6 +100,23 @@
       "writtenOn": "2021-04-12T20:46:47Z",
       "side": 1,
       "message": "This should probably be info level.",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3e9784ba_6eb499a6",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-13T17:30:45Z",
+      "side": 1,
+      "message": "Are we certain that the upgrade path from no password protection to using a password works?\n\n1) Current state: non-password-protected key\n2) Load that key from the backup file storage (should work) via paramiko.RSAKey.from_private_key_file\n3) Then here we try to load a key from that using a password:\n   Does that work -- does it say \"this is already a valid key, I don\u0027t need to use this password\"\n4) Then we store the key in ZK with the password, that\u0027s fine.\n5) Then we store the key in the file keystore without the password.\n\nAfter walking through that, it looks like we don\u0027t have a path to write a key to the backup keystore with a password, which I think means we don\u0027t need lines 285 and 286, and can just do \"key, _ \u003d self.backup.getProjectSSH...\".\n\nIt looks like the secret keys behave that way already.",
       "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
