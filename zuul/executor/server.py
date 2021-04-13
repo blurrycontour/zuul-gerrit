@@ -1420,6 +1420,7 @@ class AnsibleJob(object):
              self.cpu_times['children_user'],
              self.cpu_times['children_system']))
 
+        run_unreachable = False
         if not pre_failed:
             for index, playbook in enumerate(self.jobdir.playbooks):
                 ansible_timeout = self.getAnsibleTimeout(
@@ -1434,6 +1435,13 @@ class AnsibleJob(object):
                     # overridden by a post-failure.
                     pre_failed = True
                     result = 'TIMED_OUT'
+                    break
+                elif job_status == self.RESULT_UNREACHABLE:
+                    # In case we encounter unreachable nodes we need to return
+                    # None so the job can be retried. However we still want to
+                    # run post playbooks to get a chance to upload logs.
+                    pre_failed = True
+                    run_unreachable = True
                     break
                 elif job_status == self.RESULT_NORMAL:
                     success = (job_code == 0)
@@ -1456,7 +1464,7 @@ class AnsibleJob(object):
             return 'ABORTED'
 
         post_timeout = args['post_timeout']
-        unreachable = False
+        post_unreachable = False
         for index, playbook in enumerate(self.jobdir.post_playbooks):
             # Post timeout operates a little differently to the main job
             # timeout. We give each post playbook the full post timeout to
@@ -1473,7 +1481,7 @@ class AnsibleJob(object):
                 # so the job can be retried. However in the case of post
                 # playbooks we should still try to run all playbooks to get a
                 # chance to upload logs.
-                unreachable = True
+                post_unreachable = True
             if post_status != self.RESULT_NORMAL or post_code != 0:
                 success = False
                 # If we encountered a pre-failure, that takes
@@ -1483,7 +1491,7 @@ class AnsibleJob(object):
                 if (index + 1) == len(self.jobdir.post_playbooks):
                     self._logFinalPlaybookError()
 
-        if unreachable:
+        if run_unreachable or post_unreachable:
             return None
 
         return result
