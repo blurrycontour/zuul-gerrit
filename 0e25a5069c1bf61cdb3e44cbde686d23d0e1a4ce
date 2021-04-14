@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "85e4969e_299a5499",
+        "filename": "tests/unit/test_keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-14T06:22:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d252b01_761c2af6",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "190622b0_2396b671",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 9
@@ -117,6 +135,24 @@
       "writtenOn": "2021-04-13T17:30:45Z",
       "side": 1,
       "message": "Are we certain that the upgrade path from no password protection to using a password works?\n\n1) Current state: non-password-protected key\n2) Load that key from the backup file storage (should work) via paramiko.RSAKey.from_private_key_file\n3) Then here we try to load a key from that using a password:\n   Does that work -- does it say \"this is already a valid key, I don\u0027t need to use this password\"\n4) Then we store the key in ZK with the password, that\u0027s fine.\n5) Then we store the key in the file keystore without the password.\n\nAfter walking through that, it looks like we don\u0027t have a path to write a key to the backup keystore with a password, which I think means we don\u0027t need lines 285 and 286, and can just do \"key, _ \u003d self.backup.getProjectSSH...\".\n\nIt looks like the secret keys behave that way already.",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e7c92e2e_f8488d55",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-14T06:22:53Z",
+      "side": 1,
+      "message": "paramiko.RSAKey.from_private_key() will ignore the password in case the given key is not encrypted, but I will remove it since it shouldn\u0027t be necessary.\n\nHowever, I still need to create the RSAKey object in order to encrypt it. self.backup.getProjectSSHKeys() will only return the PEM/base64 encoded string representation.",
+      "parentUuid": "3e9784ba_6eb499a6",
       "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
