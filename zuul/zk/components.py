@@ -13,173 +13,259 @@
 # under the License.
 import json
 import logging
-import threading
-from typing import Any, Dict, List, Optional
+from collections import defaultdict
+from enum import Enum
 
-from kazoo.client import KazooClient
 from kazoo.exceptions import NoNodeError
+from kazoo.recipe.cache import TreeCache, TreeEvent
 
-from zuul.zk import NoClientException, ZooKeeperSimpleBase, ZooKeeperClient
-
-
-class ZooKeeperComponentReadOnly(object):
-    """
-    Read-only component object.
-    """
-
-    STOPPED = 'stopped'
-    RUNNING = 'running'
-    PAUSED = 'paused'
-
-    def __init__(self, client: ZooKeeperClient, content: Dict[str, Any]):
-        self._client = client
-        self._content = content
-
-    @property
-    def kazoo_client(self) -> KazooClient:
-        if not self._client.client:
-            raise NoClientException()
-        return self._client.client
-
-    def get(self, key: str, default: Optional[Any] = None) -> Any:
-        """
-        Gets an attribute of the component.
-
-        :param key: Attribute key
-        :param default: Default value (default: None)
-        :return: Value of the attribute
-        """
-        return self._content.get(key, default)
+from zuul.zk import ZooKeeperBase, ZooKeeperSimpleBase
 
 
-class ZooKeeperComponent(ZooKeeperComponentReadOnly):
-    """
-    Read/write component object.
+COMPONENTS_ROOT = "/zuul/components"
 
-    This object holds an offline cache of all the component's attributes.
-    In case of an failed update to zookeeper the local cache will still
-    hold the fresh values. Updating any attribute uploads all attributes to
-    zookeeper.
 
-    This enables this object to be used as a local key/value store even if
-    zookeeper connection got lost. One must still catch exceptions related
-    to zookeeper connection loss.
-    """
+class ComponentState(Enum):
+    RUNNING = 0
+    PAUSED = 1
+    STOPPED = 2
 
-    log = logging.getLogger("zuul.zk.components.ZooKeeperComponent")
 
-    def __init__(
-        self,
-        client: ZooKeeperClient,
-        kind: str,
-        hostname: str,
-        content: Dict[str, Any],
-    ):
-        super().__init__(client, content)
-        self._kind = kind
-        self._persisted = False
-        self._hostname = hostname
-        self._path = self._register(content)
-        self._set_lock = threading.Lock()
+class BaseComponent(ZooKeeperSimpleBase):
 
-    def set(self, key: str, value: int) -> None:
-        """
-        Sets an attribute of a component and uploads the whole component state
-        to zookeeper.
+    log = logging.getLogger("zuul.zk.components.BaseComponent")
+    kind = "base"
 
-        Upload only happens if the new value changed or if an previous upload
-        failed.
+    def __init__(self, client, hostname):
+        # Ensure that the content is available before setting any other
+        # attribute, because our __setattr__ implementation is relying on it.
+        self.__dict__["content"] = {
+            "hostname": hostname,
+            "state": ComponentState.STOPPED.name,
+            "kind": self.kind,
+        }
+        # NOTE (felix): If we want to have a "read-only" component, we could
+        # provide client=None to the constructor.
+        super().__init__(client)
 
-        :param key: Attribute key
-        :param value: Value
-        """
+        self.path = None
+        self._zstat = None
 
-        with self._set_lock:
-            upload = self._content.get(key) != value or not self._persisted
-            self._content[key] = value
-            if upload:
-                self._persisted = False
-                stat = self.kazoo_client.exists(self._path)
-                if not stat:  # Re-register, if connection to zk was lost
-                    self._path = self._register(self._content)
-                else:
-                    content = json.dumps(self._content).encode(
-                        encoding="UTF-8"
-                    )
-                    self.kazoo_client.set(
-                        self._path, content, version=stat.version
-                    )
-                self._persisted = True
+    def __getattr__(self, name):
+        try:
+            # Convert the state string back to enum
+            if name == "state":
+                return ComponentState[self.content[name]]
+            return self.content[name]
+        except KeyError:
+            raise AttributeError
 
-    def _register(self, content: Dict[str, Any]) -> str:
-        path = "{}/{}/{}-".format(
-            ZooKeeperComponentRegistry.ROOT, self._kind, self._hostname
-        )
-        self.log.debug(f"Creating {path} in Zookeeper")
-        return self.kazoo_client.create(
+    def __setattr__(self, name, value):
+        # If the specified attribute is not part of our content dictionary,
+        # fall back to the default __settattr__ behaviour.
+        if name not in self.content.keys():
+            return super().__setattr__(name, value)
+
+        # Convert the state enum to a string
+        if name == "state":
+            value = value.name
+
+        # Set the value in the local content dict
+        self.content[name] = value
+
+        if not self.path:
+            self.log.error(
+                "Path is not set on this component, did you forget to call "
+                "register()?"
+            )
+            return
+
+        # Update the ZooKeeper node
+        content = json.dumps(self.content).encode("utf-8")
+        try:
+            zstat = self.kazoo_client.set(
+                self.path, content, version=self._zstat.version
+            )
+            self._zstat = zstat
+        except NoNodeError:
+            self.log.error("Could not update %s in ZooKeeper", self)
+
+    def register(self):
+        path = "/".join([COMPONENTS_ROOT, self.kind, self.hostname])
+        self.log.debug("Registering component in ZooKeeper %s", path)
+        self.path, self._zstat = self.kazoo_client.create(
             path,
-            json.dumps(content).encode("utf-8"),
+            json.dumps(self.content).encode("utf-8"),
             makepath=True,
             ephemeral=True,
             sequence=True,
+            # Also return the zstat, which is necessary to successfully update
+            # the component.
+            include_data=True,
         )
 
-    def unregister(self):
-        self.kazoo_client.delete(self._path)
+    def updateFromDict(self, data):
+        self.content.update(data)
+
+    @classmethod
+    def fromDict(cls, client, hostname, data):
+        component = cls(client, hostname)
+        component.updateFromDict(data)
+        return component
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.content}>"
 
 
-class ZooKeeperComponentRegistry(ZooKeeperSimpleBase):
-    """
-    ZooKeeper component registry. Each zuul component can register itself
-    using this registry. This will create a ephemeral zookeeper node, which
-    will be then deleted in case such component looses connection to zookeeper.
+class SchedulerComponent(BaseComponent):
+    kind = "scheduler"
 
-    Any other component may request a list of registered components to check
-    their properties. List of components received by other components are
-    read-only. Only the component itself can update its entry in the registry.
-    """
 
-    ROOT = "/zuul/components"
+class ExecutorComponent(BaseComponent):
+    kind = "executor"
+
+
+class MergerComponent(BaseComponent):
+    kind = "merger"
+
+
+class FingerGatewayComponent(BaseComponent):
+    kind = "finger-gateway"
+
+
+class WebComponent(BaseComponent):
+    kind = "web"
+
+
+class ComponentRegistry(ZooKeeperBase):
 
     log = logging.getLogger("zuul.zk.components.ZooKeeperComponentRegistry")
 
-    def all(self, kind: str) -> List[ZooKeeperComponentReadOnly]:
-        """
-        Get all registered components of a given kind. Components obtained
-        using this method cannot be updated.
+    COMPONENT_CLASSES = {
+        "scheduler": SchedulerComponent,
+        "executor": ExecutorComponent,
+        "merger": MergerComponent,
+        "finger-gateway": FingerGatewayComponent,
+        "web": WebComponent,
+    }
 
-        :param kind: Kind of components
-        :return: List of read-only components
-        """
+    # TODO (felix): We could make the cache optional if more components are
+    # using the component registry. So far, only the scheduler is using the
+    # registry and it's the only component that needs the cache functionality.
+    def __init__(self, client):
+        super().__init__(client)
 
-        result = []
-        path = "{}/{}".format(self.ROOT, kind)
-        try:
-            for node in self.kazoo_client.get_children(path):
-                path = "{}/{}/{}".format(self.ROOT, kind, node)
-                data, _ = self.kazoo_client.get(path)
-                content = json.loads(data.decode("UTF-8"))
-                result.append(ZooKeeperComponentReadOnly(self.client, content))
-        except NoNodeError:
-            # If the node doesn't exist there is no component registered.
-            pass
-        return result
+        self.client = client
 
-    def register(self, kind: str, hostname: str) -> ZooKeeperComponent:
-        """
-        Register component with a hostname. This method returns an updateable
-        component object.
+        self._component_tree = TreeCache(self.kazoo_client, COMPONENTS_ROOT)
+        self._component_tree.listen_fault(self._cacheFaultListener)
+        self._component_tree.listen(self._componentCacheListener)
 
-        :param kind: Kind of component
-        :param hostname: Hostname
-        :return: Path representing the components's ZNode
-        """
-        return ZooKeeperComponent(
-            self.client,
-            kind,
-            hostname,
-            dict(
-                hostname=hostname,
-                state=ZooKeeperComponent.STOPPED,
-            ),
+        # kind -> hostname -> component
+        self._cached_components = defaultdict(dict)
+
+        # If we are already connected when the class is instantiated, directly
+        # call the onConnect callback.
+        if self.client.connected:
+            self._onConnect()
+
+    def _onConnect(self):
+        self._component_tree.start()
+
+    def _onDisconnect(self):
+        self._component_tree.close()
+
+    def all(self, kind=None):
+        if kind is None:
+            return [kind.values() for kind in self._cached_components.keys()]
+
+        # Filter the cached components for the given kind
+        return self._cached_components.get(kind, {}).values()
+
+    def _cacheFaultListener(self, e):
+        self.log.exception(e)
+
+    def _componentCacheListener(self, event):
+        path = None
+        if hasattr(event.event_data, "path"):
+            path = event.event_data.path
+
+        # Ignore events without path
+        if not path:
+            return
+
+        # Ignore root node
+        if path == COMPONENTS_ROOT:
+            return
+
+        # Ignore lock nodes
+        if "__lock__" in path:
+            return
+
+        # Ignore unrelated events
+        if event.event_type not in (
+            TreeEvent.NODE_ADDED,
+            TreeEvent.NODE_UPDATED,
+            TreeEvent.NODE_REMOVED,
+        ):
+            return
+
+        # Split the path into segments to find out the type of event (e.g.
+        # a subnode was created or the buildnode itself was touched).
+        segments = self._getSegments(path)
+
+        # The segments we are interested in should look something like this:
+        # <kind> / <hostname>
+        if len(segments) < 2:
+            # Ignore events that don't touch a component
+            return
+
+        kind = segments[0]
+        hostname = segments[1]
+
+        self.log.debug(
+            "Got cache update event %s for path %s", event.event_type, path
         )
+
+        if event.event_type in (TreeEvent.NODE_UPDATED, TreeEvent.NODE_ADDED):
+            # Ignore events without data
+            if not event.event_data.data:
+                return
+
+            # Perform an in-place update of the cached component (if any)
+            component = self._cached_components.get(kind, {}).get(hostname)
+            d = json.loads(event.event_data.data.decode("utf-8"))
+
+            if component:
+                if (
+                    event.event_data.stat.version
+                    <= component._zstat.version
+                ):
+                    # Don't update to older data
+                    return
+                component.updateFromDict(d)
+                component._zstat = event.event_data.stat
+            else:
+                # Create a new component from the data structure
+                # Get the correct kind of component
+                # TODO (felix): KeyError on unknown component type?
+                component_cls = self.COMPONENT_CLASSES[kind]
+                component = component_cls.fromDict(self.client, hostname, d)
+                component.path = path
+                component._zstat = event.event_data.stat
+
+            self._cached_components[kind][hostname] = component
+
+        elif event.event_type == TreeEvent.NODE_REMOVED:
+            try:
+                del self._cached_components[kind][hostname]
+            except KeyError:
+                # If it's already gone, don't care
+                pass
+
+    def _getSegments(self, path):
+        if path.startswith(COMPONENTS_ROOT):
+            # Normalize the path (remove the root part)
+            path = path[len(COMPONENTS_ROOT) + 1:]
+
+        return path.split("/")
