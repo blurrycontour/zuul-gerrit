@@ -35,6 +35,46 @@
       "revId": "637ac03f9cadfcd04bbe456cac92217e90a19b97",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9353471c_dee07a48",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6017,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-15T18:05:28Z",
+      "side": 1,
+      "message": "Is this actually a project removal test now?",
+      "range": {
+        "startLine": 6017,
+        "startChar": 51,
+        "endLine": 6017,
+        "endChar": 62
+      },
+      "revId": "637ac03f9cadfcd04bbe456cac92217e90a19b97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "99885794_a807303a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-15T18:05:28Z",
+      "side": 1,
+      "message": "Should this block continue to be evaluated if _reenqueueGetProject() returns None? Thinking that maybe the change ahead has gone away because it merged but that wouldn\u0027t necessarily change the liveness of the current item?",
+      "revId": "637ac03f9cadfcd04bbe456cac92217e90a19b97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
