@@ -78,6 +78,24 @@
     },
     {
       "key": {
+        "uuid": "78e07337_d4db2048",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6017,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-15T19:39:50Z",
+      "side": 1,
+      "message": "We should probably update the docstring and the test name in that case.",
+      "parentUuid": "24cff351_2cd740af",
+      "revId": "637ac03f9cadfcd04bbe456cac92217e90a19b97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "99885794_a807303a",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -106,6 +124,24 @@
       "writtenOn": "2021-04-15T19:05:51Z",
       "side": 1,
       "message": "The cancelJob method (which we will call later if new_project is None) needs item.pipeline to be set.  So we must not set that to None in this case.  For simplicity, treat item.queue the same way.\n\nThat leaves last_head.  It is only used below, also inside of a new_project block.  So the only way for last_head to be used is for the current item to have a valid project.  By including this assignment to last_head within a valid project test, we also ensure that last_head can only point to an item with a valid project.  I\u0027m not certain that\u0027s absolutely necessary, but it seems reasonable.  If it\u0027s more clear, we could probably move these 2 lines to line 920.",
+      "revId": "637ac03f9cadfcd04bbe456cac92217e90a19b97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2662c823_d7a8bf3b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-15T19:39:50Z",
+      "side": 1,
+      "message": "Moving to line 920 would be nice to keep the locality of the last_head var clear.",
+      "parentUuid": "cae2492f_d9c52678",
       "revId": "637ac03f9cadfcd04bbe456cac92217e90a19b97",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
