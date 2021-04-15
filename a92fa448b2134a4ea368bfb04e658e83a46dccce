@@ -16,6 +16,24 @@
       "revId": "a92fa448b2134a4ea368bfb04e658e83a46dccce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ba0ff59_15b09429",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2021-04-15T18:01:46Z",
+      "side": 1,
+      "message": "Ah thanks! that explains why I couldn\u0027t recall seeing TriggerEvent before.",
+      "parentUuid": "ea0efdcd_2a6cf299",
+      "revId": "a92fa448b2134a4ea368bfb04e658e83a46dccce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
