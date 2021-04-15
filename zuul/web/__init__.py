@@ -35,7 +35,7 @@ from zuul.lib.re2util import filter_allowed_disallowed
 import zuul.model
 import zuul.rpcclient
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import ZooKeeperComponentRegistry
+from zuul.zk.components import ComponentState, WebComponent
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.lib.auth import AuthenticatorRegistry
 from zuul.lib.config import get_default
@@ -1266,11 +1266,8 @@ class ZuulWeb(object):
                                             client_id='Zuul Web Server')
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
-        self.zk_component = (
-            ZooKeeperComponentRegistry(self.zk_client).register(
-                'webs', self.hostname
-            )
-        )
+        self.component_info = WebComponent(self.zk_client, self.hostname)
+        self.component_info.register()
 
         self.connections = connections
         self.authenticators = authenticators
@@ -1427,11 +1424,11 @@ class ZuulWeb(object):
                                                name='command')
         self.command_thread.daemon = True
         self.command_thread.start()
-        self.zk_component.set('state', self.zk_component.RUNNING)
+        self.component_info.state = ComponentState.RUNNING
 
     def stop(self):
         self.log.debug("ZuulWeb stopping")
-        self.zk_component.set('state', self.zk_component.STOPPED)
+        self.component_info.state = ComponentState.STOPPED
         self.rpc.shutdown()
         cherrypy.engine.exit()
         # Not strictly necessary, but without this, if the server is

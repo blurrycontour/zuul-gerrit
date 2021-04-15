@@ -56,6 +56,7 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
+from zuul.zk.components import ComponentState, ExecutorComponent
 
 BUFFER_LINES_FOR_SYNTAX = 200
 COMMANDS = ['stop', 'pause', 'unpause', 'graceful', 'verbose',
@@ -2617,9 +2618,8 @@ class ExecutorServer(BaseMergeServer):
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
                                     socket.getfqdn())
-        self.zk_component = self.zk_component_registry.register(
-            'executors', self.hostname
-        )
+        self.component_info = ExecutorComponent(self.zk_client, self.hostname)
+        self.component_info.register()
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
@@ -2668,7 +2668,6 @@ class ExecutorServer(BaseMergeServer):
         # If the execution driver ever becomes configurable again,
         # this is where it would happen.
         execution_wrapper_name = 'bubblewrap'
-        self.accepting_work = False
         self.execution_wrapper = connections.drivers[execution_wrapper_name]
 
         self.update_queue = DeduplicateQueue()
@@ -2834,7 +2833,7 @@ class ExecutorServer(BaseMergeServer):
         self.governor_thread.daemon = True
         self.governor_thread.start()
         self.disk_accountant.start()
-        self.zk_component.set('state', self.zk_component.RUNNING)
+        self.component_info.state = ComponentState.RUNNING
 
     def register_work(self):
         if self._running:
@@ -2853,7 +2852,7 @@ class ExecutorServer(BaseMergeServer):
 
     def stop(self):
         self.log.debug("Stopping")
-        self.zk_component.set('state', self.zk_component.STOPPED)
+        self.component_info.state = ComponentState.STOPPED
         # Use the BaseMergeServer's stop method to disconnect from ZooKeeper.
         super().stop()
         self.connections.stop()
@@ -2921,14 +2920,14 @@ class ExecutorServer(BaseMergeServer):
 
     def pause(self):
         self.log.debug('Pausing')
-        self.zk_component.set('state', self.zk_component.PAUSED)
+        self.component_info.state = ComponentState.PAUSED
         self.pause_sensor.pause = True
         if self.process_merge_jobs:
             super().pause()
 
     def unpause(self):
         self.log.debug('Resuming')
-        self.zk_component.set('state', self.zk_component.RUNNING)
+        self.component_info.state = ComponentState.RUNNING
         self.pause_sensor.pause = False
         if self.process_merge_jobs:
             super().unpause()
