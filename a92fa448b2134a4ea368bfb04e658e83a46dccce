@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ea0efdcd_2a6cf299",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-15T11:57:27Z",
+      "side": 1,
+      "message": "Since we now dispatch events via Zookeeper, you need to make sure that all attributes are (de-)serialized. As the `connection_name` seems to be common to all trigger events it should probably be added to the `TriggerEvent` class https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L3756",
+      "revId": "a92fa448b2134a4ea368bfb04e658e83a46dccce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
