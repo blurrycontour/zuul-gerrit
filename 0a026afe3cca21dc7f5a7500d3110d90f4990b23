@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a7b4a9cd_46fa6e3e",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4881,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-15T14:24:08Z",
+      "side": 1,
+      "message": "will do",
+      "parentUuid": "76ea216c_49624929",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c65b1323_4b928405",
         "filename": "zuul/executor/client.py",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2021-04-12T21:39:32Z",
       "side": 1,
       "message": "Review note: the lifecycle of the items in self.builds is changed a bit here.  Noop jobs now get an entry in self.builds, but for all jobs (noop and otherwise) the entry should be removed in the scheduler now, either upon normal completion, or in the new cleanup methods.",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bc2aeab8_0f179f70",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-15T14:24:08Z",
+      "side": 1,
+      "message": "That\u0027s right. I will add a section about this to the commit message. AFAIK you don\u0027t like to put comments about such \"changed behaviour\" in the code as this might confuse people which aren\u0027t aware of the old behaviour 😊",
+      "parentUuid": "c65b1323_4b928405",
       "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3b947856_87b2d3af",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1172,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-15T14:24:08Z",
+      "side": 1,
+      "message": "Ok, then I will simply remove it",
+      "parentUuid": "6cf9c641_2d36f8c4",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6367a12d_7f699b5d",
         "filename": "zuul/scheduler.py",
         "patchSetId": 3
@@ -67,6 +121,24 @@
       "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7aef8585_757dee85",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-15T14:24:08Z",
+      "side": 1,
+      "message": "I tried that out, but it looks like cancelJob() is only returning the nodeset in case the build wasn\u0027t running. I think in case the build was running the \"normal\" mechanism is used when the build result event is processed. However, with the result events in ZK, the scheduler won\u0027t process any results for deleted pipelines/tenants anymore. That might also be the reason why I didn\u0027t use cancelJob() here in the first place and only called the relevant parts (deleting the entry in self.executor.builds and returnung the nodeset) directly. So maybe we should simply call the tenant.semaphore_handler.release(item, job) in here to also handle semaphores.\n\nRegarding the \"orphaned builds\": In the builds API change I simply delete the build in ZooKeeper directly (rather than invoking a cancel on the build) because the cancel event can\u0027t be processed anymore (see the comments in this method). The executor server listens for deleted build nodes and aborts the build in that case. The result would be the same as the executor server will then put a cancel event in the queue which isn\u0027t processed anymore, but IMHO it\u0027s a little more specific to simply delete the build (and return the nodeset) in here as this is all we need.",
+      "parentUuid": "6367a12d_7f699b5d",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
