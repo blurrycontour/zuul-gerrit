@@ -1,0 +1,40 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6cd60c3d_6ed268aa",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3497,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-15T07:40:38Z",
+      "side": 1,
+      "message": "\u003e linters: E265 block comment should start with \u0027# \u0027\n\nPlease fix.",
+      "parentUuid": "7b08c474_9556cdd8",
+      "revId": "637ac03f9cadfcd04bbe456cac92217e90a19b97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e049d50f_c3d1c8a1",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6015,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-15T07:40:38Z",
+      "side": 1,
+      "message": "Leftover?",
+      "parentUuid": "7fe26f10_159e6f60",
+      "revId": "637ac03f9cadfcd04bbe456cac92217e90a19b97",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
