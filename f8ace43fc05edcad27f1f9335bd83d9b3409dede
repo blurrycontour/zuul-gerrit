@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "68740ae5_9c884cf7",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3451,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-15T02:16:35Z",
+      "side": 1,
+      "message": "This was really testing something we don\u0027t do anymore: refreezing a job during a reconfig.  There are lots of places we might throw an exception during a reconfig, but it\u0027s not clear there\u0027s value in testing them specifically.  I think we should just drop it.",
+      "revId": "f8ace43fc05edcad27f1f9335bd83d9b3409dede",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7203c96a_5b154afd",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3483,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-15T02:16:35Z",
+      "side": 1,
+      "message": "I think we should remove this.",
+      "revId": "f8ace43fc05edcad27f1f9335bd83d9b3409dede",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cee74181_0b8cea94",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 7722,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-15T02:16:35Z",
+      "side": 1,
+      "message": "Better yet, have it remove the pipeline to check we don\u0027t leak semaphores.",
+      "revId": "f8ace43fc05edcad27f1f9335bd83d9b3409dede",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
