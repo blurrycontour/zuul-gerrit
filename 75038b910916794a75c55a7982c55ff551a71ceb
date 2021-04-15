@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "904d7e7b_57aa433e",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2523,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-15T18:04:20Z",
+      "side": 1,
+      "message": "These tests don\u0027t seem to cover the case that fungi and I found. In the case we found the issue was that the executor repo was remaining stale and not updating after a fast forward merge to the repo upstream. I think the fast forward case is sufficiently likely to happen that a test case for it would be worthwhile.",
+      "revId": "75038b910916794a75c55a7982c55ff551a71ceb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d6529ad_e54c57fe",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1832,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-15T18:04:20Z",
+      "side": 1,
+      "message": "The child change of this change cleans this line up.",
+      "revId": "75038b910916794a75c55a7982c55ff551a71ceb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
