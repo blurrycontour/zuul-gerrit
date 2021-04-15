@@ -14,9 +14,9 @@
 
 from zuul.lib.fingergw import FingerGateway
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import ZooKeeperComponentRegistry
+from zuul.zk.components import BaseComponent, ComponentRegistry
 
-from tests.base import ZuulTestCase, ZuulWebFixture
+from tests.base import iterate_timeout, ZuulTestCase, ZuulWebFixture
 
 
 class TestComponentRegistry(ZuulTestCase):
@@ -33,62 +33,54 @@ class TestComponentRegistry(ZuulTestCase):
         )
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
-        self.component_registry = ZooKeeperComponentRegistry(self.zk_client)
+        self.component_registry = ComponentRegistry(self.zk_client)
+
+    def assertComponentState(self, component_name, state, timeout=5):
+        for _ in iterate_timeout(
+            timeout, f"{component_name} in cache is in state {state}"
+        ):
+            components = list(self.component_registry.all(component_name))
+            if len(components) > 0 and components[0].state == state:
+                break
+
+    def assertComponentStopped(self, component_name, timeout=5):
+        for _ in iterate_timeout(
+            timeout, f"{component_name} in cache is stopped"
+        ):
+            components = list(self.component_registry.all(component_name))
+            if len(components) == 0:
+                break
 
     def test_scheduler_component(self):
-        component_states = self.component_registry.all("schedulers")
-        self.assertEqual(len(component_states), 1)
-
-        component = component_states[0]
-        self.assertEqual(component.get("state"), component.RUNNING)
+        self.assertComponentState("scheduler", BaseComponent.RUNNING)
 
     def test_executor_component(self):
-        component_states = self.component_registry.all("executors")
-        self.assertEqual(len(component_states), 1)
-
-        component = component_states[0]
-        self.assertEqual(component.get("state"), component.RUNNING)
+        self.assertComponentState("executor", BaseComponent.RUNNING)
 
         self.executor_server.pause()
-        component = self.component_registry.all("executors")[0]
-        self.assertEqual(component.get("state"), component.PAUSED)
+        self.assertComponentState("executor", BaseComponent.PAUSED)
 
         self.executor_server.unpause()
-        component = self.component_registry.all("executors")[0]
-        self.assertEqual(component.get("state"), component.RUNNING)
+        self.assertComponentState("executor", BaseComponent.RUNNING)
 
     def test_merger_component(self):
-        component_states = self.component_registry.all("mergers")
-        self.assertEqual(len(component_states), 0)
-
         self._startMerger()
-
-        component_states = self.component_registry.all("mergers")
-        self.assertEqual(len(component_states), 1)
-
-        component = component_states[0]
-        self.assertEqual(component.get("state"), component.RUNNING)
+        self.assertComponentState("merger", BaseComponent.RUNNING)
 
         self.merge_server.pause()
-        component = self.component_registry.all("mergers")[0]
-        self.assertEqual(component.get("state"), component.PAUSED)
+        self.assertComponentState("merger", BaseComponent.PAUSED)
 
         self.merge_server.unpause()
-        component = self.component_registry.all("mergers")[0]
-        self.assertEqual(component.get("state"), component.RUNNING)
+        self.assertComponentState("merger", BaseComponent.RUNNING)
 
         self.merge_server.stop()
         self.merge_server.join()
         # Set the merger to None so the test doesn't try to stop it again
         self.merge_server = None
 
-        component_states = self.component_registry.all("mergers")
-        self.assertEqual(len(component_states), 0)
+        self.assertComponentStopped("merger")
 
     def test_fingergw_component(self):
-        component_states = self.component_registry.all("finger-gateways")
-        self.assertEqual(len(component_states), 0)
-
         gateway = FingerGateway(
             self.config,
             ("127.0.0.1", self.gearman_server.port, None, None, None),
@@ -100,22 +92,14 @@ class TestComponentRegistry(ZuulTestCase):
         gateway.start()
 
         try:
-            component_states = self.component_registry.all("finger-gateways")
-            self.assertEqual(len(component_states), 1)
-
-            component = component_states[0]
-            self.assertEqual(component.get("state"), component.RUNNING)
+            self.assertComponentState("fingergw", BaseComponent.RUNNING)
         finally:
             gateway.stop()
             gateway.wait()
 
-        component_states = self.component_registry.all("finger-gateways")
-        self.assertEqual(len(component_states), 0)
+        self.assertComponentStopped("fingergw")
 
     def test_web_component(self):
-        component_states = self.component_registry.all("finger-gateways")
-        self.assertEqual(len(component_states), 0)
-
         self.useFixture(
             ZuulWebFixture(
                 self.changes, self.config, self.additional_event_queues,
@@ -124,8 +108,4 @@ class TestComponentRegistry(ZuulTestCase):
             )
         )
 
-        component_states = self.component_registry.all("webs")
-        self.assertEqual(len(component_states), 1)
-
-        component = component_states[0]
-        self.assertEqual(component.get("state"), component.RUNNING)
+        self.assertComponentState("web", BaseComponent.RUNNING)
