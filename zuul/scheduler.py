@@ -68,7 +68,7 @@ from zuul.model import (
     UnparsedAbideConfig,
 )
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import ZooKeeperComponentRegistry
+from zuul.zk.components import SchedulerComponent
 from zuul.zk.event_queues import (
     GlobalEventWatcher,
     GlobalManagementEventQueue,
@@ -153,11 +153,8 @@ class Scheduler(threading.Thread):
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
-        self.zk_component = (
-            ZooKeeperComponentRegistry(self.zk_client).register(
-                "schedulers", self.hostname
-            )
-        )
+        self.component_info = SchedulerComponent(self.zk_client, self.hostname)
+        self.component_info.register()
 
         self.result_event_queue = NamedQueue("ResultEventQueue")
         self.global_watcher = GlobalEventWatcher(
@@ -240,11 +237,11 @@ class Scheduler(threading.Thread):
         self.rpc_slow.start()
         self.stats_thread.start()
         self.cleanup_thread.start()
-        self.zk_component.set('state', self.zk_component.RUNNING)
+        self.component_info.state = self.component_info.RUNNING
 
     def stop(self):
         self._stopped = True
-        self.zk_component.set('state', self.zk_component.STOPPED)
+        self.component_info.state = self.component_info.STOPPED
         self.stats_stop.set()
         self.cleanup_stop.set()
         self.stopConnections()
