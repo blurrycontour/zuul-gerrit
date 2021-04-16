@@ -33,6 +33,23 @@
       "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "08c90c19_35bacc12",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 959,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-16T15:32:42Z",
+      "side": 1,
+      "message": "I believe the answer is no, because while we do reset the repo, we reset it to the remote state (ie, we set refs/heads/master to origin/refs/heads/master) and the remote state is stale because isUpdateNeeded told us we didn\u0027t need to fetch.\n\nSo an implication of this is that if you call updateRepo with repo_state, you had best follow that up with something that acts on a repo_state.\n\nTo make this slightly more \"correct\" we could consider having Repo._reset use repo_state when it resets the repo.  Then I think this would pass without the checkoutBranch.",
+      "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
