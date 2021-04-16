@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "126ae2e5_0c6b1fa1",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 948,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-16T15:14:42Z",
+      "side": 1,
+      "message": "Yep, just wanted to minimize changes while we work through this.",
+      "revId": "0b204a188eca0efcb962748bd4af5359c90a6817",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2e3dd39a_5633a67c",
         "filename": "tests/unit/test_merger_repo.py",
         "patchSetId": 1
@@ -33,6 +50,23 @@
       "revId": "0b204a188eca0efcb962748bd4af5359c90a6817",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e02fe24f_c4b7eb05",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 959,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-16T15:14:42Z",
+      "side": 1,
+      "message": "Probably a good idea.",
+      "revId": "0b204a188eca0efcb962748bd4af5359c90a6817",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
