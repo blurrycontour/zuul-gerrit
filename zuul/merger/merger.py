@@ -848,6 +848,10 @@ class Merger(object):
                             repo_state=repo_state,
                             process_worker=process_worker,
                             zuul_event_id=zuul_event_id)
+        if repo_state:
+            self._restoreRepoState(connection_name, project_name, repo,
+                                   repo_state, zuul_event_id,
+                                   process_worker=process_worker)
         repo.checkout(branch, zuul_event_id=zuul_event_id)
 
     def _saveRepoState(self, connection_name, project_name, repo,

@@ -956,7 +956,8 @@ class TestMerger(ZuulTestCase):
         self.log.info('Update the repo and ensure it has updated properly')
         merger.updateRepo('gerrit', 'org/project1',
                           repo_state=repo_state_update_branch_ff_rev)
-        merger.checkoutBranch('gerrit', 'org/project1', 'master')
+        merger.checkoutBranch('gerrit', 'org/project1', 'master',
+                              repo_state=repo_state_update_branch_ff_rev)
         repo = merger.getRepo('gerrit', 'org/project1')
         zuul_repo = git.Repo(repo.local_path)
         zuul_ref = repo.refNameToZuulRef('master')
@@ -967,8 +968,7 @@ class TestMerger(ZuulTestCase):
         # to avoid garbage collection.
         # self.assertEqual(upstream_repo.commit(change_ref).hexsha,
         #                  zuul_repo.commit(zuul_ref).hexsha)
-        # TODO: These shoud be equal; fix bug and reverse logic
-        self.assertNotEqual(upstream_repo.commit('refs/heads/master').hexsha,
-                            zuul_repo.commit('refs/heads/master').hexsha)
-        self.assertNotEqual(upstream_repo.commit(change_ref).hexsha,
-                            zuul_repo.commit('refs/heads/master').hexsha)
+        self.assertEqual(upstream_repo.commit('refs/heads/master').hexsha,
+                         zuul_repo.commit('refs/heads/master').hexsha)
+        self.assertEqual(upstream_repo.commit(change_ref).hexsha,
+                         zuul_repo.commit('refs/heads/master').hexsha)
