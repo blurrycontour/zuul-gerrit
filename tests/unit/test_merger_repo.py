@@ -122,6 +122,7 @@ class TestMergerRepo(ZuulTestCase):
         parent_repo.delete_head("foobar")
         parent_repo.create_head("foobar/sub")
 
+        work_repo.update()
         work_repo.reset()
         work_repo.checkout("foobar/sub")
 
@@ -150,6 +151,7 @@ class TestMergerRepo(ZuulTestCase):
 
         parent_repo.create_head("foobar")
 
+        work_repo.update()
         work_repo.reset()
         work_repo.checkout("foobar")
 
@@ -449,6 +451,7 @@ class TestMergerRepo(ZuulTestCase):
         merger = self.executor_server.merger
         merger.updateRepo('gerrit', 'org/project1')
         repo = merger.getRepo('gerrit', 'org/project1')
+        repo.reset()
 
         # Branches master and stable must exist
         self.assertEqual(['master', 'stable'], repo.getBranches())
@@ -462,6 +465,7 @@ class TestMergerRepo(ZuulTestCase):
         merger.updateRepo('gerrit', 'org/project1',
                           repo_state=repo_state_no_update)
         repo = merger.getRepo('gerrit', 'org/project1')
+        repo.reset()
         self.assertEqual(['master', 'stable'], repo.getBranches())
 
         # Update with repo state and expect update
@@ -469,6 +473,7 @@ class TestMergerRepo(ZuulTestCase):
         merger.updateRepo('gerrit', 'org/project1',
                           repo_state=repo_state_update_ref)
         repo = merger.getRepo('gerrit', 'org/project1')
+        repo.reset()
         self.assertEqual(['master', 'stable', 'stable2'], repo.getBranches())
 
         # Test new rev causes update
@@ -480,6 +485,7 @@ class TestMergerRepo(ZuulTestCase):
         merger.updateRepo('gerrit', 'org/project1',
                           repo_state=repo_state_no_update)
         repo = merger.getRepo('gerrit', 'org/project1')
+        repo.reset()
         self.assertEqual(['master', 'stable', 'stable2'], repo.getBranches())
 
         # Update with repo state and expect update
@@ -487,6 +493,7 @@ class TestMergerRepo(ZuulTestCase):
         merger.updateRepo('gerrit', 'org/project1',
                           repo_state=repo_state_update_rev)
         repo = merger.getRepo('gerrit', 'org/project1')
+        repo.reset()
         self.assertEqual(['master', 'stable', 'stable2', 'stable3'],
                          repo.getBranches())
 
@@ -496,6 +503,7 @@ class TestMergerRepo(ZuulTestCase):
         merger.updateRepo('gerrit', 'org/project2',
                           repo_state=repo_state_no_update)
         repo = merger.getRepo('gerrit', 'org/project2')
+        repo.reset()
         self.assertEqual(['master'],
                          repo.getBranches())
 
@@ -506,6 +514,7 @@ class TestMergerRepo(ZuulTestCase):
         merger.updateRepo('gerrit', 'org/project2',
                           repo_state=repo_state_no_update)
         repo = merger.getRepo('gerrit', 'org/project2')
+        repo.reset()
         self.assertEqual(['master', 'stable'],
                          repo.getBranches())
 
@@ -814,6 +823,9 @@ class TestMerger(ZuulTestCase):
         item_c = self._item_from_fake_change(C)
 
         # Merge A -> B -> C
+        # TODO(corvus): remove this if we update in mergeChanges
+        for item in [item_a, item_b, item_c]:
+            merger.updateRepo(item['connection'], item['project'])
         result = merger.mergeChanges([item_a, item_b, item_c])
         self.assertIsNotNone(result)
         merge_state = result[3]
@@ -847,6 +859,7 @@ class TestMerger(ZuulTestCase):
         if parent_repo.git.version_info[:2] < (2, 13):
             Repo._cleanup_leaked_ref_dirs(parent_path, None, [])
 
+        cache_repo.update()
         cache_repo.reset()
         self.assertNotIn(foobar_zuul_ref, [r.path for r in repo.refs])
 
@@ -859,6 +872,9 @@ class TestMerger(ZuulTestCase):
         item_b = self._item_from_fake_change(B)
 
         # Merge A -> B -> C
+        # TODO(corvus): remove this if we update in mergeChanges
+        for item in [item_a, item_b, item_c]:
+            merger.updateRepo(item['connection'], item['project'])
         result = merger.mergeChanges([item_a, item_b, item_c])
         self.assertIsNotNone(result)
         merge_state = result[3]

@@ -84,7 +84,8 @@ class BaseMergeServer(metaclass=ABCMeta):
         # up-to-date copies of all the repos that are used by jobs, as
         # well as to support the merger:cat functon to supply
         # configuration information to Zuul when it starts.
-        self.merger = self._getMerger(self.merge_root, None)
+        self.merger = self._getMerger(self.merge_root, None,
+                                      execution_context=False)
 
         # Repo locking is needed on the executor
         self.repo_locks = self._repo_locks_class()
@@ -102,7 +103,8 @@ class BaseMergeServer(metaclass=ABCMeta):
             self.config,
             self.merger_jobs)
 
-    def _getMerger(self, root, cache_root, logger=None):
+    def _getMerger(self, root, cache_root, logger=None,
+                   execution_context=True):
         return merger.Merger(
             root,
             self.connections,
@@ -113,7 +115,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             self.merge_speed_time,
             cache_root,
             logger,
-            execution_context=True,
+            execution_context=execution_context,
             git_timeout=self.git_timeout,
         )
 
@@ -122,6 +124,8 @@ class BaseMergeServer(metaclass=ABCMeta):
         return nullcontext()
 
     def _update(self, connection_name, project_name, zuul_event_id=None):
+        # The executor overrides _update so it can do the update
+        # asynchronously.
         self.merger.updateRepo(connection_name, project_name,
                                zuul_event_id=zuul_event_id)
 
@@ -189,6 +193,8 @@ class BaseMergeServer(metaclass=ABCMeta):
         args = json.loads(job.arguments)
         zuul_event_id = args.get('zuul_event_id')
 
+        for item in args['items']:
+            self._update(item['connection'], item['project'])
         ret = self.merger.mergeChanges(
             args['items'], args.get('files'),
             args.get('dirs', []),
