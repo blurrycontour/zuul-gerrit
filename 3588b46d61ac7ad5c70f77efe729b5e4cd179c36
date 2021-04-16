@@ -50,6 +50,40 @@
       "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c902a6ad_d529a22d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 813,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-16T15:58:26Z",
+      "side": 1,
+      "message": "I think we need default to None here...",
+      "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a9d82988_207dd59e",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 819,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-16T15:58:26Z",
+      "side": 1,
+      "message": "... and check for project_repo_state is None here.\n\nOtherwise if the project is not part of the repo state isUpdateNeeded will always return False.",
+      "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
