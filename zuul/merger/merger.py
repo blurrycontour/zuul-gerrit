@@ -604,10 +604,10 @@ class Repo(object):
         self._git_fetch(repo, 'origin', zuul_event_id, tags=True,
                         prune=True, prune_tags=True)
 
-    def isUpdateNeeded(self, repo_state, zuul_event_id=None):
+    def isUpdateNeeded(self, project_repo_state, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
         refs = [x.path for x in repo.refs]
-        for ref, rev in repo_state.items():
+        for ref, rev in project_repo_state.items():
             # Check that each ref exists and that each commit exists
             if ref not in refs:
                 return True
@@ -760,7 +760,8 @@ class Merger(object):
         # behavior e.g. to keep the 'origin' remote intact.
         self.execution_context = execution_context
 
-    def _addProject(self, hostname, project_name, url, sshkey, zuul_event_id):
+    def _addProject(self, hostname, connection_name, project_name, url, sshkey,
+                    repo_state, zuul_event_id, process_worker=None):
         repo = None
         key = '/'.join([hostname, project_name])
         try:
@@ -776,6 +777,11 @@ class Merger(object):
                 logger=self.logger, git_timeout=self.git_timeout,
                 zuul_event_id=zuul_event_id)
 
+            # If we got a repo state restore it
+            if repo_state:
+                self._restoreRepoState(
+                    connection_name, project_name, repo, repo_state,
+                    zuul_event_id, process_worker=process_worker)
             self.repos[key] = repo
         except Exception:
             log = get_annotated_logger(self.log, zuul_event_id)
@@ -783,7 +789,8 @@ class Merger(object):
                           hostname, project_name)
         return repo
 
-    def getRepo(self, connection_name, project_name, zuul_event_id=None):
+    def getRepo(self, connection_name, project_name,
+                repo_state=None, zuul_event_id=None, process_worker=None):
         source = self.connections.getSource(connection_name)
         project = source.getProject(project_name)
         hostname = project.canonical_hostname
@@ -799,8 +806,9 @@ class Merger(object):
             raise Exception("Unable to set up repo for project %s/%s"
                             " without a url" %
                             (connection_name, project_name,))
-        return self._addProject(hostname, project_name, url, sshkey,
-                                zuul_event_id)
+        return self._addProject(hostname, connection_name, project_name, url,
+                                sshkey, repo_state, zuul_event_id,
+                                process_worker=process_worker)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
                    zuul_event_id=None,
@@ -808,11 +816,16 @@ class Merger(object):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
-        try:
+        if repo_state:
+            projects = repo_state.get(connection_name, {})
+            project_repo_state = projects.get(project_name, {})
+        else:
+            project_repo_state = None
 
+        try:
             # Check if we need an update if we got a repo_state
             if repo_state and not repo.isUpdateNeeded(
-                    repo_state, zuul_event_id=zuul_event_id):
+                    project_repo_state, zuul_event_id=zuul_event_id):
                 log.info("Skipping updating local repository %s/%s",
                          connection_name, project_name)
             else:
@@ -826,12 +839,19 @@ class Merger(object):
             raise
 
     def checkoutBranch(self, connection_name, project_name, branch,
-                       zuul_event_id=None):
+                       repo_state=None, zuul_event_id=None,
+                       process_worker=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         log.info("Checking out %s/%s branch %s",
                  connection_name, project_name, branch)
         repo = self.getRepo(connection_name, project_name,
+                            repo_state=repo_state,
+                            process_worker=process_worker,
                             zuul_event_id=zuul_event_id)
+        if repo_state:
+            self._restoreRepoState(connection_name, project_name, repo,
+                                   repo_state, zuul_event_id,
+                                   process_worker=process_worker)
         repo.checkout(branch, zuul_event_id=zuul_event_id)
 
     def _saveRepoState(self, connection_name, project_name, repo,
@@ -1039,7 +1059,7 @@ class Merger(object):
             self._restoreRepoState(item['connection'], item['project'], repo,
                                    repo_state, zuul_event_id)
 
-    def getRepoState(self, items, branches=None, repo_locks=None):
+    def getRepoState(self, items, repo_locks, branches=None):
         # Gets the repo state for items.  Generally this will be
         # called in any non-change pipeline.  We will return the repo
         # state for each item, but manipulated with any information in
@@ -1051,19 +1071,16 @@ class Merger(object):
         # A list of branch names the last item appears in.
         item_in_branches = []
         for item in items:
-            # If we're in the executor context we have the repo_locks object
-            # and perform per repo locking.
-            if repo_locks is not None:
-                lock = repo_locks.getRepoLock(
-                    item['connection'], item['project'])
-            else:
-                lock = nullcontext()
+            # If we're in the executor context we need to lock the repo.
+            # If not repo_locks will give us a fake lock.
+            lock = repo_locks.getRepoLock(item['connection'], item['project'])
             with lock:
                 repo = self.getRepo(item['connection'], item['project'])
-                key = (item['connection'], item['project'], item['branch'])
+                key = (item['connection'], item['project'])
                 if key not in seen:
                     try:
                         repo.reset()
+                        seen.add(key)
                     except Exception:
                         self.log.exception("Unable to reset repo %s" % repo)
                         return (False, {}, [])
@@ -1079,7 +1096,9 @@ class Merger(object):
                         item['ref'], item['newrev'])
         item = items[-1]
         repo = self.getRepo(item['connection'], item['project'])
-        item_in_branches = repo.contains(item['newrev'])
+        item_in_branches = False
+        if item.get('newrev'):
+            item_in_branches = repo.contains(item['newrev'])
         return (True, repo_state, item_in_branches)
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[]):
