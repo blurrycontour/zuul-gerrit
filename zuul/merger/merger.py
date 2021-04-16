@@ -604,10 +604,10 @@ class Repo(object):
         self._git_fetch(repo, 'origin', zuul_event_id, tags=True,
                         prune=True, prune_tags=True)
 
-    def isUpdateNeeded(self, repo_state, zuul_event_id=None):
+    def isUpdateNeeded(self, project_repo_state, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
         refs = [x.path for x in repo.refs]
-        for ref, rev in repo_state.items():
+        for ref, rev in project_repo_state.items():
             # Check that each ref exists and that each commit exists
             if ref not in refs:
                 return True
@@ -808,11 +808,17 @@ class Merger(object):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
-        try:
+        if repo_state:
+            projects = repo_state.get(connection_name, {})
+            project_repo_state = projects.get(project_name, None)
+        else:
+            project_repo_state = None
 
-            # Check if we need an update if we got a repo_state
-            if repo_state and not repo.isUpdateNeeded(
-                    repo_state, zuul_event_id=zuul_event_id):
+        try:
+            # Check if we need an update if we got a repo_state and
+            # our project appears in it (otherwise we always update).
+            if project_repo_state and not repo.isUpdateNeeded(
+                    project_repo_state, zuul_event_id=zuul_event_id):
                 log.info("Skipping updating local repository %s/%s",
                          connection_name, project_name)
             else:
