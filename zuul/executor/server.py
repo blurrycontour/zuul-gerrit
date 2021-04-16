@@ -1086,18 +1086,19 @@ class AnsibleJob(object):
             repo = merger.getRepo(
                 project['connection'],
                 project['name'],
-                repo_state=repo_state,
                 process_worker=self.executor_server.process_worker)
             repos[project['canonical_name']] = repo
 
         # The commit ID of the original item (before merging).  Used
         # later for line mapping.
         item_commit = None
+        # The set of repos which have had their state restored
+        restored_repos = set()
 
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
             item_commit = self.doMergeChanges(
-                merger, merge_items, repo_state)
+                merger, merge_items, repo_state, restored_repos)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -1108,10 +1109,11 @@ class AnsibleJob(object):
             self._send_aborted()
             return
 
-        state_items = [i for i in args['items'] if not i.get('number')]
-        if state_items:
+        for project in args['projects']:
+            if (project['connection'], project['name']) in restored_repos:
+                continue
             merger.setRepoState(
-                state_items, repo_state,
+                project['connection'], project['name'], repo_state,
                 process_worker=self.executor_server.process_worker)
 
         # Early abort if abort requested
@@ -1286,7 +1288,7 @@ class AnsibleJob(object):
 
         filecomments.updateLines(fc, new_lines)
 
-    def doMergeChanges(self, merger, items, repo_state):
+    def doMergeChanges(self, merger, items, repo_state, restored_repos):
         try:
             ret = merger.mergeChanges(
                 items, repo_state=repo_state,
@@ -1314,6 +1316,7 @@ class AnsibleJob(object):
         orig_commit = ret[4]
         for key, commit in recent.items():
             (connection, project, branch) = key
+            restored_repos.add((connection, project))
             # Compare the commit with the repo state. If it's included in the
             # repo state and it's the same we've set this ref already earlier
             # and don't have to set it again.

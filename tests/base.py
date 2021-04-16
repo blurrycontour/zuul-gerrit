@@ -3007,10 +3007,10 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
 
         super()._execute()
 
-    def doMergeChanges(self, merger, items, repo_state):
+    def doMergeChanges(self, *args, **kw):
         # Get a merger in order to update the repos involved in this job.
         commit = super(RecordingAnsibleJob, self).doMergeChanges(
-            merger, items, repo_state)
+            *args, **kw)
         if not commit:  # merge conflict
             self.recordResult('MERGER_FAILURE')
 
