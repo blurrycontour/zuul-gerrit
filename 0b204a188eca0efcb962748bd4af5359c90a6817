@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8f1480d1_b7cbec1b",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 948,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-16T15:11:17Z",
+      "side": 1,
+      "message": "We can drop this line since we\u0027re not checking the zuul_ref below.",
+      "revId": "0b204a188eca0efcb962748bd4af5359c90a6817",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e3dd39a_5633a67c",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 959,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-16T15:11:17Z",
+      "side": 1,
+      "message": "Should we also assert some state about the checkoutBranch() results? I guess we would want to check the HEAD is master? something like that.",
+      "revId": "0b204a188eca0efcb962748bd4af5359c90a6817",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
