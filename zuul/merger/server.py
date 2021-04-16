@@ -122,6 +122,8 @@ class BaseMergeServer(metaclass=ABCMeta):
         return nullcontext()
 
     def _update(self, connection_name, project_name, zuul_event_id=None):
+        # The executor overrides _update so it can do the update
+        # asynchronously.
         self.merger.updateRepo(connection_name, project_name,
                                zuul_event_id=zuul_event_id)
 
