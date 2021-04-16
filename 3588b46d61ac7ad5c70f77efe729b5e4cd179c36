@@ -84,6 +84,23 @@
       "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d4cc1fc8_bfa7a3ce",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 819,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-16T16:00:52Z",
+      "side": 1,
+      "message": "Agreed; and that\u0027s worth a comment in the code.",
+      "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
