@@ -16,6 +16,23 @@
       "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "76425963_2a8c31c6",
+        "filename": "tests/unit/test_merger_repo.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 959,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-16T15:28:10Z",
+      "side": 1,
+      "message": "If we dropped the checkoutBranch() here would this test pass without modifying the assertions below? I\u0027m curious because I think updateRepo() should properly trigger the isUpdateNeeded() path and do the necessary updates as a result. But then checkoutBranch() may undo that state?\n\nUltimately we want to test what zuul is doing in job preparation which I suspect includes a checkoutBranch() so don\u0027t remove it here just to make the test pass :) Just curious if I am understanding this properly.",
+      "revId": "3588b46d61ac7ad5c70f77efe729b5e4cd179c36",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
