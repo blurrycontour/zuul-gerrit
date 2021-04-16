@@ -397,7 +397,6 @@ class Repo(object):
     def reset(self, zuul_event_id=None, build=None, process_worker=None):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
         log.debug("Resetting repository %s", self.local_path)
-        self.update(zuul_event_id=zuul_event_id, build=build)
         self.createRepoObject(zuul_event_id, build=build)
 
         if process_worker is None:
@@ -761,7 +760,7 @@ class Merger(object):
         self.execution_context = execution_context
 
     def _addProject(self, hostname, connection_name, project_name, url, sshkey,
-                    repo_state, zuul_event_id, process_worker=None):
+                    zuul_event_id, process_worker=None):
         repo = None
         key = '/'.join([hostname, project_name])
         try:
@@ -777,11 +776,6 @@ class Merger(object):
                 logger=self.logger, git_timeout=self.git_timeout,
                 zuul_event_id=zuul_event_id)
 
-            # If we got a repo state restore it
-            if repo_state:
-                self._restoreRepoState(
-                    connection_name, project_name, repo, repo_state,
-                    zuul_event_id, process_worker=process_worker)
             self.repos[key] = repo
         except Exception:
             log = get_annotated_logger(self.log, zuul_event_id)
@@ -790,7 +784,7 @@ class Merger(object):
         return repo
 
     def getRepo(self, connection_name, project_name,
-                repo_state=None, zuul_event_id=None, process_worker=None):
+                zuul_event_id=None, process_worker=None):
         source = self.connections.getSource(connection_name)
         project = source.getProject(project_name)
         hostname = project.canonical_hostname
@@ -807,12 +801,19 @@ class Merger(object):
                             " without a url" %
                             (connection_name, project_name,))
         return self._addProject(hostname, connection_name, project_name, url,
-                                sshkey, repo_state, zuul_event_id,
+                                sshkey, zuul_event_id,
                                 process_worker=process_worker)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
                    zuul_event_id=None,
                    build=None, process_worker=None):
+        """Fetch from origin if needed
+
+        If repo_state is None, then this will always git fetch.
+        If repo_state is provided, then this may no-op if
+        the shas specified by repo_state are already present.
+        """
+
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
@@ -832,8 +833,7 @@ class Merger(object):
             else:
                 log.info("Updating local repository %s/%s",
                          connection_name, project_name)
-                repo.reset(zuul_event_id=zuul_event_id, build=build,
-                           process_worker=process_worker)
+                repo.update(zuul_event_id=zuul_event_id, build=build)
         except Exception:
             log.exception("Unable to update %s/%s",
                           connection_name, project_name)
@@ -842,13 +842,20 @@ class Merger(object):
     def checkoutBranch(self, connection_name, project_name, branch,
                        repo_state=None, zuul_event_id=None,
                        process_worker=None):
+        """Check out a branch
+
+        Call Merger.updateRepo() first.  This does not reset the repo,
+        and is expected to be called only after a fresh clone.
+
+        """
         log = get_annotated_logger(self.log, zuul_event_id)
         log.info("Checking out %s/%s branch %s",
                  connection_name, project_name, branch)
         repo = self.getRepo(connection_name, project_name,
-                            repo_state=repo_state,
                             process_worker=process_worker,
                             zuul_event_id=zuul_event_id)
+        # We don't need to reset because this is only called by the
+        # executor after a clone.
         if repo_state:
             self._restoreRepoState(connection_name, project_name, repo,
                                    repo_state, zuul_event_id,
@@ -1006,6 +1013,11 @@ class Merger(object):
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
                      repo_locks=None, branches=None, zuul_event_id=None,
                      process_worker=None):
+        """Merge changes
+
+        Call Merger.updateRepo() first.
+        """
+        # _mergeItem calls reset as necessary.
         log = get_annotated_logger(self.log, zuul_event_id)
         # connection+project+branch -> commit
         recent = {}
@@ -1043,29 +1055,35 @@ class Merger(object):
             ret_recent[k] = v.hexsha
         return commit.hexsha, read_files, repo_state, ret_recent, orig_commit
 
-    def setRepoState(self, items, repo_state, zuul_event_id=None,
-                     process_worker=None):
-        # Sets the repo state for the items
-        seen = set()
-        for item in items:
-            repo = self.getRepo(item['connection'], item['project'],
-                                zuul_event_id=zuul_event_id)
-            key = (item['connection'], item['project'], item['branch'])
+    def setRepoState(self, connection_name, project_name, repo_state,
+                     zuul_event_id=None, process_worker=None):
+        """Set the repo state
 
-            if key in seen:
-                continue
+        Sets the repo to the specified state.  Call
+        Merger.updateRepo() first.  This does not reset the repo, and
+        is expected to be called only after a fresh clone.
 
-            repo.reset(zuul_event_id=zuul_event_id,
-                       process_worker=process_worker)
-            self._restoreRepoState(item['connection'], item['project'], repo,
-                                   repo_state, zuul_event_id)
+        """
+        repo = self.getRepo(connection_name, project_name,
+                            zuul_event_id=zuul_event_id)
+
+        # We don't need to reset the repo because this is only called
+        # from the executor after a clone into the working dir.
+        self._restoreRepoState(connection_name, project_name, repo,
+                               repo_state, zuul_event_id)
 
     def getRepoState(self, items, repo_locks, branches=None):
-        # Gets the repo state for items.  Generally this will be
-        # called in any non-change pipeline.  We will return the repo
-        # state for each item, but manipulated with any information in
-        # the item (eg, if it creates a ref, that will be in the repo
-        # state regardless of the actual state).
+        """Gets the repo state for items.
+
+        This will perform repo updates as needed, so there is no need
+        to call Merger.updateRepo() first.
+
+        """
+        # Generally this will be called in any non-change pipeline.  We
+        # will return the repo state for each item, but manipulated with
+        # any information in the item (eg, if it creates a ref, that
+        # will be in the repo state regardless of the actual state).
+
         seen = set()
         recent = {}
         repo_state = {}
@@ -1080,6 +1098,7 @@ class Merger(object):
                 key = (item['connection'], item['project'])
                 if key not in seen:
                     try:
+                        repo.update()
                         repo.reset()
                         seen.add(key)
                     except Exception:
@@ -1103,11 +1122,34 @@ class Merger(object):
         return (True, repo_state, item_in_branches)
 
     def getFiles(self, connection_name, project_name, branch, files, dirs=[]):
+        """Get file contents on branch.
+
+        Call Merger.updateRepo() first to make sure the repo is up to
+        date.
+
+        """
+        # We don't update the repo so that it can happen outside the
+        # lock.
         repo = self.getRepo(connection_name, project_name)
+        # This does not fetch, update, or reset, it operates on the
+        # working state.
         return repo.getFiles(files, dirs, branch=branch)
 
     def getFilesChanges(self, connection_name, project_name, branch,
                         tosha=None, zuul_event_id=None):
+        """Get a list of files changed in one or more commits
+
+        Gets files changed between tosha and branch (or just the
+        commit on branch if tosha is not specified).
+
+        Call Merger.updateRepo() first to make sure the repo is up to
+        date.
+        """
+        # Note, the arguments to this method should be reworked.  We
+        # fetch branch, and therefore it is typically actually a
+        # change ref.  tosha is typically the branch name.
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
+        # This performs a fetch, and therefore update/reset are not
+        # required.
         return repo.getFilesChanges(branch, tosha, zuul_event_id=zuul_event_id)
