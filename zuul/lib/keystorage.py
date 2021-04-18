@@ -19,12 +19,11 @@ import logging
 import os
 import tempfile
 import time
-from urllib.parse import quote_plus
 
 import kazoo
 import paramiko
 
-from zuul.lib import encryption
+from zuul.lib import encryption, strings
 from zuul.zk import ZooKeeperBase
 
 RSA_KEY_SIZE = 2048
@@ -270,7 +269,7 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
         self.backup = backup
 
     def getProjectSSHKeys(self, connection_name, project_name):
-        key_project_name = quote_plus(project_name)
+        key_project_name = strings.unique_project_name(project_name)
         key_path = self.SSH_PATH.format(connection_name, key_project_name)
 
         try:
@@ -337,7 +336,7 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
         self.kazoo_client.create(key_path, value=data, makepath=True)
 
     def getProjectSecretsKeys(self, connection_name, project_name):
-        key_project_name = quote_plus(project_name)
+        key_project_name = strings.unique_project_name(project_name)
         key_path = self.SECRETS_PATH.format(connection_name, key_project_name)
 
         try:
