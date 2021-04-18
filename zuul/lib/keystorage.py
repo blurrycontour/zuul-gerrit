@@ -18,11 +18,12 @@ import json
 import logging
 import os
 import tempfile
+import time
 
 import kazoo
 import paramiko
 
-from zuul.lib import encryption
+from zuul.lib import encryption, strings
 from zuul.zk import ZooKeeperBase
 
 RSA_KEY_SIZE = 2048
@@ -268,7 +269,8 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
         self.backup = backup
 
     def getProjectSSHKeys(self, connection_name, project_name):
-        key_path = self.SSH_PATH.format(connection_name, project_name)
+        key_project_name = strings.unique_project_name(project_name)
+        key_path = self.SSH_PATH.format(connection_name, key_project_name)
 
         try:
             key = self._getSSHKey(key_path)
@@ -288,9 +290,11 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
                 self.log.info("Generating a new SSH key for %s/%s",
                               connection_name, project_name)
                 key = paramiko.RSAKey.generate(bits=RSA_KEY_SIZE)
+            key_version = 0
+            key_created = int(time.time())
 
             try:
-                self._storeSSHKey(key_path, key)
+                self._storeSSHKey(key_path, key, key_version, key_created)
             except kazoo.exceptions.NodeExistsError:
                 # Handle race condition between multiple schedulers
                 # creating the same SSH key.
@@ -308,23 +312,35 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
         return private_key, public_key
 
     def _getSSHKey(self, key_path):
-        raw_pk, _ = self.kazoo_client.get(key_path)
-        encrypted_key = raw_pk.decode("utf-8")
+        data, _ = self.kazoo_client.get(key_path)
+        keydata = json.loads(data)
+        encrypted_key = keydata['keys'][0]["private_key"]
         with io.StringIO(encrypted_key) as o:
             return paramiko.RSAKey.from_private_key(o, self.password)
 
-    def _storeSSHKey(self, key_path, key):
+    def _storeSSHKey(self, key_path, key, version, created):
+        # key is an rsa key object
         with io.StringIO() as o:
             key.write_private_key(o, self.password)
             private_key = o.getvalue()
-        raw_pk = private_key.encode("utf-8")
-        self.kazoo_client.create(key_path, value=raw_pk, makepath=True)
+        keys = [{
+            "version": version,
+            "created": created,
+            "private_key": private_key,
+        }]
+        keydata = {
+            'schema': 1,
+            'keys': keys
+        }
+        data = json.dumps(keydata).encode("utf-8")
+        self.kazoo_client.create(key_path, value=data, makepath=True)
 
     def getProjectSecretsKeys(self, connection_name, project_name):
-        key_path = self.SECRETS_PATH.format(connection_name, project_name)
+        key_project_name = strings.unique_project_name(project_name)
+        key_path = self.SECRETS_PATH.format(connection_name, key_project_name)
 
         try:
-            pem_private_key, _ = self._getSecretsKeys(key_path)
+            pem_private_key = self._getSecretsKeys(key_path)
         except kazoo.exceptions.NoNodeError:
             self.log.debug("Could not find existing secrets key for %s/%s",
                            connection_name, project_name)
@@ -342,14 +358,15 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
 
             pem_private_key = encryption.serialize_rsa_private_key(
                 private_key, self.password_bytes)
-            pem_public_key = encryption.serialize_rsa_public_key(public_key)
+            key_version = 0
+            key_created = int(time.time())
             try:
                 self._storeSecretsKeys(key_path, pem_private_key,
-                                       pem_public_key)
+                                       key_version, key_created)
             except kazoo.exceptions.NodeExistsError:
                 # Handle race condition between multiple schedulers
                 # creating the same secrets key.
-                pem_private_key, _ = self._getSecretsKeys(key_path)
+                pem_private_key = self._getSecretsKeys(key_path)
 
         private_key, public_key = encryption.deserialize_rsa_keypair(
             pem_private_key, self.password_bytes)
@@ -363,16 +380,19 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
 
     def _getSecretsKeys(self, key_path):
         data, _ = self.kazoo_client.get(key_path)
-        keys = json.loads(data)
-        return (
-            keys["private_key"].encode("utf-8"),
-            keys["public_key"].encode("utf-8"),
-        )
+        keydata = json.loads(data)
+        return keydata['keys'][0]["private_key"].encode("utf-8")
 
-    def _storeSecretsKeys(self, key_path, private_key, public_key):
-        keys = {
-            "private_key": private_key.decode("utf-8"),
-            "public_key": public_key.decode("utf-8"),
+    def _storeSecretsKeys(self, key_path, key, version, created):
+        # key is a pem-encoded (base64) private key stored in bytes
+        keys = [{
+            "version": version,
+            "created": created,
+            "private_key": key.decode("utf-8"),
+        }]
+        keydata = {
+            'schema': 1,
+            'keys': keys
         }
-        data = json.dumps(keys).encode("utf-8")
+        data = json.dumps(keydata).encode("utf-8")
         self.kazoo_client.create(key_path, value=data, makepath=True)
