@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b9afe217_09b024ae",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-19T08:11:17Z",
+      "side": 1,
+      "message": "In other places where this could be a problem I\u0027ve used `urllib.parse.quote_plus` so far, e.g. for the semaphore name. Maybe we should decide on a common method for escaping. The zlib approach will probably fail in cases where there are chars other than \"/\" that we need to escape. IMHO `quote_plus()` is the better choice in this regard.",
+      "revId": "8eda1e908063a9dbfa598d68cff3e6d1ba7c1c47",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
