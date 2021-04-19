@@ -127,3 +127,32 @@
       github:
         - event: push
           ref: ^refs/tags/.*$
+
+- pipeline:
+    name: promote
+    post-review: true
+    description: |
+      This pipeline runs jobs that operate after each change is merged
+      in order to promote artifacts generated in the gate
+      pipeline.
+    manager: supercedent
+    precedence: high
+    require:
+      merged: true
+    trigger:
+      github:
+        - event: closed
+
+- pipeline:
+    name: deploy
+    post-review: true
+    description: |
+      This pipeline runs jobs that operate after each change is merged
+      in order to run production deployment playbooks.
+    manager: serial
+    precedence: high
+    require:
+      merged: true
+    trigger:
+      github:
+        - event: closed
