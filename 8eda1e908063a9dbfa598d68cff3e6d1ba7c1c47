@@ -16,6 +16,40 @@
       "revId": "8eda1e908063a9dbfa598d68cff3e6d1ba7c1c47",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1be0be54_780683e6",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-19T16:18:24Z",
+      "side": 1,
+      "message": "Let\u0027s move this conversation over to where the unique string is generated...",
+      "revId": "8eda1e908063a9dbfa598d68cff3e6d1ba7c1c47",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "38bd3b09_a5040cbd",
+        "filename": "zuul/lib/strings.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-19T16:18:24Z",
+      "side": 1,
+      "message": "\u003e Simon Westphahl: In other places where this could be a problem I\u0027ve used `urllib.parse.quote_plus` so far, e.g. for the semaphore name. Maybe we should decide on a common method for escaping. The zlib approach will probably fail in cases where there are chars other than \"/\" that we need to escape. IMHO `quote_plus()` is the better choice in this regard.\n\nThis approach does two things: it translates / to _, and it adds a crc32 to virtually guarantee uniqueness (in the case that two names escape to the same value, ie foo/bar \u003d\u003d foo_bar).\n\nI don\u0027t see how the crc32 part of that (which comes from zlib) can fail if we add more escaped characters.\n\nWe could also use quote_plus instead, though I intend to use the same thing for filesystems, and we are guaranteed that \u0027/\u0027 will occur in project names, so almost every repo path on disk will look like gerrit/foo%20bar\n\nAs a bash user, I find that mildly annoying, but thanks to tab completion, not a show-stopper.  :)\n\nSo all things considered, I\u0027d be happy to switch to quote_plus for this.  I think it will achieve the main goal which is to flatten the repo hierarchy so that foo/bar is not under foo/.  AFAICT it poses no problems with uniqueness.  Compared to the crc32 method, it has the advantage of sorting, but a slight disadvantage in readability.",
+      "revId": "8eda1e908063a9dbfa598d68cff3e6d1ba7c1c47",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
