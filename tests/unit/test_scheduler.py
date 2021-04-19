@@ -4637,6 +4637,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(aborted_build.newrev, B_commit)
         self.assertIn('project-post', job_names)
         self.assertEqual(r, True)
+        self.log.debug("SWE-TEST> end")
 
     def test_client_dequeue_dependent_change(self):
         "Test that the RPC client can dequeue a change"
