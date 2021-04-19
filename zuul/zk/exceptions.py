@@ -29,3 +29,8 @@ class NoClientException(ZuulZooKeeperException):
 
 class JobRequestNotFound(ZuulZooKeeperException):
     pass
+
+
+# TODO: remove this
+class SyncTimeoutException(ZuulZooKeeperException):
+    pass

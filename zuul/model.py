@@ -305,6 +305,16 @@ class Pipeline(object):
         self.window_decrease_factor = None
         self.state = self.STATE_NORMAL
 
+    def toDict(self):
+        return {
+            "_consecutive_failures": self._consecutive_failures,
+            "_disabled": self._disabled,
+            "state": self.state,
+        }
+
+    def updateFromDict(self, d):
+        self.__dict__.update(d)
+
     @property
     def actions(self):
         return (
@@ -431,6 +441,7 @@ class ChangeQueue(object):
                  window_decrease_type='exponential', window_decrease_factor=2,
                  name=None, dynamic=False):
         self.pipeline = pipeline
+        self.uuid = uuid4().hex
         if name:
             self.name = name
         else:
@@ -445,6 +456,70 @@ class ChangeQueue(object):
         self.window_decrease_type = window_decrease_type
         self.window_decrease_factor = window_decrease_factor
         self.dynamic = dynamic
+
+    def toDict(self):
+        log = logging.getLogger("SWE")
+        log.debug(f"SWE> {self.project_branches}")
+        project_branches = [(p.canonical_name, b)
+                            for p, b in self.project_branches]
+        queue = [
+            (i.uuid, {
+                "ahead": i.item_ahead.uuid if i.item_ahead else i.item_ahead,
+                "behind": [b.uuid for b in i.items_behind]}
+            ) for i in self.queue
+        ]
+        return {
+            "uuid": self.uuid,
+            "name": self.name,
+            "project_branches": project_branches,
+            "window": self.window,
+            "window_floor": self.window_floor,
+            "window_increase_type": self.window_increase_type,
+            "window_increase_factor": self.window_increase_factor,
+            "window_decrease_type": self.window_decrease_type,
+            "window_decrease_factor": self.window_decrease_factor,
+            "dynamic": self.dynamic,
+            "queue": queue,
+        }
+
+    def updateFromDict(self, d):
+        self.uuid = d["uuid"]
+        self.name = d["name"]
+        self.project_branches = [(self.pipeline.tenant.getProject(p)[1], b)
+                                 for p, b in d["project_branches"]]
+        self.window = d["window"]
+        self.window_increase_type = d["window_increase_type"]
+        self.window_increase_factor = d["window_increase_factor"]
+        self.window_decrease_type = d["window_increase_type"]
+        self.window_decrease_factor = d["window_increase_factor"]
+        self.dynamic = d["dynamic"]
+
+        # Create and/or update queue items
+        queue_items = OrderedDict()
+        existing_items = {i.uuid: i for i in self.queue}
+        log = logging.getLogger("SWE")
+        log.debug(f"SWE> existing queue items: {existing_items}")
+        for uid, state in d["queue"]:
+            try:
+                item = existing_items[uid]
+            except KeyError:
+                item = QueueItem(self, None, None)
+                item.uuid = uid
+            item.item_ahead = state["ahead"]
+            item.items_behind = state["behind"]
+            queue_items[item.uuid] = item
+
+        # Restore the order of items in the queue
+        self.queue = []
+        for item in queue_items.values():
+            if item.item_ahead is not None:
+                item.item_ahead = queue_items[item.item_ahead]
+            item.items_behind = [queue_items[qid] for qid in item.items_behind]
+            self.queue.append(item)
+
+    @property
+    def id(self):
+        return self.uuid if self.dynamic else self.name
 
     def __repr__(self):
         return '<ChangeQueue %s: %s>' % (self.pipeline.name, self.name)
@@ -1386,7 +1461,7 @@ class Job(ConfigObject):
         """
         return Job._deepUpdate(self.parent_data or {}, self.variables)
 
-    def toDict(self, tenant):
+    def toDict(self, tenant=None):
         '''
         Convert a Job object's attributes to a dictionary.
         '''
@@ -2284,6 +2359,56 @@ class Build(object):
 
         self.build_request_ref = None
 
+    def toDict(self):
+        return {
+            "job": self.job.name,
+            "uuid": self.uuid,
+            "url": self.url,
+            "result": self.result,
+            "result_data": self.result_data,
+            "error_detail": self.error_detail,
+            "execute_time": self.execute_time,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "estimated_time": self.estimated_time,
+            "canceled": self.canceled,
+            "paused": self.paused,
+            "retry": self.retry,
+            "held": self.held,
+            "parameters": self.parameters,
+            "worker": self.worker.toDict(),
+            "zuul_event_id": self.zuul_event_id,
+            "build_request_ref": self.build_request_ref,
+        }
+
+    def updateFromDict(self, d):
+        # self.job = d["job"]
+        self.url = d["url"]
+        self.result = d["result"]
+        self.result_data = d["result_data"]
+        self.error_detail = d["error_detail"]
+        self.execute_time = d["execute_time"]
+        self.start_time = d["start_time"]
+        self.end_time = d["end_time"]
+        self.estimated_time = d["estimated_time"]
+        self.canceled = d["canceled"]
+        self.paused = d["paused"]
+        self.retry = d["retry"]
+        self.held = d["held"]
+        self.parameters = d["parameters"]
+        self.worker.updateFromData(d["worker"])
+        self.zuul_event_id = d["zuul_event_id"]
+        self.build_request_ref = d["build_request_ref"]
+        self.uuid = d["uuid"]
+
+    @classmethod
+    def fromDict(cls, d, build_set):
+        log = logging.getLogger("SWE")
+        log.debug(f"SWE> build dict: {d}")
+        build = cls(build_set.item.job_graph.jobs[d["job"]], build_set)
+        build.updateFromDict(d)
+        return build
+
     def __repr__(self):
         return ('<Build %s of %s voting:%s on %s>' %
                 (self.uuid, self.job.name, self.job.voting, self.worker))
@@ -2330,6 +2455,13 @@ class Worker(object):
     def __repr__(self):
         return '<Worker %s>' % self.name
 
+    def toDict(self):
+        return {
+            "name": self.name,
+            "hostname": self.hostname,
+            "log_port": self.log_port,
+        }
+
 
 class RepoFiles(object):
     """RepoFiles holds config-file content for per-project job config.
@@ -2362,6 +2494,13 @@ class RepoFiles(object):
     def getFile(self, connection_name, project_name, branch, fn):
         host = self.connections.get(connection_name, {})
         return host.get(project_name, {}).get(branch, {}).get(fn)
+
+    def toDict(self):
+        return self.connections
+
+    def updateFromDict(self, d):
+        self.connections.clear()
+        self.connections.update(d)
 
 
 class BuildSet(object):
@@ -2411,11 +2550,67 @@ class BuildSet(object):
         self.files = RepoFiles()
         self.repo_state = {}
         self.tries = {}
-        if item.change.files is not None:
+        if item.change and item.change.files is not None:
             self.files_state = self.COMPLETE
         else:
             self.files_state = self.NEW
         self.repo_state_state = self.NEW
+
+    def toDict(self):
+        return {
+            "builds": [b.uuid for b in self.builds.values()],
+            "retry_builds": [b.uuid for b in self.retry_builds.values()],
+            "result": self.result,
+            "commit": self.commit,
+            "dependent_changes": self.dependent_changes,
+            "merger_items": self.merger_items,
+            "unable_to_merge": self.unable_to_merge,
+            "config_errors": self.config_errors,
+            "failing_reasons": self.failing_reasons,
+            "debug_messages": self.debug_messages,
+            "warning_messages": self.warning_messages,
+            "merge_state": self.merge_state,
+            "nodeset_info": self.nodeset_info,
+            "node_requests": self.node_requests,
+            "files": self.files.toDict(),
+            "repo_state": self.repo_state,
+            "tries": self.tries,
+            "files_state": self.files_state,
+        }
+
+    def updateFromDict(self, d):
+        existing_builds = {b.uuid: b for b in self.builds.values()}
+        self.builds = {}
+        for build_id in d["builds"]:
+            try:
+                build = existing_builds[build_id]
+            except KeyError:
+                raise NotImplementedError("We don't have all the data yet")
+            self.builds[build.job.name] = build
+        existing_retry_builds = {b.uuid: b for b in self.retry_builds.values()}
+        self.retry_builds = {}
+        for build_id in d["retry_builds"]:
+            try:
+                build = existing_retry_builds[build_id]
+            except KeyError:
+                raise NotImplementedError("We don't have all the data yet")
+            self.retry_builds.setdefault(build.jobname, []).append(build)
+        self.result = d["result"]
+        self.commit = d["commit"]
+        self.dependent_changes = d["dependent_changes"]
+        self.merger_items = d["merger_items"]
+        self.unable_to_merge = d["unable_to_merge"]
+        self.config_errors = d["config_errors"]
+        self.failing_reasons = d["failing_reasons"]
+        self.debug_messages = d["debug_messages"]
+        self.warning_messages = d["warning_messages"]
+        self.merge_state = d["merge_state"]
+        self.nodeset_info = d["nodeset_info"]
+        self.node_requests = d["node_requests"]
+        self.files.updateFromDict(d["files"])
+        self.repo_state = d["repo_state"]
+        self.tries = d["tries"]
+        self.files_state = d["files_state"]
 
     @property
     def ref(self):
@@ -2608,6 +2803,77 @@ class QueueItem(object):
         # for the current queue item to succeed
         self.bundle = None
         self.dequeued_bundle_failing = False
+
+    def toDict(self):
+        if isinstance(self.event, TriggerEvent):
+            event_type = "TriggerEvent"
+        elif isinstance(self.event, EnqueueEvent):
+            event_type = "EnqueueEvent"
+        else:
+            raise NotImplementedError(
+                f"Event type {type(self.event)} not serializable")
+        return {
+            # TODO: we need to also store some info about the change in
+            # Zookeeper in order to show the change info on the status page.
+            # "change": {...}
+            "dequeued_needing_change": self.dequeued_needing_change,
+            "current_build_set": self.current_build_set.uuid,
+            "enqueue_time": self.enqueue_time,
+            "report_time": self.report_time,
+            "dequeue_time": self.dequeue_time,
+            "reported": self.reported,
+            "reported_enqueue": self.reported_enqueue,
+            "reported_start": self.reported_start,
+            "quiet": self.quiet,
+            "active": self.active,
+            "live": self.live,
+            "layout_uuid": self.layout_uuid,
+            # "project_pipeline_config": self.project_pipeline_config,
+            # "job_graph": self.job_graph,
+            # "_old_job_graph": self._old_job_graph,
+            "event": {
+                "type": event_type,
+                "data": self.event.toDict(),
+            },
+        }
+
+    def updateFromDict(self, d):
+        self.dequeued_needing_change = d["dequeued_needing_change"]
+        self.current_build_set.uuid = d["current_build_set"]
+        self.enqueue_time = d["enqueue_time"]
+        self.report_time = d["report_time"]
+        self.dequeue_time = d["dequeue_time"]
+        self.reported = d["reported"]
+        self.reported_enqueue = d["reported_enqueue"]
+        self.reported_start = d["reported_start"]
+        self.quiet = d["quiet"]
+        self.active = d["active"]
+        self.live = d["live"]
+        self.layout_uuid = d["layout_uuid"]
+        # self.project_pipeline_config = d["project_pipeline_config"]
+        # self.job_graph = d["job_graph"]
+        # self._old_job_graph = d["_old_job_graph"]
+
+        event_type = d["event"]["type"]
+        if event_type == "TriggerEvent":
+            # TODO: hrmpf
+            event_class = (
+                self.pipeline.manager.sched.connections.getTriggerEventClass(
+                    d["event"]["data"]["driver_name"])
+            )
+        elif event_type == "EnqueueEvent":
+            event_class = EnqueueEvent
+        else:
+            raise NotImplementedError(
+                f"Event type {event_type} not deserializable")
+
+        self.event = event_class.fromDict(d["event"]["data"])
+
+        # FIXME: error handling in case the project or change can't be found
+        trusted, project = self.pipeline.tenant.getProject(
+            self.event.canonical_project_name
+        )
+        self.change = project.source.getChange(self.event)
 
     def annotateLogger(self, logger):
         """Return an annotated logger with the trigger event"""
@@ -4013,6 +4279,10 @@ class ChangeManagementEvent(ManagementEvent):
         event.updateFromDict(data)
         return event
 
+    @property
+    def canonical_project_name(self):
+        return f"{self.project_hostname}/{self.project_name}"
+
 
 class DequeueEvent(ChangeManagementEvent):
     """Dequeue a change from a pipeline"""
@@ -4264,6 +4534,7 @@ class TriggerEvent(AbstractEvent):
             "arrived_at_scheduler_timestamp": (
                 self.arrived_at_scheduler_timestamp
             ),
+            "driver_name": self.driver_name,
         }
 
     def updateFromDict(self, d):
@@ -4294,6 +4565,7 @@ class TriggerEvent(AbstractEvent):
         self.arrived_at_scheduler_timestamp = (
             d["arrived_at_scheduler_timestamp"]
         )
+        self.driver_name = d.get("driver_name")
 
     @property
     def canonical_project_name(self):
