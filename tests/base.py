@@ -4994,6 +4994,9 @@ class ZuulTestCase(BaseTestCase):
         for tenant in self.scheds.first.sched.abide.tenants.values():
             for pipeline in tenant.layout.pipelines.values():
                 if isinstance(pipeline.manager, ipm):
+                    self.log.debug(f"SWE-TEST> queues: {pipeline.queues}")
+                    for queue in pipeline.queues:
+                        self.log.debug(f"SWE-TEST> queue {queue}: {queue.queue}")
                     self.assertEqual(len(pipeline.queues), 0)
 
     def shutdown(self):

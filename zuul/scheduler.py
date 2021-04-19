@@ -100,6 +100,7 @@ from zuul.zk.locks import (
     management_queue_lock,
     trigger_queue_lock,
 )
+from zuul.zk.pipelines import PipelineCache
 from zuul.zk.system import ZuulSystem
 
 COMMANDS = ['full-reconfigure', 'smart-reconfigure', 'stop', 'repl', 'norepl']
@@ -180,6 +181,7 @@ class Scheduler(threading.Thread):
         self.system_config_cache = SystemConfigCache(self.zk_client,
                                                      self.wake_event.set)
         self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
+        self.pipeline_cache = PipelineCache(self.zk_client)
 
         # TODO (swestphahl): Remove after we've refactored reconfigurations
         # to be performed on the tenant level.
@@ -252,6 +254,7 @@ class Scheduler(threading.Thread):
         self.keystore = KeyStorage(
             self.zk_client,
             password=self._get_key_store_password())
+        self.pipeline_cache.start()
 
         self._command_running = True
         self.log.debug("Starting command processor")
@@ -289,6 +292,7 @@ class Scheduler(threading.Thread):
         self._command_running = False
         self.command_socket.stop()
         self.command_thread.join()
+        self.pipeline_cache.stop()
         self.join()
         self.zk_client.disconnect()
 
@@ -1273,6 +1277,9 @@ class Scheduler(threading.Thread):
         if old_tenant:
             self._reenqueueTenant(old_tenant, tenant)
 
+        for pipeline in tenant.layout.pipelines.values():
+            pipeline.manager.saveState()
+
         # TODOv3(jeblair): update for tenants
         # self.maintainConnectionCache()
         self.connections.reconfigureDrivers(tenant)
@@ -1588,20 +1595,24 @@ class Scheduler(threading.Thread):
                                pipeline.name, tenant.name)
 
     def _process_pipeline(self, tenant, pipeline):
-        self.process_pipeline_management_queue(tenant, pipeline)
-        # Give result events priority -- they let us stop builds, whereas
-        # trigger events cause us to execute builds.
-        self.process_pipeline_result_queue(tenant, pipeline)
-        self.process_pipeline_trigger_queue(tenant, pipeline)
+        pipeline.manager.restoreState()
         try:
-            while not self._stopped and pipeline.manager.processQueue():
-                pass
-        except Exception:
-            self.log.exception("Exception in pipeline processing:")
-            pipeline.state = pipeline.STATE_ERROR
-            # Continue processing other pipelines+tenants
-        else:
-            pipeline.state = pipeline.STATE_NORMAL
+            self.process_pipeline_management_queue(tenant, pipeline)
+            # Give result events priority -- they let us stop builds, whereas
+            # trigger events cause us to execute builds.
+            self.process_pipeline_result_queue(tenant, pipeline)
+            self.process_pipeline_trigger_queue(tenant, pipeline)
+            try:
+                while not self._stopped and pipeline.manager.processQueue():
+                    pass
+            except Exception:
+                self.log.exception("Exception in pipeline processing:")
+                pipeline.state = pipeline.STATE_ERROR
+                # Continue processing other pipelines+tenants
+            else:
+                pipeline.state = pipeline.STATE_NORMAL
+        finally:
+            pipeline.manager.saveState()
 
     def maintainConnectionCache(self):
         # TODOv3(jeblair): update for tenants
@@ -1693,6 +1704,8 @@ class Scheduler(threading.Thread):
             # reconfiguration.
             self.reconfigureTenant(tenant, change.project, event)
 
+        # FIXME: check if there is a way to find affected pipelines
+        # w/o accessing the pipelines as we don't hold a lock here.
         for pipeline in tenant.layout.pipelines.values():
             if (
                 pipeline.manager.eventMatches(event, change)

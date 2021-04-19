@@ -22,6 +22,7 @@ from zuul.lib.dependson import find_dependency_headers
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.tarjan import strongly_connected_components
 from zuul.model import QueueItem
+from zuul.zk.pipelines import PipelineStore
 
 
 class DynamicChangeQueueContextManager(object):
@@ -61,9 +62,25 @@ class PipelineManager(metaclass=ABCMeta):
         # Cached dynamic layouts (layout uuid -> layout)
         self._layout_cache = {}
         self.sql = self.sched.sql
+        self.pipeline_store = PipelineStore(sched.pipeline_cache,
+                                            pipeline.tenant.name,
+                                            pipeline.name)
+        # Save the new pipeline state. This resets the failure/disabled states
+        # in case of a reconfiguration.
+        self.pipeline_store.savePipelineState(self.pipeline)
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
+
+    def savePipelineState(self):
+        self.pipeline_store.savePipelineState(self.pipeline)
+
+    def saveState(self):
+        self.pipeline_store.saveState(self.pipeline)
+        self.pipeline_store.cleanup(self.pipeline)
+
+    def restoreState(self):
+        self.pipeline_store.restoreState(self.pipeline)
 
     def _postConfig(self, layout):
         # All pipelines support shared queues for setting
@@ -549,6 +566,7 @@ class PipelineManager(metaclass=ABCMeta):
         log = get_annotated_logger(self.log, item.event)
         log.debug("Removing change %s from queue", item.change)
         item.queue.dequeueItem(item)
+        # FIXME: remove item from ZK
         # In case a item is dequeued that doesn't have a result yet
         # (success/failed/...) we report it as dequeued.
         # Without this check, all items with a valid result would be reported
