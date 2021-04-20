@@ -68,6 +68,23 @@
       "revId": "8eda1e908063a9dbfa598d68cff3e6d1ba7c1c47",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f03f197d_5a062852",
+        "filename": "zuul/lib/strings.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-20T16:50:50Z",
+      "side": 1,
+      "message": "Makes sense.  My idea was we would expand the TR_RE as needed for other characters.",
+      "revId": "8eda1e908063a9dbfa598d68cff3e6d1ba7c1c47",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
