@@ -43,7 +43,8 @@ class SupercedentPipelineManager(PipelineManager):
             window=1,
             window_floor=1,
             window_increase_type='none',
-            window_decrease_type='none')
+            window_decrease_type='none',
+            dynamic=True)
         change_queue.addProject(change.project, None)
         self.pipeline.addQueue(change_queue)
         log.debug("Dynamically created queue %s", change_queue)
