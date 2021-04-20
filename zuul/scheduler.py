@@ -68,7 +68,9 @@ from zuul.model import (
     UnparsedAbideConfig,
 )
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import SchedulerComponent
+from zuul.zk.components import (
+    BaseComponent, ComponentRegistry, SchedulerComponent
+)
 from zuul.zk.event_queues import (
     GlobalEventWatcher,
     GlobalManagementEventQueue,
@@ -155,6 +157,7 @@ class Scheduler(threading.Thread):
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.component_info = SchedulerComponent(self.zk_client, self.hostname)
         self.component_info.register()
+        self.component_registry = ComponentRegistry(self.zk_client)
 
         self.result_event_queue = NamedQueue("ResultEventQueue")
         self.global_watcher = GlobalEventWatcher(
@@ -280,9 +283,69 @@ class Scheduler(threading.Thread):
     def _runStats(self):
         if not self.statsd:
             return
+
+        # Calculate the executor and merger stats
+        executors_online = 0
+        executors_accepting = 0
+        executors_unzoned_online = 0
+        executors_unzoned_accepting = 0
+        # zone -> accepting|online
+        zoned_executor_stats = {}
+
+        mergers_online = 0
+
+        for executor_component in self.component_registry.all("executor"):
+            if executor_component.allow_unzoned or not executor_component.zone:
+                if executor_component.state == BaseComponent.RUNNING:
+                    executors_unzoned_online += 1
+                if executor_component.accepting_work:
+                    executors_unzoned_accepting += 1
+            else:
+                zone_stats = zoned_executor_stats.setdefault(
+                    executor_component.zone, {"online": 0, "accepting": 0}
+                )
+                if executor_component.state == BaseComponent.RUNNING:
+                    zone_stats["online"] += 1
+                if executor_component.accepting_work:
+                    zone_stats["accepting"] += 1
+            # An executor with merger capabilities does also count as merger
+            if executor_component.process_merge_jobs:
+                mergers_online += 1
+
+            # TODO(corvus): Remove for 5.0:
+            executors_online += 1
+            executors_accepting += 1
+
+        for merger_component in self.component_registry.all("merger"):
+            if merger_component.state == BaseComponent.RUNNING:
+                mergers_online += 1
+
+        # Publish the executor stats
+        self.statsd.gauge(
+            'zuul.executors.unzoned.accepting', executors_unzoned_accepting
+        )
+        self.statsd.gauge(
+            'zuul.executors.unzoned.online', executors_unzoned_online
+        )
+        for zone, stats in zoned_executor_stats.items():
+            self.statsd.gauge(
+                f'zuul.executors.zone.{normalize_statsd_name(zone)}.accepting',
+                stats["accepting"],
+            )
+            self.statsd.gauge(
+                f'zuul.executors.zone.{normalize_statsd_name(zone)}.online',
+                stats["online"],
+            )
+
+        # TODO(corvus): Remove for 5.0:
+        self.statsd.gauge('zuul.executors.accepting', executors_accepting)
+        self.statsd.gauge('zuul.executors.online', executors_online)
+
+        # Publish the merger stats
+        self.statsd.gauge('zuul.mergers.online', mergers_online)
+
         functions = getGearmanFunctions(self.rpc.gearworker.gearman)
         functions.update(getGearmanFunctions(self.rpc_slow.gearworker.gearman))
-        mergers_online = 0
         merge_queue = 0
         merge_running = 0
         for (name, (queued, running, registered)) in functions.items():
@@ -291,15 +354,11 @@ class Scheduler(threading.Thread):
                 tokens = name.split(':', 2)
                 if len(tokens) == 2:
                     # unzoned case
-                    self.statsd.gauge('zuul.executors.unzoned.accepting',
-                                      registered)
                     self.statsd.gauge('zuul.executors.unzoned.jobs_running',
                                       running)
                     self.statsd.gauge('zuul.executors.unzoned.jobs_queued',
                                       execute_queue)
                     # TODO(corvus): Remove for 5.0:
-                    self.statsd.gauge('zuul.executors.accepting',
-                                      registered)
                     self.statsd.gauge('zuul.executors.jobs_running',
                                       running)
                     self.statsd.gauge('zuul.executors.jobs_queued',
@@ -307,9 +366,6 @@ class Scheduler(threading.Thread):
                 else:
                     # zoned case
                     zone = tokens[2]
-                    self.statsd.gauge('zuul.executors.zone.%s.accepting' %
-                                      normalize_statsd_name(zone),
-                                      registered)
                     self.statsd.gauge('zuul.executors.zone.%s.jobs_running' %
                                       normalize_statsd_name(zone),
                                       running)
@@ -317,26 +373,11 @@ class Scheduler(threading.Thread):
                                       normalize_statsd_name(zone),
                                       execute_queue)
 
-            if name.startswith('executor:online'):
-                tokens = name.split(':', 2)
-                if len(tokens) == 2:
-                    # unzoned case
-                    self.statsd.gauge('zuul.executors.unzoned.online',
-                                      registered)
-                    # TODO(corvus): Remove for 5.0:
-                    self.statsd.gauge('zuul.executors.online', registered)
-                else:
-                    # zoned case
-                    zone = tokens[2]
-                    self.statsd.gauge('zuul.executors.zone.%s.online' %
-                                      normalize_statsd_name(zone),
-                                      registered)
             if name == 'merger:merge':
                 mergers_online = registered
             if name.startswith('merger:'):
                 merge_queue += queued - running
                 merge_running += running
-        self.statsd.gauge('zuul.mergers.online', mergers_online)
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
         self.statsd.gauge('zuul.scheduler.eventqueues.trigger',
