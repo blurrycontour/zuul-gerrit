@@ -124,6 +124,16 @@ class SchedulerComponent(BaseComponent):
 class ExecutorComponent(BaseComponent):
     kind = "executor"
 
+    def __init__(self, client, hostname):
+        super().__init__(client, hostname)
+        self.initial_state = {
+            "accepting_work": False,
+            "zone": None,
+            "allow_unzoned": False,
+            "process_merge_jobs": False,
+        }
+        self.content.update(self.initial_state)
+
 
 class MergerComponent(BaseComponent):
     kind = "merger"
