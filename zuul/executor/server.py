@@ -1566,6 +1566,7 @@ class AnsibleJob(object):
                         provider=node.get('provider'),
                         region=node.get('region'),
                         host_id=node.get('host_id'),
+                        external_id=node.get('external_id'),
                         interface_ip=node.get('interface_ip'),
                         public_ipv4=node.get('public_ipv4'),
                         private_ipv4=node.get('private_ipv4'),
