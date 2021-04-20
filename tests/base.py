@@ -55,6 +55,7 @@ import gear
 import fixtures
 import kazoo.client
 import kazoo.exceptions
+import kazoo.recipe.lock
 import pymysql
 import psycopg2
 import psycopg2.extensions
@@ -88,6 +89,7 @@ from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import ZooKeeperClient
 from zuul.zk.event_queues import ConnectionEventQueue
+from zuul.zk.exceptions import LockException
 from psutil import Popen
 
 import tests.fakegithub
@@ -3404,7 +3406,18 @@ class FakeNodepool(object):
         if self.paused:
             return
         for req in self.getNodeRequests():
-            self.fulfillRequest(req)
+            try:
+                self.lockNodeRequest(req)
+            except LockException:
+                continue
+            try:
+                self.fulfillRequest(req)
+            finally:
+                try:
+                    self.unlockNodeRequest(req)
+                except Exception:
+                    self.log.exception("Unable to unlock node request %s",
+                                       req)
 
     def registerLauncher(self, labels=["label1"], id="FakeLauncher"):
         path = os.path.join(self.LAUNCHER_ROOT, id)
@@ -3522,12 +3535,36 @@ class FakeNodepool(object):
     def addFailRequest(self, request):
         self.fail_requests.add(request['_oid'])
 
+    def lockNodeRequest(self, request):
+        path = "/nodepool/requests-lock/%s" % (request['_oid'])
+        lock = kazoo.recipe.lock.Lock(self.client, path)
+        try:
+            have_lock = lock.acquire(True, 0)
+        except kazoo.exceptions.LockTimeout:
+            raise LockException(
+                "Timeout trying to acquire lock %s" % path)
+        except kazoo.exceptions.NoNodeError:
+            have_lock = False
+            self.log.error("Request not found for locking: %s", request)
+
+        # If we aren't blocking, it's possible we didn't get the lock
+        # because someone else has it.
+        if not have_lock:
+            raise LockException(
+                "Did not get lock on %s" % path)
+        request['_lock'] = lock
+
+    def unlockNodeRequest(self, req):
+        request['_lock'].release()
+        request['_lock'] = None
+
     def fulfillRequest(self, request):
         if request['state'] != 'requested':
             return
         request = request.copy()
         oid = request['_oid']
         del request['_oid']
+        del request['_lock']
 
         if oid in self.fail_requests:
             request['state'] = 'failed'
