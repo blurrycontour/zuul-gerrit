@@ -50,6 +50,24 @@
       "revId": "8eda1e908063a9dbfa598d68cff3e6d1ba7c1c47",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "60bb8552_bade574f",
+        "filename": "zuul/lib/strings.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-20T05:34:18Z",
+      "side": 1,
+      "message": "I agree that your approach is more readable. My main concern was other chars that are not allowed as part of the ZK path that we also need to escape (interestingly spaces seem to be fine): https://zookeeper.apache.org/doc/current/zookeeperProgrammers.html#ch_zkDataModel\n\n`quote_plus()` takes care of of most of those cases, except for the standalone \"./..\".\n\nI\u0027m also fine with extending this in a way that we can use this for other strings that need to be escaped.",
+      "parentUuid": "38bd3b09_a5040cbd",
+      "revId": "8eda1e908063a9dbfa598d68cff3e6d1ba7c1c47",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
