@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c52ea7a_03f81bd4",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1067,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-20T13:43:33Z",
+      "side": 1,
+      "message": "I think we probably need that to make the working copy clean.",
+      "revId": "e30dc9686ba3cfb84eaef10fcbe37090664102c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0032b54_76390d9a",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1136,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-20T13:43:33Z",
+      "side": 1,
+      "message": "According to this comment we need a repo.update() before calling repo.getFiles().",
+      "revId": "e30dc9686ba3cfb84eaef10fcbe37090664102c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
