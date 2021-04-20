@@ -124,6 +124,16 @@ class SchedulerComponent(BaseComponent):
 class ExecutorComponent(BaseComponent):
     kind = "executor"
 
+    def __init__(self, client, hostname):
+        super().__init__(client, hostname)
+        self.initial_state = {
+            "accepting_work": False,
+            "zone": None,
+            "allow_unzoned": False,
+            "process_merge_jobs": False,
+        }
+        self.content.update(self.initial_state)
+
 
 class MergerComponent(BaseComponent):
     kind = "merger"
@@ -157,9 +167,6 @@ class ComponentRegistry(ZooKeeperBase):
 
         self.client = client
 
-        self._component_tree = TreeCache(self.kazoo_client, COMPONENTS_ROOT)
-        self._component_tree.listen_fault(self._cacheFaultListener)
-        self._component_tree.listen(self._componentCacheListener)
 
         # kind -> hostname -> component
         self._cached_components = defaultdict(dict)
@@ -170,10 +177,15 @@ class ComponentRegistry(ZooKeeperBase):
             self._onConnect()
 
     def _onConnect(self):
+        self._component_tree = TreeCache(self.kazoo_client, COMPONENTS_ROOT)
+        self._component_tree.listen_fault(self._cacheFaultListener)
+        self._component_tree.listen(self._componentCacheListener)
         self._component_tree.start()
 
     def _onDisconnect(self):
-        self._component_tree.close()
+        if self._component_tree is not None:
+            self._component_tree.close()
+            self._component_tree = None
 
     def all(self, kind=None):
         if kind is None:

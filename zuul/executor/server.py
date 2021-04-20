@@ -2651,6 +2651,11 @@ class ExecutorServer(BaseMergeServer):
         self.allow_unzoned = get_default(self.config, 'executor',
                                          'allow_unzoned', False)
 
+        # Those attributes won't change, so it's enough to set them once on the
+        # component info.
+        self.component_info.zone = self.zone
+        self.component_info.allow_unzoned = self.allow_unzoned
+
         self.ansible_callbacks = {}
         for section_name in self.config.sections():
             cb_match = re.match(r'^ansible_callback ([\'\"]?)(.*)(\1)$',
@@ -2747,6 +2752,7 @@ class ExecutorServer(BaseMergeServer):
 
         self.process_merge_jobs = get_default(self.config, 'executor',
                                               'merge_jobs', True)
+        self.component_info.process_merge_jobs = self.process_merge_jobs
 
         self.executor_jobs = {
             "executor:resume:%s" % self.hostname: self.resumeJob,
@@ -2789,6 +2795,16 @@ class ExecutorServer(BaseMergeServer):
 
     def _repoLock(self, connection_name, project_name):
         return self.repo_locks.getRepoLock(connection_name, project_name)
+
+    # We use a property to reflect the accepting_work state on the property
+    # since it might change quite often.
+    @property
+    def accepting_work(self):
+        return self.component_info.accepting_work
+
+    @accepting_work.setter
+    def accepting_work(self, work):
+        self.component_info.accepting_work = work
 
     def noop(self, job):
         """A noop gearman job so we can register for statistics."""
