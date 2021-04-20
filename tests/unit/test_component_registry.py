@@ -35,13 +35,24 @@ class TestComponentRegistry(ZuulTestCase):
         self.zk_client.connect()
         self.component_registry = ComponentRegistry(self.zk_client)
 
-    def assertComponentState(self, component_name, state, timeout=5):
+    def assertComponentAttr(
+        self, component_name, attr_name, attr_value, timeout=5
+    ):
         for _ in iterate_timeout(
-            timeout, f"{component_name} in cache is in state {state.name}"
+            timeout,
+            f"{component_name} in cache has {attr_name} set to {attr_value}",
         ):
             components = list(self.component_registry.all(component_name))
-            if len(components) > 0 and components[0].state == state:
+            if (
+                len(components) > 0 and
+                getattr(components[0], attr_name) == attr_value
+            ):
                 break
+
+    def assertComponentState(self, component_name, state, timeout=5):
+        return self.assertComponentAttr(
+            component_name, "state", state, timeout
+        )
 
     def assertComponentStopped(self, component_name, timeout=5):
         for _ in iterate_timeout(
@@ -62,6 +73,12 @@ class TestComponentRegistry(ZuulTestCase):
 
         self.executor_server.unpause()
         self.assertComponentState("executor", ComponentState.RUNNING)
+
+        self.executor_server.unregister_work()
+        self.assertComponentAttr("executor", "accepting_work", False)
+
+        self.executor_server.register_work()
+        self.assertComponentAttr("executor", "accepting_work", True)
 
     def test_merger_component(self):
         self._startMerger()
