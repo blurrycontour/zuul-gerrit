@@ -92,6 +92,11 @@ NODE_STATES = set([STATE_BUILDING,
                    STATE_HOLD,
                    STATE_DELETING])
 
+# Workspace scheme
+SCHEME_GOLANG = 'golang'
+SCHEME_FLAT = 'flat'
+SCHEME_UNIQUE = 'unique'  # Internal use only
+
 
 class ConfigurationErrorKey(object):
     """A class which attempts to uniquely identify configuration errors
@@ -1242,6 +1247,7 @@ class Job(ConfigObject):
             override_branch=None,
             override_checkout=None,
             post_review=None,
+            workspace_scheme=SCHEME_GOLANG,
         )
 
         # These are generally internal attributes which are not
@@ -1340,6 +1346,7 @@ class Job(ConfigObject):
             d['ansible_version'] = self.ansible_version
         else:
             d['ansible_version'] = None
+        d['workspace_scheme'] = self.workspace_scheme
         return d
 
     def __ne__(self, other):

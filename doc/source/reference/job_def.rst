@@ -866,3 +866,36 @@ Here is an example of two job definitions:
       This means that changes to jobs with file matchers will be
       self-testing without requiring that the file matchers include
       the Zuul configuration file defining the job.
+
+   .. attr:: workspace-scheme
+      :default: golang
+
+      The scheme to use when placing git repositories in the
+      workspace.
+
+      .. value:: golang
+
+         This writes the repository into a directory based on the
+         canonical hostname and the full name of the repository.  For
+         example::
+
+           src/example.com/organization/project
+
+         This is the default and, despite the name, is suitable and
+         recommended for any language.
+
+      .. value:: flat
+
+         This writes the repository into a directory based only on the
+         last component of the name.  For example::
+
+           src/project
+
+         In some cases the ``golang`` scheme can produce collisions
+         (conisder the projects `component` and
+         `component/subcomponent`).  In this case it may be preferable
+         to use the ``flat`` scheme (which would produce repositories
+         at `component` and `subcomponent`).
+
+         Note, however, that this scheme may produce collisions with
+         `component` and `component/component`.
