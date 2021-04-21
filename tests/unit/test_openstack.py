@@ -68,7 +68,8 @@ class TestOpenStack(AnsibleZuulTestCase):
         # Check that a change to nova triggered a keystone clone
         executor_git_dir = os.path.join(self.executor_src_root,
                                         'review.example.com',
-                                        'openstack', 'keystone', '.git')
+                                        'openstack', 'openstack%2Fkeystone',
+                                        '.git')
         self.assertTrue(os.path.exists(executor_git_dir),
                         msg='openstack/keystone should be cloned.')
 
@@ -91,7 +92,8 @@ class TestOpenStack(AnsibleZuulTestCase):
         # Check that a change to keystone triggered a nova clone
         executor_git_dir = os.path.join(self.executor_src_root,
                                         'review.example.com',
-                                        'openstack', 'nova', '.git')
+                                        'openstack', 'openstack%2Fnova',
+                                        '.git')
         self.assertTrue(os.path.exists(executor_git_dir),
                         msg='openstack/nova should be cloned.')
 

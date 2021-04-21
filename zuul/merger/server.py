@@ -104,7 +104,8 @@ class BaseMergeServer(metaclass=ABCMeta):
             self.merger_jobs)
 
     def _getMerger(self, root, cache_root, logger=None,
-                   execution_context=True):
+                   execution_context=True, scheme=None,
+                   cache_scheme=None):
         return merger.Merger(
             root,
             self.connections,
@@ -117,6 +118,8 @@ class BaseMergeServer(metaclass=ABCMeta):
             logger,
             execution_context=execution_context,
             git_timeout=self.git_timeout,
+            scheme=scheme,
+            cache_scheme=cache_scheme,
         )
 
     def _repoLock(self, connection_name, project_name):

@@ -12,7 +12,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os.path
 from urllib.parse import quote_plus
+
+import zuul.model
 
 
 def unique_project_name(project_name):
@@ -21,3 +24,15 @@ def unique_project_name(project_name):
 
     name = quote_plus(project_name)
     return f'{prefix}/{name}'
+
+
+def workspace_project_path(hostname, project_name, scheme):
+    """Return the project path based on the specified scheme"""
+    if scheme == zuul.model.SCHEME_UNIQUE:
+        project_name = unique_project_name(project_name)
+        return os.path.join(hostname, project_name)
+    elif scheme == zuul.model.SCHEME_GOLANG:
+        return os.path.join(hostname, project_name)
+    elif scheme == zuul.model.SCHEME_FLAT:
+        parts = project_name.split('/')
+        return os.path.join(parts[-1])
