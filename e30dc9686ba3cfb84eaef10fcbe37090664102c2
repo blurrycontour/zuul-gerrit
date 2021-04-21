@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "409b3189_2abedb3c",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1067,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-21T00:05:29Z",
+      "side": 1,
+      "message": "I think I don\u0027t quite understand why the working copy needs to be clean in order for refs to be updated.",
+      "revId": "e30dc9686ba3cfb84eaef10fcbe37090664102c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c0032b54_76390d9a",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 5
@@ -33,6 +50,23 @@
       "revId": "e30dc9686ba3cfb84eaef10fcbe37090664102c2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ca94e507_57600f84",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-21T00:05:29Z",
+      "side": 1,
+      "message": "This should only be called via merger.server.BaseMergeServer.getFiles, and that does have a _update() call (which calls updateRepo) before it calls this getFiles.  So I think we\u0027re good.",
+      "revId": "e30dc9686ba3cfb84eaef10fcbe37090664102c2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
