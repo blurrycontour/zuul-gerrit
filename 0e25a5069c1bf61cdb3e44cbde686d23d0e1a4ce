@@ -124,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "60562779_5d5edf0e",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-21T10:52:38Z",
+      "side": 1,
+      "message": "For reference, this is done in the followup.",
+      "parentUuid": "190622b0_2396b671",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3e9784ba_6eb499a6",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 9
@@ -193,6 +211,24 @@
     },
     {
       "key": {
+        "uuid": "16114cea_c368eafb",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-21T10:52:38Z",
+      "side": 1,
+      "message": "Done in followup",
+      "parentUuid": "8e23e81a_3d5e929c",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "55897580_eac3c802",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 9
@@ -210,6 +246,24 @@
     },
     {
       "key": {
+        "uuid": "194fb554_762b5760",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-21T10:52:38Z",
+      "side": 1,
+      "message": "Done in followup",
+      "parentUuid": "55897580_eac3c802",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8631bb99_cc644341",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 9
@@ -221,6 +275,24 @@
       "writtenOn": "2021-04-12T20:46:47Z",
       "side": 1,
       "message": "Info.",
+      "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d648cfc3_dcccf901",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-21T10:52:38Z",
+      "side": 1,
+      "message": "Done in followup",
+      "parentUuid": "8631bb99_cc644341",
       "revId": "0e25a5069c1bf61cdb3e44cbde686d23d0e1a4ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
