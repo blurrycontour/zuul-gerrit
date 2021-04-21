@@ -648,7 +648,7 @@ class Scheduler(threading.Thread):
 
     def _get_key_store_password(self):
         try:
-            return self.config["scheduler"]["key_store_password"]
+            return self.config["keystore"]["password"]
         except KeyError:
             raise RuntimeError("No key store password configured!")
 
