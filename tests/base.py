@@ -4251,6 +4251,9 @@ class ZuulTestCase(BaseTestCase):
         self.config.set(
             'scheduler', 'command_socket',
             os.path.join(self.test_root, 'scheduler.socket'))
+        if not self.config.has_option("scheduler", "key_store_password"):
+            self.config.set("scheduler", "key_store_password",
+                            uuid.uuid4().hex)
         self.config.set('merger', 'git_dir', self.merger_src_root)
         self.config.set('executor', 'git_dir', self.executor_src_root)
         self.config.set('executor', 'private_key_file', self.private_key_file)
