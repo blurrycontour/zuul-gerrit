@@ -60,6 +60,7 @@ from zuul.merger.server import BaseMergeServer, RepoLocks
 from zuul.model import (
     BuildCompletedEvent, BuildPausedEvent, BuildStartedEvent, BuildStatusEvent
 )
+import zuul.model
 from zuul.zk.event_queues import PipelineResultEventQueue
 
 BUFFER_LINES_FOR_SYNTAX = 200
@@ -823,6 +824,10 @@ class AnsibleJob(object):
         self.zuul_event_id = self.arguments.get('zuul_event_id')
         # Record ansible version being used for the cleanup phase
         self.ansible_version = self.arguments.get('ansible_version')
+        # TODO(corvus): Remove default setting after 4.3.0; this is to handle
+        # scheduler/executor version skew.
+        self.scheme = self.arguments.get('workspace_scheme',
+                                         zuul.model.SCHEME_GOLANG)
         self.log = get_annotated_logger(
             logger, self.zuul_event_id, build=job.unique)
         self.executor_server = executor_server
@@ -1083,7 +1088,8 @@ class AnsibleJob(object):
         merger = self.executor_server._getMerger(
             self.jobdir.src_root,
             self.executor_server.merge_root,
-            self.log)
+            logger=self.log,
+            scheme=self.scheme)
         repos = {}
         for project in args['projects']:
             self.log.debug("Cloning %s/%s" % (project['connection'],
@@ -1776,10 +1782,15 @@ class AnsibleJob(object):
                                                  branch)
             self.log.debug("Cloning %s@%s into new trusted space %s",
                            project, branch, root)
+            # We always use the golang scheme for playbook checkouts
+            # (so that the path indicates the canonical repo name for
+            # easy debugging; there are no concerns with collisions
+            # since we only have one repo in the working dir).
             merger = self.executor_server._getMerger(
                 root,
                 self.executor_server.merge_root,
-                self.log)
+                logger=self.log,
+                scheme=zuul.model.SCHEME_GOLANG)
             merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch,
@@ -1804,6 +1815,11 @@ class AnsibleJob(object):
             # If the project is in the dependency chain, clone from
             # there so we pick up any speculative changes, otherwise,
             # clone from the cache.
+            #
+            # We always use the golang scheme for playbook checkouts
+            # (so that the path indicates the canonical repo name for
+            # easy debugging; there are no concerns with collisions
+            # since we only have one repo in the working dir).
             merger = None
             for p in args['projects']:
                 if (p['connection'] == project.connection_name and
@@ -1813,7 +1829,9 @@ class AnsibleJob(object):
                     merger = self.executor_server._getMerger(
                         root,
                         self.jobdir.src_root,
-                        self.log)
+                        logger=self.log,
+                        scheme=zuul.model.SCHEME_GOLANG,
+                        cache_scheme=self.scheme)
                     break
 
             repo_state = None
@@ -1821,7 +1839,8 @@ class AnsibleJob(object):
                 merger = self.executor_server._getMerger(
                     root,
                     self.executor_server.merge_root,
-                    self.log)
+                    logger=self.log,
+                    scheme=zuul.model.SCHEME_GOLANG)
 
                 # If we don't have this repo yet prepared we need to restore
                 # the repo state. Otherwise we have speculative merges in the

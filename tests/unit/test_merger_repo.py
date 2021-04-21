@@ -20,9 +20,9 @@ import os
 import git
 import testtools
 
-from zuul.merger.merger import Repo
-from zuul.model import MERGER_MERGE_RESOLVE
-from tests.base import ZuulTestCase, FIXTURE_DIR, simple_layout
+from zuul.merger.merger import MergerTree, Repo
+import zuul.model
+from tests.base import BaseTestCase, ZuulTestCase, FIXTURE_DIR, simple_layout
 
 
 class TestMergerRepo(ZuulTestCase):
@@ -701,7 +701,7 @@ class TestMerger(ZuulTestCase):
             branch=fake_change.branch,
             project=fake_change.project,
             buildset_uuid='fake-uuid',
-            merge_mode=MERGER_MERGE_RESOLVE,
+            merge_mode=zuul.model.MERGER_MERGE_RESOLVE,
         )
 
     def test_merge_multiple_items(self):
@@ -913,7 +913,7 @@ class TestMerger(ZuulTestCase):
 
         # Add an index.lock file
         fpath = os.path.join(self.merger_src_root, 'review.example.com',
-                             'org', 'project1', '.git', 'index.lock')
+                             'org', 'org%2Fproject1', '.git', 'index.lock')
         with open(fpath, 'w'):
             pass
         self.assertTrue(os.path.exists(fpath))
@@ -1003,3 +1003,163 @@ class TestMerger(ZuulTestCase):
                          zuul_repo.commit('refs/heads/master').hexsha)
         self.assertEqual(upstream_repo.commit(change_ref).hexsha,
                          zuul_repo.commit('HEAD').hexsha)
+
+
+class TestMergerTree(BaseTestCase):
+
+    def test_tree(self):
+        t = MergerTree()
+
+        t.add('/root/component')
+        t.add('/root/component2')
+        with testtools.ExpectedException(Exception):
+            t.add('/root/component/subcomponent')
+        t.add('/root/foo/bar/baz')
+        with testtools.ExpectedException(Exception):
+            t.add('/root/foo')
+
+
+class TestMergerSchemes(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def setUp(self):
+        super().setUp()
+        self.work_root = os.path.join(self.test_root, 'workspace')
+        self.cache_root = os.path.join(self.test_root, 'cache')
+
+    def _getMerger(self, work_root=None, cache_root=None, scheme=None):
+        work_root = work_root or self.work_root
+        return self.executor_server._getMerger(
+            work_root, cache_root=cache_root, scheme=scheme)
+
+    def _assertScheme(self, root, scheme):
+        if scheme == 'unique':
+            self.assertTrue(os.path.exists(
+                os.path.join(root, 'review.example.com',
+                             'org/org%2Fproject1')))
+        else:
+            self.assertFalse(os.path.exists(
+                os.path.join(root, 'review.example.com',
+                             'org/org%2Fproject1')))
+
+        if scheme == 'golang':
+            self.assertTrue(os.path.exists(
+                os.path.join(root, 'review.example.com',
+                             'org/project1')))
+        else:
+            self.assertFalse(os.path.exists(
+                os.path.join(root, 'review.example.com',
+                             'org/project1')))
+
+        if scheme == 'flat':
+            self.assertTrue(os.path.exists(
+                os.path.join(root, 'project1')))
+        else:
+            self.assertFalse(os.path.exists(
+                os.path.join(root, 'project1')))
+
+    def test_unique_scheme(self):
+        merger = self._getMerger(scheme=zuul.model.SCHEME_UNIQUE)
+        merger.getRepo('gerrit', 'org/project1')
+        self._assertScheme(self.work_root, 'unique')
+
+    def test_golang_scheme(self):
+        cache_merger = self._getMerger(work_root=self.cache_root)
+        cache_merger.updateRepo('gerrit', 'org/project1')
+        self._assertScheme(self.cache_root, 'unique')
+
+        merger = self._getMerger(
+            cache_root=self.cache_root,
+            scheme=zuul.model.SCHEME_GOLANG)
+        merger.getRepo('gerrit', 'org/project1')
+        self._assertScheme(self.work_root, 'golang')
+
+    def test_flat_scheme(self):
+        cache_merger = self._getMerger(work_root=self.cache_root)
+        cache_merger.updateRepo('gerrit', 'org/project1')
+        self._assertScheme(self.cache_root, 'unique')
+
+        merger = self._getMerger(
+            cache_root=self.cache_root,
+            scheme=zuul.model.SCHEME_FLAT)
+        merger.getRepo('gerrit', 'org/project1')
+        self._assertScheme(self.work_root, 'flat')
+
+    @simple_layout('layouts/overlapping-repos.yaml')
+    def test_golang_collision(self):
+        merger = self._getMerger(scheme=zuul.model.SCHEME_GOLANG)
+        repo = merger.getRepo('gerrit', 'component')
+        self.assertIsNotNone(repo)
+        repo = merger.getRepo('gerrit', 'component/subcomponent')
+        self.assertIsNone(repo)
+
+    @simple_layout('layouts/overlapping-repos.yaml')
+    def test_flat_collision(self):
+        merger = self._getMerger(scheme=zuul.model.SCHEME_FLAT)
+        repo = merger.getRepo('gerrit', 'component')
+        self.assertIsNotNone(repo)
+        repo = merger.getRepo('gerrit', 'component/component')
+        self.assertIsNone(repo)
+
+
+class TestOverlappingRepos(ZuulTestCase):
+
+    @simple_layout('layouts/overlapping-repos.yaml')
+    def test_overlapping_repos(self):
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('component', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1')],
+            ordered=False)
+
+        build = self.getJobFromHistory('test-job')
+        jobdir_git_dir = os.path.join(build.jobdir.src_root,
+                                      'component', '.git')
+        self.assertTrue(os.path.exists(jobdir_git_dir))
+        jobdir_git_dir = os.path.join(build.jobdir.src_root,
+                                      'subcomponent', '.git')
+        self.assertTrue(os.path.exists(jobdir_git_dir))
+
+
+class TestMergerUpgrade(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_merger_upgrade(self):
+        work_root = os.path.join(self.test_root, 'workspace')
+
+        # Simulate existing repos
+        org_project = os.path.join(work_root, 'review.example.com', 'org',
+                                   'project', '.git')
+        os.makedirs(org_project)
+        scheme_file = os.path.join(work_root, '.zuul_merger_scheme')
+
+        # Verify that an executor merger doesn't "upgrade" or write a
+        # scheme file.
+        self.executor_server._getMerger(
+            work_root, cache_root=None, scheme=zuul.model.SCHEME_FLAT)
+        self.assertTrue(os.path.exists(org_project))
+        self.assertFalse(os.path.exists(scheme_file))
+
+        # Verify that a "real" merger does upgrade.
+        self.executor_server._getMerger(
+            work_root, cache_root=None,
+            execution_context=False)
+
+        self.assertFalse(os.path.exists(org_project))
+        self.assertTrue(os.path.exists(scheme_file))
+        with open(scheme_file) as f:
+            self.assertEqual(f.read().strip(), 'unique')
+
+        # Verify that the next time it starts, we don't upgrade again.
+        flag_dir = os.path.join(work_root, 'flag')
+        os.makedirs(flag_dir)
+        self.executor_server._getMerger(
+            work_root, cache_root=None,
+            execution_context=False)
+
+        self.assertFalse(os.path.exists(org_project))
+        self.assertTrue(os.path.exists(scheme_file))
+        self.assertTrue(os.path.exists(flag_dir))

@@ -14,6 +14,8 @@
 
 import os
 
+from zuul.lib import strings
+
 
 def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
                              dependent_changes=[], merger_items=[],
@@ -32,7 +34,11 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
         short_name=item.change.project.name.split('/')[-1],
         canonical_hostname=item.change.project.canonical_hostname,
         canonical_name=item.change.project.canonical_name,
-        src_dir=os.path.join('src', item.change.project.canonical_name),
+        src_dir=os.path.join('src',
+                             strings.workspace_project_path(
+                                 item.change.project.canonical_hostname,
+                                 item.change.project.name,
+                                 job.workspace_scheme)),
     )
 
     zuul_params = dict(
@@ -90,6 +96,7 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
     params['override_checkout'] = job.override_checkout
     params['repo_state'] = item.current_build_set.repo_state
     params['ansible_version'] = job.ansible_version
+    params['workspace_scheme'] = job.workspace_scheme
 
     def make_playbook(playbook):
         d = playbook.toDict(redact_secrets=redact_secrets_and_keys)
@@ -187,7 +194,11 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
             # project.values() is easier for callers
             canonical_name=p.canonical_name,
             canonical_hostname=p.canonical_hostname,
-            src_dir=os.path.join('src', p.canonical_name),
+            src_dir=os.path.join('src',
+                                 strings.workspace_project_path(
+                                     p.canonical_hostname,
+                                     p.name,
+                                     job.workspace_scheme)),
             required=(p in required_projects),
         ))
 

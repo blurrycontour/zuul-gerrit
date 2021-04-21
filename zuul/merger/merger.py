@@ -28,6 +28,7 @@ import git
 import gitdb
 import paramiko
 from zuul.zk import ZooKeeperClient
+from zuul.lib import strings
 
 import zuul.model
 
@@ -723,7 +724,36 @@ class Repo(object):
         return branches
 
 
+class MergerTree:
+    """
+    A tree structure for quickly determining if a repo collides with
+    another in the same merger workspace.
+
+    Each node is a dictionary represents a path element.  The keys are
+    child path elements and their values are either another dictionary
+    for another node, or None if the child node is a git repo.
+    """
+
+    def __init__(self):
+        self.root = {}
+
+    def add(self, path):
+        parts = path.split('/')
+        root = self.root
+        for i, part in enumerate(parts[:-1]):
+            root = root.setdefault(part, {})
+            if root is None:
+                other = '/'.join(parts[:i])
+                raise Exception(f"Repo {path} collides with {other}")
+        last = parts[-1]
+        if last in root:
+            raise Exception(f"Repo {path} collides with "
+                            "an existing repo with a longer path")
+        root[last] = None
+
+
 class Merger(object):
+
     def __init__(
         self,
         working_root: str,
@@ -737,6 +767,8 @@ class Merger(object):
         logger: Optional[Logger] = None,
         execution_context: bool = False,
         git_timeout: int = 300,
+        scheme: str = None,
+        cache_scheme: str = None,
     ):
         self.logger = logger
         if logger is None:
@@ -754,20 +786,55 @@ class Merger(object):
         self.speed_time = speed_time
         self.git_timeout = git_timeout
         self.cache_root = cache_root
+        self.scheme = scheme or zuul.model.SCHEME_UNIQUE
+        self.cache_scheme = cache_scheme or zuul.model.SCHEME_UNIQUE
         # Flag to determine if the merger is used for preparing repositories
         # for job execution. This flag can be used to enable executor specific
         # behavior e.g. to keep the 'origin' remote intact.
         self.execution_context = execution_context
+        # A tree of repos in our working root for detecting collisions
+        self.repo_roots = MergerTree()
+        # If we're not in an execution context, then check to see if
+        # our working root needs a "schema" upgrade.
+        if not execution_context:
+            self._upgradeRootScheme()
+
+    def _upgradeRootScheme(self):
+        # If the scheme for the root directory has changed, delete all
+        # the repos so they can be re-cloned.
+        try:
+            with open(os.path.join(self.working_root,
+                                   '.zuul_merger_scheme')) as f:
+                scheme = f.read().strip()
+        except FileNotFoundError:
+            # The previous default was golang
+            scheme = zuul.model.SCHEME_GOLANG
+        if scheme == self.scheme:
+            return
+        if os.listdir(self.working_root):
+            self.log.info(f"Existing merger scheme {scheme} does not match "
+                          f"requested scheme {self.scheme}, deleting merger "
+                          "root (repositories will be re-cloned).")
+            shutil.rmtree(self.working_root)
+            os.makedirs(self.working_root)
+        with open(os.path.join(self.working_root,
+                               '.zuul_merger_scheme'), 'w') as f:
+            f.write(self.scheme)
 
     def _addProject(self, hostname, connection_name, project_name, url, sshkey,
                     zuul_event_id, process_worker=None):
         repo = None
         key = '/'.join([hostname, project_name])
         try:
-            path = os.path.join(self.working_root, hostname, project_name)
+            path = os.path.join(self.working_root,
+                                strings.workspace_project_path(
+                                    hostname, project_name, self.scheme))
+            self.repo_roots.add(path)
             if self.cache_root:
-                cache_path = os.path.join(self.cache_root, hostname,
-                                          project_name)
+                cache_path = os.path.join(
+                    self.cache_root,
+                    strings.workspace_project_path(
+                        hostname, project_name, self.cache_scheme))
             else:
                 cache_path = None
             repo = Repo(

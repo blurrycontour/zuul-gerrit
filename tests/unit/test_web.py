@@ -374,7 +374,8 @@ class TestWeb(BaseTestWeb):
                 'group_variables': {},
                 'host_variables': {},
                 'variant_description': '',
-                'voting': True
+                'voting': True,
+                'workspace_scheme': 'golang'
             }, {
                 'name': 'project-test1',
                 'abstract': False,
@@ -419,7 +420,8 @@ class TestWeb(BaseTestWeb):
                 'group_variables': {},
                 'host_variables': {},
                 'variant_description': 'stable',
-                'voting': True
+                'voting': True,
+                'workspace_scheme': 'golang'
             }], data)
 
         data = self.get_url('api/tenant/tenant-one/job/test-job').json()
@@ -462,7 +464,8 @@ class TestWeb(BaseTestWeb):
                 'group_variables': {},
                 'host_variables': {},
                 'variant_description': '',
-                'voting': True
+                'voting': True,
+                'workspace_scheme': 'golang'
             }], data)
 
     def test_find_job_complete_playbooks(self):
@@ -584,7 +587,8 @@ class TestWeb(BaseTestWeb):
                   'group_variables': {},
                   'host_variables': {},
                   'variant_description': '',
-                  'voting': True}],
+                  'voting': True,
+                  'workspace_scheme': 'golang'}],
                 [{'abstract': False,
                   'ansible_version': None,
                   'attempts': 3,
@@ -622,7 +626,8 @@ class TestWeb(BaseTestWeb):
                   'group_variables': {},
                   'host_variables': {},
                   'variant_description': '',
-                  'voting': True}],
+                  'voting': True,
+                  'workspace_scheme': 'golang'}],
                 [{'abstract': False,
                   'ansible_version': None,
                   'attempts': 3,
@@ -660,7 +665,8 @@ class TestWeb(BaseTestWeb):
                   'group_variables': {},
                   'host_variables': {},
                   'variant_description': '',
-                  'voting': True}],
+                  'voting': True,
+                  'workspace_scheme': 'golang'}],
                 [{'abstract': False,
                   'ansible_version': None,
                   'attempts': 3,
@@ -698,7 +704,8 @@ class TestWeb(BaseTestWeb):
                   'group_variables': {},
                   'host_variables': {},
                   'variant_description': '',
-                  'voting': True}]]
+                  'voting': True,
+                  'workspace_scheme': 'golang'}]]
 
         self.assertEqual(
             {
@@ -756,7 +763,8 @@ class TestWeb(BaseTestWeb):
                              'group_variables': {},
                              'host_variables': {},
                              'variant_description': '',
-                             'voting': True}
+                             'voting': True,
+                             'workspace_scheme': 'golang'}
                         ]],
                     }
                     ]
@@ -1075,6 +1083,7 @@ class TestWeb(BaseTestWeb):
                 'child_jobs': [],
                 'event_id': None,
             },
+            'workspace_scheme': 'golang',
         }
 
         self.assertEqual(job_params, resp.json())
