@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0df21715_7791d972",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1295,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-22T21:54:03Z",
+      "side": 1,
+      "message": "mergeChanges() says you should call updateRepo() first. I\u0027m not seeing that here. On the executor server side merge() will update things, but I think this merge is happening the executor without going out to gearman?",
+      "revId": "d4c7d293609a151f0c58b2d8a6fe4ac2817ee501",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
