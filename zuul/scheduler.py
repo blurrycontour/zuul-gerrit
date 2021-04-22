@@ -213,6 +213,11 @@ class Scheduler(threading.Thread):
 
     def start(self):
         super(Scheduler, self).start()
+        self.keystore = ZooKeeperKeyStorage(
+            self.zk_client,
+            password=self._get_key_store_password(),
+            backup=FileKeyStorage(self._get_key_dir()))
+
         self._command_running = True
         self.log.debug("Starting command processor")
         self.command_socket.start()
@@ -665,12 +670,6 @@ class Scheduler(threading.Thread):
                             "current mode is %o" % (key_dir, mode))
         return key_dir
 
-    def getKeyStorage(self):
-        file_key_store = FileKeyStorage(self._get_key_dir())
-        return ZooKeeperKeyStorage(self.zk_client,
-                                   password=self._get_key_store_password(),
-                                   backup=file_key_store)
-
     def _checkTenantSourceConf(self, config):
         tenant_config = None
         script = False
@@ -714,8 +713,7 @@ class Scheduler(threading.Thread):
                 connection.clearCache()
 
             loader = configloader.ConfigLoader(
-                self.connections, self, self.merger,
-                self.getKeyStorage())
+                self.connections, self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
@@ -759,8 +757,7 @@ class Scheduler(threading.Thread):
                 default_version=default_ansible_version)
 
             loader = configloader.ConfigLoader(
-                self.connections, self, self.merger,
-                self.getKeyStorage())
+                self.connections, self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
@@ -814,8 +811,7 @@ class Scheduler(threading.Thread):
                                                     branch_name)
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
-                self.connections, self, self.merger,
-                self.getKeyStorage())
+                self.connections, self, self.merger, self.keystore)
             abide = loader.reloadTenant(
                 self.abide, old_tenant, self.ansible_manager)
             tenant = abide.tenants[event.tenant_name]
