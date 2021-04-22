@@ -156,6 +156,24 @@
       "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0abeaf00_0e1bfb17",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-22T07:17:47Z",
+      "side": 1,
+      "message": "1) I can adapt the comment. I just wanted to write down what I saw so that at least somebody understands what this is all about in the first place.\n\n2) I can re-use the line that returns the semaphores in the cancelJob() method. I\u0027m just not sure if that is enough or if there is something else to address since I\u0027m not familiar with semaphores at all.\n\n3) Regarding your concern here\n\u003e Once we rebase, we\u0027ll still have to address the conflict you point out: that sometimes we call cancelJob when a tenant+pipeline still exists, and sometimes we call it when we\u0027re deleting it.\n\nI think we need to implement some periodic cleanup for most of the ZooKeeper stuff. This could then also deal with that use case. Apart from this I think it\u0027s quite difficult to solve this issue as there could always be a race between the reconfiguration and a running job (unless we ensure that all jobs are finished before the reconfig starts, but I think this is rather difficult and not what we want). We might also be able to process the result events from all tenants/pipelines (not just the active ones), but that doesn\u0027t sound right. IMHO it wouldn\u0027t make much sense to process those results since nobody would be able to use them.",
+      "parentUuid": "d22ef751_d20499d2",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
