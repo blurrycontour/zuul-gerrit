@@ -139,6 +139,23 @@
       "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d22ef751_d20499d2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-22T00:35:35Z",
+      "side": 1,
+      "message": "Okay, deleting the build from zk directly sounds like a potentially good solution.\n\nWe still have some issues we need to address:\n\n1) The comment above is a little misleading -- it\u0027s not really to fix the tests, it fixes a real problem that the tests are showing us.\n\n2) We still need to deal with semaphores.\n\n3) This shares a lot in common with https://review.opendev.org/785536 which effectively changes reconfigurations so that the only things they can mutate are deleting pipelines or tenants.  I think we should rebase on top of that change (actually https://review.opendev.org/786744 which is the end of that stack) and work from there.\n\nOnce we rebase, we\u0027ll still have to address the conflict you point out: that sometimes we call cancelJob when a tenant+pipeline still exists, and sometimes we call it when we\u0027re deleting it.\n\nIf it\u0027s complicated to resolve that issue, and in the very next change we\u0027re going to move the build requests into ZK as well which makes the issue moot, then we may want to review those changes together (we don\u0027t need to squash them, we can leave them as two changes) and just make sure we merge them together.\n\nIf we can resolve it with a temporary method like this one, that\u0027s fine too.\n\nTo summarise:\n\n* Rebase on 786744\n* Analyze the pipeline/tenant cleanup situation in that case\n  * If it\u0027s not too difficult to resolve, keep this as a standalone change (we need to handle semaphores too).\n  * Otherwise, do something hacky to make the tests pass but review it with the next change and merge them together.",
+      "revId": "0a026afe3cca21dc7f5a7500d3110d90f4990b23",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
