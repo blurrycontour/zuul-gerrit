@@ -16,6 +16,23 @@
       "revId": "d4c7d293609a151f0c58b2d8a6fe4ac2817ee501",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9aa8457d_74a4b45c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1295,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-22T22:04:02Z",
+      "side": 1,
+      "message": "This is the jobdir merger, so it\u0027s the merger that prepares changes in the build\u0027s working directory.  Those repos are all freshly cloned from the executor\u0027s internal merger, which in turn just had updateRepo called on them.  So it\u0027s true, we\u0027re not calling updateRepo on these repos, but we also know there were freshly cloned from a repo that was updated, so they should be gtg.",
+      "revId": "d4c7d293609a151f0c58b2d8a6fe4ac2817ee501",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
