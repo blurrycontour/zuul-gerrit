@@ -20,6 +20,8 @@ import json
 import logging
 import os
 from itertools import chain
+from enum import Enum
+from functools import total_ordering
 
 import re2
 import struct
@@ -1942,6 +1944,98 @@ class JobGraph(object):
         return all_parent_jobs
 
 
+class BuildRequestState(Enum):
+    # Waiting
+    REQUESTED = 0
+    HOLD = 1
+    # Running
+    RUNNING = 2
+    PAUSED = 3
+    # Finished
+    COMPLETED = 4
+
+
+@total_ordering
+class BuildRequest:
+    """A request for a build in a specific zone"""
+
+    def __init__(
+        self,
+        uuid,
+        state,
+        precedence,
+        params,
+        zone,
+        tenant_name,
+        pipeline_name,
+    ):
+        self.uuid = uuid
+        self.state = state
+        self.precedence = precedence
+        self.params = params
+        self.zone = zone
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+
+        # ZK related data
+        self.path = None
+        self._zstat = None
+        self.lock = None
+
+    def toDict(self):
+        return {
+            "uuid": self.uuid,
+            "state": self.state.name,
+            "precedence": self.precedence,
+            "params": self.params,
+            "zone": self.zone,
+            "tenant_name": self.tenant_name,
+            "pipeline_name": self.pipeline_name,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        build_request = cls(
+            data["uuid"],
+            BuildRequestState[data["state"]],
+            data["precedence"],
+            data["params"],
+            data["zone"],
+            data["tenant_name"],
+            data["pipeline_name"],
+        )
+
+        return build_request
+
+    def __lt__(self, other):
+        # Sort build requests by precedence and their creation time in
+        # ZooKeeper in ascending order to prevent older builds from starving.
+        if self.precedence == other.precedence:
+            if self._zstat and other._zstat:
+                return self._zstat.ctime < other._zstat.ctime
+            # NOTE (felix): As the _zstat should always be set when retrieving
+            # the build request from ZooKeeper, this branch shouldn't matter
+            # much. It's just there, because the _zstat could - theoretically -
+            # be None.
+            return self.uuid < other.uuid
+        return self.precedence < other.precedence
+
+    def __eq__(self, other):
+        same_prec = self.precedence == other.precedence
+        if self._zstat and other._zstat:
+            same_ctime = self._zstat.ctime == other._zstat.ctime
+        else:
+            same_ctime = self.uuid == other.uuid
+
+        return same_prec and same_ctime
+
+    def __repr__(self):
+        return (
+            f"<BuildRequest {self.uuid}, state={self.state.name}, "
+            f"path={self.path} zone={self.zone}>"
+        )
+
+
 class Build(object):
     """A Build is an instance of a single execution of a Job.
 
@@ -1972,6 +2066,8 @@ class Build(object):
         self.node_name = None
         self.nodeset = None
         self.zuul_event_id = zuul_event_id
+
+        self.build_request_ref = None
 
     def __repr__(self):
         return ('<Build %s of %s voting:%s on %s>' %
@@ -3698,10 +3794,12 @@ class EnqueueEvent(ChangeManagementEvent):
     """Enqueue a change into a pipeline"""
 
 
-class ResultEvent:
+class ResultEvent(AbstractEvent):
     """An event that needs to modify the pipeline state due to a
     result from an external system."""
-    pass
+
+    def updateFromDict(self, d) -> None:
+        pass
 
 
 class BuildStartedEvent(ResultEvent):
@@ -3710,8 +3808,38 @@ class BuildStartedEvent(ResultEvent):
     :arg Build build: The build which has started.
     """
 
-    def __init__(self, build):
+    def __init__(self, build, data):
         self.build = build
+        self.data = data
+
+    def toDict(self):
+        return {
+            "build": self.build,
+            "data": self.data,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build"),
+            data.get("data"),
+        )
+
+
+class BuildStatusEvent(ResultEvent):
+    def __init__(self, build, data):
+        self.build = build
+        self.data = data
+
+    def toDict(self):
+        return {
+            "build": self.build,
+            "data": self.data,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data.get("build"), data.get("data"))
 
 
 class BuildPausedEvent(ResultEvent):
@@ -3720,8 +3848,22 @@ class BuildPausedEvent(ResultEvent):
     :arg Build build: The build which has been paused.
     """
 
-    def __init__(self, build):
+    def __init__(self, build, data):
         self.build = build
+        self.data = data
+
+    def toDict(self):
+        return {
+            "build": self.build,
+            "data": self.data,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build"),
+            data.get("data"),
+        )
 
 
 class BuildCompletedEvent(ResultEvent):
@@ -3733,6 +3875,19 @@ class BuildCompletedEvent(ResultEvent):
     def __init__(self, build, result):
         self.build = build
         self.result = result
+
+    def toDict(self):
+        return {
+            "build": self.build,
+            "result": self.result,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build"),
+            data.get("result"),
+        )
 
 
 class MergeCompletedEvent(ResultEvent):
@@ -3757,6 +3912,29 @@ class MergeCompletedEvent(ResultEvent):
         self.repo_state = repo_state
         self.item_in_branches = item_in_branches
 
+    def toDict(self):
+        return {
+            "build_set": self.build_set,
+            "merged": self.merged,
+            "updated": self.updated,
+            "commit": self.commit,
+            "files": list(self.files),
+            "repo_state": dict(self.repo_state),
+            "item_in_branches": list(self.item_in_branches),
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build_set"),
+            data.get("merged"),
+            data.get("updated"),
+            data.get("commit"),
+            list(data.get("files", [])),
+            dict(data.get("repo_state", {})),
+            list(data.get("item_in_branches", [])),
+        )
+
 
 class FilesChangesCompletedEvent(ResultEvent):
     """A remote fileschanges operation has completed
@@ -3769,17 +3947,40 @@ class FilesChangesCompletedEvent(ResultEvent):
         self.build_set = build_set
         self.files = files
 
+    def toDict(self):
+        return {
+            "build_set": self.build_set,
+            "files": list(self.files),
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("build_set"),
+            list(data.get("files", [])),
+        )
+
 
 class NodesProvisionedEvent(ResultEvent):
     """Nodes have been provisioned for a build_set
 
-    :arg BuildSet build_set: The build_set which has nodes.
-    :arg list of Node objects nodes: The provisioned nodes
+    :arg NodeRequest request: The fulfilled node request.
     """
 
     def __init__(self, request):
         self.request = request
         self.request_id = request.id
+
+    def toDict(self):
+        return {
+            "request": self.request,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(
+            data.get("request"),
+        )
 
 
 class TriggerEvent(AbstractEvent):
