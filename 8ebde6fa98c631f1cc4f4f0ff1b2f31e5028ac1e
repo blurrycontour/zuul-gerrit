@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "846a4916_6729d4e7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-23T08:10:32Z",
+      "side": 1,
+      "message": "This also means that changes e.g. of the keystore path or password would require a scheduler restart to take effect.",
+      "revId": "8ebde6fa98c631f1cc4f4f0ff1b2f31e5028ac1e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
