@@ -20,6 +20,8 @@ import json
 import logging
 import os
 from itertools import chain
+from enum import Enum
+from functools import total_ordering
 
 import re2
 import struct
@@ -2006,6 +2008,98 @@ class JobGraph(object):
         return all_parent_jobs
 
 
+class BuildRequestState(Enum):
+    # Waiting
+    REQUESTED = 0
+    HOLD = 1
+    # Running
+    RUNNING = 2
+    PAUSED = 3
+    # Finished
+    COMPLETED = 4
+
+
+@total_ordering
+class BuildRequest:
+    """A request for a build in a specific zone"""
+
+    def __init__(
+        self,
+        uuid,
+        state,
+        precedence,
+        params,
+        zone,
+        tenant_name,
+        pipeline_name,
+    ):
+        self.uuid = uuid
+        self.state = state
+        self.precedence = precedence
+        self.params = params
+        self.zone = zone
+        self.tenant_name = tenant_name
+        self.pipeline_name = pipeline_name
+
+        # ZK related data
+        self.path = None
+        self._zstat = None
+        self.lock = None
+
+    def toDict(self):
+        return {
+            "uuid": self.uuid,
+            "state": self.state.name,
+            "precedence": self.precedence,
+            "params": self.params,
+            "zone": self.zone,
+            "tenant_name": self.tenant_name,
+            "pipeline_name": self.pipeline_name,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        build_request = cls(
+            data["uuid"],
+            BuildRequestState[data["state"]],
+            data["precedence"],
+            data["params"],
+            data["zone"],
+            data["tenant_name"],
+            data["pipeline_name"],
+        )
+
+        return build_request
+
+    def __lt__(self, other):
+        # Sort build requests by precedence and their creation time in
+        # ZooKeeper in ascending order to prevent older builds from starving.
+        if self.precedence == other.precedence:
+            if self._zstat and other._zstat:
+                return self._zstat.ctime < other._zstat.ctime
+            # NOTE (felix): As the _zstat should always be set when retrieving
+            # the build request from ZooKeeper, this branch shouldn't matter
+            # much. It's just there, because the _zstat could - theoretically -
+            # be None.
+            return self.uuid < other.uuid
+        return self.precedence < other.precedence
+
+    def __eq__(self, other):
+        same_prec = self.precedence == other.precedence
+        if self._zstat and other._zstat:
+            same_ctime = self._zstat.ctime == other._zstat.ctime
+        else:
+            same_ctime = self.uuid == other.uuid
+
+        return same_prec and same_ctime
+
+    def __repr__(self):
+        return (
+            f"<BuildRequest {self.uuid}, state={self.state.name}, "
+            f"path={self.path} zone={self.zone}>"
+        )
+
+
 class Build(object):
     """A Build is an instance of a single execution of a Job.
 
@@ -2036,6 +2130,8 @@ class Build(object):
         self.node_name = None
         self.nodeset = None
         self.zuul_event_id = zuul_event_id
+
+        self.build_request_ref = None
 
     def __repr__(self):
         return ('<Build %s of %s voting:%s on %s>' %
