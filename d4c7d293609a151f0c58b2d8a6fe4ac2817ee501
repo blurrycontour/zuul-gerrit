@@ -33,6 +33,23 @@
       "revId": "d4c7d293609a151f0c58b2d8a6fe4ac2817ee501",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19ebe40e_1939baf0",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1151,
+      "author": {
+        "id": 31905
+      },
+      "writtenOn": "2021-04-23T14:02:57Z",
+      "side": 1,
+      "message": "I have a change related to that.\nhttps://review.opendev.org/c/zuul/zuul/+/762887",
+      "revId": "d4c7d293609a151f0c58b2d8a6fe4ac2817ee501",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
