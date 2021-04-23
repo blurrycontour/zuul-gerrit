@@ -16,12 +16,12 @@ import json
 
 import testtools
 
-from tests.base import BaseTestCase, iterate_timeout
-
 from zuul import model
+from zuul.model import BuildRequestState, HoldRequest
 from zuul.zk import ZooKeeperClient
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.exceptions import LockException
+from zuul.zk.executor import ExecutorApi
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import (
     RawShardIO,
@@ -32,6 +32,8 @@ from zuul.zk.sharding import (
 from zuul.zk.components import (
     BaseComponent, ComponentRegistry, ExecutorComponent
 )
+
+from tests.base import BaseTestCase, iterate_timeout
 
 
 class ZooKeeperBaseTestCase(BaseTestCase):
@@ -57,7 +59,7 @@ class TestNodepool(ZooKeeperBaseTestCase):
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
 
     def _createRequest(self):
-        req = model.HoldRequest()
+        req = HoldRequest()
         req.count = 1
         req.reason = 'some reason'
         req.expiration = 1
@@ -306,3 +308,53 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
 
         self.component_info.state = self.component_info.RUNNING
         self.assertComponentState("executor", BaseComponent.RUNNING)
+
+
+class TestExecutorApi(ZooKeeperBaseTestCase):
+
+    def test_lost_build_requests(self):
+        executor_api = ExecutorApi(self.zk_client, use_cache=True)
+
+        executor_api.submit("A", "tenant", "pipeline", {}, "zone")
+        path_b = executor_api.submit("B", "tenant", "pipeline", {}, "zone")
+        path_c = executor_api.submit("C", "tenant", "pipeline", {}, "zone")
+        path_d = executor_api.submit("D", "tenant", "pipeline", {}, "zone")
+        path_e = executor_api.submit("E", "tenant", "pipeline", {}, "zone")
+
+        b = executor_api.get(path_b)
+        c = executor_api.get(path_c)
+        d = executor_api.get(path_d)
+        e = executor_api.get(path_e)
+
+        b.state = BuildRequestState.RUNNING
+        executor_api.update(b)
+
+        c.state = BuildRequestState.RUNNING
+        executor_api.update(c)
+        executor_api.lock(c)
+
+        d.state = BuildRequestState.COMPLETED
+        executor_api.update(d)
+
+        e.state = BuildRequestState.PAUSED
+        executor_api.update(e)
+
+        # Wait until the latest state transition is reflected in the Executor
+        # APIs cache. Using a DataWatch for this purpose could lead to race
+        # conditions depending on which DataWatch is executed first. The
+        # DataWatch might be triggered for the correct event, but the cache
+        # might still be outdated as the DataWatch that updates the cache
+        # itself wasn't triggered yet.
+        for _ in iterate_timeout(30, "wait for cache to be up-to-date"):
+            if (
+                executor_api._cached_build_requests[path_e].state
+                == BuildRequestState.PAUSED
+            ):
+                break
+
+        # The lost_builds method should only return builds which are running or
+        # paused, but not locked by any executor, in this case build b and e.
+        lost_build_requests = list(executor_api.lostBuildRequests())
+
+        self.assertEqual(2, len(lost_build_requests))
+        self.assertEqual(b.path, lost_build_requests[0].path)
