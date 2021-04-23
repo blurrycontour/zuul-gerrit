@@ -24,7 +24,7 @@ from kazoo.recipe.lock import Lock
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import BuildRequest, BuildRequestState
-from zuul.zk import ZooKeeperBase
+from zuul.zk import ZooKeeperSimpleBase
 from zuul.zk.exceptions import BuildRequestNotFound
 
 
@@ -36,58 +36,44 @@ class BuildRequestEvent(Enum):
     DELETED = 4
 
 
-class ExecutorApi(ZooKeeperBase):
+class ExecutorApi(ZooKeeperSimpleBase):
 
     BUILD_REQUEST_ROOT = "/zuul/build-requests"
     LOCK_ROOT = "/zuul/build-request-locks"
-    DEFAULT_ZONE = "default-zone"
 
     log = logging.getLogger("zuul.zk.executor.ExecutorApi")
 
-    def __init__(
-        self,
-        client,
-        zone_filter=None,
-        build_request_callback=None,
-        build_event_callback=None,
-        use_cache=False,
-    ):
+    def __init__(self, client, zone_filter=None,
+                 build_request_callback=None,
+                 build_event_callback=None):
         super().__init__(client)
 
         self.zone_filter = zone_filter
         self.build_request_callback = build_request_callback
         self.build_event_callback = build_event_callback
-        self.use_cache = use_cache
 
         # path -> build request
         self._cached_build_requests = {}
 
-        if zone_filter is not None:
-            for zone in zone_filter:
-                self.registerZone(zone)
-        elif self.use_cache:
-            # Only register for all zones (which will create ChildWatches) if
-            # the cache is enabled.
-            self.registerAllZones()
+        if zone_filter is None:
+            zone_filter = [None]
+        for zone in zone_filter:
+            self.registerZone(zone)
 
     @property
     def initial_state(self):
+        # This supports holding build requests in tests
         return BuildRequestState.REQUESTED
 
-    def registerAllZones(self):
-        self.kazoo_client.ensure_path(self.BUILD_REQUEST_ROOT)
-
-        # Register a child watch that listens to new zones and automatically
-        # registers to them.
-        def watch_zones(children):
-            for zone in children:
-                self.registerZone(zone)
-
-        self.kazoo_client.ChildrenWatch(self.BUILD_REQUEST_ROOT, watch_zones)
+    def _getZoneRoot(self, zone):
+        if zone is None:
+            return "/".join([self.BUILD_REQUEST_ROOT, 'unzoned'])
+        else:
+            return "/".join([self.BUILD_REQUEST_ROOT, 'zones', zone])
 
     def registerZone(self, zone):
-        self.log.debug("Registering zone %s", zone)
-        zone_root = "/".join([self.BUILD_REQUEST_ROOT, zone])
+        zone_root = self._getZoneRoot(zone)
+        self.log.debug("Registering for zone %s at %s", zone, zone_root)
         self.kazoo_client.ensure_path(zone_root)
 
         self.kazoo_client.ChildrenWatch(
@@ -207,12 +193,11 @@ class ExecutorApi(ZooKeeperBase):
     def next(self):
         yield from self.inState(BuildRequestState.REQUESTED)
 
-    def submit(
-        self, uuid, tenant_name, pipeline_name, params, zone, precedence=200
-    ):
+    def submit(self, uuid, tenant_name, pipeline_name, params, zone,
+               precedence=200):
         log = get_annotated_logger(self.log, event=None, build=uuid)
 
-        path = "/".join([self.BUILD_REQUEST_ROOT, zone, uuid])
+        path = "/".join([self._getZoneRoot(zone), uuid])
 
         build_request = BuildRequest(
             uuid,
@@ -234,6 +219,8 @@ class ExecutorApi(ZooKeeperBase):
 
         return real_path
 
+    # We use child nodes here so that we don't need to lock the build
+    # request node.
     def requestResume(self, build_request):
         self.kazoo_client.ensure_path(f"{build_request.path}/resume")
 
