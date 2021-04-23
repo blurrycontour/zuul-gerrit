@@ -2011,7 +2011,7 @@ class JobGraph(object):
 class BuildRequestState(Enum):
     # Waiting
     REQUESTED = 0
-    HOLD = 1
+    HOLD = 1  # Used by tests to stall processing
     # Running
     RUNNING = 2
     PAUSED = 3
@@ -2023,16 +2023,8 @@ class BuildRequestState(Enum):
 class BuildRequest:
     """A request for a build in a specific zone"""
 
-    def __init__(
-        self,
-        uuid,
-        state,
-        precedence,
-        params,
-        zone,
-        tenant_name,
-        pipeline_name,
-    ):
+    def __init__(self, uuid, state, precedence, params, zone,
+                 tenant_name, pipeline_name):
         self.uuid = uuid
         self.state = state
         self.precedence = precedence
