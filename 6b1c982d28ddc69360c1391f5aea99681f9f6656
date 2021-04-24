@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e86a20d_3b76600d",
+        "filename": "tests/base.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 3111,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-24T00:11:00Z",
+      "side": 1,
+      "message": "Starting a class name with Test indicates that it holds unit tests and the autoloader will search it.  We should use other class names for both of these (if it is necessary to have them; I\u0027d like to avoid it as much as possible).",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "badd80fc_38658442",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 3161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-24T00:11:00Z",
+      "side": 1,
+      "message": "I\u0027m not sure every 60 minutes would be okay.  The only way to tell that an executor handling a build has not crashed is if the lock has disappeared, and we want to respond to that very quickly (less than a minute, I think).\n\nThis should probably run in the scheduler and operate across all zones at once, so that if all the executors for a zone go offline, their buildrequests are still released.",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "162ef751_6dcda3c5",
+        "filename": "zuul/model.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 1933,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-24T00:11:00Z",
+      "side": 1,
+      "message": "Ultimately, I think we can merge Build and BuildRequest as they have pretty much the same data.  But let\u0027s do that later since having a BuildRequest helps bridge the gap when removing gearman.",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "05fbdd5e_b6155bfb",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-24T00:11:00Z",
+      "side": 1,
+      "message": "Why not SimpleBase?",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "452fb984_7f722487",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-24T00:11:00Z",
+      "side": 1,
+      "message": "There\u0027s nothing stopping a user from creating a zone called \u0027default-zone\u0027.",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1fd28a_5a569173",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-24T00:11:00Z",
+      "side": 1,
+      "message": "I can\u0027t find any code that does anything with caching.  What was this argument meant to support?",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b2d8690_ec87d556",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-24T00:11:00Z",
+      "side": 1,
+      "message": "This is an important behavior change.  There is currently no support for an executor running jobs for all zones.  But, if I\u0027m following the code right, this isn\u0027t ever called by the actual executor since it\u0027s only called if zone_filter is None and use_cache is True.\n\nI think we can simplify the zone setup here.  I\u0027ll propose a cahnge.",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a2bd5d74_b81c834a",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-24T00:11:00Z",
+      "side": 1,
+      "message": "Why not use a treecache?\n\nAlso, do we really need a cache?  The scheduler and executor seem to be communicating by creating and deleting nodes, not by mutating data.  I\u0027m not sure there\u0027s actually a case where we\u0027re benefitting from the cache.  Maybe on the executor when receiving a new build request, but we could turn that into a queue where we submit the build uuid pretty easily (so the executor pops a uuid from the queue, tries to lock it, and if it locks it, reads the znode and proceeds).  The event callback already returns a new buildrequest along with the event.\n\nI think that leaves the lostBuildRequests method as the only thing that benefits from a cache?",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
