@@ -20,6 +20,7 @@ import os
 import tempfile
 import time
 
+import cachetools
 import kazoo
 import paramiko
 
@@ -268,6 +269,7 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
         self.password_bytes = password.encode("utf-8")
         self.backup = backup
 
+    @cachetools.cached(cache={})
     def getProjectSSHKeys(self, connection_name, project_name):
         key_project_name = strings.unique_project_name(project_name)
         key_path = self.SSH_PATH.format(connection_name, key_project_name)
@@ -335,6 +337,7 @@ class ZooKeeperKeyStorage(ZooKeeperBase, KeyStorage):
         data = json.dumps(keydata).encode("utf-8")
         self.kazoo_client.create(key_path, value=data, makepath=True)
 
+    @cachetools.cached(cache={})
     def getProjectSecretsKeys(self, connection_name, project_name):
         key_project_name = strings.unique_project_name(project_name)
         key_path = self.SECRETS_PATH.format(connection_name, key_project_name)

@@ -3712,7 +3712,7 @@ class TestProjectKeys(ZuulTestCase):
             with open(os.path.join(FIXTURE_DIR, fn)) as i:
                 test_keys.append(i.read())
 
-        keystore = self.scheds.first.sched.getKeyStorage()
+        keystore = self.scheds.first.sched.keystore
         private_secrets_key, public_secrets_key = (
             keystore.getProjectSecretsKeys("gerrit", "org/project")
         )
