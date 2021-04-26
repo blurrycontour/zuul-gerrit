@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d9394301_4eac8787",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-26T14:40:21Z",
+      "side": 1,
+      "message": "If I\u0027m reading https://github.com/prometheus/client_python/issues/132 correctly, It looks like we can switch this to \"::\" once our minimum python is 3.8.0?\n\nMaybe it\u0027s worth a comment with a link to that so we know why we\u0027re defaulting to v4 only?",
+      "revId": "9d2be1b2752157b0cbbb138b780657fefa71b843",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
