@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "383e58c0_5746798c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1832,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T21:53:45Z",
+      "side": 1,
+      "message": "cache_scheme seems to only be used if cache_root is passed along too. Do we need this scheme to be specified?",
+      "revId": "f6c29950a96be1356ab66b6dc489dd36782fb9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b69699d9_d51c1aef",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 744,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T21:53:45Z",
+      "side": 1,
+      "message": "Just thinking out loud here, may want to use a smaller type to differentiate against None with. Just for minor efficiency sake.",
+      "range": {
+        "startLine": 744,
+        "startChar": 41,
+        "endLine": 744,
+        "endChar": 43
+      },
+      "revId": "f6c29950a96be1356ab66b6dc489dd36782fb9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
