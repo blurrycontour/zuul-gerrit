@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7212b9a6_41037ee2",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1791,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T22:09:00Z",
+      "side": 1,
+      "message": "Should we be providing the cache_scheme here since it may differ from the GOLANG scheme used for the actual repo? Similar to what is done for untrusted checkouts below.",
+      "revId": "f6c29950a96be1356ab66b6dc489dd36782fb9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "383e58c0_5746798c",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
@@ -33,6 +50,23 @@
       "revId": "f6c29950a96be1356ab66b6dc489dd36782fb9a9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "94334486_ffceb265",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1841,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T22:09:00Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "f6c29950a96be1356ab66b6dc489dd36782fb9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     },
     {
       "key": {
@@ -70,6 +104,24 @@
       "writtenOn": "2021-04-26T21:58:41Z",
       "side": 1,
       "message": "Hrm, didn\u0027t think about that.  Like 0 or something?",
+      "revId": "f6c29950a96be1356ab66b6dc489dd36782fb9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a5273afe_2cbbffca",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 744,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T22:09:00Z",
+      "side": 1,
+      "message": "Yup.",
+      "parentUuid": "d7ef9f80_5b285c08",
       "revId": "f6c29950a96be1356ab66b6dc489dd36782fb9a9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
