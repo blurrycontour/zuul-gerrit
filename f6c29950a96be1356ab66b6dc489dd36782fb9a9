@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "0688451c_d32fd51a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1791,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-26T22:23:11Z",
+      "side": 1,
+      "message": "The cache root is the internal merger, and it always uses the \u0027unique\u0027 scheme, which is what we default to for the cache.",
+      "revId": "f6c29950a96be1356ab66b6dc489dd36782fb9a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "383e58c0_5746798c",
         "filename": "zuul/executor/server.py",
         "patchSetId": 1
