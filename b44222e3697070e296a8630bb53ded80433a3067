@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "61e45431_49e3f26d",
+        "filename": "tests/unit/test_github_driver.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T22:55:17Z",
+      "side": 1,
+      "message": "Does the commitConfigUpdate() above need to run before we release builds to ensure there isn\u0027t a race between timer jobs running and this update happening?",
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cbe4e183_94fd5911",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T22:55:17Z",
+      "side": 1,
+      "message": "This method only exists to log the job data at this point. Would it be better to simply pass it? Or remove it altogether?\n\nAs an alternative should we keep the method largely as is? its purpose is to return info back to gearman about build status. We can clean this up when gearman goes away? I think for now it would only make sense for the merge jobs?",
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e91c025f_11a7774a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T22:55:17Z",
+      "side": 1,
+      "message": "The import above is for TENANT_ROOT not TENANT_EVENT_ROOT.",
+      "range": {
+        "startLine": 1012,
+        "startChar": 51,
+        "endLine": 1012,
+        "endChar": 56
+      },
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68870a82_948cc368",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1433,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T22:55:17Z",
+      "side": 1,
+      "message": "Any concern that a busy tenant could starve the others? Maybe we should consider a breadth first approach? I though I suspect depth first like this is better most of the time.",
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43e16754_17630d16",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1694,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-26T22:55:17Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be subject to the build.job.attempts upper limit of retries too?",
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
