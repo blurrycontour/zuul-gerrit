@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f45fc407_af63b2df",
+        "filename": "zuul/cmd/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-26T13:31:02Z",
+      "side": 1,
+      "message": "Should this be \"::\" ?",
+      "revId": "5f66a6d3a6dbd85546277986eee6ed27c038bf53",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
