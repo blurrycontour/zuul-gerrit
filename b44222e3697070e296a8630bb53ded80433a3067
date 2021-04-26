@@ -76,6 +76,23 @@
     },
     {
       "key": {
+        "uuid": "cf97d4a4_d69c25ca",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1433,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-26T23:09:24Z",
+      "side": 1,
+      "message": "When there are multiple schedulers, we\u0027ll lock for processing at the pipeline level.  So this is probably the way to go to be most efficient then.  And of course, if there is starvation in that case, another scheduler can be added.\n\nAlso, I think since we get the event list at the start of the iterator, we\u0027ll eventually move on to other pipelines and tenants, so a busy tenant could cause other tenants to \u0027pause\u0027 but not completely starve them.",
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "43e16754_17630d16",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
@@ -90,6 +107,23 @@
       "revId": "b44222e3697070e296a8630bb53ded80433a3067",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "adebf377_d7551bab",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1694,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-26T23:09:24Z",
+      "side": 1,
+      "message": "I think this is a straight copy from the existing executor client and not a change in logic.\n\nRegardless, I think this is correct -- an executor crashing shouldn\u0027t penalize the job.",
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
