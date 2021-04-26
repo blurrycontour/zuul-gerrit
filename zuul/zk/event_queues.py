@@ -571,6 +571,8 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
         )
 
     def put(self, data):
+        self.log.debug("Submitting connection event to queue %s: %s",
+                       self.event_root, data)
         self._put(data)
 
     def __iter__(self):
