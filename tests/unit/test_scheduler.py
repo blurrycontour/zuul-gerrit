@@ -7339,6 +7339,13 @@ class TestSemaphore(ZuulTestCase):
             len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
             0)
 
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.semaphore.test-semaphore.holders',
+            value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.semaphore.test-semaphore.holders',
+            value='0', kind='g')
+
     def test_semaphore_two(self):
         "Test semaphores with max>1"
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
