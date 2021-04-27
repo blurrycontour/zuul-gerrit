@@ -215,8 +215,8 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderJobStatusLabel (result) {
-    let className
+  renderJobStatusLabel (job, result) {
+    let className, title
     switch (result) {
       case 'success':
         className = 'label-success'
@@ -234,13 +234,19 @@ class ChangePanel extends React.Component {
       case 'skipped':
         className = 'label-info'
         break
-      // 'in progress' 'queued' 'lost' 'aborted' 'waiting' ...
+      case 'waiting':
+        className = 'label-default'
+        if (job.waiting_status !== null) {
+          title = 'Waiting on ' + job.waiting_status
+        }
+        break
+      // 'in progress' 'queued' 'lost' 'aborted' ...
       default:
         className = 'label-default'
     }
 
     return (
-      <span className={'zuul-job-result label ' + className}>{result}</span>
+      <span className={'zuul-job-result label ' + className} title={title}>{result}</span>
     )
   }
 
@@ -272,7 +278,7 @@ class ChangePanel extends React.Component {
       resultBar = this.renderJobProgressBar(
         job.elapsed_time, job.remaining_time)
     } else {
-      resultBar = this.renderJobStatusLabel(result)
+      resultBar = this.renderJobStatusLabel(job, result)
     }
 
     return (
