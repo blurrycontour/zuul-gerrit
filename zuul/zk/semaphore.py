@@ -84,8 +84,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
                 semaphore_holders, zstat = self.getHolders(semaphore_path)
                 continue
 
-            log.debug("Semaphore %s acquired: job %s, item %s",
-                      job.semaphore.name, job.name, item)
+            log.info("Semaphore %s acquired: job %s, item %s",
+                     job.semaphore.name, job.name, item)
             return True
 
         return False
@@ -121,8 +121,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
                     semaphore_path)
                 continue
 
-            log.debug("Semaphore %s released for %s",
-                      semaphore_path, semaphore_handle)
+            log.info("Semaphore %s released for %s",
+                     semaphore_path, semaphore_handle)
             break
 
     def release(self, item, job):
