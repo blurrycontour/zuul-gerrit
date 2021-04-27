@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "ef0a28bc_b332ce05",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-27T05:13:49Z",
+      "side": 1,
+      "message": "IIRC I remove this method in the follow up change, when we switch from Gearman to ZooKeeper for the actual job execution (BuildRequest). In here I just moved all the different parts that deal with build result events into a single place in the scheduler.\n\nI think we should keep it for now, to not cause any issues with gearman.",
+      "parentUuid": "cbe4e183_94fd5911",
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e91c025f_11a7774a",
         "filename": "zuul/scheduler.py",
         "patchSetId": 7
@@ -64,6 +82,30 @@
       "writtenOn": "2021-04-26T22:55:17Z",
       "side": 1,
       "message": "The import above is for TENANT_ROOT not TENANT_EVENT_ROOT.",
+      "range": {
+        "startLine": 1012,
+        "startChar": 51,
+        "endLine": 1012,
+        "endChar": 56
+      },
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c3f2eb64_d0e0b373",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1012,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-27T05:13:49Z",
+      "side": 1,
+      "message": "I did the following import in my version of the change:\n\nfrom zuul.zk.event_queues import TENANT_ROOT as TENANT_EVENT_ROOT\n\nThe main reason was to make the delete part that uses this variable further down a little more understandable. We are not removing the whole tenant there, but just the event queues in ZooKeeper. Maybe we will change the variable name in the event_queues module later on as well, but I didn\u0027t want to do this in here.",
+      "parentUuid": "e91c025f_11a7774a",
       "range": {
         "startLine": 1012,
         "startChar": 51,
@@ -138,6 +180,24 @@
       "writtenOn": "2021-04-26T23:09:24Z",
       "side": 1,
       "message": "I think this is a straight copy from the existing executor client and not a change in logic.\n\nRegardless, I think this is correct -- an executor crashing shouldn\u0027t penalize the job.",
+      "revId": "b44222e3697070e296a8630bb53ded80433a3067",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1709825f_86deda34",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 1694,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-27T05:13:49Z",
+      "side": 1,
+      "message": "Yes the whole result event handling is just copy/move of the existing parts from different places. I did just a few adaptions to make the parts work together in a single place.",
+      "parentUuid": "adebf377_d7551bab",
       "revId": "b44222e3697070e296a8630bb53ded80433a3067",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
