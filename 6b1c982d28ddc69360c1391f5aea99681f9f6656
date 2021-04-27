@@ -135,6 +135,24 @@
       "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "749be23f_3d6abef6",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-04-27T08:23:22Z",
+      "side": 1,
+      "message": "I don\u0027t fully understand that. I thought you were suggesting to use a cache for the builds API to not ask ZooKeeper directly for the builds, but only operate on the cached data structure.\n\nThinking about that know: With the current build result change, the scheduler doesn\u0027t need to process the BuildRequest when a build is completed because the BuildCompletedEvent now contains all information. But, there is also the \"future\" use case of calculating stats metrics like queued/running builds based on the ExecutorApi and for those it would make a big difference if we iterate over all builds in ZK directly or in a cache since we have to evaluate their state (queued/running/completed).\n\nAnother option might be: When each executor stores the number of running builds in its component, we could sum those values up in the scheduler when calculating the stats. For the queued builds we could do something like queued \u003d total - running, whereby total is the number of child nodes in ZK. Calling kazoo.get_children() shouldn\u0027t be too costly.",
+      "parentUuid": "a2bd5d74_b81c834a",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
