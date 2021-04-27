@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "01c7d64e_eafc45f2",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-27T13:16:28Z",
+      "side": 1,
+      "message": "It would probably be better if we continued to count the resources as used by the tenant until the hold is removed, however it\u0027s possible for someone to remove the node before removing the hold record, and we would lose track of the resource values then.  So this is probably the best we can do right now without changing more of how we track held nodes.",
+      "revId": "da60b252a70099316d0de702dcf48b0ce3cb69dd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
