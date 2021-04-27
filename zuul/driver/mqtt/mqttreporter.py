@@ -17,6 +17,7 @@ import time
 import voluptuous as v
 
 from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.reporter import BaseReporter
 
 
@@ -73,7 +74,10 @@ class MQTTReporter(BaseReporter):
                     'web_url': web_url,
                     'result': result,
                     'dependencies': [j.name for j in job.dependencies],
+                    'artifacts': get_artifacts_from_result_data(
+                        build.result_data, logger=log)
                 })
+
                 # Report build data of retried builds if available
                 retry_builds = item.current_build_set.getRetryBuildsForJob(
                     job.name)
