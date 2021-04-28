@@ -259,6 +259,15 @@ class ExecutorApi(ZooKeeperSimpleBase):
             )
 
     def get(self, path):
+        """Get a build request
+
+        Note: do not mix get with iteration; iteration returns cached
+        BuildRequests while get returns a newly created object each
+        time.  If you lock a BuildRequest, you must use the same
+        object to unlock it.
+
+        """
+
         try:
             data, zstat = self.kazoo_client.get(path)
         except NoNodeError:
@@ -282,6 +291,12 @@ class ExecutorApi(ZooKeeperSimpleBase):
             self.kazoo_client.delete(build_request.path, recursive=True)
         except NoNodeError:
             # Nothing to do if the node is already deleted
+            pass
+        try:
+            # Delete the lock parent node as well.
+            path = "/".join([self.LOCK_ROOT, build_request.uuid])
+            self.kazoo_client.delete(path, recursive=True)
+        except NoNodeError:
             pass
 
     def _watchBuildEvents(self, actions, event=None):
@@ -314,6 +329,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
             self.log.error(
                 "Timeout trying to acquire lock: %s", build_request.uuid
             )
+        # Can this actually happen?
         except NoNodeError:
             have_lock = False
             self.log.error(
@@ -323,6 +339,24 @@ class ExecutorApi(ZooKeeperSimpleBase):
         # If we aren't blocking, it's possible we didn't get the lock
         # because someone else has it.
         if not have_lock:
+            return False
+
+        if not self.kazoo_client.exists(build_request.path):
+            lock.release()
+            self.log.error(
+                "Build not found for locking: %s", build_request.uuid
+            )
+
+            # We may have just re-created the lock parent node just
+            # after the scheduler deleted it; therefore we should
+            # (re-) delete it.
+            try:
+                # Delete the lock parent node as well.
+                path = "/".join([self.LOCK_ROOT, build_request.uuid])
+                self.kazoo_client.delete(path, recursive=True)
+            except NoNodeError:
+                pass
+
             return False
 
         build_request.lock = lock
