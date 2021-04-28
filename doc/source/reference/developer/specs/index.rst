@@ -21,3 +21,4 @@ documentation instead.
    circular-dependencies
    scale-out-scheduler
    zuul-runner
+   tenant-resource-quota
