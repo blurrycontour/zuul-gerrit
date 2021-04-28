@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3d57f928_481eae84",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-04-28T08:46:25Z",
+      "side": 1,
+      "message": "nit: Seems like the waiting_status field is always in the format \"xxx: yyy[, ...]\" thus to avoid a repetition of colons we could simply prefix the title with \"Waiting on \"",
+      "range": {
+        "startLine": 239,
+        "startChar": 17,
+        "endLine": 239,
+        "endChar": 28
+      },
+      "revId": "64289f112f96748e3f4638d201fbfa30f6d20b6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef472d6d_a3d5cb99",
+        "filename": "web/src/containers/status/ChangePanel.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-04-28T08:46:25Z",
+      "side": 1,
+      "message": "nit: to remove since it\u0027s got its own case now",
+      "range": {
+        "startLine": 241,
+        "startChar": 49,
+        "endLine": 241,
+        "endChar": 57
+      },
+      "revId": "64289f112f96748e3f4638d201fbfa30f6d20b6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
