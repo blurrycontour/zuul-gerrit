@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "606c1fb9_472a09e0",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-04-28T06:27:05Z",
+      "side": 1,
+      "message": "I guess this was suppose to use semaphore_key instead of semaphore_name?",
+      "revId": "11a219123b5080b9a3f00136c952cdfd0a0719ea",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
