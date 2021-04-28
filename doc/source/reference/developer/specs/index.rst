@@ -22,3 +22,4 @@ documentation instead.
    scale-out-scheduler
    zuul-runner
    enhanced-regional-executors
+   tenant-resource-quota
