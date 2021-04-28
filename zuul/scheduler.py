@@ -219,7 +219,8 @@ class Scheduler(threading.Thread):
         if not testonly:
             self.executor = ExecutorClient(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
-            self.nodepool = nodepool.Nodepool(self)
+            self.nodepool = nodepool.Nodepool(
+                self.zk_client, self.hostname, self.statsd, self)
 
     def start(self):
         super(Scheduler, self).start()
