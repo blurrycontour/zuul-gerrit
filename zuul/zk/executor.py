@@ -260,6 +260,15 @@ class ExecutorApi(ZooKeeperSimpleBase):
             )
 
     def get(self, path):
+        """Get a build request
+
+        Note: do not mix get with iteration; iteration returns cached
+        BuildRequests while get returns a newly created object each
+        time.  If you lock a BuildRequest, you must use the same
+        object to unlock it.
+
+        """
+
         try:
             data, zstat = self.kazoo_client.get(path)
         except NoNodeError:

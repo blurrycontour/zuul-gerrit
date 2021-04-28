@@ -163,8 +163,60 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Scheduler removes build request on completion
         client.remove(sched_a)
 
-    # TODO: test scheduler forcibly removing buildrequest
+    def test_build_request_remove(self):
+        # Test the scheduler forcibly removing a request (perhaps the
+        # tenant is being deleted, so there will be no result queue).
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        # Scheduler submits request
+        client.submit("A", "tenant", "pipeline", {}, None)
+        request_queue.get(timeout=30)
+
+        # Executor receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # Executor locks request
+        self.assertTrue(server.lock(a, blocking=False))
+        a.state = BuildRequestState.RUNNING
+        server.update(a)
+        self.assertEqual(client.get(a.path).state, BuildRequestState.RUNNING)
+
+        # Executor should see no pending requests
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 0)
+        self.assertTrue(event_queue.empty())
+
+        # Scheduler rudely removes build request
+        sched_a = client.get(a.path)
+        client.remove(sched_a)
+
+        # Make sure it shows up as deleted
+        (build_request, event) = event_queue.get(timeout=30)
+        self.assertEqual(build_request, a)
+        self.assertEqual(event, BuildRequestEvent.DELETED)
+
+        # Executor should not write anything else since the request
+        # was deleted.
+
     # TODO: test hold process
+    # TODO: lock build that doesn't exist
 
     def test_lost_build_requests(self):
         # Test that lostBuildRequests() returns unlocked running build
