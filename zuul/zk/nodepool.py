@@ -150,6 +150,19 @@ class ZooKeeperNodepool(ZooKeeperBase):
             return []
 
     def getHoldRequest(self, hold_request_id):
+        # To be friendly, zero pad if this request came from a client
+        # call, where the user might have done "zuul autohold-delete
+        # 123" thinking that would match the "0000000123" shown in
+        # "autohold-list".
+        #
+        #  "A sequential node will be given the specified path plus a
+        #  suffix i where i is the current sequential number of the
+        #  node. The sequence number is always fixed length of 10
+        #  digits, 0 padded. Once such a node is created, the
+        #  sequential number will be incremented by one."
+        if len(hold_request_id) != 10:
+            hold_request_id = hold_request_id.rjust(10, '0')
+
         path = self.HOLD_REQUEST_ROOT + "/" + hold_request_id
         try:
             data, stat = self.kazoo_client.get(path)
