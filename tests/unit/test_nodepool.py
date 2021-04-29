@@ -42,12 +42,14 @@ class TestNodepool(BaseTestCase):
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
         self.hostname = 'nodepool-test-hostname'
+        # empty tenants dict
+        self.tenants = {}
 
         self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
         self.nodepool = zuul.nodepool.Nodepool(
-            self.zk_client, self.hostname, self.statsd, self)
+            self.zk_client, self.hostname, self.statsd, self.tenants, self)
 
         self.fake_nodepool = FakeNodepool(self.zk_chroot_fixture)
         self.addCleanup(self.fake_nodepool.stop)

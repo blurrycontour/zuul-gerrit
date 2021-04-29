@@ -227,7 +227,8 @@ class Scheduler(threading.Thread):
             self.executor = self._executor_client_class(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
             self.nodepool = nodepool.Nodepool(
-                self.zk_client, self.hostname, self.statsd, self)
+                self.zk_client, self.hostname, self.statsd,
+                list(self.abide.tenants.keys()), self)
 
     def start(self):
         super(Scheduler, self).start()
@@ -898,6 +899,9 @@ class Scheduler(threading.Thread):
                         f"Configuration errors: {summary}")
 
             self.abide = abide
+
+            # update tenants known to nodepool client
+            self.nodepool.tenants = list(self.abide.tenants.keys())
         finally:
             self.layout_lock.release()
 
@@ -958,6 +962,9 @@ class Scheduler(threading.Thread):
                     self._reconfigureTenant(tenant, old_tenant)
                 else:
                     self._reconfigureDeleteTenant(old_tenant)
+
+            # update tenants known to nodepool client
+            self.nodepool.tenants = list(self.abide.tenants.keys())
         duration = round(time.monotonic() - start, 3)
         self.log.info("Smart reconfiguration of tenants %s complete "
                       "(duration: %s seconds)", reconfigured_tenants, duration)
