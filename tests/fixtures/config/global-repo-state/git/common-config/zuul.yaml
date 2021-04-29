@@ -26,16 +26,28 @@
         - event: comment-added
           approval:
             - Code-Review: 2
+      github:
+        - event: pull_request
+          action: opened
     success:
       gerrit:
         Verified: 1
         submit: true
+      github:
+        check: success
+        comment: false
     failure:
       gerrit:
         Verified: -1
+      github:
+        check: failure
+        comment: false
     start:
       gerrit:
         Verified: 0
+      github:
+        check: in_progress
+        comment: false
     precedence: high
 
 - job:
