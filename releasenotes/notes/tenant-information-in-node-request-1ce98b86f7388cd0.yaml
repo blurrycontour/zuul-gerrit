@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Add the name of the tenant to node requests. This new field is passed to
+    ZooKeeper in preparation of a tenant-aware nodepool.  Also, new statsd
+    guage metrics of current open node requests are exported in the form
+    ``zuul.nodepool.tenant.<tenant>.current_requests``. This metric tracks the
+    currently open node requests per tenant. It drills down the overall
+    ``zuul.nodepool.current_requests`` metric.
