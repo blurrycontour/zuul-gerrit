@@ -864,6 +864,7 @@ class PipelineManager(metaclass=ABCMeta):
         return self._loadDynamicLayout(item)
 
     def _branchesForRepoState(self, projects, tenant, items=None):
+        items = items or []
         if all(tenant.getExcludeUnprotectedBranches(project)
                for project in projects):
             branches = set()
@@ -873,9 +874,22 @@ class PipelineManager(metaclass=ABCMeta):
                 branches.update(tenant.getProjectBranches(project))
 
             # Additionally add all target branches of all involved items.
-            if items is not None:
-                branches.update(item.change.branch for item in items
-                                if hasattr(item.change, 'branch'))
+            branches.update(item.change.branch for item in items
+                            if hasattr(item.change, 'branch'))
+
+            # Make sure override-checkout targets are part of the repo state
+            for item in items:
+                if not item.job_graph:
+                    continue
+
+                for job in item.job_graph.jobs.values():
+                    if job.override_checkout:
+                        branches.add(job.override_checkout)
+
+                    for p in job.required_projects.values():
+                        if p.override_checkout:
+                            branches.add(p.override_checkout)
+
             branches = list(branches)
         else:
             branches = None
@@ -959,7 +973,8 @@ class PipelineManager(metaclass=ABCMeta):
                 item.current_build_set.COMPLETE
             return True
 
-        branches = self._branchesForRepoState(projects=projects, tenant=tenant)
+        branches = self._branchesForRepoState(
+            projects=projects, tenant=tenant, items=[item])
 
         new_items = list()
         for project in projects:
