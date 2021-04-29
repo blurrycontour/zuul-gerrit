@@ -54,7 +54,6 @@ class Nodepool(object):
         #  timer   zuul.nodepool.requests.(fulfilled|failed)
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<label>
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<size>
-        #  gauge   zuul.nodepool.current_requests
         if not self.statsd:
             return
         pipe = self.statsd.pipeline()
@@ -78,7 +77,6 @@ class Nodepool(object):
         pipe.incr(key + '.size.%s' % len(request.nodeset.nodes))
         if dt:
             pipe.timing(key + '.size.%s' % len(request.nodeset.nodes), dt)
-        pipe.gauge('zuul.nodepool.current_requests', len(self.requests))
         pipe.send()
 
     def emitStatsResources(self):
