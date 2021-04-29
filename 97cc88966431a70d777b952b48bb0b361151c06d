@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83a962db_d9df51d1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 838,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-29T10:47:24Z",
+      "side": 1,
+      "message": "Should be:\n\n    if fallback_layout is None:",
+      "revId": "97cc88966431a70d777b952b48bb0b361151c06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c25868dc_6677648a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 847,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-29T10:47:24Z",
+      "side": 1,
+      "message": "I think there is no need to re-calculate the layout of all items ahead as we just need the \"nearest\" one.",
+      "revId": "97cc88966431a70d777b952b48bb0b361151c06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "415ee9b0_6ad46b75",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 859,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-29T10:47:24Z",
+      "side": 1,
+      "message": "This won\u0027t work for independent pipelines as the item ahead can be non-live and therefore won\u0027t have a job graph. In case it updates config we\u0027d still need to create the layout.",
+      "revId": "97cc88966431a70d777b952b48bb0b361151c06d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
