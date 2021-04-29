@@ -879,6 +879,7 @@ class NodeRequest(object):
         d['state_time'] = self.state_time
         d['relative_priority'] = self.relative_priority
         d['event_id'] = self.event_id
+        d['tenant_name'] = self.tenant_name
         return d
 
     def updateFromDict(self, data):
@@ -887,6 +888,11 @@ class NodeRequest(object):
         self.state_time = data['state_time']
         self.relative_priority = data.get('relative_priority', 0)
         self.event_id = data['event_id']
+        # Make sure we don't update tenant_name to 'None'.
+        # This can happen if nodepool does not report one back and leads
+        # to errors at other places where we rely on that info.
+        if 'tenant_name' in data:
+            self.tenant_name = data['tenant_name']
 
     @classmethod
     def fromDict(cls, data):
