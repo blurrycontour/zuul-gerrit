@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4b09fc79_adc1aaae",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3469,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-04-29T10:54:46Z",
+      "side": 1,
+      "message": "Since this change also updates config it is not really testing the fallback layout code path. I\u0027ll remove the config change so it is using the layout of the item ahead.",
+      "revId": "4b7ab6990f0130b49de7e19b5bdec2b04638167f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
