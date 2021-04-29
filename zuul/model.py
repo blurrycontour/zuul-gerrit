@@ -809,6 +809,10 @@ class NodeRequest(object):
         self.relative_priority = relative_priority
         self.provider = provider
         self.id = None
+        if build_set is not None:
+            self.tenant = build_set.item.pipeline.tenant.name
+        else:
+            self.tenant = None
         self._zk_data = {}  # Data that we read back from ZK
         if event is not None:
             self.event_id = event.zuul_event_id
@@ -865,6 +869,7 @@ class NodeRequest(object):
         d['state_time'] = self.state_time
         d['relative_priority'] = self.relative_priority
         d['event_id'] = self.event_id
+        d['tenant'] = self.tenant
         return d
 
     def updateFromDict(self, data):

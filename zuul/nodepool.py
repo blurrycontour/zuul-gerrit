@@ -55,6 +55,7 @@ class Nodepool(object):
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<label>
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<size>
         #  gauge   zuul.nodepool.current_requests
+        #  gauge   zuul.nodepool.tenant.<tenant>.current_requests
         if not self.statsd:
             return
         pipe = self.statsd.pipeline()
@@ -79,6 +80,34 @@ class Nodepool(object):
         if dt:
             pipe.timing(key + '.size.%s' % len(request.nodeset.nodes), dt)
         pipe.gauge('zuul.nodepool.current_requests', len(self.requests))
+
+        # export current_requests stats per tenant
+        tenant_requests = defaultdict(int)
+        # skip if we don't have a scheduler reference (e.g. when called from
+        # an executor). In this case we can't report tenant stats as we don't
+        # know the current config
+        if self.sched:
+            tenants = list(self.sched.abide.tenants.keys())
+
+            # need to initialize tenants here explicitly to report a zero for
+            # all tenants for which no requests are in-flight
+            for tenant_name in tenants:
+                tenant_requests[tenant_name] = 0
+
+            for r in self.requests.values():
+                # might be None, we ignore them for this metric
+                if not r.tenant:
+                    continue
+                tenant_requests[r.tenant] += 1
+
+        for tenant, request_count in tenant_requests.items():
+            # the custom statsd clients' format is not supported for pipelines
+            # therefore call _format_stat here manually.
+            stats_key = self.statsd._format_stat(
+                'zuul.nodepool.tenant.{tenant}.current_requests',
+                tenant=tenant)
+            pipe.gauge(stats_key, request_count)
+
         pipe.send()
 
     def emitStatsResources(self):
