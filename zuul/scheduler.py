@@ -220,7 +220,8 @@ class Scheduler(threading.Thread):
             self.executor = ExecutorClient(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
             self.nodepool = nodepool.Nodepool(
-                self.zk_client, self.hostname, self.statsd, self)
+                self.zk_client, self.hostname, self.statsd,
+                self.abide.tenants, self)
 
     def start(self):
         super(Scheduler, self).start()

@@ -33,9 +33,10 @@ def subtract_resources(target, source):
 class Nodepool(object):
     log = logging.getLogger('zuul.nodepool')
 
-    def __init__(self, zk_client, hostname, statsd, scheduler=None):
+    def __init__(self, zk_client, hostname, statsd, tenants, scheduler=None):
         self.hostname = hostname
         self.statsd = statsd
+        self.tenants = tenants
         # TODO (felix): Remove the scheduler parameter once the nodes are
         # locked on the executor side.
         self.sched = scheduler
@@ -55,6 +56,7 @@ class Nodepool(object):
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<label>
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<size>
         #  gauge   zuul.nodepool.current_requests
+        #  gauge   zuul.nodepool.tenant.<tenant>.current_requests
         if not self.statsd:
             return
         pipe = self.statsd.pipeline()
@@ -79,6 +81,27 @@ class Nodepool(object):
         if dt:
             pipe.timing(key + '.size.%s' % len(request.nodeset.nodes), dt)
         pipe.gauge('zuul.nodepool.current_requests', len(self.requests))
+
+        # count the current requests of all tenants
+        # first get all currently configured tenants
+        tenant_requests = defaultdict(int)
+        for tenant_name in self.tenants.keys():
+            tenant_requests[tenant_name] = 0
+
+        for r in self.requests.values():
+            # (might be None, we report them separately as 'unknown')
+            tenant_name = r.tenant if r.tenant else 'unknown'
+            tenant_requests[tenant_name] += 1
+
+        # export current_requests stats per tenant
+        for tenant, request_count in tenant_requests.items():
+            # the custom statsd clients' format is not supported for pipelines
+            # therefore call _format_stat here manually.
+            stats_key = self.statsd._format_stat(
+                'zuul.nodepool.tenant.{tenant}.current_requests',
+                tenant=tenant)
+            pipe.gauge(stats_key, request_count)
+
         pipe.send()
 
     def emitStatsResources(self):
