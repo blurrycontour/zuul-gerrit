@@ -658,7 +658,7 @@ class PipelineManager(metaclass=ABCMeta):
     def executeJobs(self, item):
         # TODO(jeblair): This should return a value indicating a job
         # was executed.  Appears to be a longstanding bug.
-        if not item.layout:
+        if not item.job_graph:
             return False
 
         jobs = item.findJobsToRun(
@@ -829,14 +829,36 @@ class PipelineManager(metaclass=ABCMeta):
             item.setConfigError("Unknown configuration error")
             return None
 
-    def getLayout(self, item):
-        if item.item_ahead:
+
+    def getFallbackLayout(self, item):
+        if not item.item_ahead:
+            return item.pipeline.tenant.layout
+
+        fallback_layout = item.item_ahead.layout
+        if fallback_layout is not None:
+            # The fallback layout is not existing currently. Since the
+            # item ahead has a job graph we know that all items ahead
+            # have or had the layout set. Since the layout can be reset
+            # during reconfigurations we need to recalculate it.
+            for parent_item in reversed(list(item.items_ahead)):
+                if not parent_item.layout:
+                    self.log.info("Recalculating layout of parent item %s",
+                                  parent_item)
+                    parent_item.layout = self.getLayout(parent_item)
             fallback_layout = item.item_ahead.layout
             if fallback_layout is None:
-                # We're probably waiting on a merge job for the item ahead.
+                raise RuntimeError('Re-calculation of layouts failed')
+        return fallback_layout
+
+    def getLayout(self, item):
+        self.log.error('getLayout %s', item)
+        if item.item_ahead:
+            # Check if the item ahead has a job graph. If not it hasn't
+            # finished job freezing and is likely waiting on a merge job.
+            # Therefore we need to wait as well.
+            if not item.item_ahead.job_graph:
+                self.log.error('Item ahead %s has no job graph', item.item_ahead)
                 return None
-        else:
-            fallback_layout = item.pipeline.tenant.layout
 
         # If the current change does not update the layout, use its parent.
         # If the bundle doesn't update the config or the bundle updates the
@@ -852,14 +874,14 @@ class PipelineManager(metaclass=ABCMeta):
                 )[1] is not None
             )
         ):
-            return fallback_layout
+            return self.getFallbackLayout(item)
         # Else this item updates the config,
         # ask the merger for the result.
         build_set = item.current_build_set
         if build_set.merge_state != build_set.COMPLETE:
             return None
         if build_set.unable_to_merge:
-            return fallback_layout
+            return self.getFallbackLayout(item)
         self.log.debug("Preparing dynamic layout for: %s" % item.change)
         return self._loadDynamicLayout(item)
 
@@ -872,10 +894,12 @@ class PipelineManager(metaclass=ABCMeta):
             for project in projects:
                 branches.update(tenant.getProjectBranches(project))
 
-            # Additionally add all target branches of all involved items.
+            # Additionally add all target branches of all involved items plus
+            # override-checkout branches.
             if items is not None:
                 branches.update(item.change.branch for item in items
                                 if hasattr(item.change, 'branch'))
+                # TODO: Add override-checkout
             branches = list(branches)
         else:
             branches = None
@@ -976,6 +1000,7 @@ class PipelineManager(metaclass=ABCMeta):
         return True
 
     def prepareItem(self, item: QueueItem) -> bool:
+        self.log.warning('prepareItem %s', item)
         build_set = item.current_build_set
         tenant = item.pipeline.tenant
         # We always need to set the configuration of the item if it
@@ -1033,9 +1058,10 @@ class PipelineManager(metaclass=ABCMeta):
         # None if there was an error that makes the layout unusable.
         # In the last case, it will have set the config_errors on this
         # item, which may be picked up by the next itme.
-        if not item.layout:
+        if not item.layout and not item.job_graph:
             item.layout = self.getLayout(item)
-        if not item.layout:
+            self.log.warning('prepareItem got layout %s for item %s', item.layout, item)
+        if not item.layout and not item.job_graph:
             return False
 
         # If the change can not be merged or has config errors, don't
