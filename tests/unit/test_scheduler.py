@@ -3420,6 +3420,81 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
 
+    def test_live_reconfiguration_dynamic(self):
+        "Test that live reconfiguration works"
+        self.executor_server.hold_jobs_in_build = True
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test3
+                parent: project-test1
+
+            # add a job by the canonical project name
+            - project:
+                gate:
+                  jobs:
+                    - project-test3:
+                        dependencies:
+                          - project-merge
+            """)
+
+        file_dict = {'zuul.d/a.yaml': in_repo_conf}
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        # Enqueue a further change into the gate
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test4
+                parent: project-test1
+
+            # add a job by the canonical project name
+            - project:
+                gate:
+                  jobs:
+                    - project-test4:
+                        dependencies:
+                          - project-merge
+            """)
+        file_dict = {'zuul.d/b.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict,
+                                           parent='refs/changes/01/1/1')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('project-merge')
+        self.waitUntilSettled()
+
+        # Expecting from:
+        # A: project-test1, project-test2, project-test3
+        # B: project-merge
+        self.assertEqual(len(self.builds), 4)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('project-merge').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test1').result,
+                         'SUCCESS')
+        self.assertEqual(self.getJobFromHistory('project-test2').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(B.reported, 2)
+
     def test_live_reconfiguration_command_socket(self):
         "Test that live reconfiguration via command socket works"
 
