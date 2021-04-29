@@ -324,6 +324,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
             self.log.error(
                 "Timeout trying to acquire lock: %s", build_request.uuid
             )
+        # Can this actually happen?
         except NoNodeError:
             have_lock = False
             self.log.error(
@@ -333,6 +334,13 @@ class ExecutorApi(ZooKeeperSimpleBase):
         # If we aren't blocking, it's possible we didn't get the lock
         # because someone else has it.
         if not have_lock:
+            return False
+
+        if not self.kazoo_client.exists(build_request.path):
+            lock.release()
+            self.log.error(
+                "Build not found for locking: %s", build_request.uuid
+            )
             return False
 
         build_request.lock = lock

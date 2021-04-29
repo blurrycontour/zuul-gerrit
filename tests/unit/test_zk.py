@@ -268,7 +268,33 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
         # The rest is redundant.
 
-    # TODO: lock build that doesn't exist
+    def test_nonexistent_lock(self):
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+
+        # Scheduler submits request
+        a_path = client.submit("A", "tenant", "pipeline", {}, None)
+        sched_a = client.get(a_path)
+
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        exec_a = server.get(a_path)
+        client.remove(sched_a)
+
+        # Try to lock a request that was just removed
+        self.assertFalse(server.lock(exec_a))
 
     def test_lost_build_requests(self):
         # Test that lostBuildRequests() returns unlocked running build
