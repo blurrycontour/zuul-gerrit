@@ -87,6 +87,17 @@ class TestZK(ZooKeeperBaseTestCase):
         self.assertEqual([], self.zk_nodepool.getHoldRequests())
 
 
+class HoldableExecutorApi(ExecutorApi):
+    hold_in_queue = False
+
+    @property
+    def initial_state(self):
+        # This supports holding build requests in tests
+        if self.hold_in_queue:
+            return BuildRequestState.HOLD
+        return BuildRequestState.REQUESTED
+
+
 class TestExecutorApi(ZooKeeperBaseTestCase):
     def test_build_request(self):
         # Test the lifecycle of a build request
@@ -215,7 +226,48 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # Executor should not write anything else since the request
         # was deleted.
 
-    # TODO: test hold process
+    def test_build_request_hold(self):
+        # Test that we can hold a build request in "queue"
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        def rq_put():
+            request_queue.put(None)
+
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = HoldableExecutorApi(self.zk_client)
+        client.hold_in_queue = True
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        # Scheduler submits request
+        a_path = client.submit("A", "tenant", "pipeline", {}, None)
+        request_queue.get(timeout=30)
+
+        # Executor receives nothing
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 0)
+
+        # Test releases hold
+        a = client.get(a_path)
+        self.assertEqual(a.uuid, 'A')
+        a.state = BuildRequestState.REQUESTED
+        client.update(a)
+
+        # Executor receives request
+        request_queue.get(timeout=30)
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
+
+        # The rest is redundant.
+
     # TODO: lock build that doesn't exist
 
     def test_lost_build_requests(self):
