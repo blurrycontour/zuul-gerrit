@@ -47,6 +47,7 @@ class Nodepool(object):
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<label>
         #  timer   zuul.nodepool.requests.(fulfilled|failed).<size>
         #  gauge   zuul.nodepool.current_requests
+        #  gauge   zuul.nodepool.tenant.<tenant>.current_requests
         if not self.sched.statsd:
             return
         statsd = self.sched.statsd
@@ -72,6 +73,24 @@ class Nodepool(object):
         if dt:
             pipe.timing(key + '.size.%s' % len(request.nodeset.nodes), dt)
         pipe.gauge('zuul.nodepool.current_requests', len(self.requests))
+
+        # count the current requests of all tenants
+        # first get all currently configured tenants
+        tenant_requests = defaultdict(int)
+        for tenant_name in self.sched.abide.tenants.keys():
+            tenant_requests[tenant_name] = 0
+
+        for r in self.requests.values():
+            # (might be None, we report them separately as 'unknown')
+            tenant_name = r.tenant if r.tenant else 'unknown'
+            tenant_requests[tenant_name] += 1
+
+        # export current_requests stats per tenant
+        for tenant, request_count in tenant_requests.items():
+            pipe.gauge(
+                'zuul.nodepool.tenant.%s.current_requests' % tenant,
+                request_count)
+
         pipe.send()
 
     def emitStatsResources(self):

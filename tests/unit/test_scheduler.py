@@ -433,6 +433,9 @@ class TestScheduler(ZuulTestCase):
         self.assertReportedStat(
             'zuul.nodepool.current_requests', value='1', kind='g')
         self.assertReportedStat(
+            'zuul.nodepool.tenant.tenant-one.current_requests', value='1',
+            kind='g')
+        self.assertReportedStat(
             'zuul.executors.online', value='1', kind='g')
         self.assertReportedStat(
             'zuul.executors.accepting', value='1', kind='g')
