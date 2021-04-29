@@ -879,6 +879,7 @@ class NodeRequest(object):
         d['state_time'] = self.state_time
         d['relative_priority'] = self.relative_priority
         d['event_id'] = self.event_id
+        d['tenant_name'] = self.tenant_name
         return d
 
     def updateFromDict(self, data):
@@ -887,6 +888,7 @@ class NodeRequest(object):
         self.state_time = data['state_time']
         self.relative_priority = data.get('relative_priority', 0)
         self.event_id = data['event_id']
+        self.tenant_name = data['tenant_name']
 
     @classmethod
     def fromDict(cls, data):
