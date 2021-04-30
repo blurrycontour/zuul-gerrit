@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbf8202f_cd727552",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-30T22:38:11Z",
+      "side": 1,
+      "message": "This important Z must be respected 😊",
+      "range": {
+        "startLine": 114,
+        "startChar": 73,
+        "endLine": 114,
+        "endChar": 74
+      },
+      "revId": "a59b4b9f14e7b1a5f06bd3369b0f21c8d720da7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
