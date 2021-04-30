@@ -3260,6 +3260,11 @@ class ExecutorServer(BaseMergeServer):
         # scheduler via the event queues in ZooKeeper.
         job.sendWorkData(json.dumps(data))
 
+        # TODO (felix): Once the builds are stored in ZooKeeper, we can store
+        # the start_time directly on the build. But for now we have to use the
+        # data dict for that.
+        data["start_time"] = time.time()
+
         params = json.loads(job.arguments)
         tenant_name = params["zuul"]["tenant"]
         pipeline_name = params["zuul"]["pipeline"]
@@ -3296,6 +3301,11 @@ class ExecutorServer(BaseMergeServer):
         # scheduler via the event queues in ZooKeeper.
         # TODO (felix): Remove the data from the complete() call
         job.sendWorkComplete(json.dumps(result))
+
+        # TODO (felix): Once the builds are stored in ZooKeeper, we can store
+        # the end_time directly on the build. But for now we have to use the
+        # result dict for that.
+        result["end_time"] = time.time()
 
         params = json.loads(job.arguments)
         tenant_name = params["zuul"]["tenant"]
