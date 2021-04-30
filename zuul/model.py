@@ -5238,8 +5238,50 @@ class Abide(object):
     def __init__(self):
         self.admin_rules = OrderedDict()
         self.tenants = OrderedDict()
+        # tenant -> project -> list(tpcs)
+        # The project TPCs are stored as a list as we don't check for
+        # duplicate projects here.
+        self.config_tpcs = defaultdict(lambda: defaultdict(list))
+        self.untrusted_tpcs = defaultdict(lambda: defaultdict(list))
         # project -> branch -> UnparsedBranchCache
         self.unparsed_project_branch_cache = {}
+
+    def addConfigTPC(self, tenant_name, tpc):
+        self.config_tpcs[tenant_name][tpc.project.name].append(tpc)
+
+    def getConfigTPCs(self, tenant_name):
+        return list(itertools.chain.from_iterable(
+            self.config_tpcs[tenant_name].values()))
+
+    def addUntrustedTPC(self, tenant_name, tpc):
+        self.untrusted_tpcs[tenant_name][tpc.project.name].append(tpc)
+
+    def getUntrustedTPCs(self, tenant_name):
+        return list(itertools.chain.from_iterable(
+            self.untrusted_tpcs[tenant_name].values()))
+
+    def clearTPCs(self, tenant_name):
+        self.config_tpcs[tenant_name].clear()
+        self.untrusted_tpcs[tenant_name].clear()
+
+    def _allProjectTPCs(self, project_name):
+        # Flatten the lists of a project TPCs from all tenants
+        return itertools.chain.from_iterable(
+            tenant_tpcs.get(project_name, [])
+            for tenant_tpcs in itertools.chain(self.config_tpcs.values(),
+                                               self.untrusted_tpcs.values()))
+
+    def getExtraConfigFiles(self, project_name):
+        """Get all extra config files for a project accross tenants."""
+        return set(itertools.chain.from_iterable(
+            tpc.extra_config_files
+            for tpc in self._allProjectTPCs(project_name)))
+
+    def getExtraConfigDirs(self, project_name):
+        """Get all extra config dirs for a project accross tenants."""
+        return set(itertools.chain.from_iterable(
+            tpc.extra_config_dirs
+            for tpc in self._allProjectTPCs(project_name)))
 
     def hasUnparsedBranchCache(self, canonical_project_name, branch):
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(
