@@ -180,12 +180,13 @@ class ExecutorClient(object):
         self.builds[uuid] = build
 
         if job.name == 'noop':
-            started_event = BuildStartedEvent(build.uuid, None)
+            data = {"start_time": time.time()}
+            started_event = BuildStartedEvent(build.uuid, data)
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 started_event
             )
 
-            result = {"result": "SUCCESS"}
+            result = {"result": "SUCCESS", "end_time": time.time()}
             completed_event = BuildCompletedEvent(build.uuid, result)
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 completed_event
@@ -329,7 +330,8 @@ class ExecutorClient(object):
             tenant_name = build.build_set.item.pipeline.tenant.name
             pipeline_name = build.build_set.item.pipeline.name
 
-            event = BuildCompletedEvent(build.uuid, {"result": "CANCELED"})
+            result = {"result": "CANCELED", "end_time": time.time()}
+            event = BuildCompletedEvent(build.uuid, result)
             self.result_events[tenant_name][pipeline_name].put(event)
             return True
         return False

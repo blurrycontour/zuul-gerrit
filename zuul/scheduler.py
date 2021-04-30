@@ -1480,7 +1480,7 @@ class Scheduler(threading.Thread):
         if not build:
             return
 
-        build.start_time = time.time()
+        build.start_time = event.data["start_time"]
         # TODO (felix): Remove this once the builds are executed via ZooKeeper.
         # It's currently necessary to set the correct private attribute on the
         # build for the gearman worker.
@@ -1721,7 +1721,7 @@ class Scheduler(threading.Thread):
             result = build.result
             build.retry = False
 
-        build.end_time = time.time()
+        build.end_time = event_result["end_time"]
         build.result_data = result_data
         build.build_set.warning_messages.extend(warnings)
 
