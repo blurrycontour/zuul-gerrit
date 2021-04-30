@@ -1608,9 +1608,10 @@ class TenantParser(object):
 
         tenant.unparsed_config = conf
         # tpcs is TenantProjectConfigs
-        config_tpcs, untrusted_tpcs = self._loadTenantProjects(conf)
+        config_tpcs = abide.getConfigTPCs(tenant.name)
         for tpc in config_tpcs:
             tenant.addConfigProject(tpc)
+        untrusted_tpcs = abide.getUntrustedTPCs(tenant.name)
         for tpc in untrusted_tpcs:
             tenant.addUntrustedProject(tpc)
 
@@ -1774,7 +1775,7 @@ class TenantParser(object):
             raise Exception("Unable to parse project %s", conf)
         return projects
 
-    def _loadTenantProjects(self, conf_tenant):
+    def loadTenantProjects(self, conf_tenant):
         config_projects = []
         untrusted_projects = []
 
@@ -1823,12 +1824,14 @@ class TenantParser(object):
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
                     continue
+                extra_config_files = abide.getExtraConfigFiles(project.name)
+                extra_config_dirs = abide.getExtraConfigDirs(project.name)
                 job = self.merger.getFiles(
                     project.source.connection.connection_name,
                     project.name, branch,
                     files=(['zuul.yaml', '.zuul.yaml'] +
-                           list(tpc.extra_config_files)),
-                    dirs=['zuul.d', '.zuul.d'] + list(tpc.extra_config_dirs))
+                           list(extra_config_files)),
+                    dirs=['zuul.d', '.zuul.d'] + list(extra_config_dirs))
                 self.log.debug("Submitting cat job %s for %s %s %s" % (
                     job, project.source.connection.connection_name,
                     project.name, branch))
@@ -2258,11 +2261,22 @@ class ConfigLoader(object):
             abide.admin_rules[admin_rule.name] = admin_rule
 
         if tenants:
-            tenants_to_load = [unparsed_abide.tenants[t] for t in tenants]
+            tenants_to_load = {t: unparsed_abide.tenants[t] for t in tenants}
         else:
-            tenants_to_load = unparsed_abide.tenants.values()
+            tenants_to_load = unparsed_abide.tenants
 
-        for conf_tenant in tenants_to_load:
+        # Pre-load TenantProjectConfigs so we can get and cache all of a
+        # project's config files (incl. tenant specific extra config) at once.
+        for tenant_name, conf_tenant in tenants_to_load.items():
+            config_tpcs, untrusted_tpcs = (
+                self.tenant_parser.loadTenantProjects(conf_tenant)
+            )
+            for tpc in config_tpcs:
+                abide.addConfigTPC(tenant_name, tpc)
+            for tpc in untrusted_tpcs:
+                abide.addUntrustedTPC(tenant_name, tpc)
+
+        for conf_tenant in tenants_to_load.values():
             # When performing a full reload, do not use cached data.
             tenant = self.tenant_parser.fromYaml(
                 abide, conf_tenant, ansible_manager)
@@ -2284,6 +2298,8 @@ class ConfigLoader(object):
         new_abide.admin_rules = abide.admin_rules.copy()
         new_abide.unparsed_project_branch_cache = \
             abide.unparsed_project_branch_cache
+        new_abide.config_tpcs = abide.config_tpcs
+        new_abide.untrusted_tpcs = abide.untrusted_tpcs
 
         if unparsed_abide:
             # We got a new unparsed abide so re-load the tenant completely.
@@ -2296,6 +2312,17 @@ class ConfigLoader(object):
             unparsed_config = unparsed_abide.tenants[tenant.name]
         else:
             unparsed_config = tenant.unparsed_config
+
+        # Pre-load TenantProjectConfig so we can get and cache all of a
+        # project's config files (incl. tenant specific extra config) at once.
+        config_tpcs, untrusted_tpcs = (
+            self.tenant_parser.loadTenantProjects(unparsed_config)
+        )
+        new_abide.clearTPCs(tenant.name)
+        for tpc in config_tpcs:
+            new_abide.addConfigTPC(tenant.name, tpc)
+        for tpc in untrusted_tpcs:
+            new_abide.addUntrustedTPC(tenant.name, tpc)
 
         # When reloading a tenant only, use cached data if available.
         new_tenant = self.tenant_parser.fromYaml(
