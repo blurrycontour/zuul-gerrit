@@ -2436,6 +2436,7 @@ class TestInRepoConfig(ZuulTestCase):
 
 
 class TestGlobalRepoState(AnsibleZuulTestCase):
+    config_file = 'zuul-connections-gerrit-and-github.conf'
     tenant_config_file = 'config/global-repo-state/main.yaml'
 
     def test_inherited_playbooks(self):
@@ -2482,6 +2483,34 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='test1', result='SUCCESS', changes='1,1'),
             dict(name='test2', result='SUCCESS', changes='1,1'),
+        ])
+
+    def test_required_projects_unprotected_override_checkout(self):
+        # Setup branch protection for master on org/requiringproject-github
+        github = self.fake_github.getGithubClient()
+        github.repo_from_project(
+            'org/requiringproject-github')._set_branch_protection(
+            'master', True)
+
+        # Create unprotected branch feat-x. This branch will be the target
+        # of override-checkout
+        repo = github.repo_from_project('org/requiredproject-github')
+        repo._set_branch_protection('master', True)
+        repo._create_branch('feat-x')
+        self.create_branch('org/requiredproject-github', 'feat-x')
+
+        # Reconfigure to ensure zuul knows about the branch protection
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        A = self.fake_github.openFakePullRequest(
+            'org/requiringproject-github', 'master', 'A')
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # Job must be successful
+        self.assertHistory([
+            dict(name='require-test1-github', result='SUCCESS'),
         ])
 
     def test_required_projects(self):
