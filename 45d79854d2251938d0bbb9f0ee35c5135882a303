@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "68c4209b_5d6c98c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-04-30T02:02:28Z",
+      "side": 1,
+      "message": "nit: 2 change id\u0027s",
+      "revId": "45d79854d2251938d0bbb9f0ee35c5135882a303",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
