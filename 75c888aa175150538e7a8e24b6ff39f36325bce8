@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "599e295b_6456da45",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 846,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-04-30T22:28:53Z",
+      "side": 1,
+      "message": "nit: To prevent parent_item.layout and item.item_ahead.layout from getting out of sync here you may want to use the same var name in both cases. Specifically use:\n\n  item.item_ahead.layout \u003d self.getLayout(item.item_ahead)\n\nor\n\n  parent_item.layout \u003d self.getLayout(parent_item)",
+      "range": {
+        "startLine": 846,
+        "startChar": 48,
+        "endLine": 846,
+        "endChar": 63
+      },
+      "revId": "75c888aa175150538e7a8e24b6ff39f36325bce8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
