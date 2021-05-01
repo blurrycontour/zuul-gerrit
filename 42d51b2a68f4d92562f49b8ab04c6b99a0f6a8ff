@@ -1,0 +1,378 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e18ccc0e_842ec5f4",
+        "filename": ".zuul.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "The requires and dependencies are different when run in the zuul and nodepool projects, which is why they are added in the project-pipeline config.  If you put them here, then they\u0027ll be wrong in nodepool.  See https://opendev.org/zuul/nodepool/src/branch/master/.zuul.yaml#L394-L396",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d20d683_630bb962",
+        "filename": ".zuul.yaml",
+        "patchSetId": 48
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "Most of the text of this comment applies to the job above.",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7305292c_c7a3515f",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "Making gate a hyperlink to https://zuul-ci.org/docs/zuul/discussion/gating.html might be nice?",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f9a8cae1_f130b85f",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "Maybe add something like this to make the idea more clear: \"Please run that first to get a Zuul system up and running if you don\u0027t already have one.\"",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "022af654_feae8b26",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "I think you need a conditional first.  Maybe either put this paragraph first, or add a conditional to line 15.  I would suggest putting this first since we just said that we assume they ran the quickstart.",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "939b7f14_cfe08dbc",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "The Zuul doc style guide[1] says use ``literal`` for things we expect people to type in; we should probably use that for both the directory and file here.\n\n[1] https://zuul-ci.org/docs/zuul/reference/developer/docs.html#literal-values\n\nThere are a lot more of these; I won\u0027t leave comments for all of them.",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3b108d4_904e4a39",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "We should probably make this a link with :var::`zuul.project.src_dir`.",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "24d1e6d9_b7496d10",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "This feels like it\u0027s missing a word like \"are available at \u003cJob Variables\u003e\" or \"are available in the \u003cJob Variables\u003e section of the documentation\".",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5be93270_b9e71bd0",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "\"directly push\" might read a little more naturally.",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a4546521_e909bd82",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": ":)",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4ff71191_1a0999a9",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "You can use :term:`check` here to link this to the glossary: https://zuul-ci.org/docs/zuul/reference/glossary.html#term-check",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5d434254_69064958",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "Capitalize the first word, and use \"i.e.,\"",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "549bf700_e5b80f9b",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": ":term:`gate`",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b95559d_0ab843a0",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "According to the style guide, we should use italics for inherits.  We might even want to add inherit to the glossary?  We have child job and parent job there...",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e551df59_c1c046d8",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "I\u0027m okay with the casualness of \"grisly details\" but the actual word \"grisy\" (\"inspiring horror, intense fear, disgust, or distate\") seems a little over the top.  The last one \"inspiring distaste\" seems like what the author was going for, but my first read is closer to horror or disgust.\n\nMaybe \"tedious details\"?",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aa7fd7e7_cd72830b",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "I get the importance of talking about encapsulation here, but I\u0027d like to do it in a way where we\u0027re not fighting the rest of the Zuul terminology/documentation by telling users that inheritance is wrong.\n\nMaybe: By inheriting from the base job, the unit-tests job is encapsulated within it, by running...",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e23c34d2_52f78abb",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "It\u0027s probably worth reminding people how to approve a change here (even though we did that in the quickstart, if they didn\u0027t run the quickstart or have arrived here some other way they may welcome a reminder).  Could add \"by leaving a +2 Code-Review and +1 Workflow approval\" or similar.",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cc064f05_28087a9f",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "It might be worth cropping the date out of the console log here (the timestamps are fine) just so this doesn\u0027t start to look dated.",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ac15660_33a595f8",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "Do you think we should suggest that if it didn\u0027t work, they could ask for help on the mailing list or irc?",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37d8ea33_5e717fb5",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "Consider \"automatically trigger\".",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7876587b_7e7f3ac8",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "I wonder about this -- if they followed the quick-start, then they *wrote* the base job.",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0c3115c0_de26f3f8",
+        "filename": "doc/source/tutorials/gate-your-first-patch.rst",
+        "patchSetId": 48
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-01T14:36:49Z",
+      "side": 1,
+      "message": "This is great, but should we add this in the next commit just in case it takes us a while to merge it?",
+      "revId": "42d51b2a68f4d92562f49b8ab04c6b99a0f6a8ff",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
