@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "c64d2dc5_a76c3942",
+        "filename": ".zuul.yaml",
+        "patchSetId": 20
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-02T18:35:07Z",
+      "side": 1,
+      "message": "I\u0027m not seeing an increase in runtime locally after I made a change to the test settled check.",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e86a20d_3b76600d",
         "filename": "tests/base.py",
         "patchSetId": 20
@@ -13,6 +30,40 @@
       "writtenOn": "2021-04-24T00:11:00Z",
       "side": 1,
       "message": "Starting a class name with Test indicates that it holds unit tests and the autoloader will search it.  We should use other class names for both of these (if it is necessary to have them; I\u0027d like to avoid it as much as possible).",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6055f67f_4644655d",
+        "filename": "tests/base.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 4997,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-02T18:35:07Z",
+      "side": 1,
+      "message": "This is why you had to change the timeout.  I set this to 0.1 and that seemed to be enough to let other threads run without slowing down too much.  Still, we should try to eliminate the sleep and use only locks/events.",
+      "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3be192f7_2b328a8f",
+        "filename": "tests/zk/executor.py",
+        "patchSetId": 20
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-02T18:35:07Z",
+      "side": 1,
+      "message": "This class is used by the executor in the tests, so this means that the actual behavior of getting a build request is never tested.  If we need to iterate over zk for test assertions, let\u0027s add a test-only method for just that.  I did that in my patch series.",
       "revId": "6b1c982d28ddc69360c1391f5aea99681f9f6656",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
