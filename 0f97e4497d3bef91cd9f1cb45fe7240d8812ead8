@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fd5fdbba_3902b385",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-03T05:57:00Z",
+      "side": 1,
+      "message": "I think there could always be a race between the scheduler canceling a build request by directly deleting it and the executor trying to lock this build request as it was already returned by the next() iterator.",
+      "revId": "0f97e4497d3bef91cd9f1cb45fe7240d8812ead8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d89c24c_4b4becad",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-03T05:57:00Z",
+      "side": 1,
+      "message": "Is this about the race condition in the different direction? The executor has successfully locked the build while the scheduler deleted it?",
+      "revId": "0f97e4497d3bef91cd9f1cb45fe7240d8812ead8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
