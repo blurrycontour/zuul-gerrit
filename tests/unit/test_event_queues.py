@@ -13,7 +13,6 @@
 # under the License.
 
 import threading
-from unittest.mock import patch
 
 import testtools
 
@@ -413,14 +412,6 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
             self.zk_client.client.get_children('/zuul/results/management')), 0)
 
 
-# TODO: use actual model.ResultEvent once it inherits from
-# AbstractEvent and implements serialization.
-class DummyResultEvent(model.ResultEvent, DummyEvent):
-    pass
-
-
-@patch.dict(event_queues.RESULT_EVENT_TYPE_MAP,
-            {"DummyResultEvent": DummyResultEvent})
 class TestResultEventQueue(EventQueueBaseTestCase):
 
     def test_pipeline_result_events(self):
@@ -435,7 +426,7 @@ class TestResultEventQueue(EventQueueBaseTestCase):
         self.assertEqual(len(queue), 0)
         self.assertFalse(queue.hasEvents())
 
-        event = DummyResultEvent()
+        event = model.BuildStartedEvent("build", {})
         queue.put(event)
 
         self.assertEqual(len(queue), 1)
@@ -447,7 +438,7 @@ class TestResultEventQueue(EventQueueBaseTestCase):
 
         acked = 0
         for event in queue:
-            self.assertIsInstance(event, DummyResultEvent)
+            self.assertIsInstance(event, model.BuildStartedEvent)
             queue.ack(event)
             acked += 1
 
@@ -456,8 +447,6 @@ class TestResultEventQueue(EventQueueBaseTestCase):
         self.assertFalse(queue.hasEvents())
 
 
-@patch.dict(event_queues.RESULT_EVENT_TYPE_MAP,
-            {"DummyResultEvent": DummyResultEvent})
 class TestEventWatchers(EventQueueBaseTestCase):
 
     def setUp(self):
@@ -515,7 +504,8 @@ class TestEventWatchers(EventQueueBaseTestCase):
         self._wait_for_event(event)
         event.clear()
 
-        result_queues["other-tenant"]["post"].put(DummyResultEvent())
+        result_event = model.BuildStartedEvent("build", {})
+        result_queues["other-tenant"]["post"].put(result_event)
         self._wait_for_event(event)
 
 
