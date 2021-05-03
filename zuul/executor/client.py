@@ -180,7 +180,7 @@ class ExecutorClient(object):
         self.builds[uuid] = build
 
         if job.name == 'noop':
-            started_event = BuildStartedEvent(build.uuid, None)
+            started_event = BuildStartedEvent(build.uuid, {})
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 started_event
             )
