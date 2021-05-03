@@ -47,7 +47,18 @@ then
             echo "Using yarn registry: ${YARN_REGISTRY}"
             sed -i "s#https://registry.yarnpkg.com#${YARN_REGISTRY}#" yarn.lock
         fi
-        yarn install --verbose
+
+        # Be forgiving of package retrieval errors
+        attempts=0
+        until yarn install --verbose; do
+            ((attempts++))
+            if [[ $attempts > 2 ]]
+            then
+                echo "Failed installing npm packages"
+                exit 1
+            fi
+        done
+
         yarn build
         if [[ -n "${YARN_REGISTRY}" ]]
         then
