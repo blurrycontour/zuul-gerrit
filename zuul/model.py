@@ -1760,13 +1760,13 @@ class Job(ConfigObject):
 
         return True
 
-    def _projectsFromPlaybooks(self, playbooks):
+    def _projectsFromPlaybooks(self, playbooks, with_implicit=False):
         for playbook in playbooks:
             # noop job does not have source_context
             if playbook.source_context:
                 yield playbook.source_context.project.canonical_name
             for role in playbook.roles:
-                if role.implicit:
+                if role.implicit and not with_implicit:
                     continue
                 yield role.project_canonical_name
 
@@ -1779,7 +1779,7 @@ class Job(ConfigObject):
         project_canonical_names.update(self.required_projects.keys())
         project_canonical_names.update(self._projectsFromPlaybooks(
             chain(self.pre_run, [self.run[0]], self.post_run,
-                  self.cleanup_run)))
+                  self.cleanup_run), with_implicit=True))
 
         projects = list()
         for project_canonical_name in project_canonical_names:
