@@ -1480,10 +1480,11 @@ class Scheduler(threading.Thread):
             return
 
         build.start_time = time.time()
-        # TODO (felix): Remove this once the builds are executed via ZooKeeper.
-        # It's currently necessary to set the correct private attribute on the
-        # build for the gearman worker.
-        self.executor.setWorkerInfo(build, event.data)
+        if event.data:
+            # TODO (felix): Remove this once the builds are executed via
+            # ZooKeeper. It's currently necessary to set the correct private
+            # attribute on the build for the gearman worker.
+            self.executor.setWorkerInfo(build, event.data)
 
         log = get_annotated_logger(self.log, build.zuul_event_id)
         if build.build_set is not build.build_set.item.current_build_set:
