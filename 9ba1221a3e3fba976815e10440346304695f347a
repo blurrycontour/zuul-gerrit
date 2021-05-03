@@ -151,6 +151,23 @@
       "revId": "9ba1221a3e3fba976815e10440346304695f347a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6c8eae7e_88697233",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3068,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T17:05:59Z",
+      "side": 1,
+      "message": "I don\u0027t think anything else uses these return values, so maybe we should remove the .branches and .refs attributes and save these calls.",
+      "revId": "9ba1221a3e3fba976815e10440346304695f347a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
