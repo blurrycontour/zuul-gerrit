@@ -128,6 +128,26 @@ An MQTT report uses this schema:
 
             The build results (not present in start report).
 
+         .. attr:: artifacts
+            :type: list
+
+            The build artifacts (not present in start report).
+
+            This is a list of dictionaries corresponding to the returned artifacts.
+
+            .. attr:: name
+
+               The name of the artifact.
+
+            .. attr:: url
+
+               The url of the artifact.
+
+            .. attr:: metadata
+               :type: dict
+
+               The metadata of the artifact.  This is a dictionary of
+               arbitrary key values determined by the job.
 
 Here is an example of a start message:
 
@@ -191,7 +211,8 @@ Here is an example of a success message:
         'log_url': 'https://logs.example.com/logs/3/3/1/check/linters/16e3e55/',
         'web_url': 'https://tenant.example.com/t/tenant-one/build/16e3e55aca984c6c9a50cc3c5b21bb83/',
         'result': 'SUCCESS',
-        'dependencies': []
+        'dependencies': [],
+        'artifacts': [],
       }],
     },
   }

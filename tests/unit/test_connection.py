@@ -586,8 +586,15 @@ class TestMQTTConnection(ZuulTestCase):
         "Test the MQTT reporter"
         # Add a success result
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        artifact = {'name': 'image',
+                    'url': 'http://example.com/image',
+                    'metadata': {
+                        'type': 'container_image'
+                    }}
         self.executor_server.returnData(
-            "test", A, {"zuul": {"log_url": "some-log-url"}}
+            "test", A, {"zuul": {"log_url": "some-log-url",
+                                 'artifacts': [artifact],
+                                 }}
         )
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
@@ -606,6 +613,7 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertEquals(mqtt_payload['buildset']['builds'][0]['job_name'],
                           'test')
         self.assertNotIn('result', mqtt_payload['buildset']['builds'][0])
+        self.assertNotIn('artifacts', mqtt_payload['buildset']['builds'][0])
 
         self.assertEquals(success_event.get('topic'),
                           'tenant-one/zuul_buildset/check/org/project/master')
@@ -621,6 +629,7 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertEquals(test_job['job_name'], 'test')
         self.assertEquals(test_job['result'], 'SUCCESS')
         self.assertEquals(test_job['dependencies'], [])
+        self.assertEquals(test_job['artifacts'], [artifact])
         # Both log- and web-url should point to the same URL which is specified
         # in the build result data under zuul.log_url.
         self.assertEquals(test_job['log_url'], 'some-log-url/')
