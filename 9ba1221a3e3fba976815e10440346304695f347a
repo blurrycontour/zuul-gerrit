@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59b9c508_83317e86",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2600,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-03T15:36:20Z",
+      "side": 1,
+      "message": "Should we log at info level? This isn\u0027t really logging an error.",
+      "range": {
+        "startLine": 2600,
+        "startChar": 17,
+        "endLine": 2600,
+        "endChar": 22
+      },
+      "revId": "9ba1221a3e3fba976815e10440346304695f347a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9ddb257f_429c0f3b",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2603,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-03T15:36:20Z",
+      "side": 1,
+      "message": "See above.",
+      "range": {
+        "startLine": 2603,
+        "startChar": 17,
+        "endLine": 2603,
+        "endChar": 22
+      },
+      "revId": "9ba1221a3e3fba976815e10440346304695f347a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63ec2c06_baa5f3d3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1082,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-03T15:36:20Z",
+      "side": 1,
+      "message": "Nit there shouldn\u0027t be a / prefix in the ref names.",
+      "range": {
+        "startLine": 1082,
+        "startChar": 31,
+        "endLine": 1082,
+        "endChar": 32
+      },
+      "revId": "9ba1221a3e3fba976815e10440346304695f347a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dca3c825_2cd4dcf0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1084,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-03T15:36:20Z",
+      "side": 1,
+      "message": "Should we filter empty list/empty string from this in case we somehow get back refs/foo and that gets split as [\u0027refs\u0027, \u0027foo\u0027] ?",
+      "revId": "9ba1221a3e3fba976815e10440346304695f347a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
