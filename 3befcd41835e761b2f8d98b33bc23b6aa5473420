@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6f27cbe4_63ac7e0b",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-03T05:45:23Z",
+      "side": 1,
+      "message": "I like this test 😊",
+      "revId": "3befcd41835e761b2f8d98b33bc23b6aa5473420",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ecef237b_c5cb54f9",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-03T05:45:23Z",
+      "side": 1,
+      "message": "nit: Maybe it\u0027s worth to write \"rq\" and \"eq\" out for better understanding. I was struggling quite some time finding out what this means until I recognized that the answer is in the lines below 😄",
+      "revId": "3befcd41835e761b2f8d98b33bc23b6aa5473420",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
