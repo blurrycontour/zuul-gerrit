@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "11d1c2e5_c49c9a6e",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 4803,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-03T06:14:29Z",
+      "side": 1,
+      "message": "nit: BuildQueues -\u003e ExecutorApis. Looks like I forgot to adapt this",
+      "revId": "ab6ebcabe8eb08c345c4c801de8b55166ef6bdb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "19b4d631_f0d47246",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-03T06:14:29Z",
+      "side": 1,
+      "message": "This comment could be removed now, as the builds API is now based on the improved component registry.",
+      "revId": "ab6ebcabe8eb08c345c4c801de8b55166ef6bdb4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
