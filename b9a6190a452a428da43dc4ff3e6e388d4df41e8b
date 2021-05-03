@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "71bf45a6_b17a8442",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T20:39:21Z",
+      "side": 0,
+      "message": "This is a nice docstring, can you replace it with something similar?",
+      "revId": "b9a6190a452a428da43dc4ff3e6e388d4df41e8b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

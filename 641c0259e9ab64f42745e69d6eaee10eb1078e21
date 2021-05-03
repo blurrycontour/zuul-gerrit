@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fe5cdf2b_50ead844",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T20:39:21Z",
+      "side": 1,
+      "message": "This reverts two changes we intentionally made during review of change I4b7197d6cb399513e30d314f8a5f4f55ad9266f8.  See the review comments and diffs from patchset 23..24 and 25..26.\n\nPlease keep these as string constants.  The getter and setter don\u0027t need to be nearly as complex and it\u0027s easier to debug in ZK.  And the python code is just as safe.",
+      "revId": "641c0259e9ab64f42745e69d6eaee10eb1078e21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a2589ac8_6cbf7e96",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T20:39:21Z",
+      "side": 1,
+      "message": "This is from the original patch, but since we\u0027re here, we really should call this fingergw to match the executable name and help with grepping.",
+      "revId": "641c0259e9ab64f42745e69d6eaee10eb1078e21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c1ac8d58_d6d36c6e",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T20:39:21Z",
+      "side": 1,
+      "message": "Web will use it to display system status info.",
+      "revId": "641c0259e9ab64f42745e69d6eaee10eb1078e21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
