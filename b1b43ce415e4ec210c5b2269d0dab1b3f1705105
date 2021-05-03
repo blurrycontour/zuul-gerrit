@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "155c9b0f_38ce4d7e",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 6953,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T23:18:44Z",
+      "side": 1,
+      "message": "Why this change?",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6c4872be_2a092a12",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T23:18:44Z",
+      "side": 1,
+      "message": "Why are we adding a new zuul variable (for users to use in jobs) here?\n\nOkay, I found the answer below -- we check to see if we exceed the attempts on the executor now because it\u0027s processing the autoholds.  We should do one of two things here:\n\n1) Add this to params instead of params[\u0027zuul\u0027] so that it\u0027s hidden from users.\nor\n2) Document it as an additional zuul job variable.",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7b48f317_3f5f805c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 3131,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T23:18:44Z",
+      "side": 1,
+      "message": "How about we either put this method on the AnsibleJob, or hand the nodeset to it in the constructor (on line 3114 above)?  Even once the build is in ZK, we still need a place to store the kazoo API lock object; we could put in on the local API representation of the build (that may be what you were thinking) but I think the AnsibleJob may be a good place that works with both systems.",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3d61232_8b9f6f79",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 3450,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T23:18:44Z",
+      "side": 1,
+      "message": "Capitalize and log at info (this is useful even when not debugging).",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c6ffe683_5e13b479",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 759,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T23:18:44Z",
+      "side": 1,
+      "message": "I\u0027d prefer to avoid changing unrelated lines on complicated changes like this, but if you really want to change these lines, please switch from items() to values() in order to avoid the \u0027_\u0027 variable.",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "55d3d4b2_efab7ea4",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T23:18:44Z",
+      "side": 1,
+      "message": "A gearman job seems like the wrong thing to be passing into this.  How about either the AnsibleJob, or we could create a temporary \"Build\" class that has all the same info (which we construct from the job arguments), then switch it for the real zuul.model.Build later once we have that in ZK?\n\nIncidentally, this change has convinced me that once we have the build in ZK, we should remove the arguments from the BuildRequest and just reference the Build from it.",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "01403e4b_11da3f2d",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T23:18:44Z",
+      "side": 1,
+      "message": "I think this question may be moot; see below.",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9d852b83_e3f2f227",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T23:18:44Z",
+      "side": 1,
+      "message": "If you delete a node request without locking the nodes, the Nodepool will notice that, lock the nodes, and reallocate them.  It may mostly work most of the time because that\u0027s a periodic action, but I think every few minutes, you would probably see nodepool go through and reallocate a bunch of node requests right before executors tried to start.\n\nIn the nodepool protocol, nodes must be locked before the request is deleted.  So I think what we need to do is leave this method as-is, and remove its invocation from the scheduler, then let the pipeline manager see that the request is fulfilled and therefore it\u0027s ready to submit a build request.  Then the executor should call this method instead of the \"lock + use\" that you currently have.",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
