@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "29d2dd69_0f756bda",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T17:46:53Z",
+      "side": 1,
+      "message": "But the lock is outside the node request.  And I don\u0027t think the executor api ever deletes the lock.\n\nI think that\u0027s the problem -- we do need to delete the lock, and then this could happen.",
+      "revId": "0f97e4497d3bef91cd9f1cb45fe7240d8812ead8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5d89c24c_4b4becad",
         "filename": "zuul/zk/executor.py",
         "patchSetId": 3
@@ -33,6 +50,23 @@
       "revId": "0f97e4497d3bef91cd9f1cb45fe7240d8812ead8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "76c65241_bd341081",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T17:46:53Z",
+      "side": 1,
+      "message": "Yes.  That direction can happen now.\n\nNote that a Lock will always create its parent paths, so we actually need to delete the lock here, since we may have recreated it after the scheduler deleted both the request and this lock.",
+      "revId": "0f97e4497d3bef91cd9f1cb45fe7240d8812ead8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
