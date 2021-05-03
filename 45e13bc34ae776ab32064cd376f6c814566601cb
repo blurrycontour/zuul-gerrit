@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2906b112_e270cda3",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T21:09:06Z",
+      "side": 1,
+      "message": "-1: How about validating these stats at the end then we can skip the iterate_timeout?",
+      "revId": "45e13bc34ae776ab32064cd376f6c814566601cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f6e36dc_02eb25f0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2824,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-03T21:09:06Z",
+      "side": 1,
+      "message": "Nit: did you mean to say \"on the component registry\" instead of \"property\"?",
+      "revId": "45e13bc34ae776ab32064cd376f6c814566601cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
