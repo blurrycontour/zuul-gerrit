@@ -23,6 +23,7 @@ import gc
 from time import sleep
 from unittest import skip, skipIf
 
+import git
 import paramiko
 
 import zuul.configloader
@@ -2558,6 +2559,53 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
         # Job must be successful
         self.assertHistory([
             dict(name='require-test1-github', result='SUCCESS'),
+        ])
+
+    def test_required_projects_branch_old_cache(self):
+        self.create_branch('org/requiringproject', 'feat-x')
+        self.create_branch('org/requiredproject', 'feat-x')
+
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/requiringproject', 'feat-x'))
+
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_start = True
+
+        B = self.fake_gerrit.addFakeChange('org/requiringproject', 'feat-x',
+                                           'A')
+        B.addApproval('Approved', 1)
+        self.fake_gerrit.addEvent(B.addApproval('Code-Review', 2))
+
+        for _ in iterate_timeout(30, 'Wait for build to be in starting phase'):
+            if self.executor_server.job_workers:
+                sleep(1)
+                break
+
+        # Delete local feat-x from org/requiredproject on the executor cache
+        repo = self.executor_server.merger.getRepo(
+            'gerrit', 'org/requiredproject')
+        repo.deleteRef('refs/heads/feat-x')
+
+        # Let the job continue to the build phase
+        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.hold_jobs_in_start = False
+        self.waitUntilSettled()
+
+        # Assert that feat-x has been checked out in the job workspace
+        path = os.path.join(self.builds[0].jobdir.src_root,
+                            'review.example.com/org/requiredproject')
+        repo = git.Repo(path)
+        self.assertEqual(str(repo.active_branch), 'feat-x')
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='require-test1', result='SUCCESS', changes='1,1'),
+            dict(name='require-test2', result='SUCCESS', changes='1,1'),
         ])
 
     def test_required_projects(self):
