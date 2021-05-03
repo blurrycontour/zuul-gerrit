@@ -1584,7 +1584,8 @@ class AnsibleJob(object):
                         interface_ip=node.get('interface_ip'),
                         public_ipv4=node.get('public_ipv4'),
                         private_ipv4=node.get('private_ipv4'),
-                        public_ipv6=node.get('public_ipv6'))))
+                        public_ipv6=node.get('public_ipv6'),
+                        private_ipv6=node.get('private_ipv6'))))
 
                 # Ansible >=2.8 introduced "auto" as an
                 # ansible_python_interpreter argument that looks up

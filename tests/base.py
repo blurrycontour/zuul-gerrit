@@ -3475,6 +3475,7 @@ class FakeNodepool(object):
                     public_ipv4=remote_ip,
                     private_ipv4=None,
                     public_ipv6=None,
+                    private_ipv6=None,
                     python_path=self.python_path,
                     shell_type=self.shell_type,
                     allocated_to=request_id,
