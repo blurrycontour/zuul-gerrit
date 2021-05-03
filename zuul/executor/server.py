@@ -1070,9 +1070,18 @@ class AnsibleJob(object):
                 raise ExecutorError(
                     'Failed to update project %s' % task.project_name)
 
+            # Take refs and branches from repo state
+            project_repo_state = \
+                repo_state[task.connection_name][task.project_name]
+            refs = list(project_repo_state.keys())
+            branches = [
+                ref[11:]  # strip refs/heads/
+                for ref in refs
+                if ref.startswith('refs/heads/')
+            ]
             self.project_info[task.canonical_name] = {
-                'refs': task.refs,
-                'branches': task.branches,
+                'refs': refs,
+                'branches': branches,
             }
 
         # Early abort if abort requested
