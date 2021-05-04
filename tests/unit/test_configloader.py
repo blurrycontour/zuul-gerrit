@@ -18,6 +18,7 @@ import logging
 import textwrap
 import testtools
 
+from zuul import model
 from zuul.configloader import AuthorizationRuleParser, safe_load_yaml
 
 from tests.base import ZuulTestCase
@@ -519,6 +520,62 @@ class TestConfigConflict(ZuulTestCase):
             ['base', 'noop', 'trusted-zuul.yaml-job',
              'untrusted-zuul.yaml-job'],
             jobs)
+
+
+class TestUnparsedConfigCache(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_config_caching(self):
+        cache = self.scheds.first.sched. unparsed_config_cache
+        tenant = self.scheds.first.sched.abide.tenants["tenant-one"]
+
+        common_cache = cache.getFilesCache("review.example.com/common-config",
+                                           "master")
+        tpc = tenant.project_configs["review.example.com/common-config"]
+        self.assertTrue(common_cache.isValidFor(tpc, cache_ltime=-1))
+        self.assertEqual(len(common_cache), 1)
+        self.assertIn("zuul.yaml", common_cache)
+        self.assertTrue(len(common_cache["zuul.yaml"]) > 0)
+
+        project_cache = cache.getFilesCache("review.example.com/org/project",
+                                            "master")
+        # Cache of org/project should be valid but empty (no in-repo config)
+        tpc = tenant.project_configs["review.example.com/org/project"]
+        self.assertTrue(project_cache.isValidFor(tpc, cache_ltime=-1))
+        self.assertEqual(len(project_cache), 0)
+
+    def test_cache_use(self):
+        sched = self.scheds.first.sched
+        # Stop cleanup thread so it's not removing projects from the cache
+        # during the test.
+        sched.cleanup_stop.set()
+        sched.cleanup_thread.join()
+        tenant = sched.abide.tenants['tenant-one']
+        _, project = tenant.getProject('org/project2')
+
+        # Get the current ltime from Zookeeper and run a full reconfiguration,
+        # so that we know all items in the cache have a larger ltime.
+        ltime = self.getCurrentLtime()
+        self.scheds.first.fullReconfigure()
+
+        # Clear the unparsed branch cache so all projects (except for
+        # org/project2) are retrieved from the cache in Zookeeper.
+        sched.abide.unparsed_project_branch_cache.clear()
+        self.gearman_server.jobs_history.clear()
+
+        # Create a tenant reconfiguration event with a known ltime that is
+        # smaller than the ltime of the items in the cache.
+        event = model.TenantReconfigureEvent(
+            tenant.name, project.canonical_name, branch_name=None)
+        event.zuul_event_ltime = ltime
+        sched.management_events.put(event, needs_result=False)
+        self.waitUntilSettled()
+
+        # As the cache should be valid, we only expect a cat job for
+        # org/project2
+        cat_jobs = [job for job in self.gearman_server.jobs_history
+                    if job.name == b"merger:cat"]
+        self.assertEqual(len(cat_jobs), 1)
 
 
 class TestAuthorizationRuleParser(ZuulTestCase):

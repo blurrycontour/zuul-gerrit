@@ -1485,6 +1485,7 @@ class TenantParser(object):
         self.scheduler = scheduler
         self.merger = merger
         self.keystorage = keystorage
+        self.unparsed_config_cache = self.scheduler.unparsed_config_cache
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret', 'queue')
@@ -1546,7 +1547,7 @@ class TenantParser(object):
                   }
         return vs.Schema(tenant)
 
-    def fromYaml(self, abide, conf, ansible_manager):
+    def fromYaml(self, abide, conf, ansible_manager, cache_ltime=None):
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -1604,7 +1605,7 @@ class TenantParser(object):
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
         # cache.
-        self._cacheTenantYAML(abide, tenant, loading_errors)
+        self._cacheTenantYAML(abide, tenant, loading_errors, cache_ltime)
 
         # Then collect the appropriate YAML based on this tenant
         # config.
@@ -1770,7 +1771,7 @@ class TenantParser(object):
 
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors):
+    def _cacheTenantYAML(self, abide, tenant, loading_errors, cache_ltime):
         jobs = []
         for project in itertools.chain(
                 tenant.config_projects, tenant.untrusted_projects):
@@ -1790,6 +1791,24 @@ class TenantParser(object):
                     # If all config classes are excluded then do not
                     # request any getFiles jobs.
                     continue
+
+                source_context = model.SourceContext(
+                    project, branch, '', False)
+                if cache_ltime is not None:
+                    files_cache = self.unparsed_config_cache.getFilesCache(
+                        project.canonical_name, branch)
+                    with self.unparsed_config_cache.readLock(
+                            project.canonical_name):
+                        if files_cache.isValidFor(tpc, cache_ltime):
+                            self.log.debug(
+                                "Using files from cache for project %s @%s",
+                                project.canonical_name, branch)
+                            self._updateUnparsedBranchCache(
+                                abide, tenant, source_context, files_cache,
+                                loading_errors)
+                            branch_cache.setValidFor(tpc)
+                            continue
+
                 extra_config_files = abide.getExtraConfigFiles(project.name)
                 extra_config_dirs = abide.getExtraConfigDirs(project.name)
                 job = self.merger.getFiles(
@@ -1801,8 +1820,9 @@ class TenantParser(object):
                 self.log.debug("Submitting cat job %s for %s %s %s" % (
                     job, project.source.connection.connection_name,
                     project.name, branch))
-                job.source_context = model.SourceContext(
-                    project, branch, '', False)
+                job.extra_config_files = extra_config_files
+                job.extra_config_dirs = extra_config_dirs
+                job.source_context = source_context
                 jobs.append(job)
                 branch_cache.setValidFor(tpc)
 
@@ -1817,41 +1837,54 @@ class TenantParser(object):
                 raise Exception("Cat job %s failed" % (job,))
             self.log.debug("Cat job %s got files %s" %
                            (job, job.files.keys()))
-            loaded = False
-            files = sorted(job.files.keys())
-            unparsed_config = model.UnparsedConfig()
-            tpc = tenant.project_configs[
-                job.source_context.project.canonical_name]
-            for conf_root in (
-                    ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
-                    tpc.extra_config_files + tpc.extra_config_dirs):
-                for fn in files:
-                    fn_root = fn.split('/')[0]
-                    if fn_root != conf_root or not job.files.get(fn):
+
+            self._updateUnparsedBranchCache(abide, tenant, job.source_context,
+                                            job.files, loading_errors)
+
+            # Save all config files in Zookeeper (not just for the current tpc)
+            files_cache = self.unparsed_config_cache.getFilesCache(
+                job.source_context.project.canonical_name,
+                job.source_context.branch)
+            with self.unparsed_config_cache.writeLock(project.canonical_name):
+                for fn, content in job.files.items():
+                    # Cache file in Zookeeper
+                    if content is not None:
+                        files_cache[fn] = content
+                files_cache.setValidFor(job.extra_config_files,
+                                        job.extra_config_dirs)
+
+    def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
+                                   loading_errors):
+        loaded = False
+        tpc = tenant.project_configs[source_context.project.canonical_name]
+        for conf_root in (
+                ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d') +
+                tpc.extra_config_files + tpc.extra_config_dirs):
+            for fn in sorted(files.keys()):
+                fn_root = fn.split('/')[0]
+                if fn_root != conf_root or not files.get(fn):
+                    continue
+                # Don't load from more than one configuration in a
+                # project-branch (unless an "extra" file/dir).
+                if (conf_root not in tpc.extra_config_files and
+                    conf_root not in tpc.extra_config_dirs):
+                    if (loaded and loaded != conf_root):
+                        self.log.warning("Multiple configuration files in %s",
+                                         source_context)
                         continue
-                    # Don't load from more than one configuration in a
-                    # project-branch (unless an "extra" file/dir).
-                    if (conf_root not in tpc.extra_config_files and
-                        conf_root not in tpc.extra_config_dirs):
-                        if (loaded and loaded != conf_root):
-                            self.log.warning(
-                                "Multiple configuration files in %s" %
-                                (job.source_context,))
-                            continue
-                        loaded = conf_root
-                    # Create a new source_context so we have unique filenames.
-                    source_context = job.source_context.copy()
-                    source_context.path = fn
-                    self.log.info(
-                        "Loading configuration from %s" %
-                        (source_context,))
-                    incdata = self.loadProjectYAML(
-                        job.files[fn], source_context, loading_errors)
-                    branch_cache = abide.getUnparsedBranchCache(
-                        source_context.project.canonical_name,
-                        source_context.branch)
-                    branch_cache.put(source_context.path, incdata)
-                    unparsed_config.extend(incdata)
+                    loaded = conf_root
+                # Create a new source_context so we have unique filenames.
+                source_context = source_context.copy()
+                source_context.path = fn
+                self.log.info(
+                    "Loading configuration from %s" %
+                    (source_context,))
+                incdata = self.loadProjectYAML(
+                    files[fn], source_context, loading_errors)
+                branch_cache = abide.getUnparsedBranchCache(
+                    source_context.project.canonical_name,
+                    source_context.branch)
+                branch_cache.put(source_context.path, incdata)
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()
@@ -2262,7 +2295,7 @@ class ConfigLoader(object):
         return abide
 
     def reloadTenant(self, abide, tenant, ansible_manager,
-                     unparsed_abide=None):
+                     unparsed_abide=None, cache_ltime=None):
         new_abide = model.Abide()
         new_abide.tenants = abide.tenants.copy()
         new_abide.admin_rules = abide.admin_rules.copy()
@@ -2296,7 +2329,7 @@ class ConfigLoader(object):
 
         # When reloading a tenant only, use cached data if available.
         new_tenant = self.tenant_parser.fromYaml(
-            new_abide, unparsed_config, ansible_manager)
+            new_abide, unparsed_config, ansible_manager, cache_ltime)
         new_abide.tenants[tenant.name] = new_tenant
         if len(new_tenant.layout.loading_errors):
             self.log.warning(
