@@ -3519,6 +3519,10 @@ class ManagementEvent(AbstractEvent):
     def __init__(self):
         self.traceback = None
         self.zuul_event_id = None
+        # Logical timestamp of the event (Zookeeper creation transaction ID).
+        # This will be automatically set when the event is consumed from
+        # the event queue in case it is None.
+        self.zuul_event_ltime = None
         # Opaque identifier in order to report the result of an event
         self.result_ref = None
 
@@ -3528,10 +3532,12 @@ class ManagementEvent(AbstractEvent):
     def toDict(self):
         return {
             "zuul_event_id": self.zuul_event_id,
+            "zuul_event_ltime": self.zuul_event_ltime,
         }
 
     def updateFromDict(self, d):
         self.zuul_event_id = d.get("zuul_event_id")
+        self.zuul_event_ltime = d.get("zuul_event_ltime")
 
 
 class ReconfigureEvent(ManagementEvent):
