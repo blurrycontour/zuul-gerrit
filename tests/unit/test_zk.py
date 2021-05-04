@@ -46,6 +46,13 @@ class ZooKeeperBaseTestCase(BaseTestCase):
         self.zk_client.connect()
 
 
+class TestZookeeperClient(ZooKeeperBaseTestCase):
+
+    def test_ltime(self):
+        self.assertIsInstance(self.zk_client.ltime, int)
+        self.assertGreaterEqual(self.zk_client.ltime, -1)
+
+
 class TestNodepool(ZooKeeperBaseTestCase):
 
     def setUp(self):
