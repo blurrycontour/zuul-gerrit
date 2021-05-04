@@ -68,18 +68,50 @@ class BuildsPage extends React.Component {
         placeholder: 'Filter by Change...',
         type: 'search',
       },
-      // TODO (felix): We could change the result filter to a dropdown later on
       {
         key: 'result',
         title: 'Result',
-        placeholder: 'Filter by Result...',
-        type: 'search',
+        placeholder: 'Any result',
+        type: 'select',
+        // TODO there should be a single source of truth for this
+        options: [
+          'SUCCESS',
+          'FAILURE',
+          'RETRY_LIMIT',
+          'POST_FAILURE',
+          'SKIPPED',
+          'NODE_FAILURE',
+          'MERGER_FAILURE',
+          'CONFIG_ERROR',
+          'TIMED_OUT',
+          'CANCELED',
+          'ERROR',
+          'RETRY',
+          'DISK_FULL',
+          'NO_JOBS',
+          'DISCONNECT',
+          'ABORTED',
+          'LOST',
+          'EXCEPTION',
+          'NO_HANDLE'],
       },
       {
         key: 'uuid',
         title: 'Build',
         placeholder: 'Filter by Build UUID...',
         type: 'search',
+      },
+      {
+        key: 'held',
+        title: 'Hold Status',
+        placeholder: 'Only show builds that triggered an autohold',
+        type: 'checkbox',
+      },
+      {
+        key: 'voting',
+        title: 'Voting',
+        placeholder: 'Only show builds for voting jobs',
+        type: 'checkbox',
       },
     ]
 
