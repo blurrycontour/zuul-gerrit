@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f7340245_03e7c18f",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-04T09:51:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe5cdf2b_50ead844",
+      "revId": "641c0259e9ab64f42745e69d6eaee10eb1078e21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a2589ac8_6cbf7e96",
         "filename": "zuul/zk/components.py",
         "patchSetId": 6
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "81dca996_d5fa7d99",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-04T09:51:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2589ac8_6cbf7e96",
+      "revId": "641c0259e9ab64f42745e69d6eaee10eb1078e21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c1ac8d58_d6d36c6e",
         "filename": "zuul/zk/components.py",
         "patchSetId": 6
@@ -47,6 +83,24 @@
       "writtenOn": "2021-05-03T20:39:21Z",
       "side": 1,
       "message": "Web will use it to display system status info.",
+      "revId": "641c0259e9ab64f42745e69d6eaee10eb1078e21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17e02e2a_4fac405f",
+        "filename": "zuul/zk/components.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-04T09:51:29Z",
+      "side": 1,
+      "message": "Good point, I\u0027ve removed the TODO",
+      "parentUuid": "c1ac8d58_d6d36c6e",
       "revId": "641c0259e9ab64f42745e69d6eaee10eb1078e21",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
