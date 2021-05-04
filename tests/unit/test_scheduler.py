@@ -2693,7 +2693,13 @@ class TestScheduler(ZuulTestCase):
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         for _ in iterate_timeout(30, 'Wait for build to be in starting phase'):
-            if self.executor_server.job_workers:
+            if not self.executor_server.job_workers:
+                continue
+
+            # Wait until the BuildStartedEvent was processed by the scheduler
+            # as we need the worker info in order to cancel a build.
+            builds = self.scheds.first.sched.executor.builds.values()
+            if all(b.worker.name != "Unknown" for b in builds):
                 break
 
         # Abandon change to cancel build
