@@ -69,6 +69,7 @@ from zuul.model import (
 )
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import ZooKeeperComponentRegistry
+from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.event_queues import (
     GlobalEventWatcher,
     GlobalManagementEventQueue,
@@ -158,6 +159,7 @@ class Scheduler(threading.Thread):
                 "schedulers", self.hostname
             )
         )
+        self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
 
         self.result_event_queue = NamedQueue("ResultEventQueue")
         self.global_watcher = GlobalEventWatcher(
@@ -373,6 +375,14 @@ class Scheduler(threading.Thread):
                     tenant.semaphore_handler.cleanupLeaks()
                 except Exception:
                     self.log.exception("Error in semaphore cleanup:")
+
+            active_projects = set(
+                self.abide.unparsed_project_branch_cache.keys())
+            cached_projects = set(
+                self.unparsed_config_cache.listCachedProjects())
+            unused_projects = cached_projects - active_projects
+            for project_cname in unused_projects:
+                self.unparsed_config_cache.clearCache(project_cname)
 
     def addTriggerEvent(self, driver_name, event):
         event.arrived_at_scheduler_timestamp = time.time()
@@ -805,11 +815,16 @@ class Scheduler(threading.Thread):
                                project_name, branch_name)
                 self.abide.clearUnparsedBranchCache(project_name,
                                                     branch_name)
+                with self.unparsed_config_cache.writeLock(project_name):
+                    self.unparsed_config_cache.clearCache(project_name,
+                                                          branch_name)
+
             old_tenant = self.abide.tenants[event.tenant_name]
             loader = configloader.ConfigLoader(
                 self.connections, self, self.merger, self.keystore)
-            abide = loader.reloadTenant(
-                self.abide, old_tenant, self.ansible_manager)
+            abide = loader.reloadTenant(self.abide, old_tenant,
+                                        self.ansible_manager,
+                                        cache_ltime=event.zuul_event_ltime)
             tenant = abide.tenants[event.tenant_name]
             self._reconfigureTenant(tenant)
             self.abide = abide
