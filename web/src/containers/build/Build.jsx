@@ -29,6 +29,7 @@ import {
   OutlinedCalendarAltIcon,
   OutlinedClockIcon,
   StreamIcon,
+  ThumbtackIcon,
 } from '@patternfly/react-icons'
 import * as moment from 'moment'
 import 'moment-duration-format'
@@ -57,6 +58,12 @@ function Build({ build, tenant, timezone }) {
           {build.job_name} {!build.voting && ' (non-voting)'}
         </BuildResultWithIcon>
         <BuildResultBadge result={build.result} />
+        {build.held &&
+          <ThumbtackIcon title="This build triggered an autohold"
+            style={{
+              marginLeft: 'var(--pf-global--spacer--sm)',
+            }}
+          />}
       </Title>
       {/* We handle the spacing for the body and the flex items by ourselves
           so they go hand in hand. By default, the flex items' spacing only
