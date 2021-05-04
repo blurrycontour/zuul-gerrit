@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "be638a43_0f66fcb4",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 6953,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-04T11:28:40Z",
+      "side": 1,
+      "message": "This was not intended. Maybe some leftover from the old version of this change after the rebasing.",
+      "parentUuid": "155c9b0f_38ce4d7e",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6c4872be_2a092a12",
         "filename": "zuul/executor/client.py",
         "patchSetId": 5
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "9fa92225_4abd5d9c",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-04T11:28:40Z",
+      "side": 1,
+      "message": "I thought it\u0027s a good idea to store them in the same place as the attempts. But I get the point about user visibility.\n\nI don\u0027t have a strong opinion on this, but the easiest would be just move it to the params rather than params[\"zuul\"].",
+      "parentUuid": "6c4872be_2a092a12",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7b48f317_3f5f805c",
         "filename": "zuul/executor/server.py",
         "patchSetId": 5
@@ -47,6 +83,24 @@
       "writtenOn": "2021-05-03T23:18:44Z",
       "side": 1,
       "message": "How about we either put this method on the AnsibleJob, or hand the nodeset to it in the constructor (on line 3114 above)?  Even once the build is in ZK, we still need a place to store the kazoo API lock object; we could put in on the local API representation of the build (that may be what you were thinking) but I think the AnsibleJob may be a good place that works with both systems.",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "83476582_0487f1e6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 3131,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-04T11:28:40Z",
+      "side": 1,
+      "message": "Yes, my plan was to use the local API representation of the build, but I get your point about the AnsibleJob. I will try that out.",
+      "parentUuid": "7b48f317_3f5f805c",
       "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -104,6 +158,24 @@
     },
     {
       "key": {
+        "uuid": "a6f4e92c_431f4226",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-04T11:28:40Z",
+      "side": 1,
+      "message": "\u003e A gearman job seems like the wrong thing to be passing into this\n\nI thought the same, but it was the least thing I could provide without changing too much. In combination with your comment on https://review.opendev.org/c/zuul/zuul/+/774610/5/zuul/executor/server.py#3131 it might be a start to use the AnsibleJob here instead and see where this leads us. As long as the build itself is not in ZK, I would like to avoid having another \"build-like\" object with the same params in another stack of changes.",
+      "parentUuid": "55d3d4b2_efab7ea4",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "01403e4b_11da3f2d",
         "filename": "zuul/nodepool.py",
         "patchSetId": 5
@@ -135,6 +207,24 @@
       "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "71732e67_e604fa70",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-04T11:28:40Z",
+      "side": 1,
+      "message": "Ok. This would mean that we remove this call from the scheduler https://opendev.org/zuul/zuul/src/branch/master/zuul/scheduler.py#L1796 but have to find another way to tell the pipeline manager that the job is ready for execution?",
+      "parentUuid": "9d852b83_e3f2f227",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
