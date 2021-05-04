@@ -20,6 +20,7 @@ from tests.base import BaseTestCase
 
 from zuul import model
 from zuul.zk import ZooKeeperClient
+from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.exceptions import LockException
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import (
@@ -161,3 +162,83 @@ class TestSharding(ZooKeeperBaseTestCase):
             self.zk_client.client, "/test/shards"
         ) as shard_io:
             self.assertDictEqual(json.load(shard_io), data)
+
+
+class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.config_cache = UnparsedConfigCache(self.zk_client)
+
+    def test_files_cache(self):
+        master_files = self.config_cache.getFilesCache("project", "master")
+
+        with self.config_cache.readLock("project"):
+            self.assertEqual(len(master_files), 0)
+
+        with self.config_cache.writeLock("project"):
+            master_files["/path/to/file"] = "content"
+
+        with self.config_cache.readLock("project"):
+            self.assertEqual(master_files["/path/to/file"], "content")
+            self.assertEqual(len(master_files), 1)
+
+    def test_valid_for(self):
+        tpc = model.TenantProjectConfig("project")
+        tpc.extra_config_files = {"foo.yaml", "bar.yaml"}
+        tpc.extra_config_dirs = {"foo.d/", "bar.d/"}
+
+        master_files = self.config_cache.getFilesCache("project", "master")
+        self.assertFalse(master_files.isValidFor(tpc, cache_ltime=-1))
+
+        master_files.setValidFor(tpc.extra_config_files, tpc.extra_config_dirs)
+        self.assertTrue(master_files.isValidFor(tpc, cache_ltime=-1))
+
+        tpc.extra_config_files = set()
+        tpc.extra_config_dirs = set()
+        self.assertTrue(master_files.isValidFor(tpc, cache_ltime=-1))
+
+        tpc.extra_config_files = {"bar.yaml"}
+        tpc.extra_config_dirs = {"bar.d/"}
+        # Valid for subset
+        self.assertTrue(master_files.isValidFor(tpc, cache_ltime=-1))
+
+        tpc.extra_config_files = {"foo.yaml", "bar.yaml"}
+        tpc.extra_config_dirs = {"foo.d/", "bar.d/", "other.d/"}
+        # Invalid for additional dirs
+        self.assertFalse(master_files.isValidFor(tpc, cache_ltime=-1))
+
+        tpc.extra_config_files = {"foo.yaml", "bar.yaml", "other.yaml"}
+        tpc.extra_config_dirs = {"foo.d/", "bar.d/"}
+        # Invalid for additional files
+        self.assertFalse(master_files.isValidFor(tpc, cache_ltime=-1))
+
+    def test_branch_cleanup(self):
+        master_files = self.config_cache.getFilesCache("project", "master")
+        release_files = self.config_cache.getFilesCache("project", "release")
+
+        master_files["/path/to/file"] = "content"
+        release_files["/path/to/file"] = "content"
+
+        self.config_cache.clearCache("project", "master")
+        self.assertEqual(len(master_files), 0)
+        self.assertEqual(len(release_files), 1)
+
+    def test_project_cleanup(self):
+        master_files = self.config_cache.getFilesCache("project", "master")
+        stable_files = self.config_cache.getFilesCache("project", "stable")
+        other_files = self.config_cache.getFilesCache("other", "master")
+
+        self.assertEqual(len(master_files), 0)
+        self.assertEqual(len(stable_files), 0)
+        master_files["/path/to/file"] = "content"
+        stable_files["/path/to/file"] = "content"
+        other_files["/path/to/file"] = "content"
+        self.assertEqual(len(master_files), 1)
+        self.assertEqual(len(stable_files), 1)
+        self.assertEqual(len(other_files), 1)
+
+        self.config_cache.clearCache("project")
+        self.assertEqual(len(master_files), 0)
+        self.assertEqual(len(stable_files), 0)
+        self.assertEqual(len(other_files), 1)
