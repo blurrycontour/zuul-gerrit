@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import logging
+import re
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
@@ -28,6 +29,8 @@ class ZooKeeperClient(object):
 
     # Log zookeeper retry every 10 seconds
     retry_log_rate = 10
+    # Regex for matching the zxid in the 'srvr' command output
+    ZXID_RE = re.compile(r"zxid:\s+0x(?P<zxid>[a-f0-9])", re.I)
 
     def __init__(
         self,
@@ -92,6 +95,19 @@ class ZooKeeperClient(object):
     @property
     def lost(self):
         return not self.client or self.client.state == KazooState.LOST
+
+    @property
+    def ltime(self):
+        """Current logical timestamp as seen by the Zookeeper cluster."""
+        if not self.client:
+            raise NoClientException()
+
+        result = self.client.command(b"srvr")
+        for line in result.splitlines():
+            match = self.ZXID_RE.match(line)
+            if match:
+                return int(match.group("zxid"), 16)
+        raise RuntimeError("Could not find zxid in Zookeeper srvr output")
 
     def logConnectionRetryEvent(self):
         now = time.monotonic()
