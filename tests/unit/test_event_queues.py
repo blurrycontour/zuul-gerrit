@@ -62,7 +62,7 @@ class DummyEventQueue(event_queues.ZooKeeperEventQueue):
         self._put(event.toDict())
 
     def __iter__(self):
-        for data, ack_ref in self._iterEvents():
+        for data, ack_ref, _ in self._iterEvents():
             event = DummyEvent.fromDict(data)
             event.ack_ref = ack_ref
             yield event
@@ -265,6 +265,39 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
 
         queue.ack(event)
         self.assertFalse(queue.hasEvents())
+
+    def test_event_ltime(self):
+        global_queue = event_queues.GlobalManagementEventQueue(self.zk_client)
+        registry = event_queues.PipelineManagementEventQueue.createRegistry(
+            self.zk_client
+        )
+
+        event = model.ReconfigureEvent(None)
+        global_queue.put(event, needs_result=False)
+        self.assertTrue(global_queue.hasEvents())
+
+        pipeline_queue = registry["tenant"]["pipeline"]
+        self.assertIsInstance(
+            pipeline_queue, event_queues.ManagementEventQueue
+        )
+        processed_events = 0
+        for event in global_queue:
+            processed_events += 1
+            event_ltime = event.zuul_event_ltime
+            self.assertGreater(event_ltime, -1)
+            # Forward event to pipeline management event queue
+            pipeline_queue.put(event)
+
+        self.assertEqual(processed_events, 1)
+        self.assertTrue(pipeline_queue.hasEvents())
+
+        processed_events = 0
+        for event in pipeline_queue:
+            pipeline_queue.ack(event)
+            processed_events += 1
+            self.assertEqual(event.zuul_event_ltime, event_ltime)
+
+        self.assertEqual(processed_events, 1)
 
     def test_pipeline_management_events(self):
         # Test that when a management event is forwarded from the
