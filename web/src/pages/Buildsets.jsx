@@ -60,12 +60,17 @@ class BuildsetsPage extends React.Component {
         placeholder: 'Filter by Change...',
         type: 'search',
       },
-      // TODO (felix): We could change the result filter to a dropdown later on
       {
         key: 'result',
         title: 'Result',
         placeholder: 'Filter by Result...',
-        type: 'search',
+        type: 'select',
+        // are there more?
+        options: [
+          'SUCCESS',
+          'FAILURE',
+          'MERGER_FAILURE',
+        ]
       },
       {
         key: 'uuid',

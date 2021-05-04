@@ -32,6 +32,11 @@ import {
 } from '@patternfly/react-core'
 import { FilterIcon, SearchIcon } from '@patternfly/react-icons'
 
+import { FilterSelect } from './filters/Select'
+import { FilterTernarySelect } from './filters/TernarySelect'
+import { FilterCheckbox } from './filters/Checkbox'
+
+
 function FilterToolbar(props) {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
   const [currentCategory, setCurrentCategory] = useState(
@@ -89,9 +94,16 @@ function FilterToolbar(props) {
     // filter to be updated/removed.
     let newFilters = {}
     if (type) {
-      newFilters = {
-        ...filters,
-        [category.key]: filters[category.key].filter((s) => s !== id),
+      if (category.type === 'ternary') {
+        newFilters = {
+          ...filters,
+          [category.key]: [],
+        }
+      } else {
+        newFilters = {
+          ...filters,
+          [category.key]: filters[category.key].filter((s) => s !== id),
+        }
       }
     } else {
       // Delete the values for each filter category
@@ -122,7 +134,12 @@ function FilterToolbar(props) {
             </DropdownToggle>
           }
           isOpen={isCategoryDropdownOpen}
-          dropdownItems={filterCategories.map((category) => (
+          dropdownItems={filterCategories.filter(
+            (category) => (category.type === 'search' ||
+              category.type === 'select' ||
+              category.type === 'ternary' ||
+              category.type === 'checkbox')
+          ).map((category) => (
             <DropdownItem key={category.key}>{category.title}</DropdownItem>
           ))}
           style={{ width: '100%' }}
@@ -131,7 +148,8 @@ function FilterToolbar(props) {
     )
   }
 
-  function renderFilterInput(category) {
+  function renderFilterInput(category, filters) {
+    const { onFilterChange } = props
     if (category.type === 'search') {
       return (
         <InputGroup>
@@ -154,6 +172,37 @@ function FilterToolbar(props) {
           </Button>
         </InputGroup>
       )
+    } else if (category.type === 'select') {
+      return (
+        <InputGroup>
+          <FilterSelect
+            onFilterChange={onFilterChange}
+            filters={filters}
+            category={category}
+          />
+        </InputGroup>
+      )
+    } else if (category.type === 'ternary') {
+      return (
+        <InputGroup>
+          <FilterTernarySelect
+            onFilterChange={onFilterChange}
+            filters={filters}
+            category={category}
+          />
+        </InputGroup>
+      )
+    } else if (category.type === 'checkbox') {
+      return (
+        <InputGroup>
+          <br />
+          <FilterCheckbox
+            onFilterChange={onFilterChange}
+            filters={filters}
+            category={category}
+          />
+        </InputGroup>
+      )
     }
   }
 
@@ -165,12 +214,12 @@ function FilterToolbar(props) {
         {filterCategories.map((category) => (
           <ToolbarFilter
             key={category.key}
-            chips={filters[category.key]}
+            chips={getChipsFromFilters(filters, category)}
             deleteChip={(type, id) => handleDelete(type, id, category)}
             categoryName={category.title}
             showToolbarItem={currentCategory === category.title}
           >
-            {renderFilterInput(category)}
+            {renderFilterInput(category, filters)}
           </ToolbarFilter>
         ))}
       </>
@@ -203,14 +252,45 @@ FilterToolbar.propTypes = {
   filterCategories: PropTypes.array.isRequired,
 }
 
+function getChipsFromFilters(filters, category) {
+  if (category.type === 'ternary') {
+    switch ([...filters[category.key]].pop()) {
+      case 1:
+      case '1':
+        return ['True',]
+      case 0:
+      case '0':
+        return ['False',]
+      default:
+        return []
+    }
+  } else {
+    return filters[category.key]
+  }
+}
+
 function getFiltersFromUrl(location, filterCategories) {
   const urlParams = new URLSearchParams(location.search)
   const filters = filterCategories.reduce((filterDict, item) => {
     // Initialize each filter category with an empty list
     filterDict[item.key] = []
+
     // And update the list with each matching element from the URL query
     urlParams.getAll(item.key).forEach((param) => {
-      filterDict[item.key].push(param)
+      if (item.type === 'checkbox') {
+        switch (param) {
+          case '1':
+            filterDict[item.key].push(1)
+            break
+          case '0':
+            filterDict[item.key].push(0)
+            break
+          default:
+            break
+        }
+      } else {
+        filterDict[item.key].push(param)
+      }
     })
     return filterDict
   }, {})
