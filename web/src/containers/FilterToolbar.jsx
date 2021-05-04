@@ -17,6 +17,7 @@ import PropTypes from 'prop-types'
 import {
   Button,
   ButtonVariant,
+  Checkbox,
   Dropdown,
   DropdownItem,
   DropdownPosition,
@@ -122,7 +123,9 @@ function FilterToolbar(props) {
             </DropdownToggle>
           }
           isOpen={isCategoryDropdownOpen}
-          dropdownItems={filterCategories.map((category) => (
+          dropdownItems={filterCategories.filter(
+            (category) => (category.type === 'search')
+          ).map((category) => (
             <DropdownItem key={category.key}>{category.title}</DropdownItem>
           ))}
           style={{ width: '100%' }}
@@ -177,6 +180,34 @@ function FilterToolbar(props) {
     )
   }
 
+  function renderCheckboxes() {
+    const { filterCategories, filters, onFilterChange } = props
+    return (
+      <>
+        {filterCategories.filter(
+          (obj) => (obj.type === "checkbox")
+        ).map((category) => (
+          <div>
+            <Checkbox
+              id={category.key}
+              label={category.title}
+              isChecked={[...filters[category.key]].pop() ? true : false}
+              onChange={(checked) => {
+                const newFilters = {
+                  ...filters,
+                  [category.key]: checked ? [1,] : [],
+                }
+                onFilterChange(newFilters)
+              }}
+              aria-label={category.placeholder}
+            />
+          </div>
+        )
+        )}
+      </>
+    )
+  }
+
   return (
     <>
       <Toolbar
@@ -191,6 +222,7 @@ function FilterToolbar(props) {
               {renderFilterDropdown()}
             </ToolbarGroup>
           </ToolbarToggleGroup>
+          {renderCheckboxes()}
         </ToolbarContent>
       </Toolbar>
     </>
@@ -208,9 +240,24 @@ function getFiltersFromUrl(location, filterCategories) {
   const filters = filterCategories.reduce((filterDict, item) => {
     // Initialize each filter category with an empty list
     filterDict[item.key] = []
+
     // And update the list with each matching element from the URL query
     urlParams.getAll(item.key).forEach((param) => {
-      filterDict[item.key].push(param)
+      if (item.type === 'search') {
+        filterDict[item.key].push(param)
+      }
+      else if (item.type === 'checkbox') {
+        switch (param) {
+          case '1':
+            filterDict[item.key].push(1)
+            break
+          case '0':
+            filterDict[item.key].push(0)
+            break
+          default:
+            break
+        }
+      }
     })
     return filterDict
   }, {})

@@ -81,6 +81,18 @@ class BuildsPage extends React.Component {
         placeholder: 'Filter by Build UUID...',
         type: 'search',
       },
+      {
+        key: 'held',
+        title: 'Show held builds only',
+        placeholder: 'Display builds that triggered a autohold only',
+        type: 'checkbox',
+      },
+      {
+        key: 'voting',
+        title: 'Show voting jobs only',
+        placeholder: 'Display builds for voting jobs only',
+        type: 'checkbox',
+      },
     ]
 
     this.state = {
