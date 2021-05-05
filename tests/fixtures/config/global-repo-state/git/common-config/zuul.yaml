@@ -51,19 +51,20 @@
     precedence: high
 
 - job:
-    name: base
+    name: base-calling-implicit-role
     pre-run:
       - playbooks/pre.yaml
     roles:
       - zuul: org/roles
-    parent: null
 
 - job:
     name: test1
+    parent: base-calling-implicit-role
     run: playbooks/test1.yaml
 
 - job:
     name: test2
+    parent: base-calling-implicit-role
     run: playbooks/test2.yaml
 
 - job:

@@ -5,6 +5,7 @@
       gerrit:
         config-projects:
           - common-config
+          - org/implicit-role
         untrusted-projects:
           - org/dependentproject
           - org/project
