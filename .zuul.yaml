@@ -101,12 +101,13 @@
       python_version: 3.6
 
 - job:
-    name: zuul-tox-py38
+    name: zuul-tox-py39
     parent: zuul-tox
     timeout: 5400  # 90 minutes
+    nodeset: ubuntu-focal
     vars:
-      tox_envlist: py38
-      python_version: 3.8
+      tox_envlist: py39
+      python_version: 3.9
 
 - job:
     name: zuul-build-dashboard
@@ -195,8 +196,8 @@
     allowed-projects: zuul/zuul
     timeout: 2700  # 45 minutes
     requires:
-      - python-builder-3.8-container-image
-      - python-base-3.8-container-image
+      - python-builder-3.9-container-image
+      - python-base-3.9-container-image
     provides: zuul-container-image
     vars: &zuul_image_vars
       docker_images:
@@ -234,8 +235,8 @@
     description: Build Docker images and upload to Docker Hub.
     allowed-projects: zuul/zuul
     requires:
-      - python-builder-3.8-container-image
-      - python-base-3.8-container-image
+      - python-builder-3.9-container-image
+      - python-base-3.9-container-image
     provides: zuul-container-image
     secrets:
       name: docker_credentials
@@ -278,7 +279,7 @@
             vars:
               tox_install_bindep: false
         - zuul-tox-py36
-        - zuul-tox-py38
+        - zuul-tox-py39
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
@@ -309,7 +310,7 @@
             vars:
               tox_install_bindep: false
         - zuul-tox-py36
-        - zuul-tox-py38
+        - zuul-tox-py39
         - zuul-build-dashboard
         - nodejs-run-lint:
             vars:
