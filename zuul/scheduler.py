@@ -1855,8 +1855,18 @@ class Scheduler(threading.Thread):
                 "message": "Tenant %s isn't ready" % tenant_name,
                 "code": 204
             })
+        trigger_event_queues = self.pipeline_trigger_events[tenant_name]
+        result_event_queues = self.pipeline_result_events[tenant_name]
+        management_event_queues = self.pipeline_management_events[tenant_name]
         for pipeline in tenant.layout.pipelines.values():
-            pipelines.append(pipeline.formatStatusJSON(websocket_url))
+            status = pipeline.formatStatusJSON(websocket_url)
+            status['trigger_events'] = len(
+                trigger_event_queues[pipeline.name])
+            status['result_events'] = len(
+                result_event_queues[pipeline.name])
+            status['management_events'] = len(
+                management_event_queues[pipeline.name])
+            pipelines.append(status)
         return json.dumps(data)
 
     def onChangeUpdated(self, change, event):
