@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e34a549e_c9618ad5",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-05T15:11:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_3b6a5fb2",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_9b528b12",
         "filename": "web/src/containers/status/Pipeline.jsx",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2020-08-20T12:45:02Z",
       "side": 1,
       "message": "I think it would make sense to define a dictionary here, that contains all necessary attributes as value whereby the key is the same as pipeline.manager. This way, you could simply look up the value from the dictionary without a lot of if/else branches in renderPipelineIcon(). I used this approach here https://opendev.org/zuul/zuul/src/branch/master/web/src/containers/build/Misc.jsx#L25 and here https://review.opendev.org/#/c/739973/7/web/src/containers/build/Artifact.jsx (line 33). The default value could be defined in a different variable that is used if the key wasn\u0027t found in the dictionary.",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "340c7064_bbdd940d",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-05T15:11:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_9b528b12",
       "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "7b93e7e3_e182fce5",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-05T15:11:56Z",
+      "side": 1,
+      "message": "I chose to keep the flask to emphasize the experimental aspect of this type of pipelines, but I am totally open to using CodeIcon instead!",
+      "parentUuid": "9f560f44_5b42b3ac",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_9bcc4b36",
         "filename": "web/src/containers/status/Pipeline.jsx",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "a15c3856_a72f187c",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-05T15:11:56Z",
+      "side": 1,
+      "message": "IIUC it\u0027s actually \"in order and one after another\", as opposed to supercedent which is \"in order but only the latest one\". I\u0027m not sure there\u0027s any icon from the patternfly pool that translates this well. Maybe the Sort Amount Down icon? https://fontawesome.com/icons/sort-amount-down",
+      "parentUuid": "9f560f44_9bcc4b36",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_1b92fb57",
         "filename": "web/src/containers/status/Pipeline.jsx",
         "patchSetId": 2
@@ -81,6 +153,24 @@
       "writtenOn": "2020-08-20T13:11:12Z",
       "side": 1,
       "message": "Maybe we could use the StreamIcon as default one https://fontawesome.com/icons/stream?style\u003dsolid? As this is also the icon I used for the pipeline in other places",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b393e20_2685dc59",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-05T15:11:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f560f44_1b92fb57",
       "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
