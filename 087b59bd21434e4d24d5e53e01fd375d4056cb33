@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ce68d13_fa7cdf62",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2600,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-05T17:14:51Z",
+      "side": 1,
+      "message": "I think you were going to change the level (or remove this)?",
+      "revId": "087b59bd21434e4d24d5e53e01fd375d4056cb33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37d1a830_a3c53223",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2603,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-05T17:14:51Z",
+      "side": 1,
+      "message": "And this?",
+      "revId": "087b59bd21434e4d24d5e53e01fd375d4056cb33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
