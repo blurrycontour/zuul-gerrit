@@ -168,6 +168,24 @@
       "revId": "9ba1221a3e3fba976815e10440346304695f347a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "237a1678_a8809067",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3068,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-05-05T19:39:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6c8eae7e_88697233",
+      "revId": "9ba1221a3e3fba976815e10440346304695f347a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
