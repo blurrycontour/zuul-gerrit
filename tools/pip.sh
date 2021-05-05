@@ -23,6 +23,7 @@ then
     pip install nodeenv
     # Initialize nodeenv and tell it to re-use the currently active virtualenv
     attempts=0
+    set +e
     until nodeenv --python-virtualenv -n 14.3.0 ; do
         ((attempts++))
         if [[ $attempts > 2 ]]
@@ -31,6 +32,7 @@ then
             exit 1
         fi
     done
+    set -e
     # Use -g because inside of the virtualenv '-g' means 'install into the'
     # virtualenv - as opposed to installing into the local node_modules.
     # Avoid writing a package-lock.json file since we don't use it.
@@ -50,6 +52,7 @@ then
 
         # Be forgiving of package retrieval errors
         attempts=0
+	set +e
         until yarn install --verbose; do
             ((attempts++))
             if [[ $attempts > 2 ]]
@@ -58,6 +61,7 @@ then
                 exit 1
             fi
         done
+	set -e
 
         yarn build
         if [[ -n "${YARN_REGISTRY}" ]]
