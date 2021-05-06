@@ -106,6 +106,14 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         """
         return None
 
+    def getEventQueue(self):
+        """Return the event queue for this connection.
+
+        :returns: A `zuul.zk.event_queues.ConnectionEventQueue` instance
+                  or None.
+        """
+        return None
+
     def validateWebConfig(self, config, connections):
         """Validate web config.
 

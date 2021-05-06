@@ -464,6 +464,11 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
          The size of the current management event queue.
 
+      .. stat:: connection.<connection-name>
+         :type: gauge
+
+         The size of the current connection event queue.
+
 .. stat:: zuul.geard
 
    Gearman job distribution statistics.  Gearman jobs encompass the

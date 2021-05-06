@@ -539,6 +539,9 @@ class PagureConnection(BaseConnection):
     def getWebController(self, zuul_web):
         return PagureWebController(zuul_web, self)
 
+    def getEventQueue(self):
+        return getattr(self, "event_queue", None)
+
     def validateWebConfig(self, config, connections):
         return True
 

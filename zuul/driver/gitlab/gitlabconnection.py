@@ -414,6 +414,9 @@ class GitlabConnection(CachedBranchConnection):
     def getWebController(self, zuul_web):
         return GitlabWebController(zuul_web, self)
 
+    def getEventQueue(self):
+        return getattr(self, "event_queue", None)
+
     def getProject(self, name):
         return self.projects.get(name)
 
