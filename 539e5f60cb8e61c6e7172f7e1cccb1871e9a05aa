@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "62de4fdb_6e029e3b",
+        "filename": "web/src/containers/autohold/AutoholdTable.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-06T14:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "490e97cf_5aa030e0",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "98f3d8eb_b2f0e25e",
         "filename": "web/src/containers/autohold/AutoholdTable.jsx",
         "patchSetId": 5
@@ -33,6 +51,24 @@
       "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7698e3f_90164417",
+        "filename": "web/src/containers/autohold/AutoholdTable.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-06T14:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98f3d8eb_b2f0e25e",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "07b0f14b_65c1c270",
+        "filename": "web/src/containers/autohold/AutoholdTable.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-06T14:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db310fa8_468cbe99",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8e76da98_84179198",
         "filename": "web/src/containers/build/Build.jsx",
         "patchSetId": 5
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "047b4dab_2bb983ca",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-06T14:47:20Z",
+      "side": 1,
+      "message": "moved IconProperty to the \"root\" Misc file",
+      "parentUuid": "8e76da98_84179198",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6407276d_00f511c4",
         "filename": "web/src/reducers/autoholds.js",
         "patchSetId": 5
@@ -84,6 +156,24 @@
       "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d61b3ec_c0652b13",
+        "filename": "web/src/reducers/autoholds.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-06T14:47:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6407276d_00f511c4",
+      "revId": "539e5f60cb8e61c6e7172f7e1cccb1871e9a05aa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
