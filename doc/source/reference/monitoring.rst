@@ -142,6 +142,21 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          The number of changes processed by the pipeline since Zuul
          started.
 
+      .. stat:: trigger_events
+         :type: gauge
+
+         The size of the pipeline's trigger event queue.
+
+      .. stat:: result_events
+         :type: gauge
+
+         The size of the pipeline's result event queue.
+
+      .. stat:: management_events
+         :type: gauge
+
+         The size of the pipeline's management event queue.
+
 .. stat:: zuul.executor.<executor>
 
    Holds metrics emitted by individual executors.  The ``<executor>``
