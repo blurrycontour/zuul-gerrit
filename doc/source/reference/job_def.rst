@@ -220,12 +220,22 @@ Here is an example of two job definitions:
 
    .. attr:: semaphore
 
-      The name of a :ref:`semaphore` which should be acquired and
-      released when the job begins and ends.  If the semaphore is at
-      maximum capacity, then Zuul will wait until it can be acquired
-      before starting the job. The format is either a string or a
-      dictionary. If it's a string it references a semaphore using the
-      default value for :attr:`job.semaphore.resources-first`.
+      A deprecated alias of :attr:`job.semaphores`.
+
+   .. attr:: semaphores
+
+      The name of a :ref:`semaphore` (or list of them) which should be
+      acquired and released when the job begins and ends.  If the
+      semaphore is at maximum capacity, then Zuul will wait until it
+      can be acquired before starting the job. The format is either a
+      string, a dictionary, or a list of either of those in the case
+      of multiple semaphores. If it's a string it references a
+      semaphore using the default value for
+      :attr:`job.semaphores.resources-first`.
+
+      If multiple semaphores are requested, the job will not start
+      until all have been acquired, and Zuul will wait until all are
+      available before acquiring any.
 
       .. attr:: name
          :required:
@@ -236,12 +246,12 @@ Here is an example of two job definitions:
          :default: False
 
          By default a semaphore is acquired before the resources are
-         requested. However in some cases the user wants to run cheap
-         jobs as quickly as possible in a consecutive manner. In this
-         case :attr:`job.semaphore.resources-first` can be enabled to
-         request the resources before locking the semaphore. This can
-         lead to some amount of blocked resources while waiting for the
-         semaphore so this should be used with caution.
+         requested. However in some cases the user may want to run
+         cheap jobs as quickly as possible in a consecutive manner. In
+         this case `resources-first` can be enabled to request the
+         resources before locking the semaphore. This can lead to some
+         amount of blocked resources while waiting for the semaphore
+         so this should be used with caution.
 
    .. attr:: tags
 
