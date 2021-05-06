@@ -39,11 +39,12 @@ from urllib.parse import urlsplit
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.gearworker import ZuulGearWorker
 from zuul.lib.result_data import get_warnings_from_result_data
-from zuul.lib.yamlutil import yaml
+from zuul.lib import yamlutil as yaml
 from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 from zuul.lib import filecomments
+from zuul.lib.keystorage import ZooKeeperKeyStorage
 
 import gear
 
@@ -1767,13 +1768,41 @@ class AnsibleJob(object):
         for role in playbook['roles']:
             self.prepareRole(jobdir_playbook, role, args)
 
-        secrets = playbook['secrets']
+        secrets = self.decryptSecrets(playbook['secrets'])
         if secrets:
             check_varnames(secrets)
             jobdir_playbook.secrets_content = yaml.safe_dump(
                 secrets, default_flow_style=False)
 
         self.writeAnsibleConfig(jobdir_playbook)
+
+    def decryptSecrets(self, secrets):
+        """Decrypt the secrets dictionary provided by the scheduler
+
+        The input dictionary has a frozen secret dictionary as its
+        value (with encrypted data and the project name of the key to
+        use to decrypt it).
+
+        The output dictionary simply has decrypted data as its value.
+
+        :param dict secrets: The encrypted secrets dictionary from the
+            scheduler
+
+        :returns: A decrypted secrets dictionary
+
+        """
+        ret = {}
+        for secret_name, frozen_secret in secrets.items():
+            secret = zuul.model.Secret(secret_name, None)
+            secret.secret_data = yaml.safe_load(
+                frozen_secret['encrypted_data'])
+            private_secrets_key, public_secrets_key = \
+                self.executor_server.keystore.getProjectSecretsKeys(
+                    frozen_secret['connection_name'],
+                    frozen_secret['project_name'])
+            secret = secret.decrypt(private_secrets_key)
+            ret[secret_name] = secret.secret_data
+        return ret
 
     def checkoutTrustedProject(self, project, branch, args):
         root = self.jobdir.getTrustedProject(project.canonical_name,
@@ -2635,6 +2664,11 @@ class ExecutorServer(BaseMergeServer):
 
         self.keep_jobdir = keep_jobdir
         self.jobdir_root = jobdir_root
+
+        self.keystore = ZooKeeperKeyStorage(
+            self.zk_client,
+            password=self._get_key_store_password())
+
         # TODOv3(mordred): make the executor name more unique --
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
@@ -2794,6 +2828,12 @@ class ExecutorServer(BaseMergeServer):
 
         # Used to offload expensive operations to different processes
         self.process_worker = None
+
+    def _get_key_store_password(self):
+        try:
+            return self.config["keystore"]["password"]
+        except KeyError:
+            raise RuntimeError("No key store password configured!")
 
     def _getFunctionSuffixes(self):
         suffixes = []

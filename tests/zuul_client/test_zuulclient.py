@@ -21,6 +21,7 @@ import textwrap
 
 import zuul.web
 import zuul.rpcclient
+from zuul.lib.yamlutil import yaml
 
 from tests.base import iterate_timeout
 from tests.base import ZuulDBTestCase
@@ -50,8 +51,11 @@ class TestZuulClientEncrypt(BaseTestWeb):
     def _getSecrets(self, job, pbtype):
         secrets = []
         build = self.getJobFromHistory(job)
-        for pb in build.parameters[pbtype]:
-            secrets.append(pb['secrets'])
+        for pb in getattr(build.jobdir, pbtype):
+            if pb.secrets_content:
+                secrets.append(yaml.safe_load(pb.secrets_content))
+            else:
+                secrets.append({})
         return secrets
 
     def test_encrypt_large_secret(self):
