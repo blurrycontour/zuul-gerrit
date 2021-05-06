@@ -349,6 +349,16 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           len(self.management_events))
 
+        for tenant in self.abide.tenants.values():
+            for pipeline in tenant.layout.pipelines.values():
+                base = f"zuul.tenant.{tenant.name}.pipeline.{pipeline.name}"
+                self.statsd.gauge(f"{base}.trigger_events",
+                                  len(trigger_event_queues[pipeline.name]))
+                self.statsd.gauge(f"{base}.result_events",
+                                  len(result_event_queues[pipeline.name]))
+                self.statsd.gauge(f"{base}.management_events",
+                                  len(management_event_queues[pipeline.name]))
+
     def runCleanup(self):
         # Run the first cleanup immediately after the first
         # reconfiguration.
