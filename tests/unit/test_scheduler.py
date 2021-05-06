@@ -7269,7 +7269,7 @@ class TestSemaphore(ZuulTestCase):
         self.assertIsNone(jobs[0]["waiting_status"])
         self.assertIsNone(jobs[1]["waiting_status"])
         self.assertEqual(jobs[2]["waiting_status"],
-                         'semaphore: test-semaphore')
+                         'semaphores: test-semaphore')
 
         # By default we first lock the semaphore and then get the nodes
         # so at this point the semaphore needs to be aquired.
@@ -7832,6 +7832,43 @@ class TestSemaphore(ZuulTestCase):
         self.assertEqual(
             len(tenant.semaphore_handler.semaphoreHolders("test-semaphore")),
             0)
+
+    @simple_layout('layouts/multiple-semaphores.yaml')
+    def test_multiple_semaphores(self):
+        # Test a job with multiple semaphores
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # One job should be running, and hold sem1
+        self.assertBuilds([dict(name='job1')])
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Job2 requires sem1 and sem2; it hasn't started because job
+        # is still holding sem1.
+        self.assertBuilds([dict(name='job1')])
+
+        self.executor_server.release('job1')
+        self.waitUntilSettled()
+
+        # Job1 is finished, so job2 can acquire both semaphores.
+        self.assertBuilds([dict(name='job2')])
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='job1', result='SUCCESS', changes='1,1'),
+            dict(name='job2', result='SUCCESS', changes='2,1'),
+        ])
+        # TODO(corvus): Consider a version of this test which launches
+        # 2 jobs with the same multiple-semaphore requirements
+        # simultaneously to test the behavior with contention (at
+        # least one should be able to start on each pass through the
+        # loop).
 
 
 class TestSemaphoreMultiTenant(ZuulTestCase):

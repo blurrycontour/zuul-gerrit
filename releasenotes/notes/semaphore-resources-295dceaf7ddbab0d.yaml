@@ -10,5 +10,5 @@ upgrade:
     to run. However this could lead to a high amount of resource waste. Instead
     jobs now acquire the semaphore before requesting the resources by default.
     This behavior can be overridden by jobs using
-    :attr:`job.semaphore.resources-first` if some waste of resources is
+    job.semaphores.resources-first if some waste of resources is
     acceptable.

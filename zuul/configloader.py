@@ -619,6 +619,7 @@ class JobParser(object):
                       'hold-following-changes': bool,
                       'voting': bool,
                       'semaphore': vs.Any(semaphore, str),
+                      'semaphores': to_list(vs.Any(semaphore, str)),
                       'tags': to_list(str),
                       'branches': to_list(str),
                       'files': to_list(str),
@@ -883,14 +884,22 @@ class JobParser(object):
                 new_dependencies.append(job_dependency)
             job.dependencies = new_dependencies
 
-        if 'semaphore' in conf:
-            semaphore = conf.get('semaphore')
+        semaphores = as_list(conf.get('semaphores', conf.get('semaphore', [])))
+        job_semaphores = []
+        for semaphore in semaphores:
             if isinstance(semaphore, str):
-                job.semaphore = model.JobSemaphore(semaphore)
+                job_semaphores.append(model.JobSemaphore(semaphore))
             else:
-                job.semaphore = model.JobSemaphore(
+                job_semaphores.append(model.JobSemaphore(
                     semaphore.get('name'),
-                    semaphore.get('resources-first', False))
+                    semaphore.get('resources-first', False)))
+        if job_semaphores:
+            # Sort the list of semaphores to avoid issues with
+            # contention (where two jobs try to start at the same time
+            # and fail due to acquiring the same semaphores but in
+            # reverse order.
+            job.semaphores = tuple(sorted(job_semaphores,
+                                          key=lambda x: x.name))
 
         for k in ('tags', 'requires', 'provides'):
             v = frozenset(as_list(conf.get(k)))
