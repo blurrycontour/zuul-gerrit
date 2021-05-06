@@ -225,6 +225,24 @@
       "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23357efb_b608e296",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-06T12:45:06Z",
+      "side": 1,
+      "message": "I tried to move the acceptNodes() call to the executor side, but I\u0027m a little stuck there.\n\nThe main reason is: To call the acceptNodes() on the executor, I would have to provide the NodeRequest object to the executor. Although most of the NodeRequest data is stored in ZooKeeper, there is a lot ongoing on the NodeRequest object itself which is not persisted to ZooKeeper. Thus, I would have to fully serialize the NodeRequest first to be able to restore a \"rich\" NodeRequest object on the executor side that can be used to interact with the local NodePool API.\n\nI have already started with this in a follow-up change (not pushed to gerrit yet) where I switch the NodePool API from the \"in-place NodeRequest update\" (which updates the local NodeRequest object with fresh data from ZooKeeper) to a TreeCache. But I would like to keep that change on top of this one, because I think it\u0027s simpler to update the NodePool API when the node locking is done in the executor.\n\nI can try to move parts out of the follow-up change into this one to make the NodeRequest fully serializable. Maybe doing that is also worth a change on its own, but I currently cannot see the whole impact of this change. When this is done, we might be able to keep the acceptNodes() method like it is.\n\nI hope this was somewhat understandable. Please let me know if anything is unclear or if you have a better idea. Maybe I\u0027m also missing some important point.",
+      "parentUuid": "71732e67_e604fa70",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
