@@ -148,6 +148,9 @@ class TestWeb(BaseTestWeb):
 
         data = resp.json()
         status_jobs = []
+        self.assertEqual(
+            data["connection_event_queues"]["gerrit"]["length"], 0)
+
         for p in data['pipelines']:
             for q in p['change_queues']:
                 if p['name'] in ['gate', 'conflict']:
