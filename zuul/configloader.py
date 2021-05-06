@@ -437,10 +437,12 @@ class EncryptedPKCS1_OAEP(yaml.YAMLObject):
     def to_yaml(cls, dumper, data):
         ciphertext = data.ciphertext
         if isinstance(ciphertext, list):
-            ciphertext = [yaml.ScalarNode(value=base64.b64encode(x))
+            ciphertext = [yaml.ScalarNode(tag='tag:yaml.org,2002:str',
+                                          value=base64.b64encode(x))
                           for x in ciphertext]
-        else:
-            ciphertext = base64.b64encode(ciphertext)
+            return yaml.SequenceNode(tag=cls.yaml_tag,
+                                     value=ciphertext)
+        ciphertext = base64.b64encode(ciphertext)
         return yaml.ScalarNode(tag=cls.yaml_tag, value=ciphertext)
 
     def decrypt(self, private_key):
