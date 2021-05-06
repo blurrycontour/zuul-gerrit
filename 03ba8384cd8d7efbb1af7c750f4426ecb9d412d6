@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ab6e9b8_c4723620",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-06T13:42:48Z",
+      "side": 1,
+      "message": "We talked about maybe switching to orjson at some point for performance reasons. Switching to yaml we would not benefit from that. Not sure how relevant that would be for the build requests though.",
+      "revId": "03ba8384cd8d7efbb1af7c750f4426ecb9d412d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
