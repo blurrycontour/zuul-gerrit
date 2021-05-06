@@ -1070,9 +1070,24 @@ class AnsibleJob(object):
                 raise ExecutorError(
                     'Failed to update project %s' % task.project_name)
 
+            # Take refs and branches from repo state
+            project_repo_state = \
+                repo_state[task.connection_name][task.project_name]
+            # All branch names
+            branches = [
+                ref[11:]  # strip refs/heads/
+                for ref in project_repo_state
+                if ref.startswith('refs/heads/')
+            ]
+            # All refs without refs/*/ prefix
+            refs = []
+            for ref in project_repo_state:
+                r = '/'.join(ref.split('/')[2:])
+                if r:
+                    refs.append(r)
             self.project_info[task.canonical_name] = {
-                'refs': task.refs,
-                'branches': task.branches,
+                'refs': refs,
+                'branches': branches,
             }
 
         # Early abort if abort requested
@@ -3046,13 +3061,9 @@ class ExecutorServer(BaseMergeServer):
                     repo_state=task.repo_state,
                     zuul_event_id=task.zuul_event_id, build=task.build,
                     process_worker=self.process_worker)
-                repo = self.merger.getRepo(
-                    task.connection_name, task.project_name)
                 source = self.connections.getSource(task.connection_name)
                 project = source.getProject(task.project_name)
                 task.canonical_name = project.canonical_name
-                task.branches = repo.getBranches()
-                task.refs = [r.name for r in repo.getRefs()]
                 log.debug("Finished updating repo %s/%s",
                           task.connection_name, task.project_name)
                 task.success = True
