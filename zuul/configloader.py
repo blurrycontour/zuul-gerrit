@@ -1840,6 +1840,10 @@ class TenantParser(object):
         for job in jobs:
             self.log.debug("Waiting for cat job %s" % (job,))
             job.wait(self.merger.git_timeout)
+            if not hasattr(job, 'updated'):
+                # We timed out
+                raise Exception("Cat job %s timed out; consider setting "
+                                "merger.git_timeout in zuul.conf" % (job,))
             if not job.updated:
                 raise Exception("Cat job %s failed" % (job,))
             self.log.debug("Cat job %s got files %s" %
