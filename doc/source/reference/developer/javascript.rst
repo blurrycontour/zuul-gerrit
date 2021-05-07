@@ -228,7 +228,7 @@ As long as `yarn`_ is installed, the installation of zuul will run
 .. _Components: https://www.patternfly.org/v4/documentation/react/components/aboutmodal
 .. _Demos: https://www.patternfly.org/v4/documentation/react/demos/bannerdemo
 .. _Usage and behaviour: https://www.patternfly.org/v4/design-guidelines/usage-and-behavior/about-modal
-.. _icons: https://www.patternfly.org/v4/design-guidelines/styles/icons
+.. _icons: https://www.patternfly.org/v4/guidelines/icons
 .. _FontAwesome Free: https://fontawesome.com/icons?d=gallery&m=free
 .. _address-book: https://fontawesome.com/icons/address-book?style=solid
 
