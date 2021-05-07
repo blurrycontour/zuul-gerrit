@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "49eff990_dff6f912",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1863,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-07T05:54:51Z",
+      "side": 1,
+      "message": "Not sure if we want to nest this instead, as done for the global event queues:\n\n    status[\u0027trigger_event_queue\u0027][\u0027length\u0027]",
+      "revId": "48ef350cb2501ce5003aa2f71253e23a1bd454dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
