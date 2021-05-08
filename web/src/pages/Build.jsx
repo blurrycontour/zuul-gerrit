@@ -18,6 +18,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { parse } from 'query-string'
 import {
+  Button,
   EmptyState,
   EmptyStateVariant,
   EmptyStateIcon,
@@ -30,6 +31,7 @@ import {
   Title,
 } from '@patternfly/react-core'
 import {
+  ArrowUpIcon,
   BuildIcon,
   FileArchiveIcon,
   FileCodeIcon,
@@ -65,6 +67,10 @@ class BuildPage extends React.Component {
     history: PropTypes.object.isRequired,
   }
 
+  state = {
+    topOfPageVisible: true,
+  }
+
   updateData = () => {
     // The related fetchBuild...() methods won't do anything if the data is
     // already available in the local state, so just call them.
@@ -75,11 +81,16 @@ class BuildPage extends React.Component {
     )
   }
 
+  onScroll = () => {
+    this.setState({topOfPageVisible: window.scrollY == 0})
+  }
+
   componentDidMount() {
     document.title = 'Zuul Build'
     if (this.props.tenant.name) {
       this.updateData()
     }
+    window.addEventListener('scroll', this.onScroll)
   }
 
   componentDidUpdate(prevProps) {
@@ -302,9 +313,21 @@ class BuildPage extends React.Component {
             </Tab>
           </Tabs>
         </PageSection>
+        {!this.state.topOfPageVisible && (
+          <PageSection variant={PageSectionVariants.light}>
+            <Button onClick={scrollToTop} variant="primary" style={{position: 'fixed', bottom: 20, right: 20}}>
+              Go to top of page <ArrowUpIcon/>
+            </Button>
+          </PageSection>
+        )}
       </>
     )
   }
+}
+
+function scrollToTop() {
+  window.scrollTo(0,0)
+  document.activeElement.blur()
 }
 
 function mapStateToProps(state, ownProps) {
