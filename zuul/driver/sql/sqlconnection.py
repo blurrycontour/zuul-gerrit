@@ -13,6 +13,7 @@
 # under the License.
 
 import logging
+import time
 
 import alembic
 import alembic.command
@@ -188,7 +189,6 @@ class SQLConnection(BaseConnection):
         self.dburi = None
         self.engine = None
         self.connection = None
-        self.tables_established = False
         self.table_prefix = self.connection_config.get('table_prefix', '')
         self.log.info("Initializing SQL connection {} (prefix: {})".format(
             connection_name, self.table_prefix))
@@ -215,15 +215,10 @@ class SQLConnection(BaseConnection):
                                                     expire_on_commit=False,
                                                     autoflush=False)
             self.session = orm.scoped_session(self.session_factory)
-
         except sa.exc.NoSuchModuleError:
-            self.log.exception(
-                "The required module for the dburi dialect isn't available. "
-                "SQL connection %s will be unavailable." % connection_name)
-        except sa.exc.OperationalError:
-            self.log.exception(
-                "Unable to connect to the database or establish the required "
-                "tables. Reporter %s is disabled" % self)
+            self.log.error(
+                "The required module for the dburi dialect isn't available.")
+            raise
 
     def getSession(self):
         return DatabaseSession(self)
@@ -247,18 +242,15 @@ class SQLConnection(BaseConnection):
             alembic.command.upgrade(config, 'head', tag=tag)
 
     def onLoad(self):
-        try:
-            self._migrate()
-            self.tables_established = True
-        except sa.exc.NoSuchModuleError:
-            self.log.exception(
-                "The required module for the dburi dialect isn't available. "
-                "SQL connection %s will be unavailable." %
-                self.connection_name)
-        except sa.exc.OperationalError:
-            self.log.exception(
-                "Unable to connect to the database or establish the required "
-                "tables. Connection %s is disabled" % self)
+        while True:
+            try:
+                self._migrate()
+                break
+            except sa.exc.OperationalError:
+                self.log.error(
+                    "Unable to connect to the database or establish the "
+                    "required tables.")
+            time.sleep(10)
 
     def _setup_models(self):
         Base = declarative_base(metadata=sa.MetaData())
