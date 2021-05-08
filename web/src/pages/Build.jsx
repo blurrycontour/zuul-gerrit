@@ -18,6 +18,7 @@ import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { parse } from 'query-string'
 import {
+  Button,
   EmptyState,
   EmptyStateVariant,
   EmptyStateIcon,
@@ -30,6 +31,7 @@ import {
   Title,
 } from '@patternfly/react-core'
 import {
+  ArrowUpIcon,
   BuildIcon,
   FileArchiveIcon,
   FileCodeIcon,
@@ -302,9 +304,19 @@ class BuildPage extends React.Component {
             </Tab>
           </Tabs>
         </PageSection>
+        <PageSection variant={PageSectionVariants.light}>
+          <Button onClick={scrollToTop} variant="primary" style={{position: 'fixed', bottom: 20, right: 20}}>
+            Go to top of page <ArrowUpIcon/>
+          </Button>
+        </PageSection>
       </>
     )
   }
+}
+
+function scrollToTop() {
+  window.scrollTo(0,0)
+  document.activeElement.blur()
 }
 
 function mapStateToProps(state, ownProps) {
