@@ -75,7 +75,7 @@ from zuul.driver.git import GitDriver
 from zuul.driver.smtp import SMTPDriver
 from zuul.driver.github import GithubDriver
 from zuul.driver.timer import TimerDriver
-from zuul.driver.sql import SQLDriver, sqlconnection
+from zuul.driver.sql import SQLDriver, sqlconnection, sqlreporter
 from zuul.driver.bubblewrap import BubblewrapDriver
 from zuul.driver.nullwrap import NullwrapDriver
 from zuul.driver.mqtt import MQTTDriver
@@ -318,6 +318,9 @@ class SQLDriverMock(SQLDriver):
 
     def getConnection(self, name, config):
         return FakeSqlConnection(self, name, config)
+
+    def getReporter(self, connection, pipeline, config=None):
+        return FakeSqlReporter(self, connection, config)
 
 
 class TestConnectionRegistry(ConnectionRegistry):
@@ -2994,6 +2997,12 @@ class FakeSqlConnection(sqlconnection.SQLConnection):
 
     def getSession(self):
         return FakeZuulDatabaseSession(self)
+
+
+class FakeSqlReporter(sqlreporter.SQLReporter):
+
+    def report(self, item):
+        pass
 
 
 class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
