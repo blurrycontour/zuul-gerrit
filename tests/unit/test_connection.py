@@ -428,23 +428,6 @@ class TestRequiredSQLConnection(BaseTestCase):
         self.connections.stop()
 
 
-class TestConnectionsBadSQL(ZuulDBTestCase):
-    config_file = 'zuul-sql-driver-bad.conf'
-    tenant_config_file = 'config/sql-driver/main.yaml'
-
-    def test_unable_to_connect(self):
-        "Test the SQL reporter fails gracefully when unable to connect"
-        self.config.set('zuul', 'layout_config',
-                        'tests/fixtures/layout-sql-reporter.yaml')
-        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
-
-        # Trigger a reporter. If no errors are raised, the reporter has been
-        # disabled correctly
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-
 class TestMultipleGerrits(ZuulTestCase):
     config_file = 'zuul-connections-multiple-gerrits.conf'
     tenant_config_file = 'config/zuul-connections-multiple-gerrits/main.yaml'
