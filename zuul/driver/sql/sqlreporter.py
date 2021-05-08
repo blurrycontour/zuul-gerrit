@@ -68,10 +68,6 @@ class SQLReporter(BaseReporter):
         """Create an entry into a database."""
         log = get_annotated_logger(self.log, item.event)
 
-        if not self.connection.tables_established:
-            log.warning("SQL reporter (%s) is disabled ", self)
-            return
-
         event_id = None
         if item.event is not None:
             event_id = getattr(item.event, "zuul_event_id", None)

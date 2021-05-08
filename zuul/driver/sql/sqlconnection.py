@@ -188,7 +188,6 @@ class SQLConnection(BaseConnection):
         self.dburi = None
         self.engine = None
         self.connection = None
-        self.tables_established = False
         self.table_prefix = self.connection_config.get('table_prefix', '')
         self.log.info("Initializing SQL connection {} (prefix: {})".format(
             connection_name, self.table_prefix))
@@ -215,15 +214,15 @@ class SQLConnection(BaseConnection):
                                                     expire_on_commit=False,
                                                     autoflush=False)
             self.session = orm.scoped_session(self.session_factory)
-
         except sa.exc.NoSuchModuleError:
-            self.log.exception(
-                "The required module for the dburi dialect isn't available. "
-                "SQL connection %s will be unavailable." % connection_name)
+            self.log.error(
+                "The required module for the dburi dialect isn't available.")
+            raise
         except sa.exc.OperationalError:
-            self.log.exception(
+            self.log.error(
                 "Unable to connect to the database or establish the required "
-                "tables. Reporter %s is disabled" % self)
+                "tables.")
+            raise
 
     def getSession(self):
         return DatabaseSession(self)
@@ -249,16 +248,15 @@ class SQLConnection(BaseConnection):
     def onLoad(self):
         try:
             self._migrate()
-            self.tables_established = True
         except sa.exc.NoSuchModuleError:
-            self.log.exception(
-                "The required module for the dburi dialect isn't available. "
-                "SQL connection %s will be unavailable." %
-                self.connection_name)
+            self.log.error(
+                "The required module for the dburi dialect isn't available.")
+            raise
         except sa.exc.OperationalError:
-            self.log.exception(
+            self.log.error(
                 "Unable to connect to the database or establish the required "
-                "tables. Connection %s is disabled" % self)
+                "tables.")
+            raise
 
     def _setup_models(self):
         Base = declarative_base(metadata=sa.MetaData())
