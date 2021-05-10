@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bdbf62e5_b1532284",
+        "filename": "releasenotes/notes/tenant-information-in-node-request-1ce98b86f7388cd0.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-10T23:48:24Z",
+      "side": 1,
+      "message": "Nit: should be spelled \"gauge\". Don\u0027t make a new patchset for this.",
+      "range": {
+        "startLine": 6,
+        "startChar": 4,
+        "endLine": 6,
+        "endChar": 10
+      },
+      "revId": "2fc8a33e49003cdba1dfff8976e7400b8191a9b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a88a1813_5f956834",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-10T23:48:24Z",
+      "side": 1,
+      "message": "When is this condition triggered? Wouldn\u0027t there always be a buildset if Zuul is making the request?\n\nNodepool\u0027s max-server allocation will make requests without any previous job demand being associated, but that happens in the Nodepool codebase.",
+      "revId": "2fc8a33e49003cdba1dfff8976e7400b8191a9b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0184a199_653a8474",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-10T23:48:24Z",
+      "side": 1,
+      "message": "We probably need to make this value statsd safe? tenant names could in theory have \u0027.\u0027s in them I think (and maybe /s ?).",
+      "range": {
+        "startLine": 99,
+        "startChar": 61,
+        "endLine": 99,
+        "endChar": 67
+      },
+      "revId": "2fc8a33e49003cdba1dfff8976e7400b8191a9b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "da521d32_01d68459",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-10T23:48:24Z",
+      "side": 1,
+      "message": "I had to figure out how the tests that assert statsd data for the test tenants work if this is in a testonly block. Turns out this block is for config validation. That is what testonly refers too. Maybe we should do a followup to rename this to validateonly or something to make it clearer.\n\nDefinitely don\u0027t bother in this change. But thought I\u0027d leave a note to help other reviewers.",
+      "revId": "2fc8a33e49003cdba1dfff8976e7400b8191a9b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
