@@ -39,7 +39,8 @@ class TestNodepoolIntegration(BaseTestCase):
         self.provisioned_requests = []
         # This class implements the scheduler methods zuul.nodepool
         # needs, so we pass 'self' as the scheduler.
-        self.nodepool = zuul.nodepool.Nodepool(self)
+        self.nodepool = zuul.nodepool.Nodepool(
+            self.zk_client, self.hostname, self.statsd, self)
 
     def waitForRequests(self):
         # Wait until all requests are complete.
