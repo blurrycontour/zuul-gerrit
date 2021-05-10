@@ -951,7 +951,12 @@ class AnsibleJob(object):
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
             for key in self.arguments.get('ssh_keys', []):
-                self.ssh_agent.addData(key['name'], key['key'])
+                private_ssh_key, public_ssh_key = \
+                    self.executor_server.keystore.getProjectSSHKeys(
+                        key['connection_name'],
+                        key['project_name'])
+                name = '%s project key' % (key['project_name'])
+                self.ssh_agent.addData(name, private_ssh_key)
             self.jobdir = JobDir(self.executor_server.jobdir_root,
                                  self.executor_server.keep_jobdir,
                                  str(self.job.unique))
