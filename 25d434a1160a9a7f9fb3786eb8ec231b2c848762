@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2df4ac06_1754a56f",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-10T20:55:34Z",
+      "side": 1,
+      "message": "Let\u0027s add a docstring here that indicates how we expect the cache to be used (it\u0027s not used in this change, so it\u0027s hard to see why it\u0027s there).",
+      "revId": "25d434a1160a9a7f9fb3786eb8ec231b2c848762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
