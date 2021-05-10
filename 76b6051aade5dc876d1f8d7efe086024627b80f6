@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0c7fe51_c11a74a3",
+        "filename": "zuul/zk/config_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-10T22:45:02Z",
+      "side": 1,
+      "message": "nit: s/go/to/",
+      "revId": "76b6051aade5dc876d1f8d7efe086024627b80f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
