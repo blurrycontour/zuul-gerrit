@@ -26,12 +26,12 @@ Consider the following project definition::
 
   - project:
       name: yoyodyne
+      queue: integrated
       check:
         jobs:
           - check-syntax
           - unit-tests
       gate:
-        queue: integrated
         jobs:
           - unit-tests
           - integration-tests
