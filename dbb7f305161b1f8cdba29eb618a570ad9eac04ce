@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6962d56c_b34a51bf",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-10T15:14:19Z",
+      "side": 1,
+      "message": "Should we call this \"tenant-resource-limits\"?",
+      "revId": "dbb7f305161b1f8cdba29eb618a570ad9eac04ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a74922c6_2e9d8c05",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-10T15:14:19Z",
+      "side": 1,
+      "message": "I *think* that the intent is for the tenant-resources limit to be global across all providers, but it would be good to specify that.  The reason I think that is that you cited the use case of a number of openstack clouds, and, if we use the opendev system as an example, it doesn\u0027t make a lot of sense to me to have tenant quotas for each provider in the general case.\n\nHowever, it does make sense to me that we might want to give, say, airship extended use of special nodes.  We can already limit labels to tenants, so we can set up an all-or-none control.  But is there a use case for saying \"this tenant can have 200 cores from this provider, and another tenant can have 400 cores from the same provider\"?\n\nThat sounds complicated to describe and I sure don\u0027t want to set up a system that way.  So maybe if we don\u0027t have an immediate use case for that, we should just implement this as a global limit.  And if it comes up later, I think we could add it in as a provider-level config.\n\n-1: Assuming this all sounds good, let\u0027s state somewhere in here explicitly that the tenant-resources limit is global across all providers.",
+      "revId": "dbb7f305161b1f8cdba29eb618a570ad9eac04ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "826cadb9_53e66769",
+        "filename": "doc/source/reference/developer/specs/tenant-resource-quota.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-10T15:14:19Z",
+      "side": 1,
+      "message": "When I was trying to determine whether this made sense as a global or per-provider config, I considered that right now the launchers effectively only handle nodes from their own providers.  In other words, the QuotaSupport class only looks at nodes from that provider.\n\nHowever, it does *read* all of the nodes from ZK, so the additionaly load of calculating a global quota won\u0027t be significant.  So that\u0027s fine.\n\nHowever (again), it establishes quota usage by calling quotaNeededByLabel, which can have side effects of calling provider methods.  That could mean one provider calling another provider\u0027s methods, and that won\u0027t work (it won\u0027t have started).  So we should fully adopt the method of putting the resource usage information in the ZK Node entries.  We should make sure all providers do that in all cases, and then remove the quotaNeededByLabel call in the QuotaSupport class, so it (and the new method) will rely only on data in ZK.",
+      "revId": "dbb7f305161b1f8cdba29eb618a570ad9eac04ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
