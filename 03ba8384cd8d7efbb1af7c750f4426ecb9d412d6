@@ -16,6 +16,24 @@
       "revId": "03ba8384cd8d7efbb1af7c750f4426ecb9d412d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0c219012_65f74f12",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-05-10T20:46:35Z",
+      "side": 1,
+      "message": "I\u0027m not sure if we should switch the entire job request to yaml. Since we use json for all machine to machine communication this feels wrong and likely comes with a performance drawback. Thus I think this is a good compromise. Another possibility would be to serialize the secret to json if we find an easy way to do that.",
+      "parentUuid": "1ab6e9b8_c4723620",
+      "revId": "03ba8384cd8d7efbb1af7c750f4426ecb9d412d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
