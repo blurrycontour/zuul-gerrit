@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e0723cd_bc72656b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-10T22:42:48Z",
+      "side": 1,
+      "message": "I\u0027m not sure we really need to get the \"current\" time, since everything we\u0027re interested in is event-based, and those events have times.  We\u0027re going to use the zxid to compare a management event with the cache update time.  The management event will have its own zxid, so as long as cache \u003e event, cache is current.\n\nI looked ahead a bit, and it looks like that\u0027s exactly what you do in the following changes.  The only use of this feature is in the unit tests.  Maybe we could just make this a utility method in the test framework and omit it here?  That way people aren\u0027t tempted to use it when some other source of ltime would do.",
+      "revId": "07ade312c27dcdb3b04f337537f662f886064e6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
