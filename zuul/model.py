@@ -636,6 +636,7 @@ class Node(ConfigObject):
 
     def toDict(self, internal_attributes=False):
         d = {}
+        d["id"] = self.id
         d['state'] = self.state
         d['hold_job'] = self.hold_job
         d['comment'] = self.comment
@@ -657,6 +658,12 @@ class Node(ConfigObject):
             keys.append(k)
             setattr(self, k, v)
         self._keys = keys
+
+    @classmethod
+    def fromDict(cls, data):
+        node = cls(data["name"], data["label"])
+        node.updateFromDict(data)
+        return node
 
 
 class Group(ConfigObject):
@@ -689,6 +696,10 @@ class Group(ConfigObject):
             'name': self.name,
             'nodes': self.nodes
         }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data["name"], data["nodes"])
 
 
 class NodeSet(ConfigObject):
@@ -726,6 +737,15 @@ class NodeSet(ConfigObject):
         for group in self.groups.values():
             d['groups'].append(group.toDict())
         return d
+
+    @classmethod
+    def fromDict(cls, data):
+        nodeset = cls(data["name"])
+        for node in data["nodes"]:
+            nodeset.addNode(Node.fromDict(node))
+        for group in data["groups"]:
+            nodeset.addGroup(Group.fromDict(group))
+        return nodeset
 
     def copy(self):
         n = NodeSet(self.name)
