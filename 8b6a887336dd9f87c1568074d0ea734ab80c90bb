@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5905e93b_b59def13",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 18
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-10T18:23:33Z",
+      "side": 1,
+      "message": "Something that would help in review is a quick note about how this makes it better.  It doesn\u0027t actually look any simpler, it just looks different.\n\nIt looks like you see the UnparsedAbideConfig holding a list of tenants when it should really be a dictionary, because we should only ever have a single tenant YAML block for a tenant.\n\nThe user-facing config of Zuul is always a list of items, rather than a dict, because (a) many of them can be repeated in order to achieve the \u0027variant\u0027 behavior that we rely on, but even cases where there should be a single definition, we like lists of dicts because (b) duplicating a key in a yaml dict can lead to an undetectable error.\n\nThe internal data structure in Zuul for all of the regular user-facing objects mirrors that to make things easier.\n\nWe copied that into the tenant config too, again for consistency.  However, we never defined an overlay behavior like the variants described in (a), and it looks like we make assumptions that there is only ever a single tenant object with a given name.  I tried out some tests, and the behavior is... undefined at best.  It looks like we might even, to some extent, load two separate tenants with the same name, but then have things fail when we try to use them.\n\nIn the future, we might want to support overlayed tenant definitions, or tenants with regex names, but we don\u0027t now.\n\nI think we can go ahead and make the idea of a single yaml-dict per tenant official, and raise an exception if the same name appears twice.  I think we should do that as part of this change though, since this change may cause something that would have failed loudly before to fail silently now (with this change, we would always just use the last block.\n\nI implemented this in a followup.",
+      "revId": "8b6a887336dd9f87c1568074d0ea734ab80c90bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
