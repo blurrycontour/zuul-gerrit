@@ -203,6 +203,7 @@ class PagureEventConnector(threading.Thread):
 
     def _event_base(self, body, pull_data_field='pullrequest'):
         event = PagureTriggerEvent()
+        event.connection_name = self.connection.connection_name
 
         if pull_data_field in body['msg']:
             data = body['msg'][pull_data_field]

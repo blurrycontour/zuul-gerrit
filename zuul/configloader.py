@@ -1368,15 +1368,16 @@ class PipelineParser(object):
             manager.ref_filters.extend(
                 source.getRejectFilters(reject_config))
 
-        for trigger_name, trigger_config in conf.get('trigger').items():
+        for connection_name, trigger_config in conf.get('trigger').items():
             if self.pcontext.tenant.allowed_triggers is not None and \
-               trigger_name not in self.pcontext.tenant.allowed_triggers:
-                raise UnknownConnection(trigger_name)
+               connection_name not in self.pcontext.tenant.allowed_triggers:
+                raise UnknownConnection(connection_name)
             trigger = self.pcontext.connections.getTrigger(
-                trigger_name, trigger_config)
+                connection_name, trigger_config)
             pipeline.triggers.append(trigger)
             manager.event_filters.extend(
-                trigger.getEventFilters(conf['trigger'][trigger_name]))
+                trigger.getEventFilters(connection_name,
+                                        conf['trigger'][connection_name]))
 
         # Pipelines don't get frozen
         return pipeline

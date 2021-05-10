@@ -3932,6 +3932,7 @@ class TriggerEvent(AbstractEvent):
         self.project_hostname = None
         self.project_name = None
         self.trigger_name = None
+        self.connection_name = None
         # Representation of the user account that performed the event.
         self.account = None
         # patchset-created, comment-added, etc.
@@ -3966,6 +3967,7 @@ class TriggerEvent(AbstractEvent):
             "project_hostname": self.project_hostname,
             "project_name": self.project_name,
             "trigger_name": self.trigger_name,
+            "connection_name": self.connection_name,
             "account": self.account,
             "change_number": self.change_number,
             "change_url": self.change_url,
@@ -3995,6 +3997,7 @@ class TriggerEvent(AbstractEvent):
         self.project_hostname = d["project_hostname"]
         self.project_name = d["project_name"]
         self.trigger_name = d["trigger_name"]
+        self.connection_name = d["connection_name"]
         self.account = d["account"]
         self.change_number = d["change_number"]
         self.change_url = d["change_url"]
@@ -4059,12 +4062,18 @@ class BaseFilter(ConfigObject):
 
 class EventFilter(BaseFilter):
     """Allows a Pipeline to only respond to certain events."""
-    def __init__(self, trigger):
+    def __init__(self, connection_name, trigger):
         super(EventFilter, self).__init__()
+        self.connection_name = connection_name
         self.trigger = trigger
 
     def matches(self, event, ref):
         # TODO(jeblair): consider removing ref argument
+
+        # Event came from wrong connection
+        if self.connection_name != event.connection_name:
+            return False
+
         return True
 
 
