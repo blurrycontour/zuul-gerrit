@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d396bdfa_e20aaa43",
+        "filename": "web/src/containers/FilterToolbar.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-10T12:37:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dca3e381_0298a546",
+      "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "894dfb57_4bb2c863",
         "filename": "web/src/containers/FilterToolbar.jsx",
         "patchSetId": 14
@@ -47,6 +65,24 @@
       "writtenOn": "2021-05-10T08:15:28Z",
       "side": 1,
       "message": "Why do we need a list here? Can\u0027t we use a simple bool (or 1/0) value for all \"checkbox\" typed filters?",
+      "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1790ebf5_507d9b56",
+        "filename": "web/src/containers/FilterToolbar.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-10T12:37:07Z",
+      "side": 1,
+      "message": "out of laziness I didn\u0027t want to handle a special case where we have to check the type of the category before we append or update the filter value. It works well enough with the generic list.",
+      "parentUuid": "393216bd_e4a5e8ad",
       "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
@@ -84,6 +120,24 @@
       "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cf5f2330_ac2ffa99",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2021-05-10T12:37:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5127fe5_7d36f6b3",
+      "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
