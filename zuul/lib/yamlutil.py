@@ -12,7 +12,7 @@
 import types
 import yaml
 from yaml import (  # noqa: F401
-    YAMLObject, YAMLError, ScalarNode, MappingNode
+    YAMLObject, YAMLError, ScalarNode, MappingNode, SequenceNode
 )
 
 try:
