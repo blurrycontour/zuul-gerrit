@@ -4324,6 +4324,9 @@ class UnparsedAbideConfig(object):
                 raise ConfigItemMultipleKeysError(item)
             key, value = list(item.items())[0]
             if key == 'tenant':
+                if value["name"] in self.tenants:
+                    raise Exception("Duplicate configuration for "
+                                    f"tenant {value['name']}")
                 self.tenants[value["name"]] = value
             elif key == 'admin-rule':
                 self.admin_rules.append(value)
