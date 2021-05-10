@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dca3e381_0298a546",
+        "filename": "web/src/containers/FilterToolbar.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-10T08:15:28Z",
+      "side": 1,
+      "message": "I think all checkboxes should be wrapped into a single \u003cToolbarGroup\u003e and each one additionally into a \u003cToolbarItem\u003e, so that they are evenly spread. Currently both filter containers look a little clutched together (not sure if that is the correct wording). What I mean is that there should be some space in between those checkbox containers and my assumption is that Patternfly takes care of that if we put them into the correct toolbar containers.",
+      "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "894dfb57_4bb2c863",
+        "filename": "web/src/containers/FilterToolbar.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-10T08:15:28Z",
+      "side": 1,
+      "message": "If we remove the list here we could also get rid of the pop() operation.",
+      "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "393216bd_e4a5e8ad",
+        "filename": "web/src/containers/FilterToolbar.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-10T08:15:28Z",
+      "side": 1,
+      "message": "Why do we need a list here? Can\u0027t we use a simple bool (or 1/0) value for all \"checkbox\" typed filters?",
+      "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "65aed406_0a26ffd5",
+        "filename": "web/src/containers/FilterToolbar.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-10T08:15:28Z",
+      "side": 1,
+      "message": "This goes in hand with the question above",
+      "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5127fe5_7d36f6b3",
+        "filename": "web/src/containers/build/Build.jsx",
+        "patchSetId": 14
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-10T08:15:28Z",
+      "side": 1,
+      "message": "nit: I think it should be \"an autohold\", or?\n\nI would add a little space before the element, something like\n\n    margin-left: var(--pf-global--spacer--sm);\n\nwhich is also used for the BuildResultBadge.",
+      "revId": "9705d1a855d7a8985a2fccc96ad8112c1e2bf346",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
