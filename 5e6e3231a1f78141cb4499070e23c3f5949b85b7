@@ -107,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "133a99da_fb1722d9",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-10T13:34:20Z",
+      "side": 1,
+      "message": "Fine with me",
+      "parentUuid": "7b93e7e3_e182fce5",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f560f44_9bcc4b36",
         "filename": "web/src/containers/status/Pipeline.jsx",
         "patchSetId": 2
@@ -136,6 +154,24 @@
       "side": 1,
       "message": "IIUC it\u0027s actually \"in order and one after another\", as opposed to supercedent which is \"in order but only the latest one\". I\u0027m not sure there\u0027s any icon from the patternfly pool that translates this well. Maybe the Sort Amount Down icon? https://fontawesome.com/icons/sort-amount-down",
       "parentUuid": "9f560f44_9bcc4b36",
+      "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "49137e24_3de79885",
+        "filename": "web/src/containers/status/Pipeline.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-10T13:34:20Z",
+      "side": 1,
+      "message": "Let\u0027s use this for now. I\u0027m a little worried that somebody could misinterpret the sorting icon as an \"action\" icon to sort things on the page, but maybe that\u0027s unsubstantiated since the icon is placed \"somewhere in the middle of the page\" and not in some toolbar or header.\n\nI would like to see how this looks for a production CI system. And if we really face problems with this icon, we could still adapt it later on.",
+      "parentUuid": "a15c3856_a72f187c",
       "revId": "5e6e3231a1f78141cb4499070e23c3f5949b85b7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
