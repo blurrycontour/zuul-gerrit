@@ -26,12 +26,23 @@ from tests.base import BaseTestCase
 class TestNodepoolIntegration(BaseTestCase):
     # Tests the Nodepool interface class using a *real* nodepool and
     # fake scheduler.
+    config_file: str = 'zuul.conf'
 
     def setUp(self):
         super(TestNodepoolIntegration, self).setUp()
 
         self.statsd = None
-        self.zk_client = zuul.zk.ZooKeeperClient('localhost:2181')
+        self.setupZK()
+        self.config = self.setup_config(self.config_file)
+        self.config.set('zookeeper', 'hosts', self.zk_chroot_fixture.zk_hosts)
+        self.config.set('zookeeper', 'session_timeout', '30')
+        self.config.set('zookeeper', 'tls_cert',
+                        self.zk_chroot_fixture.zookeeper_cert)
+        self.config.set('zookeeper', 'tls_key',
+                        self.zk_chroot_fixture.zookeeper_key)
+        self.config.set('zookeeper', 'tls_ca',
+                        self.zk_chroot_fixture.zookeeper_ca)
+        self.zk_client = zuul.zk.ZooKeeperClient.fromConfig(self.config)
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
         self.hostname = socket.gethostname()
