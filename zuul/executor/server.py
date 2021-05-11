@@ -2389,8 +2389,12 @@ class AnsibleJob(object):
                     idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
                     syntax_buffer.append(line)
-                line = line[:1024].rstrip()
-                ansible_log.debug("Ansible output: %s" % (line,))
+
+                if line.startswith(b'fatal'):
+                    ansible_log.error("Ansible output: %s" % (line,))
+                else:
+                    line = line[:1024].rstrip()
+                    ansible_log.debug("Ansible output: %s" % (line,))
             self.log.debug("Ansible output terminated")
             try:
                 cpu_times = self.proc.cpu_times()
