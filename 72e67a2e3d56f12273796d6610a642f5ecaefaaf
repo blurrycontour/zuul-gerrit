@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a964a05c_1065f188",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 805,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-11T12:23:34Z",
+      "side": 1,
+      "message": "With https://review.opendev.org/c/zuul/zuul/+/788681 merge we should avoid using the layout as it might be None after a re-enqueue. In your case you can get the tenant name via the pipeline:\n\n    self.tenant \u003d build_set.item.pipeline.tenant.name",
+      "revId": "72e67a2e3d56f12273796d6610a642f5ecaefaaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
