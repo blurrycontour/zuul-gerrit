@@ -2017,6 +2017,31 @@ class TestScheduler(ZuulTestCase):
         request_list = self.scheds.first.sched.zk_nodepool.getHoldRequests()
         self.assertEqual([], request_list)
 
+    def test_autohold_padding(self):
+        client = zuul.rpcclient.RPCClient('127.0.0.1',
+                                          self.gearman_server.port)
+        self.addCleanup(client.shutdown)
+        r = client.autohold('tenant-one', 'org/project', 'project-test2',
+                            "", "", "reason text", 1)
+        self.assertTrue(r)
+
+        # There should be a record in ZooKeeper
+        request_list = self.scheds.first.sched.zk_nodepool.getHoldRequests()
+        self.assertEqual(1, len(request_list))
+        request = self.scheds.first.sched.zk_nodepool.getHoldRequest(
+            request_list[0])
+        self.assertIsNotNone(request)
+
+        # Assert the ID leads with a bunch of zeros, them strip them
+        # off to test autohold_delete can handle a user passing in an
+        # ID without leading zeros.
+        self.assertEqual(request.id[0:5], '00000')
+        trimmed_request = request.id[5:]
+        # Delete and verify no more requests
+        self.assertTrue(client.autohold_delete(trimmed_request))
+        request_list = self.scheds.first.sched.zk_nodepool.getHoldRequests()
+        self.assertEqual([], request_list)
+
     def _test_autohold_scoped(self, change_obj, change, ref):
         client = zuul.rpcclient.RPCClient('127.0.0.1',
                                           self.gearman_server.port)
