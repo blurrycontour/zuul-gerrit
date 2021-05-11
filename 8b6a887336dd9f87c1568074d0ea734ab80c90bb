@@ -16,6 +16,24 @@
       "revId": "8b6a887336dd9f87c1568074d0ea734ab80c90bb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "078f37ac_3dfb5e4f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 18
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-11T06:32:08Z",
+      "side": 1,
+      "message": "Thanks for the explanation on why it was implemented that way. I indeed made the mistake to assume that there can only be a single tenant with the same name w/o checking the config format (I\u0027m a little spoiled by the meta config that we use internally).\n\n\u003e Something that would help in review is a quick note about how this makes it better.  It doesn\u0027t actually look any simpler, it just looks different.\n\nI did not intend this to be a change in behavior, but to make easier to work with in the configloader. For my taste it simplifies the code, but I guess that\u0027s subjective. Now, knowing the context, I think we at least got rid of some undefined behavior, especially with your follow-up change (thanks for that).",
+      "parentUuid": "5905e93b_b59def13",
+      "revId": "8b6a887336dd9f87c1568074d0ea734ab80c90bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
