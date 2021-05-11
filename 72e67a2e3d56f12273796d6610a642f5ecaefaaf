@@ -16,6 +16,24 @@
       "revId": "72e67a2e3d56f12273796d6610a642f5ecaefaaf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c184bdc5_4ba4df1d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 805,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-11T12:29:02Z",
+      "side": 1,
+      "message": "Just for reference: I also found another place where the layout was still used (also to get the tenant name): https://review.opendev.org/c/zuul/zuul/+/790682",
+      "parentUuid": "a964a05c_1065f188",
+      "revId": "72e67a2e3d56f12273796d6610a642f5ecaefaaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
     }
   ]
 }
