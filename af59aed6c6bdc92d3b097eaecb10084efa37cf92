@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f3a689a1_1dc2f702",
+        "filename": "doc/source/examples/pipelines/github-reference-pipelines.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-11T19:28:33Z",
+      "side": 1,
+      "message": "Unfortunately because of https://opendev.org/zuul/zuul/src/branch/master/zuul/driver/github/githubconnection.py#L579 this should be \u0027requested\u0027 but we actually want to fix zuul to make what you wrote correct.\n\nWe should either hold this change until that happens, or update this change to match the current behavior and then switch it when we fix zuul.",
+      "revId": "af59aed6c6bdc92d3b097eaecb10084efa37cf92",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
