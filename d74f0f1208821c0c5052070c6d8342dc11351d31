@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a6fbd909_4c946c8f",
+        "filename": "doc/source/examples/pipelines/github-reference-pipelines.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-05-11T19:47:06Z",
+      "side": 1,
+      "message": "as discused on irc this should be rerequested after I2a75c92d1aeacf261b517a328d91ea02f6013762",
+      "revId": "d74f0f1208821c0c5052070c6d8342dc11351d31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
