@@ -16,6 +16,24 @@
       "revId": "07ade312c27dcdb3b04f337537f662f886064e6b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbe46cf8_f4d21324",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-11T07:10:37Z",
+      "side": 1,
+      "message": "Yea I think that makes sense. I had some other use cases for the layout state in mind, but YAGNI.\n\nI\u0027ll abandon this change and make it a method of ZuulTestCase in https://review.opendev.org/c/zuul/zuul/+/771455",
+      "parentUuid": "4e0723cd_bc72656b",
+      "revId": "07ade312c27dcdb3b04f337537f662f886064e6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
