@@ -1917,6 +1917,7 @@ class JobGraph(object):
         self.jobs = OrderedDict()  # job_name -> Job
         # dependent_job_name -> dict(parent_job_name -> soft)
         self._dependencies = {}
+        self.project_metadata = {}
 
     def __repr__(self):
         return '<JobGraph %s>' % (self.jobs)
@@ -2004,6 +2005,11 @@ class JobGraph(object):
             for j in new_parent_jobs:
                 jobs_to_iterate.add((j, current_parent_jobs[j]))
         return all_parent_jobs
+
+    def getProjectMetadata(self, name):
+        if name in self.project_metadata:
+            return self.project_metadata[name]
+        return None
 
 
 class Build(object):
@@ -2270,20 +2276,23 @@ class BuildSet(object):
         # or if that fails, the current live layout, or if that fails,
         # use the default: merge-resolve.
         item = self.item
-        layout = None
+        project = self.item.change.project
+        project_metadata = None
         while item:
-            layout = item.layout
-            if layout:
-                break
+            if item.job_graph:
+                project_metadata = item.job_graph.getProjectMetadata(
+                    project.canonical_name)
+                if project_metadata:
+                    break
             item = item.item_ahead
-        if not layout:
+        if not project_metadata:
             layout = self.item.pipeline.tenant.layout
-        if layout:
-            project = self.item.change.project
-            project_metadata = layout.getProjectMetadata(
-                project.canonical_name)
-            if project_metadata:
-                return project_metadata.merge_mode
+            if layout:
+                project_metadata = layout.getProjectMetadata(
+                    project.canonical_name
+                )
+        if project_metadata:
+            return project_metadata.merge_mode
         return MERGER_MERGE_RESOLVE
 
     def getSafeAttributes(self):
@@ -2399,6 +2408,12 @@ class QueueItem(object):
                 # Ensure that each jobs's dependencies are fully
                 # accessible.  This will raise an exception if not.
                 job_graph.getParentJobsRecursively(job.name, self.layout)
+
+            # Copy project metadata to job_graph since this will be needed
+            # later but must be independent of the layout due to buildset
+            # global repo state
+            job_graph.project_metadata = self.layout.project_metadata
+
             self.job_graph = job_graph
         except Exception:
             self.project_pipeline_config = None
