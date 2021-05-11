@@ -48,6 +48,10 @@
         check: 'failure'
         comment: false
         #status: 'failure'
+    dequeue:
+      github:
+        check: cancelled
+        comment: false
 
 - pipeline:
     name: gate
@@ -104,6 +108,10 @@
       github:
         check: 'failure'
         #status: 'failure'
+        comment: false
+    dequeue:
+      github:
+        check: cancelled
         comment: false
     window-floor: 20
     window-increase-factor: 2
