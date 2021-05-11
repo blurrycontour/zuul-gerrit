@@ -16,6 +16,24 @@
       "revId": "25d434a1160a9a7f9fb3786eb8ec231b2c848762",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da58c923_9a659709",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2021-05-11T07:26:15Z",
+      "side": 1,
+      "message": "This is a left-over from the time the config cache still used a tree cache. As we can\u0027t use a tree cache for this purpose I\u0027ll remove the cache entirely.\n\nIn case we see a use-case later on it should be easy to add, but having it here by default gives the impression that it\u0027s easy to use it w/o considering the sync behavior of the cache.",
+      "parentUuid": "2df4ac06_1754a56f",
+      "revId": "25d434a1160a9a7f9fb3786eb8ec231b2c848762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
