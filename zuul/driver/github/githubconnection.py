@@ -575,9 +575,6 @@ class GithubEventProcessor(object):
         event = self._pull_request_to_event(pr_body)
         event.type = "check_run"
 
-        # Simplify rerequested action to requested
-        if action == "rerequested":
-            action = "requested"
         event.action = action
 
         check_run_tuple = "%s:%s:%s" % _check_as_tuple(check_run)
