@@ -243,6 +243,23 @@
       "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c77a12aa_d6a5155d",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-11T13:13:03Z",
+      "side": 1,
+      "message": "It\u0027s true that there are attributes of the NodeRequest which aren\u0027t serialized to ZK, but I don\u0027t think they\u0027re important; they are mostly used to deal with potentialy issues with the async nature of ZK requests and Zuul\u0027s main event loop.\n\nHowever, I don\u0027t think any of the \"extra\" stuff on the NodeRequest object is important.  I think it should be enough to simply pass the node request path to the executor with the build request, instantiate a NodeRequest object from ZK, and call acceptNodes on that.  Some of the checks at the start may not be very relevant anymore.\n\nThe executor should also delete the node request when it locks the nodes.  The scheduler should be fine with that: it will have stopped watching the node request once it was fulfilled, and it will be removed from the buildset from onNodesProvisioned so it won\u0027t try to update it any more.\n\nThe function that cleans up orphaned buildrequests should also make sure that it deletes linked noderequests as well.",
+      "revId": "b1b43ce415e4ec210c5b2269d0dab1b3f1705105",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
