@@ -82,6 +82,8 @@ class Nodepool(object):
         pipe.send()
 
     def emitStatsResources(self):
+        if not self.statsd:
+            return
 
         for tenant, resources in self.current_resources_by_tenant.items():
             for resource, value in resources.items():
@@ -96,6 +98,9 @@ class Nodepool(object):
                     key, value, project=project, resource=resource)
 
     def emitStatsResourceCounters(self, tenant, project, resources, duration):
+        if not self.statsd:
+            return
+
         for resource, value in resources.items():
             key = 'zuul.nodepool.resources.tenant.{tenant}.{resource}'
             self.statsd.incr(
