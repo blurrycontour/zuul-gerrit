@@ -44,6 +44,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.statsd import get_statsd
 from zuul.lib import filecomments
 from zuul.lib.keystorage import ZooKeeperKeyStorage
+from zuul.lib.varnames import check_varnames
 
 import gear
 
@@ -742,25 +743,6 @@ class DeduplicateQueue(object):
             self.condition.release()
 
 
-VARNAME_RE = re.compile(r'^[A-Za-z0-9_]+$')
-
-
-def check_varnames(var):
-    # We block these in configloader, but block it here too to make
-    # sure that a job doesn't pass variables named zuul or nodepool.
-    if 'zuul' in var:
-        raise Exception("Defining variables named 'zuul' is not allowed")
-    if 'nodepool' in var:
-        raise Exception("Defining variables named 'nodepool' is not allowed")
-    if 'unsafe_vars' in var:
-        raise Exception("Defining variables named 'unsafe_vars' "
-                        "is not allowed")
-    for varname in var.keys():
-        if not VARNAME_RE.match(varname):
-            raise Exception("Variable names may only contain letters, "
-                            "numbers, and underscores")
-
-
 def squash_variables(nodes, groups, jobvars, groupvars,
                      extravars):
     """Combine the Zuul job variable parameters into a hostvars dictionary.
@@ -1333,6 +1315,13 @@ class AnsibleJob(object):
                     file_data = json.loads(file_data)
                     data = file_data.get('data', {})
                     secret_data = file_data.get('secret_data', {})
+            # Check the variable names for safety, but zuul is allowed.
+            data_copy = data.copy()
+            data_copy.pop('zuul', None)
+            check_varnames(data_copy)
+            secret_data_copy = data.copy()
+            secret_data_copy.pop('zuul', None)
+            check_varnames(secret_data_copy)
         except Exception:
             self.log.exception("Unable to load result data:")
         return data, secret_data

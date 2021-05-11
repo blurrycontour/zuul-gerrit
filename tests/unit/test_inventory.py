@@ -295,13 +295,20 @@ class TestInventory(TestInventoryBase):
                           inventory['all']['children']
                           ['ceph-monitor']['hosts'])
         self.assertEqual(
-            'python4',
+            'auto',
             inventory['all']['hosts']['controller']
             ['ansible_python_interpreter'])
+        self.assertEqual(
+            'ceph',
+            inventory['all']['hosts']['controller']
+            ['ceph_var'])
         self.assertEqual(
             'auto',
             inventory['all']['hosts']['compute1']
             ['ansible_python_interpreter'])
+        self.assertNotIn(
+            'ceph_var',
+            inventory['all']['hosts']['compute1'])
         self.assertIn('zuul', inventory['all']['vars'])
         z_vars = inventory['all']['vars']['zuul']
         self.assertIn('executor', z_vars)
@@ -341,9 +348,13 @@ class TestInventory(TestInventoryBase):
                     inventory['all']['hosts'][node_name]['ansible_connection'])
 
             self.assertEqual(
-                'python1.5.2',
+                'auto',
                 inventory['all']['hosts'][node_name]
                 ['ansible_python_interpreter'])
+            self.assertEqual(
+                'all',
+                inventory['all']['hosts'][node_name]
+                ['all_var'])
         self.assertNotIn(
             'ansible_python_interpreter',
             inventory['all']['vars'])

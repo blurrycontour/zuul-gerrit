@@ -82,14 +82,14 @@
     run: playbooks/group-inventory.yaml
     group-vars:
       ceph-osd:
-        ansible_python_interpreter: python4
+        ceph_var: ceph
 
 - job:
     name: hostvars-inventory
     run: playbooks/hostvars-inventory.yaml
     nodeset: nodeset2
     vars:
-      ansible_python_interpreter: python1.5.2
+      all_var: all
 
 - job:
     name: jinja2-message

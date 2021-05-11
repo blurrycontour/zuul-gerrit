@@ -32,6 +32,7 @@ import zuul.manager.supercedent
 import zuul.manager.serial
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
+from zuul.lib.varnames import check_varnames
 from zuul.zk.semaphore import SemaphoreHandler
 
 
@@ -873,31 +874,22 @@ class JobParser(object):
                 setattr(job, k, v)
 
         variables = conf.get('vars', None)
-        forbidden = {'zuul', 'nodepool', 'unsafe_vars'}
         if variables:
-            if set(variables.keys()).intersection(forbidden):
-                raise Exception("Variables named 'zuul', 'nodepool', "
-                                "or 'unsafe_vars' are not allowed.")
+            check_varnames(variables)
             job.variables = variables
         extra_variables = conf.get('extra-vars', None)
         if extra_variables:
-            if set(extra_variables.keys()).intersection(forbidden):
-                raise Exception("Variables named 'zuul', 'nodepool', "
-                                "or 'unsafe_vars' are not allowed.")
+            check_varnames(extra_variables)
             job.extra_variables = extra_variables
         host_variables = conf.get('host-vars', None)
         if host_variables:
             for host, hvars in host_variables.items():
-                if set(hvars.keys()).intersection(forbidden):
-                    raise Exception("Variables named 'zuul', 'nodepool', "
-                                    "or 'unsafe_vars'are not allowed.")
+                check_varnames(hvars)
             job.host_variables = host_variables
         group_variables = conf.get('group-vars', None)
         if group_variables:
             for group, gvars in group_variables.items():
-                if set(gvars.keys()).intersection(forbidden):
-                    raise Exception("Variables named 'zuul', 'nodepool', "
-                                    "or 'unsafe_vars'are not allowed.")
+                check_varnames(gvars)
             job.group_variables = group_variables
 
         allowed_projects = conf.get('allowed-projects', None)

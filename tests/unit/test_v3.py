@@ -7356,3 +7356,48 @@ class TestUnsafeVars(AnsibleZuulTestCase):
 
         # This is marked unsafe
         self.assertIn("TESTJOB SECRET: {{ subtext }}", job_output)
+
+
+class TestConnectionVars(AnsibleZuulTestCase):
+    tenant_config_file = 'config/connection-vars/main.yaml'
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def test_ansible_connection(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - test-job:
+                        vars:
+                          ansible_shell_executable: /bin/du
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn("Variable name 'ansible_shell_executable' "
+                      "is not allowed", A.messages[0])
+        self.assertHistory([])
+
+    def test_return_data(self):
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        # Currently, second-job errors; if it ever runs, add these assertions:
+        # job = self.getJobFromHistory('second-job')
+        # job_output = self._get_file(job, 'work/logs/job-output.txt')
+        # self.log.debug(job_output)
+        # self.assertNotIn("/bin/du", job_output)

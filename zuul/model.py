@@ -21,7 +21,6 @@ import logging
 import os
 from itertools import chain
 
-import re
 import re2
 import struct
 import time
@@ -31,6 +30,7 @@ import textwrap
 import types
 import itertools
 from zuul.lib import yamlutil as yaml
+from zuul.lib.varnames import check_varnames
 
 import jsonpath_rw
 
@@ -97,8 +97,6 @@ NODE_STATES = set([STATE_BUILDING,
 SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'  # Internal use only
-
-VARNAME_RE = re.compile(r'^[A-Za-z0-9_]+$')
 
 
 class ConfigurationErrorKey(object):
@@ -1106,12 +1104,7 @@ class PlaybookContext(ConfigObject):
                 raise Exception(
                     'The secret "{name}" was not found.'.format(
                         name=secret_use.name))
-            if secret_use.alias in ('zuul', 'nodepool', 'unsafe_vars'):
-                raise Exception("Secrets named 'zuul', 'nodepool', "
-                                "or 'unsafe_vars' are not allowed.")
-            if not VARNAME_RE.match(secret_use.alias):
-                raise Exception("Variable names may only contain letters, "
-                                "numbers, and underscores")
+            check_varnames({secret_use.alias: ''})
             if not secret.source_context.isSameProject(self.source_context):
                 raise Exception(
                     "Unable to use secret {name}.  Secrets must be "
