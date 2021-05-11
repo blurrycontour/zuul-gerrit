@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "60cbb98d_7d5c1c47",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2021-05-11T09:34:57Z",
+      "side": 1,
+      "message": "I wasn\u0027t sure about whether the buildset is never None. As we do the same check for similar reasons over here [1] I thought it makes sense to add this as a safety measure here as well.\n\n[1] https://opendev.org/zuul/zuul/src/branch/master/zuul/nodepool.py#L238",
+      "parentUuid": "a88a1813_5f956834",
+      "revId": "2fc8a33e49003cdba1dfff8976e7400b8191a9b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0184a199_653a8474",
         "filename": "zuul/nodepool.py",
         "patchSetId": 3
@@ -79,6 +97,24 @@
       "revId": "2fc8a33e49003cdba1dfff8976e7400b8191a9b9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b0b2edde_2e9e7336",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2021-05-11T09:34:57Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "da521d32_01d68459",
+      "revId": "2fc8a33e49003cdba1dfff8976e7400b8191a9b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
