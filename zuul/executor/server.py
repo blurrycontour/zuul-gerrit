@@ -2390,7 +2390,12 @@ class AnsibleJob(object):
                     idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
                     syntax_buffer.append(line)
-                line = line[:1024].rstrip()
+
+                if line.startswith(b'fatal'):
+                    line = line[:8192].rstrip()
+                else:
+                    line = line[:1024].rstrip()
+
                 ansible_log.debug("Ansible output: %s" % (line,))
             self.log.debug("Ansible output terminated")
             try:
