@@ -238,7 +238,7 @@ class Nodepool(object):
         if build_set and resources:
             # we have a buildset and thus also tenant and project so we
             # can emit project specific resource usage stats
-            tenant_name = build_set.item.layout.tenant.name
+            tenant_name = build_set.item.pipeline.tenant.name
             project_name = build_set.item.change.project.canonical_name
 
             self.current_resources_by_tenant.setdefault(
