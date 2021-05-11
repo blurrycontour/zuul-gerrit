@@ -23,6 +23,17 @@ class GithubTrigger(BaseTrigger):
     name = 'github'
     log = logging.getLogger("zuul.trigger.GithubTrigger")
 
+    def __init__(self, driver, connection, config=None):
+
+        # This is a compatibility layer to map the action 'requested' back
+        # to the original action 'rerequested'.
+        # TODO: Remove after zuul 5.0
+        for item in config:
+            if item.get('action') == 'requested':
+                item['action'] = 'rerequested'
+
+        super().__init__(driver, connection, config=config)
+
     def getEventFilters(self, connection_name, trigger_config):
         efilters = []
         for trigger in to_list(trigger_config):
