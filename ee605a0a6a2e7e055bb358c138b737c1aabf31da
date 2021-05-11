@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a025fb80_4eac2e0d",
+        "filename": "doc/source/examples/pipelines/github-reference-pipelines.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-05-11T19:14:18Z",
+      "side": 1,
+      "message": "We use this in our pipeline:\n\n        - event: check_run\n          action: requested\n          check: .*/check:.*",
+      "revId": "ee605a0a6a2e7e055bb358c138b737c1aabf31da",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
