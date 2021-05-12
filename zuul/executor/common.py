@@ -103,14 +103,14 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
         for role in d['roles']:
             if role['type'] != 'zuul':
                 continue
-            project_metadata = item.job_graph.getProjectMetadata(
+            project_metadata = item.layout.getProjectMetadata(
                 role['project_canonical_name'])
             if project_metadata:
                 role['project_default_branch'] = \
                     project_metadata.default_branch
             else:
                 role['project_default_branch'] = 'master'
-            role_trusted, role_project = item.pipeline.tenant.getProject(
+            role_trusted, role_project = item.layout.tenant.getProject(
                 role['project_canonical_name'])
             role_connection = role_project.source.connection
             role['connection'] = role_connection.connection_name
@@ -149,7 +149,7 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
 
     def make_project_dict(project, override_branch=None,
                           override_checkout=None):
-        project_metadata = item.job_graph.getProjectMetadata(
+        project_metadata = item.layout.getProjectMetadata(
             project.canonical_name)
         if project_metadata:
             project_default_branch = project_metadata.default_branch
