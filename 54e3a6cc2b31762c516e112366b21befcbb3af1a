@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7ecbf2f1_fa22060f",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-13T14:29:02Z",
+      "side": 1,
+      "message": "nit: I think we pretty much decided not to use annotations for variable initializers.",
+      "revId": "54e3a6cc2b31762c516e112366b21befcbb3af1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
