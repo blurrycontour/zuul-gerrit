@@ -16,6 +16,23 @@
       "revId": "54e3a6cc2b31762c516e112366b21befcbb3af1a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "951c87aa_a400447c",
+        "filename": "tests/nodepool/test_nodepool_integration.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2021-05-13T14:40:08Z",
+      "side": 1,
+      "message": "Oh! Thanks, I was copying from ZuulTestCase and didn\u0027t even notice. Will update in the next revision.",
+      "revId": "54e3a6cc2b31762c516e112366b21befcbb3af1a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
