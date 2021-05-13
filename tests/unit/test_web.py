@@ -1125,7 +1125,7 @@ class TestWebSecrets(BaseTestWeb):
             "project1-secret").json()
         self.assertEqual(
             {'secret_name': 'REDACTED'}, resp['playbooks'][0]['secrets'])
-        self.assertEqual('REDACTED', resp['ssh_keys'][0])
+        self.assertEqual('REDACTED', resp['ssh_keys'][0]['key'])
 
 
 class TestInfo(ZuulDBTestCase, BaseTestWeb):

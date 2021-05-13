@@ -134,11 +134,12 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
     params['ssh_keys'] = []
     if pipeline.post_review:
         if redact_secrets_and_keys:
-            params['ssh_keys'].append("REDACTED")
+            ssh_key = "REDACTED"
         else:
-            params['ssh_keys'].append(dict(
-                connection_name=item.change.project.connection_name,
-                project_name=item.change.project.name))
+            ssh_key = item.change.project.private_ssh_key
+        params['ssh_keys'].append(dict(
+            name='%s project key' % item.change.project.canonical_name,
+            key=ssh_key))
     params['vars'] = job.combined_variables
     params['extra_vars'] = job.extra_variables
     params['host_vars'] = job.host_variables

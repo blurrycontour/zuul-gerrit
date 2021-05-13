@@ -22,7 +22,6 @@ import textwrap
 import gc
 from time import sleep
 from unittest import skip, skipIf
-from zuul.lib.yamlutil import yaml
 
 import git
 import paramiko
@@ -4803,11 +4802,8 @@ class TestSecrets(ZuulTestCase):
     def _getSecrets(self, job, pbtype):
         secrets = []
         build = self.getJobFromHistory(job)
-        for pb in getattr(build.jobdir, pbtype):
-            if pb.secrets_content:
-                secrets.append(yaml.safe_load(pb.secrets_content))
-            else:
-                secrets.append({})
+        for pb in build.parameters[pbtype]:
+            secrets.append(pb['secrets'])
         return secrets
 
     def test_secret_branch(self):
@@ -4981,11 +4977,8 @@ class TestSecretInheritance(ZuulTestCase):
     def _getSecrets(self, job, pbtype):
         secrets = []
         build = self.getJobFromHistory(job)
-        for pb in getattr(build.jobdir, pbtype):
-            if pb.secrets_content:
-                secrets.append(yaml.safe_load(pb.secrets_content))
-            else:
-                secrets.append({})
+        for pb in build.parameters[pbtype]:
+            secrets.append(pb['secrets'])
         return secrets
 
     def _checkTrustedSecrets(self):
@@ -5089,11 +5082,8 @@ class TestSecretPassToParent(ZuulTestCase):
     def _getSecrets(self, job, pbtype):
         secrets = []
         build = self.getJobFromHistory(job)
-        for pb in getattr(build.jobdir, pbtype):
-            if pb.secrets_content:
-                secrets.append(yaml.safe_load(pb.secrets_content))
-            else:
-                secrets.append({})
+        for pb in build.parameters[pbtype]:
+            secrets.append(pb['secrets'])
         return secrets
 
     def test_secret_no_pass_to_parent(self):

@@ -9,11 +9,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import types
 import yaml
-from yaml import (  # noqa: F401
-    YAMLObject, YAMLError, ScalarNode, MappingNode, SequenceNode
-)
+from yaml import YAMLObject, YAMLError  # noqa: F401
 
 try:
     # Explicit type ignore to deal with provisional import failure
@@ -29,14 +26,9 @@ except ImportError:
     Mark = yaml.Mark
 
 
-yaml.add_representer(types.MappingProxyType,
-                     yaml.representer.SafeRepresenter.represent_dict,
-                     Dumper=SafeDumper)
-
-
 def safe_load(stream, *args, **kwargs):
     return yaml.load(stream, *args, Loader=SafeLoader, **kwargs)
 
 
-def safe_dump(data, *args, **kwargs):
-    return yaml.dump(data, *args, Dumper=SafeDumper, **kwargs)
+def safe_dump(stream, *args, **kwargs):
+    return yaml.dump(stream, *args, Dumper=SafeDumper, **kwargs)
