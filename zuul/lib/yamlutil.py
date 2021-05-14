@@ -9,8 +9,11 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import base64
 import yaml
 from yaml import YAMLObject, YAMLError  # noqa: F401
+
+from zuul.lib import encryption
 
 try:
     # Explicit type ignore to deal with provisional import failure
@@ -24,6 +27,40 @@ except ImportError:
     SafeLoader = yaml.SafeLoader  # type: ignore
     SafeDumper = yaml.SafeDumper  # type: ignore
     Mark = yaml.Mark
+
+
+class EncryptedPKCS1_OAEP(YAMLObject):
+    yaml_tag = u'!encrypted/pkcs1-oaep'
+    yaml_loader = SafeLoader
+
+    def __init__(self, ciphertext):
+        if isinstance(ciphertext, list):
+            self.ciphertext = [base64.b64decode(x.value)
+                               for x in ciphertext]
+        else:
+            self.ciphertext = base64.b64decode(ciphertext)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, EncryptedPKCS1_OAEP):
+            return False
+        return (self.ciphertext == other.ciphertext)
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        return cls(node.value)
+
+    def decrypt(self, private_key):
+        if isinstance(self.ciphertext, list):
+            return ''.join([
+                encryption.decrypt_pkcs1_oaep(chunk, private_key).
+                decode('utf8')
+                for chunk in self.ciphertext])
+        else:
+            return encryption.decrypt_pkcs1_oaep(self.ciphertext,
+                                                 private_key).decode('utf8')
 
 
 def safe_load(stream, *args, **kwargs):
