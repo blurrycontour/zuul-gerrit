@@ -10,7 +10,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import base64
 import collections
 from contextlib import contextmanager
 import copy
@@ -31,7 +30,6 @@ import zuul.manager.dependent
 import zuul.manager.independent
 import zuul.manager.supercedent
 import zuul.manager.serial
-from zuul.lib import encryption
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.re2util import filter_allowed_disallowed
 from zuul.zk.semaphore import SemaphoreHandler
@@ -407,40 +405,6 @@ repo {repo} on branch {branch}.  The error was:
         raise ConfigurationSyntaxError(m)
     finally:
         loader.dispose()
-
-
-class EncryptedPKCS1_OAEP(yaml.YAMLObject):
-    yaml_tag = u'!encrypted/pkcs1-oaep'
-    yaml_loader = yaml.SafeLoader
-
-    def __init__(self, ciphertext):
-        if isinstance(ciphertext, list):
-            self.ciphertext = [base64.b64decode(x.value)
-                               for x in ciphertext]
-        else:
-            self.ciphertext = base64.b64decode(ciphertext)
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def __eq__(self, other):
-        if not isinstance(other, EncryptedPKCS1_OAEP):
-            return False
-        return (self.ciphertext == other.ciphertext)
-
-    @classmethod
-    def from_yaml(cls, loader, node):
-        return cls(node.value)
-
-    def decrypt(self, private_key):
-        if isinstance(self.ciphertext, list):
-            return ''.join([
-                encryption.decrypt_pkcs1_oaep(chunk, private_key).
-                decode('utf8')
-                for chunk in self.ciphertext])
-        else:
-            return encryption.decrypt_pkcs1_oaep(self.ciphertext,
-                                                 private_key).decode('utf8')
 
 
 def ansible_var_name(value):
