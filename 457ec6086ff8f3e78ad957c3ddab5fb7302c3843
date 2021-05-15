@@ -16,6 +16,24 @@
       "revId": "457ec6086ff8f3e78ad957c3ddab5fb7302c3843",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f43e51f_7ef07aba",
+        "filename": "doc/source/reference/client.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2021-05-15T20:47:31Z",
+      "side": 1,
+      "message": "I have no expertise to fix the underlying problem, so I\u0027m abandoning the change.",
+      "parentUuid": "634b935f_bd561499",
+      "revId": "457ec6086ff8f3e78ad957c3ddab5fb7302c3843",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
