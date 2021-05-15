@@ -250,6 +250,7 @@ class GerritEventConnector(threading.Thread):
             'ref-updated': 'submitter',
             'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
             'topic-changed': 'changer',
+            'vote-deleted': 'deleter',
             'project-created': None,  # Gerrit 2.14
             'pending-check': None,  # Gerrit 3.0+
         }
