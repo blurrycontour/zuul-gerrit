@@ -115,9 +115,12 @@ The command can also be used asynchronosly trigger a job in a
 ``periodic`` pipeline that would usually be run at a specific time by
 the ``timer`` driver.  For example, the following command would
 trigger the ``periodic`` jobs against the current ``master`` branch
-top-of-tree for a project::
+top-of-tree for a project (newrev should match SHA of tip of the
+``master`` branch)::
 
-  zuul enqueue-ref --tenant openstack --trigger timer --pipeline periodic --project openstack/example_project --ref refs/heads/master
+  zuul enqueue-ref --tenant openstack --pipeline periodic \
+    --project openstack/example_project --ref refs/heads/master \
+    --newrev $(git rev-parse master)
 
 Another common pipeline is a ``post`` queue listening for ``gerrit``
 merge results.  Triggering here is slightly more complicated as you
