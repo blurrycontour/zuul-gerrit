@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "634b935f_bd561499",
+        "filename": "doc/source/reference/client.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-15T20:24:18Z",
+      "side": 1,
+      "message": "I agree that --newrev appears to fix the current issue, however, it should not be required, and was not required until recently.  I believe the new behavior of reporting error without it may be due to changes related to the buildset global repo state.  I\u0027m not comfortable updating the documentation to suggest using newrev since it should not be necessary and we don\u0027t fully understand why it is.  I think we should fix the underlying problem instead.",
+      "revId": "457ec6086ff8f3e78ad957c3ddab5fb7302c3843",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
