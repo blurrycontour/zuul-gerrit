@@ -350,7 +350,7 @@ class ZuulMark(object):
                 self.snippet == other.snippet)
 
 
-class ZuulSafeLoader(yaml.SafeLoader):
+class ZuulSafeLoader(yaml.EncryptedLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template',
                                  'semaphore', 'queue', 'pragma'))
