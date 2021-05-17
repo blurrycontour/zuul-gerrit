@@ -23,7 +23,7 @@ from kazoo.recipe.lock import Lock
 
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
-from zuul.model import BuildRequest, BuildRequestState
+from zuul.model import BuildRequest
 from zuul.zk import ZooKeeperSimpleBase
 from zuul.zk.exceptions import BuildRequestNotFound
 
@@ -64,7 +64,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
     @property
     def initial_state(self):
         # This supports holding build requests in tests
-        return BuildRequestState.REQUESTED
+        return BuildRequest.REQUESTED
 
     def _getZoneRoot(self, zone):
         if zone is None:
@@ -113,8 +113,8 @@ class ExecutorApi(ZooKeeperSimpleBase):
             if (
                 self.build_request_callback
                 and old_build_request
-                and old_build_request.state == BuildRequestState.HOLD
-                and build_request.state == BuildRequestState.REQUESTED
+                and old_build_request.state == BuildRequest.HOLD
+                and build_request.state == BuildRequest.REQUESTED
             ):
                 self.build_request_callback()
 
@@ -181,7 +181,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
             # If no states are provided, build a tuple containing all available
             # ones to always match. We need a tuple to be compliant to the
             # type of *states above.
-            states = tuple(BuildRequestState)
+            states = BuildRequest.ALL_STATES
 
         build_requests = list(
             filter(lambda b: b.state in states, self._iterBuildRequests())
@@ -192,7 +192,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
         return (b for b in sorted(build_requests))
 
     def next(self):
-        yield from self.inState(BuildRequestState.REQUESTED)
+        yield from self.inState(BuildRequest.REQUESTED)
 
     def submit(self, uuid, tenant_name, pipeline_name, params, zone,
                precedence=200):
@@ -361,7 +361,7 @@ class ExecutorApi(ZooKeeperSimpleBase):
         # Get a list of builds which are running but not locked by any executor
         yield from filter(
             lambda b: not self.isLocked(b),
-            self.inState(BuildRequestState.RUNNING, BuildRequestState.PAUSED),
+            self.inState(BuildRequest.RUNNING, BuildRequest.PAUSED),
         )
 
     @staticmethod

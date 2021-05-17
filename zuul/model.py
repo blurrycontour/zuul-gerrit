@@ -2008,20 +2008,21 @@ class JobGraph(object):
         return all_parent_jobs
 
 
-class BuildRequestState(Enum):
-    # Waiting
-    REQUESTED = 0
-    HOLD = 1  # Used by tests to stall processing
-    # Running
-    RUNNING = 2
-    PAUSED = 3
-    # Finished
-    COMPLETED = 4
-
-
 @total_ordering
 class BuildRequest:
     """A request for a build in a specific zone"""
+
+    # States:
+    # Waiting
+    REQUESTED = 'requested'
+    HOLD = 'hold'  # Used by tests to stall processing
+    # Running
+    RUNNING = 'running'
+    PAUSED = 'paused'
+    # Finished
+    COMPLETED = 'completed'
+
+    ALL_STATES = (REQUESTED, HOLD, RUNNING, PAUSED, COMPLETED)
 
     def __init__(self, uuid, state, precedence, params, zone,
                  tenant_name, pipeline_name):
@@ -2053,7 +2054,7 @@ class BuildRequest:
     def fromDict(cls, data):
         build_request = cls(
             data["uuid"],
-            BuildRequestState[data["state"]],
+            data["state"],
             data["precedence"],
             data["params"],
             data["zone"],
