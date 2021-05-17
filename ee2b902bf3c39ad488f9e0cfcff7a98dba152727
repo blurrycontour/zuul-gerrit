@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6fcc0d04_498e2beb",
+        "filename": "zuul/model.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 2019,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-17T23:17:51Z",
+      "side": 1,
+      "message": "Might be a good idea to switch this to string constants as well, for zk introspection/debugging.",
+      "revId": "ee2b902bf3c39ad488f9e0cfcff7a98dba152727",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4777bfc1_06fbec7a",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-17T23:17:51Z",
+      "side": 1,
+      "message": "Since this isn\u0027t used, maybe we should remove it or move it to the test suite?",
+      "revId": "ee2b902bf3c39ad488f9e0cfcff7a98dba152727",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
