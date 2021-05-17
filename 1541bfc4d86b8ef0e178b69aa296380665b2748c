@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f837799_548beaa7",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-17T15:32:48Z",
+      "side": 1,
+      "message": "This should just be SafeDumper to use the conditional imports above.",
+      "range": {
+        "startLine": 85,
+        "startChar": 22,
+        "endLine": 85,
+        "endChar": 37
+      },
+      "revId": "1541bfc4d86b8ef0e178b69aa296380665b2748c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "327ca817_4c694b70",
+        "filename": "zuul/lib/yamlutil.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-17T15:32:48Z",
+      "side": 1,
+      "message": "This should just be SafeLoader to use the conditional imports above.",
+      "range": {
+        "startLine": 89,
+        "startChar": 27,
+        "endLine": 89,
+        "endChar": 37
+      },
+      "revId": "1541bfc4d86b8ef0e178b69aa296380665b2748c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
