@@ -9,7 +9,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import json
 import logging
 import time
 from abc import ABCMeta
@@ -18,7 +17,6 @@ from threading import Thread
 from typing import Optional, List, Callable
 
 from kazoo.client import KazooClient
-from kazoo.exceptions import NoNodeError
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
 
@@ -187,21 +185,6 @@ class ZooKeeperClient(object):
             tls_cert=tls_cert,
             tls_ca=tls_ca,
         )
-
-    def _show_tree(self, path):
-        """Helper method to debug a tree in ZooKeeper"""
-        self.log.debug(path)
-
-        try:
-            data, _ = self.client.get(path)
-        except NoNodeError:
-            data = None
-
-        if data:
-            self.log.debug(json.loads(data.decode("utf-8")))
-
-        for node in self.client.get_children(path):
-            self._show_tree(f"{path}/{node}")
 
 
 class ZooKeeperSimpleBase(metaclass=ABCMeta):
