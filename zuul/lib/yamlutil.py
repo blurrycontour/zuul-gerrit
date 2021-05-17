@@ -10,10 +10,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import base64
-import yaml
-from yaml import YAMLObject, YAMLError  # noqa: F401
+import types
 
 from zuul.lib import encryption
+
+import yaml
+from yaml import YAMLError  # noqa: F401
+
 
 try:
     # Explicit type ignore to deal with provisional import failure
@@ -90,10 +93,15 @@ class EncryptedLoader(SafeLoader):
     pass
 
 
+# Add support for encrypted objects
 EncryptedDumper.add_representer(EncryptedPKCS1_OAEP,
                                 EncryptedPKCS1_OAEP.to_yaml)
 EncryptedLoader.add_constructor(EncryptedPKCS1_OAEP.yaml_tag,
                                 EncryptedPKCS1_OAEP.from_yaml)
+# Also add support for serializing frozen data
+EncryptedDumper.add_representer(
+    types.MappingProxyType,
+    yaml.representer.SafeRepresenter.represent_dict)
 
 
 def encrypted_dump(data, *args, **kwargs):
