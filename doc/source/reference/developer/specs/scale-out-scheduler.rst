@@ -16,7 +16,7 @@ can avoid this.
 
 The same problem holds true when updating the scheduler. Currently there is no
 possibility to upgrade the scheduler without downtime. While the pipeline state
-can be saved and re-enqueued this still looses all in-flight jobs. Further on a
+can be saved and re-enqueued this still loses all in-flight jobs. Further on a
 larger deployment the startup of the scheduler easily can be in the multi minute
 range. Having the ability to do zero downtime upgrades can make updates much
 more easier.
@@ -253,14 +253,14 @@ lifecycle will be as follows.
 * If a build should be canceled the pipeline processor adds a ``cancel`` child
   znode that will be recognized by the executor which will act accordingly.
 
-It can be that an executor crashes. In this case it will loose the lock. We need
+It can be that an executor crashes. In this case it will lose the lock. We need
 to be able to recover from this and emit the right event to the pipeline.
 Such a lost builds can be detected if it is in a state other than REQUESTED or
 COMPLETED but unlocked. Any executor that sees such a request while looking for
 new builds to execute will lock and mark it as COMPLETED and failed. It then
 will emit a build completed event such that the pipeline event processor can
 react on this and reschedule the build. There is no special handling needed to
-return the nodes as in this case the failing executor will also loose its lock
+return the nodes as in this case the failing executor will also lose its lock
 on the nodes so they will be deleted or recycled by nodepool automatically.
 
 

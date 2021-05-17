@@ -54,7 +54,7 @@ be selected as required status check.  This is in conflict with
 managing jobs in pipelines with Zuul.  For example, to implement
 branch protection on GitHub would mean listing each job as a dedicated
 check, leading to a check run list that is not kept in sync with the
-project's Zuul pipeline configuration.  Additionally, you loose some
+project's Zuul pipeline configuration.  Additionally, you lose some
 of Zuul's features like non-voting jobs as Github branch protections
 has no concept of a non-voting job.
 
