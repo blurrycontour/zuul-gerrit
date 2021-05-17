@@ -29,7 +29,7 @@ import urllib.parse
 import textwrap
 import types
 import itertools
-import yaml
+from zuul.lib import yamlutil as yaml
 
 import jsonpath_rw
 
@@ -944,6 +944,9 @@ class Secret(ConfigObject):
         r.secret_data = self._decrypt(private_key, self.secret_data)
         return r
 
+    def serialize(self):
+        return yaml.encrypted_dump(self.secret_data, default_flow_style=False)
+
 
 class SecretUse(ConfigObject):
     """A use of a secret in a Job"""
@@ -953,6 +956,25 @@ class SecretUse(ConfigObject):
         self.name = name
         self.alias = alias
         self.pass_to_parent = False
+
+
+class FrozenSecret(ConfigObject):
+    """A frozen secret for use by the executor"""
+
+    def __init__(self, connection_name, project_name, name, encrypted_data):
+        super(FrozenSecret, self).__init__()
+        self.connection_name = connection_name
+        self.project_name = project_name
+        self.name = name
+        self.encrypted_data = encrypted_data
+
+    def toDict(self):
+        # Name is omitted since this is used in a dictionary
+        return dict(
+            connection_name=self.connection_name,
+            project_name=self.project_name,
+            encrypted_data=self.encrypted_data,
+        )
 
 
 class ProjectContext(ConfigObject):
@@ -1043,8 +1065,12 @@ class PlaybookContext(ConfigObject):
         self.source_context = source_context
         self.path = path
         self.roles = roles
+        # The original SecretUse objects describing how the secret
+        # should be used
         self.secrets = secrets
-        self.decrypted_secrets = ()
+        # FrozenSecret objects which contain only the info the
+        # executor needs
+        self.frozen_secrets = ()
 
     def __repr__(self):
         return '<PlaybookContext %s %s>' % (self.source_context,
@@ -1093,26 +1119,30 @@ class PlaybookContext(ConfigObject):
         secrets = []
         for secret_use in self.secrets:
             secret = layout.secrets.get(secret_use.name)
-            decrypted_secret = secret.decrypt(
-                self.source_context.project.private_secrets_key)
-            decrypted_secret.name = secret_use.alias
-            secrets.append(decrypted_secret)
-        self.decrypted_secrets = tuple(secrets)
+            secret_name = secret_use.alias
+            encrypted_secret_data = secret.serialize()
+            # Use *our* project, not the secret's, because we want to decrypt
+            # with *our* key.
+            connection_name = self.source_context.project.connection_name
+            project_name = self.source_context.project.name
+            secrets.append(FrozenSecret(connection_name, project_name,
+                                        secret_name, encrypted_secret_data))
+        self.frozen_secrets = tuple(secrets)
 
-    def addSecrets(self, decrypted_secrets):
-        current_names = set([s.name for s in self.decrypted_secrets])
-        new_secrets = [s for s in decrypted_secrets
+    def addSecrets(self, frozen_secrets):
+        current_names = set([s.name for s in self.frozen_secrets])
+        new_secrets = [s for s in frozen_secrets
                        if s.name not in current_names]
-        self.decrypted_secrets = self.decrypted_secrets + tuple(new_secrets)
+        self.frozen_secrets = self.frozen_secrets + tuple(new_secrets)
 
     def toDict(self, redact_secrets=True):
         # Render to a dict to use in passing json to the executor
         secrets = {}
-        for secret in self.decrypted_secrets:
+        for secret in self.frozen_secrets:
             if redact_secrets:
                 secrets[secret.name] = 'REDACTED'
             else:
-                secrets[secret.name] = secret.secret_data
+                secrets[secret.name] = secret.toDict()
         return dict(
             connection=self.source_context.project.connection_name,
             project=self.source_context.project.name,
@@ -1698,15 +1728,21 @@ class Job(ConfigObject):
         # Pass secrets to parents
         secrets_for_parents = [s for s in other.secrets if s.pass_to_parent]
         if secrets_for_parents:
-            decrypted_secrets = []
+            frozen_secrets = []
             for secret_use in secrets_for_parents:
                 secret = layout.secrets.get(secret_use.name)
                 if secret is None:
                     raise Exception("Secret %s not found" % (secret_use.name,))
-                decrypted_secret = secret.decrypt(
-                    other.source_context.project.private_secrets_key)
-                decrypted_secret.name = secret_use.alias
-                decrypted_secrets.append(decrypted_secret)
+                secret_name = secret_use.alias
+                encrypted_secret_data = secret.serialize()
+                # Use the other project, not the secret's, because we
+                # want to decrypt with the other project's key key.
+                connection_name = other.source_context.project.connection_name
+                project_name = other.source_context.project.name
+                frozen_secrets.append(FrozenSecret(
+                    connection_name, project_name,
+                    secret_name, encrypted_secret_data))
+
             # Add the secrets to any existing playbooks.  If any of
             # them are in an untrusted project, then we've just given
             # a secret to a playbook which can run in dynamic config,
@@ -1716,7 +1752,7 @@ class Job(ConfigObject):
             # trusted context.
             for pb in itertools.chain(
                     self.pre_run, self.run, self.post_run, self.cleanup_run):
-                pb.addSecrets(decrypted_secrets)
+                pb.addSecrets(frozen_secrets)
                 if not pb.source_context.trusted:
                     self.post_review = True
 
@@ -4248,7 +4284,7 @@ class ConfigItemErrorException(Exception):
         # ordered by default.  If this is a foreign config file or
         # something the dump might be really long; hence the
         # truncation.
-        extract = yaml.dump(conf, sort_keys=False)
+        extract = yaml.encrypted_dump(conf, sort_keys=False)
         lines = extract.split('\n')
         if len(lines) > 5:
             lines = lines[0:4]
