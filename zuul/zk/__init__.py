@@ -176,21 +176,6 @@ class ZooKeeperClient(object):
             tls_ca=tls_ca,
         )
 
-    def _show_tree(self, path):
-        """Helper method to debug a tree in ZooKeeper"""
-        self.log.debug(path)
-
-        try:
-            data, _ = self.client.get(path)
-        except NoNodeError:
-            data = None
-
-        if data:
-            self.log.debug(json.loads(data.decode("utf-8")))
-
-        for node in self.client.get_children(path):
-            self._show_tree(f"{path}/{node}")
-
 
 class ZooKeeperSimpleBase(metaclass=ABCMeta):
     """Base class for stateless Zookeeper interaction."""

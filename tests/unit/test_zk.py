@@ -15,7 +15,7 @@
 import queue
 import testtools
 
-from zuul.model import BuildRequestState, HoldRequest
+from zuul.model import BuildRequest, HoldRequest
 from zuul.zk import ZooKeeperClient
 from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi, BuildRequestEvent
@@ -120,18 +120,18 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
         # Executor locks request
         self.assertTrue(server.lock(a, blocking=False))
-        a.state = BuildRequestState.RUNNING
+        a.state = BuildRequest.RUNNING
         server.update(a)
-        self.assertEqual(client.get(a.path).state, BuildRequestState.RUNNING)
+        self.assertEqual(client.get(a.path).state, BuildRequest.RUNNING)
 
         # Executor should see no pending requests
         reqs = list(server.next())
         self.assertEqual(len(reqs), 0)
 
         # Executor pauses build
-        a.state = BuildRequestState.PAUSED
+        a.state = BuildRequest.PAUSED
         server.update(a)
-        self.assertEqual(client.get(a.path).state, BuildRequestState.PAUSED)
+        self.assertEqual(client.get(a.path).state, BuildRequest.PAUSED)
 
         # Scheduler resumes build
         self.assertTrue(event_queue.empty())
@@ -142,10 +142,10 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(event, BuildRequestEvent.RESUMED)
 
         # Executor resumes build
-        a.state = BuildRequestState.RUNNING
+        a.state = BuildRequest.RUNNING
         server.update(a)
         server.fulfillResume(a)
-        self.assertEqual(client.get(a.path).state, BuildRequestState.RUNNING)
+        self.assertEqual(client.get(a.path).state, BuildRequest.RUNNING)
 
         # Scheduler cancels build
         self.assertTrue(event_queue.empty())
@@ -156,11 +156,11 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         self.assertEqual(event, BuildRequestEvent.CANCELED)
 
         # Executor aborts build
-        a.state = BuildRequestState.COMPLETED
+        a.state = BuildRequest.COMPLETED
         server.update(a)
         server.fulfillCancel(a)
         server.unlock(a)
-        self.assertEqual(client.get(a.path).state, BuildRequestState.COMPLETED)
+        self.assertEqual(client.get(a.path).state, BuildRequest.COMPLETED)
 
         # Scheduler removes build request on completion
         client.remove(sched_a)
@@ -184,17 +184,17 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         d = executor_api.get(path_d)
         e = executor_api.get(path_e)
 
-        b.state = BuildRequestState.RUNNING
+        b.state = BuildRequest.RUNNING
         executor_api.update(b)
 
-        c.state = BuildRequestState.RUNNING
+        c.state = BuildRequest.RUNNING
         executor_api.lock(c)
         executor_api.update(c)
 
-        d.state = BuildRequestState.COMPLETED
+        d.state = BuildRequest.COMPLETED
         executor_api.update(d)
 
-        e.state = BuildRequestState.PAUSED
+        e.state = BuildRequest.PAUSED
         executor_api.update(e)
 
         # Wait until the latest state transition is reflected in the Executor
@@ -206,7 +206,7 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         for _ in iterate_timeout(30, "wait for cache to be up-to-date"):
             if (
                 executor_api._cached_build_requests[path_e].state
-                == BuildRequestState.PAUSED
+                == BuildRequest.PAUSED
             ):
                 break
 
