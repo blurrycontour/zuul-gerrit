@@ -29,9 +29,8 @@ except ImportError:
     Mark = yaml.Mark
 
 
-class EncryptedPKCS1_OAEP(YAMLObject):
+class EncryptedPKCS1_OAEP:
     yaml_tag = u'!encrypted/pkcs1-oaep'
-    yaml_loader = SafeLoader
 
     def __init__(self, ciphertext):
         if isinstance(ciphertext, list):
@@ -52,6 +51,18 @@ class EncryptedPKCS1_OAEP(YAMLObject):
     def from_yaml(cls, loader, node):
         return cls(node.value)
 
+    @classmethod
+    def to_yaml(cls, dumper, data):
+        ciphertext = data.ciphertext
+        if isinstance(ciphertext, list):
+            ciphertext = [yaml.ScalarNode(tag='tag:yaml.org,2002:str',
+                                          value=base64.b64encode(x))
+                          for x in ciphertext]
+            return yaml.SequenceNode(tag=cls.yaml_tag,
+                                     value=ciphertext)
+        ciphertext = base64.b64encode(ciphertext).decode('utf8')
+        return yaml.ScalarNode(tag=cls.yaml_tag, value=ciphertext)
+
     def decrypt(self, private_key):
         if isinstance(self.ciphertext, list):
             return ''.join([
@@ -69,3 +80,25 @@ def safe_load(stream, *args, **kwargs):
 
 def safe_dump(stream, *args, **kwargs):
     return yaml.dump(stream, *args, Dumper=SafeDumper, **kwargs)
+
+
+class EncryptedDumper(SafeDumper):
+    pass
+
+
+class EncryptedLoader(SafeLoader):
+    pass
+
+
+EncryptedDumper.add_representer(EncryptedPKCS1_OAEP,
+                                EncryptedPKCS1_OAEP.to_yaml)
+EncryptedLoader.add_constructor(EncryptedPKCS1_OAEP.yaml_tag,
+                                EncryptedPKCS1_OAEP.from_yaml)
+
+
+def encrypted_dump(data, *args, **kwargs):
+    return yaml.dump(data, *args, Dumper=EncryptedDumper, **kwargs)
+
+
+def encrypted_load(stream, *args, **kwargs):
+    return yaml.load(stream, *args, Loader=EncryptedLoader, **kwargs)
