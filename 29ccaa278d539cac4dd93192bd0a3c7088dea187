@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d9411f9d_5db7186e",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2021-05-18T16:25:14Z",
+      "side": 1,
+      "message": "We already have the function normalize_statsd_name that could be reused probably.",
+      "revId": "29ccaa278d539cac4dd93192bd0a3c7088dea187",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
