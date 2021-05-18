@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e6452d5a_a4c4b97b",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-18T07:18:22Z",
+      "side": 1,
+      "message": "I think I took that from the Nodepool implementation (https://opendev.org/zuul/nodepool/src/branch/master/nodepool/zk.py#L1890).\n\nBut you are right, this exception is not mentioned in the kazoo.recipe.lock.Lock documentation (https://kazoo.readthedocs.io/en/latest/api/recipe/lock.html) and also not raised in the implementation (https://kazoo.readthedocs.io/en/latest/_modules/kazoo/recipe/lock.html).\n\nSo this shouldn\u0027t be necessary. Maybe we should then also \"fix\" the nodepool implementation?",
+      "revId": "b7673634e6ba41c06faa1969b8376b44bc42b78c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
