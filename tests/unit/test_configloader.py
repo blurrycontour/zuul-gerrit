@@ -762,3 +762,62 @@ class TestTenantExtra(TenantParserTestCase):
             dict(name='project2-job', result='SUCCESS', changes='2,1'),
             dict(name='project2-extra-file2', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+
+class TestJobInheritance(ZuulTestCase):
+    tenant_config_file = 'config/tenant-parser/simple.yaml'
+
+    def test_dependencies(self):
+        in_repo_conf_project1 = textwrap.dedent(
+            """
+            - job:
+                name: project1-provider
+                parent: common-config-job
+            - job:
+                name: project1-consumer
+                parent: common-config-job
+                dependencies:
+                  - name: project1-provider
+                    soft: False
+            - project:
+                check:
+                  jobs:
+                    - project1-provider
+                    - project1-consumer
+            """)
+        in_repo_conf_project2 = textwrap.dedent(
+            """
+            - job:
+                name: project2-provider
+                parent: project1-provider
+            - job:
+                name: project2-consumer
+                parent: project1-consumer
+                dependencies:
+                  - name: project2-provider
+                    soft: True
+            - project:
+                check:
+                  jobs:
+                    - project2-provider
+                    - project2-consumer
+            """)
+        file_dict1 = {'zuul.d/dependencies.yaml': in_repo_conf_project1}
+        change1 = self.fake_gerrit.addFakeChange(
+                'org/project1', 'master', 'A', files=file_dict1)
+        self.fake_gerrit.addEvent(change1.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        file_dict2 = {'zuul.d/dependencies.yaml': in_repo_conf_project2}
+        change2 = self.fake_gerrit.addFakeChange(
+                'org/project2', 'master', 'A', files=file_dict1)
+        self.fake_gerrit.addEvent(change2.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='common-config-job', result='SUCCESS', changes='1,1'),
+            dict(name='project1-provider', result='SUCCESS', changes='1,1'),
+            dict(name='project1-consumer', result='SUCCESS', changes='1,1'),
+            dict(name='common-config-job', result='SUCCESS', changes='2,1'),
+            dict(name='project2-job', result='SUCCESS', changes='2,1'),
+            dict(name='project2-provider', result='SUCCESS', changes='2,1'),
+            dict(name='project2-consumer', result='SUCCESS', changes='2,1'),
+        ], ordered=False)

@@ -6841,6 +6841,16 @@ class TestDependencyGraph(ZuulTestCase):
         ], ordered=False)
         self.assertIn('SKIPPED', A.messages[0])
 
+    @simple_layout('layouts/inherited-dependencies.yaml')
+    def test_inherited_dependencies(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='A2', result='SUCCESS', changes='1,1'),
+            dict(name='B2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
 
 class TestDuplicatePipeline(ZuulTestCase):
     tenant_config_file = 'config/duplicate-pipeline/main.yaml'
