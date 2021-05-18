@@ -33,6 +33,24 @@
       "revId": "ee2b902bf3c39ad488f9e0cfcff7a98dba152727",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5209e3da_d2f4e1fa",
+        "filename": "zuul/zk/__init__.py",
+        "patchSetId": 23
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-18T06:25:17Z",
+      "side": 1,
+      "message": "I needed this for debugging purposes and I thought it could be helpful for the future development. As we are putting more and more into ZooKeeper such a helper method might be useful to find leftovers in ZooKeeper and cleanup opportunities. Maybe there is a better place for this. As mainly put it in here as I didn\u0027t find a better one.",
+      "parentUuid": "4777bfc1_06fbec7a",
+      "revId": "ee2b902bf3c39ad488f9e0cfcff7a98dba152727",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
