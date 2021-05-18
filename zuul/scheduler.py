@@ -289,25 +289,19 @@ class Scheduler(threading.Thread):
         mergers_online = 0
         merge_queue = 0
         merge_running = 0
+        unzoned_online = 0
+        unzoned_accepting = 0
+        unzoned_running = 0
+        unzoned_queued = 0
         for (name, (queued, running, registered)) in functions.items():
             if name.startswith('executor:execute'):
                 execute_queue = queued - running
                 tokens = name.split(':', 2)
                 if len(tokens) == 2:
                     # unzoned case
-                    self.statsd.gauge('zuul.executors.unzoned.accepting',
-                                      registered)
-                    self.statsd.gauge('zuul.executors.unzoned.jobs_running',
-                                      running)
-                    self.statsd.gauge('zuul.executors.unzoned.jobs_queued',
-                                      execute_queue)
-                    # TODO(corvus): Remove for 5.0:
-                    self.statsd.gauge('zuul.executors.accepting',
-                                      registered)
-                    self.statsd.gauge('zuul.executors.jobs_running',
-                                      running)
-                    self.statsd.gauge('zuul.executors.jobs_queued',
-                                      execute_queue)
+                    unzoned_accepting = registered
+                    unzoned_running = running
+                    unzoned_queued = execute_queue
                 else:
                     # zoned case
                     zone = tokens[2]
@@ -325,10 +319,7 @@ class Scheduler(threading.Thread):
                 tokens = name.split(':', 2)
                 if len(tokens) == 2:
                     # unzoned case
-                    self.statsd.gauge('zuul.executors.unzoned.online',
-                                      registered)
-                    # TODO(corvus): Remove for 5.0:
-                    self.statsd.gauge('zuul.executors.online', registered)
+                    unzoned_online = registered
                 else:
                     # zoned case
                     zone = tokens[2]
@@ -349,6 +340,17 @@ class Scheduler(threading.Thread):
                           self.result_event_queue.qsize())
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           len(self.management_events))
+        self.statsd.gauge('zuul.executors.unzoned.accepting',
+                          unzoned_accepting)
+        self.statsd.gauge('zuul.executors.unzoned.jobs_running',
+                          unzoned_running)
+        self.statsd.gauge('zuul.executors.unzoned.jobs_queued', unzoned_queued)
+        self.statsd.gauge('zuul.executors.unzoned.online', unzoned_online)
+        # TODO(corvus): Remove for 5.0:
+        self.statsd.gauge('zuul.executors.accepting', unzoned_accepting)
+        self.statsd.gauge('zuul.executors.jobs_running', unzoned_running)
+        self.statsd.gauge('zuul.executors.jobs_queued', unzoned_queued)
+        self.statsd.gauge('zuul.executors.online', unzoned_online)
 
     def runCleanup(self):
         # Run the first cleanup immediately after the first
