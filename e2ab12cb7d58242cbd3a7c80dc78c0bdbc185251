@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "8eaa38db_06109251",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-18T07:39:11Z",
+      "side": 1,
+      "message": "This looks like a leftover from the rebase. We moved the \"accepting work assertion\" to the end of this test to avoid the iterate_timeout().",
+      "revId": "e2ab12cb7d58242cbd3a7c80dc78c0bdbc185251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e022aa7b_685d0057",
+        "filename": "tests/zk/executor.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-18T07:39:11Z",
+      "side": 1,
+      "message": "Should we combine this with the HoldableExecutorApi that you implemented here https://review.opendev.org/c/zuul/zuul/+/788624/8/tests/unit/test_zk.py#90 ?",
+      "revId": "e2ab12cb7d58242cbd3a7c80dc78c0bdbc185251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dafa07b2_6760ce8b",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-18T07:39:11Z",
+      "side": 1,
+      "message": "This comment should be invalid now as this change is already on top of the improved (cached) component registry.",
+      "revId": "e2ab12cb7d58242cbd3a7c80dc78c0bdbc185251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93439f9e_1f369139",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 3138,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-18T07:39:11Z",
+      "side": 1,
+      "message": "nit: Since we decided to not use type annotations in Zuul, should we remove them from this file directly? I removed them from most of my patches by now and those seem to be the only ones left that would be added. The same applies for resumeJob(), stopJob() and the {start|pause|complete}Build() methods at the end of this file.",
+      "revId": "e2ab12cb7d58242cbd3a7c80dc78c0bdbc185251",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c10d5d84_010416f5",
         "filename": "zuul/scheduler.py",
         "patchSetId": 9
