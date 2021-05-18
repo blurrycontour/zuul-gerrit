@@ -762,3 +762,52 @@ class TestTenantExtra(TenantParserTestCase):
             dict(name='project2-job', result='SUCCESS', changes='2,1'),
             dict(name='project2-extra-file2', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+
+class TestJobInheritance(ZuulTestCase):
+    tenant_config_file = 'config/tenant-parser/simple.yaml'
+
+    def test_dependencies(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project1-provider
+                parent: common-config-job
+            - job:
+                name: project1-consumer
+                parent: common-config-job
+                dependencies:
+                  - name: project1-provider
+                    soft: False
+            - job:
+                name: project2-provider
+                parent: project1-provider
+            - job:
+                name: project2-consumer
+                parent: project1-consumer
+                dependencies:
+                  - name: project2-provider
+                    soft: True
+            - project:
+                name: org/project1
+                check:
+                  jobs:
+                    - project1-provider
+                    - project1-consumer
+            - project:
+                name: org/project2
+                check:
+                  jobs:
+                    - project2-provider
+                    - project2-consumer
+            """)
+        file_dict = {'extra.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='common-config-job', result='SUCCESS', changes='1,1'),
+            dict(name='project2-provider', result='SUCCESS', changes='1,1'),
+            dict(name='project2-consumer', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
