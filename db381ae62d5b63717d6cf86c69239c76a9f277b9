@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f6b30d11_b9fe3a2b",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 24
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-18T06:55:11Z",
+      "side": 1,
+      "message": "Side note: I tried to implement these helper methods directly in the ZooKeeperBase class so we can use them in all other ZooKeeper classes. I find it helpful to not have to deal with the encode/decode part every time. However, doing so resulted in some circular import issues (I think because of the json_dumps function being imported in zk/__init__.py). Maybe we could keep that in mind and solve this issue some time.",
+      "revId": "db381ae62d5b63717d6cf86c69239c76a9f277b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
