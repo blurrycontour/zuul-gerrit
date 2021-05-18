@@ -5486,34 +5486,28 @@ For CI problems and help debugging, contact ci@example.org"""
             tenant.layout.pipelines['gate'].merge_failure_message)
 
         self.assertEqual(
-            len(tenant.layout.pipelines['check'].merge_failure_actions), 2)
+            len(tenant.layout.pipelines['check'].merge_failure_actions), 1)
         self.assertEqual(
-            len(tenant.layout.pipelines['gate'].merge_failure_actions), 3)
+            len(tenant.layout.pipelines['gate'].merge_failure_actions), 2)
 
         self.assertTrue(isinstance(
-            tenant.layout.pipelines['check'].merge_failure_actions[1],
+            tenant.layout.pipelines['check'].merge_failure_actions[0],
             gerritreporter.GerritReporter))
 
         self.assertTrue(
             (
                 isinstance(tenant.layout.pipelines['gate'].
                            merge_failure_actions[0],
-                           zuul.driver.sql.sqlreporter.SQLReporter) and
-                isinstance(tenant.layout.pipelines['gate'].
-                           merge_failure_actions[1],
                            zuul.driver.smtp.smtpreporter.SMTPReporter) and
                 isinstance(tenant.layout.pipelines['gate'].
-                           merge_failure_actions[2],
+                           merge_failure_actions[1],
                            gerritreporter.GerritReporter)
             ) or (
                 isinstance(tenant.layout.pipelines['gate'].
                            merge_failure_actions[0],
-                           zuul.driver.sql.sqlreporter.SQLReporter) and
-                isinstance(tenant.layout.pipelines['gate'].
-                           merge_failure_actions[1],
                            gerritreporter.GerritReporter) and
                 isinstance(tenant.layout.pipelines['gate'].
-                           merge_failure_actions[2],
+                           merge_failure_actions[1],
                            zuul.driver.smtp.smtpreporter.SMTPReporter)
             )
         )
