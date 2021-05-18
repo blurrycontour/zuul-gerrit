@@ -60,6 +60,7 @@ class PipelineManager(metaclass=ABCMeta):
         self.ref_filters = []
         # Cached dynamic layouts (layout uuid -> layout)
         self._layout_cache = {}
+        self.sql = self.sched.connections.getSqlReporter(pipeline)
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -193,6 +194,10 @@ class PipelineManager(metaclass=ABCMeta):
                 self.log.error(
                     "Reporting item dequeue %s received: %s", item, ret
                 )
+        # This might be called after canceljobs, which also sets a
+        # non-final 'cancel' result.
+        self.sql.reportBuildsetEnd(item.current_build_set, 'cancel',
+                                   final=False)
 
     def sendReport(self, action_reporters, item, message=None):
         """Sends the built message off to configured reporters.
@@ -415,6 +420,8 @@ class PipelineManager(metaclass=ABCMeta):
                         ci
                     ):
                         self.sendReport(actions, ci)
+                    self.sql.reportBuildsetEnd(ci.current_build_set,
+                                               'failure', final=True)
 
                     return False
 
@@ -683,6 +690,8 @@ class PipelineManager(metaclass=ABCMeta):
         # reported immediately afterwards during queue processing.
         if (prime and item.current_build_set.ref and not
                 item.didBundleStartReporting()):
+            self.sql.reportBuildsetEnd(
+                item.current_build_set, 'dequeue', final=False)
             item.resetAllBuilds()
 
         for job in jobs_to_cancel:
@@ -1030,6 +1039,7 @@ class PipelineManager(metaclass=ABCMeta):
         tpc = tenant.project_configs.get(item.change.project.canonical_name)
         if not build_set.ref:
             build_set.setConfiguration()
+            self.sql.reportBuildsetStart(build_set)
 
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
@@ -1274,6 +1284,8 @@ class PipelineManager(metaclass=ABCMeta):
         for ri in reported_items:
             ri.setReportedResult('FAILURE')
             self.sendReport(actions, ri)
+            self.sql.reportBuildsetEnd(ri.current_build_set,
+                                       'failure', final=True)
 
     def processQueue(self):
         # Do whatever needs to be done for each change in the queue
@@ -1315,6 +1327,7 @@ class PipelineManager(metaclass=ABCMeta):
     def onBuildStarted(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id)
         log.debug("Build %s started", build)
+        self.sql.reportBuildStart(build)
         return True
 
     def onBuildPaused(self, build):
@@ -1377,6 +1390,7 @@ class PipelineManager(metaclass=ABCMeta):
         item = build.build_set.item
 
         log.debug("Build %s of %s completed" % (build, item.change))
+        self.sql.reportBuildEnd(build, final=(not build.retry))
         item.pipeline.tenant.semaphore_handler.release(item, build.job)
 
         if item.getJob(build.job.name) is None:
@@ -1543,42 +1557,51 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("Project %s not in pipeline %s for change %s",
                       item.change.project, self.pipeline, item.change)
             project_in_pipeline = False
+            action = 'no-jobs'
             actions = self.pipeline.no_jobs_actions
             item.setReportedResult('NO_JOBS')
         elif item.getConfigErrors():
             log.debug("Invalid config for change %s", item.change)
             # TODOv3(jeblair): consider a new reporter action for this
+            action = 'merge-failure'
             actions = self.pipeline.merge_failure_actions
             item.setReportedResult('CONFIG_ERROR')
         elif item.didMergerFail():
             log.debug("Merger failure")
+            action = 'merge-failure'
             actions = self.pipeline.merge_failure_actions
             item.setReportedResult('MERGER_FAILURE')
         elif item.wasDequeuedNeedingChange():
             log.debug("Dequeued needing change")
+            action = 'failure'
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
         elif not item.getJobs():
             # We don't send empty reports with +1
             log.debug("No jobs for change %s", item.change)
+            action = 'no-jobs'
             actions = self.pipeline.no_jobs_actions
             item.setReportedResult('NO_JOBS')
         elif item.cannotMergeBundle():
             log.debug("Bundle can not be merged")
+            action = 'failure'
             actions = self.pipeline.failure_actions
             item.setReportedResult("FAILURE")
         elif item.isBundleFailing():
             log.debug("Bundle is failing")
+            action = 'failure'
             actions = self.pipeline.failure_actions
             item.setReportedResult("FAILURE")
             if not item.didAllJobsSucceed():
                 self.pipeline._consecutive_failures += 1
         elif item.didAllJobsSucceed() and not item.isBundleFailing():
             log.debug("success %s", self.pipeline.success_actions)
+            action = 'success'
             actions = self.pipeline.success_actions
             item.setReportedResult('SUCCESS')
             self.pipeline._consecutive_failures = 0
         else:
+            action = 'failure'
             actions = self.pipeline.failure_actions
             item.setReportedResult('FAILURE')
             self.pipeline._consecutive_failures += 1
@@ -1595,6 +1618,7 @@ class PipelineManager(metaclass=ABCMeta):
             ret = self.sendReport(actions, item)
             if ret:
                 log.error("Reporting item %s received: %s", item, ret)
+        self.sql.reportBuildsetEnd(item.current_build_set, action, final=True)
         return ret
 
     def reportStats(self, item, added=False):

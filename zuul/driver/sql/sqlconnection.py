@@ -116,6 +116,30 @@ class DatabaseSession(object):
         except sqlalchemy.orm.exc.NoResultFound:
             return []
 
+    def getBuild(self, tenant, uuid):
+        build_table = self.connection.zuul_build_table
+        buildset_table = self.connection.zuul_buildset_table
+
+        # contains_eager allows us to perform eager loading on the
+        # buildset *and* use that table in filters (unlike
+        # joinedload).
+        q = self.session().query(self.connection.buildModel).\
+            join(self.connection.buildSetModel).\
+            outerjoin(self.connection.providesModel).\
+            options(orm.contains_eager(self.connection.buildModel.buildset),
+                    orm.selectinload(self.connection.buildModel.provides),
+                    orm.selectinload(self.connection.buildModel.artifacts))
+
+        q = self.listFilter(q, buildset_table.c.tenant, tenant)
+        q = self.listFilter(q, build_table.c.uuid, uuid)
+
+        try:
+            return q.one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return None
+        except sqlalchemy.orm.exc.MultipleResultsFound:
+            raise Exception("Multiple builds found with uuid %s", uuid)
+
     def createBuildSet(self, *args, **kw):
         bs = self.connection.buildSetModel(*args, **kw)
         self.session().add(bs)
@@ -173,8 +197,7 @@ class DatabaseSession(object):
         except sqlalchemy.orm.exc.NoResultFound:
             return None
         except sqlalchemy.orm.exc.MultipleResultsFound:
-            self.log.error("Multiple buildset found with uuid %s", uuid)
-            return None
+            raise Exception("Multiple buildset found with uuid %s", uuid)
 
 
 class SQLConnection(BaseConnection):

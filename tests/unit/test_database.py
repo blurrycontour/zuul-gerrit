@@ -71,3 +71,42 @@ class TestDatabase(BaseTestCase):
             create = self.connection.engine.execute(
                 f"show create table {table}").one()[1]
             self.compareMysql(create, sqlalchemy_tables[table])
+
+    def test_buildsets(self):
+        tenant = 'tenant1',
+        buildset_uuid = 'deadbeef'
+        change = 1234
+        buildset_args = dict(
+            uuid=buildset_uuid,
+            tenant=tenant,
+            pipeline='check',
+            project='project',
+            change=change,
+            patchset='1',
+            ref='',
+            oldrev='',
+            newrev='',
+            branch='master',
+            zuul_ref='Zdeadbeef',
+            ref_url='http://example.com/1234',
+            event_id='eventid',
+        )
+
+        # Create the buildset entry (driver-internal interface)
+        with self.connection.getSession() as db:
+            db.createBuildSet(**buildset_args)
+
+        # Verify that worked using the driver-external interface
+        self.assertEqual(len(self.connection.getBuildsets()), 1)
+        self.assertEqual(self.connection.getBuildsets()[0].uuid, buildset_uuid)
+
+        # Update the buildset using the internal interface
+        with self.connection.getSession() as db:
+            db_buildset = db.getBuildset(tenant=tenant, uuid=buildset_uuid)
+            self.assertEqual(db_buildset.change, change)
+            db_buildset.result = 'SUCCESS'
+
+        # Verify that worked
+        db_buildset = self.connection.getBuildset(
+            tenant=tenant, uuid=buildset_uuid)
+        self.assertEqual(db_buildset.result, 'SUCCESS')

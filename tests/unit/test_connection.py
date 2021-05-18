@@ -126,16 +126,15 @@ class TestSQLConnectionMysql(ZuulDBTestCase):
     def test_sql_results(self):
         "Test results are entered into an sql table"
 
-        def check_results(connection_name):
+        def check_results():
             # Grab the sa tables
             tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-            reporter = _get_reporter_from_connection_name(
-                tenant.layout.pipelines['check'].success_actions,
-                connection_name
-            )
-
-            conn = self.scheds.first.connections.connections[connection_name].\
+            pipeline = tenant.layout.pipelines['check']
+            reporter = self.scheds.first.connections.getSqlReporter(
+                pipeline)
+            conn = self.scheds.first.connections.getSqlConnection().\
                 engine.connect()
+
             result = conn.execute(
                 sa.sql.select([reporter.connection.zuul_buildset_table]))
 
@@ -229,22 +228,21 @@ class TestSQLConnectionMysql(ZuulDBTestCase):
         self.orderedRelease()
         self.waitUntilSettled()
 
-        check_results('database')
+        check_results()
 
     def test_sql_results_retry_builds(self):
         "Test that retry results are entered into an sql table correctly"
 
         # Check the results
-        def check_results(connection_name):
+        def check_results():
             # Grab the sa tables
             tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
-            reporter = _get_reporter_from_connection_name(
-                tenant.layout.pipelines["check"].success_actions,
-                connection_name
-            )
+            pipeline = tenant.layout.pipelines['check']
+            reporter = self.scheds.first.connections.getSqlReporter(
+                pipeline)
 
-            with self.scheds.first.connections.connections[connection_name]\
-                    .engine.connect() as conn:
+            with self.scheds.first.connections.getSqlConnection().\
+                    engine.connect() as conn:
 
                 result = conn.execute(
                     sa.sql.select([reporter.connection.zuul_buildset_table])
@@ -282,13 +280,13 @@ class TestSQLConnectionMysql(ZuulDBTestCase):
             self.assertEqual('project-test1', buildset0_builds[1]['job_name'])
             self.assertEqual('RETRY', buildset0_builds[1]['result'])
             self.assertFalse(buildset0_builds[1]['final'])
-            self.assertEqual('project-test1', buildset0_builds[2]['job_name'])
-            self.assertEqual('SUCCESS', buildset0_builds[2]['result'])
-            self.assertTrue(buildset0_builds[2]['final'])
+            self.assertEqual('project-test2', buildset0_builds[2]['job_name'])
+            self.assertEqual('RETRY', buildset0_builds[2]['result'])
+            self.assertFalse(buildset0_builds[2]['final'])
 
-            self.assertEqual('project-test2', buildset0_builds[3]['job_name'])
-            self.assertEqual('RETRY', buildset0_builds[3]['result'])
-            self.assertFalse(buildset0_builds[3]['final'])
+            self.assertEqual('project-test1', buildset0_builds[3]['job_name'])
+            self.assertEqual('SUCCESS', buildset0_builds[3]['result'])
+            self.assertTrue(buildset0_builds[3]['final'])
             self.assertEqual('project-test2', buildset0_builds[4]['job_name'])
             self.assertEqual('SUCCESS', buildset0_builds[4]['result'])
             self.assertTrue(buildset0_builds[4]['final'])
@@ -309,7 +307,7 @@ class TestSQLConnectionMysql(ZuulDBTestCase):
         self.orderedRelease()
         self.waitUntilSettled()
 
-        check_results('database')
+        check_results()
 
     def test_multiple_sql_connections(self):
         "Test putting results in different databases"
@@ -326,14 +324,13 @@ class TestSQLConnectionMysql(ZuulDBTestCase):
 
         def check_results(connection_name_1, connection_name_2):
             # Grab the sa tables for resultsdb
-            tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-            reporter1 = _get_reporter_from_connection_name(
-                tenant.layout.pipelines['check'].success_actions,
-                connection_name_1
-            )
+            tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+            pipeline = tenant.layout.pipelines['check']
+            reporter1 = self.scheds.first.connections.getSqlReporter(
+                pipeline)
 
-            conn = self.scheds.first.connections.\
-                connections[connection_name_1].engine.connect()
+            conn = self.scheds.first.connections.getSqlConnection().\
+                engine.connect()
             buildsets_resultsdb = conn.execute(sa.sql.select(
                 [reporter1.connection.zuul_buildset_table])).fetchall()
             # Should have been 2 buildset reported to the resultsdb (both
@@ -349,13 +346,6 @@ class TestSQLConnectionMysql(ZuulDBTestCase):
             self.assertEqual('SUCCESS', buildsets_resultsdb[0]['result'])
             self.assertEqual(
                 'Build succeeded.', buildsets_resultsdb[0]['message'])
-
-            # Grab the sa tables for resultsdb_mysql_failures
-            reporter2 = _get_reporter_from_connection_name(
-                tenant.layout.pipelines['check'].failure_actions,
-                connection_name_2
-            )
-            self.assertIsNone(reporter2)  # Explicit SQL reporters are ignored
 
             buildsets_resultsdb_failures = conn.execute(sa.sql.select(
                 [reporter1.connection.zuul_buildset_table])).fetchall()
