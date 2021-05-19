@@ -16,6 +16,23 @@
       "revId": "29ccaa278d539cac4dd93192bd0a3c7088dea187",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "60dc1002_628d14c0",
+        "filename": "zuul/zk/semaphore.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-19T18:56:37Z",
+      "side": 1,
+      "message": "Though that one doesn\u0027t handle \u0027/\u0027 which isn\u0027t strictly necessary, but let\u0027s do it too :)",
+      "revId": "29ccaa278d539cac4dd93192bd0a3c7088dea187",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
     }
   ]
 }
