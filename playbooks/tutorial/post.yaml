@@ -7,6 +7,7 @@
         mode: 0755
     - name: Save docker log files
       become: true
+      ignore_errors: yes
       shell: |
         docker logs zuultutorial_gerrit_1 > {{ ansible_user_dir }}/logs/gerrit.log 2>&1
         docker logs zuultutorial_gerritconfig_1 > {{ ansible_user_dir }}/logs/gerritconfig.log 2>&1
