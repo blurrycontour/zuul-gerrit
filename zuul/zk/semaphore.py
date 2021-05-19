@@ -15,7 +15,7 @@
 
 import json
 import logging
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, unquote
 
 from kazoo.exceptions import BadVersionError, NoNodeError
 
@@ -38,10 +38,26 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
     semaphore_root = "/zuul/semaphores"
 
-    def __init__(self, client, tenant_name, layout):
+    def __init__(self, client, statsd, tenant_name, layout):
         super().__init__(client)
         self.layout = layout
+        self.statsd = statsd
+        self.tenant_name = tenant_name
         self.tenant_root = f"{self.semaphore_root}/{tenant_name}"
+
+    def _emitStats(self, semaphore_path, num_holders):
+        if self.statsd is None:
+            return
+        try:
+            semaphore_quoted = semaphore_path.split('/')[-1]
+            semaphore_name = unquote(semaphore_quoted)
+            # statsd safe key:
+            semaphore_key = semaphore_name.replace('.', '_').replace('/', '_')
+            key = (f'zuul.tenant.{self.tenant_name}'
+                   f'.semaphore.{semaphore_key}')
+            self.statsd.gauge(f'{key}.holders', num_holders)
+        except Exception:
+            self.log.exception("Unable to send semaphore stats:")
 
     def acquire(self, item, job, request_resources):
         if not job.semaphore:
@@ -86,6 +102,8 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
             log.info("Semaphore %s acquired: job %s, item %s",
                      job.semaphore.name, job.name, item)
+
+            self._emitStats(semaphore_path, len(semaphore_holders))
             return True
 
         return False
@@ -123,6 +141,7 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
 
             log.info("Semaphore %s released for %s",
                      semaphore_path, semaphore_handle)
+            self._emitStats(semaphore_path, len(semaphore_holders))
             break
 
     def release(self, item, job):
