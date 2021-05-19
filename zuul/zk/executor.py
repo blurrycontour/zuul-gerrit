@@ -81,7 +81,8 @@ class ExecutorApi(ZooKeeperSimpleBase):
         self.kazoo_client.ensure_path(zone_root)
 
         self.kazoo_client.ChildrenWatch(
-            zone_root, self._watchBuildRequests, send_event=True
+            zone_root, self._makeBuildRequestWatcher(zone_root),
+            send_event=True
         )
         self._watched_zones.add(zone)
 
@@ -99,13 +100,13 @@ class ExecutorApi(ZooKeeperSimpleBase):
         self.kazoo_client.ChildrenWatch(zones_root, watch_zones)
         self.registerZone(None)
 
-    def _watchBuildState(self, data, stat, event=None):
-        if not event:
-            # Initial data watch call. Can be ignored, as we've already added
-            # the build request to our cache before creating the data watch.
-            return
+    def _makeBuildStateWatcher(self, path):
+        def watch(data, stat, event=None):
+            return self._watchBuildState(path, data, stat, event)
+        return watch
 
-        if event.type == EventType.CHANGED:
+    def _watchBuildState(self, path, data, stat, event=None):
+        if not event or event.type == EventType.CHANGED:
             # As we already get the data and the stat value, we can directly
             # use it without asking ZooKeeper for the data again.
             content = self._bytesToDict(data)
@@ -113,12 +114,12 @@ class ExecutorApi(ZooKeeperSimpleBase):
                 return
 
             # We need this one for the HOLD -> REQUESTED check further down
-            old_build_request = self._cached_build_requests.get(event.path)
+            old_build_request = self._cached_build_requests.get(path)
 
             build_request = BuildRequest.fromDict(content)
-            build_request.path = event.path
+            build_request.path = path
             build_request._zstat = stat
-            self._cached_build_requests[event.path] = build_request
+            self._cached_build_requests[path] = build_request
 
             # NOTE (felix): This is a test-specific condition: For test cases
             # which are using hold_jobs_in_queue the state change on the build
@@ -137,9 +138,9 @@ class ExecutorApi(ZooKeeperSimpleBase):
                 self.build_request_callback()
 
         elif event.type == EventType.DELETED:
-            build_request = self._cached_build_requests.get(event.path)
+            build_request = self._cached_build_requests.get(path)
             with suppress(KeyError):
-                del self._cached_build_requests[event.path]
+                del self._cached_build_requests[path]
 
             if build_request and self.build_event_callback:
                 self.build_event_callback(
@@ -149,10 +150,12 @@ class ExecutorApi(ZooKeeperSimpleBase):
             # Return False to stop the datawatch as the build got deleted.
             return False
 
-    def _watchBuildRequests(self, build_requests, event=None):
-        if event is None:
-            return
+    def _makeBuildRequestWatcher(self, path):
+        def watch(build_requests, event=None):
+            return self._watchBuildRequests(path, build_requests, event)
+        return watch
 
+    def _watchBuildRequests(self, path, build_requests, event=None):
         # The build_requests list always contains all active children. Thus, we
         # first have to find the new ones by calculating the delta between the
         # build_requests list and our current cache entries.
@@ -163,24 +166,21 @@ class ExecutorApi(ZooKeeperSimpleBase):
         # update a cache entry while the other tries to remove it.
 
         build_request_paths = {
-            f"{event.path}/{uuid}" for uuid in build_requests
+            f"{path}/{uuid}" for uuid in build_requests
         }
 
         new_build_requests = build_request_paths - set(
             self._cached_build_requests.keys()
         )
 
-        for path in new_build_requests:
-            build_request = self.get(path)
-            if not build_request:
-                continue
-            self._cached_build_requests[path] = build_request
-            # Set a datawatch on that path to listen for change events on the
-            # build request itself (e.g. status changes, znode deleted, ...).
-            self.kazoo_client.DataWatch(path, self._watchBuildState)
+        for req_path in new_build_requests:
+            self.kazoo_client.DataWatch(req_path,
+                                        self._makeBuildStateWatcher(req_path))
 
-        # Notify the user about new build requests if a callback is provided
-        if self.build_request_callback:
+        # Notify the user about new build requests if a callback is provided,
+        # but only if there are new requests (we don't want to fire on the
+        # initial callback from kazoo from registering the datawatch).
+        if new_build_requests and self.build_request_callback:
             self.build_request_callback()
 
     def _iterBuildRequests(self):
