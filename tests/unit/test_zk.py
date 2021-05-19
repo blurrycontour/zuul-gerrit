@@ -345,11 +345,10 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         # DataWatch might be triggered for the correct event, but the cache
         # might still be outdated as the DataWatch that updates the cache
         # itself wasn't triggered yet.
-        for _ in iterate_timeout(30, "wait for cache to be up-to-date"):
-            if (
-                executor_api._cached_build_requests[path_e].state
-                == BuildRequest.PAUSED
-            ):
+        cache = executor_api._cached_build_requests
+        for _ in iterate_timeout(30, "cache to be up-to-date"):
+            if (cache[path_b].state == BuildRequest.RUNNING and
+                cache[path_e].state == BuildRequest.PAUSED):
                 break
 
         # The lost_builds method should only return builds which are running or
@@ -358,3 +357,37 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
         self.assertEqual(2, len(lost_build_requests))
         self.assertEqual(b.path, lost_build_requests[0].path)
+
+    def test_existing_build_request(self):
+        # Test that an executor sees an existing build request when
+        # coming online
+
+        # Test the lifecycle of a build request
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # and the event queue
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+        client.submit("A", "tenant", "pipeline", {}, None)
+
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        # Scheduler submits request
+        request_queue.get(timeout=30)
+
+        # Executor receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+        self.assertEqual(a.uuid, 'A')
