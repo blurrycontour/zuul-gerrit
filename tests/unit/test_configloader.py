@@ -16,6 +16,7 @@ from configparser import ConfigParser
 import fixtures
 import logging
 import textwrap
+import testtools
 
 from zuul.configloader import AuthorizationRuleParser, safe_load_yaml
 
@@ -762,3 +763,15 @@ class TestTenantExtra(TenantParserTestCase):
             dict(name='project2-job', result='SUCCESS', changes='2,1'),
             dict(name='project2-extra-file2', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+
+class TestTenantDuplicate(TenantParserTestCase):
+    tenant_config_file = 'config/tenant-parser/duplicate.yaml'
+
+    def setUp(self):
+        with testtools.ExpectedException(Exception, 'Duplicate configuration'):
+            super().setUp()
+
+    def test_tenant_dupe(self):
+        # The magic is in setUp
+        pass
