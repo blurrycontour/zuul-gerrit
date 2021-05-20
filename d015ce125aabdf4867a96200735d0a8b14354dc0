@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "72219a93_f295d431",
+        "filename": "tests/base.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 3124,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2021-05-20T07:15:22Z",
+      "side": 1,
+      "message": "This init should be done in the HoldableExecutorApi as this is the one using the self.hold_in_queue attribute, or?",
+      "revId": "d015ce125aabdf4867a96200735d0a8b14354dc0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
