@@ -58,6 +58,8 @@ class PipelineManager(metaclass=ABCMeta):
         self.pipeline = pipeline
         self.event_filters = []
         self.ref_filters = []
+        # Cached dynamic layouts (layout uuid -> layout)
+        self._layout_cache = {}
 
     def __str__(self):
         return "<%s %s>" % (self.__class__.__name__, self.pipeline.name)
@@ -299,7 +301,7 @@ class PipelineManager(metaclass=ABCMeta):
                 # necessary, or it will do nothing if we're waiting on
                 # a merge job.
                 has_job_graph = bool(item.job_graph)
-                item.layout = None
+                item.layout_uuid = None
 
                 # If the item is no longer active, but has a job graph we
                 # will make sure to update it.
@@ -658,7 +660,7 @@ class PipelineManager(metaclass=ABCMeta):
     def executeJobs(self, item):
         # TODO(jeblair): This should return a value indicating a job
         # was executed.  Appears to be a longstanding bug.
-        if not item.layout:
+        if not item.layout_uuid:
             return False
 
         jobs = item.findJobsToRun(
@@ -691,16 +693,18 @@ class PipelineManager(metaclass=ABCMeta):
         return canceled
 
     def _findRelevantErrors(self, item, layout):
-        if item.item_ahead:
-            parent_layout = item.item_ahead.layout
-        else:
-            parent_layout = item.pipeline.tenant.layout
+        # Collect all the config errors that are not related to the
+        # current item.
+        parent_error_keys = list(
+            self.pipeline.tenant.layout.loading_errors.error_keys)
+        for item_ahead in item.items_ahead:
+            parent_error_keys.extend(
+                e.key for e in item.item_ahead.current_build_set.config_errors)
 
         relevant_errors = []
         for err in layout.loading_errors.errors:
             econtext = err.key.context
-            if ((err.key not in
-                 parent_layout.loading_errors.error_keys) or
+            if ((err.key not in parent_error_keys) or
                 (econtext.project == item.change.project.name and
                  econtext.branch == item.change.branch)):
                 relevant_errors.append(err)
@@ -829,14 +833,37 @@ class PipelineManager(metaclass=ABCMeta):
             item.setConfigError("Unknown configuration error")
             return None
 
+    def getFallbackLayout(self, item):
+        parent_item = item.item_ahead
+        if not parent_item:
+            return item.pipeline.tenant.layout
+
+        return self.getLayout(parent_item)
+
     def getLayout(self, item):
+        layout = self._layout_cache.get(item.layout_uuid)
+        if layout:
+            self.log.debug("Using cached layout %s for item %s",
+                           layout.uuid, item)
+            return layout
+
+        if item.layout_uuid:
+            self.log.debug("Re-calculating layout for item %s", item)
+
+        layout = self._getLayout(item)
+        if layout:
+            item.layout_uuid = layout.uuid
+            self._layout_cache[item.layout_uuid] = layout
+        return layout
+
+    def _getLayout(self, item):
         if item.item_ahead:
-            fallback_layout = item.item_ahead.layout
-            if fallback_layout is None:
+            if (
+                (item.item_ahead.live and not item.item_ahead.job_graph) or
+                (not item.item_ahead.live and not item.item_ahead.layout_uuid)
+            ):
                 # We're probably waiting on a merge job for the item ahead.
                 return None
-        else:
-            fallback_layout = item.pipeline.tenant.layout
 
         # If the current change does not update the layout, use its parent.
         # If the bundle doesn't update the config or the bundle updates the
@@ -852,14 +879,15 @@ class PipelineManager(metaclass=ABCMeta):
                 )[1] is not None
             )
         ):
-            return fallback_layout
+            return self.getFallbackLayout(item)
         # Else this item updates the config,
         # ask the merger for the result.
         build_set = item.current_build_set
         if build_set.merge_state != build_set.COMPLETE:
             return None
         if build_set.unable_to_merge:
-            return fallback_layout
+            return self.getFallbackLayout(item)
+
         self.log.debug("Preparing dynamic layout for: %s" % item.change)
         return self._loadDynamicLayout(item)
 
@@ -1048,9 +1076,10 @@ class PipelineManager(metaclass=ABCMeta):
         # None if there was an error that makes the layout unusable.
         # In the last case, it will have set the config_errors on this
         # item, which may be picked up by the next itme.
-        if not item.layout:
-            item.layout = self.getLayout(item)
-        if not item.layout:
+        if not item.layout_uuid:
+            self.getLayout(item)
+
+        if not item.layout_uuid:
             return False
 
         # If the change can not be merged or has config errors, don't
@@ -1071,7 +1100,8 @@ class PipelineManager(metaclass=ABCMeta):
         if not item.job_graph:
             try:
                 log.debug("Freezing job graph for %s" % (item,))
-                item.freezeJobGraph()
+                item.freezeJobGraph(self.getLayout(item),
+                                    layout_ahead=self.getFallbackLayout(item))
             except Exception as e:
                 # TODOv3(jeblair): nicify this exception as it will be reported
                 log.exception("Error freezing job graph for %s" % (item,))
@@ -1260,6 +1290,18 @@ class PipelineManager(metaclass=ABCMeta):
                 if status:
                     self.log.debug("Queue %s status is now:\n %s" %
                                    (queue.name, status))
+
+        # Cleanup unused layouts in the cache
+        active_layout_uuids = {i.layout_uuid
+                               for i in self.pipeline.getAllItems()
+                               if i.layout_uuid}
+        unused_layouts = set(self._layout_cache.keys()) - active_layout_uuids
+        if unused_layouts:
+            self.log.debug("Removing unused layouts %s from cache",
+                           unused_layouts)
+        for uid in unused_layouts:
+            del self._layout_cache[uid]
+
         self.log.debug("Finished queue processor: %s (changed: %s)" %
                        (self.pipeline.name, changed))
         return changed
@@ -1476,7 +1518,11 @@ class PipelineManager(metaclass=ABCMeta):
         # pipeline, use the dynamic layout if available, otherwise,
         # fall back to the current static layout as a best
         # approximation.
-        layout = (item.layout or self.pipeline.tenant.layout)
+        layout = None
+        if item.layout_uuid:
+            layout = self.getLayout(item)
+        if not layout:
+            layout = self.pipeline.tenant.layout
 
         project_in_pipeline = True
         ppc = None

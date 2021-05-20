@@ -1917,6 +1917,7 @@ class JobGraph(object):
         self.jobs = OrderedDict()  # job_name -> Job
         # dependent_job_name -> dict(parent_job_name -> soft)
         self._dependencies = {}
+        self.project_metadata = {}
 
     def __repr__(self):
         return '<JobGraph %s>' % (self.jobs)
@@ -2004,6 +2005,11 @@ class JobGraph(object):
             for j in new_parent_jobs:
                 jobs_to_iterate.add((j, current_parent_jobs[j]))
         return all_parent_jobs
+
+    def getProjectMetadata(self, name):
+        if name in self.project_metadata:
+            return self.project_metadata[name]
+        return None
 
 
 class Build(object):
@@ -2270,20 +2276,23 @@ class BuildSet(object):
         # or if that fails, the current live layout, or if that fails,
         # use the default: merge-resolve.
         item = self.item
-        layout = None
+        project = self.item.change.project
+        project_metadata = None
         while item:
-            layout = item.layout
-            if layout:
-                break
+            if item.job_graph:
+                project_metadata = item.job_graph.getProjectMetadata(
+                    project.canonical_name)
+                if project_metadata:
+                    break
             item = item.item_ahead
-        if not layout:
+        if not project_metadata:
             layout = self.item.pipeline.tenant.layout
-        if layout:
-            project = self.item.change.project
-            project_metadata = layout.getProjectMetadata(
-                project.canonical_name)
-            if project_metadata:
-                return project_metadata.merge_mode
+            if layout:
+                project_metadata = layout.getProjectMetadata(
+                    project.canonical_name
+                )
+        if project_metadata:
+            return project_metadata.merge_mode
         return MERGER_MERGE_RESOLVE
 
     def getSafeAttributes(self):
@@ -2319,7 +2328,7 @@ class QueueItem(object):
         self.quiet = False
         self.active = False  # Whether an item is within an active window
         self.live = True  # Whether an item is intended to be processed at all
-        self.layout = None
+        self.layout_uuid = None
         self.project_pipeline_config = None
         self.job_graph = None
         self._old_job_graph = None  # Cached job graph of previous layout
@@ -2349,7 +2358,7 @@ class QueueItem(object):
 
     def resetAllBuilds(self):
         self.current_build_set = BuildSet(self)
-        self.layout = None
+        self.layout_uuid = None
         self.project_pipeline_config = None
         self.job_graph = None
         self._old_job_graph = None
@@ -2381,11 +2390,12 @@ class QueueItem(object):
         self.current_build_set.warning_messages.append(msg)
         self.log.info(msg)
 
-    def freezeJobGraph(self, skip_file_matcher=False):
+    def freezeJobGraph(self, layout, layout_ahead=None,
+                       skip_file_matcher=False):
         """Find or create actual matching jobs for this item's change and
         store the resulting job tree."""
 
-        ppc = self.layout.getProjectPipelineConfig(self)
+        ppc = layout.getProjectPipelineConfig(self)
         try:
             # Conditionally set self.ppc so that the debug method can
             # consult it as we resolve the jobs.
@@ -2393,12 +2403,18 @@ class QueueItem(object):
             if ppc:
                 for msg in ppc.debug_messages:
                     self.debug(msg)
-            job_graph = self.layout.createJobGraph(
-                self, ppc, skip_file_matcher)
+            job_graph = layout.createJobGraph(
+                self, ppc, layout_ahead, skip_file_matcher)
             for job in job_graph.getJobs():
                 # Ensure that each jobs's dependencies are fully
                 # accessible.  This will raise an exception if not.
-                job_graph.getParentJobsRecursively(job.name, self.layout)
+                job_graph.getParentJobsRecursively(job.name, layout)
+
+            # Copy project metadata to job_graph since this will be needed
+            # later but must be independent of the layout due to buildset
+            # global repo state
+            job_graph.project_metadata = layout.project_metadata
+
             self.job_graph = job_graph
         except Exception:
             self.project_pipeline_config = None
@@ -3264,12 +3280,9 @@ class QueueItem(object):
                     newrev=newrev,
                     )
 
-    def updatesJobConfig(self, job):
+    def updatesJobConfig(self, job, layout, layout_ahead=None):
         log = self.annotateLogger(self.log)
-        layout_ahead = self.pipeline.tenant.layout
-        if self.item_ahead and self.item_ahead.layout:
-            layout_ahead = self.item_ahead.layout
-        if layout_ahead and self.layout and self.layout is not layout_ahead:
+        if layout_ahead and layout and layout is not layout_ahead:
             # This change updates the layout.  Calculate the job as it
             # would be if the layout had not changed.
             if self._old_job_graph is None:
@@ -3277,7 +3290,7 @@ class QueueItem(object):
                     ppc = layout_ahead.getProjectPipelineConfig(self)
                     log.debug("Creating job graph for config change detection")
                     self._old_job_graph = layout_ahead.createJobGraph(
-                        self, ppc, skip_file_matcher=True)
+                        self, ppc, layout_ahead, skip_file_matcher=True)
                     log.debug("Done creating job graph for "
                               "config change detection")
                 except Exception:
@@ -4547,8 +4560,8 @@ class Layout(object):
 
     log = logging.getLogger("zuul.layout")
 
-    def __init__(self, tenant):
-        self.uuid = uuid4().hex
+    def __init__(self, tenant, uuid=None):
+        self.uuid = uuid or uuid4().hex
         self.tenant = tenant
         self.project_configs = {}
         self.project_templates = {}
@@ -4906,7 +4919,8 @@ class Layout(object):
             raise NoMatchingParentError()
         return jobs
 
-    def _createJobGraph(self, item, ppc, job_graph, skip_file_matcher):
+    def _createJobGraph(self, item, ppc, job_graph, layout_ahead,
+                        skip_file_matcher):
         log = item.annotateLogger(self.log)
         job_list = ppc.job_list
         change = item.change
@@ -4942,9 +4956,9 @@ class Layout(object):
             for variant in variants:
                 if frozen_job is None:
                     frozen_job = variant.copy()
-                    frozen_job.setBase(item.layout)
+                    frozen_job.setBase(self)
                 else:
-                    frozen_job.applyVariant(variant, item.layout)
+                    frozen_job.applyVariant(variant, self)
                     frozen_job.name = variant.name
             frozen_job.name = jobname
 
@@ -4956,7 +4970,7 @@ class Layout(object):
             # tenant default.
             if not frozen_job.ansible_version:
                 frozen_job.ansible_version = \
-                    item.layout.tenant.default_ansible_version
+                    self.tenant.default_ansible_version
 
             log.debug("Froze job %s for %s", jobname, change)
             # Whether the change matches any of the project pipeline
@@ -4964,7 +4978,7 @@ class Layout(object):
             matched = False
             for variant in job_list.jobs[jobname]:
                 if variant.changeMatchesBranch(change):
-                    frozen_job.applyVariant(variant, item.layout)
+                    frozen_job.applyVariant(variant, self)
                     matched = True
                     log.debug("Pipeline variant %s matched %s",
                               repr(variant), change)
@@ -4986,7 +5000,8 @@ class Layout(object):
                not frozen_job.changeMatchesFiles(change):
                 matched_files = False
                 if frozen_job.match_on_config_updates:
-                    updates_job_config = item.updatesJobConfig(frozen_job)
+                    updates_job_config = item.updatesJobConfig(
+                        frozen_job, self, layout_ahead)
             else:
                 matched_files = True
             if not matched_files:
@@ -5023,12 +5038,14 @@ class Layout(object):
 
             job_graph.addJob(frozen_job)
 
-    def createJobGraph(self, item, ppc, skip_file_matcher=False):
+    def createJobGraph(self, item, ppc, layout_ahead=None,
+                       skip_file_matcher=False):
         # NOTE(pabelanger): It is possible for a foreign project not to have a
         # configured pipeline, if so return an empty JobGraph.
         ret = JobGraph()
         if ppc:
-            self._createJobGraph(item, ppc, ret, skip_file_matcher)
+            self._createJobGraph(item, ppc, ret, layout_ahead,
+                                 skip_file_matcher)
         return ret
 
 
