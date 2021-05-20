@@ -469,8 +469,7 @@ class RPCListener(RPCListenerBase):
         change.branch = args.get("branch", "master")
         queue = model.ChangeQueue(pipeline)
         item = model.QueueItem(queue, change, None)
-        item.layout = tenant.layout
-        item.freezeJobGraph(skip_file_matcher=True)
+        item.freezeJobGraph(tenant.layout, skip_file_matcher=True)
 
         output = []
 
@@ -500,8 +499,7 @@ class RPCListener(RPCListenerBase):
         change.branch = args.get("branch", "master")
         queue = model.ChangeQueue(pipeline)
         item = model.QueueItem(queue, change, None)
-        item.layout = tenant.layout
-        item.freezeJobGraph(skip_file_matcher=True)
+        item.freezeJobGraph(tenant.layout, skip_file_matcher=True)
 
         job = item.job_graph.jobs.get(args.get("job"))
         if not job:
