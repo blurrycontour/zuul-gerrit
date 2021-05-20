@@ -3605,7 +3605,9 @@ class ReconfigureEvent(ManagementEvent):
 
     @classmethod
     def fromDict(cls, data):
-        return cls(data.get("validate_tenants"))
+        event = cls(data.get("validate_tenants"))
+        event.updateFromDict(data)
+        return event
 
 
 class SmartReconfigureEvent(ManagementEvent):
@@ -3655,6 +3657,7 @@ class TenantReconfigureEvent(ManagementEvent):
     def fromDict(cls, data):
         project, branch = next(iter(data["project_branches"]))
         event = cls(data.get("tenant_name"), project, branch)
+        event.updateFromDict(data)
         # In case the dictionary was deserialized from JSON we get
         # [[project, branch]] instead of [(project, branch]).
         # Because of that we need to make sure we have a hashable
@@ -3689,11 +3692,13 @@ class PromoteEvent(ManagementEvent):
 
     @classmethod
     def fromDict(cls, data):
-        return cls(
+        event = cls(
             data.get("tenant_name"),
             data.get("pipeline_name"),
             list(data.get("change_ids", [])),
         )
+        event.updateFromDict(data)
+        return event
 
 
 class ChangeManagementEvent(ManagementEvent):
