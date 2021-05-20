@@ -301,7 +301,10 @@ class PipelineManager(metaclass=ABCMeta):
                 # necessary, or it will do nothing if we're waiting on
                 # a merge job.
                 has_job_graph = bool(item.job_graph)
-                item.layout_uuid = None
+                if item.live:
+                    # Only reset the layout for live items as we don't need to
+                    # re-create the layout in independent pipelines.
+                    item.layout_uuid = None
 
                 # If the item is no longer active, but has a job graph we
                 # will make sure to update it.
@@ -660,7 +663,7 @@ class PipelineManager(metaclass=ABCMeta):
     def executeJobs(self, item):
         # TODO(jeblair): This should return a value indicating a job
         # was executed.  Appears to be a longstanding bug.
-        if not item.layout_uuid:
+        if not item.job_graph:
             return False
 
         jobs = item.findJobsToRun(
@@ -1070,24 +1073,23 @@ class PipelineManager(metaclass=ABCMeta):
         if not ready:
             return False
 
-        # With the merges done, we have the info needed to get a
-        # layout.  This may return the pipeline layout, a layout from
-        # a change ahead, a newly generated layout for this change, or
-        # None if there was an error that makes the layout unusable.
-        # In the last case, it will have set the config_errors on this
-        # item, which may be picked up by the next itme.
-        if not item.layout_uuid:
-            self.getLayout(item)
-
-        if not item.layout_uuid:
-            return False
-
         # If the change can not be merged or has config errors, don't
         # run jobs.
         if build_set.unable_to_merge:
             return False
         if build_set.config_errors:
             return False
+
+        # With the merges done, we have the info needed to get a
+        # layout.  This may return the pipeline layout, a layout from
+        # a change ahead, a newly generated layout for this change, or
+        # None if there was an error that makes the layout unusable.
+        # In the last case, it will have set the config_errors on this
+        # item, which may be picked up by the next item.
+        if not (item.layout_uuid or item.job_graph):
+            layout = self.getLayout(item)
+            if not layout:
+                return False
 
         # We don't need to build a job graph for a non-live item, we
         # just need the layout.
