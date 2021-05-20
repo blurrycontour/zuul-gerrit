@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6c85cf9e_4d8ca627",
+        "filename": "playbooks/tutorial/post.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-05-20T09:34:23Z",
+      "side": 1,
+      "message": "i think we should remove this now like Ia812dae029eecc7f96757a9d930b3a9c098394bd as it was only meant to help diagnose the errors",
+      "range": {
+        "startLine": 10,
+        "startChar": 5,
+        "endLine": 10,
+        "endChar": 24
+      },
+      "revId": "f70e0eaccf1590bbbe6ab05bc27a0da9d17367cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
