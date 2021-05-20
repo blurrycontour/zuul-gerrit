@@ -51,6 +51,7 @@ class TestJob(BaseTestCase):
         self.tenant = model.Tenant('tenant')
         self.tenant.default_ansible_version = AnsibleManager().default_version
         self.layout = model.Layout(self.tenant)
+        self.tenant.layout = self.layout
         self.project = model.Project('project', self.source)
         self.context = model.SourceContext(self.project, 'master',
                                            'test', True)
@@ -204,13 +205,12 @@ class TestJob(BaseTestCase):
         change = model.Change(self.project)
         change.branch = 'master'
         item = queue.enqueueChange(change, None)
-        item.layout = self.layout
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
         self.assertFalse(python27diablo.changeMatchesBranch(change))
 
-        item.freezeJobGraph()
+        item.freezeJobGraph(self.layout)
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -218,13 +218,12 @@ class TestJob(BaseTestCase):
 
         change.branch = 'stable/diablo'
         item = queue.enqueueChange(change, None)
-        item.layout = self.layout
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
         self.assertTrue(python27diablo.changeMatchesBranch(change))
 
-        item.freezeJobGraph()
+        item.freezeJobGraph(self.layout)
         self.assertEqual(len(item.getJobs()), 1)
         job = item.getJobs()[0]
         self.assertEqual(job.name, 'python27')
@@ -267,12 +266,11 @@ class TestJob(BaseTestCase):
         change.branch = 'master'
         change.files = ['/COMMIT_MSG', 'ignored-file']
         item = queue.enqueueChange(change, None)
-        item.layout = self.layout
 
         self.assertTrue(base.changeMatchesFiles(change))
         self.assertFalse(python27.changeMatchesFiles(change))
 
-        item.freezeJobGraph()
+        item.freezeJobGraph(self.layout)
         self.assertEqual([], item.getJobs())
 
     def test_job_source_project(self):
@@ -340,7 +338,7 @@ class TestJob(BaseTestCase):
         with testtools.ExpectedException(
                 Exception,
                 "Pre-review pipeline gate does not allow post-review job"):
-            item.freezeJobGraph()
+            item.freezeJobGraph(self.layout)
 
 
 class TestJobTimeData(BaseTestCase):
