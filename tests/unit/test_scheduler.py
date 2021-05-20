@@ -8122,7 +8122,9 @@ class TestSemaphoreInRepo(ZuulTestCase):
                 queue = queue_candidate
                 break
         queue_item = queue.queue[0]
-        item_dynamic_layout = queue_item.layout
+        item_dynamic_layout = pipeline.manager._layout_cache.get(
+            queue_item.layout_uuid)
+        self.assertIsNotNone(item_dynamic_layout)
         dynamic_test_semaphore = \
             item_dynamic_layout.semaphores.get('test-semaphore')
         self.assertEqual(dynamic_test_semaphore.max, 1)
