@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "45142631_fd8f664a",
+        "filename": "playbooks/tutorial/post.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2021-05-20T01:46:27Z",
+      "side": 1,
+      "message": "I think we should drop this; I added it with https://review.opendev.org/c/zuul/zuul/+/792054 to try and diagnose why this was failing.  It\u0027s now hiding a real error.\n\nIt looks possibly like a docker-compose difference between focal and bionic.  It seems we install docker-compose from packages and it appears to have updated the way it deals with \"-\" i guess.",
+      "range": {
+        "startLine": 10,
+        "startChar": 6,
+        "endLine": 10,
+        "endChar": 24
+      },
+      "revId": "0cb49a3c91e06d70b7f89c39856bcc8bcad007d8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
