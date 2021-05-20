@@ -892,7 +892,7 @@ Here is an example of two job definitions:
            src/project
 
          In some cases the ``golang`` scheme can produce collisions
-         (conisder the projects `component` and
+         (consider the projects `component` and
          `component/subcomponent`).  In this case it may be preferable
          to use the ``flat`` scheme (which would produce repositories
          at `component` and `subcomponent`).
