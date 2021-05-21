@@ -28,6 +28,7 @@ import github3.exceptions
 from tests.fakegithub import FakeGithubEnterpriseClient
 from zuul.driver.github.githubconnection import GithubShaCache
 import zuul.rpcclient
+from zuul.lib import strings
 
 from tests.base import (AnsibleZuulTestCase, BaseTestCase,
                         ZuulGithubAppTestCase, ZuulTestCase,
@@ -64,7 +65,9 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual('master', zuulvars['branch'])
         self.assertEquals('https://github.com/org/project/pull/1',
                           zuulvars['items'][0]['change_url'])
-        self.assertEqual(zuulvars["message"], "A\n\n{}".format(body))
+        expected = "A\n\n{}".format(body)
+        self.assertEqual(zuulvars["message"],
+                         strings.b64encode(expected))
         self.assertEqual(1, len(A.comments))
         self.assertThat(
             A.comments[0],

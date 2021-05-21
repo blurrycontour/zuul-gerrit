@@ -60,3 +60,14 @@ class TestYamlDumper(BaseTestCase):
         with testtools.ExpectedException(
                 yamlutil.yaml.representer.RepresenterError):
             out = yamlutil.safe_dump(data, default_flow_style=False)
+
+    def test_ansible_dumper(self):
+        data = {'foo': 'bar'}
+        expected = "!unsafe 'foo': !unsafe 'bar'\n"
+        yaml_out = yamlutil.ansible_unsafe_dump(data, default_flow_style=False)
+        self.assertEqual(yaml_out, expected)
+
+        data = {'foo': {'bar': 'baz'}}
+        expected = "!unsafe 'foo':\n  !unsafe 'bar': !unsafe 'baz'\n"
+        yaml_out = yamlutil.ansible_unsafe_dump(data, default_flow_style=False)
+        self.assertEqual(yaml_out, expected)

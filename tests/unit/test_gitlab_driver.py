@@ -19,6 +19,7 @@ import yaml
 import socket
 
 import zuul.rpcclient
+from zuul.lib import strings
 
 from tests.base import random_sha1, simple_layout
 from tests.base import ZuulTestCase, ZuulWebFixture
@@ -106,7 +107,7 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual('master', zuulvars['branch'])
         self.assertEquals('https://gitlab/org/project/merge_requests/1',
                           zuulvars['items'][0]['change_url'])
-        self.assertEqual(zuulvars["message"], description)
+        self.assertEqual(zuulvars["message"], strings.b64encode(description))
         self.assertEqual(2, len(self.history))
         self.assertEqual(2, len(A.notes))
         self.assertEqual(

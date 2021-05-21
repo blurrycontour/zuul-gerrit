@@ -3098,13 +3098,15 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         if self.executor_server._run_ansible:
             # Call run on the fake build omitting the result so we also can
             # hold real ansible jobs.
-            if playbook.path:
+            if playbook not in [self.jobdir.setup_playbook,
+                                self.jobdir.freeze_playbook]:
                 build.run()
 
             result = super(RecordingAnsibleJob, self).runAnsible(
                 cmd, timeout, playbook, ansible_version, wrapped, cleanup)
         else:
-            if playbook.path:
+            if playbook not in [self.jobdir.setup_playbook,
+                                self.jobdir.freeze_playbook]:
                 result = build.run()
             else:
                 result = (self.RESULT_NORMAL, 0)

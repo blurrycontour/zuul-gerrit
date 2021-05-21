@@ -75,6 +75,24 @@ project as long as the contents are the same.  This is to aid in
 branch maintenance, so that creating a new branch based on an existing
 branch will not immediately produce a configuration error.
 
+When the values of secrets are passed to Ansible, the ``!unsafe`` YAML
+tag is added which prevents them from being evaluated as Jinja
+expressions.  This is to avoid a situation where a child job might
+expose a parent job's secrets via template expansion.
+
+However, if it is known that a given secret value can be trusted, then
+this limitation can be worked around by using the following construct
+in a playbook:
+
+.. code-block:: yaml
+
+   - set_fact:
+       unsafe_var_eval: "{{ hostvars['localhost'].secretname.var }}"
+
+This will force an explicit template evaluation of the `var` attribute
+on the `secretname` secret.  The results will be stored in
+unsafe_var_eval.
+
 .. attr:: secret
 
    The following attributes must appear on a secret:

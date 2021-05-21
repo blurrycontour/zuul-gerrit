@@ -22,7 +22,7 @@ import textwrap
 import gc
 from time import sleep
 from unittest import skip, skipIf
-from zuul.lib.yamlutil import yaml
+from zuul.lib import yamlutil
 
 import git
 import paramiko
@@ -4899,7 +4899,8 @@ class TestSecrets(ZuulTestCase):
         build = self.getJobFromHistory(job)
         for pb in getattr(build.jobdir, pbtype):
             if pb.secrets_content:
-                secrets.append(yaml.safe_load(pb.secrets_content))
+                secrets.append(
+                    yamlutil.ansible_unsafe_load(pb.secrets_content))
             else:
                 secrets.append({})
         return secrets
@@ -5077,7 +5078,8 @@ class TestSecretInheritance(ZuulTestCase):
         build = self.getJobFromHistory(job)
         for pb in getattr(build.jobdir, pbtype):
             if pb.secrets_content:
-                secrets.append(yaml.safe_load(pb.secrets_content))
+                secrets.append(
+                    yamlutil.ansible_unsafe_load(pb.secrets_content))
             else:
                 secrets.append({})
         return secrets
@@ -5089,10 +5091,10 @@ class TestSecretInheritance(ZuulTestCase):
         base_secret = {'username': 'base-username'}
         self.assertEqual(
             self._getSecrets('trusted-secrets', 'playbooks'),
-            [{'trusted-secret': secret}])
+            [{'trusted_secret': secret}])
         self.assertEqual(
             self._getSecrets('trusted-secrets', 'pre_playbooks'),
-            [{'base-secret': base_secret}])
+            [{'base_secret': base_secret}])
         self.assertEqual(
             self._getSecrets('trusted-secrets', 'post_playbooks'), [])
 
@@ -5102,7 +5104,7 @@ class TestSecretInheritance(ZuulTestCase):
         self.assertEqual(
             self._getSecrets('trusted-secrets-trusted-child',
                              'pre_playbooks'),
-            [{'base-secret': base_secret}])
+            [{'base_secret': base_secret}])
         self.assertEqual(
             self._getSecrets('trusted-secrets-trusted-child',
                              'post_playbooks'), [])
@@ -5113,7 +5115,7 @@ class TestSecretInheritance(ZuulTestCase):
         self.assertEqual(
             self._getSecrets('trusted-secrets-untrusted-child',
                              'pre_playbooks'),
-            [{'base-secret': base_secret}])
+            [{'base_secret': base_secret}])
         self.assertEqual(
             self._getSecrets('trusted-secrets-untrusted-child',
                              'post_playbooks'), [])
@@ -5185,7 +5187,8 @@ class TestSecretPassToParent(ZuulTestCase):
         build = self.getJobFromHistory(job)
         for pb in getattr(build.jobdir, pbtype):
             if pb.secrets_content:
-                secrets.append(yaml.safe_load(pb.secrets_content))
+                secrets.append(
+                    yamlutil.ansible_unsafe_load(pb.secrets_content))
             else:
                 secrets.append({})
         return secrets
@@ -5768,15 +5771,15 @@ class TestJobOutput(AnsibleZuulTestCase):
         j = json.loads(self._get_file(self.history[0],
                                       'work/logs/job-output.json'))
         self.assertEqual(token,
-                         j[0]['plays'][0]['tasks'][1]
+                         j[0]['plays'][0]['tasks'][0]
                          ['hosts']['test_node']['stdout'])
-        self.assertTrue(j[0]['plays'][0]['tasks'][2]
+        self.assertTrue(j[0]['plays'][0]['tasks'][1]
                         ['hosts']['test_node']['skipped'])
-        self.assertTrue(j[0]['plays'][0]['tasks'][3]
+        self.assertTrue(j[0]['plays'][0]['tasks'][2]
                         ['hosts']['test_node']['failed'])
         self.assertEqual(
             "This is a handler",
-            j[0]['plays'][0]['tasks'][4]
+            j[0]['plays'][0]['tasks'][3]
             ['hosts']['test_node']['stdout'])
 
         self.log.info(self._get_file(self.history[0],
@@ -5826,7 +5829,7 @@ class TestJobOutput(AnsibleZuulTestCase):
         j = json.loads(self._get_file(self.history[0],
                                       'work/logs/job-output.json'))
         self.assertEqual(token,
-                         j[0]['plays'][0]['tasks'][1]
+                         j[0]['plays'][0]['tasks'][0]
                          ['hosts']['test_node']['stdout'])
 
         self.log.info(self._get_file(self.history[0],
@@ -6392,6 +6395,13 @@ class TestContainerJobs(AnsibleZuulTestCase):
         self.patch(zuul.executor.server.KubeFwd,
                    'kubectl_command',
                    os.path.join(FIXTURE_DIR, 'fake_kubectl.sh'))
+
+        def noop(*args, **kw):
+            return 1, 0
+
+        self.patch(zuul.executor.server.AnsibleJob,
+                   'runAnsibleFreeze',
+                   noop)
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
@@ -7247,3 +7257,53 @@ class TestReturnWarnings(AnsibleZuulTestCase):
         self.assertTrue(A.reported)
         self.assertIn('This is the first warning', A.messages[0])
         self.assertIn('This is the second warning', A.messages[0])
+
+
+class TestUnsafeVars(AnsibleZuulTestCase):
+    tenant_config_file = 'config/unsafe-vars/main.yaml'
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def test_unsafe_vars(self):
+        self.executor_server.keep_jobdir = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        testjob = self.getJobFromHistory('testjob')
+        job_output = self._get_file(testjob, 'work/logs/job-output.txt')
+        self.log.debug(job_output)
+        # base_secret wasn't present when frozen
+        self.assertIn("BASE JOBSECRET: undefined", job_output)
+        # secret variables are marked unsafe
+        self.assertIn("BASE SECRETSUB: {{ subtext }}", job_output)
+        # latefact wasn't present when frozen
+        self.assertIn("BASE LATESUB: undefined", job_output)
+
+        # Both of these are dynamically evaluated
+        self.assertIn("TESTJOB SUB: text", job_output)
+        self.assertIn("TESTJOB LATESUB: late", job_output)
+
+        # The project secret is not defined
+        self.assertNotIn("TESTJOB SECRET:", job_output)
+
+        testjob = self.getJobFromHistory('testjob-secret')
+        job_output = self._get_file(testjob, 'work/logs/job-output.txt')
+        self.log.debug(job_output)
+        # base_secret wasn't present when frozen
+        self.assertIn("BASE JOBSECRET: undefined", job_output)
+        # secret variables are marked unsafe
+        self.assertIn("BASE SECRETSUB: {{ subtext }}", job_output)
+        # latefact wasn't present when frozen
+        self.assertIn("BASE LATESUB: undefined", job_output)
+
+        # These are frozen
+        self.assertIn("TESTJOB SUB: text", job_output)
+        self.assertIn("TESTJOB LATESUB: undefined", job_output)
+
+        # This is marked unsafe
+        self.assertIn("TESTJOB SECRET: {{ subtext }}", job_output)

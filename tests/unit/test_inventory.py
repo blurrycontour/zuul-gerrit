@@ -15,7 +15,7 @@
 import base64
 import os
 
-import yaml
+from zuul.lib import yamlutil as yaml
 
 from tests.base import AnsibleZuulTestCase
 from tests.base import ZuulTestCase
@@ -56,15 +56,22 @@ class TestInventoryBase(ZuulTestCase):
 
         build = self.getBuildByName(name)
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
-        return yaml.safe_load(open(inv_path, 'r'))
+        inventory = yaml.safe_load(open(inv_path, 'r'))
+
+        zv_path = os.path.join(build.jobdir.root, 'ansible', 'zuul_vars.yaml')
+        zv = yaml.safe_load(open(zv_path, 'r'))
+
+        # TODO(corvus): zuul vars aren't really stored here anymore;
+        # rework these tests to examine them separately.
+        inventory['all']['vars'] = {'zuul': zv['zuul']}
+        return inventory
 
     def _get_setup_inventory(self, name):
         self.runJob(name)
 
         build = self.getBuildByName(name)
-        setup_inv_path = os.path.join(build.jobdir.root, 'ansible',
-                                      'setup-inventory.yaml')
-        return yaml.safe_load(open(setup_inv_path, 'r'))
+        setup_inv_path = build.jobdir.setup_playbook.inventory
+        return yaml.ansible_unsafe_load(open(setup_inv_path, 'r'))
 
     def runJob(self, name):
         self.gearman_server.hold_jobs_in_queue = False
@@ -287,16 +294,13 @@ class TestInventory(TestInventoryBase):
             self.assertIn(node_name,
                           inventory['all']['children']
                           ['ceph-monitor']['hosts'])
-        self.assertNotIn(
-            'ansible_python_interpreter',
-            inventory['all']['hosts']['controller'])
+        self.assertEqual(
+            'python4',
+            inventory['all']['hosts']['controller']
+            ['ansible_python_interpreter'])
         self.assertEqual(
             'auto',
             inventory['all']['hosts']['compute1']
-            ['ansible_python_interpreter'])
-        self.assertEqual(
-            'python4',
-            inventory['all']['children']['ceph-osd']['vars']
             ['ansible_python_interpreter'])
         self.assertIn('zuul', inventory['all']['vars'])
         z_vars = inventory['all']['vars']['zuul']
@@ -336,12 +340,13 @@ class TestInventory(TestInventoryBase):
                     'local',
                     inventory['all']['hosts'][node_name]['ansible_connection'])
 
-            self.assertNotIn(
-                'ansible_python_interpreter',
-                inventory['all']['hosts'][node_name])
-        self.assertEqual(
-            'python1.5.2',
-            inventory['all']['vars']['ansible_python_interpreter'])
+            self.assertEqual(
+                'python1.5.2',
+                inventory['all']['hosts'][node_name]
+                ['ansible_python_interpreter'])
+        self.assertNotIn(
+            'ansible_python_interpreter',
+            inventory['all']['vars'])
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -395,6 +400,13 @@ class TestAnsibleInventory(AnsibleZuulTestCase):
         build = self.history[0]
         inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
         inventory = yaml.safe_load(open(inv_path, 'r'))
+
+        zv_path = os.path.join(build.jobdir.root, 'ansible', 'zuul_vars.yaml')
+        zv = yaml.safe_load(open(zv_path, 'r'))
+
+        # TODO(corvus): zuul vars aren't really stored here anymore;
+        # rework these tests to examine them separately.
+        inventory['all']['vars'] = {'zuul': zv['zuul']}
 
         decoded_message = base64.b64decode(
             inventory['all']['vars']['zuul']['message']).decode('utf-8')

@@ -63,13 +63,6 @@
       value: vartest_secret
 
 # This is used by the check-vars job to evaluate variable precedence.
-# The name of this secret conflicts with an extra variable.
-- secret:
-    name: vartest_extra
-    data:
-      value: vartest_secret
-
-# This is used by the check-vars job to evaluate variable precedence.
 # The name of this secret should not conflict.
 - secret:
     name: vartest_secret
@@ -137,7 +130,6 @@
       vartest_extra: vartest_extra
       vartest_site: vartest_extra
     secrets:
-      - vartest_extra
       - vartest_site
       - vartest_secret
 

@@ -663,11 +663,17 @@ Here is an example of two job definitions:
       same name will override a previously defined variable, but new
       variable names will be added to the set of defined variables.
 
+      When running a trusted playbook, the value of variables will be
+      frozen at the start of the job.  Therefore if the value of the
+      variable is an Ansible Jinja template, it may only reference
+      values which are known at the start of the job, and its value
+      will not change.  Untrusted playbooks dynamically evaluate
+      variables and are not limited by this restriction.
+
    .. attr:: extra-vars
 
-      A dictionary of variables to be passed to ansible command-line
-      using the --extra-vars flag. Note by using extra-vars, these
-      variables always win precedence.
+      A dictionary of variables to supply to Ansible with higher
+      precedence than job, host, or group vars.
 
    .. attr:: host-vars
 

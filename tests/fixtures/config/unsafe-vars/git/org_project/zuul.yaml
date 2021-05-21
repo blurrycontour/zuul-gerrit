@@ -1,0 +1,27 @@
+- secret:
+    name: project_secret
+    data:
+      secret: "yoyo"
+      secretsub: "{{ subtext }}"
+
+- job:
+    name: testjob
+    vars:
+      latesub: "{{ latefact | default('undefined') }}"
+      jobvar: "{{ base_secret.secret | default('undefined') }}"
+    run: playbooks/testjob-run.yaml
+
+- job:
+    name: testjob-secret
+    run: playbooks/testjob-run.yaml
+    vars:
+      latesub: "{{ latefact | default('undefined') }}"
+      jobvar: "{{ base_secret.secret | default('undefined') }}"
+    secrets:
+      - project_secret
+
+- project:
+    check:
+      jobs:
+        - testjob
+        - testjob-secret

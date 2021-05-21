@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import base64
 import collections
 import datetime
 import json
@@ -416,11 +415,13 @@ class JobDirPlaybook(object):
         self.roles = []
         self.roles_path = []
         self.ansible_config = os.path.join(self.root, 'ansible.cfg')
+        self.inventory = os.path.join(self.root, 'inventory.yaml')
         self.project_link = os.path.join(self.root, 'project')
-        self.secrets_root = os.path.join(self.root, 'secrets')
+        self.secrets_root = os.path.join(self.root, 'group_vars')
         os.makedirs(self.secrets_root)
-        self.secrets = os.path.join(self.secrets_root, 'secrets.yaml')
+        self.secrets = os.path.join(self.secrets_root, 'all.yaml')
         self.secrets_content = None
+        self.secrets_keys = set()
 
     def addRole(self):
         count = len(self.roles)
@@ -444,8 +445,8 @@ class JobDir(object):
         #   ansible (mounted in bwrap read-only)
         #     logging.json
         #     inventory.yaml
-        #     extra_vars.yaml
         #     vars_blacklist.yaml
+        #     zuul_vars.yaml
         #   .ansible (mounted in bwrap read-write)
         #     fact-cache/localhost
         #     cp
@@ -498,6 +499,7 @@ class JobDir(object):
             self.ansible_root, 'vars_blacklist.yaml')
         with open(self.ansible_vars_blacklist, 'w') as blacklist:
             blacklist.write(json.dumps(BLACKLISTED_VARS))
+        self.zuul_vars = os.path.join(self.ansible_root, 'zuul_vars.yaml')
         self.trusted_root = os.path.join(self.root, 'trusted')
         os.makedirs(self.trusted_root)
         self.untrusted_root = os.path.join(self.root, 'untrusted')
@@ -559,9 +561,6 @@ class JobDir(object):
             pass
         self.known_hosts = os.path.join(ssh_dir, 'known_hosts')
         self.inventory = os.path.join(self.ansible_root, 'inventory.yaml')
-        self.extra_vars = os.path.join(self.ansible_root, 'extra_vars.yaml')
-        self.setup_inventory = os.path.join(self.ansible_root,
-                                            'setup-inventory.yaml')
         self.logging_json = os.path.join(self.ansible_root, 'logging.json')
         self.playbooks = []  # The list of candidate playbooks
         self.pre_playbooks = []
@@ -590,6 +589,14 @@ class JobDir(object):
         os.makedirs(setup_root)
         self.setup_playbook = JobDirPlaybook(setup_root)
         self.setup_playbook.trusted = True
+
+        # Create a JobDirPlaybook for the Ansible variable freeze run.
+        freeze_root = os.path.join(self.ansible_root, 'freeze_playbook')
+        os.makedirs(freeze_root)
+        self.freeze_playbook = JobDirPlaybook(freeze_root)
+        self.freeze_playbook.trusted = False
+        self.freeze_playbook.path = os.path.join(self.freeze_playbook.root,
+                                                 'freeze_playbook.yaml')
 
     def addTrustedProject(self, canonical_name, branch):
         # Trusted projects are placed in their own directories so that
@@ -735,6 +742,9 @@ class DeduplicateQueue(object):
             self.condition.release()
 
 
+VARNAME_RE = re.compile(r'^[A-Za-z0-9_]+$')
+
+
 def check_varnames(var):
     # We block these in configloader, but block it here too to make
     # sure that a job doesn't pass variables named zuul or nodepool.
@@ -742,15 +752,67 @@ def check_varnames(var):
         raise Exception("Defining variables named 'zuul' is not allowed")
     if 'nodepool' in var:
         raise Exception("Defining variables named 'nodepool' is not allowed")
+    for varname in var.keys():
+        if not VARNAME_RE.match(varname):
+            raise Exception("Variable names may only contain letters, "
+                            "numbers, and underscores")
 
 
-def make_setup_inventory_dict(nodes):
+def squash_variables(nodes, groups, jobvars, groupvars,
+                     extravars):
+    """Combine the Zuul job variable parameters into a hostvars dictionary.
+
+    This is used by the executor when freezing job variables.  It
+    simulates the Ansible variable precedence to arrive at a single
+    hostvars dict (ultimately, all variables in ansible are hostvars;
+    therefore group vars and extra vars can be combined in such a way
+    to present a single hierarchy of variables visible to each host).
+
+    :param list nodes: A list of node dictionaries (as supplied by
+         the executor client)
+    :param dict groups: A list of group dictionaries (as supplied by
+         the executor client)
+    :param dict jobvars: A dictionary corresponding to Zuul's job.vars.
+    :param dict groupvars: A dictionary keyed by group name with a value of
+         a dictionary of variables for that group.
+    :param dict extravars: A dictionary corresponding to Zuul's job.extra-vars.
+
+    :returns: A dict keyed by hostname with a value of a dictionary of
+         variables for the host.
+    """
+
+    # The output dictionary, keyed by hostname.
+    ret = {}
+
+    # Zuul runs ansible with the default hash behavior of 'replace';
+    # this means we don't need to deep-merge dictionaries.
+    for node in nodes:
+        hostname = node['name']
+        ret[hostname] = {}
+        # group 'all'
+        ret[hostname].update(jobvars)
+        # group vars
+        groups = sorted(groups, key=lambda g: g['name'])
+        if 'all' in groupvars:
+            ret[hostname].update(groupvars.get('all', {}))
+        for group in groups:
+            if hostname in group['nodes']:
+                ret[hostname].update(groupvars.get(group['name'], {}))
+        # host vars
+        ret[hostname].update(node['host_vars'])
+        # extra vars
+        ret[hostname].update(extravars)
+
+    return ret
+
+
+def make_setup_inventory_dict(nodes, hostvars):
     hosts = {}
     for node in nodes:
-        if (node['host_vars']['ansible_connection'] in
+        if (hostvars[node['name']]['ansible_connection'] in
             BLACKLISTED_ANSIBLE_CONNECTION_TYPES):
             continue
-        hosts[node['name']] = node['host_vars']
+        hosts[node['name']] = hostvars[node['name']]
 
     inventory = {
         'all': {
@@ -770,36 +832,41 @@ def is_group_var_set(name, host, args):
     return False
 
 
-def make_inventory_dict(nodes, args, all_vars):
+def make_inventory_dict(nodes, groups, hostvars, remove_keys=None):
     hosts = {}
     for node in nodes:
-        hosts[node['name']] = node['host_vars']
+        node_hostvars = hostvars[node['name']].copy()
+        if remove_keys:
+            for k in remove_keys:
+                node_hostvars.pop(k, None)
+        hosts[node['name']] = node_hostvars
 
-    zuul_vars = all_vars['zuul']
-    if 'message' in zuul_vars:
-        zuul_vars['message'] = base64.b64encode(
-            zuul_vars['message'].encode("utf-8")).decode('utf-8')
+    # localhost has no hostvars, so we'll set what we froze for
+    # localhost as the 'all' vars which will in turn be available to
+    # localhost plays.
+    all_hostvars = hostvars['localhost'].copy()
+    if remove_keys:
+        for k in remove_keys:
+            all_hostvars.pop(k, None)
 
     inventory = {
         'all': {
             'hosts': hosts,
-            'vars': all_vars,
+            'vars': all_hostvars,
         }
     }
 
-    for group in args['groups']:
+    for group in groups:
         if 'children' not in inventory['all']:
             inventory['all']['children'] = dict()
+
         group_hosts = {}
         for node_name in group['nodes']:
             group_hosts[node_name] = None
-        group_vars = args['group_vars'].get(group['name'], {}).copy()
-        check_varnames(group_vars)
 
         inventory['all']['children'].update({
             group['name']: {
                 'hosts': group_hosts,
-                'vars': group_vars,
             }})
 
     return inventory
@@ -889,6 +956,13 @@ class AnsibleJob(object):
         self.lookup_dir = os.path.join(plugin_dir, 'lookup')
         self.filter_dir = os.path.join(plugin_dir, 'filter')
         self.ansible_callbacks = self.executor_server.ansible_callbacks
+        # The result of getHostList
+        self.host_list = None
+        # The supplied job/host/group/extra vars, squashed.  Indexed
+        # by hostname.
+        self.original_hostvars = {}
+        # The same, but frozen
+        self.frozen_hostvars = {}
 
     def run(self):
         self.running = True
@@ -1200,9 +1274,10 @@ class AnsibleJob(object):
 
         # This prepares each playbook and the roles needed for each.
         self.preparePlaybooks(args)
-
-        self.prepareAnsibleFiles(args)
         self.writeLoggingConfig()
+        zuul_resources = self.prepareNodes(args)  # set self.host_list
+        self.prepareVars(args, zuul_resources)   # set self.original_hostvars
+        self.writeDebugInventory()
 
         # Early abort if abort requested
         if self.aborted:
@@ -1428,11 +1503,24 @@ class AnsibleJob(object):
         # within that timeout, there is likely a network problem
         # between here and the hosts in the inventory; return them and
         # reschedule the job.
+
+        self.writeSetupInventory()
         setup_status, setup_code = self.runAnsibleSetup(
             self.jobdir.setup_playbook, self.ansible_version)
         if setup_status != self.RESULT_NORMAL or setup_code != 0:
             return result
 
+        # Freeze the variables so that we have a copy of them without
+        # any jinja templates for use in the trusted execution
+        # context.
+        self.writeInventory(self.jobdir.freeze_playbook,
+                            self.original_hostvars)
+        freeze_status, freeze_code = self.runAnsibleFreeze(
+            self.jobdir.freeze_playbook, self.ansible_version)
+        if freeze_status != self.RESULT_NORMAL or setup_code != 0:
+            return result
+
+        self.loadFrozenHostvars()
         pre_failed = False
         success = False
         if self.executor_server.statsd:
@@ -1740,6 +1828,7 @@ class AnsibleJob(object):
 
     def preparePlaybooks(self, args):
         self.writeAnsibleConfig(self.jobdir.setup_playbook)
+        self.writeAnsibleConfig(self.jobdir.freeze_playbook)
 
         for playbook in args['pre_playbooks']:
             jobdir_playbook = self.jobdir.addPrePlaybook()
@@ -1803,8 +1892,9 @@ class AnsibleJob(object):
         secrets = self.mergeSecretVars(secrets, args)
         if secrets:
             check_varnames(secrets)
-            jobdir_playbook.secrets_content = yaml.safe_dump(
+            jobdir_playbook.secrets_content = yaml.ansible_unsafe_dump(
                 secrets, default_flow_style=False)
+            jobdir_playbook.secrets_keys = set(secrets.keys())
 
         self.writeAnsibleConfig(jobdir_playbook)
 
@@ -1936,10 +2026,10 @@ class AnsibleJob(object):
         secret_vars = args.get('secret_vars') or {}
 
         # We need to handle secret vars specially.  We want to pass
-        # them to Ansible as we do secrets with a -e file, but we want
-        # them to have the lowest priority.  In order to accomplish
-        # that, we will simply remove any top-level secret var with
-        # the same name as anything above it in precedence.
+        # them to Ansible as we do secrets, but we want them to have
+        # the lowest priority.  In order to accomplish that, we will
+        # simply remove any top-level secret var with the same name as
+        # anything above it in precedence.
 
         other_vars = set()
         other_vars.update(args['vars'].keys())
@@ -1947,6 +2037,7 @@ class AnsibleJob(object):
             other_vars.update(group_vars.keys())
         for host_vars in args['host_vars'].values():
             other_vars.update(host_vars.keys())
+        other_vars.update(args['extra_vars'].keys())
         other_vars.update(secrets.keys())
 
         ret = secret_vars.copy()
@@ -2114,20 +2205,13 @@ class AnsibleJob(object):
         with open(kube_cfg_path, "w") as of:
             of.write(yaml.safe_dump(kube_cfg, default_flow_style=False))
 
-    def prepareAnsibleFiles(self, args):
-        all_vars = args['vars'].copy()
-        check_varnames(all_vars)
-        all_vars['zuul'] = args['zuul'].copy()
-        all_vars['zuul']['executor'] = dict(
-            hostname=self.executor_server.hostname,
-            src_root=self.jobdir.src_root,
-            log_root=self.jobdir.log_root,
-            work_root=self.jobdir.work_root,
-            result_data_file=self.jobdir.result_data_file,
-            inventory_file=self.jobdir.inventory)
+    def prepareNodes(self, args):
+        # Returns the zuul.resources ansible variable for later user
 
+        # Used to remove resource nodes from the inventory
         resources_nodes = []
-        all_vars['zuul']['resources'] = {}
+        # The zuul.resources ansible variable
+        zuul_resources = {}
         for node in args['nodes']:
             if node.get('connection_type') in (
                     'namespace', 'project', 'kubectl'):
@@ -2139,8 +2223,8 @@ class AnsibleJob(object):
                 node['connection_port'] = None
                 node['kubectl_namespace'] = data['namespace']
                 node['kubectl_context'] = data['context_name']
-                # Add node information to zuul_resources
-                all_vars['zuul']['resources'][node['name'][0]] = {
+                # Add node information to zuul.resources
+                zuul_resources[node['name'][0]] = {
                     'namespace': data['namespace'],
                     'context': data['context_name'],
                 }
@@ -2149,8 +2233,8 @@ class AnsibleJob(object):
                     resources_nodes.append(node)
                 else:
                     # Add the real pod name to the resources_var
-                    all_vars['zuul']['resources'][
-                        node['name'][0]]['pod'] = data['pod']
+                    zuul_resources[node['name'][0]]['pod'] = data['pod']
+
                     fwd = KubeFwd(zuul_event_id=self.zuul_event_id,
                                   build=self.job.unique,
                                   kubeconfig=self.jobdir.kubeconfig,
@@ -2160,8 +2244,8 @@ class AnsibleJob(object):
                     try:
                         fwd.start()
                         self.port_forwards.append(fwd)
-                        all_vars['zuul']['resources'][
-                            node['name'][0]]['stream_port'] = fwd.port
+                        zuul_resources[node['name'][0]]['stream_port'] = \
+                            fwd.port
                     except Exception:
                         self.log.exception("Unable to start port forward:")
                         self.log.error("Kubectl and socat are required for "
@@ -2171,26 +2255,108 @@ class AnsibleJob(object):
         for node in resources_nodes:
             args['nodes'].remove(node)
 
-        nodes = self.getHostList(args)
-        setup_inventory = make_setup_inventory_dict(nodes)
-        inventory = make_inventory_dict(nodes, args, all_vars)
+        self.host_list = self.getHostList(args)
 
-        with open(self.jobdir.setup_inventory, 'w') as setup_inventory_yaml:
-            setup_inventory_yaml.write(
-                yaml.safe_dump(setup_inventory, default_flow_style=False))
+        with open(self.jobdir.known_hosts, 'w') as known_hosts:
+            for node in self.host_list:
+                for key in node['host_keys']:
+                    known_hosts.write('%s\n' % key)
+        return zuul_resources
+
+    def prepareVars(self, args, zuul_resources):
+        all_vars = args['vars'].copy()
+        check_varnames(all_vars)
+
+        # Check the group and extra var names for safety; they'll get
+        # merged later
+        for group in args['groups']:
+            group_vars = args['group_vars'].get(group['name'], {})
+            check_varnames(group_vars)
+
+        check_varnames(args['extra_vars'])
+
+        zuul_vars = {}
+        # Start with what the client supplied
+        zuul_vars = args['zuul'].copy()
+        # Overlay the zuul.resources we set in prepareNodes
+        zuul_vars.update({'resources': zuul_resources})
+
+        # Add in executor info
+        zuul_vars['executor'] = dict(
+            hostname=self.executor_server.hostname,
+            src_root=self.jobdir.src_root,
+            log_root=self.jobdir.log_root,
+            work_root=self.jobdir.work_root,
+            result_data_file=self.jobdir.result_data_file,
+            inventory_file=self.jobdir.inventory)
+
+        with open(self.jobdir.zuul_vars, 'w') as zuul_vars_yaml:
+            zuul_vars_yaml.write(
+                yaml.safe_dump({'zuul': zuul_vars}, default_flow_style=False))
+
+        # Squash all and extra vars into localhost (it's not
+        # explicitly listed).
+        localhost = {
+            'name': 'localhost',
+            'host_vars': {},
+        }
+        host_list = self.host_list + [localhost]
+        self.original_hostvars = squash_variables(
+            host_list, args['groups'], all_vars,
+            args['group_vars'], args['extra_vars'])
+
+    def loadFrozenHostvars(self):
+        # Read in the frozen hostvars, and remove the frozen variable
+        # from the fact cache.
+
+        # localhost hold our "all" vars.
+        localhost = {
+            'name': 'localhost',
+        }
+        host_list = self.host_list + [localhost]
+        for host in host_list:
+            self.log.debug("Loading frozen vars for %s", host['name'])
+            path = os.path.join(self.jobdir.fact_cache, host['name'])
+            facts = {}
+            if os.path.exists(path):
+                with open(path) as f:
+                    facts = json.loads(f.read())
+            self.frozen_hostvars[host['name']] = facts.pop('_zuul_frozen', {})
+            with open(path, 'w') as f:
+                f.write(json.dumps(facts))
+
+    def writeDebugInventory(self):
+        # This file is unused by Zuul, but the base jobs copy it to logs
+        # for debugging, so let's continue to put something there.
+        args = self.arguments
+        inventory = make_inventory_dict(
+            self.host_list, args['groups'], self.original_hostvars)
 
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
             inventory_yaml.write(
                 yaml.safe_dump(inventory, default_flow_style=False))
 
-        with open(self.jobdir.known_hosts, 'w') as known_hosts:
-            for node in nodes:
-                for key in node['host_keys']:
-                    known_hosts.write('%s\n' % key)
+    def writeSetupInventory(self):
+        jobdir_playbook = self.jobdir.setup_playbook
+        setup_inventory = make_setup_inventory_dict(
+            self.host_list, self.original_hostvars)
 
-        with open(self.jobdir.extra_vars, 'w') as extra_vars:
-            extra_vars.write(
-                yaml.safe_dump(args['extra_vars'], default_flow_style=False))
+        with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
+            # Write this inventory with !unsafe tags to avoid mischief
+            # since we're running without bwrap.
+            inventory_yaml.write(
+                yaml.ansible_unsafe_dump(setup_inventory,
+                                         default_flow_style=False))
+
+    def writeInventory(self, jobdir_playbook, hostvars):
+        args = self.arguments
+        inventory = make_inventory_dict(
+            self.host_list, args['groups'], hostvars,
+            remove_keys=jobdir_playbook.secrets_keys)
+
+        with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
+            inventory_yaml.write(
+                yaml.safe_dump(inventory, default_flow_style=False))
 
     def writeLoggingConfig(self):
         self.log.debug("Writing logging config for job %s %s",
@@ -2214,7 +2380,7 @@ class AnsibleJob(object):
             callback_path = self.callback_dir
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
-            config.write('inventory = %s\n' % self.jobdir.inventory)
+            config.write('inventory = %s\n' % jobdir_playbook.inventory)
             config.write('local_tmp = %s\n' % self.jobdir.local_tmp)
             config.write('retry_files_enabled = False\n')
             config.write('gathering = smart\n')
@@ -2224,8 +2390,11 @@ class AnsibleJob(object):
             config.write('library = %s\n'
                          % self.library_dir)
             config.write('command_warnings = False\n')
-            config.write('callback_plugins = %s\n' % callback_path)
-            config.write('stdout_callback = zuul_stream\n')
+            # Disable the Zuul callback plugins for the freeze playbooks
+            # as that output is verbose and would be confusing for users.
+            if jobdir_playbook != self.jobdir.freeze_playbook:
+                config.write('callback_plugins = %s\n' % callback_path)
+                config.write('stdout_callback = zuul_stream\n')
             config.write('filter_plugins = %s\n'
                          % self.filter_dir)
             config.write('nocows = True\n')  # save useless stat() calls
@@ -2559,7 +2728,7 @@ class AnsibleJob(object):
             ansible_version,
             command='ansible')
         cmd = [ansible, '*', verbose, '-m', 'setup',
-               '-i', self.jobdir.setup_inventory,
+               '-i', playbook.inventory,
                '-a', 'gather_subset=!all']
         if self.executor_variables_file is not None:
             cmd.extend(['-e@%s' % self.executor_variables_file])
@@ -2573,6 +2742,64 @@ class AnsibleJob(object):
             base_key = "zuul.executor.{hostname}.phase.setup"
             self.executor_server.statsd.incr(base_key + ".%s" %
                                              self.RESULT_MAP[result])
+        return result, code
+
+    def runAnsibleFreeze(self, playbook, ansible_version):
+        if self.executor_server.verbose:
+            verbose = '-vvv'
+        else:
+            verbose = '-v'
+
+        # Create a play for each host with set_fact, and every
+        # top-level variable.
+        plays = []
+        localhost = {
+            'name': 'localhost',
+        }
+        for host in self.host_list + [localhost]:
+            tasks = [{
+                'set_fact': {
+                    '_zuul_frozen': {},
+                    'cacheable': True,
+                },
+            }]
+            for var in self.original_hostvars[host['name']].keys():
+                val = "{{ _zuul_frozen | combine({'%s': %s}) }}" % (var, var)
+                task = {
+                    'set_fact': {
+                        '_zuul_frozen': val,
+                        'cacheable': True,
+                    },
+                    'ignore_errors': True,
+                }
+                tasks.append(task)
+            play = {
+                'hosts': host['name'],
+                'tasks': tasks,
+            }
+            if host['name'] == 'localhost':
+                play['gather_facts'] = False
+            plays.append(play)
+
+        self.log.debug("Freeze playbook: %s", repr(plays))
+        with open(self.jobdir.freeze_playbook.path, 'w') as f:
+            f.write(yaml.safe_dump(plays, default_flow_style=False))
+
+        cmd = [self.executor_server.ansible_manager.getAnsibleCommand(
+            ansible_version), verbose, playbook.path]
+
+        if self.executor_variables_file is not None:
+            cmd.extend(['-e@%s' % self.executor_variables_file])
+
+        cmd.extend(['-e', '@' + self.jobdir.ansible_vars_blacklist])
+        cmd.extend(['-e', '@' + self.jobdir.zuul_vars])
+
+        result, code = self.runAnsible(
+            cmd=cmd, timeout=self.executor_server.setup_timeout,
+            playbook=playbook, ansible_version=ansible_version)
+        self.log.debug("Ansible freeze complete, result %s code %s" % (
+            self.RESULT_MAP[result], code))
+
         return result, code
 
     def runAnsibleCleanup(self, playbook):
@@ -2632,6 +2859,11 @@ class AnsibleJob(object):
 
     def runAnsiblePlaybook(self, playbook, timeout, ansible_version,
                            success=None, phase=None, index=None):
+        if playbook.trusted or playbook.secrets_content:
+            self.writeInventory(playbook, self.frozen_hostvars)
+        else:
+            self.writeInventory(playbook, self.original_hostvars)
+
         if self.executor_server.verbose:
             verbose = '-vvv'
         else:
@@ -2639,10 +2871,6 @@ class AnsibleJob(object):
 
         cmd = [self.executor_server.ansible_manager.getAnsibleCommand(
             ansible_version), verbose, playbook.path]
-        if playbook.secrets_content:
-            cmd.extend(['-e', '@' + playbook.secrets])
-
-        cmd.extend(['-e', '@' + self.jobdir.extra_vars])
 
         if success is not None:
             cmd.extend(['-e', 'zuul_success=%s' % str(bool(success))])
@@ -2665,6 +2893,7 @@ class AnsibleJob(object):
 
         if not playbook.trusted:
             cmd.extend(['-e', '@' + self.jobdir.ansible_vars_blacklist])
+        cmd.extend(['-e', '@' + self.jobdir.zuul_vars])
 
         self.emitPlaybookBanner(playbook, 'START', phase)
 

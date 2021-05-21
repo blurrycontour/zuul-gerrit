@@ -21,7 +21,7 @@ import types
 import sqlalchemy as sa
 
 import zuul
-from zuul.lib.yamlutil import yaml
+from zuul.lib import yamlutil
 from tests.base import ZuulTestCase, FIXTURE_DIR, \
     PostgresqlSchemaFixture, MySQLSchemaFixture, ZuulDBTestCase, \
     BaseTestCase, AnsibleZuulTestCase
@@ -731,7 +731,8 @@ class TestElasticsearchConnection(AnsibleZuulTestCase):
         build = self.getJobFromHistory(job)
         for pb in getattr(build.jobdir, pbtype):
             if pb.secrets_content:
-                secrets.append(yaml.safe_load(pb.secrets_content))
+                secrets.append(
+                    yamlutil.ansible_unsafe_load(pb.secrets_content))
             else:
                 secrets.append({})
         return secrets

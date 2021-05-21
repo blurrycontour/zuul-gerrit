@@ -26,6 +26,7 @@ import zuul.model
 import gear
 
 from tests.base import (
+    BaseTestCase,
     ZuulTestCase,
     AnsibleZuulTestCase,
     FIXTURE_DIR,
@@ -957,3 +958,64 @@ class TestExecutorExtraPackages(AnsibleZuulTestCase):
         self.assertFalse(ansible_manager.validate())
         ansible_manager.install()
         self.assertTrue(ansible_manager.validate())
+
+
+class TestVarSquash(BaseTestCase):
+    def test_squash_variables(self):
+        # Test that we correctly squash job variables
+        nodes = [
+            {'name': 'node1', 'host_vars': {
+                'host': 'node1_host',
+                'extra': 'node1_extra',
+            }},
+            {'name': 'node2', 'host_vars': {
+                'host': 'node2_host',
+                'extra': 'node2_extra',
+            }},
+        ]
+        groups = [
+            {'name': 'group1', 'nodes': ['node1']},
+            {'name': 'group2', 'nodes': ['node2']},
+        ]
+        groupvars = {
+            'group1': {
+                'host': 'group1_host',
+                'group': 'group1_group',
+                'extra': 'group1_extra',
+            },
+            'group2': {
+                'host': 'group2_host',
+                'group': 'group2_group',
+                'extra': 'group2_extra',
+            },
+            'all': {
+                'all2': 'groupvar_all2',
+            }
+        }
+        jobvars = {
+            'host': 'jobvar_host',
+            'group': 'jobvar_group',
+            'all': 'jobvar_all',
+            'extra': 'jobvar_extra',
+        }
+        extravars = {
+            'extra': 'extravar_extra',
+        }
+        out = zuul.executor.server.squash_variables(
+            nodes, groups, jobvars, groupvars, extravars)
+
+        expected = {
+            'node1': {
+                'all': 'jobvar_all',
+                'all2': 'groupvar_all2',
+                'group': 'group1_group',
+                'host': 'node1_host',
+                'extra': 'extravar_extra'},
+            'node2': {
+                'all': 'jobvar_all',
+                'all2': 'groupvar_all2',
+                'group': 'group2_group',
+                'host': 'node2_host',
+                'extra': 'extravar_extra'},
+        }
+        self.assertEqual(out, expected)

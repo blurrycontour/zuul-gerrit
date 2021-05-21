@@ -110,3 +110,28 @@ def encrypted_dump(data, *args, **kwargs):
 
 def encrypted_load(stream, *args, **kwargs):
     return yaml.load(stream, *args, Loader=EncryptedLoader, **kwargs)
+
+
+# Add support for the Ansible !unsafe tag
+# Note that "unsafe" here is used differently than "safe" from PyYAML
+class AnsibleUnsafeDumper(yaml.SafeDumper):
+    def represent_str(self, data):
+        return self.represent_scalar('!unsafe', data)
+
+
+class AnsibleUnsafeLoader(yaml.SafeLoader):
+    pass
+
+
+AnsibleUnsafeDumper.add_representer(
+    str, AnsibleUnsafeDumper.represent_str)
+AnsibleUnsafeLoader.add_constructor(
+    '!unsafe', AnsibleUnsafeLoader.construct_yaml_str)
+
+
+def ansible_unsafe_dump(data, *args, **kwargs):
+    return yaml.dump(data, *args, Dumper=AnsibleUnsafeDumper, **kwargs)
+
+
+def ansible_unsafe_load(stream, *args, **kwargs):
+    return yaml.load(stream, *args, Loader=AnsibleUnsafeLoader, **kwargs)

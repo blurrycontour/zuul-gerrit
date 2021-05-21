@@ -21,6 +21,7 @@ import logging
 import os
 from itertools import chain
 
+import re
 import re2
 import struct
 import time
@@ -96,6 +97,8 @@ NODE_STATES = set([STATE_BUILDING,
 SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'  # Internal use only
+
+VARNAME_RE = re.compile(r'^[A-Za-z0-9_]+$')
 
 
 class ConfigurationErrorKey(object):
@@ -1106,6 +1109,9 @@ class PlaybookContext(ConfigObject):
             if secret_use.alias == 'zuul' or secret_use.alias == 'nodepool':
                 raise Exception('Secrets named "zuul" or "nodepool" '
                                 'are not allowed.')
+            if not VARNAME_RE.match(secret_use.alias):
+                raise Exception("Variable names may only contain letters, "
+                                "numbers, and underscores")
             if not secret.source_context.isSameProject(self.source_context):
                 raise Exception(
                     "Unable to use secret {name}.  Secrets must be "

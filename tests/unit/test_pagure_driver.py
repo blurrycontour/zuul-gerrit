@@ -21,6 +21,7 @@ import socket
 from testtools.matchers import MatchesRegex
 
 import zuul.rpcclient
+from zuul.lib import strings
 
 from tests.base import ZuulTestCase, simple_layout
 from tests.base import ZuulWebFixture
@@ -50,7 +51,8 @@ class TestPagureDriver(ZuulTestCase):
         self.assertEqual('master', zuulvars['branch'])
         self.assertEquals('https://pagure/org/project/pull-request/1',
                           zuulvars['items'][0]['change_url'])
-        self.assertEqual(zuulvars["message"], initial_comment)
+        self.assertEqual(zuulvars["message"],
+                         strings.b64encode(initial_comment))
         self.assertEqual(2, len(self.history))
         self.assertEqual(2, len(A.comments))
         self.assertEqual(

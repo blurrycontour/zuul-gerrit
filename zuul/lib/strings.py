@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import base64
 import os.path
 from urllib.parse import quote_plus
 
@@ -36,3 +37,8 @@ def workspace_project_path(hostname, project_name, scheme):
     elif scheme == zuul.model.SCHEME_FLAT:
         parts = project_name.split('/')
         return os.path.join(parts[-1])
+
+
+def b64encode(string):
+    # Return a base64 encoded string (the module operates on bytes)
+    return base64.b64encode(string.encode('utf8')).decode('utf8')
