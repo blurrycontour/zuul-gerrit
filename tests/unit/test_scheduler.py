@@ -410,6 +410,15 @@ class TestScheduler(ZuulTestCase):
             'zuul.tenant.tenant-one.pipeline.gate.total_changes', value='1',
             kind='c')
         self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.trigger_events',
+            value='0', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.result_events',
+            value='0', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.management_events',
+            value='0', kind='g')
+        self.assertReportedStat(
             'zuul.tenant.tenant-one.pipeline.gate.project.review_example_com.'
             'org_project.master.resident_time', kind='ms')
         self.assertReportedStat(
