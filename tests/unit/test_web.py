@@ -152,6 +152,9 @@ class TestWeb(BaseTestWeb):
             data["connection_event_queues"]["gerrit"]["length"], 0)
 
         for p in data['pipelines']:
+            self.assertEqual(p["trigger_events"], 0)
+            self.assertEqual(p["result_events"], 0)
+            self.assertEqual(p["management_events"], 0)
             for q in p['change_queues']:
                 if p['name'] in ['gate', 'conflict']:
                     self.assertEqual(q['window'], 20)
