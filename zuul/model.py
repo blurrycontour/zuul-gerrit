@@ -1309,6 +1309,7 @@ class Job(ConfigObject):
             start_mark=None,
             inheritance_path=(),
             parent_data=None,
+            secret_parent_data=None,
             artifact_data=None,
             description=None,
             variant_description=None,
@@ -1566,6 +1567,13 @@ class Job(ConfigObject):
         if 'zuul' in v:
             del v['zuul']
         self.parent_data = v
+
+        secret_other_vars = other_build.secret_result_data
+        v = self.secret_parent_data or {}
+        v = Job._deepUpdate(secret_other_vars, v)
+        if 'zuul' in v:
+            del v['zuul']
+        self.secret_parent_data = v
 
         artifact_data = self.artifact_data or []
         artifacts = get_artifacts_from_result_data(other_vars)

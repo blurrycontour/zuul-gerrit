@@ -4464,7 +4464,7 @@ class TestDataReturn(AnsibleZuulTestCase):
 
         # zuul_return data is set correct
         j = json.loads(_get_file(paused_job.jobdir.result_data_file))
-        self.assertEqual(j["build_id"], paused_job.uuid)
+        self.assertEqual(j["data"]["build_id"], paused_job.uuid)
 
         # Stop the job worker to simulate an executor restart
         for job_worker in self.executor_server.job_workers.values():
@@ -4492,7 +4492,7 @@ class TestDataReturn(AnsibleZuulTestCase):
 
         # zuul_return data is set correct to new build id
         j = json.loads(_get_file(retried_build.jobdir.result_data_file))
-        self.assertEqual(j["build_id"], retried_build.uuid)
+        self.assertEqual(j["data"]["build_id"], retried_build.uuid)
 
         self.assertNotIn(first_build.uuid,
                          _get_file(print_build.jobdir.job_output_file))

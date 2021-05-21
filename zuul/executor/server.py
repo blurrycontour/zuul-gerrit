@@ -917,7 +917,10 @@ class AnsibleJob(object):
 
         self.paused = True
 
-        data = {'paused': self.paused, 'data': self.getResultData()}
+        result_data, secret_result_data = self.getResultData()
+        data = {'paused': self.paused,
+                'data': result_data,
+                'secret_data': secret_result_data}
         self.executor_server.pauseBuild(self.job, data)
         self._resume_event.wait()
 
@@ -1230,24 +1233,31 @@ class AnsibleJob(object):
 
         if self.aborted_reason == self.RESULT_DISK_FULL:
             result = 'DISK_FULL'
-        data = self.getResultData()
+        data, secret_data = self.getResultData()
         warnings = []
         self.mapLines(merger, args, data, item_commit, warnings)
         warnings.extend(get_warnings_from_result_data(data, logger=self.log))
-        result_data = dict(result=result, warnings=warnings, data=data)
+        result_data = dict(result=result,
+                           warnings=warnings,
+                           data=data,
+                           secret_data=secret_data)
+        # TODO do we want to log the secret data here?
         self.log.debug("Sending result: %s", result_data)
         self.executor_server.completeBuild(self.job, result_data)
 
     def getResultData(self):
         data = {}
+        secret_data = {}
         try:
             with open(self.jobdir.result_data_file) as f:
                 file_data = f.read()
                 if file_data:
-                    data = json.loads(file_data)
+                    file_data = json.loads(file_data)
+                    data = file_data.get('data', {})
+                    secret_data = file_data.get('secret_data', {})
         except Exception:
             self.log.exception("Unable to load result data:")
-        return data
+        return data, secret_data
 
     def mapLines(self, merger, args, data, commit, warnings):
         # The data and warnings arguments are mutated in this method.
@@ -1492,7 +1502,7 @@ class AnsibleJob(object):
                     return None
 
         # check if we need to pause here
-        result_data = self.getResultData()
+        result_data, secret_result_data = self.getResultData()
         pause = result_data.get('zuul', {}).get('pause')
         if success and pause:
             self.pause()
@@ -1790,6 +1800,7 @@ class AnsibleJob(object):
             self.prepareRole(jobdir_playbook, role, args)
 
         secrets = self.decryptSecrets(playbook['secrets'])
+        secrets = self.mergeSecretVars(secrets, args)
         if secrets:
             check_varnames(secrets)
             jobdir_playbook.secrets_content = yaml.safe_dump(
@@ -1913,6 +1924,40 @@ class AnsibleJob(object):
                             project.canonical_hostname,
                             project.name)
         return path
+
+    def mergeSecretVars(self, secrets, args):
+        '''
+        Merge secret return data with secrets.
+
+        :arg secrets dict: Actual Zuul secrets.
+        :arg args dict: The job arguments.
+        '''
+
+        secret_vars = args.get('secret_vars') or {}
+
+        # We need to handle secret vars specially.  We want to pass
+        # them to Ansible as we do secrets with a -e file, but we want
+        # them to have the lowest priority.  In order to accomplish
+        # that, we will simply remove any top-level secret var with
+        # the same name as anything above it in precedence.
+
+        other_vars = set()
+        other_vars.update(args['vars'].keys())
+        for group_vars in args['group_vars'].values():
+            other_vars.update(group_vars.keys())
+        for host_vars in args['host_vars'].values():
+            other_vars.update(host_vars.keys())
+        other_vars.update(secrets.keys())
+
+        ret = secret_vars.copy()
+        for key in other_vars:
+            ret.pop(key, None)
+
+        # Add in the actual secrets
+        if secrets:
+            ret.update(secrets)
+
+        return ret
 
     def prepareRole(self, jobdir_playbook, role, args):
         if role['type'] == 'zuul':

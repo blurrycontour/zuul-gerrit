@@ -1590,6 +1590,7 @@ class Scheduler(threading.Thread):
         # with child job skipping.
         build.paused = True
         build.result_data = event.data.get("data", {})
+        build.secret_result_data = event.data.get("secret_data", {})
 
         log = get_annotated_logger(self.log, build.zuul_event_id)
         if build.build_set is not build.build_set.item.current_build_set:
@@ -1780,6 +1781,7 @@ class Scheduler(threading.Thread):
                 build.retry = True
 
         result_data = event_result.get("data", {})
+        secret_result_data = event_result.get("secret_data", {})
         warnings = event_result.get("warnings", [])
 
         log.info("Build complete, result %s, warnings %s", result, warnings)
@@ -1795,6 +1797,7 @@ class Scheduler(threading.Thread):
 
         build.end_time = event_result["end_time"]
         build.result_data = result_data
+        build.secret_result_data = secret_result_data
         build.build_set.warning_messages.extend(warnings)
 
         build.result = result

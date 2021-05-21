@@ -2948,7 +2948,7 @@ class FakeBuild(object):
         if data is None:
             return
         with open(self.jobdir.result_data_file, 'w') as f:
-            f.write(json.dumps(data))
+            f.write(json.dumps({'data': data}))
 
     def hasChanges(self, *changes):
         """Return whether this build has certain changes in its git repos.

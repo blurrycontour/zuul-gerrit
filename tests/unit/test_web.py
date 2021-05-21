@@ -1058,6 +1058,7 @@ class TestWeb(BaseTestWeb):
             'extra_vars': {},
             'host_vars': {},
             'group_vars': {},
+            'secret_vars': None,
             'zuul': {
                 '_inheritance_path': [
                     '<Job base branches: None source: '

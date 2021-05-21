@@ -77,6 +77,12 @@
     name: data-return-cd
     run: playbooks/data-return-cd.yaml
 
+# Used to test returned secret data precedence.
+- secret:
+    name: test_secret
+    data:
+      password: fromsecret
+
 # This child job will be skipped in the test case test_data_return_child_jobs.
 # In order to verify that this doesn't lead to node leaks attach a nodeset to
 # it. Each test case automatically verifies that there are no open node
@@ -88,6 +94,23 @@
       nodes:
         - name: node
           label: test
+      groups:
+        - name: group1
+          nodes: node
+    # Include a bunch of variables + secret to test returned secret
+    # data precedence.
+    secrets:
+      - test_secret
+    vars:
+      jobvar: job
+    host-vars:
+      node:
+        hostvar: host
+    group-vars:
+      group1:
+        groupvar: group
+    extra-vars:
+      extravar: extra
 
 - job:
     name: several-zuul-return-parent

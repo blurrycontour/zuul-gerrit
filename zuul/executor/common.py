@@ -143,6 +143,7 @@ def construct_gearman_params(uuid, sched, nodeset, job, item, pipeline,
     params['extra_vars'] = job.extra_variables
     params['host_vars'] = job.host_variables
     params['group_vars'] = job.group_variables
+    params['secret_vars'] = job.secret_parent_data
     params['zuul'] = zuul_params
     projects = set()
     required_projects = set()

@@ -792,6 +792,21 @@ path to a JSON-formatted file with that data. For example:
     - zuul_return:
         file: /path/to/data.json
 
+Normally returned data are provided to dependent jobs in the inventory
+file, which may end up in the log archive of a job.  In the case where
+sensitive data must be provided to dependent jobs, the ``secret_data``
+attribute may be used instead, and the data will be provided via the
+same mechanism as job secrets, where the data are not written to disk
+in the work directory.  Care must still be taken to avoid displaying
+or storing sensitive data within the job.  For example:
+
+.. code-block:: yaml
+
+  tasks:
+    - zuul_return:
+        secret_data:
+          password: foobar
+
 .. TODO: xref to section describing formatting
 
 Any values other than those in the ``zuul`` hierarchy will be supplied

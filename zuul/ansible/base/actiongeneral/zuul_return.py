@@ -86,33 +86,42 @@ def merge_file_comments(dict_a, dict_b):
     return file_comments
 
 
-def set_value(path, new_data, new_file):
+def set_value(path, new_data, new_file, new_secret_data, new_secret_file):
     workdir = os.path.dirname(path)
     data = None
+    secret_data = None
 
     # Read any existing zuul_return data.
     if os.path.exists(path):
         with open(path, 'r') as f:
-            data = f.read()
-    if data:
-        data = json.loads(data)
+            file_data = f.read()
+    if file_data:
+        file_data = json.loads(file_data)
+        data = file_data['data']
+        secret_data = file_data['secret_data']
     else:
         data = {}
+        secret_data = {}
 
     # If a file of data was supplied, merge its contents.
     if new_file:
         with open(new_file, 'r') as f:
             merge_data(json.load(f), data)
+    if new_secret_file:
+        with open(new_secret_file, 'r') as f:
+            merge_data(json.load(f), secret_data)
 
     # If a 'data' value was supplied, merge it.
     if new_data:
         merge_data(new_data, data)
+    if new_secret_data:
+        merge_data(new_secret_data, secret_data)
 
     # Replace our results file ('path') with the updated data.
     (f, tmp_path) = tempfile.mkstemp(dir=workdir)
     try:
         f = os.fdopen(f, 'w')
-        json.dump(data, f)
+        json.dump({'data': data, 'secret_data': secret_data}, f)
         f.close()
         os.rename(tmp_path, path)
     except Exception:
@@ -128,11 +137,13 @@ class ActionModule(ActionBase):
         Our plugin currently accepts these arguments:
 
            data - A dictionary of arbitrary data to return to Zuul.
+           secret_data - The same, but secret data.
            path - File location on the executor to store the return data.
                   Unlikely to be supplied.
            file - A JSON-formatted file storing the data to return to Zuul.
                   This can be used instead of, or in conjunction with, the
                   'data' argument to return large amounts of data.
+           secret_file - The same, but secret data.
 
         Note: The plugin parameters are stored in the self._task.args variable.
 
@@ -156,6 +167,10 @@ class ActionModule(ActionBase):
             return paths._fail_dict(path)
 
         set_value(
-            path, self._task.args.get('data'), self._task.args.get('file'))
+            path,
+            self._task.args.get('data'),
+            self._task.args.get('file'),
+            self._task.args.get('secret_data'),
+            self._task.args.get('secret_file'))
 
         return results
