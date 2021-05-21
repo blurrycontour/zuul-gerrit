@@ -1524,6 +1524,9 @@ class GerritConnection(BaseConnection):
         self._stop_ref_watcher_thread()
         self._stop_event_connector()
 
+    def getEventQueue(self):
+        return getattr(self, "event_queue", None)
+
     def _stop_watcher_thread(self):
         if self.watcher_thread:
             self.watcher_thread.stop()

@@ -387,6 +387,12 @@ class Scheduler(threading.Thread):
                           self.result_event_queue.qsize())
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           len(self.management_events))
+        base = 'zuul.scheduler.eventqueues.connection'
+        for connection in self.connections.connections.values():
+            queue = connection.getEventQueue()
+            if queue is not None:
+                self.statsd.gauge(f'{base}.{connection.connection_name}',
+                                  len(queue))
 
     def runCleanup(self):
         # Run the first cleanup immediately after the first
@@ -1874,6 +1880,13 @@ class Scheduler(threading.Thread):
             self.result_event_queue.qsize()
         data['management_event_queue'] = {}
         data['management_event_queue']['length'] = len(self.management_events)
+        data['connection_event_queues'] = {}
+        for connection in self.connections.connections.values():
+            queue = connection.getEventQueue()
+            if queue is not None:
+                data['connection_event_queues'][connection.connection_name] = {
+                    'length': len(queue),
+                }
 
         if self.last_reconfigured:
             data['last_reconfigured'] = self.last_reconfigured * 1000

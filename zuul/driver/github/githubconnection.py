@@ -2208,6 +2208,9 @@ class GithubConnection(CachedBranchConnection):
     def getWebController(self, zuul_web):
         return GithubWebController(zuul_web, self)
 
+    def getEventQueue(self):
+        return getattr(self, "event_queue", None)
+
     def validateWebConfig(self, config, connections):
         if 'webhook_token' not in self.connection_config:
             raise Exception(
