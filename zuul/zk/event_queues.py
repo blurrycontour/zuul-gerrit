@@ -202,7 +202,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
                 self.log.exception("Malformed event data in %s", path)
                 self._remove(path)
                 continue
-            yield event, EventAckRef(path, zstat.version)
+            yield event, EventAckRef(path, zstat.version), zstat
 
     def _remove(self, path, version=UNKNOWN_ZVERSION):
         with suppress(NoNodeError):
@@ -334,7 +334,7 @@ class ManagementEventQueue(SchedulerEventQueue):
 
     def __iter__(self):
         event_list = []
-        for data, ack_ref in self._iterEvents():
+        for data, ack_ref, zstat in self._iterEvents():
             try:
                 event_class = MANAGEMENT_EVENT_TYPE_MAP[data["event_type"]]
                 event_data = data["event_data"]
@@ -346,6 +346,9 @@ class ManagementEventQueue(SchedulerEventQueue):
             event = event_class.fromDict(event_data)
             event.ack_ref = ack_ref
             event.result_ref = result_path
+            # Initialize the logical timestamp if not valid
+            if event.zuul_event_ltime is None:
+                event.zuul_event_ltime = zstat.creation_transaction_id
 
             with suppress(ValueError):
                 other_event = event_list[event_list.index(event)]
@@ -464,7 +467,7 @@ class PipelineResultEventQueue(SchedulerEventQueue):
         self._put(data)
 
     def __iter__(self):
-        for data, ack_ref in self._iterEvents():
+        for data, ack_ref, _ in self._iterEvents():
             try:
                 event_class = RESULT_EVENT_TYPE_MAP[data["event_type"]]
                 event_data = data["event_data"]
@@ -494,7 +497,7 @@ class TriggerEventQueue(SchedulerEventQueue):
         self._put(data)
 
     def __iter__(self):
-        for data, ack_ref in self._iterEvents():
+        for data, ack_ref, _ in self._iterEvents():
             try:
                 event_class = self.connections.getTriggerEventClass(
                     data["driver_name"]
@@ -577,7 +580,7 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
         self._put(data)
 
     def __iter__(self):
-        for data, ack_ref in self._iterEvents():
+        for data, ack_ref, _ in self._iterEvents():
             if not data:
                 self.log.warning("Malformed event found: %s", data)
                 self._remove(ack_ref.path)
