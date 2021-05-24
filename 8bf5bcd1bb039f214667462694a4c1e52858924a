@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5df66639_f58778ea",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1440,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 0,
+      "message": "Why is this removed?",
+      "revId": "8bf5bcd1bb039f214667462694a4c1e52858924a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7137a5ef_e8640e87",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2951,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 0,
+      "message": "Why remove this?",
+      "revId": "8bf5bcd1bb039f214667462694a4c1e52858924a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dba08ae6_a379df08",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1691,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 0,
+      "message": "DISCONNECT is dead code we forgot to remove earlier.",
+      "revId": "8bf5bcd1bb039f214667462694a4c1e52858924a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}

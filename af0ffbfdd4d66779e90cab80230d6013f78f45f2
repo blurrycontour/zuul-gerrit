@@ -1,0 +1,259 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4516e1d_0dc23f68",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "This seems like a build attribute, not a job attribute, so shouldn\u0027t be here.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "082baf2d_625798b6",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b2fc1b8d_2e77b0a0",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Sounds reasonable.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3f5f1ab7_7948fe07",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Honestly, I\u0027d rather go the other way and use the explicit hierarchy.  If zuul.model is too verbose, then let\u0027s just:\n  from zuul import model\nBut for now, let\u0027s just try to keep this change small and not move the scheme into this; there are too many lines changed.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1364ef6a_db622a75",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 835,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Undo.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10e5b99a_1ce022b0",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1851,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Undo.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ffd20e94_9289111b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1891,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Undo.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f98a1322_769fd106",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 1901,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Undo.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "56a8455f_b848b19f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3171,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "This comment is confusing and led me down an erroneous path.  Instead I suggest:\n\n# Add the worker before locking the node; if the lock fails, the lock method will ensure that the worker is removed.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c230a9a8_bcf216ab",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 3176,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Why lock the nodes here and now?  Why not hove this inside the run method of the AnsibleJob?",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d15881fc_29833b27",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Do we need them at all?",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d979b613_c028375e",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2299,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "This seems like it should stay.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "59861bc8_df120175",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "Agreed; I don\u0027t see a way for this to happen.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "049d40d3_51f14ffe",
+        "filename": "zuul/nodepool.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "I think this is similar to the above, yes.  An internal state change within the scheduler which doesn\u0027t apply any more.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "aa50fee2_a9acd5f6",
+        "filename": "zuul/zk/nodepool.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2021-05-24T21:05:10Z",
+      "side": 1,
+      "message": "I\u0027d rather treat this as an error to make sure we catch bugs.  Better to handle the lock failure separately.",
+      "revId": "af0ffbfdd4d66779e90cab80230d6013f78f45f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": false
+    }
+  ]
+}
