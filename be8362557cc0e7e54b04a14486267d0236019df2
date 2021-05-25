@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a9d50645_4015cf12",
+        "filename": "doc/source/reference/job_def.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-25T22:43:30Z",
+      "side": 1,
+      "message": "I think order of the semaphores in the job configs matters too in order to reduce contention. You want all jobs to use a consistent ordering of semaphores so that they aren\u0027t acquired in different orders by different jobs causing multiple jobs to all get their first semaphore but then fail to get the second because the second is the first semaphore for some other job.\n\nWe can document that as something users need to be mindful of in their configs or we could apply a sort order internally.",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b6603a3_8d8307a2",
+        "filename": "releasenotes/notes/semaphore-resources-295dceaf7ddbab0d.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-25T22:43:30Z",
+      "side": 1,
+      "message": "Nit should this be \"semaphores\" ?",
+      "range": {
+        "startLine": 13,
+        "startChar": 8,
+        "endLine": 13,
+        "endChar": 17
+      },
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "864e4073_575b7dab",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 7866,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-25T22:43:30Z",
+      "side": 1,
+      "message": "One thing this test doesn\u0027t really cover is when there is a bunch of contention for the semaphores.\n\nWe might want to consider another test that doesn\u0027t care which order jobs run in but that they all eventually complete if they use shared semaphores.",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "abad269e_b3d5ccc2",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1715,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2021-05-25T22:43:30Z",
+      "side": 1,
+      "message": "I think this is a slight behavior change where parent semaphores won\u0027t be overridden but appended to. That shoudl probably go into the docs and release notes?",
+      "revId": "be8362557cc0e7e54b04a14486267d0236019df2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543",
+      "unresolved": true
+    }
+  ]
+}
